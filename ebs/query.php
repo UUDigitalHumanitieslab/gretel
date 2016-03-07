@@ -2,6 +2,7 @@
 <!-- query.php -->
 <!-- query summary -->
 
+<!-- version 0.7 date: 01.03.2013  log subtrees -->
 <!-- version 0.6 date: 12.12.2014  page loader added -->
 <!-- version 0.5 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
@@ -53,6 +54,7 @@ $continue='<div style="float:right"><button type="Submit" value="Continue" class
 
 // log files
 $grtllog="$log/gretel-ebq.log";
+$treelog="$log/gretel-querytrees.log";
 
 if ($_POST['treebank']) {
   $treebank=$_POST['treebank']; 
@@ -122,6 +124,12 @@ chop($xpath);
 $log = fopen($grtllog, "a");  //concatenate
 fwrite($log, "$date\t$user\t$id-$time\t$sm\t$treebank\tAUTOXP\t$xpath");
 fclose($log);
+
+  //log query tree
+$qtree = file_get_contents("$tmp/$id-sub.xml");
+$tlog = fopen($treelog, "a");  //concatenate
+fwrite($tlog, "<alpino_ds id=\"$id-$time\">$qtree\n</alpino_ds>\n");
+fclose($tlog);
 
 // add style to query tree
 `perl  $scripts/sub2tree.pl $tmp/$id-sub.xml '//node[@rel]' 'ptsonar' > $tmp/$id-sub-style.xml`;
