@@ -94,7 +94,6 @@ $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $step="step_three";
 $title="<h1>Step 3: Results</h1><hr/>";
-$iframe="<iframe height=\"450px\"  name=\"treeimg\" src=\"http://nederbooms.ccl.kuleuven.be/pics/click-tree.png\">Sorry, your browser does not support iframes.</iframe>\n";
 
 // messages and documentation
 $export="$home/scripts/SaveResults.php?"; // script for downloading the results

@@ -2,6 +2,7 @@
 <!-- query.php -->
 <!-- query summary -->
 
+<!-- version 0.6 date: 12.12.2014  page loader added -->
 <!-- version 0.5 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
 <!-- for the GrETEL2.0 project -->
@@ -12,9 +13,22 @@
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 require 'header.php';?>
+
+<script type="text/javascript">
+// show loading div
+$(document).ready(function(){
+    $('button[type="submit"]').click(function(){
+	$(".loading").show();
+      });
+  });
+</script>
 </head>
 
 <body>
+<div class="loading" style="display:none;">
+<p>Loading... Please wait</p>
+</div>
+
 <div id="container">
 <?php
 session_cache_limiter('private'); // avoids page reload when going back

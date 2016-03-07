@@ -97,7 +97,6 @@ $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $step="step_six";
 $title="<h1>Step 6: Results</h1><hr/>";
-$iframe="<iframe height=\"450px\"  name=\"treeimg\" src=\"http://nederbooms.ccl.kuleuven.be/pics/click-tree.png\">Sorry, your browser does not support iframes.</iframe>\n";
 
 // messages and documentation
 $span="<span id=\"span_ID\">no sentence selected</span>";
@@ -446,6 +445,7 @@ else {
 	fclose($pipes[1]);
 	fclose($pipes[2]);
 	proc_terminate($process); // terminate the process and continue with other tasks
+	session_write_close();
       }
       
        elseif ($output == "__END__") {

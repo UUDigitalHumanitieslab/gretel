@@ -281,7 +281,7 @@ function SetDB2Corpus($corpus) {
     $CORPUS['CGN_ID_VL']="VL";
     $CORPUS['CGN_ID_VM']="VM";
     $CORPUS['CGN_ID_VN']="VN";
-    $CORPUS['CGN_ID_VO']="VN";
+    $CORPUS['CGN_ID_VO']="VO";
   }
   
   elseif ($corpus == 'sonar') {

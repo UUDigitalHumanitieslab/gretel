@@ -3,6 +3,7 @@
 # GetSubtree.pl
 # Subtree finder which extracts a subtree from an Alpino XML tree
 
+# version 1.7 date: 15.12.2014  bug fix
 # version 1.6 date: 15.10.2014  RELEASED WITH GrETEL2.0
 # written by Liesbeth Augustinus (c) 2014
 # for the GrETEL2.0 project
@@ -90,6 +91,7 @@ if ($opt_r) {
 }
 
 # get XML
+#my $inputxml=shift(@ARGV);
 my $inputxml=$opt_xml;
 
 my $twig=XML::Twig->new(pretty_print => 'indented');    # create the twig
@@ -374,6 +376,7 @@ sub initialize {
 		'pos'=> 'vwtype',
 		'vrag'=> 'vwtype',
 		'betr'=> 'vwtype',
+		'bez'=> 'vwtype',
 		'vb'=> 'vwtype',
 		'excl'=> 'vwtype',
 		'aanw'=> 'vwtype',

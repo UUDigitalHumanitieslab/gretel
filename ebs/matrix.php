@@ -2,6 +2,7 @@
 <!-- matrix.php -->
 <!-- script returns the parsed input construction in a matrix -->
 
+<!-- version 0.7 date: 12.12.2014  bug fix -->
 <!-- version 0.6 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
 <!-- for the GrETEL2.0 project -->
@@ -64,7 +65,7 @@ $inputzoom=$home."/tmp/$id-style-zoom.xml?$time";
 
 /***********************************************************/
 /* INFO + OPTIONS*/
-$info='<p>Indicate the relevant<a href="#" class="clickMe" tooltip="In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones. The latter do not need to be represented in the sentences found. The obligatory elements are to be represented, be it as an element of the same word class, any form of a specific lemma, or a specific word form."><sup>[?]</sup></a>  parts of the sentence, i.e. the parts you are interested in. [<a href="'.$inputzoom.'" target="_blank">view input parse</a>]</p>';
+$info='<p>Indicate the relevant<a href="#" class="clickMe" tooltip="In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones. The latter do not need to be represented in the search results.<br/> The obligatory elements have to be included in the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form."><sup>[?]</sup></a>  parts of the sentence, i.e. the parts you are interested in. [<a href="'.$inputzoom.'" target="_blank">view input parse</a>]</p>';
 
 $basicguidelines='<p><b>GUIDELINES</b></p>
 <ul>
@@ -81,7 +82,7 @@ $advancedguidelines='<p><b>GUIDELINES</b></p>
 <li><b>detailed word class</b>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
 <li><b>word class</b>: Short Dutch part-of-speech tag. The different tags are: <tt>n</tt> (noun), <tt>ww</tt> (verb), <tt>adj</tt> (adjective), <tt>lid</tt> (article), <tt>vnw</tt> (pronoun), <tt>vg</tt> (conjunction), <tt>bw</tt> (adverb), <tt>tw</tt> (numeral), <tt>vz</tt> (preposition), <tt>tsw</tt> (interjection), <tt>spec</tt> (special token)</tt>, and <tt>let</tt> (punctuation).</li>
 <li><b>optional in search</b>: The word will be ignored in the search instruction. It may be included in the results, but it is not necessary.</li>
-<li><b>NOT in search</b>: The word will be excluded from the search instruction. It will not be included in the results.</li>
+<li><b>NOT in search</b>: The word class and the dependency relation  will be excluded from the search instruction. They will not be included in the results.</li>
 </ul>';
 
 $options='<p><b>OPTIONS</b></p>
@@ -157,11 +158,11 @@ foreach ($sentence as $key=>$word) {
 
   // do not check punctuation marks
 
- if (preg_match("/\w/", $word))  {
-    echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\" checked /></td>";
+ if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word) )  {
+    echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\"/></td>";
   }  
   else {
-    echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\" /></td>";
+    echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\" checked /></td>";
   }
 
 }
@@ -171,8 +172,8 @@ foreach ($sentence as $key=>$word) {
   $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
   $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
   
-  // check punctuation marks
-  if (preg_match("/\W/", $word))  {
+ // check punctuation marks
+  if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word))  {
     echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"na\" checked /></td>";
   }  
   else {

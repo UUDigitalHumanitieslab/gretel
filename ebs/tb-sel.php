@@ -2,6 +2,8 @@
 <!-- tb-sel.php -->
 <!-- script for treebank selection; generates query tree and XPath in the background -->
 
+<!-- version 0.8 date: 19.03.2015  bug fix (add -CS for utf8 output) -->
+<!-- version 0.7 date: 12.12.2014  bug fix -->
 <!-- version 0.6 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
 <!-- for the GrETEL2.0 project -->
@@ -138,8 +140,8 @@ $sentencearray = explode(" ", $sentence);
 
 // add info annotation matrix to alpino parse
 foreach($sentencearray as $begin => $word) { 
-  $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-  $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
+  //$word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
+  //$word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
   $postword=preg_replace('/\./','_' , $word); // dots are internally changed to underscores in POST variables
   $postvalue=$_POST["$postword--$begin"];
   
@@ -170,7 +172,7 @@ else {
   $remove="-r rel";
 }
 
-`perl $scripts/GetSubtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
+`perl -CS $scripts/GetSubtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
 
 if (isset($_POST['order'])) {
   $order="-order"; 
@@ -183,7 +185,7 @@ else {
 
 // get XPath
 $attsout="-ex postag,begin"; // attributes to be excluded from XPath
-$xpath = `perl $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
+$xpath = `perl -CS $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
 $xpath = preg_replace('/@cat="\s+"/',"@cat",$xpath); // underspecify empty attribute values
 $_SESSION['xpath']="$xpath";
 

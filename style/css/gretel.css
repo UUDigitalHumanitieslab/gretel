@@ -55,6 +55,7 @@ cursor:help;
 a.hovertip {
   position: relative;
   text-decoration: none;
+#  color: black;
 }
 a.hovertip span {display: none;}
 a.hovertip:hover span {
@@ -64,6 +65,7 @@ a.hovertip:hover span {
   content: attr(title);
   min-width: 120px;
   text-align: left;
+#  text-align: center;
   width: auto;
   height: auto;
   white-space: nowrap;
@@ -91,6 +93,7 @@ div.hovertip:hover span {
   content: attr(title);
   min-width: 120px;
   text-align: left;
+#  text-align: center;
   width: auto;
   height: auto;
   white-space: nowrap;
@@ -101,11 +104,14 @@ div.hovertip:hover span {
   border-radius:10px;    
   color: #fff;
   font-size: .86em;
+
+
 }
 
 /* Navigation */
 table.navigation {
-    width: 100%;
+    width: 100%;    
+    //table-layout: fixed;
 }
 
 .home {
@@ -129,7 +135,7 @@ table.navigation {
     color: white;
     text-decoration: none; 
     padding: 0px 15 0px 50px;
-    background: transparent ; /* fallback color */
+    background: transparent ;// grey;                   /* fallback color */
     position: relative; 
     display: block;
     float: left;
@@ -167,6 +173,69 @@ table.navigation {
    padding-left: 10px;
    
 }
+
+.circle p{
+    padding-top: 15px;
+    text-align: center;
+}
+
+.ellipse { 
+    list-style: none; 
+    overflow: hidden; 
+    //font: 18px Helvetica, Arial, Sans-Serif;
+    margin-left:-40px;
+    font-size: 15px;
+    
+}
+.ellipse li { 
+    float: left;
+    background: #C0C0C0; //grey;
+    width: 120px;
+    height: 50px;
+    border-radius: 25px; // a complete circle requires the border radius to be half of your width/height // rectangular if no border-radius
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+}
+.ellipse li p {
+    color: white;
+    text-decoration: none; 
+    padding: 0px 0px 0px 20px;
+    background: transparent ;// grey;                   /* fallback color */
+    position: relative; 
+    display: block;
+    float: left;
+    text-align: center;
+}
+
+
+.circular { 
+    list-style: none; 
+    overflow: hidden; 
+    //font: 18px Helvetica, Arial, Sans-Serif;
+    margin-left:-40px;
+    font-size: 15px;
+    
+}
+.circular li { 
+    float: left;
+    background: #C0C0C0; //grey;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px; // a complete circle requires the border radius to be half of your width/height
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+}
+.circular li p {
+    color: white;
+    text-decoration: none; 
+    padding: 0px 0px 0px 20px;
+    background: transparent ;// grey;                   /* fallback color */
+    position: relative; 
+    display: block;
+    float: left;
+    text-align: center;
+}
+
 
 #step_one li:nth-child(1) {
  background-color: #b4c24b;
@@ -290,9 +359,11 @@ table.navigation {
 
 div.tableWrapper {
 	clear: both;
+	# border: 1px solid #963;
 	width: 100%;
 	height: 500px;
 	overflow: hidden;
+	# background-color: #b4c24b;
 }
 
 table.sortable {
@@ -319,4 +390,24 @@ a.match {
 .match:hover {
     color:  grey;
     font-weight:bold;
+}
+
+/* loading image */
+.loading {
+position:absolute;
+z-index:100;
+  //border:3px double #999;
+width:300px;
+height:300px;
+margin-top:-150px;
+margin-left:-150px;
+top:50%;
+left:50%;
+text-align:center;
+line-height:300px;
+font-size:20pt;
+//background: #f7f7f7;
+background: url('../../img/gretel_logo_trans.png'),url('../../img/page-loader.gif') 50% 50% no-repeat rgb(249,249,249);
+background-size: 300px 300px;
+  //background: url('../../img/page-loader.gif') 50% 50% no-repeat rgb(249,249,249);
 }

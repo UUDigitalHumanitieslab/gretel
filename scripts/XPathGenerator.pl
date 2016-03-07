@@ -2,6 +2,8 @@
 # XPathGenerator.pl
 # Alpino-XML XPath Generator
 
+# version 1.7 date: 10.06.2015  bug fix (@number)
+# version 1.6 date: 15.12.2014  bug fix (ignore not-function if word order is checked)
 # version 1.5 date: 14.10.2014  RELEASED WITH GrETEL2.0
 # written by Vincent Vandeghinste and Liesbeth Augustinus (c) 2014
 # for the GrETEL2.0 project
@@ -121,6 +123,7 @@ else {
 my $topxpath=GetXPath($subtree,$attsin,$attsout);
 $xpath=ProcessTree($subtree,$order,$attsin,$attsout);
 
+
 if ($xpath && $topxpath) { # if more than one node is selected
     $xpath='//'.$topxpath. ' and '.$xpath.']';
 }
@@ -137,6 +140,10 @@ else {
     print "ERROR: no XPath expression could be generated.\n";
 }
 
+
+if ($xpath=~/not/) { # exclude nodes using not-function
+    $xpath =~ s/\sand\s\@not=".*?"//g;
+}
 print "$xpath\n";
 
   
@@ -161,7 +168,7 @@ sub ProcessTree {
 			$childxpath='not('.$childxpath.')';
 			$childxpath =~ s/\sand\s\@not=".*?"//;
 		    }
-
+		    
 		}
 		$COUNTS{$childxpath}++;
 		push(@childxpaths,$childxpath);
@@ -224,7 +231,8 @@ sub FindNextTerminalToCompare {
 	($next_terminal,$xpath)=&FindNextLeafNode($next_sibling);
 	$path=$path.$xpath;
 	if ($path=~/begin/) {
-	    $path='number('.$path.')';
+	    # $path='number('.$path.')';
+	     $path=~s/\@begin/number\(\@begin\)/;
 	}
     }
     else {
@@ -250,6 +258,10 @@ sub FindNextLeafNode {
     my $childpath;
     my $xpath=GetXPath($node,$attsin,$attsout).']';
     
+#   if ($xpath=~/not/) { # exclude nodes using not-function
+#			$xpath='not('.$xpath.')';
+#			$xpath =~ s/\sand\s\@not=".*?"//;
+#		    }
 
     if (@children>0) {
 	($node,$childpath)=FindNextLeafNode($children[0]);

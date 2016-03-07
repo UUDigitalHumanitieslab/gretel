@@ -2,6 +2,7 @@
 <!-- index.php -->
 <!-- GrETEL info -->
 
+<!-- version 0.3 date: 17.11.2014  Documentation added -->
 <!-- version 0.2 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
 <!-- for the GrETEL2.0 project -->
@@ -37,6 +38,26 @@
 
 <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the XPath search tool only when you are an experienced XPath user!</p>
 <br/>
+
+<p>Please <b>cite</b> the following paper if you are using GrETEL for your research:<br/><br/>
+Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a> In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012). Istanbul, Turkey. pp. 3161-3167</p>
+
+<h2>Documentation</h2>
+<h4>Tutorial</h4>
+<ul>
+<li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf">Slides</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial-handson.pdf" >Exercises</a></li>
+<li><a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf" target="_blank">CLARIN Educational Module</a></li>
+<li><a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html" target="_blank">Combined Case Study MIMORE - GrETEL</a></li>
+</ul>
+
+<h4>Information</h4>
+<ul>
+<li><a href="http://nederbooms.ccl.kuleuven.be/eng/treebanks" target="_blank">Treebanks</a></li>
+<li><a href="http://nederbooms.ccl.kuleuven.be/eng/publications" target="_blank">Publications and Talks</a></li>
+<li><a href="http://nederbooms.ccl.kuleuven.be/eng/history" target="_blank">Previous versions of GrETEL</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans</a></li>
+</ul>
 
 </div>
 </body>

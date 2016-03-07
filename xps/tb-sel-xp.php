@@ -2,6 +2,7 @@
 <!-- tb-sel.php -->
 <!-- script for treebank selection -->
 
+<!-- version 0.2 date: 12.12.2014  page loader added -->
 <!-- version 0.1 date: 10.11.2014  RELEASED WITH GrETEL2.0 -->
 <!-- written by Liesbeth Augustinus (c) 2014 -->
 <!-- for the GrETEL2.0 project -->
@@ -69,9 +70,20 @@ $(document).ready(function(){
     }
   });
 </script>
+<script type="text/javascript">
+// show loading div
+$(document).ready(function(){
+    $('button[type="submit"]').click(function(){
+	$(".loading").show();
+      });
+  });
+</script>
 </head>
 
 <body>
+<div class="loading" style="display:none;">
+<p>Loading... Please wait</p>
+</div>
 <div id="container">
 <?php
 session_cache_limiter('private'); // avoids page reload when going back
