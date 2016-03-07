@@ -82,7 +82,7 @@ $advancedguidelines='<p><b>GUIDELINES</b></p>
 <li><b>detailed word class</b>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
 <li><b>word class</b>: Short Dutch part-of-speech tag. The different tags are: <tt>n</tt> (noun), <tt>ww</tt> (verb), <tt>adj</tt> (adjective), <tt>lid</tt> (article), <tt>vnw</tt> (pronoun), <tt>vg</tt> (conjunction), <tt>bw</tt> (adverb), <tt>tw</tt> (numeral), <tt>vz</tt> (preposition), <tt>tsw</tt> (interjection), <tt>spec</tt> (special token)</tt>, and <tt>let</tt> (punctuation).</li>
 <li><b>optional in search</b>: The word will be ignored in the search instruction. It may be included in the results, but it is not necessary.</li>
-<li><b>NOT in search</b>: The word class and the dependency relation  will be excluded from the search instruction. They will not be included in the results.</li>
+<li><b>NOT in search</b>: The word class and the dependency relation will be excluded from the search instruction. They will not be included in the results.</li>
 </ul>';
 
 $options='<p><b>OPTIONS</b></p>
