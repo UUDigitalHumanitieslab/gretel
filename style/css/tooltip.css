@@ -1,0 +1,57 @@
+/* GrETEL 2.0 tooltip css style sheet */
+/* written by Jonas Doumen (c) 2014 */
+/* for the GrETEL2.0 project */
+
+div.tip{
+    font: 12px/170% Verdana, sans-serif;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px; /* future proofing */
+    -khtml-border-radius: 10px; /* for old Konqueror browsers */
+
+    color:#FFF;
+    position: fixed;
+    margin-left: 50px;
+    margin-top:-1em;
+    background: rgba(0,0,0,.8);
+    padding:5px;
+    min-width:100px;
+    box-shadow: 1px 1px 1px grey;
+}
+.tip p {
+    padding-left: 10px;
+    padding-right:10px;
+    text-align: center;
+    position: relative;
+}
+
+#close{
+    border: 2px solid #FFF;
+    -moz-border-radius: 13px;
+    -webkit-border-radius: 13px;
+    border-radius: 13px; /* future proofing */
+    -khtml-border-radius: 13px; /* for old Konqueror browsers */
+    background:black;
+    box-shadow: 1px 1px 1px black;
+    position:absolute;
+    right: -13px;
+    top:-14px;
+    color: white;
+    font: bold 15px/13px Helvetica, Verdana, Tahoma;
+    height: 16px; 
+    min-width: 14px;
+    padding: 4px 4px 1px 4px;
+    text-align: center;
+}
+#close:hover{
+    border-color:red;
+    color:red;
+    cursor:default;
+}
+.clickMe{
+    cursor:help;
+}
+a.clickMe {
+  text-decoration: none;
+  color: black;
+}
