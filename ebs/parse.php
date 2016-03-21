@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- parse.php -->
 <!-- show Alpino input parse -->
 
@@ -8,11 +8,11 @@
 
 <head>
 
-<?php 
+<?php
 require 'header.php';
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 ?>
 </head>
 

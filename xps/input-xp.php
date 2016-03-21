@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- input-xp.php -->
 <!-- form to get an XPath expression -->
 
@@ -10,7 +10,7 @@
 <?php
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 require 'header-xp.php';?>
 
 <script>

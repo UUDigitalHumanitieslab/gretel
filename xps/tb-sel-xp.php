@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- tb-sel.php -->
 <!-- script for treebank selection -->
 
@@ -12,7 +12,7 @@
 <?php
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 require 'header-xp.php';?>
 
 <style type="text/css">
@@ -143,7 +143,7 @@ if (is_uploaded_file($_FILES['xpfile']['tmp_name'])) { // check whether a file i
     exit;
   }
   else {
-    $file=$_FILES["xpfile"]["tmp_name"];    
+    $file=$_FILES["xpfile"]["tmp_name"];
     $xpath=file_get_contents($file);
   }
 }
@@ -152,7 +152,7 @@ else {
   if (isset($_POST["xpinput"]) && $_POST["xpinput"]!="") {
     $xpath=$_POST['xpinput']; // get xpath
   }
-  
+
   else {
     echo "<h1>XPath Error</h1><hr/>";
     echo "Please enter or upload an XPath query\n<br/><br/>";
@@ -174,7 +174,7 @@ if (preg_match('/(http:\/\/.*)|(<\W+>)/', $xpath)==1) { // check for spam
   exit;
 }
 
-else { 
+else {
   echo "$title";
   $_SESSION['xpath']=$xpath;
 }

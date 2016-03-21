@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- query.php -->
 <!-- query summary -->
 
@@ -45,7 +45,7 @@ $sm=$_SESSION['search'];
 
 // navigation
 $start="input.php";
-$next="results.php";					
+$next="results.php";
 $step="step_five";
 $title="<h1>Step 5: Query Overview</h1><hr/>";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
@@ -57,11 +57,11 @@ $grtllog="$log/gretel-ebq.log";
 $treelog="$log/gretel-querytrees.log";
 
 if ($_POST['treebank']) {
-  $treebank=$_POST['treebank']; 
+  $treebank=$_POST['treebank'];
   $_SESSION['treebank']="$treebank";
 }
 else {
-  $treebank=$_SESSION['treebank']; 
+  $treebank=$_SESSION['treebank'];
 }
 
 // get subtreebanks
@@ -150,7 +150,7 @@ echo "<td><iframe name=\"treeimg\" src=\"".$subparse."\">Sorry, your browser doe
 
 if ($_SESSION['search']=="advanced") { // print XPath expression in advanced search mode
 
-  if ($treebank=="sonar") { 
+  if ($treebank=="sonar") {
     echo '<br/><b>XPath expression </b>generated from the query tree.<br/>';
   }
 
@@ -165,7 +165,7 @@ if ($_SESSION['search']=="advanced") { // print XPath expression in advanced sea
   else {
     echo '<textarea rows="4" cols="100" name="xp" wrap="soft">'.$xpath.'</textarea>';
   }
-  
+
   echo '<input type="reset" value="Reset XPath"/> ';
 }
 

@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- matrix.php -->
 <!-- script returns the parsed input construction in a matrix -->
 
@@ -11,7 +11,7 @@
 <?php
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 
 require 'header.php';?>
 
@@ -142,7 +142,7 @@ foreach ($sentence as $key=>$word) {
 }
 
 if ($_SESSION['search']=="advanced") { // print detailed pos in advanced search mode
-  
+
   echo "</tr>\n<tr><th>detailed word class</th>";
   foreach ($sentence as $key=>$word) {
     $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
@@ -160,7 +160,7 @@ foreach ($sentence as $key=>$word) {
 
  if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word) )  {
     echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\"/></td>";
-  }  
+  }
   else {
     echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\" checked /></td>";
   }
@@ -171,18 +171,18 @@ echo "</tr>\n<tr bgcolor=\"#DCDCDC\"><th>optional in search</th>";
 foreach ($sentence as $key=>$word) {
   $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
   $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-  
+
  // check punctuation marks
   if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word))  {
     echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"na\" checked /></td>";
-  }  
+  }
   else {
     echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"na\" /></td>";
   }
 }
 
 if ($_SESSION['search']=="advanced") { // print 'not' in advanced search mode
-  
+
   echo "</tr>\n<tr bgcolor=\"#A9A9A9\" ><th><font color=\"red\">NOT in search</font></th>";
   foreach ($sentence as $key=>$word) {
     $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes

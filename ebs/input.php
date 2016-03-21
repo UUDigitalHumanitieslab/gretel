@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- input.php -->
 <!-- form to get an input sentence and send it to another script -->
 
@@ -11,7 +11,7 @@
 require 'header.php';
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 ?>
 
 <script>

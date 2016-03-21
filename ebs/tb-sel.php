@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- tb-sel.php -->
 <!-- script for treebank selection; generates query tree and XPath in the background -->
 
@@ -139,12 +139,12 @@ $sentence = $_SESSION['sentence']; // get input sentence
 $sentencearray = explode(" ", $sentence);
 
 // add info annotation matrix to alpino parse
-foreach($sentencearray as $begin => $word) { 
+foreach($sentencearray as $begin => $word) {
   //$word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
   //$word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
   $postword=preg_replace('/\./','_' , $word); // dots are internally changed to underscores in POST variables
   $postvalue=$_POST["$postword--$begin"];
-  
+
   if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) { //for punctuation (!) . changes to _ (!)
     $xp = $lpxml->xpath("//node[@begin='$begin']");
   }
@@ -157,7 +157,7 @@ foreach($sentencearray as $begin => $word) {
 }
 
 // save parse with @interesting annotations
-$inttree = fopen("$tmp/$id-int.xml", "w"); 
+$inttree = fopen("$tmp/$id-int.xml", "w");
 $tree = $lpxml->asXML();
 fwrite($inttree, "$tree");
 fclose($inttree);
@@ -175,12 +175,12 @@ else {
 `perl -CS $scripts/GetSubtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
 
 if (isset($_POST['order'])) {
-  $order="-order"; 
-  $_SESSION["order"]="on"; 
+  $order="-order";
+  $_SESSION["order"]="on";
 }
 
 else {
-  $order=" "; 
+  $order=" ";
 }
 
 // get XPath
@@ -194,7 +194,7 @@ if (filesize("$tmp/$id-sub.xml") == 0) {
   echo $back."<br/>";
 }
 
-else { 
+else {
 // print info
   echo "$title";
 
@@ -228,7 +228,7 @@ else {
 
   echo '<br/><br/>';
   echo $new.$back.$continue;
-  
+
   echo '</form>';
 
 }
