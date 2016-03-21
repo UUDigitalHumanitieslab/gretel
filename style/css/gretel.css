@@ -22,6 +22,20 @@ padding: 2%;
 //height:150%;
 }
 
+#ccl-logo *{
+ display:inline;
+ margin: 0;
+ margin-left: 15px;
+ vertical-align: middle;
+}
+
+#ccl-logo {
+    float: right;
+}
+nav #ccl-logo {
+    float:none;
+}
+
 h1 {
   font-family: 'Oswald', helvetica, sans-serif;
 }
@@ -109,9 +123,15 @@ div.hovertip:hover span {
 }
 
 /* Navigation */
-table.navigation {
-    width: 100%;    
-    //table-layout: fixed;
+nav {
+    display:flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.circular span{
+    display: none;
 }
 
 .home {
