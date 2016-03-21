@@ -15,9 +15,8 @@ require 'header-xp.php';?>
 
 <script>
 // clear function
-function copyText()
-{
-document.getElementById("xpath").value=document.getElementById("clear").value;
+function copyText() {
+    $("#example").val($("#clear").val());
 }
 
 // back function

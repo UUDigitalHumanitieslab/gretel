@@ -16,9 +16,8 @@ require 'header.php';
 
 <script>
 // clear function
-function copyText()
-{
-document.getElementById("example").value=document.getElementById("clear").value;
+function copyText() {
+    $("#example").val($("#clear").val());
 }
 
 // back function

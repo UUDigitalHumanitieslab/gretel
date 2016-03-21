@@ -28,55 +28,47 @@ fieldset {
 
 <script>
 // checkall LASSY function
-$(function () { // this line makes sure this code runs on page load
+$(document).ready(function() {
     $('.checkall').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
-      });
-  });
-// checkall CGN function
-$(function () { // this line makes sure this code runs on page load
-    $('.checknlfunction').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
-      });
-  });
-$(function () { // this line makes sure this code runs on page load
+        $(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
+    });
     $('.checkvlfunction').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
-      });
-  });
-// show/hide subtreebanks
-$(document).ready(function(){
+        $(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
+    });
+    $('.checknlfunction').click(function () {
+        $(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
+    });
 
     $('input[type="radio"]').click(function(){
-	if($(this).attr("value")=="cgn"){
-	  $(".box").hide();
-	  $(".cgn").show();
-	}
-	if($(this).attr("value")=="lassy"){
-	  $(".box").hide();
-	  $(".lassy").show();
-	}
-      });
-  });
-
-$(document).ready(function(){
-    if (document.getElementById('cgn').checked) {
-      $(".box").hide();
-      $(".cgn").show();
-    }
-    if (document.getElementById('lassy').checked) {
-      $(".box").hide();
-      $(".lassy").show();
-    }
-  });
-</script>
-<script type="text/javascript">
-// show loading div
-$(document).ready(function(){
-    $('button[type="submit"]').click(function(){
-	$(".loading").show();
-      });
-  });
+        if($(this).attr("value")=="cgn"){
+          $(".box").hide();
+          $(".cgn").show();
+        }
+        if($(this).attr("value")=="lassy"){
+          $(".box").hide();
+          $(".lassy").show();
+        }
+        if($(this).attr("value")=="sonar"){
+          $(".box").hide();
+          $(".sonar").show();
+        }
+    });
+     if ($('#cgn').is(":checked")) {
+       $(".box").hide();
+       $(".cgn").show();
+     }
+     if ($('#lassy').is(":checked")) {
+       $(".box").hide();
+       $(".lassy").show();
+     }
+     if ($('#sonar').is(":checked")) {
+       $(".box").hide();
+       $(".sonar").show();
+     }
+     $('button[type="submit"]').click(function(){
+         $(".loading").show();
+     });
+});
 </script>
 </head>
 

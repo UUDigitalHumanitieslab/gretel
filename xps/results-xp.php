@@ -31,27 +31,25 @@ $(document).ready(function() {
 
 
 // show/hide function
-$(document).ready(function(){
+$(document).ready(function() {
+    // Initialisation code dataTables
+	$('#example').dataTable({
+        "sScrollY": "400px",
+        "bPaginate": false
+    });
 
+    // Show and hide required elements
     $(".slidingDiv").hide();
     $(".show_hide").show();
-     $("#hide").hide(); // hide message 'hide'
+    $("#hide").hide(); // hide message 'hide'
     $("#show").show(); // show message 'show'
 
     $('.show_hide').click(function(){
-	$(".slidingDiv").slideToggle();
-	if ($('#show').is(":visible")){
-	  $("#show").hide();
-	  $("#hide").show();
-	}
-	else {
-	  $("#show").show();
-	  $("#hide").hide();
-	}
-      });
-
+        $(".slidingDiv").slideToggle();
+        $("#show").toggle();
+        $("#hide").toggle();
+    });
   });
-
 </script>
 
 </head>
