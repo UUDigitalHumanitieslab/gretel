@@ -15,7 +15,7 @@ URL: http://gretel.ccl.kuleuven.be/gretel-2.0
 1. Download GrETEL
 2. Create directories log, tmp, and parsers (make sure tmp and log are writable)
 3. Put Alpino parser in the parsers directory. Current version in GrETEL: Alpino-x86_64-linux-glibc2.5-20548-sicstus (http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)
-4. Adapt config/config.php file
+4. Adapt config/config.example.php file and change name to config/config.php
    - Set paths to home directory and home URL
    - Set path to Alpino parser
    - Set BaseX variables
