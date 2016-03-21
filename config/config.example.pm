@@ -7,7 +7,7 @@
 use warnings;
 
 our $showhits=100;
-our @basexpaths=("/home/wiske/Gretel/BaseX1/", "/home/wiske/Gretel/BaseX2/","/home/wiske/Gretel/BaseX3/","/home/wiske/Gretel/BaseX4/");
+our @basexpaths=("/path/to/BaseX1/", "/path/to/BaseX2/","/path/to/BaseX3/","/path/to/BaseX4/");
 
 our %dbname_server=('WRPEA' => 'machine1',
 		    'WRPEC' => 'machine1',
