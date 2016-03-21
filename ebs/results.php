@@ -17,7 +17,6 @@ include 'header.php';
 echo '
 <link rel="stylesheet" type="text/css" href="'.$home.'/style/css/datatable.css"></link>
 
-<script type="text/javascript" src="'.$home.'/js/jquery-2.0.2.min.js" ></script>
 <script type="text/javascript" src="'.$home.'/js/jquery.dataTables.js" ></script>
 <script type="text/javascript" src="'.$home.'/js/sorttable.js" ></script>
 ';
