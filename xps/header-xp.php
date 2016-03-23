@@ -8,15 +8,15 @@ $navigation="navigation-xp.php"; // progress bar script
 // stylesheets
 
 echo '
-<link href="http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="'.$home.'/style/css/gretel.css"></link>
-<link rel="stylesheet" type="text/css" href="'.$home.'/style/css/tooltip.css"></link>
-<link rel="shortcut icon" type="image/pgn" href="'.$home.'/img/gretel_logo_trans.png" />
+<link rel="stylesheet"href="http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic">
+<link rel="stylesheet" href="'.$home.'/style/css/gretel.css">
+<link rel="stylesheet" href="'.$home.'/style/css/tooltip.css">
+<link rel="shortcut icon" type="image/png" href="'.$home.'/img/gretel_logo_trans.png">
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript" src="'.$home.'/js/tooltip.js" ></script>
-<script type="text/javascript" src="'.$home.'/js/browserDetection.js" ></script>
-<script type="text/javascript" src="'.$home.'/js/TaalPortaal.js" ></script>
+<script src="'.$home.'/js/tooltip.js"></script>
+<script src="'.$home.'/js/browserDetection.js"></script>
+<script src="'.$home.'/js/TaalPortaal.js"></script>
 ';
 
 include_once("$root/scripts/AnalyticsTracking.php");
