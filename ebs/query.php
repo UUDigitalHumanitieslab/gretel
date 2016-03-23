@@ -15,13 +15,12 @@
 //ini_set('display_errors', 1);
 require 'header.php';?>
 
-<script type="text/javascript">
-// show loading div
+<script>
 $(document).ready(function(){
     $('button[type="submit"]').click(function(){
-	$(".loading").show();
-      });
-  });
+        $(".loading").show();
+    });
+});
 </script>
 </head>
 
@@ -131,8 +130,6 @@ $tlog = fopen($treelog, "a");  //concatenate
 fwrite($tlog, "<alpino_ds id=\"$id-$time\">$qtree\n</alpino_ds>\n");
 fclose($tlog);
 
-// add style to query tree
-`perl  $scripts/sub2tree.pl $tmp/$id-sub.xml '//node[@rel]' 'ptsonar' > $tmp/$id-sub-style.xml`;
 
 //print input sentence and treebank
 echo "$title";
@@ -140,13 +137,6 @@ echo "<b>Input example:</b> <i>$sentence</i><br/><br/>\n";
 
 echo "<b>Treebank:</b> ".strtoupper($treebank)."<br/>\n";
 echo "<b>Components:</b> ".strtoupper($components)."<br/><br/>\n";
-
-// print tree
-$subparse=$home."/tmp/$id-sub-style.xml?$time";
-
-echo '<table border=1 class="hd" width="100%"><tr><th>Query tree [<a href="'.$subparse.'" target="_blank">full screen</a>]</th></tr>';
-echo "<td><iframe name=\"treeimg\" src=\"".$subparse."\">Sorry, your browser does not support iframes.</iframe></td></tr></table>";
-
 
 if ($_SESSION['search']=="advanced") { // print XPath expression in advanced search mode
 
@@ -181,5 +171,11 @@ echo '</form>';
 
 ?>
 </div>
+<script src="<?php echo $root; ?>/js/min/tree-visualizer.js"></script>
+<script>
+$.treeVisualizer("<?php echo $tmp/$id; ?>-sub.xml", {
+    container: "#tree-output"
+});
+</script>
 </body>
 </html>

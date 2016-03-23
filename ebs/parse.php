@@ -111,22 +111,12 @@ $parse = Alpino($tokinput,$id); // $parse = parse location
 //MODIFY LEMMA
 $parseloc=ModifyLemma($parse,$id,$tmp); // returns parse location
 
-//ADD STYLE
-`perl  $scripts/xml2tree.pl $tmp/$id-pt.xml '//node[@rel]' 'psonar' > $tmp/$id-style.xml`; //add stylesheet to input parse
-`perl  $scripts/xml2tree.pl $tmp/$id-pt.xml '//node[@rel ]' 'zsonar'> $tmp/$id-style-zoom.xml`; //add stylesheet (zoom function) to input parse
-
 // INFO
 echo "$title";
 echo "<p>$info";
 echo "<em>$tokinput</em></p>";
 
-// DRAW INPUT PARSE
-$inputparse=$home."/tmp/$id-style.xml?$time";
-$inputzoom=$home."/tmp/$id-style-zoom.xml?$time";
-
-echo '<table border=1 class="hd" width="100%"><tr><th>Alpino parse of the input example [<a href="'.$inputzoom.'" target="_blank">full screen</a>]</th></tr>';
-echo "<td><iframe name=\"treeimg\" src=\"".$inputparse."\">Sorry, your browser does not support iframes.</iframe></td>
-</tr></table>";
+echo '<div id="tree-output"></div>';
 
 echo '
 <form action="'.$next.'" method="post" enctype="multipart/form-data" >
@@ -141,5 +131,11 @@ echo "</form>";
 ?>
 
 </div>
+<script src="<?php echo $root; ?>/js/min/tree-visualizer.js"></script>
+<script>
+$.treeVisualizer("<?php echo $tmp/$id; ?>-pt.xml", {
+    container: "#tree-output"
+});
+</script>
 </body>
 </html>
