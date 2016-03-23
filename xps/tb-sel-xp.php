@@ -1,4 +1,4 @@
-<html>
+<!DOCTYPE html>
 <!-- tb-sel.php -->
 <!-- script for treebank selection -->
 
@@ -12,7 +12,7 @@
 <?php
 /* Display errors*/
 //error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
+//ini_set('display_errors', 1);
 require 'header-xp.php';?>
 
 <style type="text/css">
@@ -28,55 +28,47 @@ fieldset {
 
 <script>
 // checkall LASSY function
-$(function () { // this line makes sure this code runs on page load
+$(document).ready(function() {
     $('.checkall').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
-      });
-  });
-// checkall CGN function
-$(function () { // this line makes sure this code runs on page load
-    $('.checknlfunction').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
-      });
-  });
-$(function () { // this line makes sure this code runs on page load
+        $(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
+    });
     $('.checkvlfunction').click(function () {
-	$(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
-      });
-  });
-// show/hide subtreebanks
-$(document).ready(function(){
+        $(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
+    });
+    $('.checknlfunction').click(function () {
+        $(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
+    });
 
     $('input[type="radio"]').click(function(){
-	if($(this).attr("value")=="cgn"){
-	  $(".box").hide();
-	  $(".cgn").show();
-	}
-	if($(this).attr("value")=="lassy"){
-	  $(".box").hide();
-	  $(".lassy").show();
-	}
-      });
-  });
-
-$(document).ready(function(){
-    if (document.getElementById('cgn').checked) {
-      $(".box").hide();
-      $(".cgn").show();
-    }
-    if (document.getElementById('lassy').checked) {
-      $(".box").hide();
-      $(".lassy").show();
-    }
-  });
-</script>
-<script type="text/javascript">
-// show loading div
-$(document).ready(function(){
-    $('button[type="submit"]').click(function(){
-	$(".loading").show();
-      });
-  });
+        if($(this).attr("value")=="cgn"){
+          $(".box").hide();
+          $(".cgn").show();
+        }
+        if($(this).attr("value")=="lassy"){
+          $(".box").hide();
+          $(".lassy").show();
+        }
+        if($(this).attr("value")=="sonar"){
+          $(".box").hide();
+          $(".sonar").show();
+        }
+    });
+     if ($('#cgn').is(":checked")) {
+       $(".box").hide();
+       $(".cgn").show();
+     }
+     if ($('#lassy').is(":checked")) {
+       $(".box").hide();
+       $(".lassy").show();
+     }
+     if ($('#sonar').is(":checked")) {
+       $(".box").hide();
+       $(".sonar").show();
+     }
+     $('button[type="submit"]').click(function(){
+         $(".loading").show();
+     });
+});
 </script>
 </head>
 
@@ -116,7 +108,7 @@ $next="results-xp.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New XPath query</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_two"; // for progress bar
+$step=2; // for progress bar
 $title="<h1>Step 2: Select a treebank</h1><hr/>";
 
 $info='<p>You can search an entire treebank (default), or select just one or more components.</p>';
@@ -143,7 +135,7 @@ if (is_uploaded_file($_FILES['xpfile']['tmp_name'])) { // check whether a file i
     exit;
   }
   else {
-    $file=$_FILES["xpfile"]["tmp_name"];    
+    $file=$_FILES["xpfile"]["tmp_name"];
     $xpath=file_get_contents($file);
   }
 }
@@ -152,7 +144,7 @@ else {
   if (isset($_POST["xpinput"]) && $_POST["xpinput"]!="") {
     $xpath=$_POST['xpinput']; // get xpath
   }
-  
+
   else {
     echo "<h1>XPath Error</h1><hr/>";
     echo "Please enter or upload an XPath query\n<br/><br/>";
@@ -174,7 +166,7 @@ if (preg_match('/(http:\/\/.*)|(<\W+>)/', $xpath)==1) { // check for spam
   exit;
 }
 
-else { 
+else {
   echo "$title";
   $_SESSION['xpath']=$xpath;
 }
