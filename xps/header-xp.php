@@ -1,5 +1,7 @@
 <title>GrETEL 2.0 - XPath Search</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <?php
 require("../config/config.php");
 

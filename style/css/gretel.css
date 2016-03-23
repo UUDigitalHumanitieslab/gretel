@@ -17,6 +17,9 @@ body {
 #container {
     clear: both;
     padding: 2%;
+    min-width: 480px;
+    max-width: 1024px;
+    margin: 0 auto;
     border: 1px solid #ccc;
     background: #fff;
 }
@@ -31,6 +34,11 @@ body {
 }
 nav #ccl-logo {
     float: none;
+}
+@media all and (max-width: 820px) {
+    nav {
+        flex-direction: column-reverse;
+    }
 }
 h1 {
     font-family: 'Oswald', helvetica, sans-serif;
@@ -108,14 +116,14 @@ div.hovertip:hover span {
     font-size: .86em;
 }
 
-/* Navigation */
-
+/* Progress bar */
 nav {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
 }
+
 .progressbar {
     overflow: hidden;
     margin: 0;
@@ -123,21 +131,12 @@ nav {
     list-style: none;
     font-size: 12px;
 }
-.circular {
-    font-size: 15px;
-}
 .progressbar li {
     display: inline-block;
     background: #C0C0C0;
     padding: 0;
 }
-/* Add padding so text is nicely centered in breadcrumb view */
-.progressbar.breadcrumb li:not(:first-child) {padding-left: 50px;}
-.progressbar.breadcrumb li:last-child {padding-right: 25px;}
 
-/* Specific border radius */
-.progressbar.ellipse li {border-radius: 25px;}
-.progressbar.circular li {border-radius: 50%;}
 
 /* Style and position actual text */
 .progressbar li p {
@@ -147,47 +146,68 @@ nav {
     margin: 0;
     padding: 1em;
 }
-.ellipse li p, .circular li p {
-    text-align: center;
-}
-.circular li p {
-    line-height: 32px;
-    height: 32px;
-    width: 32px;
-    padding: 0;
-}
-
-/* Arrows for breadcrumbs; not on last child */
-.breadcrumb li:not(:last-child) p:after, .breadcrumb li:not(:last-child) p:before {
-    position: absolute;
-    top: 50%;
-    left: 100%;
-    z-index: 1;
-    display: block;
-    margin-top: -50px;
-    width: 0;
-    height: 0;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
-    border-left: 30px solid white;
-    content: " ";
-}
-.breadcrumb li:not(:last-child) p:after {
-    border-left-color: #C0C0C0;
-    margin-left: -1px;
-    z-index: 2;
-}
-.breadcrumb li:first-child p {
-    padding-left: 10px;
-}
 
 /* Change colour of active page in progress bar */
-.progressbar li.active {background-color: #b4c24b;}
-.breadcrumb li.active:not(:last-child) p:after {border-left-color: #b4c24b;}
+.progressbar li.active {
+    background-color: #b4c24b;
+}
 
-/* Don't show span with text in smallest progress (circle) */
-.circular span {
-    display: none;
+/* Circular - small circles on small screen size */
+@media all and (max-width: 1239px) {
+    .progressbar {
+        font-size: 15px;
+    }
+    .progressbar li {
+        border-radius: 50%;
+    }
+    .progressbar li p {
+        line-height: 32px;
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        text-align: center;
+    }
+    .progressbar span {
+        display: none;
+    }
+}
+/* Breacrumbs - arrow directed progress bar on large screens */
+@media all and (min-width: 1240px) {
+    .progressbar li:not(:first-child) {
+        padding-left: 10px;
+    }
+    /* Arrows for breadcrumbs; not on last child */
+    .progressbar li:not(:last-child) p:after, .progressbar li:not(:last-child) p:before {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateX(-50%);
+        z-index: 1;
+        display: block;
+        margin-top: -50px;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent;
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid white;
+        content: " ";
+    }
+    .progressbar li:not(:last-child) p:after {
+        border-left-color: #C0C0C0;
+        margin-left: -1px;
+        z-index: 2;
+    }
+    .progressbar li:last-child {
+        padding-right: 10px;
+    }
+    /* Position text on top of the arrow, this saves us some space */
+    .progressbar li span {
+        position: relative;
+        z-index: 3;
+    }
+    .breadcrumb li.active:not(:last-child) p:after {
+        border-left-color: #b4c24b;
+    }
 }
 .home {
     width: 30px;

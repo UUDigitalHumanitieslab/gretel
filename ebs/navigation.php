@@ -4,18 +4,6 @@ function goBack() {
 }
 
 $(document).ready(function() {
-    function navResize() {
-        if($(window).width() < 1300 && $(window).width() > 960 ) {
-            $("nav ul").addClass('ellipse').removeClass('circular breadcrumb');
-        }
-        else if ($(window).width() <= 960 ) {
-            $("nav ul").addClass('circular').removeClass('ellipse breadcrumb');
-        }
-        else {$("nav ul").addClass('breadcrumb').removeClass('ellipse circular');}
-    }
-    $(window).resize(navResize);
-    navResize();
-
     $(".progressbar li:nth-child(<?php echo $step;?>)").addClass("active");
 });
 </script>
