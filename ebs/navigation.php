@@ -5,10 +5,10 @@ function goBack() {
 
 $(document).ready(function() {
     function navResize() {
-        if($(window).width() < 1100 && $(window).width() >= 700 ) {
+        if($(window).width() < 1300 && $(window).width() > 960 ) {
             $("nav ul").addClass('ellipse').removeClass('circular breadcrumb');
         }
-        else if ($(window).width() < 700 ) {
+        else if ($(window).width() <= 960 ) {
             $("nav ul").addClass('circular').removeClass('ellipse breadcrumb');
         }
         else {$("nav ul").addClass('breadcrumb').removeClass('ellipse circular');}
@@ -20,7 +20,7 @@ $(document).ready(function() {
 <?php
 echo'
 <nav>
-<ul style="list-style:none" class="breadcrumb" id="'.$step.'">
+<ul style="list-style:none" class="breadcrumb progressbar" id="'.$step.'">
   <li><p>1<span> - Example</span></p></li>
   <li><p>2<span> - Parse</span></p></li>
   <li><p>3<span> - Matrix</span></p></li>
