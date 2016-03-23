@@ -148,6 +148,9 @@ nav {
 }
 
 /* Change colour of active page in progress bar */
+.progressbar li.done {
+    background-color: #747474;
+}
 .progressbar li.active {
     background-color: #b4c24b;
 }
@@ -205,8 +208,11 @@ nav {
         position: relative;
         z-index: 3;
     }
-    .breadcrumb li.active:not(:last-child) p:after {
+    .progressbar li.active:not(:last-child) p:after {
         border-left-color: #b4c24b;
+    }
+    .progressbar li.done:not(:last-child) p:after {
+        border-left-color: #747474;
     }
 }
 .home {
