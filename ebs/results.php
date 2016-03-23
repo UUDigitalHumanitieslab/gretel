@@ -81,7 +81,7 @@ $xplog="$log/gretel-ebq.log";
 $start="input.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
-$step="step_six";
+$step=6;
 $title="<h1>Step 6: Results</h1><hr/>";
 
 // messages and documentation

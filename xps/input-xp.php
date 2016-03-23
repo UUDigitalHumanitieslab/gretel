@@ -38,7 +38,7 @@ header('Content-Type:text/html; charset=utf-8');
 $id=session_id();
 $next="tb-sel-xp.php";
 $inputxp='//node[@rel="su" and @cat="np" and node[@pt="n" and @ntype="eigen"]]'; // default example
-$step="step_one"; // for progress bar
+$step=1; // for progress bar
 $title="<h1>Step 1: Give an XPath expression</h1>
 <hr/>";
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';

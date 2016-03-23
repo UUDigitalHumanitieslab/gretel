@@ -15,12 +15,14 @@ $(document).ready(function() {
     }
     $(window).resize(navResize);
     navResize();
+
+    $(".progressbar li:nth-child(<?php echo $step;?>)").addClass("active");
 });
 </script>
 <?php
 echo'
 <nav>
-<ul style="list-style:none" class="breadcrumb progressbar" id="'.$step.'">
+<ul class="breadcrumb progressbar">
   <li><p>1<span> - Example</span></p></li>
   <li><p>2<span> - Parse</span></p></li>
   <li><p>3<span> - Matrix</span></p></li>
@@ -30,7 +32,7 @@ echo'
 </ul>
 <div id="ccl-logo">';
 
-if ($step=="step_one") {
+if ($step==1) {
   echo '<p><b>GrETEL 2.0</b></p>';
 }
 else {

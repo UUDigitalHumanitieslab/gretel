@@ -53,7 +53,7 @@ $next="tb-sel.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_three"; // for progress bar
+$step= 3; // for progress bar
 $title="<h1>Step 3: Select relevant parts</h1>
 <hr/>";
 

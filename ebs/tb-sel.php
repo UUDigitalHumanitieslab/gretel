@@ -105,7 +105,7 @@ $next="query.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_four"; // for progress bar
+$step=4; // for progress bar
 $title="<h1>Step 4: Select a treebank</h1><hr/>";
 
 $info='<p>

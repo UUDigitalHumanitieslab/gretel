@@ -39,7 +39,7 @@ header('Content-Type:text/html; charset=utf-8');
 $id=session_id();
 $next="parse.php";
 $input="Dit is een zin."; // default example
-$step="step_one"; // for progress bar
+$step= 1; // for progress bar
 $title="<h1>Step 1: Give an example</h1>
 <hr/>";
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';

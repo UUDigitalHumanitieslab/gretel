@@ -46,7 +46,7 @@ $sm=$_SESSION['search'];
 // navigation
 $start="input.php";
 $next="results.php";
-$step="step_five";
+$step=5;
 $title="<h1>Step 5: Query Overview</h1><hr/>";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';

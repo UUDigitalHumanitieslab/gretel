@@ -108,7 +108,7 @@ $next="results-xp.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New XPath query</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_two"; // for progress bar
+$step=2; // for progress bar
 $title="<h1>Step 2: Select a treebank</h1><hr/>";
 
 $info='<p>You can search an entire treebank (default), or select just one or more components.</p>';

@@ -88,7 +88,7 @@ $xplog="$log/gretel-xps.log";
 $start="input-xp.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New XPath Query</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
-$step="step_three";
+$step=3;
 $title="<h1>Step 3: Results</h1><hr/>";
 
 // messages and documentation

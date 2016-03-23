@@ -51,9 +51,8 @@ $next="matrix.php";
 $new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
 $back='<button type="button" value="Back" onclick="goBack()">Back</button>';
 $continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_two"; // for progress bar
-$title="<h1>Step 2: Input Parse</h1>
-<hr/>";
+$step=2; // for progress bar
+$title="<h1>Step 2: Input Parse</h1><hr>";
 
 // messages
 $captcha="This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
@@ -83,14 +82,14 @@ require("$modlem");
 
 if (preg_match('/(http:\/\/.*)|(<.*)|(.*>)/', $input)==1) { // check for spam
   echo "<h3>Error</h3>";
-  echo $captcha."\n<br/><br/>";
+  echo "<p>".$captcha."</p>";
   echo $back;
   exit;
 }
 
 elseif(!$input || empty($input)) {
   echo "<h3>Error</h3>";
-  echo "Please provide an <b>input example</b>. \n<br/><br/>";
+  echo "<p>Please provide an <b>input example</b>.</p>";
   echo $back;
   exit;
 }
@@ -118,8 +117,8 @@ $parseloc=ModifyLemma($parse,$id,$tmp); // returns parse location
 
 // INFO
 echo "$title";
-echo "$info";
-echo "<i>$tokinput</i></p><br/>";
+echo "<p>$info";
+echo "<em>$tokinput</em></p>";
 
 // DRAW INPUT PARSE
 $inputparse=$home."/tmp/$id-style.xml?$time";
@@ -132,7 +131,7 @@ echo "<td><iframe name=\"treeimg\" src=\"".$inputparse."\">Sorry, your browser d
 echo '
 <form action="'.$next.'" method="post" enctype="multipart/form-data" >
 ';
-echo "<br/>";
+echo "<br>";
 echo $info2;
 echo $new;
 echo $back;
