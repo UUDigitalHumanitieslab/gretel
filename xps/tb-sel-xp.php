@@ -27,44 +27,27 @@ fieldset {
 </style>
 
 <script>
-// checkall LASSY function
 $(document).ready(function() {
     $('.checkall').click(function () {
-        $(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
+	var checked = $(this).prop("checked");
+        $("input[name^='lassytb']").prop("checked", checked);
     });
     $('.checkvlfunction').click(function () {
-        $(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
+	var checked = $(this).prop("checked");
+        $("input[name^='cgntb[v']").prop("checked", checked);
     });
     $('.checknlfunction').click(function () {
-        $(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
+	var checked = $(this).prop("checked");
+        $("input[name^='cgntb[n']").prop("checked", checked);
     });
 
-    $('input[type="radio"]').click(function(){
-        if($(this).attr("value")=="cgn"){
-          $(".box").hide();
-          $(".cgn").show();
-        }
-        if($(this).attr("value")=="lassy"){
-          $(".box").hide();
-          $(".lassy").show();
-        }
-        if($(this).attr("value")=="sonar"){
-          $(".box").hide();
-          $(".sonar").show();
-        }
+    $('input[name="treebank"]').click(function(){
+        var val = $(this).val();
+        $(".box").hide();
+        $("."+val).show();
     });
-     if ($('#cgn').is(":checked")) {
-       $(".box").hide();
-       $(".cgn").show();
-     }
-     if ($('#lassy').is(":checked")) {
-       $(".box").hide();
-       $(".lassy").show();
-     }
-     if ($('#sonar').is(":checked")) {
-       $(".box").hide();
-       $(".sonar").show();
-     }
+    $("#cgn").click();
+
      $('button[type="submit"]').click(function(){
          $(".loading").show();
      });
