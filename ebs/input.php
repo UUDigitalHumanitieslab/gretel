@@ -20,13 +20,10 @@ function copyText() {
     $("#example").val($("#clear").val());
 }
 
+// back function
 function goBack() {
     window.history.back()
 }
-
-$(document).ready(function()) {
-    fillInputField();
-});
 
 </script>
 </head>
@@ -62,7 +59,7 @@ if (isset($_SESSION['example'])) { // find previous input example
 }
 
 echo '
-<input type="text" name="input" size=50 value="'.$input.'" id="example">
+<input type="text" name="input" size=50 value="'.$input.'" id="example" />
 <button type="button" onClick="copyText();" id="clear" title="This button clears the input box above, allowing you to enter new input without having to delete the current input character by character">Clear</button>';
 
 echo '
