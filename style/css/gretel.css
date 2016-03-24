@@ -7,7 +7,7 @@
 /* for the GrETEL2.0 project */
 
 body {
-    margin: 0% 8%;
+    margin: 0;
     background-color: #747474;
     background-image: url("../../img/gretel_logo_small.png");
     background-repeat: repeat;
@@ -15,12 +15,10 @@ body {
     font-family: 'Carrois Gothic', helvetica, sans-serif;
 }
 #container {
-    clear: both;
-    padding: 2%;
+    padding: 1.6em;
     min-width: 480px;
     max-width: 1024px;
-    margin: 0 auto;
-    border: 1px solid #ccc;
+    margin: 0 auto 0.8em;
     background: #fff;
 }
 #ccl-logo * {
