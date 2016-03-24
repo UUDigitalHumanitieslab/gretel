@@ -5,7 +5,7 @@ function goBack() {
 
 $(document).ready(function() {
     <?php if($step > 1): ?>
-    $(".progressbar li:nth-child(<?php echo $step-1;?>)").addClass("done");
+    $(".progressbar li:nth-child(-n+<?php echo $step-1;?>)").addClass("done");
     <?php endif ?>
     $(".progressbar li:nth-child(<?php echo $step;?>)").addClass("active");
 });
@@ -22,7 +22,7 @@ $(document).ready(function() {
 <div id="ccl-logo">
 <p>
     <strong>GrETEL 2.0</strong>
-    <?php if ($step > 1) echo $sm . 'search mode'; ?>
+    <?php if ($step > 1) echo $sm . ' search mode'; ?>
 </p>
 <input type="button" value="Home" onclick="location.href = '../index.php'">
 <a href="http://ccl.kuleuven.be" target="_blank"><img src="../img/ccl-logo-square.png" height="50"></img></a>

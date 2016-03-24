@@ -5,10 +5,11 @@ function goBack() {
 
 $(document).ready(function() {
     <?php if($step > 1): ?>
-    $(".progressbar li:nth-child(<?php echo $step-1;?>)").addClass("done");
+    $(".progressbar li:nth-child(-n+<?php echo $step-1;?>)").addClass("done");
     <?php endif ?>
     $(".progressbar li:nth-child(<?php echo $step;?>)").addClass("active");
 });
+</script>
 </script>
 <nav>
 <ul class="progressbar">
