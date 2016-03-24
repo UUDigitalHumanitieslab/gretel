@@ -14,6 +14,7 @@ require 'header.php';
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 ?>
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">
 </head>
 
 <body>
@@ -131,10 +132,12 @@ echo "</form>";
 ?>
 
 </div>
-<script src="<?php echo $root; ?>/js/min/tree-visualizer.js"></script>
+<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
 <script>
-$.treeVisualizer("<?php echo $tmp/$id; ?>-pt.xml", {
+$(document).ready(function(){
+$.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml', {
     container: "#tree-output"
+});
 });
 </script>
 </body>

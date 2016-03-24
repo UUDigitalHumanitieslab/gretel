@@ -13,17 +13,16 @@
 //ini_set('display_errors', 1);
 
 include 'header.php';
-
 echo '
 <link rel="stylesheet" type="text/css" href="'.$home.'/style/css/datatable.css"></link>
-
 <script type="text/javascript" src="'.$home.'/js/jquery.dataTables.js" ></script>
 <script type="text/javascript" src="'.$home.'/js/sorttable.js" ></script>
 ';
 ?>
+
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">
 <script>
 $(document).ready(function() {
-    // Initialisation code dataTables
 	$('#example').dataTable({
         "sScrollY": "400px",
         "bPaginate": false
@@ -376,7 +375,7 @@ else {
 	    if (preg_match('/SAMPLE/',$match))   {
 	      $sample=preg_split("/\t/", $match);
 	      // end table
-	      print "</tbody></table></div>\n<br/><br/>\n";
+	      echo "</tbody></table></div>\n<br/><br/>\n";
 	      echo "<script>document.getElementById('sample').innerHTML ='The corpus sample displayed below contains ".$sample[1]." hits in ".$sample[2]." matching sentences <!-- (".$sample[3]." hit(s) per sentence on average) -->';</script>";
 	    }
 	    else {
@@ -389,10 +388,11 @@ else {
 	      $beginlist=$match[5];
 
 	      $hlsentence=HighlightSentence($matchsent,$beginlist);
-	      $sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=zoom" target="_blank" >'.$sid.'</a>';
+	      $sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=xml" target="_blank" >'.$sid.'</a>';
 	      echo "<tr><td>".$sentenceidlink."</td><td>".$hlsentence."</td><td width=\"100px\" >".$counthits."</td></tr>\n";
 	    }
 	  }
+          else {echo "</tbody></table></div>";}
 	}
 	ob_flush();
 	flush();
@@ -499,5 +499,18 @@ catch (Exception $e) {
 
 ?>
 </div>
+<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('a[href$="xml"]').click(function(e) {
+        $("#tree-visualizer, #tree-visualizer-fs").remove();
+        $.treeVisualizer($(this).attr("href"), {
+            normalView: false,
+            initFSOnClick: true
+        });
+        e.preventDefault();
+    });
+});
+</script>
 </body>
 </html>

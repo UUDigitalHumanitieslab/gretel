@@ -15,13 +15,8 @@
 //ini_set('display_errors', 1);
 require 'header.php';?>
 
-<script>
-$(document).ready(function(){
-    $('button[type="submit"]').click(function(){
-        $(".loading").show();
-    });
-});
-</script>
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css" >
+
 </head>
 
 <body>
@@ -158,7 +153,7 @@ if ($_SESSION['search']=="advanced") { // print XPath expression in advanced sea
 
   echo '<input type="reset" value="Reset XPath"/> ';
 }
-
+echo '<div id="tree-output"></div>';
 echo '
 <form action="'.$next.'" method="post">
 ';
@@ -171,11 +166,18 @@ echo '</form>';
 
 ?>
 </div>
-<script src="<?php echo $root; ?>/js/min/tree-visualizer.js"></script>
+<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
 <script>
-$.treeVisualizer("<?php echo $tmp/$id; ?>-sub.xml", {
-    container: "#tree-output"
+$(document).ready(function(){
+    $('button[type="submit"]').click(function(){
+        $(".loading").show();
+    });
+
+    $.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml', {
+        container: "#tree-output"
+    });
 });
+</script>
 </script>
 </body>
 </html>

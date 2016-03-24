@@ -20,16 +20,6 @@ echo '
 ';
 ?>
 <script>
-
-// Initialisation code dataTables
-$(document).ready(function() {
-	$('#example').dataTable( {
-	    "sScrollY": "400px",
-	      "bPaginate": false,
-	      } );
-  });
-
-
 // show/hide function
 $(document).ready(function() {
     // Initialisation code dataTables

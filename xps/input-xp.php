@@ -13,18 +13,6 @@
 //ini_set('display_errors', 1);
 require 'header-xp.php';?>
 
-<script>
-// clear function
-function copyText() {
-    $("#example").val($("#clear").val());
-}
-
-// back function
-function goBack() {
-    window.history.back()
-}
-
-</script>
 </head>
 
 <body>
@@ -63,5 +51,17 @@ if (isset($_SESSION['xpath'])) { // find previous input example
 echo $continue;
 ?>
 </div>
+
+<script>
+// clear function
+function copyText() {
+    $("#example").val($("#clear").val());
+}
+
+// back function
+function goBack() {
+    window.history.back()
+}
+</script>
 </body>
 </html>
