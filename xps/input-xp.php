@@ -52,7 +52,11 @@ echo $continue;
 ?>
 </div>
 
+<?php echo '<script src="'.$home.'/js/TaalPortaal.js"></script>';?>
 <script>
+$(document).ready(function() {
+    fillInputField("xpath");
+});
 // clear function
 function copyText() {
     $("#example").val($("#clear").val());

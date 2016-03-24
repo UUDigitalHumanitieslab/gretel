@@ -6,19 +6,17 @@ version 1.0 date: 25.06.2014
 version 1.1 date: 30.06.2014 set default sentence in PHP script
 version 1.2 date: 25.02.2015 deal with diacritics
 version 1.3 date: 21.03.2016 reinstate declaration of examplefiller (bug fix) &
- wrap all in self-invoking function (keep namespace clean) (by Bram Vanroy for CCL) 
+ wrap all in self-invoking function (keep namespace clean) (by Bram Vanroy for CCL)
 
 included in GrETEL/Nederbooms by Liesbeth Augustinus
 */
 
-(function() {
-    jQuery(document).ready(function() {
-        fillInputField(); // taalportaalextensie
-    });
-
-    function fillInputField() {
+    function fillInputField(mode) {
         // De standaardzin die we invullen als er geen argument is meegegeven in de url
-        var examplefiller = "Dit is een zin.";
+        var examplefiller;
+
+        if (mode=="xpath") examplefiller = '//node[@rel="su" and @cat="np" and node[@pt="n" and @ntype="eigen"]]';
+        else examplefiller = "Dit is een zin.";
 
         var tpinput = getUrlVars()["tpinput"]; // Zoek specifiek op waarde van 'tpinput'
         if (getUrlVars()["tpinput"]) {
@@ -54,4 +52,3 @@ included in GrETEL/Nederbooms by Liesbeth Augustinus
         }
         return vars;
     }
-})();

@@ -18,7 +18,6 @@ echo '
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script src="'.$home.'/js/tooltip.js"></script>
 <script src="'.$home.'/js/browserDetection.js"></script>
-<script src="'.$home.'/js/TaalPortaal.js"></script>
 ';
 
 include_once("$root/scripts/AnalyticsTracking.php");

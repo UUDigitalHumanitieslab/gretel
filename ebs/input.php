@@ -13,19 +13,6 @@ require 'header.php';
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 ?>
-
-<script>
-// clear function
-function copyText() {
-    $("#example").val($("#clear").val());
-}
-
-// back function
-function goBack() {
-    window.history.back()
-}
-
-</script>
 </head>
 
 <body>
@@ -74,5 +61,21 @@ echo '
 echo $continue;
 ?>
 </div>
+<?php echo '<script src="'.$home.'/js/TaalPortaal.js"></script>';?>
+<script>
+$(document).ready(function() {
+    fillInputField("string");
+});
+// clear function
+function copyText() {
+    $("#example").val($("#clear").val());
+}
+
+// back function
+function goBack() {
+    window.history.back()
+}
+
+</script>
 </body>
 </html>
