@@ -5,16 +5,11 @@ author: Frank Landsbergen (INL)
 version 1.0 date: 25.06.2014
 version 1.1 date: 30.06.2014 set default sentence in PHP script
 version 1.2 date: 25.02.2015 deal with diacritics
-version 1.3 date: 21.03.2016 reinstate declaration of examplefiller (bug fix) &
- wrap all in self-invoking function (keep namespace clean) (by Bram Vanroy for CCL) 
+version 1.3 date: 21.03.2016 reinstate declaration of examplefiller (bug fix) (by Bram Vanroy for CCL) 
 
 included in GrETEL/Nederbooms by Liesbeth Augustinus
 */
 
-(function() {
-    jQuery(document).ready(function() {
-        fillInputField(); // taalportaalextensie
-    });
 
     function fillInputField() {
         // De standaardzin die we invullen als er geen argument is meegegeven in de url
@@ -54,4 +49,3 @@ included in GrETEL/Nederbooms by Liesbeth Augustinus
         }
         return vars;
     }
-})();
