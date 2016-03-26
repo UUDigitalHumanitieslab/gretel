@@ -166,7 +166,7 @@ echo '</form>';
 
 ?>
 </div>
-<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
+<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
 <script>
 $(document).ready(function(){
     $('button[type="submit"]').click(function(){

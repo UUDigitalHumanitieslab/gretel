@@ -12,36 +12,10 @@
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 require'header-xp.php';
-
-echo '
-<link rel="stylesheet" type="text/css" href="'.$home.'/style/css/datatable.css"></link>
-<script type="text/javascript" src="'.$home.'/js/jquery.dataTables.js" ></script>
-<script type="text/javascript" src="'.$home.'/js/sorttable.js" ></script>
-';
 ?>
-<script>
-// show/hide function
-$(document).ready(function() {
-    // Initialisation code dataTables
-	$('#example').dataTable({
-        "sScrollY": "400px",
-        "bPaginate": false
-    });
 
-    // Show and hide required elements
-    $(".slidingDiv").hide();
-    $(".show_hide").show();
-    $("#hide").hide(); // hide message 'hide'
-    $("#show").show(); // show message 'show'
-
-    $('.show_hide').click(function(){
-        $(".slidingDiv").slideToggle();
-        $("#show").toggle();
-        $("#hide").toggle();
-    });
-  });
-</script>
-
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/datatable.css">
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">
 </head>
 
 <body>
@@ -291,5 +265,52 @@ catch (Exception $e) {
 
 ?>
 </div>
+<script src="<?php echo $home; ?>/js/jquery.dataTables.js"></script>
+<script src="<?php echo $home; ?>/js/sorttable.js"></script>
+<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+<script>
+$(document).ready(function () {
+	var tvLink = $("a.match");
+
+	tvLink.each(function (index) {
+	    $(this).attr("data-tv-url", $(this).attr("href"));
+	    $(this).attr("href", "#tv-" + (index + 1));
+	});
+	tvLink.click(function (e) {
+	    var $this = $(this);
+	    window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
+	    $("#tree-visualizer, #tree-visualizer-fs").remove();
+	    $.treeVisualizer($this.data("tv-url"), {
+	        normalView: false,
+	        initFSOnClick: true
+	    });
+	    e.preventDefault();
+	});
+	var hash = window.location.hash;
+	if (hash) {
+	    if (hash.indexOf("tv-") == 1) {
+	        var index = hash.match(/\d+$/);
+	        tvLink.eq(index[0] - 1).click();
+	    }
+	}
+	// Initialisation code dataTables
+	$('#example').dataTable({
+	    "sScrollY": "400px",
+	    "bPaginate": false
+	});
+
+	// Show and hide required elements
+	$(".slidingDiv").hide();
+	$(".show_hide").show();
+	$("#hide").hide(); // hide message 'hide'
+	$("#show").show(); // show message 'show'
+
+	$('.show_hide').click(function () {
+	    $(".slidingDiv").slideToggle();
+	    $("#show").toggle();
+	    $("#hide").toggle();
+	});
+});
+</script>
 </body>
 </html>

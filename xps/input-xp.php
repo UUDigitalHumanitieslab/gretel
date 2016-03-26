@@ -52,11 +52,9 @@ echo $continue;
 ?>
 </div>
 
-<?php echo '<script src="'.$home.'/js/TaalPortaal.js"></script>';?>
+
+<?php echo '<script src="'.$home.'/js/TaalPortaal.js"></script>'; ?>
 <script>
-$(document).ready(function() {
-    fillInputField("xpath");
-});
 // clear function
 function copyText() {
     $("#example").val($("#clear").val());
@@ -66,6 +64,9 @@ function copyText() {
 function goBack() {
     window.history.back()
 }
+$(document).ready(function() {
+    taalPortaalFiller();
+});
 </script>
 </body>
 </html>

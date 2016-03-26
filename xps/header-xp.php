@@ -11,6 +11,7 @@ $navigation="navigation-xp.php"; // progress bar script
 
 echo '
 <link rel="stylesheet"href=" http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.0.0/normalize.min.css">
 <link rel="stylesheet" href="'.$home.'/style/css/gretel.css">
 <link rel="stylesheet" href="'.$home.'/style/css/tooltip.css">
 <link rel="shortcut icon" type="image/png" href="'.$home.'/img/gretel_logo_trans.png">

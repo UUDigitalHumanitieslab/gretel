@@ -13,19 +13,19 @@
  */
 
 (function($) {
-    var zoomCounter,
-        FS, SS,
+    var FS, SS,
         treeFS, treeSS, tooltipFS, tooltipSS,
         anyTree,
         anyTooltip,
-        zoomOpts, normalView, fsView, fontSizes, initFSOnClick;
+        zoomOpts, normalView, fsView, initFSOnClick,
+		fsFontSize, nvFontSize;
 
     $.treeVisualizer = function(xml, options) {
         var args = $.extend({}, $.treeVisualizer.defaults, options);
 
         if (args.normalView || args.fsView) {
-            initVars(args);
-            loadXML(xml);
+			initVars(args);
+			loadXML(xml);
         } else {
             console.error("Cannot initialize Tree Visualizer: either the container " +
                 "does not exist, or you have set both normal and fullscreen view to " +
@@ -33,14 +33,7 @@
         }
 
         $(document).ready(function() {
-            if (initFSOnClick) {
-                FS.fadeIn();
-                noMoreZooming();
-                fontSizeTreeFS();
-                setTimeout(function() {
-                    sizeTreeFS();
-                }, 10);
-            } else {
+            if (!initFSOnClick) {
                 // Show tree-visualizer-fs tree
                 $(".tv-show-fs").click(function(e) {
                     anyTooltip.css("top", "-100%").children("ul").empty();
@@ -49,7 +42,7 @@
                     noMoreZooming();
                     fontSizeTreeFS();
 
-                    FS.show();
+                    FS.fadeIn(250);
                     sizeTreeFS();
                     e.preventDefault();
                 });
@@ -71,16 +64,16 @@
                     FS.fadeOut(250, function() {
                         treeFS.find("a").removeClass("hovered");
                     });
+                    if (initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
                 } else {
                     if ($this.is(".zoom-in")) {
-                        zoomCounter++;
+						fontSizeTreeFS("zoom-in");
                     } else if ($this.is(".zoom-out")) {
-                        zoomCounter--;
+                        fontSizeTreeFS("zoom-out");
                     } else if ($this.is(".zoom-default")) {
-                        zoomCounter = Math.round(fontSizes.length / 2);
+						fontSizeTreeFS("zoom-default");
                     }
                     noMoreZooming();
-                    fontSizeTreeFS();
                     sizeTreeFS();
                     tooltipPosition();
                 }
@@ -126,10 +119,10 @@
 
     $.treeVisualizer.defaults = {
         normalView: true,
+        nvFontSize: 12,
         fsView: true,
-        fontSize: 12,
+		fsFontSize: 14,
         fsBtn: "",
-        fsFontSizes: [8, 10, 12, 14, 16, 20],
         initFSOnClick: false,
         container: "body"
     };
@@ -144,10 +137,11 @@
 
         if (args.normalView) {
             normalView = true;
+			nvFontSize = args.nvFontSize;
             $(args.container).append('<div id="tree-visualizer" style="display: none"></div>');
             SS = $("#tree-visualizer");
             var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
-                '<div class="tree" style="font-size: ' + args.fontSize + 'px;"></div>' +
+                '<div class="tree" style="font-size: ' + nvFontSize + 'px;"></div>' +
                 '<aside class="tooltip" style="display: none"><ul></ul>' +
                 '<button>&#10005;</button></aside>';
             if (args.fsView) {
@@ -163,10 +157,12 @@
         }
         if (args.fsView) {
             fsView = true;
+			fsFontSize = args.fsFontSize;
             $("body").append('<div id="tree-visualizer-fs" style="display: none"></div>');
             FS = $("#tree-visualizer-fs");
             var FSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
-                '<div class="tree"></div><aside class="tooltip" style="display: none"><ul></ul>' +
+                '<div class="tree" style="font-size: ' + fsFontSize + 'px;"></div>' +
+				'<aside class="tooltip" style="display: none"><ul></ul>' +
                 '<button>&#10005;</button></aside><div class="zoom-opts"><button class="zoom-out">-</button>' +
                 '<button class="zoom-default">Default</button><button class="zoom-in">+</button>' +
                 '<button class="close">&#10005;</button></div>';
@@ -174,7 +170,6 @@
             treeFS = FS.find(".tree");
             tooltipFS = FS.find(".tooltip");
             zoomOpts = FS.find(".zoom-opts");
-            zoomCounter = Math.round(fontSizes.length / 2);
 
             trees.push("#tree-visualizer-fs .tree");
             tooltips.push("#tree-visualizer-fs .tooltip");
@@ -200,6 +195,12 @@
                     errorHandle("Your XML appears to be empty or not in a compatible format.");
                 } else {
                     parseXMLObj(data);
+					if(initFSOnClick) {
+							FS.fadeIn(250);
+							noMoreZooming();
+							fontSizeTreeFS();
+							sizeTreeFS();
+					}
                 }
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -298,17 +299,27 @@
     }
 
     function noMoreZooming() {
-        if (zoomCounter >= fontSizes.length - 1) {
-            zoomOpts.find("button.zoom-in").prop("disabled", true);
-        } else if (zoomCounter <= 0) {
+		var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
+		if (currentFontSize <= 2) {
             zoomOpts.find("button.zoom-out").prop("disabled", true);
+        } else if (currentFontSize >= 32) {
+            zoomOpts.find("button.zoom-in").prop("disabled", true);
         } else {
             zoomOpts.find("button").prop("disabled", false);
         }
     }
 
-    function fontSizeTreeFS() {
-        treeFS.css("fontSize", fontSizes[zoomCounter] + "px");
+    function fontSizeTreeFS(mode) {
+		if (mode=='zoom-default') treeFS.css("fontSize", fsFontSize + "px");
+		else {
+			var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
+			if (mode=='zoom-in') {
+				treeFS.css("fontSize", currentFontSize+2 + "px");
+			}
+			else if (mode=='zoom-out') {
+				treeFS.css("fontSize", currentFontSize-2 + "px");
+			}
+		}
     }
 
     function tooltipPosition() {
@@ -318,42 +329,43 @@
         } else if (typeof treeSS != "undefined" && treeSS.is(":visible")) {
             tree = treeSS;
         }
-        var targetLink = tree.find("a.hovered");
-        if (targetLink.length) {
-            var tooltip = tree.next(".tooltip"),
-                targetOffset = targetLink.offset(),
-                treeOffset = tree.offset(),
-                win = $(window),
-                linkV = {
-                    top: targetOffset.top,
-                    right: win.outerWidth() - (targetOffset.left + targetLink.outerWidth()),
-                    bottom: win.outerHeight() - (targetOffset.top + targetLink.outerHeight()),
-                    left: targetOffset.left,
-                    w: targetLink.outerWidth(),
-                    h: targetLink.outerHeight()
-                },
-                treeV = {
-                    top: treeOffset.top,
-                    right: win.outerWidth() - (treeOffset.left + tree.outerWidth()),
-                    bottom: win.outerHeight() - (treeOffset.top + tree.outerHeight()),
-                    left: treeOffset.left,
-                    w: tree.outerWidth(),
-                    h: tree.outerHeight()
-                };
-            tooltip.css({
-                "left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
-                "top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10) - win.scrollTop()
-            });
-            console.log(win.scrollTop());
+		if (tree!= "undefined") {
+			var targetLink = tree.find("a.hovered");
+			if (targetLink.length) {
+				var tooltip = tree.next(".tooltip"),
+					targetOffset = targetLink.offset(),
+					treeOffset = tree.offset(),
+					win = $(window),
+					linkV = {
+						top: targetOffset.top,
+						right: win.outerWidth() - (targetOffset.left + targetLink.outerWidth()),
+						bottom: win.outerHeight() - (targetOffset.top + targetLink.outerHeight()),
+						left: targetOffset.left,
+						w: targetLink.outerWidth(),
+						h: targetLink.outerHeight()
+					},
+					treeV = {
+						top: treeOffset.top,
+						right: win.outerWidth() - (treeOffset.left + tree.outerWidth()),
+						bottom: win.outerHeight() - (treeOffset.top + tree.outerHeight()),
+						left: treeOffset.left,
+						w: tree.outerWidth(),
+						h: tree.outerHeight()
+					};
+				tooltip.css({
+					"left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
+					"top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10) - win.scrollTop()
+				});
 
-            if (((linkV.left + (linkV.w / 2)) < treeV.left) ||
-                ((linkV.right + (linkV.w / 2)) < treeV.right) ||
-                ((linkV.top + (linkV.h / 2)) < treeV.top) ||
-                ((linkV.bottom + linkV.h) < treeV.bottom)) {
-                tooltip.fadeOut(400);
-            } else {
-                tooltip.show();
-            }
+				if (((linkV.left + (linkV.w / 2)) < treeV.left) ||
+					((linkV.right + (linkV.w / 2)) < treeV.right) ||
+					((linkV.top + (linkV.h / 2)) < treeV.top) ||
+					((linkV.bottom + linkV.h) < treeV.bottom)) {
+					tooltip.fadeOut(400);
+				} else {
+					tooltip.show();
+				}
+			}
         }
     }
 

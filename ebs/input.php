@@ -37,35 +37,33 @@ require("$navigation");
 /***********************************************************/
 
 echo "$title";
+?>
 
-echo '<form action="'.$next.'" method="post" enctype="multipart/form-data" >
-<p> Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>';
+<form action="<?php echo $next; ?>" method="post" enctype="multipart/form-data">
+<p> Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
 
+<?php
 if (isset($_SESSION['example'])) { // find previous input example
   $input=$_SESSION['example'];
 }
+?>
 
-echo '
-<input type="text" name="input" size=50 value="'.$input.'" id="example" />
-<button type="button" onClick="copyText();" id="clear" title="This button clears the input box above, allowing you to enter new input without having to delete the current input character by character">Clear</button>';
+<input type="text" name="input" size=50 value="<?php echo $input; ?>" id="example" />
+<button type="button" onClick="copyText();" id="clear" title="This button clears the input box above, allowing you to enter new input without having to delete the current input character by character">Clear</button>
 
-echo '
 <br/><br/>
 <p>Select the <b>search mode</b> you want to use:</p>
-<input type="radio" name="search" value="basic" checked />Basic search  <a href="#" class="clickMe" tooltip="Without formal query language and less search options."> <sup>[?]</sup></a>
+<label><input type="radio" name="search" value="basic" checked>Basic search</label>  <a href="#" class="clickMe" tooltip="Without formal query language and less search options."> <sup>[?]</sup></a>
 <br/>
-<input type="radio" name="search" value="advanced" />Advanced search <a href="#" class="clickMe" tooltip="Allows a more specific search and has the possibility to adapt the automatically generated XPath query."> <sup>[?]</sup></a>
+<label><input type="radio" name="search" value="advanced">Advanced search</label> <a href="#" class="clickMe" tooltip="Allows a more specific search and has the possibility to adapt the automatically generated XPath query."> <sup>[?]</sup></a>
 <br/><br/>
-';
 
+<?php
 echo $continue;
 ?>
 </div>
-<?php echo '<script src="'.$home.'/js/TaalPortaal.js"></script>';?>
+<script src="<?php echo $home; ?>/js/TaalPortaal.js"></script>
 <script>
-$(document).ready(function() {
-    fillInputField("string");
-});
 // clear function
 function copyText() {
     $("#example").val($("#clear").val());
@@ -75,7 +73,9 @@ function copyText() {
 function goBack() {
     window.history.back()
 }
-
+$(document).ready(function() {
+    taalPortaalFiller();
+});
 </script>
 </body>
 </html>

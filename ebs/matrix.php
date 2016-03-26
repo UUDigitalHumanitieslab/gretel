@@ -20,6 +20,8 @@ require 'header.php';?>
  border: solid 1px black;
 }
 </style>
+
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">
 </head>
 
 <body>
@@ -61,11 +63,12 @@ $title="<h1>Step 3: Select relevant parts</h1>
 $captcha="This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
 
 // LINK TO INPUT PARSE
-$inputzoom=$home."/tmp/$id-style-zoom.xml?$time";
+$inputzoom=$home."/tmp/$id.xml";
 
 /***********************************************************/
 /* INFO + OPTIONS*/
-$info='<p>Indicate the relevant<a href="#" class="clickMe" tooltip="In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones. The latter do not need to be represented in the search results.<br/> The obligatory elements have to be included in the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form."><sup>[?]</sup></a>  parts of the sentence, i.e. the parts you are interested in. [<a href="'.$inputzoom.'" target="_blank">view input parse</a>]</p>';
+$info='<p>Indicate the relevant<a href="#" class="clickMe" tooltip="In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones. The latter do not need to be represented in the search results.<br/> The obligatory elements have to be included in the results, be it as an element of the same word class, any form of a specific lemma,
+or a specific word form."><sup>[?]</sup></a>  parts of the sentence, i.e. the parts you are interested in. [<a href="'.$inputzoom.'" target="_blank" class="tv-show-fs">view input parse</a>]</p>';
 
 $basicguidelines='<p><b>GUIDELINES</b></p>
 <ul>
@@ -210,5 +213,21 @@ echo $new.$back.$continue;
 echo "</form>";
 ?>
 </div>
+
+<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+<script>
+$(document).ready(function () {
+	var tvLink = $("a.tv-show-fs");
+	tvLink.click(function (e) {
+	    var $this = $(this);
+	    $("#tree-visualizer, #tree-visualizer-fs").remove();
+	    $.treeVisualizer($this.attr("href"), {
+	        normalView: false,
+          initFSOnClick: true
+	    });
+	    e.preventDefault();
+	});
+});
+</script>
 </body>
 </html>

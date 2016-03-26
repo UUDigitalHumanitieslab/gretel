@@ -9,14 +9,17 @@
 
 <head>
 <title>GrETEL 2.0</title>
-<link rel="stylesheet" type="text/css" href="style/css/gretel.css"></link>
-<link rel="stylesheet" type="text/css" href="style/css/tooltip.css"></link>
-<link href="http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.0.0/normalize.min.css">
+
+<link rel="stylesheet" href="style/css/gretel.css">
+<link rel="stylesheet" href="style/css/tooltip.css">
+
 <link rel="shortcut icon" type="image/png" href="img/gretel_logo_trans.png" />
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript" src="js/tooltip.js" ></script>
-<script type="text/javascript" src="js/browserDetection.js" ></script>
+<script src="js/tooltip.js"></script>
+<script src="js/browserDetection.js"></script>
 <?php include_once("scripts/AnalyticsTracking.php") ?>
 </head>
 
