@@ -218,15 +218,27 @@ echo "</form>";
 <script>
 $(document).ready(function () {
 	var tvLink = $("a.tv-show-fs");
-	tvLink.click(function (e) {
+  tvLink.each(function (index) {
+      $(this).attr("data-tv-url", $(this).attr("href"));
+      $(this).attr("href", "#tv-" + (index + 1));
+  });
+  tvLink.click(function (e) {
 	    var $this = $(this);
+	    window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
 	    $("#tree-visualizer, #tree-visualizer-fs").remove();
-	    $.treeVisualizer($this.attr("href"), {
+	    $.treeVisualizer($this.data("tv-url"), {
 	        normalView: false,
-          initFSOnClick: true
+	        initFSOnClick: true
 	    });
 	    e.preventDefault();
 	});
+  var hash = window.location.hash;
+  if (hash) {
+      if (hash.indexOf("tv-") == 1) {
+          var index = hash.match(/\d+$/);
+          tvLink.eq(index[0] - 1).click();
+      }
+  }
 });
 </script>
 </body>
