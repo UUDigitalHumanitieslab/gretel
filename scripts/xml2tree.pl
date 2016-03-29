@@ -14,54 +14,62 @@
 use strict;
 use XML::Twig::XPath;
 
-my $twig= XML::Twig::XPath->new(pretty_print => 'indented');    # create the twig
+# create the twig
+my $twig = XML::Twig::XPath->new( pretty_print => 'indented' );
 
-my $inputxml=$ARGV[0];
-my $inputxp=$ARGV[1];
-my $style=$ARGV[2];
+my $inputxml = $ARGV[0];
+my $inputxp  = $ARGV[1];
+my $style    = $ARGV[2];
 
 # style for sonar
-if ($style eq "psonar") {
-    $style="../style/xsl/xml2tree-sonar.xsl"; # plain
+if ( $style eq "psonar" ) {
+    # plain
+    $style = "../style/xsl/xml2tree-sonar.xsl";
 }
-elsif ($style eq "zsonar") {
-    $style="../style/xsl/xml2tree-sonar-zoom.xsl"; #zoom
+elsif ( $style eq "zsonar" ) {
+    #zoom
+    $style = "../style/xsl/xml2tree-sonar-zoom.xsl";
 }
-elsif ($style eq "ptsonar") {
-    $style="../style/xsl/xml2tree-sonar-postag.xsl"; # extended postags
+elsif ( $style eq "ptsonar" ) {
+    # extended postags
+    $style = "../style/xsl/xml2tree-sonar-postag.xsl";
 }
-
-else {
-    $style="../style/xsl/xml2tree-alpino-plain.xsl"; # default (plain Alpino style)
-}
-
-if($inputxml =~ /^<alpino_ds/) {
-    $twig->parse("$inputxml"); # build it (xml-string)
+elsif ( $style eq "tv-default" ) {
+    # do nothing
 }
 else {
-    $twig->parsefile("$inputxml"); # build it (xml-file)
+    # default (plain Alpino style)
+    $style = "../style/xsl/xml2tree-alpino-plain.xsl";
 }
 
-$twig->add_stylesheet(xsl=>$style);
-my $root=$twig->root; 
-my $sentence=$root->first_child('sentence');
-my @xpath = $twig->find_nodes($inputxp);
+if ( $inputxml =~ /^<alpino_ds/ ) {
+    # build it (xml-string)
+    $twig->parse("$inputxml");
+}
+else {
+    # build it (xml-file)
+    $twig->parsefile("$inputxml");
+}
+
+unless ( $style eq "tv-default" ) { $twig->add_stylesheet( xsl => $style ); }
+my $root     = $twig->root;
+my $sentence = $root->first_child('sentence');
+my @xpath    = $twig->find_nodes($inputxp);
 
 if (@xpath) {
-    foreach my $node(@xpath) {
-    $node->set_att(highlight=>"yes");
+    foreach my $node (@xpath) {
+        $node->set_att( highlight => "yes" );
     }
 }
 
 else {
-    open (ERROR, ">../log/xml2tree.log");
+    open( ERROR, ">../log/xml2tree.log" );
     print ERROR "Can't find $inputxp\n";
-    close (ERROR);
-    my $backupxp='//node[@rel="top"]';
+    close(ERROR);
+    my $backupxp = '//node[@rel="top"]';
     @xpath = $twig->find_nodes($backupxp);
-    foreach my $node(@xpath) {
-	$node->set_att(highlight=>"yes");
+    foreach my $node (@xpath) {
+        $node->set_att( highlight => "yes" );
     }
 }
-
 $twig->print();

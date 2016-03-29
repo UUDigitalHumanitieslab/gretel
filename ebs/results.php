@@ -363,7 +363,7 @@ else {
 	      $beginlist=$match[5];
 
 	      $hlsentence=HighlightSentence($matchsent,$beginlist);
-	      $sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=xml" target="_blank" >'.$sid.'</a>';
+	      $sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
 	      echo "<tr><td>".$sentenceidlink."</td><td>".$hlsentence."</td><td width=\"100px\" >".$counthits."</td></tr>\n";
 	    }
 	  }

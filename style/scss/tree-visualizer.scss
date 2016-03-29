@@ -7,9 +7,8 @@
 @import "tv-variables";
 @import "tv-buttons";
 @import "clearfix";
-
-#tree-visualizer-fs,
-#tree-visualizer {
+#tree-visualizer,
+#tree-visualizer-fs {
     box-sizing: border-box;
     color: $text_main;
     * {
@@ -106,8 +105,8 @@
             list-style-type: none;
             vertical-align: top;
             text-align: center;
-            &:before,
-            &:after {
+            &:after,
+            &:before {
                 position: absolute;
                 top: 0;
                 right: 50%;
@@ -141,6 +140,15 @@
                     display: none;
                 }
             }
+            &.highlight {
+                a, a.only-child {
+                    border: 2px solid lighten($tree_highlight,10%);
+                    &:hover {
+                        border: 2px solid darken($tree_highlight,10%);
+                        background: lighten($tree_highlight,10%);
+                    }
+                }
+            }
             a {
                 display: inline-block;
                 padding: 0.5em 1em;
@@ -148,35 +156,45 @@
                 border-bottom: 2px solid lighten($tree_branch,8%);
                 border-radius: 4em;
                 background: white;
-                color: #666;
+                color: $text_main;
                 text-decoration: none;
+                position: relative;
+                z-index: 2;
                 span:nth-child(2) {
                     color: $text_main;
                     font-weight: normal;
                 }
+                &.hovered,
                 &:hover,
-                &:hover + ol li a,
-                &.hovered {
+                &:hover + ol li a {
                     border: 1px solid $tree_highlight;
                     border-bottom-width: 2px;
                     background: $tree_highlight;
                     color: white;
                 }
-                &:hover span:nth-child(2),
+                &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
+                    border: 2px solid darken($tree_highlight,10%);
+                    background: lighten($tree_highlight,10%);
+                }
+                &.hovered span:nth-child(2),
                 &:hover + ol li a span:nth-child(2),
-                &.hovered span:nth-child(2) {
+                &:hover span:nth-child(2) {
                     color: white;
                 }
                 &:hover + ol li a.only-child {
                     border: 1px solid darken($tree_highlight,15%);
                     border-bottom-width: 2px;
                     background: darken($tree_highlight,15%);
-                    text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+                    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+                }
+                &:hover + ol li.highlight a.only-child {
+                    border: 2px solid darken($tree_highlight,10%);
+                    background: lighten($tree_highlight,10%);
                 }
                 &:hover + ol {
+                     &:before,
                     li:after,
                     li:before,
-                    &:before,
                     ol:before {
                         border-color: lighten($tree_highlight,10%);
                     }
@@ -184,8 +202,8 @@
                 &.only-child {
                     color: $tree_highlight;
                     font-weight: bold;
-                    &:hover,
-                    &.hovered {
+                    &.hovered,
+                    &:hover {
                         border: 1px solid darken($tree_highlight,12%);
                         border-bottom-width: 2px;
                         background: darken($tree_highlight,12%);
@@ -236,6 +254,67 @@
         min-width: 480px;
         min-height: 180px;
         background: #F5F5F5;
+        &.small {
+            overflow-y: scroll;
+            a {
+                transition: transform 150ms;
+                will-change: transform;
+                &:hover, &.hovered {
+                    transform: scale(2);
+                    z-index: 3;
+                    border-color: transparent !important;
+                }
+                &.only-child {
+                    ~ span {transition: transform 150ms;}
+                    &:hover, &.hovered {
+                        margin-bottom: 2em;
+                        ~ span {
+                            transform: scale(2);
+                            margin-top: 1.5em;
+                            z-index: 3;
+                        }
+                    }
+                }
+            }
+        }
+        &.x-small {
+            a {
+                &:hover, &.hovered {
+                    transform: scale(3);
+                    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+                }
+                &.only-child {
+                    &:hover, &.hovered {
+                        margin-bottom: 5em;
+                        text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+                        ~ span {
+                            transform: scale(3);
+                            margin-top: 3em;
+                        }
+                    }
+                }
+            }
+        }
+        &.xx-small {
+            li a span {margin: 0;}
+            a {
+                border-width: 1px !important;
+                &:hover, &.hovered {
+                    transform: scale(6);
+                    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+                }
+                &.only-child {
+                    &:hover, &.hovered {
+                        margin-bottom: 14em;
+                        text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+                        ~ span {
+                            transform: scale(6);
+                            margin-top: 6em;
+                        }
+                    }
+                }
+            }
+        }
     }
     .zoom-opts {
         position: absolute;

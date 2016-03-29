@@ -31,7 +31,9 @@ elsif ($style eq "zsonar") {
 elsif ($style eq "ptsonar") {
     $style="../style/xsl/xml2tree-sonar-postag.xsl"; # extended postags
 }
-
+elsif ($style eq "default") {
+    $style="../style/xsl/xml2tree-alpino-plain-bhl.xsl"; # default (plain)
+}
 else {
     $style="../style/xsl/xml2tree-alpino-plain-bhl.xsl"; # default (plain)
 }

@@ -40,16 +40,16 @@ require("../config/config.php"); // load configuration file
 $scripts="$root/scripts"; // scripts dir
 $basexclient="$scripts/BaseXClient.php";
 
-// INCLUDE EXTERNAL SCRIPTS 
+// INCLUDE EXTERNAL SCRIPTS
 require("$basexclient");
 
 // connect to database
 if(!$treebank) { // if no treebank is set
-  echo "Treebank not found!</br>\n"; 
+  echo "Treebank not found!</br>\n";
   exit;
 }
 
-// BaseX database variables  
+// BaseX database variables
 
 if ($treebank=='lassy' || $treebank=='cgn') {
 
@@ -67,7 +67,7 @@ else { // for sonar
   preg_match('/^([A-Z]{5})/', $db, $comp);
   $component=$comp[0];
   $dbhost2=$dbname_server[$component]; // get DBserver name
-   
+
   $xquery = 'db:open("'.$db.'")/treebank/alpino_ds[@id="'.$sentid.'"]'; // build XQuery
 
   // create session
@@ -75,7 +75,7 @@ else { // for sonar
 }
 
 // fetch tree
-$query = $session->query($xquery); // create query instance 
+$query = $session->query($xquery); // create query instance
 $xml=$query->execute();
 
 $query->close(); // close query instance
@@ -108,20 +108,23 @@ else {
 // representation modes
 
 if (isset($option) && $option=="xml") {
-  echo $xml;
+    echo $xml;
 }
 
 else {
-  if (isset($option) && $option=="zoom") {
+  if (isset($option) && $option=="tv-xml") {
+      $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'tv-default'`;
+  }
+  elseif (isset($option) && $option=="zoom") {
     $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'zsonar'`;
   }
-  
+
   else {
     $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'psonar'`;
   }
 
   $stylexml=simplexml_load_string($styletree);
-  echo $stylexml->asXML(); 
+  echo $stylexml->asXML();
 }
 
 ?>
