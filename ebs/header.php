@@ -3,9 +3,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <?php
-require("../config/config.php");
+require '../config/config.php';
 
-$navigation="navigation.php"; // progress bar script
+$navigation = 'navigation.php'; // progress bar script
 
 // stylesheets
 
@@ -21,5 +21,5 @@ echo '
 <script src="'.$home.'/js/browserDetection.js"></script>
 ';
 
-include_once("$root/scripts/AnalyticsTracking.php");
+include_once "$root/scripts/AnalyticsTracking.php";
 ?>

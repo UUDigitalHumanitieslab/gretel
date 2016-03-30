@@ -1,0 +1,210 @@
+@import "normalize";
+@import "clearfix";
+@import "variables";
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+body {
+    background-color: #D6E69D;
+    background-image: url("../../img/gretel_logo_trans.png");
+    background-repeat: no-repeat;
+    color: #505050;
+    font-family: $fontbody;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+#container {
+    padding: 1.6em;
+    min-width: 480px;
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+    flex: 1;
+    background: #fff;
+}
+h1,
+h2,
+h3,
+h4 {
+    font-family: $fontheadings;
+}
+a {
+    /* GrETEL green */
+    color: #b4c24b;
+    text-decoration: none;
+}
+a:hover {
+    color: #968A7A;
+}
+.colour {
+    background-color: #b4c24b;
+}
+#ccl-logo {
+    float: right;
+    * {
+        display: inline;
+        margin: 0 0 0 15px;
+        vertical-align: middle;
+    }
+    p {
+        margin: 0;
+    }
+}
+nav #ccl-logo {
+    float: none;
+}
+@media all and (max-width: 820px) {
+    nav {
+        flex-direction: column-reverse;
+    }
+}
+/* Progress bar */
+nav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.progressbar {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+}
+.progressbar li {
+    display: inline-block;
+    background: #C0C0C0;
+    padding: 0;
+}
+/* Style and position actual text */
+.progressbar li p {
+    position: relative;
+    color: white;
+    text-decoration: none;
+    margin: 0;
+    padding: 1em;
+}
+/* Change colour of active page in progress bar */
+.progressbar li.done {
+    background-color: #747474;
+}
+.progressbar li.active {
+    background-color: #b4c24b;
+}
+/* Circular - small circles on small screen size */
+@media all and (max-width: 1239px) {
+    .progressbar {
+        font-size: 15px;
+    }
+    .progressbar li {
+        border-radius: 50%;
+    }
+    .progressbar li p {
+        line-height: 32px;
+        height: 32px;
+        width: 32px;
+        padding: 0;
+        text-align: center;
+    }
+    .progressbar span {
+        display: none;
+    }
+}
+/* Breacrumbs - arrow directed progress bar on large screens */
+@media all and (min-width: 1240px) {
+    .progressbar li:not(:first-child) {
+        padding-left: 10px;
+    }
+    /* Arrows for breadcrumbs; not on last child */
+    .progressbar li:not(:last-child) p:after,
+    .progressbar li:not(:last-child) p:before {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateX(-50%);
+        z-index: 1;
+        display: block;
+        margin-top: -50px;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent;
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid white;
+        content: " ";
+    }
+    .progressbar li:not(:last-child) p:after {
+        border-left-color: #C0C0C0;
+        margin-left: -1px;
+        z-index: 2;
+    }
+    .progressbar li:last-child {
+        padding-right: 10px;
+    }
+    /* Position text on top of the arrow, this saves us some space */
+    .progressbar li span {
+        position: relative;
+        z-index: 3;
+    }
+    .progressbar li.active:not(:last-child) p:after {
+        border-left-color: #b4c24b;
+    }
+    .progressbar li.done:not(:last-child) p:after {
+        border-left-color: #747474;
+    }
+}
+.home {
+    width: 30px;
+    height: 30px;
+}
+/* Sortable tables */
+/* define height and width of scrollable area. Add 16px to width for scrollbar */
+div.tableWrapper {
+    clear: both;
+    overflow: hidden;
+    /*border: 1px solid #963;*/
+    width: 100%;
+    height: 500px;
+    /*background-color: #b4c24b;*/
+}
+table.sortable {
+    width: 100%;
+}
+table.sortable thead {
+    display: table-header-group;
+    background-color: grey;
+}
+.pointer {
+    cursor: pointer;
+}
+a.match {
+    color: #b4c24b;
+    text-decoration: none;
+    font-weight: bold;
+}
+/* mouse over */
+.match:hover {
+    color: grey;
+    font-weight: bold;
+}
+/* loading image */
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 100;
+    margin-top: -150px;
+    margin-left: -150px;
+    /*border:3px double #999;*/
+    width: 300px;
+    height: 300px;
+    /*background: #f7f7f7;*/
+    background: url('../../img/gretel_logo_trans.png'), url('../../img/page-loader.gif') 50% 50% no-repeat rgb(249, 249, 249);
+    background-size: 300px 300px;
+    text-align: center;
+    font-size: 20pt;
+    line-height: 300px;
+}
