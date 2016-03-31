@@ -148,8 +148,13 @@
                     background: $tree_branch;
                     color: white;
                     &:hover {
-                        border-color: darken($tree_branch, 5%);
-                        background: darken($tree_branch, 5%);
+                        border-color: darken($tree_branch, 10%);
+                        background: darken($tree_branch, 10%);
+                        color: darken($text_main,  10%);
+                        &.hovered span:nth-child(2),
+                        &:hover span:nth-child(2) {
+                            color: darken($text_main,  10%);
+                        }
                     }
                 }
             }
@@ -164,6 +169,7 @@
                 text-decoration: none;
                 position: relative;
                 z-index: 2;
+                &:hover {font-weight: normal;}
                 span:nth-child(2) {
                     color: $text_main;
                     font-weight: normal;
@@ -177,13 +183,17 @@
                     color: white;
                 }
                 &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
-                    border-color: darken($tree_branch, 5%);
-                    background: darken($tree_branch, 5%);
+                    border-color: darken($tree_branch, 10%);
+                    background: darken($tree_branch, 10%);
+                    color: darken($text_main,  10%);
                 }
                 &.hovered span:nth-child(2),
                 &:hover + ol li a span:nth-child(2),
                 &:hover span:nth-child(2) {
                     color: white;
+                }
+                &:hover + ol li.highlight a span:nth-child(2), {
+                    color: darken($text_main,  10%);
                 }
                 &:hover + ol li a.only-child {
                     border: 1px solid darken($tree_highlight,15%);

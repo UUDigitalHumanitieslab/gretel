@@ -242,8 +242,19 @@
 #tree-visualizer .tree li.highlight a:hover, #tree-visualizer .tree li.highlight a.only-child:hover,
 #tree-visualizer-fs .tree li.highlight a:hover,
 #tree-visualizer-fs .tree li.highlight a.only-child:hover {
-  border-color: #bfbfbf;
-  background: #bfbfbf;
+  border-color: #b3b3b3;
+  background: #b3b3b3;
+  color: #3d3d3d;
+}
+
+#tree-visualizer .tree li.highlight a:hover.hovered span:nth-child(2),
+#tree-visualizer .tree li.highlight a:hover:hover span:nth-child(2), #tree-visualizer .tree li.highlight a.only-child:hover.hovered span:nth-child(2),
+#tree-visualizer .tree li.highlight a.only-child:hover:hover span:nth-child(2),
+#tree-visualizer-fs .tree li.highlight a:hover.hovered span:nth-child(2),
+#tree-visualizer-fs .tree li.highlight a:hover:hover span:nth-child(2),
+#tree-visualizer-fs .tree li.highlight a.only-child:hover.hovered span:nth-child(2),
+#tree-visualizer-fs .tree li.highlight a.only-child:hover:hover span:nth-child(2) {
+  color: #3d3d3d;
 }
 
 #tree-visualizer .tree li a,
@@ -258,6 +269,11 @@
   text-decoration: none;
   position: relative;
   z-index: 2;
+}
+
+#tree-visualizer .tree li a:hover,
+#tree-visualizer-fs .tree li a:hover {
+  font-weight: normal;
 }
 
 #tree-visualizer .tree li a span:nth-child(2),
@@ -280,8 +296,9 @@
 #tree-visualizer .tree li a:hover + ol li.highlight a, #tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
 #tree-visualizer-fs .tree li a:hover + ol li.highlight a,
 #tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
-  border-color: #bfbfbf;
-  background: #bfbfbf;
+  border-color: #b3b3b3;
+  background: #b3b3b3;
+  color: #3d3d3d;
 }
 
 #tree-visualizer .tree li a.hovered span:nth-child(2),
@@ -291,6 +308,11 @@
 #tree-visualizer-fs .tree li a:hover + ol li a span:nth-child(2),
 #tree-visualizer-fs .tree li a:hover span:nth-child(2) {
   color: white;
+}
+
+#tree-visualizer .tree li a:hover + ol li.highlight a span:nth-child(2),
+#tree-visualizer-fs .tree li a:hover + ol li.highlight a span:nth-child(2) {
+  color: #3d3d3d;
 }
 
 #tree-visualizer .tree li a:hover + ol li a.only-child,
