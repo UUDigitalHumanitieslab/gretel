@@ -68,11 +68,12 @@
 
             // Zooming
             zoomOpts.find("button").click(function() {
-                var $this = $(this);
+                var $this = $(this),
+                    hoveredLink = treeFS.find("a.hovered");
 
                 if ($this.is(".close")) {
                     FS.fadeOut(250, function() {
-                        treeFS.find("a").removeClass("hovered");
+                        hoveredLink.removeClass("hovered");
                     });
                     if (initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
                 } else {
@@ -85,14 +86,16 @@
                     }
                     sizeTreeFS();
 
-                    var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
+                    if (hoveredLink.length) {
+                        var animationSpeed = (parseFloat(hoveredLink.css("transition-duration")) > 0) ? hoveredLink.css("transition-duration") : "150ms";
+                        animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
+                        animationSpeed += 10;
+                        console.log(animationSpeed);
 
-                    animationSpeed = (animationSpeed.indexOf("ms")>-1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
-                    animationSpeed += 50;
-                    
-                    setTimeout(function() {
-                      tooltipPosition(true);
-                    }, animationSpeed);
+                        setTimeout(function() {
+                          tooltipPosition(true);
+                        }, animationSpeed);
+                    }
                 }
             });
 
