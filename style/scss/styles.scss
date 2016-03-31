@@ -9,12 +9,29 @@
 body {
     background-color: #D6E69D;
     background-image: url("../../img/gretel_logo_trans.png");
+    background-attachment: fixed;
     background-repeat: no-repeat;
     color: #505050;
     font-family: $fontbody;
     display: flex;
     min-height: 100vh;
     flex-direction: column;
+}
+.page-header {
+    h1 {
+        padding-bottom: 0.67em;
+        border-bottom: 1px dotted #968A7A;
+        span {
+            font-size: 67%;
+            font-family: $fontbody;
+            font-weight: normal;
+            margin-left: 0.67em;
+        }
+    }
+    figure {
+        margin: 0;
+        float: right;
+    }
 }
 #container {
     padding: 1.6em;

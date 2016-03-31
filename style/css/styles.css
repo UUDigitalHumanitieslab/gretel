@@ -410,6 +410,7 @@ textarea {
 body {
   background-color: #D6E69D;
   background-image: url("../../img/gretel_logo_trans.png");
+  background-attachment: fixed;
   background-repeat: no-repeat;
   color: #505050;
   font-family: "Open Sans", sans-serif;
@@ -420,6 +421,21 @@ body {
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
+}
+
+.page-header h1 {
+  padding-bottom: 0.67em;
+  border-bottom: 1px dotted #968A7A;
+}
+.page-header h1 span {
+  font-size: 67%;
+  font-family: "Open Sans", sans-serif;
+  font-weight: normal;
+  margin-left: 0.67em;
+}
+.page-header figure {
+  margin: 0;
+  float: right;
 }
 
 #container {

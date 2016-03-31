@@ -1,16 +1,21 @@
 <?php
-require 'config/config.php';
+
+require "config/config.php";
 require 'php/head.php';
+
 ?>
 </head>
 
 <body>
     <div id="container">
-        <figure id="ccl-logo">
-            <a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60" alt="Logo CCL"></a>
-        </figure>
+        <header class="page-header">
+            <h1>GrETEL 2.0 <span>An example based search engine for corpora</span></h1>
+            
+            <figure id="ccl-logo">
+                <a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60" alt="Logo CCL"></a>
+            </figure>
+        </header>
         <section>
-        <h1>GrETEL 2.0</h1>
         <h2>What is GrETEL?</h2>
 
         <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
