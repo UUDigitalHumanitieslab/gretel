@@ -144,10 +144,12 @@
             }
             &.highlight {
                 a, a.only-child {
-                    border: 2px solid lighten($tree_highlight,10%);
+                    border-color: $tree_branch;
+                    background: $tree_branch;
+                    color: white;
                     &:hover {
-                        border: 2px solid darken($tree_highlight,10%);
-                        background: lighten($tree_highlight,10%);
+                        border-color: darken($tree_branch, 5%);
+                        background: darken($tree_branch, 5%);
                     }
                 }
             }
@@ -175,8 +177,8 @@
                     color: white;
                 }
                 &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
-                    border: 2px solid darken($tree_highlight,10%);
-                    background: lighten($tree_highlight,10%);
+                    border-color: darken($tree_branch, 5%);
+                    background: darken($tree_branch, 5%);
                 }
                 &.hovered span:nth-child(2),
                 &:hover + ol li a span:nth-child(2),
@@ -190,8 +192,8 @@
                     text-shadow: 0 1px 0 rgba(0,0,0,0.3);
                 }
                 &:hover + ol li.highlight a.only-child {
-                    border: 2px solid darken($tree_highlight,10%);
-                    background: lighten($tree_highlight,10%);
+                    border-color: darken($tree_branch, 5%);
+                    background: darken($tree_branch, 5%);
                 }
                 &:hover + ol {
                      &:before,
@@ -254,6 +256,7 @@
     justify-content: center;
     .sentence {
         background: darken(#F5F5F5, 5%);
+        border-bottom: 1px solid $tree_branch;
         padding: 12px;
         line-height: 1.6;
         width: 100vw;
