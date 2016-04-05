@@ -1,8 +1,6 @@
 <?php
-
 require "config/config.php";
 require 'php/head.php';
-
 ?>
 </head>
 
@@ -10,7 +8,7 @@ require 'php/head.php';
     <div id="container">
         <header class="page-header">
             <h1>GrETEL 2.0 <span>An example based search engine for corpora</span></h1>
-            
+
             <figure id="ccl-logo">
                 <a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60" alt="Logo CCL"></a>
             </figure>
@@ -65,6 +63,9 @@ require 'php/head.php';
         </main>
     </div>
 
-    <?php include_once('scripts/AnalyticsTracking.php') ?>
+    <?php
+    require 'php/footer.php';
+    include 'scripts/AnalyticsTracking.php';
+    ?>
 </body>
 </html>

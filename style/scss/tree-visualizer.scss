@@ -7,10 +7,11 @@
 @import "tv-variables";
 @import "tv-buttons";
 @import "clearfix";
-#tree-visualizer,
-#tree-visualizer-fs {
+.tree-visualizer,
+.tree-visualizer-fs {
     box-sizing: border-box;
     color: $text_main;
+    text-align: center;
     * {
         box-sizing: border-box;
         margin: 0;
@@ -19,6 +20,19 @@
     button {
         outline: 0;
         cursor: pointer;
+    }
+    .tv-error {
+        margin-top: 24px;
+        padding: 8px 16px;
+        background: $error;
+        color: white;
+        text-align: center;
+        text-shadow: 0 1px rgba(0,0,0,0.32);
+        line-height: 1.75;
+        display: inline-block;
+        p {
+            margin: 0;
+        }
     }
     .tree {
         overflow: auto;
@@ -33,6 +47,7 @@
             border: 6px solid white;
             background: darken(#F5F5F5, 2%);
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            text-align: left;
             > ul {
                 padding: 0 8px;
                 list-style: none;
@@ -144,10 +159,18 @@
             }
             &.highlight {
                 a, a.only-child {
-                    border: 2px solid lighten($tree_highlight,10%);
+                    border-color: $tree_branch;
+                    background: $tree_branch;
+                    color: white;
+                    text-shadow: none;
                     &:hover {
-                        border: 2px solid darken($tree_highlight,10%);
-                        background: lighten($tree_highlight,10%);
+                        border-color: darken($tree_branch, 10%);
+                        background: darken($tree_branch, 10%);
+                        color: darken($text_main,  10%);
+                        &.hovered span:nth-child(2),
+                        &:hover span:nth-child(2) {
+                            color: darken($text_main,  10%);
+                        }
                     }
                 }
             }
@@ -162,6 +185,7 @@
                 text-decoration: none;
                 position: relative;
                 z-index: 2;
+                &:hover {font-weight: normal;}
                 span:nth-child(2) {
                     color: $text_main;
                     font-weight: normal;
@@ -175,13 +199,18 @@
                     color: white;
                 }
                 &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
-                    border: 2px solid darken($tree_highlight,10%);
-                    background: lighten($tree_highlight,10%);
+                    border-color: darken($tree_branch, 10%);
+                    background: darken($tree_branch, 10%);
+                    color: darken($text_main,  10%);
+                    text-shadow: none;
                 }
                 &.hovered span:nth-child(2),
                 &:hover + ol li a span:nth-child(2),
                 &:hover span:nth-child(2) {
                     color: white;
+                }
+                &:hover + ol li.highlight a span:nth-child(2), {
+                    color: darken($text_main,  10%);
                 }
                 &:hover + ol li a.only-child {
                     border: 1px solid darken($tree_highlight,15%);
@@ -190,8 +219,9 @@
                     text-shadow: 0 1px 0 rgba(0,0,0,0.3);
                 }
                 &:hover + ol li.highlight a.only-child {
-                    border: 2px solid darken($tree_highlight,10%);
-                    background: lighten($tree_highlight,10%);
+                    border-color: darken($tree_branch, 5%);
+                    background: darken($tree_branch, 5%);
+                    text-shadow: none;
                 }
                 &:hover + ol {
                      &:before,
@@ -221,7 +251,7 @@
         }
     }
 }
-#tree-visualizer {
+.tree-visualizer {
     .tree {
         margin: 24px auto;
         padding: 24px;
@@ -230,7 +260,7 @@
         background: darken(#F5F5F5, 2%);
         font-size: 12px;
         + .tooltip {
-            font-size: 12px;
+            z-index: 9;
         }
     }
     .tv-show-fs {
@@ -239,7 +269,7 @@
         @extend %button;
     }
 }
-#tree-visualizer-fs {
+.tree-visualizer-fs {
     position: fixed;
     top: 0;
     left: 0;
@@ -254,6 +284,7 @@
     justify-content: center;
     .sentence {
         background: darken(#F5F5F5, 5%);
+        border-bottom: 1px solid $tree_branch;
         padding: 12px;
         line-height: 1.6;
         width: 100vw;
@@ -315,7 +346,8 @@
         padding: 12px;
         background: #F5F5F5;
         opacity: 0.7;
-        transition: all 200ms;
+        transition: opacity 200ms;
+        will-change: opacity;
         @extend %clearfix;
         &:hover {
             z-index: 12;
@@ -365,17 +397,5 @@
                 border-radius: 0 3px 3px 0;
             }
         }
-    }
-}
-#tv-error {
-    margin-top: 24px;
-    padding: 8px 16px;
-    background: $error;
-    color: white;
-    text-align: center;
-    text-shadow: 0 1px rgba(0,0,0,0.32);
-    line-height: 1.75;
-    p {
-        margin: 0;
     }
 }
