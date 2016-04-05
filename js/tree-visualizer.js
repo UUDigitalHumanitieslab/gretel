@@ -147,8 +147,8 @@
                 SS = instance.children(".tree-visualizer");
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
-                    '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button>&#10005;</button></aside>';
+                    '<aside class="tooltip" style="display: none; font-size: ' + args.nvFontSize + 'px;"">' +
+                    '<ul></ul><button>&#10005;</button></aside>';
                 if (args.fsView) {
                     SSHTML += '<button class="tv-show-fs">Fullscreen</button>';
                 }
@@ -372,7 +372,7 @@
                             h: treeRect.height
                         };
                     if (animate) {
-                        tooltip.animate({
+                        tooltip.stop(true).animate({
                             "left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
                             "top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10)
                         }, 250);
