@@ -172,14 +172,9 @@ $(document).ready(function(){
         $(".loading").show();
     });
     <?php if ($_SESSION['search']=="advanced"): ?>
-    $.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml', {
-        container: "#tree-output",
-        extendedPOS: true
-    });
+        $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml', {extendedPOS: true});
     <?php else: ?>
-    $.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml', {
-        container: "#tree-output"
-    });
+        $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml');
     <?php endif; ?>
 });
 </script>
