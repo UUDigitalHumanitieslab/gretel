@@ -7,37 +7,42 @@ require 'php/head.php';
 <body>
     <div id="container">
         <header class="page-header">
-            <h1>GrETEL 2.0 <span>An example based search engine for corpora</span></h1>
+            <h1>GrETEL 2.0</h1>
 
-            <figure id="ccl-logo">
-                <a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60" alt="Logo CCL"></a>
-            </figure>
+            <nav class="primary-navigation">
+                <ul>
+                    <li><a href="#" title="Home" class="active">Home</a></li>
+                    <li><a href="#" title="Example-based search">Example-based search</a></li>
+                    <li><a href="#" title="XPath search">XPath search</a></li>
+                    <li><a href="#" title="Documentation">Documentation</a></li>
+                </ul>
+            </nav>
         </header>
         <section>
-        <h2>What is GrETEL?</h2>
+            <h2>What is GrETEL?</h2>
 
-        <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
-            <strong>E</strong>mpirical <strong>L</strong>inguistics.
-            It is a user-friendly search engine for the exploitation of treebanks. It comes in two formats:</p>
+            <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
+                <strong>E</strong>mpirical <strong>L</strong>inguistics.
+                It is a user-friendly search engine for the exploitation of treebanks. It comes in two formats:</p>
 
-        <h3><a href="ebs/input.php">Example-based search</a></h3>
+            <h3><a href="ebs/input.php">Example-based search</a></h3>
 
-        <p>In this search mode you can use a natural language example as a starting point for searching
-            a treebank (a text corpus with syntactic annotations) with limited knowledge about
-            tree representations and formal query languages. The formal (XPath) query is automatically generated</p>
+            <p>In this search mode you can use a natural language example as a starting point for searching
+                a treebank (a text corpus with syntactic annotations) with limited knowledge about
+                tree representations and formal query languages. The formal (XPath) query is automatically generated</p>
 
-        <h3><a href="xps/input-xp.php">XPath search</a></h3>
+            <h3><a href="xps/input-xp.php">XPath search</a></h3>
 
-        <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
-            XPath search tool only when you are an experienced XPath user!</p>
+            <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
+                XPath search tool only when you are an experienced XPath user!</p>
 
-        <p>Please cite the following paper if you are using GrETEL for your research:</p>
-        <blockquote style="border-left: 4px solid #968A7A; padding-left: 1em;">Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
-            <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a>
-            In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
-            Istanbul, Turkey. pp. 3161-3167</p></blockquote>
+            <p>Please cite the following paper if you are using GrETEL for your research:</p>
+            <blockquote style="border-left: 4px solid #968A7A; padding-left: 1em;">Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+                <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a>
+                In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
+                Istanbul, Turkey. pp. 3161-3167</p></blockquote>
         </section>
-        <aside class="documentation">
+        <aside id="documentation">
             <h2>Documentation</h2>
             <h3>Tutorials</h3>
             <ul>
@@ -59,8 +64,7 @@ require 'php/head.php';
             <li><a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans</a></li>
             <li><a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a></li>
             </ul>
-            </aside>
-        </main>
+        </aside>
     </div>
 
     <?php

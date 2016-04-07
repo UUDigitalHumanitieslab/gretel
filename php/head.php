@@ -9,7 +9,7 @@
 ?>
 <title><?php echo $pagetitle; ?></title>
 <meta name="description" content="">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic|Roboto+Condensed" rel="stylesheet" >
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed" rel="stylesheet" >
 <link href="style/css/styles.css" rel="stylesheet" >
 
 <link href="img/gretel_logo_trans.png" rel="shortcut icon" type="image/png" >
