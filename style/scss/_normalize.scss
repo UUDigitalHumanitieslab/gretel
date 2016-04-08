@@ -422,3 +422,10 @@ textarea {
 [type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
+
+
+button {
+    &:focus {
+        outline: 0;
+    }
+}

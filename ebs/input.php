@@ -1,81 +1,58 @@
-<!DOCTYPE html>
-<!-- input.php -->
-<!-- form to get an input sentence and send it to another script -->
-
-<!-- version 0.5 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
-<head>
 <?php
-require 'header.php';
-/* Display errors*/
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
-?>
-</head>
-
-<body>
-<div id="container">
-<?php
+require "../config/config.php";
+$currPage="ebs";
+$step=1;
 session_start();
-header('Content-Type:text/html; charset=utf-8');
-
-/************************************************************/
- /* VARIABLES */
 $id=session_id();
 $next="parse.php";
 $input="Dit is een zin."; // default example
-$step= 1; // for progress bar
-$title="<h1>Step 1: Give an example</h1>
-<hr/>";
-$continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-
-/***********************************************************/
-/* INCLUDES */
-require("$navigation");
-/***********************************************************/
-
-echo "$title";
+require "$root/php/head.php";
 ?>
+</head>
 
-<form action="<?php echo $next; ?>" method="post" enctype="multipart/form-data">
-<p> Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
 
-<?php
-if (isset($_SESSION['example'])) { // find previous input example
-  $input=$_SESSION['example'];
-}
-?>
+<?php require "$root/php/header.php"; ?>
 
-<input type="text" name="input" size=50 value="<?php echo $input; ?>" id="example" />
-<button type="button" onClick="copyText();" id="clear" title="This button clears the input box above, allowing you to enter new input without having to delete the current input character by character">Clear</button>
+            <form action="<?php echo $next; ?>" method="post" enctype="multipart/form-data">
+                <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
 
-<br/><br/>
-<p>Select the <b>search mode</b> you want to use:</p>
-<label><input type="radio" name="search" value="basic" checked>Basic search</label>  <a href="#" class="clickMe" tooltip="Without formal query language and less search options."> <sup>[?]</sup></a>
-<br/>
-<label><input type="radio" name="search" value="advanced">Advanced search</label> <a href="#" class="clickMe" tooltip="Allows a more specific search and has the possibility to adapt the automatically generated XPath query."> <sup>[?]</sup></a>
-<br/><br/>
+                <?php
+                if (isset($_SESSION['example'])) {
+                  $input=$_SESSION['example'];
+                }
+                ?>
 
-<?php
-echo $continue;
-?>
-</div>
-<script src="<?php echo $home; ?>/js/TaalPortaal.js"></script>
-<script>
-// clear function
-function copyText() {
-    $("#example").val($("#clear").val());
-}
+                <input type="text" name="input" value="<?php echo $input; ?>" id="example" />
+                <button type="button" name="clear">Clear</button>
 
-// back function
-function goBack() {
-    window.history.back()
-}
-$(document).ready(function() {
-    taalPortaalFiller();
-});
-</script>
+                <p>Select the <strong>search mode</strong> you want to use. <em>Basic search</em> doesn't
+                    require any knowledge of the used formal query language, but it also has less
+                    search options. <em>Advanced search</em> on the other hand allows a more specific
+                    search and offers you the possibility to adapt the automatically generated XPath query.</p>
+                <label><input type="radio" name="search" value="basic" checked>Basic search</label>
+                <label><input type="radio" name="search" value="advanced">Advanced search</label>
+
+                <button type="Submit" value="Continue" class="colour">Continue</button>
+            </form>
+        </main>
+    </div>
+
+    <?php
+    require "$root/php/footer.php";
+    include "$root/scripts/AnalyticsTracking.php";
+    ?>
+    <script src="<?php echo $home; ?>/js/TaalPortaal.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('[name="clear"]').click(function() {
+            $(this).prev('[name="input"]').val("");
+        });
+        taalPortaalFiller();
+        <?php if($step > 1): ?>
+        $(".progressbar li:nth-child(-n+<?php echo $step-1;?>)").addClass("done");
+        <?php endif ?>
+        $(".progressbar li:nth-child(<?php echo $step;?>)").addClass("active");
+    });
+    </script>
 </body>
 </html>
