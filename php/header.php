@@ -1,4 +1,4 @@
-<body class="<?php echo $currPage; ?>">
+<body <?php setBodyClasses(); ?>>
     <div id="container">
         <header class="page-header">
             <h1>GrETEL 2.0</h1>
@@ -6,60 +6,26 @@
             <nav class="primary-navigation">
                 <ul>
                     <li><a href="<?php echo $home; ?>/index.php" title="Home"
-                    <?= ($currPage == "home") ? 'class="active"':''; ?>>Home</a></li>
+                    <?= ($currentPage == "home") ? 'class="active"':''; ?>>Home</a></li>
                     <li><a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search"
-                    <?= ($currPage == "ebs") ? 'class="active"':''; ?>>Example-based search</a></li>
+                    <?= ($currentPage == "ebs") ? 'class="active"':''; ?>>Example-based search</a></li>
                     <li><a href="<?php echo $home; ?>/xps/input.php" title="XPath search"
-                    <?= ($currPage == "xps") ? 'class="active"':''; ?>>XPath search</a></li>
+                    <?= ($currentPage == "xps") ? 'class="active"':''; ?>>XPath search</a></li>
                     <li><a href="<?php echo $home; ?>/documentation.php" title="Documentation"
-                    <?= ($currPage == "docs") ? 'class="active"':''; ?>>Documentation</a></li>
+                    <?= ($currentPage == "docs") ? 'class="active"':''; ?>>Documentation</a></li>
                 </ul>
             </nav>
         </header>
         <main>
-            <?php
-                $is_search = (isset($currPage) && ($currPage == "ebs" || $currPage=="xps")) ? 1 : 0;
-                if (isset($currPage)) {
-                    if ($currPage == "home") $pageTitle = "What is GrETEL?";
-                    elseif ($currPage == "ebs") {
-                        $pageTitle = "Example-based search";
-                        if (isset($step)) {
-                            $searchStepTitles = array(
-                                "Give an input example",
-                                "Input parse",
-                                "Select relevant parts",
-                                "Select a treebank",
-                                "Query overview",
-                                "Results"
-                            );
-                        }
-                    }
-                    elseif ($currPage == "xps") {
-                        $pageTitle = "XPath search";
-
-                        if (isset($step)) {
-                            $searchStepTitles = array(
-                                "Give an XPath expression",
-                                "Select a treebank",
-                                "Results"
-                            );
-                        }
-                    }
-                    elseif ($currPage == "docs") $pageTitle = "Documentation";
-                }
-            ?>
-            <h1><?php echo $pageTitle; ?>
-                <?php
-                if ($is_search && $step > 1) {
-                    echo "<span>$sm search mode</span>";
-                }
-                ?>
+          <header <?= ($is_search)  ? 'class="progress-header"':''; ?>>
+            <h1>
+              <?php echo $pageTitle; ?>
+              <?= ($is_search && $step > 1) ? "<span>$sm search mode</span>" : ""; ?>
             </h1>
-            <?php
-            if ($is_search) {
-                echo '<header class="step-header">';
-                require "$root/php/secondary-navigation.php";
-                echo "<h2><span>Step $step:</span> " . $searchStepTitles[$step-1] . "</h2>";
-                echo '</header>';
-            }
-            ?>
+            <?php if ($is_search) require "$root/php/secondary-navigation.php"; ?>
+          </header>
+          <?php
+          if ($is_search) {
+              echo "<h2><span>Step $step:</span> " . $searchStepTitles[$step-1] . "</h2>";
+          }
+          ?>

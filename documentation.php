@@ -1,6 +1,9 @@
 <?php
 require "/config/config.php";
-$currPage="docs";
+$currentPage="docs";
+
+require "$root/functions.php";
+
 require "$root/php/head.php";
 ?>
 </head>

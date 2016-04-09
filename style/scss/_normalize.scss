@@ -424,8 +424,28 @@ textarea {
 }
 
 
-button {
+button, input {
     &:focus {
-        outline: 0;
+        outline: 0 none;
     }
+}
+
+input {
+  padding: 6px 8px;
+  border: 1px solid #C0C0C0;
+  background: white;
+  &:focus, &:active {
+    border-color: darken(#C0C0C0, 12%);
+  }
+}
+
+button {
+  background: #C0C0C0;
+  color: white;
+  border: 1px solid #C0C0C0;
+  padding: 6px 8px;
+  &:hover {
+    background: darken(#C0C0C0, 12%);
+    border: 1px solid darken(#C0C0C0, 12%);
+  }
 }

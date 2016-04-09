@@ -1,11 +1,12 @@
 <?php
 require "../config/config.php";
-$currPage="ebs";
+$currentPage="ebs";
 $step=1;
 session_start();
 $id=session_id();
 $next="parse.php";
 $input="Dit is een zin."; // default example
+require "$root/functions.php";
 require "$root/php/head.php";
 ?>
 </head>
@@ -29,10 +30,9 @@ require "$root/php/head.php";
                     require any knowledge of the used formal query language, but it also has less
                     search options. <em>Advanced search</em> on the other hand allows a more specific
                     search and offers you the possibility to adapt the automatically generated XPath query.</p>
-                <label><input type="radio" name="search" value="basic" checked>Basic search</label>
-                <label><input type="radio" name="search" value="advanced">Advanced search</label>
-
-                <button type="Submit" value="Continue" class="colour">Continue</button>
+                <div class="label-wrapper"><label><input type="radio" name="search" value="basic" checked> Basic search</label></div>
+                <div class="label-wrapper"><label><input type="radio" name="search" value="advanced"> Advanced search</label></div>
+                <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
             </form>
         </main>
     </div>
@@ -45,7 +45,7 @@ require "$root/php/head.php";
     <script>
     $(document).ready(function() {
         $('[name="clear"]').click(function() {
-            $(this).prev('[name="input"]').val("");
+            $(this).prev('[name="input"]').val("").focus();
         });
         taalPortaalFiller();
         <?php if($step > 1): ?>

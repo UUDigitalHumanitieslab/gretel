@@ -16,6 +16,7 @@ body {
     line-height: 1.625;
     display: flex;
     min-height: 100vh;
+    min-width: 480px;
     flex-direction: column;
     align-items: center;
 }
@@ -28,7 +29,9 @@ body {
     align-items: center;
     h1 {
         margin: 0;
+        font-size: 2em;
         flex: 1;
+        white-space: nowrap;
     }
 }
 .primary-navigation {
@@ -59,7 +62,7 @@ body {
                 &.active,
                 &:hover {
                     color: darken($textmain, 12%);
-                    transform: scale(1.1);
+                    transform: scale(1.25);
                     &:after {
                         width: 67%;
                     }
@@ -79,10 +82,10 @@ body {
         }
     }
 }
+
 #container,
 .page-footer .content {
     padding: 1.6em;
-    min-width: 480px;
     width: 100%;
     max-width: 1024px;
     flex: 1;
@@ -94,6 +97,10 @@ h3,
 h4 {
     font-family: $fontheadings;
 }
+h1 {font-size: 1.67em;}
+h2 {font-size: 1.34em;}
+h3 {font-size: 1.25em;}
+h4 {font-size: 1.125em;}
 a {
     color: $gretelgreen;
     text-decoration: none;
@@ -103,6 +110,7 @@ a {
         border-bottom: 0 none;
     }
 }
+
 /* Progress bar */
 .secondary-navigation {
     display: flex;
@@ -127,7 +135,7 @@ a {
     color: white;
     text-decoration: none;
     margin: 0;
-    padding: 1em;
+    padding: 0.8em;
 }
 /* Change colour of active page in progress bar */
 .progressbar li.done {
@@ -139,7 +147,7 @@ a {
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
     .progressbar {
-        font-size: 15px;
+        font-size: 14px;
     }
     .progressbar li {
         border-radius: 50%;
@@ -261,6 +269,36 @@ a.match {
         }
     }
 }
+
+/* EBS, XPS */
+.ebs, .xps {
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1em;
+    white-space: nowrap;
+    h1 {
+      margin: 0;
+      span {
+        font-family: $fontbody;
+        font-weight: 300;
+        font-size: 16px;
+      }
+    }
+  }
+  #example {
+    margin: 0.67em auto;
+  }
+  .label-wrapper {
+    margin: 4px auto;
+  }
+  .continue-btn-wrapper {
+    text-align: right;
+    margin-top: 1em;
+  }
+}
+
 .page-footer {
     flex: 1;
     margin-top: 24px;

@@ -401,8 +401,28 @@ textarea {
   -webkit-appearance: none;
 }
 
-button:focus {
-  outline: 0;
+button:focus, input:focus {
+  outline: 0 none;
+}
+
+input {
+  padding: 6px 8px;
+  border: 1px solid #C0C0C0;
+  background: white;
+}
+input:focus, input:active {
+  border-color: #a1a1a1;
+}
+
+button {
+  background: #C0C0C0;
+  color: white;
+  border: 1px solid #C0C0C0;
+  padding: 6px 8px;
+}
+button:hover {
+  background: #a1a1a1;
+  border: 1px solid #a1a1a1;
 }
 
 *,
@@ -423,6 +443,7 @@ body {
   display: -ms-flexbox;
   display: flex;
   min-height: 100vh;
+  min-width: 480px;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
@@ -447,9 +468,11 @@ body {
 }
 .page-header h1 {
   margin: 0;
+  font-size: 2em;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  white-space: nowrap;
 }
 
 .primary-navigation {
@@ -493,9 +516,9 @@ body {
 }
 .primary-navigation ul li a.active, .primary-navigation ul li a:hover {
   color: #373737;
-  -webkit-transform: scale(1.1);
-      -ms-transform: scale(1.1);
-          transform: scale(1.1);
+  -webkit-transform: scale(1.25);
+      -ms-transform: scale(1.25);
+          transform: scale(1.25);
 }
 .primary-navigation ul li a.active:after, .primary-navigation ul li a:hover:after {
   width: 67%;
@@ -517,7 +540,6 @@ body {
 #container,
 .page-footer .content {
   padding: 1.6em;
-  min-width: 480px;
   width: 100%;
   max-width: 1024px;
   -webkit-flex: 1;
@@ -531,6 +553,22 @@ h2,
 h3,
 h4 {
   font-family: "Roboto Condensed", sans-serif;
+}
+
+h1 {
+  font-size: 1.67em;
+}
+
+h2 {
+  font-size: 1.34em;
+}
+
+h3 {
+  font-size: 1.25em;
+}
+
+h4 {
+  font-size: 1.125em;
 }
 
 a {
@@ -576,7 +614,7 @@ a:hover {
   color: white;
   text-decoration: none;
   margin: 0;
-  padding: 1em;
+  padding: 0.8em;
 }
 
 /* Change colour of active page in progress bar */
@@ -591,7 +629,7 @@ a:hover {
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
   .progressbar {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .progressbar li {
@@ -736,6 +774,39 @@ a.match {
           flex: 1;
   padding: 0.67em;
   min-width: 240px;
+}
+
+/* EBS, XPS */
+.ebs .progress-header, .xps .progress-header {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-top: 1em;
+  white-space: nowrap;
+}
+.ebs .progress-header h1, .xps .progress-header h1 {
+  margin: 0;
+}
+.ebs .progress-header h1 span, .xps .progress-header h1 span {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+}
+.ebs #example, .xps #example {
+  margin: 0.67em auto;
+}
+.ebs .label-wrapper, .xps .label-wrapper {
+  margin: 4px auto;
+}
+.ebs .continue-btn-wrapper, .xps .continue-btn-wrapper {
+  text-align: right;
+  margin-top: 1em;
 }
 
 .page-footer {
