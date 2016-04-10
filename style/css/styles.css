@@ -410,6 +410,7 @@ input {
   border: 1px solid #C0C0C0;
   background: white;
 }
+
 input:focus, input:active {
   border-color: #a1a1a1;
 }
@@ -420,6 +421,7 @@ button {
   border: 1px solid #C0C0C0;
   padding: 6px 8px;
 }
+
 button:hover {
   background: #a1a1a1;
   border: 1px solid #a1a1a1;
@@ -439,67 +441,50 @@ body {
   color: #565656;
   font-family: "Open Sans", sans-serif;
   line-height: 1.625;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   min-height: 100vh;
   min-width: 480px;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .page-header {
   padding-bottom: 0.67em;
   margin: 0.34em auto;
   border-bottom: 1px dotted #968A7A;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
+
 .page-header h1 {
   margin: 0;
   font-size: 2em;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   white-space: nowrap;
 }
 
 .primary-navigation {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
 }
+
 .primary-navigation ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-around;
-      -ms-flex-pack: distribute;
-          justify-content: space-around;
+  justify-content: space-around;
 }
+
 .primary-navigation ul li {
   text-align: center;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
 }
+
 .primary-navigation ul li:not(:last-child) {
   margin-right: 1.34em;
 }
+
 .primary-navigation ul li a {
   font-size: 16px;
   font-weight: 300;
@@ -508,21 +493,20 @@ body {
   padding: 2px 4px;
   white-space: nowrap;
   color: #565656;
-  transition: -webkit-transform 200ms;
   transition: transform 200ms;
-  transition: transform 200ms, -webkit-transform 200ms;
   will-change: transform;
   position: relative;
 }
+
 .primary-navigation ul li a.active, .primary-navigation ul li a:hover {
   color: #373737;
-  -webkit-transform: scale(1.25);
-      -ms-transform: scale(1.25);
-          transform: scale(1.25);
+  transform: scale(1.25);
 }
+
 .primary-navigation ul li a.active:after, .primary-navigation ul li a:hover:after {
   width: 67%;
 }
+
 .primary-navigation ul li a:after {
   content: "";
   display: block;
@@ -531,9 +515,7 @@ body {
   bottom: -2px;
   position: absolute;
   left: 50%;
-  -webkit-transform: translateX(-50%);
-      -ms-transform: translateX(-50%);
-          transform: translateX(-50%);
+  transform: translateX(-50%);
   transition: width 200ms;
 }
 
@@ -542,9 +524,7 @@ body {
   padding: 1.6em;
   width: 100%;
   max-width: 1024px;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   background: #fff;
 }
 
@@ -576,6 +556,7 @@ a {
   text-decoration: none;
   border-bottom: 1px dotted;
 }
+
 a:hover {
   color: #8f9b35;
   border-bottom: 0 none;
@@ -583,15 +564,9 @@ a:hover {
 
 /* Progress bar */
 .secondary-navigation {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .progressbar {
@@ -631,11 +606,9 @@ a:hover {
   .progressbar {
     font-size: 14px;
   }
-
   .progressbar li {
     border-radius: 50%;
   }
-
   .progressbar li p {
     line-height: 32px;
     height: 32px;
@@ -643,26 +616,23 @@ a:hover {
     padding: 0;
     text-align: center;
   }
-
   .progressbar span {
     display: none;
   }
 }
+
 /* Breacrumbs - arrow directed progress bar on large screens */
 @media all and (min-width: 1240px) {
   .progressbar li:not(:first-child) {
     padding-left: 10px;
   }
-
   /* Arrows for breadcrumbs; not on last child */
   .progressbar li:not(:last-child) p:after,
   .progressbar li:not(:last-child) p:before {
     position: absolute;
     top: 50%;
     left: 100%;
-    -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-            transform: translateX(-50%);
+    transform: translateX(-50%);
     z-index: 1;
     display: block;
     margin-top: -50px;
@@ -673,31 +643,27 @@ a:hover {
     border-left: 30px solid white;
     content: " ";
   }
-
   .progressbar li:not(:last-child) p:after {
     border-left-color: #C0C0C0;
     margin-left: -1px;
     z-index: 2;
   }
-
   .progressbar li:last-child {
     padding-right: 10px;
   }
-
   /* Position text on top of the arrow, this saves us some space */
   .progressbar li span {
     position: relative;
     z-index: 3;
   }
-
   .progressbar li.active:not(:last-child) p:after {
     border-left-color: #B6D54B;
   }
-
   .progressbar li.done:not(:last-child) p:after {
     border-left-color: #747474;
   }
 }
+
 /* Sortable tables */
 /* define height and width of scrollable area. Add 16px to width for scrollbar */
 div.tableWrapper {
@@ -758,75 +724,83 @@ a.match {
 /* ============= */
 /* DOCUMENTATION */
 .docs .flex-content {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
+
 .docs .flex-content article {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   padding: 0.67em;
   min-width: 240px;
 }
 
 /* EBS, XPS */
 .ebs .progress-header, .xps .progress-header {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 1em;
   white-space: nowrap;
 }
+
 .ebs .progress-header h1, .xps .progress-header h1 {
   margin: 0;
 }
+
 .ebs .progress-header h1 span, .xps .progress-header h1 span {
   font-family: "Open Sans", sans-serif;
   font-weight: 300;
   font-size: 16px;
 }
+
 .ebs #example, .xps #example {
   margin: 0.67em auto;
 }
+
 .ebs .label-wrapper, .xps .label-wrapper {
   margin: 4px auto;
 }
+
 .ebs .continue-btn-wrapper, .xps .continue-btn-wrapper {
   text-align: right;
   margin-top: 1em;
 }
 
 .page-footer {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   margin-top: 24px;
   background: #BFA58A;
   max-width: none;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   width: 100%;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  align-items: center;
+  flex-direction: column;
 }
+
 .page-footer .content {
   background: transparent;
+  padding: 1em 0;
+  display: flex;
+  align-items: center;
+}
+
+.page-footer [class^="logo-link"] {
+  display: block;
+  border: 0 none;
+  box-shadow: none;
+}
+
+.page-footer .logo-link-gretel {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+}
+
+.page-footer .logo-link-kul {
+  height: 64px;
+}
+
+.page-footer .logo-link-ccl {
+  height: 72px;
 }

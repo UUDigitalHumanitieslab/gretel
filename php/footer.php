@@ -1,7 +1,13 @@
 <footer class="page-footer">
     <div class="content">
-        <figure id="ccl-logo">
-            <a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" alt="Logo CCL"></a>
-        </figure>
+      <a href="<?php echo $home; ?>" title="Home" rel="home" class="logo-link-gretel">
+      <?php include "$root/php/logo-code-gretel.php"; ?>
+      </a>
+      <a href="https://associatie.kuleuven.be/" title="Associatie KU Leuven" class="logo-link-kul">
+      <?php include "$root/php/logo-code-kul.php"; ?>
+      </a>
+      <a href="https://associatie.kuleuven.be/" title="Centre for Computational Linguistics" class="logo-link-ccl">
+      <?php include "$root/php/logo-code-ccl.php"; ?>
+      </a>
     </div>
 </footer>

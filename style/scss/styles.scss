@@ -1,6 +1,7 @@
 @import "normalize";
 @import "clearfix";
 @import "variables";
+
 *,
 *:after,
 *:before {
@@ -310,5 +311,24 @@ a.match {
     flex-direction: column;
     .content {
         background: transparent;
+        padding: 1em 0;
+        display: flex;
+        align-items: center;
+    }
+    [class^="logo-link"] {
+      display: block;
+      border: 0 none;
+      box-shadow: none;
+    }
+    .logo-link-gretel {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+    }
+    .logo-link-kul {
+      height: 64px;
+    }
+    .logo-link-ccl {
+      height: 72px;
     }
 }
