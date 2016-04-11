@@ -9,6 +9,9 @@ $input="Dit is een zin."; // default example
 require "$root/functions.php";
 require "$root/php/head.php";
 ?>
+
+<link rel="prefetch" href="<?php echo $home; ?>">
+<link rel="prefetch" href="<?php echo $home; ?>/ebs/parse.php">
 </head>
 
 

@@ -4,7 +4,7 @@
 <!-- for the GrETEL2.0 project -->
 
 <?php
-function Alpino($sentence,$id) { 
+function Alpino($sentence,$id) {
   require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $alpinoTreebank)
 
   $descriptorspec = array(
@@ -12,13 +12,13 @@ function Alpino($sentence,$id) {
 			  1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
 			  2 => array("file", "/tmp/alpino.log", "a") // stderr is a file to write to
 			  );
-  
+
   $cwd = '/';
   $env = array('ALPINO_HOME' => "$alpinoHome");
   $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $alpinoTreebank -parse";
-  
+
   $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
-  
+
   if (!is_resource($process)) {
    die('error');
   }
@@ -37,15 +37,15 @@ function Alpino($sentence,$id) {
       //       echo $buffer."\n";
     }
     fclose($pipes[1]);
-    
+
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
-    
+
     //    echo "command returned $return_value\n";
   }
-   
-  return "$alpinoTreebank/$id.xml"; //return parse location 
+
+  return "$alpinoTreebank/$id.xml"; //return parse location
 
 }
 ?>

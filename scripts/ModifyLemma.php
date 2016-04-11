@@ -3,7 +3,7 @@ function ModifyLemma($parse,$id,$tmp){
   $input=fopen("$parse", "r");
   $output=fopen("$tmp/$id-pt.xml", "w");
   $xml = simpledom_load_file("$parse"); //read alpino parse
- 
+
   $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin'); //sort terminal nodes by 'begin' attribute
 
   $i=0;
@@ -20,7 +20,7 @@ function ModifyLemma($parse,$id,$tmp){
   $tree = $xml->asXML();
   fwrite($output, "$tree");
   fclose($output);
-  return "$tmp/$id-pt.xml"; //return parse location 
+  return "$tmp/$id-pt.xml"; //return parse location
 }
 
 ?>

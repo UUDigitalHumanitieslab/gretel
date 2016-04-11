@@ -82,4 +82,41 @@
       elseif ($step > $index) echo 'class="done"';
   }
 
+  function checkInputAndLog() {
+    $error_flag = 1;
+    global $input, $log, $date, $user, $id, $time, $sm, $home;
+
+    $mode = preg_match("/([^\\/]+)\\/input\\.php\\/?$/", $_SERVER['REQUEST_URI']);
+    if ($mode == "ebs") {
+      $back = "<a href='$home/ebs/input.php'>Go to the input page.</a>";
+    }
+    elseif  ($mode == "xps") {
+        $back = "<a href='$home/xps/input.php'>Go to the input page.</a>";
+    }
+    else {
+        $back = "<a href='$home'>Go to the home page!</a>";
+    }
+
+    if (preg_match('/(http:\/\/.*)|(<.*)|(.*>)/', $input)==1) {
+      echo "<p style='font-size: 18px;color:#DF5F5F'><strong>Error!</strong></p>";
+      echo "<p>This is a suspicious input example; GrETEL does not accept URLs or HTML as input.</p>";
+      echo "<p>$back</p>";
+    }
+    elseif(!$input || empty($input)) {
+      echo "<p style='font-size: 18px;color:#DF5F5F'><strong>Error!</strong></p>";
+      echo "<p>Your input was empty. Please provide an input example.</p>";
+      echo "<p>$back</p>";
+    }
+
+    else {
+      $log = fopen("$log/gretel-ebq.log", "a");  //concatenate sentences
+      fwrite($log, "$date\t$user\t$id-$time\t$sm\t$input\n");
+      fclose($log);
+      $_SESSION['sentid']="$id-$time";
+      $_SESSION['example']=$input;
+      $error_flag = 0;
+    }
+    return $error_flag;
+  }
+
 ?>

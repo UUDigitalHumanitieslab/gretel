@@ -435,7 +435,9 @@ button:hover {
 
 body {
   background-color: #D6E69D;
-  background-image: url("../../img/gretel_logo_trans.png");
+  background-image: url("../../img/logo-image-gretel.svg");
+  background-size: 450px 374px;
+  background-position: 0px 50px;
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: #565656;

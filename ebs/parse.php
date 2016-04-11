@@ -1,12 +1,14 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require "../config/config.php";
 $currentPage="ebs";
 $step=2;
-session_start();
+
 $id=session_id();
-$input = $_POST['input'];
 $date=date('d-m-Y');
-$time=time(); // time stamp
+$time=time();
 
 if (getenv('REMOTE_ADDR')){
 $user = getenv('REMOTE_ADDR');
@@ -14,26 +16,25 @@ $user = getenv('REMOTE_ADDR');
 else {
 $user="anonymous";
 }
+
+if (isset($_POST['input'])) $input = $_POST['input'];
 // set search mode
-if ($_POST['search']=="basic") {
-  $_SESSION['search']="basic";
-}
-else {
-  $_SESSION['search']="advanced";
+if(isset($_POST['search'])) {
+  if ($_POST['search']=="basic") {
+    $_SESSION['search']="basic";
+  }
+  else {
+    $_SESSION['search']="advanced";
+  }
+  $sm=$_SESSION['search'];
 }
 
-$sm=$_SESSION['search'];
 require "$root/functions.php";
 require "$root/php/head.php";
-
-// dir to includes
-$alpino="$scripts/AlpinoParser.php";
-$tokenizer="$scripts/Tokenizer.php";
-$simpledom="$scripts/SimpleDOM.php";
-$modlem="$scripts/ModifyLemma.php";
-
-// log files
-$grtllog="$log/gretel-ebq.log";
+require "$scripts/Tokenizer.php";
+require "$scripts/SimpleDOM.php";
+require "$scripts/AlpinoParser.php";
+require "$scripts/ModifyLemma.php";
 
 ?>
 
@@ -41,85 +42,54 @@ $grtllog="$log/gretel-ebq.log";
 </head>
 
 
-<?php require "$root/php/header.php"; ?>
 <?php
-// messages
-$captcha="This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
+require "$root/php/header.php";
 
+$error_flag = checkInputAndLog();
 
-
-
-/***********************************************************/
-/* INCLUDES */
-require("$tokenizer");
-require("$simpledom");
-require("$alpino");
-require("$modlem");
-/***********************************************************/
-
-if (preg_match('/(http:\/\/.*)|(<.*)|(.*>)/', $input)==1) { // check for spam
-  echo "<h3>Error</h3>";
-  echo "<p>".$captcha."</p>";
-  echo $back;
-  exit;
+if (!$error_flag) {
+  $tokinput = Tokenize($input);
+  $_SESSION['sentence']="$tokinput";
+  $parse = Alpino($tokinput,$id); // $parse = parse location
+  $parseloc=ModifyLemma($parse,$id, $tmp); // returns parse location
 }
-
-elseif(!$input || empty($input)) {
-  echo "<h3>Error</h3>";
-  echo "<p>Please provide an <b>input example</b>.</p>";
-  echo $back;
-  exit;
-}
-
-else { // LOG INPUT
-  $log = fopen($grtllog, "a");  //concatenate sentences
-  fwrite($log, "\n$date\t$user\t$id-$time\t$sm\t$input\n");
-  fclose($log);
-  $_SESSION['sentid']="$id-$time";
-  $_SESSION['example']="$input";  // for retrieving input example on other pages
-}
-
-//ALPINO
-$tokinput = Tokenize($input);
-$_SESSION['sentence']="$tokinput";
-
-$parse = Alpino($tokinput,$id); // $parse = parse location
-
-//MODIFY LEMMA
-$parseloc=ModifyLemma($parse,$id,$tmp); // returns parse location
-
-// INFO
 ?>
-<p>You find the structure of the <strong>tagged</strong>
-   and <strong>parsed</strong> sentence below.
-   Tagging indicates <em>word classes</em>, like <strong>n</strong> (noun)
-  and parsing shows <em>dependencies</em> (or relations),
-    like <strong>su</strong> (subject) and <em>constituents</em>,
-    like <strong>np</strong> (noun phrase)</p>
 
+<?php if (!$error_flag) : ?>
+  <p>You find the structure of the <strong>tagged</strong>
+    and <strong>parsed</strong> sentence below.
+    Tagging indicates <em>word classes</em>, like <strong>n</strong> (noun)
+    and parsing shows <em>dependencies</em> (or relations),
+     like <strong>su</strong> (subject) and <em>constituents</em>,
+     like <strong>np</strong> (noun phrase).
+  </p>
 
-<?php echo "<em>$tokinput</em></p>"; ?>
+  <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
-<div id="tree-output"></div>
+  <div id="tree-output"></div>
 
-<form action="matrix.php" method="post" enctype="multipart/form-data" >
-  <p>If the analysis is different from what you expected, you can enter
-    <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">another input example</a>.</p>
-  <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
-
+  <form action="matrix.php" method="post" enctype="multipart/form-data">
+    <p>If the analysis is different from what you expected, you can enter
+      <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">another input example</a>.
+    </p>
+    <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
   </form>
+  <?php endif; ?>
   </main>
-  </div>
+</div>
 
 <?php
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 ?>
-<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
-<script>
-$(document).ready(function(){
-    $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml');
-});
-</script>
+
+<?php if (!$error_flag) : ?>
+  <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+  <script>
+  $(document).ready(function(){
+      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml');
+  });
+  </script>
+<?php endif; ?>
 </body>
 </html>
