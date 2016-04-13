@@ -1,9 +1,12 @@
 <?php
-require "config/config.php";
-$currentPage="home";
+require 'config/config.php';
+
+require "$root/helpers.php";
+$currentPage = 'home';
 require "$root/functions.php";
 
 require "$root/php/head.php";
+
 ?>
 <link rel="prefetch" href="<?php echo $home; ?>/ebs/input.php">
 <link rel="prefetch" href="<?php echo $home; ?>/xps/input-xp.php">

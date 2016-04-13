@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<?php error_reporting(E_ALL);
+ini_set('display_errors', 1); ?>
 <head>
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="">

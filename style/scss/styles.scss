@@ -1,280 +1,368 @@
 @import "normalize";
 @import "clearfix";
 @import "variables";
-
 *,
 *:after,
 *:before {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 body {
-    background-color: #D6E69D;
-    background-image: url("../../img/logo-image-gretel.svg");
-    background-size: 450px 374px;
-    background-position: 0px 50px;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    color: $textmain;
-    font-family: $fontbody;
-    line-height: 1.625;
-    display: flex;
-    min-height: 100vh;
-    min-width: 480px;
-    flex-direction: column;
-    align-items: center;
+  background-color: #D6E69D;
+  background-image: url("../../img/logo-image-gretel.svg");
+  background-size: 450px 374px;
+  background-position: 0 50px;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: $textmain;
+  font-family: $fontbody;
+  line-height: 1.625;
+  display: flex;
+  min-height: 100vh;
+  min-width: 480px;
+  flex-direction: column;
+  align-items: center;
 }
 .page-header {
-    padding-bottom: 0.67em;
-    margin: 0.34em auto;
-    border-bottom: 1px dotted #968A7A;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    h1 {
-        margin: 0;
-        font-size: 2em;
-        flex: 1;
-        white-space: nowrap;
-    }
+  padding-bottom: 0.67em;
+  margin: 0.34em auto;
+  border-bottom: 1px dotted #968A7A;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  h1 {
+    margin: 0;
+    font-size: 2em;
+    flex: 1;
+    white-space: nowrap;
+  }
 }
 .primary-navigation {
-    flex: 1;
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        justify-content: space-around;
-        li {
-            text-align: center;
-            flex: 1;
-            &:not(:last-child) {
-                margin-right: 1.34em;
-            }
-            a {
-                font-size: 16px;
-                font-weight: 300;
-                display: block;
-                border-bottom: 0 none;
-                padding: 2px 4px;
-                white-space: nowrap;
-                color: $textmain;
-                transition: transform 200ms;
-                will-change: transform;
-                position: relative;
-                &.active,
-                &:hover {
-                    color: darken($textmain, 12%);
-                    transform: scale(1.25);
-                    &:after {
-                        width: 67%;
-                    }
-                }
-                &:after {
-                    content: "";
-                    display: block;
-                    border-bottom: 1px solid;
-                    width: 0;
-                    bottom: -2px;
-                    position: absolute;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    transition: width 200ms;
-                }
-            }
+  flex: 1;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    li {
+      text-align: center;
+      flex: 1;
+      &:not(:last-child) {
+        margin-right: 1.34em;
+      }
+      a {
+        font-size: 16px;
+        font-weight: 300;
+        display: block;
+        border-bottom: 0 none;
+        padding: 2px 4px;
+        white-space: nowrap;
+        color: $textmain;
+        transition: transform 200ms;
+        will-change: transform;
+        position: relative;
+        &.active,
+        &:hover {
+          color: darken($textmain, 12%);
+          transform: scale(1.25);
+          &:after {
+            width: 67%;
+          }
         }
+        &:after {
+          content: "";
+          display: block;
+          border-bottom: 1px solid;
+          width: 0;
+          bottom: -2px;
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          transition: width 200ms;
+        }
+      }
     }
+  }
 }
-
 #container,
 .page-footer .content {
-    padding: 1.6em;
-    width: 100%;
-    max-width: 1024px;
-    flex: 1;
-    background: #fff;
+  padding: 1.6em;
+  width: 100%;
+  max-width: 1024px;
+  flex: 1;
+  background: #fff;
 }
 h1,
 h2,
 h3,
 h4 {
-    font-family: $fontheadings;
+  font-family: $fontheadings;
 }
-h1 {font-size: 1.67em;}
-h2 {font-size: 1.34em;}
-h3 {font-size: 1.25em;}
-h4 {font-size: 1.125em;}
+h1 {
+  font-size: 1.67em;
+}
+h2 {
+  font-size: 1.34em;
+}
+h3 {
+  font-size: 1.25em;
+}
+h4 {
+  font-size: 1.125em;
+}
 a {
-    color: $gretelgreen;
-    text-decoration: none;
-    border-bottom: 1px dotted;
-    &:hover {
-        color: darken($gretelgreen, 12%);
-        border-bottom: 0 none;
-    }
+  color: $gretelgreen;
+  text-decoration: none;
+  border-bottom: 1px dotted;
+  &:hover {
+    color: darken($gretelgreen, 12%);
+    border-bottom: 0 none;
+  }
 }
-
 /* Progress bar */
 .secondary-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .progressbar {
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 12px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
 }
 .progressbar li {
-    display: inline-block;
-    background: #C0C0C0;
-    padding: 0;
+  display: inline-block;
+  background: #C0C0C0;
+  padding: 0;
 }
 /* Style and position actual text */
 .progressbar li p {
-    position: relative;
-    color: white;
-    text-decoration: none;
-    margin: 0;
-    padding: 0.8em;
+  position: relative;
+  color: white;
+  text-decoration: none;
+  margin: 0;
+  padding: 0.8em;
 }
 /* Change colour of active page in progress bar */
 .progressbar li.done {
-    background-color: #747474;
+  background-color: darken(#C0C0C0, 12%);
 }
 .progressbar li.active {
-    background-color: #B6D54B;
+  background-color: #B6D54B;
 }
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
-    .progressbar {
-        font-size: 14px;
-    }
-    .progressbar li {
-        border-radius: 50%;
-    }
-    .progressbar li p {
-        line-height: 32px;
-        height: 32px;
-        width: 32px;
-        padding: 0;
-        text-align: center;
-    }
-    .progressbar span {
-        display: none;
-    }
+  .progressbar {
+    font-size: 14px;
+  }
+  .progressbar li {
+    border-radius: 50%;
+  }
+  .progressbar li p {
+    line-height: 32px;
+    height: 32px;
+    width: 32px;
+    padding: 0;
+    text-align: center;
+  }
+  .progressbar span {
+    display: none;
+  }
 }
 /* Breacrumbs - arrow directed progress bar on large screens */
 @media all and (min-width: 1240px) {
-    .progressbar li:not(:first-child) {
-        padding-left: 10px;
-    }
-    /* Arrows for breadcrumbs; not on last child */
-    .progressbar li:not(:last-child) p:after,
-    .progressbar li:not(:last-child) p:before {
-        position: absolute;
-        top: 50%;
-        left: 100%;
-        transform: translateX(-50%);
-        z-index: 1;
-        display: block;
-        margin-top: -50px;
-        width: 0;
-        height: 0;
-        border-top: 50px solid transparent;
-        border-bottom: 50px solid transparent;
-        border-left: 30px solid white;
-        content: " ";
-    }
-    .progressbar li:not(:last-child) p:after {
-        border-left-color: #C0C0C0;
-        margin-left: -1px;
-        z-index: 2;
-    }
-    .progressbar li:last-child {
-        padding-right: 10px;
-    }
-    /* Position text on top of the arrow, this saves us some space */
-    .progressbar li span {
-        position: relative;
-        z-index: 3;
-    }
-    .progressbar li.active:not(:last-child) p:after {
-        border-left-color: #B6D54B;
-    }
-    .progressbar li.done:not(:last-child) p:after {
-        border-left-color: #747474;
-    }
+  .progressbar li:not(:first-child) {
+    padding-left: 10px;
+  }
+  /* Arrows for breadcrumbs; not on last child */
+  .progressbar li:not(:last-child) p:after,
+  .progressbar li:not(:last-child) p:before {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: block;
+    margin-top: -50px;
+    width: 0;
+    height: 0;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+    border-left: 30px solid white;
+    content: " ";
+  }
+  .progressbar li:not(:last-child) p:after {
+    border-left-color: #C0C0C0;
+    margin-left: -1px;
+    z-index: 2;
+  }
+  .progressbar li:last-child {
+    padding-right: 10px;
+  }
+  /* Position text on top of the arrow, this saves us some space */
+  .progressbar li span {
+    position: relative;
+    z-index: 3;
+  }
+  .progressbar li.active:not(:last-child) p:after {
+    border-left-color: #B6D54B;
+  }
+  .progressbar li.done:not(:last-child) p:after {
+    border-left-color: darken(#C0C0C0, 12%);
+  }
 }
 /* Sortable tables */
 /* define height and width of scrollable area. Add 16px to width for scrollbar */
 div.tableWrapper {
-    clear: both;
-    overflow: hidden;
-    /*border: 1px solid #963;*/
-    width: 100%;
-    height: 500px;
-    /*background-color: $gretelgreen;*/
+  clear: both;
+  overflow: hidden;
+  /*border: 1px solid #963;*/
+  width: 100%;
+  height: 500px;
+  /*background-color: $gretelgreen;*/
 }
 table.sortable {
-    width: 100%;
+  width: 100%;
 }
 table.sortable thead {
-    display: table-header-group;
-    background-color: grey;
+  display: table-header-group;
+  background-color: grey;
 }
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 a.match {
-    color: $gretelgreen;
-    text-decoration: none;
-    font-weight: bold;
+  color: $gretelgreen;
+  text-decoration: none;
+  font-weight: bold;
 }
 /* mouse over */
 .match:hover {
-    color: grey;
-    font-weight: bold;
+  color: grey;
+  font-weight: bold;
 }
 /* loading image */
 .loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 100;
-    margin-top: -150px;
-    margin-left: -150px;
-    /*border:3px double #999;*/
-    width: 300px;
-    height: 300px;
-    /*background: #f7f7f7;*/
-    background: url('../../img/gretel_logo_trans.png'), url('../../img/page-loader.gif') 50% 50% no-repeat rgb(249, 249, 249);
-    background-size: 300px 300px;
-    text-align: center;
-    font-size: 20pt;
-    line-height: 300px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 100;
+  margin-top: -150px;
+  margin-left: -150px;
+  /*border:3px double #999;*/
+  width: 300px;
+  height: 300px;
+  /*background: #f7f7f7;*/
+  background: url('../../img/gretel_logo_trans.png'), url('../../img/page-loader.gif') 50% 50% no-repeat rgb(249, 249, 249);
+  background-size: 300px 300px;
+  text-align: center;
+  font-size: 20pt;
+  line-height: 300px;
 }
 /* ============= */
 /* PAGE SPECIFIC */
 /* ============= */
 /* DOCUMENTATION */
 .docs {
-    .flex-content {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        article {
-            flex: 1;
-            padding: 0.67em;
-            min-width: 240px;
-        }
+  .flex-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    article {
+      flex: 1;
+      padding: 0.67em;
+      min-width: 240px;
     }
+  }
 }
-
 /* EBS, XPS */
-.ebs, .xps {
+.ebs,
+.xps {
+  &.step-4 {
+    table {
+      width: 100%;
+      font-size: 14px;
+    }
+  }
+  &.step-5 {
+    textarea[name="xp"] {
+      width: 50%;
+      min-width: 320px;
+      resize: vertical;
+      font-family: monospace;
+      color: inherit;
+      vertical-align: top;
+      margin-right: 16px;
+      min-height: 100px;
+    }
+  }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    td,
+    th {
+      border-left: 1px solid #DCDCDC;
+      padding: 2px 12px;
+      &:last-child {
+        border-right: 1px solid #DCDCDC;
+      }
+    }
+    th {
+      text-align: left;
+      &[colspan="2"] {
+        text-align: center;
+      }
+    }
+    thead tr {
+      background: #DAD1C7;
+      border-top: 1px solid #DAD1C7;
+      td,
+      th {
+        border-left: 1px solid #DAD1C7;
+        &:last-child {
+          border-right: 1px solid #DAD1C7;
+        }
+      }
+    }
+    tr {
+      border-top: 1px solid #DCDCDC;
+      &.optional,
+      &.total {
+        background: #DAD1C7;
+        border-bottom: 1px solid #DAD1C7;
+        td,
+        th {
+          border-left: 1px solid #DAD1C7;
+          &:last-child {
+            border-right: 1px solid #DAD1C7;
+          }
+        }
+      }
+      &:last-child {
+        border-bottom: 1px solid #DCDCDC;
+      }
+      &.total {
+        font-weight: bold;
+        border-bottom: 1px solid #DAD1C7;
+      }
+    }
+    .not-in-search {
+      background: darken(#DAD1C7, 16%);
+      td,
+      th {
+        border-left: 1px solid darken(#DAD1C7, 16%);
+        &:last-child {
+          border-right: 1px solid darken(#DAD1C7, 16%);
+        }
+      }
+      font-weight: bold;
+    }
+    label {
+      white-space: nowrap;
+    }
+  }
   .progress-header {
     display: flex;
     justify-content: space-between;
@@ -290,9 +378,6 @@ a.match {
       }
     }
   }
-  #example {
-    margin: 0.67em auto;
-  }
   .label-wrapper {
     margin: 4px auto;
   }
@@ -301,36 +386,41 @@ a.match {
     margin-top: 1em;
   }
 }
-
 .page-footer {
-    flex: 1;
-    margin-top: 24px;
-    background: #BFA58A;
-    max-width: none;
+  flex: 1;
+  margin-top: 24px;
+  background: #BFA58A;
+  max-width: none;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  height: 48px;
+  max-height: 48px;
+  .content {
+    background: transparent;
+    padding: 0;
     display: flex;
-    width: 100%;
     align-items: center;
-    flex-direction: column;
-    .content {
-        background: transparent;
-        padding: 1em 0;
-        display: flex;
-        align-items: center;
+    position: relative;
+    color: white;
+    a {
+      color: white;
     }
-    [class^="logo-link"] {
-      display: block;
-      border: 0 none;
-      box-shadow: none;
+    span {
+      margin-left: 96px;
     }
-    .logo-link-gretel {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-    }
-    .logo-link-kul {
-      height: 64px;
-    }
-    .logo-link-ccl {
-      height: 72px;
-    }
+  }
+  [class^="logo-link"] {
+    display: block;
+    border: 0 none;
+    box-shadow: none;
+  }
+  .logo-link-gretel {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+  }
 }

@@ -1,32 +1,39 @@
-<!DOCTYPE html>
-<!-- results.php -->
-<!-- display treebank results -->
-
-<!-- version 0.5 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
-<head>
 <?php
-/* Display errors*/
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
+require "../config/config.php";
 
-include 'header.php';
-?>
-
-<link rel="stylesheet" href="<?php echo $home; ?>/style/css/datatable.css">
-<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">
-</head>
-
-<body>
-<div id="container">
-<?php
 session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-/***********************************************************/
+$currentPage="ebs";
+$step=6;
+
+$id=session_id();
+
+// Set input sentence to variable
+if (isset($_SESSION['example'])) $input = $_SESSION['example'];
+if (isset($_SESSION['treebank'])) $treebank = $_SESSION['treebank']; // get treebank
+
+// Set tokenized input sentence to variable
+if (isset($_SESSION['sentence'])) {
+  $tokinput = $_SESSION['sentence'];
+  $sentence = explode(" ", $tokinput);
+}
+// Set search mode to variable
+if(isset($_SESSION['search'])) $sm = $_SESSION['search'];
+
+$lpxml = simplexml_load_file("$tmp/$id-pt.xml");
+
+require "$root/functions.php";
+require "$root/php/head.php";
+
+?>
+<link rel="prefetch" href="<?php echo $home; ?>">
+<link rel="prefetch" href="<?php echo $home; ?>/ebs/query.php">
+</head>
+
+<?php
+require "$root/php/header.php";
 
  /* VARIABLES */
 $id=session_id();
@@ -41,11 +48,6 @@ $user = getenv('REMOTE_ADDR');
 else {
 $user="anonymous";
 }
-
-// dir to to external scripts
-$basexclient="$scripts/BaseXClient.php";
-$treebanksearch="$scripts/TreebankSearch.php";
-$formatresults="$scripts/FormatResults.php";
 
 // log files
 $oomlog="$log/oom.log";
@@ -70,10 +72,9 @@ sentence ID refers to the treebank component in which the sentence occurs, the t
 /***********************************************************/
 /* INCLUDE SCRIPTS */
 
-require("$navigation");
-require("$basexclient");
-require("$treebanksearch"); // functions to find treebank data in BaseX database and print them
-require("$formatresults"); // functions to format the treebank results
+require "$scripts/BaseXClient.php";
+require "$scripts/TreebankSearch.php"; // functions to find treebank data in BaseX database and print them
+require "$scripts/FormatResults.php"; // functions to format the treebank results
 
 /***********************************************************/
 
