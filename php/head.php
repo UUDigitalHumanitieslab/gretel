@@ -15,3 +15,8 @@ ini_set('display_errors', 1); ?>
 <link href="<?php echo $home; ?>/img/gretel_logo_trans.png" rel="shortcut icon" type="image/png" >
 
 <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+
+<link rel="prefetch" href="<?php echo $home; ?>">
+<?php if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})): ?>
+<link rel="prefetch" href='<?php echo $home.'/'.$currentPage.'/'.${$currentPage.'Pages'}[$step]; ?>'>
+<?php endif;?>

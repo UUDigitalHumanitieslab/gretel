@@ -1,80 +1,72 @@
 <?php
-require "../config/config.php";
+require '../config/config.php';
+require "$root/helpers.php";
 
 session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage="ebs";
-$step=5;
-$notbflag=0;
+$currentPage = 'ebs';
+$step = 5;
+$notbflag = 0;
 
-$id=session_id();
-
-// Set input sentence to variable
-if (isset($_SESSION['example'])) $input = $_SESSION['example'];
+$id = session_id();
+$time = time();
 
 // Set tokenized input sentence to variable
 if (isset($_SESSION['sentence'])) {
-  $tokinput = $_SESSION['sentence'];
-  $sentence = explode(" ", $tokinput);
+    $tokinput = $_SESSION['sentence'];
+    $sentence = explode(' ', $tokinput);
 }
 // Set search mode to variable
-if(isset($_SESSION['search'])) $sm = $_SESSION['search'];
+if (isset($_SESSION['search'])) {
+    $sm = $_SESSION['search'];
+}
 
 if (isset($_POST['treebank'])) {
-  $treebank=$_POST['treebank'];
-  $_SESSION['treebank']=$treebank;
-}
-elseif (isset($_SESSION['treebank'])) {
-  $treebank=$_SESSION['treebank'];
-}
-else {
-  $notbflag=1;
-  $treebank="";
+    $treebank = $_POST['treebank'];
+    $_SESSION['treebank'] = $treebank;
+} elseif (isset($_SESSION['treebank'])) {
+    $treebank = $_SESSION['treebank'];
+} else {
+    $notbflag = 1;
+    $treebank = '';
 }
 
-$subtb=$treebank.'tb';
+$subtb = $treebank.'tb';
 
 if (isset($_POST[$subtb])) {
-  $components=$_POST[$subtb];
-  $_SESSION['subtb']=$components;
-}
-elseif (isset($_SESSION['subtb'])) {
-  $components=$_SESSION['subtb'];
-}
-else {
-  $notbflag=1;
+    $components = $_POST[$subtb];
+    $_SESSION['subtb'] = $components;
+} elseif (isset($_SESSION['subtb'])) {
+    $components = $_SESSION['subtb'];
+} else {
+    $notbflag = 1;
 }
 
-if (isset($_POST["ct"])) {
-  $_SESSION["ct"]="on";
-}
-else {
-  $_SESSION["ct"]="off";
+if (isset($_POST['ct'])) {
+    $_SESSION['ct'] = 'on';
+} else {
+    $_SESSION['ct'] = 'off';
 }
 
-if (isset($_SESSION['xpath'])) $xpath = $_SESSION['xpath'];
+if (isset($_SESSION['xpath'])) {
+    $xpath = $_SESSION['xpath'];
+}
+
+$continueConstraints = !$notbflag && sessionVariablesSet(array('sentence', 'search', 'treebank', 'subtb', 'ct', 'xpath'));
 
 require "$root/functions.php";
 require "$root/php/head.php";
 
-?>
-<link rel="prefetch" href="<?php echo $home; ?>">
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/results.php">
+if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
 </head>
 
 <?php require "$root/php/header.php"; ?>
 
-<?php if ($notbflag || !isset($xpath) || !isset($sm)) : ?>
-
-<p style='font-size: 18px;color:#DF5F5F'><strong>An error occurred!</strong></p>
-<p>You did not select a treebank, or something went wrong when determining the XPath for your request.
-  Please try <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">a new input example</a>.</p>
-
-<?php else:
-  if ($treebank != "sonar") {
-    $components = implode(', ', array_keys($components));
+<?php if ($continueConstraints) :
+  if ($treebank != 'sonar') {
+      $components = implode(', ', array_keys($components));
   }
   $xpath = rtrim($xpath);
 
@@ -100,8 +92,8 @@ require "$root/php/head.php";
 <div id="tree-output"></div>
 
 <?php
-  if ($sm == "advanced") :
-    if ($treebank == "sonar") : ?>
+  if ($sm == 'advanced') :
+    if ($treebank == 'sonar') : ?>
       <p>XPath expression, generated from the query tree.</p>
 
     <?php else : ?>
@@ -111,7 +103,8 @@ require "$root/php/head.php";
     <?php endif; ?>
 
     <form action="results.php" method="post">
-    <textarea name="xp" wrap="soft" <?php if ($treebank == "sonar") echo 'readonly'?>><?php echo $xpath; ?></textarea>
+    <textarea name="xp" wrap="soft" <?php if ($treebank == 'sonar') {
+    echo 'readonly'; }?>><?php echo $xpath; ?></textarea>
 
     <input type="reset" value="Reset XPath">
   <?php else : ?>
@@ -120,31 +113,35 @@ require "$root/php/head.php";
 
   <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
   </form>
-<?php endif; ?>
+<?php else: // $continueConstraints
+    setErrorHeading();
+?>
+    <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
+    possible that you came to this page directly without first entering an input example.</p>
 
 <?php
+    getPreviousPageMessage(4);
+endif;
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-?>
 
-<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
-<script>
-$(document).ready(function(){
-  $("head").append('<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">');
-    $('button[type="submit"]').click(function(){
-        $(".loading").show();
+if ($continueConstraints) : ?>
+    <div class="loading-wrapper">
+        <div class="loading"><p>Loading...<br>Please wait</p></div>
+    </div>
+    <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+    <script>
+    $(document).ready(function() {
+        $(".continue-btn-wrapper button").click(function(){
+            $(".loading-wrapper").addClass("active");
+        });
+        <?php if ($sm == 'advanced'): ?>
+            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>', {extendedPOS: true});
+        <?php else: ?>
+            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>');
+        <?php endif; ?>
     });
-    <?php if ($_SESSION['search']=="advanced"): ?>
-        $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml', {extendedPOS: true});
-    <?php else: ?>
-        $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-sub.xml');
-    <?php endif; ?>
-});
-</script>
-
-<div class="loading" style="display:none;">
-<p>Loading... Please wait</p>
-</div>
-
+    </script>
+<?php endif; ?>
 </body>
 </html>

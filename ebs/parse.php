@@ -9,8 +9,7 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = 'ebs';
 $step = 2;
 
-// Make sure the required variables are set
-$continueConstraints = postVariablesSet(['input', 'search']);
+$continueConstraints = postVariablesSet(array('input', 'search'));
 
 if ($continueConstraints) {
     $id = session_id();
@@ -27,15 +26,11 @@ if ($continueConstraints) {
 require "$root/functions.php";
 require "$root/php/head.php";
 
-?>
-<link rel="prefetch" href="<?php echo $home; ?>">
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/matrix.php">
-<?php if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
+if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
 </head>
 
 <?php
 require "$root/php/header.php";
-
 
 // $error_flag = checkInputAndLog(1);
 
@@ -49,7 +44,7 @@ if ($continueConstraints) {
     $_SESSION['sentence'] = $tokinput;
     $parse = Alpino($tokinput, $id);
     $parseloc = ModifyLemma($parse, $id, $tmp);
-    ?>
+?>
 
   <p>You find the structure of the <strong>tagged</strong>
     and <strong>parsed</strong> sentence below.
@@ -59,24 +54,22 @@ if ($continueConstraints) {
      like <strong>np</strong> (noun phrase).
   </p>
 
-  <p>Your input sentence was: <em><?php echo $tokinput;
-    ?></em></p>
+  <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
   <div id="tree-output"></div>
 
   <form action="matrix.php" method="post" enctype="multipart/form-data">
     <p>If the analysis is different from what you expected, you can enter
-      <a href="<?php echo $home;
-    ?>/ebs/input.php" title="Example-based search">another input example</a>.
+      <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">another input example</a>.
     </p>
     <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
   </form>
 <?php
 } else {
     setErrorHeading('variables undefined');
-    echo '<p>It seems that you did not enter an input sentence or did not select a search mode. If neither is the
-  case it is also possible that you came to this page directly without first entering an input example.</p>';
-    getPreviousPageMessage();
+    echo '<p>It seems that you did not enter an input sentence or did not select a search mode. It is also
+    possible that you came to this page directly without first entering an input example.</p>';
+    getPreviousPageMessage(1);
 }
 
 require "$root/php/footer.php";
@@ -86,7 +79,7 @@ if ($continueConstraints) : ?>
   <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
   <script>
   $(document).ready(function() {
-      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml');
+      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml?$id-$time"; ?>');
   });
   </script>
 <?php endif; ?>

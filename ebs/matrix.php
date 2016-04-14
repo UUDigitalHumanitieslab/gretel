@@ -1,135 +1,57 @@
 <?php
-require "../config/config.php";
+require '../config/config.php';
+require "$root/helpers.php";
 
 session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage="ebs";
-$step=3;
+$currentPage = 'ebs';
+$step = 3;
 
-$id=session_id();
+$continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
 
-// Set input sentence to variable
-if (isset($_SESSION['example'])) $input = $_SESSION['example'];
+if ($continueConstraints) {
+    $id = session_id();
+    $time = time();
 
-// Set tokenized input sentence to variable
-if (isset($_SESSION['sentence'])) {
-  $tokinput = $_SESSION['sentence'];
-  $sentence = explode(" ", $tokinput);
+    // Set input sentence to variable
+    $input = $_SESSION['example'];
+    // Set tokenized input sentence to variable
+    $tokinput = $_SESSION['sentence'];
+    $sentence = explode(' ', $tokinput);
+    // Set search mode to variable
+    $sm = $_SESSION['search'];
 }
-// Set search mode to variable
-if(isset($_SESSION['search'])) $sm = $_SESSION['search'];
 
 require "$root/functions.php";
 require "$root/php/head.php";
 
-?>
-<link rel="prefetch" href="<?php echo $home; ?>">
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/tb-sel.php">
+if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
 </head>
 
 <?php
 require "$root/php/header.php";
 
-$error_flag = checkInputAndLog();
+if ($continueConstraints):
 ?>
-
-<?php if (!$error_flag): ?>
   <form action="tb-sel.php" method="post">
-  <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
-    The latter do not need to be represented in the search results. The obligatory elements have to be included in
-    the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form.
-    Indicate the relevant  parts of the sentence, i.e. the parts you are interested in.</p>
-  <p>If you would like to review the dependency structure of your input example,
-    you can view a dependency parse of that sentence in the tree structure given <a href='<?php echo "$home/tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.</p>
-
-  <table>
-    <thead>
-      <tr><th>sentence</th>
-        <?php
-        foreach ($sentence as $key=>$word) {
-          echo "<td>" . $word . "</td>";
-        }
-        ?>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><th>word</th>
-        <?php
-          foreach ($sentence as $key=>$word) {
-            $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-            $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"token\"></td>";
-          }
-        ?>
-      </tr>
-      <tr><th>lemma</th>
-        <?php
-          foreach ($sentence as $key=>$word) {
-            $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-            $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"lemma\"></td>";
-          }
-        ?>
-      </tr>
-
-      <?php if ($sm=="advanced"): ?>
-        <tr><th>detailed word class</th>
-          <?php
-          foreach ($sentence as $key=>$word) {
-            $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-            $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"postag\"></td>";
-          }
-          ?>
-        </tr>
-      <?php endif; ?>
-
-      <tr><th>word class</th>
-        <?php
-        foreach ($sentence as $key=>$word) {
-          $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-          $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-
-          if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word))  {
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\"></td>";
-          }
-          else {
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"pos\" checked></td>";
-          }
-        }
-        ?>
-      </tr>
-      <tr class="optional"><th>optional in search</th>
-        <?php
-          foreach ($sentence as $key=>$word) {
-            $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-            $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-
-            if (preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word))  {
-              echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"na\" checked></td>";
-            }
-            else {
-              echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"na\"></td>";
-            }
-          }
-        ?>
-      </tr>
-
-      <?php if ($sm=="advanced"): ?>
-        <tr class="not-in-search"><th>NOT in search</th>
-          <?php
-          foreach ($sentence as $key=>$word) {
-            $word=preg_replace('/\"/','&quot;' , $word); // deal with quotes
-            $word=preg_replace('/\'/','&apos;' , $word); // deal with apostrophes
-            echo "<td><input type=\"radio\" name=\"$word--$key\" value=\"not\"></td>";
-          }
-          ?>
-        </tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
+      <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
+          The latter do not need to be represented in the search results. The obligatory elements have to be included in
+          the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form.
+      </p>
+      <p>If you would like to review the dependency structure of your input example,
+          you can view a dependency parse of that sentence in the tree structure given
+          <a href='<?php echo "$home/tmp/$id.xml?$id-$time"; ?>' target="_blank" class="tv-show-fs">here</a>.
+      </p>
+      <p>Indicate the relevant  parts of the sentence, i.e. the parts you are interested in. If you have chosen
+          <em>advanced mode</em> in step 1 you have two more options to choose from, namely
+          <em>detailed word class</em> and <em>not in search</em>. A detailed description of each option is
+          given at the bottom of this page.
+      </p>
+      <div class="table-wrapper">
+          <?php buildEbsMatrix(); ?>
+      </div>
 
   <h3>Options</h3>
   <div class="label-wrapper"><label><input type="checkbox" name="order" value="on"> Respect word order</label></div>
@@ -145,37 +67,40 @@ $error_flag = checkInputAndLog();
     For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
     <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.
     Lemma is case insensitive (except for proper names).</li>
-
-    <?php if ($sm=="advanced"): ?>
-      <li><b>detailed word class</b>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
-    <?php endif; ?>
-
     <li><strong>word class</strong>: Short Dutch part-of-speech tag.
     The different tags are: <code>n</code> (noun), <code>ww</code> (verb), <code>adj</code> (adjective),
     <code>lid</code> (article), <code>vnw</code> (pronoun), <code>vg</code> (conjunction),
     <code>bw</code> (adverb), <code>tw</code> (numeral), <code>vz</code> (preposition),
     <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
-    <li><strong>optional in search</strong>: The word will be ignored in the search instruction. It may be included in the results, but it is not necessary.</li>
+    <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
+        It may be included in the results, but it is not necessary.</li>
 
-    <?php if ($sm=="advanced"): ?>
-      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the search instruction. They will not be included in the results.</li>
+    <?php if ($sm == 'advanced'): ?>
+        <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
+      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the search instruction.
+          They will not be included in the results.</li>
     <?php endif; ?>
   </ul>
   <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
 </form>
-<?php endif; ?>
-
 <?php
+else:
+    setErrorHeading('variables undefined');
+?>
+    <p>It seems that you did not enter an input sentence or you did not select a search mode in step 1. It is
+     is also possible that you came to this page directly without first entering an input example.</p>
+<?php
+getPreviousPageMessage(1);
+endif;
+
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-?>
 
-<?php if (!$error_flag): ?>
+if ($continueConstraints): ?>
 
   <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
   <script>
   $(document).ready(function () {
-    $("head").append('<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css">');
       // Specific implementation of the Tree Visualizer plugin for GrETEL:
       // allows refreshing of page, opening tree in new window and so on
   	var tvLink = $("a.tv-show-fs");

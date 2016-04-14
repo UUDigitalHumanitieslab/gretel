@@ -1,98 +1,93 @@
 <?php
-require "../config/config.php";
+require '../config/config.php';
+require "$root/helpers.php";
 
 session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage="ebs";
-$step=4;
+$currentPage = 'ebs';
+$step = 4;
 
-$id=session_id();
+$continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
+$id = session_id();
 
-// Set input sentence to variable
-if (isset($_SESSION['example'])) $input = $_SESSION['example'];
+if ($continueConstraints) {
+    // Set input sentence to variable
+    $input = $_SESSION['example'];
+    // Set tokenized input sentence to variable
+    $tokinput = $_SESSION['sentence'];
+    $sentence = explode(' ', $tokinput);
+    // Set search mode to variable
+    $sm = $_SESSION['search'];
 
-// Set tokenized input sentence to variable
-if (isset($_SESSION['sentence'])) {
-  $tokinput = $_SESSION['sentence'];
-  $sentence = explode(" ", $tokinput);
+    $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 }
-// Set search mode to variable
-if(isset($_SESSION['search'])) $sm = $_SESSION['search'];
-
-$lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 
 require "$root/functions.php";
 require "$root/php/head.php";
 
 ?>
-<link rel="prefetch" href="<?php echo $home; ?>">
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/query.php">
 </head>
 
 <?php
 require "$root/php/header.php";
 
-if (isset($sentence)) {
-  // add info annotation matrix to alpino parse
-  foreach($sentence as $begin => $word) {
-    $postword = preg_replace('/\./','_' , $word);
-    $postvalue = $_POST["$postword--$begin"];
+if ($continueConstraints) {
+    // add info annotation matrix to alpino parse
+  foreach ($sentence as $begin => $word) {
+      $postword = preg_replace('/\./', '_', $word);
+      if (isset($_POST["$postword--$begin"])) $postvalue = $_POST["$postword--$begin"];
 
-    if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) { //for punctuation (!) . changes to _ (!)
-      $xp = $lpxml->xpath("//node[@begin='$begin']");
-    }
-    else {
-      $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");
-    }
-    foreach ($xp as $x) {
-      $x->addAttribute("interesting", "$postvalue");
-    }
+      if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) { //for punctuation (!) . changes to _ (!)
+          $xp = $lpxml->xpath("//node[@begin='$begin']");
+      } else {
+          $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");
+      }
+      foreach ($xp as $x) {
+          $x->addAttribute('interesting', "$postvalue");
+      }
   }
-
   // save parse with @interesting annotations
-  $inttree = fopen("$tmp/$id-int.xml", "w");
+  $inttree = fopen("$tmp/$id-int.xml", 'w');
   $tree = $lpxml->asXML();
   fwrite($inttree, "$tree");
   fclose($inttree);
 
-
   // get query tree
   if (isset($_POST['topcat'])) {
-    $topcat=$_POST['topcat'];
-    $remove="-r relcat";
-  }
-  else {
-    $remove="-r rel";
+      $topcat = $_POST['topcat'];
+      $remove = '-r relcat';
+  } else {
+      $remove = '-r rel';
   }
 
   `perl -CS $scripts/GetSubtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
 
   if (isset($_POST['order'])) {
-    $order="-order";
-    $_SESSION["order"]="on";
-  }
-
-  else {
-    $order=" ";
+      $order = '-order';
+      $_SESSION['order'] = 'on';
+  } else {
+      $order = ' ';
   }
 
   // get XPath
-  $attsout="-ex postag,begin"; // attributes to be excluded from XPath
+  $attsout = '-ex postag,begin,end'; // attributes to be excluded from XPath
   $xpath = `perl -CS $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
-  $xpath = preg_replace('/@cat="\s+"/',"@cat",$xpath); // underspecify empty attribute values
+  $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath); // underspecify empty attribute values
   $_SESSION['xpath'] = $xpath;
 }
 ?>
 
-<?php if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !isset($sentence)) : ?>
-  <p style='font-size: 18px;color:#DF5F5F'><strong>An error occurred!</strong></p>
-  <p>No search instruction could be generated, since nothing was indicated in the matrix or no sentence was entered.
-    Please go back and indicate at least one item in the matrix or add
-    <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">a new input example</a>.</p>
+<?php if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints) :
+    setErrorHeading();
+?>
 
-<?php else: ?>
+    <p>No search instruction could be generated, since nothing was indicated in the matrix or no sentence was entered.
+        It is also possible that you came to this page directly without first entering an input example.</p>
+<?php
+    getPreviousPageMessage(1);
+else: ?>
   <p>You can search an entire treebank (default), or select just one or more components.
     For SoNaR it is currently only possible to select one component at a time. Due to pre-processing difficulties
     some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.
@@ -129,7 +124,7 @@ require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 ?>
 
-<?php if (file_exists("$tmp/$id-sub.xml") && (filesize("$tmp/$id-sub.xml") > 0) && isset($sentence)) : ?>
+<?php if (file_exists("$tmp/$id-sub.xml") && (filesize("$tmp/$id-sub.xml") > 0) && $continueConstraints) : ?>
   <script>
   $(document).ready(function() {
       $('.checkall').click(function () {

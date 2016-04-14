@@ -3,7 +3,7 @@
 function sessionVariablesSet($array)
 {
     foreach ($array as $entry) {
-        if (!isset($_SESSION['${entry}'])) {
+        if (!isset($_SESSION[$entry])) {
             return false;
         }
     }

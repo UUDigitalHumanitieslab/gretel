@@ -19,9 +19,6 @@ if (isset($_SESSION['example'])) {
 require "$root/functions.php";
 require "$root/php/head.php";
 ?>
-
-<link rel="prefetch" href="<?php echo $home; ?>">
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/parse.php">
 </head>
 
 <?php require "$root/php/header.php"; ?>

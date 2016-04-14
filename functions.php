@@ -15,20 +15,18 @@
       echo "<h3 class='error-heading'>$message</h3>";
   }
 
-  function getPreviousPageMessage()
+  function getPreviousPageMessage($goToStep)
   {
-    global $step, $home, $currentPage, $ebsPages, $xpsPages;
+      global $home, $currentPage, $ebsPages, $xpsPages;
       $message = '<p>You can ';
-      if (isset($step, $currentPage)) {
-          $i = $step - 2;
-          $href = $home.'/'.$currentPage.'/'.${$currentPage.'Pages'}[$i];
+      if (isset($currentPage)) {
+          $href = $home.'/'.$currentPage.'/'.${$currentPage.'Pages'}[$goToStep - 1];
 
-          $message .= "go to <a href='$href' title='Previous page'> the previous page</a> or ";
+          $message .= "go to <a href='$href' title='Previous page'>step $goToStep</a> or ";
       }
       $message .= "go directly to <a href='$home' title='Go to the homepage'>to the homepage</a>.</p>";
       echo $message;
   }
-
 
   // Set page heading and subheading variables
   if (isset($currentPage)) {
@@ -152,4 +150,45 @@
       }
 
       return $error_flag;
+  }
+
+  function buildEbsMatrix()
+  {
+      global $sentence, $sm,$matrixOptions;
+
+      $tableHTML = '<table><thead><tr><th>sentence</th>';
+
+      foreach ($sentence as $key => $word) {
+          $tableHTML .= "<td>$word</td>";
+      }
+      $tableHTML .= '</tr></thead><tbody>';
+      $i = 0;
+      foreach ($matrixOptions as $array) {
+          ++$i;
+          foreach ($array as $th => $val) {
+              if ($sm == 'basic' && $i == 2) {
+                  break;
+              }
+              if ($i >= 2) {
+                  $tableHTML .= '<tr class="advanced">';
+              } else {
+                  $tableHTML .= '<tr>';
+              }
+
+              $tableHTML .= "<th>$th</th>";
+              foreach ($sentence as $key => $word) {
+                  $is_puc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
+                  $word = htmlspecialchars($word, ENT_QUOTES);
+                  if (($val == 'pos' & !$is_puc) || $val == 'na' && $is_puc) {
+                      $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val' checked></td>";
+                  } else {
+                      $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val'></td>";
+                  }
+              }
+              $tableHTML .= '</tr>';
+          }
+      }
+      $tableHTML .= '</tbody></table>';
+
+      echo $tableHTML;
   }

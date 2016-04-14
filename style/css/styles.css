@@ -444,11 +444,6 @@ label.disabled {
 
 body {
   background-color: #D6E69D;
-  background-image: url("../../img/logo-image-gretel.svg");
-  background-size: 450px 374px;
-  background-position: 0 50px;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   color: #565656;
   font-family: "Open Sans", sans-serif;
   line-height: 1.625;
@@ -464,10 +459,21 @@ body {
       -ms-flex-align: center;
           align-items: center;
 }
+body:before {
+  content: url("../../img/logo-image-gretel.svg");
+  width: 374px;
+  height: 450px;
+  display: block;
+  position: fixed;
+  top: 36px;
+  left: 50%;
+  margin-left: -695px;
+  z-index: -1;
+}
 
 .page-header {
   padding-bottom: 0.67em;
-  margin: 0.34em auto;
+  margin: 0 auto 0.34em;
   border-bottom: 1px dotted #968A7A;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -748,22 +754,97 @@ a.match {
 }
 
 /* loading image */
-.loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+@-webkit-keyframes load {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+@keyframes load {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+.loading-wrapper {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.34);
+  width: 100%;
+  height: 100%;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  z-index: 11;
+  display: none;
+}
+.loading-wrapper .loading {
+  border-radius: 50%;
+  position: relative;
+  width: 320px;
+  height: 320px;
+  background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
+  background-size: 74%;
+  background-position: bottom center;
   z-index: 100;
-  margin-top: -150px;
-  margin-left: -150px;
-  /*border:3px double #999;*/
-  width: 300px;
-  height: 300px;
-  /*background: #f7f7f7;*/
-  background: url("../../img/gretel_logo_trans.png"), url("../../img/page-loader.gif") 50% 50% no-repeat #f9f9f9;
-  background-size: 300px 300px;
+  border: 18px solid  #F7F7F7;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-transform: scale(0);
+      -ms-transform: scale(0);
+          transform: scale(0);
+  will-change: transform;
+  transition: -webkit-transform 300ms;
+  transition: transform 300ms;
+  transition: transform 300ms, -webkit-transform 300ms;
+}
+.loading-wrapper .loading:after {
+  content: '';
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  bottom: -18px;
+  left: -18px;
+  border-radius: 50%;
+  border: 18px solid transparent;
+  border-top-color: #D6E69D;
+}
+.loading-wrapper .loading p {
   text-align: center;
-  font-size: 20pt;
-  line-height: 300px;
+  font-weight: 700;
+}
+.loading-wrapper.active {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.loading-wrapper.active .loading {
+  -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+          transform: scale(1);
+}
+.loading-wrapper.active .loading:after {
+  -webkit-animation: load 2.4s linear infinite;
+          animation: load 2.4s linear infinite;
 }
 
 /* ============= */
@@ -790,6 +871,10 @@ a.match {
 }
 
 /* EBS, XPS */
+.ebs .table-wrapper,
+.xps .table-wrapper {
+  overflow: auto;
+}
 .ebs.step-4 table,
 .xps.step-4 table {
   width: 100%;
@@ -853,55 +938,30 @@ a.match {
 .xps table tr {
   border-top: 1px solid #DCDCDC;
 }
-.ebs table tr.optional, .ebs table tr.total,
-.xps table tr.optional,
+.ebs table tr.total,
 .xps table tr.total {
   background: #DAD1C7;
   border-bottom: 1px solid #DAD1C7;
 }
-.ebs table tr.optional td,
-.ebs table tr.optional th, .ebs table tr.total td,
+.ebs table tr.total td,
 .ebs table tr.total th,
-.xps table tr.optional td,
-.xps table tr.optional th,
 .xps table tr.total td,
 .xps table tr.total th {
   border-left: 1px solid #DAD1C7;
 }
-.ebs table tr.optional td:last-child,
-.ebs table tr.optional th:last-child, .ebs table tr.total td:last-child,
+.ebs table tr.total td:last-child,
 .ebs table tr.total th:last-child,
-.xps table tr.optional td:last-child,
-.xps table tr.optional th:last-child,
 .xps table tr.total td:last-child,
 .xps table tr.total th:last-child {
   border-right: 1px solid #DAD1C7;
 }
+.ebs table tr.advanced,
+.xps table tr.advanced {
+  background: #F7F7F7;
+}
 .ebs table tr:last-child,
 .xps table tr:last-child {
   border-bottom: 1px solid #DCDCDC;
-}
-.ebs table tr.total,
-.xps table tr.total {
-  font-weight: bold;
-  border-bottom: 1px solid #DAD1C7;
-}
-.ebs table .not-in-search,
-.xps table .not-in-search {
-  background: #baa996;
-  font-weight: bold;
-}
-.ebs table .not-in-search td,
-.ebs table .not-in-search th,
-.xps table .not-in-search td,
-.xps table .not-in-search th {
-  border-left: 1px solid #baa996;
-}
-.ebs table .not-in-search td:last-child,
-.ebs table .not-in-search th:last-child,
-.xps table .not-in-search td:last-child,
-.xps table .not-in-search th:last-child {
-  border-right: 1px solid #baa996;
 }
 .ebs table label,
 .xps table label {
@@ -960,6 +1020,8 @@ a.match {
           flex-direction: column;
   height: 48px;
   max-height: 48px;
+  /* Firefox: */
+  min-height: 48px;
 }
 .page-footer .content {
   background: transparent;
