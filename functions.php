@@ -20,7 +20,8 @@
       global $home, $currentPage, $ebsPages, $xpsPages;
       $message = '<p>You can ';
       if (isset($currentPage)) {
-          $href = $home.'/'.$currentPage.'/'.${$currentPage.'Pages'}[$goToStep - 1];
+          $keys = array_keys(${$currentPage.'Pages'});
+          $href = $home.'/'.$currentPage.'/'. $keys[$goToStep - 1];
 
           $message .= "go to <a href='$href' title='Previous page'>step $goToStep</a> or ";
       }
@@ -108,10 +109,48 @@
   {
       global $step;
       if ($step == $index) {
-          echo 'class="active"';
+          return 'class="active no-hover"';
       } elseif ($step > $index) {
-          echo 'class="done"';
+          return 'class="done"';
+      } else {
+          return 'class="no-hover"';
       }
+  }
+
+  function setProgressGoBack($index) {
+      global $step;
+
+      if ($index < $step) {
+          $diff = $index - $step;
+          return 'onclick="history.go('.$diff.'); return false"';
+      }
+  }
+
+  function buildProgressList()
+  {
+      global $step, $home, $ebsPages, $xpsPages, $currentPage;
+      $i = 0;
+
+      $output = '<ul class="progressbar">';
+      if ($currentPage == 'ebs'):
+          foreach ($ebsPages as $uri => $title) {
+              ++$i;
+              $class = setProgressClasses($i);
+              $onclick = setProgressGoBack($i);
+              $output .= '<li '.$class.'><a href="'.$home.'/ebs/'.$uri.'" '.$onclick.'>'.$i.
+                '<span> - '.$title.'</span></a></li>';
+          }
+      else:
+          foreach ($xpsPages as $uri => $title) {
+              ++$i;
+              $class = setProgressClasses($i);
+              $onclick = setProgressGoBack($i);
+              $output .= '<li '.$class.'><a href="'.$home.'/xps/'.$uri.'" '.$onclick.'>'.$i.
+                '<span> - '.$title.'</span></a></li>';
+          }
+      endif;
+      $output .= '</ul>';
+      echo $output;
   }
 
   function checkInputAndLog($logflag = 0)
@@ -191,4 +230,17 @@
       $tableHTML .= '</tbody></table>';
 
       echo $tableHTML;
+  }
+
+  function setContinueNavigation()
+  {
+      global $step, $currentPage, $ebsPages, $xpsPages, $is_bigstep;
+      echo '<nav class="continue-btn-wrapper">';
+      if ($is_bigstep) {
+          echo '<button onclick="history.go(-1); return false"><i>&larr;</i> Go back</button>';
+      }
+      if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {
+          echo '<button type="submit">Continue <i>&rarr;</i></button>';
+      }
+      echo '</nav>';
   }

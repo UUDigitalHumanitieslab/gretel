@@ -6,11 +6,7 @@ $currentPage = 'home';
 require "$root/functions.php";
 
 require "$root/php/head.php";
-
 ?>
-<link rel="prefetch" href="<?php echo $home; ?>/ebs/input.php">
-<link rel="prefetch" href="<?php echo $home; ?>/xps/input-xp.php">
-<link rel="prefetch" href="<?php echo $home; ?>/documentation.php">
 </head>
 
         <?php require "$root/php/header.php"; ?>

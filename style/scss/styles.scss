@@ -103,6 +103,10 @@ h2,
 h3,
 h4 {
     font-family: $fontheadings;
+    letter-spacing: -1px;
+    span {
+        letter-spacing: 0;
+    }
 }
 h1 {
     font-size: 1.67em;
@@ -130,51 +134,62 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-.progressbar {
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 12px;
-}
-.progressbar li {
-    display: inline-block;
-    background: #C0C0C0;
-    padding: 0;
-}
-/* Style and position actual text */
-.progressbar li p {
-    position: relative;
-    color: white;
-    text-decoration: none;
-    margin: 0;
-    padding: 0.8em;
-}
-/* Change colour of active page in progress bar */
-.progressbar li.done {
-    background-color: darken(#C0C0C0, 12%);
-}
-.progressbar li.active {
-    background-color: #B6D54B;
+    .progressbar {
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12px;
+        li {
+            display: inline-block;
+            background: #C0C0C0;
+            padding: 0;
+            &.done {
+                background-color: darken(#C0C0C0, 12%);
+            }
+            &.active,
+            &:not(.no-hover):hover {
+                background-color: #B6D54B;
+            }
+            &.no-hover {
+                pointer-events: none;
+                cursor: default;
+                &:not(.active) a {
+                    color: rgba(white, 0.74);
+                }
+            }
+            a {
+                position: relative;
+                display: block;
+                color: white;
+                text-decoration: none;
+                border: 0 none;
+                margin: 0;
+                padding: 0.8em;
+            }
+        }
+    }
 }
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
-    .progressbar {
+    .secondary-navigation .progressbar {
         font-size: 14px;
-    }
-    .progressbar li {
-        border-radius: 50%;
-    }
-    .progressbar li p {
-        line-height: 32px;
-        height: 32px;
-        width: 32px;
-        padding: 0;
-        text-align: center;
-    }
-    .progressbar span {
-        display: none;
+        li {
+            border-radius: 50%;
+            &:not(:last-child) {
+                margin-right: 8px;
+            }
+            a {
+                line-height: 32px;
+                height: 32px;
+                width: 32px;
+                padding: 0;
+                text-align: center;
+            }
+            span {
+                display: none;
+            }
+        }
     }
 }
 /* Breacrumbs - arrow directed progress bar on large screens */
@@ -183,8 +198,8 @@ a {
         padding-left: 10px;
     }
     /* Arrows for breadcrumbs; not on last child */
-    .progressbar li:not(:last-child) p:after,
-    .progressbar li:not(:last-child) p:before {
+    .progressbar li:not(:last-child) a:after,
+    .progressbar li:not(:last-child) a:before {
         position: absolute;
         top: 50%;
         left: 100%;
@@ -199,7 +214,7 @@ a {
         border-left: 30px solid white;
         content: " ";
     }
-    .progressbar li:not(:last-child) p:after {
+    .progressbar li:not(:last-child) a:after {
         border-left-color: #C0C0C0;
         margin-left: -1px;
         z-index: 2;
@@ -212,10 +227,11 @@ a {
         position: relative;
         z-index: 3;
     }
-    .progressbar li.active:not(:last-child) p:after {
+    .progressbar li.active:not(:last-child) a:after,
+    .progressbar li:not(:last-child):not(.no-hover):hover a:after {
         border-left-color: #B6D54B;
     }
-    .progressbar li.done:not(:last-child) p:after {
+    .progressbar li.done:not(:last-child) a:after {
         border-left-color: darken(#C0C0C0, 12%);
     }
 }
@@ -250,7 +266,7 @@ a.match {
     font-weight: bold;
 }
 /* loading image */
-@keyframes load {
+@keyframes load-rotate {
     from {
         transform: rotate(0deg);
     }
@@ -259,32 +275,33 @@ a.match {
     }
 }
 .loading-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: fixed;
     left: 0;
     top: 0;
     background: rgba(0,0,0,0.34);
     width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
+    height: 0;
     z-index: 11;
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
     .loading {
         border-radius: 50%;
-        position: relative;
         width: 320px;
         height: 320px;
         background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
         background-size: 74%;
         background-position: bottom center;
         z-index: 100;
-        border: 18px solid  #F7F7F7;
+        border: 18px solid #F7F7F7;
         display: flex;
         align-items: center;
         justify-content: center;
         transform: scale(0);
         will-change: transform;
-        transition: transform 300ms;
+        transition: transform 400ms;
         &:after {
             content: '';
             position: absolute;
@@ -295,6 +312,7 @@ a.match {
             border-radius: 50%;
             border: 18px solid transparent;
             border-top-color: #D6E69D;
+            will-change: transform;
         }
         p {
             text-align: center;
@@ -302,12 +320,24 @@ a.match {
         }
     }
     &.active {
-        display: flex;
+        visibility: visible;
+        pointer-events: all;
+        height: 100%;
         .loading {
             transform: scale(1);
             &:after {
-                animation: load 2.4s linear infinite;
+                animation: load-rotate 2.4s linear infinite;
             }
+        }
+    }
+}
+
+#tree-output {
+    .loading-wrapper {
+        position: static;
+        &.active {
+            padding: 18px;
+            background: #F7F7F7;
         }
     }
 }
@@ -328,6 +358,15 @@ a.match {
     }
 }
 /* EBS, XPS */
+.ebs {
+    &.step-1 {
+        input[type="text"] {
+            width: 420px;
+            max-width: calc(100% - 60px);
+            resize: horizontal;
+        }
+    }
+}
 .ebs,
 .xps {
     .table-wrapper {
@@ -422,8 +461,16 @@ a.match {
         margin: 4px auto;
     }
     .continue-btn-wrapper {
-        text-align: right;
+        display: flex;
         margin-top: 1em;
+        button {
+            &:not([type="submit"]) {
+                margin-right: auto;
+            }
+            &[type="submit"] {
+                margin-left: auto;
+            }
+        }
     }
 }
 .page-footer {
@@ -459,7 +506,6 @@ a.match {
         box-shadow: none;
     }
     .logo-link-gretel {
-        width: 80px;
         height: 80px;
         border-radius: 50%;
         position: absolute;

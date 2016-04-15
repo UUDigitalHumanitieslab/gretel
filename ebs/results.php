@@ -85,7 +85,6 @@ if ($continueConstraints):
         if (preg_match('/(http:\/\/.*)|(<\W+>)/', $xpath) == 1) { // check for spam
             echo '<h3>Error</h3>';
             echo $captcha."\n<br/><br/>";
-            echo $back;
             exit;
         }
 
@@ -123,17 +122,16 @@ if ($continueConstraints):
                 }
 
                 // print query
-                echo '<div align="right"><button type="button" value="Printer-friendly version" ' .
+                echo '<div><button type="button" value="Printer-friendly version" ' .
                     'onclick="window.open(\''.$export.'&print=html\')">Printer-friendly version</button></div>';
 
-                echo '<table><tbody><tr><th colspan="2">QUERY</th></tr>' .
-                    '<tr><th>Input example</th><td>'.$example.'</td></tr>' .
-                    '<tr><th>XPath</th><td>'.$xpath.
-                    ' <button type="button" value="Download XPath" onclick="window.open(\''.$exportxp.'\')">Download XPath</button> ' .
-                    '<!-- [<a href="'.$exportxp.'">Download XPath</a>]--> <a href="#" class="clickMe" ' .
-                    'tooltip="You can save the query to use it as input for the XPath search mode. This allows you to use the ' .
+                echo '<h3>Query</h3>' .
+                    '<p>You can <a href="'.$exportxp.'" title="XPath query">save the XPath query</a> to use it as input for the XPath search mode. This allows you to use the ' .
                     'same query for another (part of a) treebank or for a slightly modified search without having to start completely ' .
-                    'from scratch."><sup>[?]</sup></a></td></tr>' .
+                    'from scratch.</p>' .
+                    '<table><tbody>' .
+                    '<tr><th>Input example</th><td>'.$example.'</td></tr>' .
+                    '<tr><th>XPath</th><td>'.$xpath.'</td></tr>' .
                     '<tr><th>Treebank</th><td>'.strtoupper($treebank).' ['.$components.']</td>' .
                     '</tr></tbody></table>';
 
@@ -146,13 +144,14 @@ if ($continueConstraints):
                   list($TOTALS) = NumFormatHash($TOTALS);
                   list($TOTALCOUNTS) = NumFormatHash($TOTALCOUNTS);
 
-                  echo '<table><tbody><tr><th colspan="3">RESULTS</th></tr>'.
+                  echo '<h3>Results</h3>'.
+                  '<p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below. '.
+                  'You can also see and download a distribution overview of the hits over the different treebanks.</p>' .
+                  '<table><tbody>'.
                   '<tr><th>Hits</th><td>'.$TOTALCOUNTS['hits'].'</td><td><a href="#restable" class="show_hide" id="restable">'.
                   '<div id="show" class="showhide">Show hits distribution</div><div id="hide" class="showhide">Hide hits distribution</div></a></td></tr>'.
                   '<tr><th>Matching sentences</th><td>'.$TOTALCOUNTS['ms'].'</td><td><button  onclick="window.open(\''.$export.'&print=txt\')" >Download</button>'.
-                  '<a href="#" class="clickMe" tooltip="Tab-separated file of sentence IDs, matching sentences, and hits per sentence"><sup>[?]</sup></a></td>'.
-                  '<!-- td><a href="'.$export.'&print=txt" >Download</a> <a href="#" class="clickMe" tooltip="Tab-separated file of sentence IDs, matching sentences, '.
-                  'and hits per sentence"><sup>[?]</sup></a> </td --></tr>'.
+                  '</td>'.
                   '<tr><th>Sentences in treebank</th><td>'.$TOTALCOUNTS['totals'].'</td><td></td></tr></tbody></table>';
 
                   echo '<div class="slidingDiv">';  // show/hide div pt 1
@@ -166,8 +165,8 @@ if ($continueConstraints):
                       $export .= '&limit='.$limit;
                   }
 
-                  echo '<strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank '.
-                  'component in which the sentence occurs, the text number, and the location within the text (page + sentence number).';
+                  echo '<p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank '.
+                  'component in which the sentence occurs, the text number, and the location within the text (page + sentence number).</p>';
 
                   printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree); // print matching sentence and hits per sentence
               }
@@ -179,7 +178,6 @@ if ($continueConstraints):
               if (preg_match('/\[XPST0003\]/', $error)) {
                   echo 'XPATH ERROR<br/>';
                   echo "$error<br/><br/>";
-                  echo $back;
               } elseif (preg_match('/\[XPTY0004\]/', $error)) {
                   echo 'OUT OF MEMORY<br/>';
                   echo $back;
@@ -344,19 +342,17 @@ if ($continueConstraints):
               } else {
                   echo 'ERROR<br/>';
                   echo "$error<br/>";
-                  echo $back;
               }
           }
       } else {
-          echo 'ERROR<br/>';
+          setErrorHeading();
           echo 'An unknown treebank was selected.<br/>';
-          echo $back;
       }
     } catch (Exception $e) {
         // print exception
         echo $e->getMessage();
     }
-
+    setContinueNavigation();
 else: // $continueConstraints
     setErrorHeading();
     ?>
@@ -368,59 +364,62 @@ else: // $continueConstraints
 endif;
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
+
 if ($continueConstraints) :
 ?>
+    <div class="loading-wrapper">
+        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
+    </div>
+    <script src="<?php echo $home; ?>/js/jquery.dataTables.js"></script>
+    <script src="<?php echo $home; ?>/js/sorttable.js"></script>
+    <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
 
-<script src="<?php echo $home; ?>/js/jquery.dataTables.js"></script>
-<script src="<?php echo $home; ?>/js/sorttable.js"></script>
-<script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+    <script>
+    $(document).ready(function () {
+        // Specific implementation of the Tree Visualizer plugin for GrETEL:
+        // allows refreshing of page, opening tree in new window and so on
+    	var tvLink = $("a.match");
 
-<script>
-$(document).ready(function () {
-    // Specific implementation of the Tree Visualizer plugin for GrETEL:
-    // allows refreshing of page, opening tree in new window and so on
-	var tvLink = $("a.match");
-
-    tvLink.each(function(index) {
-        $(this).attr("data-tv-url", $(this).attr("href"));
-        $(this).attr("href", "#tv-" + (index + 1));
-    });
-    tvLink.click(function(e) {
-        var $this = $(this);
-
-        window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
-        $("body").treeVisualizer($this.data("tv-url"), {
-            normalView: false,
-            initFSOnClick: true
+        tvLink.each(function(index) {
+            $(this).attr("data-tv-url", $(this).attr("href"));
+            $(this).attr("href", "#tv-" + (index + 1));
         });
-        e.preventDefault();
-    });
-    var hash = window.location.hash;
-    if (hash) {
-        if (hash.indexOf("tv-") == 1) {
-            var index = hash.match(/\d+$/);
-            tvLink.eq(index[0] - 1).click();
+        tvLink.click(function(e) {
+            var $this = $(this);
+            $(".loading-wrapper").addClass("active");
+            window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
+            $("body").treeVisualizer($this.data("tv-url"), {
+                normalView: false,
+                initFSOnClick: true
+            });
+            e.preventDefault();
+        });
+        var hash = window.location.hash;
+        if (hash) {
+            if (hash.indexOf("tv-") == 1) {
+                var index = hash.match(/\d+$/);
+                tvLink.eq(index[0] - 1).click();
+            }
         }
-    }
-	// Initialisation code dataTables
-	$('#example').dataTable({
-	    "sScrollY": "400px",
-	    "bPaginate": false
-	});
+    	// Initialisation code dataTables
+    	$('#example').dataTable({
+    	    "sScrollY": "400px",
+    	    "bPaginate": false
+    	});
 
-	// Show and hide required elements
-	$(".slidingDiv").hide();
-	$(".show_hide").show();
-	$("#hide").hide(); // hide message 'hide'
-	$("#show").show(); // show message 'show'
+    	// Show and hide required elements
+    	$(".slidingDiv").hide();
+    	$(".show_hide").show();
+    	$("#hide").hide(); // hide message 'hide'
+    	$("#show").show(); // show message 'show'
 
-	$('.show_hide').click(function () {
-	    $(".slidingDiv").slideToggle();
-	    $("#show").toggle();
-	    $("#hide").toggle();
-	});
-});
-</script>
+    	$('.show_hide').click(function () {
+    	    $(".slidingDiv").slideToggle();
+    	    $("#show").toggle();
+    	    $("#hide").toggle();
+    	});
+    });
+    </script>
 <?php endif; ?>
 </body>
 </html>

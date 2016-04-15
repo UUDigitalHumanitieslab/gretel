@@ -81,7 +81,7 @@ if ($continueConstraints):
           They will not be included in the results.</li>
     <?php endif; ?>
   </ul>
-  <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
+  <?php setContinueNavigation(); ?>
 </form>
 <?php
 else:

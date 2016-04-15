@@ -375,6 +375,7 @@ textarea {
   /* 1 */
   padding: 0;
   /* 2 */
+  vertical-align: middle;
 }
 
 /**
@@ -572,6 +573,13 @@ h2,
 h3,
 h4 {
   font-family: "Roboto Condensed", sans-serif;
+  letter-spacing: -1px;
+}
+h1 span,
+h2 span,
+h3 span,
+h4 span {
+  letter-spacing: 0;
 }
 
 h1 {
@@ -612,58 +620,60 @@ a:hover {
       -ms-flex-align: center;
           align-items: center;
 }
-
-.progressbar {
+.secondary-navigation .progressbar {
   overflow: hidden;
   margin: 0;
   padding: 0;
   list-style: none;
   font-size: 12px;
 }
-
-.progressbar li {
+.secondary-navigation .progressbar li {
   display: inline-block;
   background: #C0C0C0;
   padding: 0;
 }
-
-/* Style and position actual text */
-.progressbar li p {
+.secondary-navigation .progressbar li.done {
+  background-color: #a1a1a1;
+}
+.secondary-navigation .progressbar li.active, .secondary-navigation .progressbar li:not(.no-hover):hover {
+  background-color: #B6D54B;
+}
+.secondary-navigation .progressbar li.no-hover {
+  pointer-events: none;
+  cursor: default;
+}
+.secondary-navigation .progressbar li.no-hover:not(.active) a {
+  color: rgba(255, 255, 255, 0.74);
+}
+.secondary-navigation .progressbar li a {
   position: relative;
+  display: block;
   color: white;
   text-decoration: none;
+  border: 0 none;
   margin: 0;
   padding: 0.8em;
 }
 
-/* Change colour of active page in progress bar */
-.progressbar li.done {
-  background-color: #a1a1a1;
-}
-
-.progressbar li.active {
-  background-color: #B6D54B;
-}
-
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
-  .progressbar {
+  .secondary-navigation .progressbar {
     font-size: 14px;
   }
-
-  .progressbar li {
+  .secondary-navigation .progressbar li {
     border-radius: 50%;
   }
-
-  .progressbar li p {
+  .secondary-navigation .progressbar li:not(:last-child) {
+    margin-right: 8px;
+  }
+  .secondary-navigation .progressbar li a {
     line-height: 32px;
     height: 32px;
     width: 32px;
     padding: 0;
     text-align: center;
   }
-
-  .progressbar span {
+  .secondary-navigation .progressbar li span {
     display: none;
   }
 }
@@ -674,8 +684,8 @@ a:hover {
   }
 
   /* Arrows for breadcrumbs; not on last child */
-  .progressbar li:not(:last-child) p:after,
-  .progressbar li:not(:last-child) p:before {
+  .progressbar li:not(:last-child) a:after,
+  .progressbar li:not(:last-child) a:before {
     position: absolute;
     top: 50%;
     left: 100%;
@@ -693,7 +703,7 @@ a:hover {
     content: " ";
   }
 
-  .progressbar li:not(:last-child) p:after {
+  .progressbar li:not(:last-child) a:after {
     border-left-color: #C0C0C0;
     margin-left: -1px;
     z-index: 2;
@@ -709,11 +719,12 @@ a:hover {
     z-index: 3;
   }
 
-  .progressbar li.active:not(:last-child) p:after {
+  .progressbar li.active:not(:last-child) a:after,
+  .progressbar li:not(:last-child):not(.no-hover):hover a:after {
     border-left-color: #B6D54B;
   }
 
-  .progressbar li.done:not(:last-child) p:after {
+  .progressbar li.done:not(:last-child) a:after {
     border-left-color: #a1a1a1;
   }
 }
@@ -754,7 +765,7 @@ a.match {
 }
 
 /* loading image */
-@-webkit-keyframes load {
+@-webkit-keyframes load-rotate {
   from {
     -webkit-transform: rotate(0deg);
             transform: rotate(0deg);
@@ -764,7 +775,7 @@ a.match {
             transform: rotate(360deg);
   }
 }
-@keyframes load {
+@keyframes load-rotate {
   from {
     -webkit-transform: rotate(0deg);
             transform: rotate(0deg);
@@ -775,31 +786,34 @@ a.match {
   }
 }
 .loading-wrapper {
-  position: fixed;
-  left: 0;
-  top: 0;
-  background: rgba(0, 0, 0, 0.34);
-  width: 100%;
-  height: 100%;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.34);
+  width: 100%;
+  height: 0;
   z-index: 11;
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
 }
 .loading-wrapper .loading {
   border-radius: 50%;
-  position: relative;
   width: 320px;
   height: 320px;
   background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
   background-size: 74%;
   background-position: bottom center;
   z-index: 100;
-  border: 18px solid  #F7F7F7;
+  border: 18px solid #F7F7F7;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -813,9 +827,9 @@ a.match {
       -ms-transform: scale(0);
           transform: scale(0);
   will-change: transform;
-  transition: -webkit-transform 300ms;
-  transition: transform 300ms;
-  transition: transform 300ms, -webkit-transform 300ms;
+  transition: -webkit-transform 400ms;
+  transition: transform 400ms;
+  transition: transform 400ms, -webkit-transform 400ms;
 }
 .loading-wrapper .loading:after {
   content: '';
@@ -827,15 +841,16 @@ a.match {
   border-radius: 50%;
   border: 18px solid transparent;
   border-top-color: #D6E69D;
+  will-change: transform;
 }
 .loading-wrapper .loading p {
   text-align: center;
   font-weight: 700;
 }
 .loading-wrapper.active {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  visibility: visible;
+  pointer-events: all;
+  height: 100%;
 }
 .loading-wrapper.active .loading {
   -webkit-transform: scale(1);
@@ -843,8 +858,16 @@ a.match {
           transform: scale(1);
 }
 .loading-wrapper.active .loading:after {
-  -webkit-animation: load 2.4s linear infinite;
-          animation: load 2.4s linear infinite;
+  -webkit-animation: load-rotate 2.4s linear infinite;
+          animation: load-rotate 2.4s linear infinite;
+}
+
+#tree-output .loading-wrapper {
+  position: static;
+}
+#tree-output .loading-wrapper.active {
+  padding: 18px;
+  background: #F7F7F7;
 }
 
 /* ============= */
@@ -871,6 +894,12 @@ a.match {
 }
 
 /* EBS, XPS */
+.ebs.step-1 input[type="text"] {
+  width: 420px;
+  max-width: calc(100% - 60px);
+  resize: horizontal;
+}
+
 .ebs .table-wrapper,
 .xps .table-wrapper {
   overflow: auto;
@@ -997,8 +1026,18 @@ a.match {
 }
 .ebs .continue-btn-wrapper,
 .xps .continue-btn-wrapper {
-  text-align: right;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   margin-top: 1em;
+}
+.ebs .continue-btn-wrapper button:not([type="submit"]),
+.xps .continue-btn-wrapper button:not([type="submit"]) {
+  margin-right: auto;
+}
+.ebs .continue-btn-wrapper button[type="submit"],
+.xps .continue-btn-wrapper button[type="submit"] {
+  margin-left: auto;
 }
 
 .page-footer {
@@ -1047,7 +1086,6 @@ a.match {
   box-shadow: none;
 }
 .page-footer .logo-link-gretel {
-  width: 80px;
   height: 80px;
   border-radius: 50%;
   position: absolute;

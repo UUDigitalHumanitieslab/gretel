@@ -34,7 +34,7 @@ require "$root/php/head.php";
             search and offers you the possibility to adapt the automatically generated XPath query.</p>
         <div class="label-wrapper"><label><input type="radio" name="search" value="basic" checked> Basic search</label></div>
         <div class="label-wrapper"><label><input type="radio" name="search" value="advanced"> Advanced search</label></div>
-        <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
+        <?php setContinueNavigation(); ?>
     </form>
 
     <?php

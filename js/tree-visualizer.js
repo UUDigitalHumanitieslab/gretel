@@ -223,10 +223,15 @@
                     errorHandle(msg);
                 })
                 .always(function() {
-                    if (args.normalView) SS.show();
+                    if (args.normalView) {
+                        instance.children(".loading-wrapper").removeClass("active");
+                        SS.fadeIn(250);
+                    }
                     if (args.initFSOnClick) {
+                        $(".loading-wrapper").removeClass("active");
                         FS.fadeIn(250);
                         sizeTreeFS();
+
                     }
                 });
         }

@@ -95,12 +95,10 @@ else: ?>
     If this is fixed in an updated version of SoNaR, those components will be included as well.</p>
 
   <p>Which treebank do you want to query? Click on the treebank name to see its different components.</p>
-  <form action="query.php" method="post" >
-    <select name="treebank">
-      <option value="cgn">CGN</option>
-      <option value="lassy" selected>Lassy</option>
-      <option value="sonar">SoNaR</option>
-    </select>
+  <form action="query.php" method="post">
+    <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
+    <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy" checked> Lassy</label></div>
+    <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
 
     <div class="cgn" style="display:none">
       <?php require "$scripts/cgn-tb.html"; ?>
@@ -115,7 +113,7 @@ else: ?>
     <div class="sonar" style="display:none">
       <?php require "$scripts/sonar-tb.html"; ?>
     </div>
-    <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
+    <?php setContinueNavigation(); ?>
   </form>
 <?php endif; ?>
 
@@ -140,7 +138,7 @@ include "$root/scripts/AnalyticsTracking.php";
         $("input[name^='cgntb[n']:not([disabled])").prop("checked", checked);
       });
 
-      $("select[name='treebank']").change(function(){
+      $("[name='treebank']").change(function(){
           var val = $(this).val();
           $(".cgn, .lassy, .sonar").hide();
           $("."+val).show();

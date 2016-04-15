@@ -111,7 +111,7 @@ if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/
     <form action="results.php" method="post">
   <?php endif; ?>
 
-  <div class="continue-btn-wrapper"><button type="submit">Continue <i>&rarr;</i></button></div>
+    <?php setContinueNavigation(); ?>
   </form>
 <?php else: // $continueConstraints
     setErrorHeading();
@@ -127,12 +127,12 @@ include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
     <div class="loading-wrapper">
-        <div class="loading"><p>Loading...<br>Please wait</p></div>
+        <div class="loading"><p>Searching...<br>Please wait</p></div>
     </div>
     <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
-        $(".continue-btn-wrapper button").click(function(){
+        $("form").submit(function(){
             $(".loading-wrapper").addClass("active");
         });
         <?php if ($sm == 'advanced'): ?>
