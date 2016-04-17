@@ -444,41 +444,41 @@ label.disabled {
 }
 
 body {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  min-width: 480px;
+  min-height: 100vh;
   background-color: #D6E69D;
   color: #565656;
   font-family: "Open Sans", sans-serif;
   line-height: 1.625;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  min-height: 100vh;
-  min-width: 480px;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
 }
 body:before {
-  content: url("../../img/logo-image-gretel.svg");
-  width: 374px;
-  height: 450px;
-  display: block;
   position: fixed;
   top: 36px;
   left: 50%;
-  margin-left: -695px;
   z-index: -1;
+  display: block;
+  margin-left: -695px;
+  width: 374px;
+  height: 450px;
+  content: url("../../img/logo-image-gretel.svg");
 }
 
 .page-header {
-  padding-bottom: 0.67em;
-  margin: 0 auto 0.34em;
-  border-bottom: 1px dotted #968A7A;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin: 0 auto 0.34em;
+  padding-bottom: 0.67em;
+  border-bottom: 1px dotted #968A7A;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -488,11 +488,11 @@ body:before {
 }
 .page-header h1 {
   margin: 0;
+  white-space: nowrap;
   font-size: 2em;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  white-space: nowrap;
 }
 
 .primary-navigation {
@@ -501,12 +501,12 @@ body:before {
           flex: 1;
 }
 .primary-navigation ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   -webkit-justify-content: space-around;
       -ms-flex-pack: distribute;
           justify-content: space-around;
@@ -521,18 +521,18 @@ body:before {
   margin-right: 1.34em;
 }
 .primary-navigation ul li a {
-  font-size: 16px;
-  font-weight: 300;
+  position: relative;
   display: block;
-  border-bottom: 0 none;
   padding: 2px 4px;
-  white-space: nowrap;
+  border-bottom: 0 none;
   color: #565656;
+  white-space: nowrap;
+  font-weight: 300;
+  font-size: 16px;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
   will-change: transform;
-  position: relative;
 }
 .primary-navigation ul li a.active, .primary-navigation ul li a:hover {
   color: #373737;
@@ -544,36 +544,36 @@ body:before {
   width: 67%;
 }
 .primary-navigation ul li a:after {
-  content: "";
-  display: block;
-  border-bottom: 1px solid;
-  width: 0;
-  bottom: -2px;
   position: absolute;
+  bottom: -2px;
   left: 50%;
+  display: block;
+  width: 0;
+  border-bottom: 1px solid;
+  content: "";
+  transition: width 200ms;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
-  transition: width 200ms;
 }
 
 #container,
 .page-footer .content {
   padding: 1.6em;
-  width: 100%;
   max-width: 1024px;
+  width: 100%;
+  background: #fff;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  background: #fff;
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: "Roboto Condensed", sans-serif;
   letter-spacing: -1px;
+  font-family: "Roboto Condensed", sans-serif;
 }
 h1 span,
 h2 span,
@@ -599,13 +599,13 @@ h4 {
 }
 
 a {
+  border-bottom: 1px dotted;
   color: #b4c24b;
   text-decoration: none;
-  border-bottom: 1px dotted;
 }
 a:hover {
-  color: #8f9b35;
   border-bottom: 0 none;
+  color: #8f9b35;
 }
 
 /* Progress bar */
@@ -629,8 +629,8 @@ a:hover {
 }
 .secondary-navigation .progressbar li {
   display: inline-block;
-  background: #C0C0C0;
   padding: 0;
+  background: #C0C0C0;
 }
 .secondary-navigation .progressbar li.done {
   background-color: #a1a1a1;
@@ -639,8 +639,8 @@ a:hover {
   background-color: #B6D54B;
 }
 .secondary-navigation .progressbar li.no-hover {
-  pointer-events: none;
   cursor: default;
+  pointer-events: none;
 }
 .secondary-navigation .progressbar li.no-hover:not(.active) a {
   color: rgba(255, 255, 255, 0.74);
@@ -648,11 +648,11 @@ a:hover {
 .secondary-navigation .progressbar li a {
   position: relative;
   display: block;
-  color: white;
-  text-decoration: none;
-  border: 0 none;
   margin: 0;
   padding: 0.8em;
+  border: 0 none;
+  color: white;
+  text-decoration: none;
 }
 
 /* Circular - small circles on small screen size */
@@ -667,11 +667,11 @@ a:hover {
     margin-right: 8px;
   }
   .secondary-navigation .progressbar li a {
-    line-height: 32px;
-    height: 32px;
-    width: 32px;
     padding: 0;
+    width: 32px;
+    height: 32px;
     text-align: center;
+    line-height: 32px;
   }
   .secondary-navigation .progressbar li span {
     display: none;
@@ -682,16 +682,16 @@ a:hover {
   .progressbar li:not(:first-child) {
     padding-left: 10px;
   }
-
-  /* Arrows for breadcrumbs; not on last child */
-  .progressbar li:not(:last-child) a:after,
-  .progressbar li:not(:last-child) a:before {
+  .progressbar li:not(:last-child) {
+    /* Arrows for breadcrumbs; not on last child */
+  }
+  .progressbar li:not(:last-child) a {
+    padding-right: 10px;
+  }
+  .progressbar li:not(:last-child) a:after, .progressbar li:not(:last-child) a:before {
     position: absolute;
     top: 50%;
     left: 100%;
-    -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-            transform: translateX(-50%);
     z-index: 1;
     display: block;
     margin-top: -50px;
@@ -701,33 +701,44 @@ a:hover {
     border-bottom: 50px solid transparent;
     border-left: 30px solid white;
     content: " ";
+    -webkit-transform: translateX(-67%);
+        -ms-transform: translateX(-67%);
+            transform: translateX(-67%);
   }
-
   .progressbar li:not(:last-child) a:after {
-    border-left-color: #C0C0C0;
-    margin-left: -1px;
     z-index: 2;
+    margin-left: -1px;
+    border-left-color: #C0C0C0;
   }
-
   .progressbar li:last-child {
-    padding-right: 10px;
+    padding-right: 5px;
   }
-
-  /* Position text on top of the arrow, this saves us some space */
   .progressbar li span {
     position: relative;
     z-index: 3;
   }
-
-  .progressbar li.active:not(:last-child) a:after,
-  .progressbar li:not(:last-child):not(.no-hover):hover a:after {
+  .progressbar li.active:not(:last-child) a:after, .progressbar li:not(:last-child):not(.no-hover):hover a:after {
     border-left-color: #B6D54B;
   }
-
   .progressbar li.done:not(:last-child) a:after {
     border-left-color: #a1a1a1;
   }
 }
+#tree-output {
+  transition: -webkit-transform 400ms;
+  transition: transform 400ms;
+  transition: transform 400ms, -webkit-transform 400ms;
+  -webkit-transform: scale(0);
+      -ms-transform: scale(0);
+          transform: scale(0);
+  will-change: transform;
+}
+#tree-output.active {
+  -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+          transform: scale(1);
+}
+
 /* Sortable tables */
 /* define height and width of scrollable area. Add 16px to width for scrollbar */
 div.tableWrapper {
@@ -786,71 +797,78 @@ a.match {
   }
 }
 .loading-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 11;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  position: fixed;
-  left: 0;
-  top: 0;
-  background: rgba(0, 0, 0, 0.34);
+  visibility: hidden;
   width: 100%;
   height: 0;
-  z-index: 11;
-  visibility: hidden;
+  background: rgba(0, 0, 0, 0.34);
   pointer-events: none;
-}
-.loading-wrapper .loading {
-  border-radius: 50%;
-  width: 320px;
-  height: 320px;
-  background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
-  background-size: 74%;
-  background-position: bottom center;
-  z-index: 100;
-  border: 18px solid #F7F7F7;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-transform: scale(0);
-      -ms-transform: scale(0);
-          transform: scale(0);
-  will-change: transform;
+}
+.loading-wrapper .loading {
+  z-index: 100;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 320px;
+  height: 320px;
+  border: 18px solid #F7F7F7;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
+  background-position: bottom center;
+  background-size: 74%;
   transition: -webkit-transform 400ms;
   transition: transform 400ms;
   transition: transform 400ms, -webkit-transform 400ms;
+  -webkit-transform: scale(0);
+      -ms-transform: scale(0);
+          transform: scale(0);
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  will-change: transform;
 }
 .loading-wrapper .loading:after {
-  content: '';
   position: absolute;
   top: -18px;
   right: -18px;
   bottom: -18px;
   left: -18px;
-  border-radius: 50%;
   border: 18px solid transparent;
   border-top-color: #D6E69D;
+  border-radius: 50%;
+  content: '';
   will-change: transform;
 }
 .loading-wrapper .loading p {
   text-align: center;
   font-weight: 700;
 }
+.loading-wrapper .loading button {
+  position: relative;
+  z-index: 20;
+}
 .loading-wrapper.active {
   visibility: visible;
-  pointer-events: all;
   height: 100%;
+  pointer-events: all;
 }
 .loading-wrapper.active .loading {
   -webkit-transform: scale(1);
@@ -886,17 +904,17 @@ a.match {
           justify-content: space-between;
 }
 .docs .flex-content article {
+  padding: 0.67em;
+  min-width: 240px;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  padding: 0.67em;
-  min-width: 240px;
 }
 
 /* EBS, XPS */
 .ebs.step-1 input[type="text"] {
-  width: 420px;
   max-width: calc(100% - 60px);
+  width: 420px;
   resize: horizontal;
 }
 
@@ -911,26 +929,26 @@ a.match {
 }
 .ebs.step-5 textarea[name="xp"],
 .xps.step-5 textarea[name="xp"] {
-  width: 50%;
+  margin-right: 16px;
   min-width: 320px;
-  resize: vertical;
-  font-family: monospace;
+  min-height: 100px;
+  width: 50%;
   color: inherit;
   vertical-align: top;
-  margin-right: 16px;
-  min-height: 100px;
+  font-family: monospace;
+  resize: vertical;
 }
 .ebs table,
 .xps table {
-  border-collapse: collapse;
   border-spacing: 0;
+  border-collapse: collapse;
 }
 .ebs table td,
 .ebs table th,
 .xps table td,
 .xps table th {
-  border-left: 1px solid #DCDCDC;
   padding: 2px 12px;
+  border-left: 1px solid #DCDCDC;
 }
 .ebs table td:last-child,
 .ebs table th:last-child,
@@ -948,8 +966,8 @@ a.match {
 }
 .ebs table thead tr,
 .xps table thead tr {
-  background: #DAD1C7;
   border-top: 1px solid #DAD1C7;
+  background: #DAD1C7;
 }
 .ebs table thead tr td,
 .ebs table thead tr th,
@@ -969,8 +987,8 @@ a.match {
 }
 .ebs table tr.total,
 .xps table tr.total {
-  background: #DAD1C7;
   border-bottom: 1px solid #DAD1C7;
+  background: #DAD1C7;
 }
 .ebs table tr.total td,
 .ebs table tr.total th,
@@ -1001,14 +1019,14 @@ a.match {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin-top: 1em;
+  white-space: nowrap;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  margin-top: 1em;
-  white-space: nowrap;
 }
 .ebs .progress-header h1,
 .xps .progress-header h1 {
@@ -1016,9 +1034,9 @@ a.match {
 }
 .ebs .progress-header h1 span,
 .xps .progress-header h1 span {
-  font-family: "Open Sans", sans-serif;
   font-weight: 300;
   font-size: 16px;
+  font-family: "Open Sans", sans-serif;
 }
 .ebs .label-wrapper,
 .xps .label-wrapper {
@@ -1041,38 +1059,38 @@ a.match {
 }
 
 .page-footer {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  margin-top: 24px;
-  background: #BFA58A;
-  max-width: none;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  width: 100%;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
-  height: 48px;
-  max-height: 48px;
+  margin-top: 24px;
   /* Firefox: */
   min-height: 48px;
-}
-.page-footer .content {
-  background: transparent;
-  padding: 0;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
+  max-width: none;
+  max-height: 48px;
+  width: 100%;
+  height: 48px;
+  background: #BFA58A;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+}
+.page-footer .content {
   position: relative;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 0;
+  background: transparent;
   color: white;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 .page-footer .content a {
   color: white;
@@ -1086,8 +1104,8 @@ a.match {
   box-shadow: none;
 }
 .page-footer .logo-link-gretel {
-  height: 80px;
-  border-radius: 50%;
   position: absolute;
   bottom: 0;
+  height: 80px;
+  border-radius: 50%;
 }

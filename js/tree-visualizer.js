@@ -143,7 +143,7 @@
                 views = [];
 
             if (args.normalView) {
-                instance.append('<div class="tree-visualizer" style="display: none"></div>');
+                instance.append('<div class="tree-visualizer"></div>');
                 SS = instance.children(".tree-visualizer");
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
@@ -224,8 +224,7 @@
                 })
                 .always(function() {
                     if (args.normalView) {
-                        instance.children(".loading-wrapper").removeClass("active");
-                        SS.fadeIn(250);
+                        instance.addClass("active");
                     }
                     if (args.initFSOnClick) {
                         $(".loading-wrapper").removeClass("active");

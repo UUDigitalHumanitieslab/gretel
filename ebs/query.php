@@ -103,8 +103,8 @@ if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/
     <?php endif; ?>
 
     <form action="results.php" method="post">
-    <textarea name="xp" wrap="soft" <?php if ($treebank == 'sonar') {
-    echo 'readonly'; }?>><?php echo $xpath; ?></textarea>
+    <?php $readonly = ($treebank == 'sonar') ? 'readonly' : ''; ?>
+    <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <input type="reset" value="Reset XPath">
   <?php else : ?>
@@ -127,14 +127,43 @@ include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
     <div class="loading-wrapper">
-        <div class="loading"><p>Searching...<br>Please wait</p></div>
+        <div class="loading"><p>Searching...<br>Please wait</p><button>Cancel</button></div>
     </div>
     <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
-        $("form").submit(function(){
-            $(".loading-wrapper").addClass("active");
+      var xhr;
+      $("form").submit(function(e) {
+        e.preventDefault();
+        $(".loading-wrapper").addClass("active");
+        var url = $(this).attr("action");
+        if(xhr) {
+          xhr.abort();
+        }
+        xhr = $.ajax({
+          type: "POST",
+          cache: false,
+          url: url,
+          success: function() {
+            window.location.href = '<?php echo "$home/$currentPage/"; ?>'+url;
+          },
+          complete: function(xhr, status) {
+            xhr = null;
+          }
         });
+      });
+      $(".loading-wrapper button").click(function() {
+        $(".loading-wrapper").removeClass("active");
+        if(xhr) {
+          xhr.abort();
+        }
+      });
+      $(window).unload(function() {
+        $(".loading-wrapper").removeClass("active");
+        if(xhr) {
+          xhr.abort();
+        }
+      });
         <?php if ($sm == 'advanced'): ?>
             $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>', {extendedPOS: true});
         <?php else: ?>

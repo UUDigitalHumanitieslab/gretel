@@ -57,9 +57,6 @@ if ($continueConstraints) {
   <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
   <div id="tree-output">
-      <div class="loading-wrapper active">
-          <div class="loading"><p>Growing a tree...<br>Please wait</p></div>
-      </div>
   </div>
 
   <form action="matrix.php" method="post" enctype="multipart/form-data">
