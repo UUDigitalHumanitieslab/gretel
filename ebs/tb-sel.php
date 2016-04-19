@@ -29,7 +29,7 @@ require "$root/php/head.php";
 
 ?>
 </head>
-
+<?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
@@ -121,30 +121,5 @@ else: ?>
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 ?>
-
-<?php if (file_exists("$tmp/$id-sub.xml") && (filesize("$tmp/$id-sub.xml") > 0) && $continueConstraints) : ?>
-  <script>
-  $(document).ready(function() {
-      $('.checkall').click(function () {
-        var checked = $(this).prop("checked");
-        $("input[name^='lassytb']:not([disabled])").prop("checked", checked);
-      });
-      $('.checkvlfunction').click(function () {
-        var checked = $(this).prop("checked");
-        $("input[name^='cgntb[v']:not([disabled])").prop("checked", checked);
-      });
-      $('.checknlfunction').click(function () {
-        var checked = $(this).prop("checked");
-        $("input[name^='cgntb[n']:not([disabled])").prop("checked", checked);
-      });
-
-      $("[name='treebank']").change(function(){
-          var val = $(this).val();
-          $(".cgn, .lassy, .sonar").hide();
-          $("."+val).show();
-      });
-  });
-  </script>
-<?php endif; ?>
 </body>
 </html>

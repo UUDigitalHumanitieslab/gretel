@@ -244,3 +244,30 @@
       }
       echo '</nav>';
   }
+
+  function catchAndThrowErrorMessage($error) {
+      global $id, $xpath, $log;
+      if (preg_match('/\[XPST0003\]/', $error)) {
+          setErrorHeading("XPath difficulties");
+          echo "<p>Something went wrong when generating, fetching, or parsing
+          your XPath code. The error is: $error</p>";
+      } elseif (preg_match('/\[XPTY0004\]/', $error)) {
+          setErrorHeading("out of memory");
+          echo "<p>The server returned an out of memory error (OOM). The literal error
+          message is: $error</p>";
+
+          $date = date('d-m-Y');
+          $time = time();
+          $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
+
+          $oom = fopen("$log/oom.log", 'a');
+          fwrite($oom, "$date\t$user\t$id-$time\t$xpath\t$error\n");
+          fclose($oom);
+      } else {
+          setErrorHeading();
+          // print exception
+          echo '<p>'.$e->getMessage().'</p>';
+      }
+
+      getPreviousPageMessage(4);
+  }

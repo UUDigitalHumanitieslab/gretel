@@ -13,14 +13,17 @@ $id = session_id();
 $date = date('d-m-Y');
 $time = time();
 
-$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtb')
-    && (isset($_POST['xp']) ||  $_SESSION['xpath']));
+$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtb', 'xpath'));
 
 if ($continueConstraints) {
+    $sortTables = true;
+    $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
+    if ($treebank == "sonar") $subtreebank = $_SESSION['subtb'];
     $sm = $_SESSION['search'];
     $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
+    $xpath = $_SESSION['xpath'];
 
     // get context option
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
@@ -34,14 +37,18 @@ if ($continueConstraints) {
 
 require "$root/functions.php";
 require "$root/php/head.php";
-
-if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
+?>
 </head>
-
+<?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
 if ($continueConstraints):
+    // Clean up XPath
+    $xpath = rtrim($xpath);
+    $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
+    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]'); // deal with quotes/apos
+    $xpath = strtr("$xpath", $trans);
 
     if (getenv('REMOTE_ADDR')) {
         $user = getenv('REMOTE_ADDR');
@@ -49,49 +56,31 @@ if ($continueConstraints):
         $user = 'anonymous';
     }
 
-    // log files
-    $oomlog = "$log/oom.log";
-    $xplog = "$log/gretel-ebq.log";
-
 
     // messages and documentation
-    $span = '<span id="span_ID">no sentence selected</span>';
     $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
     $exportxp = "$home/scripts/SaveXPath.php"; // script for downloading the XPath expression
     $showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
     $captcha = "This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
-    /***********************************************************/
-    /* INCLUDE SCRIPTS */
-
-
-
-    /***********************************************************/
 
     try {
         $start = microtime(true);
-        // get XPath
-        if ($sm == 'basic') {
-            $xpath = $_SESSION['xpath'];
-        } else {
-            $xpath = $_POST['xp'];
-            $_SESSION['xpath'] = $xpath;
-        }
-
-        $xpath = rtrim($xpath);
-        $xpath = preg_replace('/[\\n\\r]+/', ' ', $xpath); // remove newlines and tabs
-        $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]'); // deal with quotes/apos
-        $xpath = strtr("$xpath", $trans);
 
         if (preg_match('/(http:\/\/.*)|(<\W+>)/', $xpath) == 1) { // check for spam
             echo '<h3>Error</h3>';
             echo $captcha."\n<br/><br/>";
             exit;
         }
-
-        // log XPath
-        $xplog = fopen($xplog, 'a'); //concatenate
+        /*
+        // log XPath :: which version? USERXP or AUTOXP
+        $xplog = fopen("$log/gretel-ebq.log", 'a'); //concatenate
         fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\tUSERXP\t$xpath\n");
         fclose($xplog);
+
+
+          $log = fopen($grtllog, "a");  //concatenate
+          fwrite($log, "$date\t$user\t$id-$time\t$sm\t$treebank\tAUTOXP\t$xpath");
+          fclose($log);*/
 
         if (is_array($_SESSION['subtb'])) {
             $subtreebanks = array_keys($_SESSION['subtb']);
@@ -104,7 +93,6 @@ if ($continueConstraints):
 
         /* FOR SMALL TREEBANKS */
         if ($treebank == 'lassy' || $treebank == 'cgn') {
-
             // create session
             $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
@@ -150,7 +138,7 @@ if ($continueConstraints):
                   '<table><tbody>'.
                   '<tr><th>Hits</th><td>'.$TOTALCOUNTS['hits'].'</td><td><a href="#restable" class="show_hide" id="restable">'.
                   '<div id="show" class="showhide">Show hits distribution</div><div id="hide" class="showhide">Hide hits distribution</div></a></td></tr>'.
-                  '<tr><th>Matching sentences</th><td>'.$TOTALCOUNTS['ms'].'</td><td><button  onclick="window.open(\''.$export.'&print=txt\')" >Download</button>'.
+                  '<tr><th>Matching sentences</th><td>'.$TOTALCOUNTS['ms'].'</td><td><button onclick="window.open(\''.$export.'&print=txt\')" >Download</button>'.
                   '</td>'.
                   '<tr><th>Sentences in treebank</th><td>'.$TOTALCOUNTS['totals'].'</td><td></td></tr></tbody></table>';
 
@@ -170,43 +158,27 @@ if ($continueConstraints):
 
                   printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree); // print matching sentence and hits per sentence
               }
+
+              setContinueNavigation();
             $session->close();
           } catch (Exception $e) {
-              // print $e->getMessage();
-              $error = $e->getMessage();
-
-              if (preg_match('/\[XPST0003\]/', $error)) {
-                  echo 'XPATH ERROR<br/>';
-                  echo "$error<br/><br/>";
-              } elseif (preg_match('/\[XPTY0004\]/', $error)) {
-                  echo 'OUT OF MEMORY<br/>';
-                  echo $back;
-                  $oom = fopen($oomlog, 'a');
-                  fwrite($oom, "$date\t$user\t$id-$time\t$xpath\t$error\n");
-                  fclose($oom);
-              } else {
-                  echo 'ERROR<br/>';
-                  echo "$error<br/>";
-                  echo $back;
-              }
+              catchAndThrowErrorMessage($e->getMessage());
           }
       }
       /* FOR SONAR */
       elseif ($treebank == 'sonar') {
-          $subtreebank = $_SESSION['subtb'];
-
           // print query
-          echo '<table><tr><th colspan="2">QUERY</th></tr>'.
+          echo '<h3>Query</h3>' .
+          '<p>You can <a href="'.$exportxp.'" title="XPath query">save the XPath query</a> to use it as input for the XPath search mode. This allows you to use the ' .
+          'same query for another (part of a) treebank or for a slightly modified search without having to start completely ' .
+          'from scratch.</p>' .
+          '<table><tbody>'.
           '<tr><th>Input example</th><td>'.$example.'<td/></tr>'.
-          '<tr><th>XPath</th><td>'.$xpath.' <button type="button" '.
-          'value="Download XPath" onclick="window.open(\''.$exportxp.'\')">Download XPath</button> ' .
-          '<!-- [<a href="'.$exportxp.'">Download XPath</a>]--> <a href="#" class="clickMe" tooltip="You can save the query '.
-          'to use it as input for the XPath search mode. This allows you to use the same query for another (part of a) treebank '.
-          'or for a slightly modified search without having to start completely from scratch."><sup>[?]</sup></a></td></tr>'.
-          '<tr><th>Treebank</th><td>'.strtoupper($treebank).' ['.$subtreebank.']</td></tr></table>';
+          '<tr><th>XPath</th><td>'.$xpath.'</td></tr>'.
+          '<tr><th>Treebank</th><td>'.strtoupper($treebank).' ['.$subtreebank.']</td></tr></tbody></table>';
 
           try {
-              $xpath = preg_replace("/^\//", '', $xpath); // remove first slash
+              $xpath = substr($xpath, 1); // remove first slash
               // XPath2BreathFirst
               $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
               $basexdb = $subtreebank.$bf;
@@ -229,7 +201,7 @@ if ($continueConstraints):
               $process = proc_open($cmd, $descriptorspec, $pipes) or die("Can't open process $cmd!");
 
               echo '<p><strong>Results</strong></p>';
-              echo '<p id="prog"><strong>Search status: </strong>Processing...    <button type="button" ' .
+              echo '<p id="prog"><strong>Search status: </strong>Processing...    <button ' .
               'onclick="window.stop();">Stop searching</button></p>';
               echo '<p id="hits"><strong>Hits: </strong>Still counting...</p>';
               echo '<p id="sample"></p>';
@@ -238,9 +210,9 @@ if ($continueConstraints):
               'within the text (page + sentence number).</p>';
 
               // print matching sentences sample
-              echo '<div class="tableWrapper"><table id="example" class="sortable" border="1">'.
-              '<thead><tr><th class="pointer">SENTENCE ID</th><th class="pointer">MATCHING SENTENCES</th>'.
-              '<th class="pointer">HITS</th></tr></thead>'.
+              echo '<div class="tableWrapper"><table id="example" class="sortable">'.
+              '<thead><tr><th class="pointer">Sentece ID</th><th class="pointer">Matching sentences</th>'.
+              '<th class="pointer">Hits</th></tr></thead>'.
               '<tfoot><tr><th colspan="3"></th></tr></tfoot><tbody>';
 
               $range = range(0, 100);
@@ -251,23 +223,19 @@ if ($continueConstraints):
                       $match = fgets($pipes[2]);
                       if (!empty($match)) {
                           $match = str_replace("\n", '', $match);
-                          if (preg_match('/SAMPLE/', $match)) {
-                              $sample = preg_split("/\t/", $match);
+                          var_dump($match);
+                          if (preg_match('/SAMPLE/',$match)) {
+                              $sample = explode("\t", $match);
                               // end table
                               echo '</tbody></table></div>';
                               echo "<script>document.getElementById('sample').innerHTML ='The corpus sample displayed below contains ".
                               $sample[1].' hits in '.$sample[2].' matching sentences <!-- ('.$sample[3]." hit(s) per sentence on average) -->';</script>";
                           } else {
-                              $match = preg_split("/\t/", $match);
-                              $sid = $match[0];
-                              $matchsent = $match[1];
-                              $counthits = $match[2];
-                              $db = $match[3];
-                              $idlist = $match[4];
-                              $beginlist = $match[5];
+                              $match = explode("\t", $match);
+                              list($sid, $matchsent, $counthits, $db, $idlist, $beginlist) = $match;
 
                               $hlsentence = HighlightSentence($matchsent, $beginlist);
-                              $sentenceidlink = '<a class="match" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
+                              $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
                               echo '<tr><td>'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td>'.$counthits."</td></tr>";
                           }
                       } else {
@@ -317,42 +285,27 @@ if ($continueConstraints):
                           flush();
                           break; // exit do-while loop before end time
                       } else {
-                          echo "<script>document.getElementById('prog').innerHTML ='ERROR';</script>";
-                          echo "TIME: $t<br/>";
+                          echo "<script>document.getElementById('prog').innerHTML ='Error';</script>";
+                          echo "Time: $t<br/>";
                           ob_flush();
                           flush();
                       }
                   }
               } while ($t <= $endtime);
               proc_close($process);
-          } catch (Exception $e) {
-              // print $e->getMessage();
-              $error = $e->getMessage();
-              if (preg_match('/\[XPST0003\]/', $error)) {
-                  echo 'XPATH ERROR<br/>';
-                  echo "$error<br/><br/>";
-                  echo $back;
-              } elseif (preg_match('/\[XPTY0004\]/', $error)) {
-                  echo 'OUT OF MEMORY<br/>';
-                  echo $back;
 
-                  $oom = fopen($oomlog, 'a');
-                  fwrite($oom, "$date\t$user\t$id-$time\t$xpath\t$error\n");
-                  fclose($oom);
-              } else {
-                  echo 'ERROR<br/>';
-                  echo "$error<br/>";
-              }
+              setContinueNavigation();
+          } catch (Exception $e) {
+              catchAndThrowErrorMessage($e->getMessage());
           }
       } else {
           setErrorHeading();
-          echo 'An unknown treebank was selected.<br/>';
+          echo '<p>An unknown treebank was selected so the search cannot continue.</p>';
+          getPreviousPageMessage(4);
       }
     } catch (Exception $e) {
-        // print exception
-        echo $e->getMessage();
+        catchAndThrowErrorMessage($e->getMessage());
     }
-    setContinueNavigation();
 else: // $continueConstraints
     setErrorHeading();
     ?>
@@ -365,61 +318,10 @@ endif;
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
-if ($continueConstraints) :
-?>
+if ($continueConstraints) : ?>
     <div class="loading-wrapper">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
-    <script src="<?php echo $home; ?>/js/jquery.dataTables.js"></script>
-    <script src="<?php echo $home; ?>/js/sorttable.js"></script>
-    <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
-
-    <script>
-    $(document).ready(function () {
-        // Specific implementation of the Tree Visualizer plugin for GrETEL:
-        // allows refreshing of page, opening tree in new window and so on
-    	var tvLink = $("a.match");
-
-        tvLink.each(function(index) {
-            $(this).attr("data-tv-url", $(this).attr("href"));
-            $(this).attr("href", "#tv-" + (index + 1));
-        });
-        tvLink.click(function(e) {
-            var $this = $(this);
-            $(".loading-wrapper").addClass("active");
-            window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
-            $("body").treeVisualizer($this.data("tv-url"), {
-                normalView: false,
-                initFSOnClick: true
-            });
-            e.preventDefault();
-        });
-        var hash = window.location.hash;
-        if (hash) {
-            if (hash.indexOf("tv-") == 1) {
-                var index = hash.match(/\d+$/);
-                tvLink.eq(index[0] - 1).click();
-            }
-        }
-    	// Initialisation code dataTables
-    	$('#example').dataTable({
-    	    "sScrollY": "400px",
-    	    "bPaginate": false
-    	});
-
-    	// Show and hide required elements
-    	$(".slidingDiv").hide();
-    	$(".show_hide").show();
-    	$("#hide").hide(); // hide message 'hide'
-    	$("#show").show(); // show message 'show'
-
-    	$('.show_hide').click(function () {
-    	    $(".slidingDiv").slideToggle();
-    	    $("#show").toggle();
-    	    $("#hide").toggle();
-    	});
-    });
-    </script>
 <?php endif; ?>
 </body>
 </html>

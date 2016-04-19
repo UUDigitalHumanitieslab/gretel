@@ -1,133 +1,138 @@
 <?php
-function NumFormatHash($hash) {
-  foreach ($hash as $key => $value) {
-    $NUMFOR{$key}=number_format($value);
-  }
-  return array($NUMFOR);
+
+function NumFormatHash($hash)
+{
+    foreach ($hash as $key => $value) {
+        $NUMFOR{$key} = number_format($value);
+    }
+
+    return array($NUMFOR);
 }
 
-function printCounts($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS) { // print table with results
-
-  $CORPUS=SetDB2CorpusDetailed($treebank);
-   print "<table id=\"results\" border=\"1\">
-             <thead>
-              <tr><th>TREEBANK</th><th>HITS</th><th>MATCHING SENTENCE</th><th>SENTENCES IN TREEBANK</th></tr>
-             </thead>
-             ";
-  foreach ($HITS as $dbname => $h) {
-    print "<tr><td>$CORPUS[$dbname]</td><td>$h<td>$MS[$dbname]</td><td>$TOTALS[$dbname]</td></tr>\n";
-  }
-  print "<tr><td><b>TOTAL</b></td><td><b>$TOTALCOUNTS[hits]</b><td><b>$TOTALCOUNTS[ms]</b></td><td><b>$TOTALCOUNTS[totals]</b></td></tr>\n";
-  print "</table>\n<br/>\n";
+function printCounts($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
+{
+    // print table with results
+    $CORPUS = SetDB2CorpusDetailed($treebank);
+    echo '<table id="results"><thead><tr>'.
+        '<th>Treebank</th><th>Hits</th><th>Matching sentence</th><th>Sentences in treebank</th>' .
+        '</tr></thead>';
+    foreach ($HITS as $dbname => $h) {
+        echo "<tr><td>$CORPUS[$dbname]</td><td>$h<td>$MS[$dbname]</td><td>$TOTALS[$dbname]</td></tr>";
+    }
+    echo "<tr><td>Total</td><td>$TOTALCOUNTS[hits]<td><b>$TOTALCOUNTS[ms]</td><td>$TOTALCOUNTS[totals]</td></tr>";
+    echo "</table>";
 }
 
-function printCountsCsv($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS) { // print table with results
+function printCountsCsv($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
+{
+    // print table with results
+    // $CORPUS = SetDB2Corpus($treebank);
 
-  $CORPUS=SetDB2Corpus($treebank);
+    echo "treebank,hits,matching-sentences,sentences-in-treebank\n";
 
-  print "treebank,hits,matching-sentences,sentences-in-treebank\n";
-
-  foreach ($HITS as $dbname => $h) {
-    print "$CORPUS[$dbname],$h,$MS[$dbname],$TOTALS[$dbname]\n";
-  }
-  print "TOTAL,$TOTALCOUNTS[hits],$TOTALCOUNTS[ms],$TOTALCOUNTS[totals]\n";
-
+    foreach ($HITS as $dbname => $h) {
+        echo "$CORPUS[$dbname],$h,$MS[$dbname],$TOTALS[$dbname]\n";
+    }
+    echo "Total,$TOTALCOUNTS[hits],$TOTALCOUNTS[ms],$TOTALCOUNTS[totals]\n";
 }
 
-function printCountsPF($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS) { // print table with results
+function printCountsPF($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
+{
+    // print table with results
+    $CORPUS = SetDB2Corpus($treebank);
+    echo '<table id="results"><thead><tr>'.
+        '<th>Treebank</th><th>Hits</th><th>Matching sentence</th><th>Sentences in treebank</th>'.
+        '</tr></thead>';
 
-  $CORPUS=SetDB2Corpus($treebank);
-  print "<table id=\"results\" border=\"1\">
-             <thead>
-              <tr><th>TREEBANK</th><th>HITS</th><th>MATCHING SENTENCE</th><th>SENTENCES IN TREEBANK</th></tr>
-             </thead>
-             ";
-  foreach ($HITS as $dbname => $h) {
-    print "<tr><td>$CORPUS[$dbname]</td><td>$h<td>$MS[$dbname]</td><td>$TOTALS[$dbname]</td></tr>\n";
-  }
-  print "<tr><td><b>TOTAL</b></td><td><b>$TOTALCOUNTS[hits]</b><td><b>$TOTALCOUNTS[ms]</b></td><td><b>$TOTALCOUNTS[totals]</b></td></tr>\n";
-  print "</table>\n<br/>\n";
+    foreach ($HITS as $dbname => $h) {
+        echo "<tr><td>$CORPUS[$dbname]</td><td>$h<td>$MS[$dbname]</td><td>$TOTALS[$dbname]</td></tr>\n";
+    }
+    echo "<tr><td>Total</td><td>$TOTALCOUNTS[hits]<td>$TOTALCOUNTS[ms]</td><td>$TOTALCOUNTS[totals]</td></tr>";
+    echo "</table>";
 }
 
-function printMatches($sentences,$counthits,$idlist,$beginlist,$treebank,$showtree) { // NOTE: sentence IDs are the keys of all hashes
-     print '<div class="tableWrapper"><table id="example" class="sortable" border="1">
-             <thead>
-<tr><th class="pointer">SENTENCE ID</th><th class="pointer">MATCHING SENTENCES</th><th class="pointer">HITS</th></tr>
-             </thead>
-             <tfoot>
-             <tr><th colspan="3"></th></tr>
-             </tfoot>
-             ';
+function printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree)
+{
+    // NOTE: sentence IDs are the keys of all hashes
+    echo '<div class="tableWrapper"><table id="example" class="sortable"><thead>'.
+        '<tr><th class="pointer">Sentence ID</th><th class="pointer">Matching sentences</th>'.
+        '<th class="pointer">Hits</th></tr></thead>';
+    echo '<tbody>';
+    // print matching sentence and hits per sentence
+    foreach ($sentences as $id => $sentence) {
+        $sid = trim($id);
+        // highlight sentence
+        $hlsentence = HighlightSentence($sentence, $beginlist[$id]);
+        // deal with quotes/apos
+        $trans = array('"' => '&quot;', "'" => "&apos;");
+        $hlsentence = strtr($hlsentence, $trans);
 
-      print '
-             <tbody>
-             ';
+        $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
 
-      foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
-	$sid=trim($id);
-	$hlsentence=HighlightSentence($sentence,$beginlist[$id]); // highlight sentence
-
-	$trans = array('"' => '&quot;', "'" => "&apos;"); // deal with quotes/apos
-	$hls=strtr("$hlsentence", $trans);
-
-	$sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
-
-	print '<tr><td width="150px">'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td width="100px" >'.$counthits[$id].'</td></tr>'."\n";
-      }
-      print "</tbody></table></div>\n<br/><br/>\n";
-
+        echo '<tr><td>'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td>'.$counthits[$id].'</td></tr>';
+    }
+    echo "</tbody></table></div>";
 }
 
-function printMatchesTxt($sentences,$counthits,$idlist,$beginlist) { // NOTE: sentence IDs are the keys of all hashes
-
-      foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
-	print "$id\t$sentence\t[$counthits[$id]]\n";
-      }
-
+function printMatchesTxt($sentences, $counthits, $idlist, $beginlist)
+{
+    // NOTE: sentence IDs are the keys of all hashes
+    foreach ($sentences as $id => $sentence) {
+         // print matching sentence and hits per sentence
+        echo "$id\t$sentence\t[$counthits[$id]]\n";
+    }
 }
 
-function printMatchesPF($sentences,$counthits,$idlist,$beginlist) { // NOTE: sentence IDs are the keys of all hashes
-      print '<table id="matches" border="1">
-             <thead>
-              <tr><th>SENTENCE ID</th><th>MATCHING SENTENCE</th><th>HITS</th></tr>
-             </thead>
-             <tfoot>
-              <tr><th>SENTENCE ID</th><th>MATCHING SENTENCE</th><th>HITS</th></tr>
-             </tfoot>
-             <tbody>
-             ';
+function printMatchesPF($sentences, $counthits, $idlist, $beginlist)
+{
+    // NOTE: sentence IDs are the keys of all hashes
+    echo '<table id="matches"><thead>'.
+        '<tr><th>Sentence ID</th><th>Matching sentence</th><th>Hits</th></tr>'.
+        '</thead><tbody>';
 
-      foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
-	$hlsentence=HighlightSentence($sentence,$beginlist[$id]); // highlight sentence
+    foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
+        // highlight sentence
+        $hlsentence = HighlightSentence($sentence, $beginlist[$id]);
+        // deal with quotes/apos
+        $trans = array('"' => '&quot;', "'" => "&apos;");
+        $hlsentence = strtr($hlsentence, $trans);
 
-	$trans = array('"' => '&quot;', "'" => "&apos;"); // deal with quotes/apos
-	$hls=strtr("$hlsentence", $trans);
-
-	print '<tr><td>'.$id.'</td><td>'.$hlsentence.'</td><td>'.$counthits[$id].'</td></tr>';
-      }
-      print "</tbody></table>\n<br/><br/>\n";
-
+        echo '<tr><td>'.$id.'</td><td>'.$hlsentence.'</td><td>'.$counthits[$id].'</td></tr>';
+    }
+    echo "</tbody></table>";
 }
 
+function HighlightSentence($sentence, $beginlist)
+{
 
-function HighlightSentence($sentence,$beginlist) {
-  if (preg_match('/<i>/', $sentence)) {
-    $s=preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", "$2", $sentence);
-    $prev=preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", "$1", $sentence);
-    $next=preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", "$3", $sentence);
-  }
-  else {
-    $s=$sentence;
-  }
-  $words=explode(' ', $s);
-  $begins=explode('-',$beginlist);
-  foreach ($begins as $begin) {
-    $words[$begin]="<b>$words[$begin]</b>";
-  }
-  $hlsentence= implode(' ', $words);
-  if (isset($prev)||isset($next)) {
-    $hlsentence=$prev.' '.$hlsentence.' '.$next;
-  }
-  return $hlsentence;
+    if (preg_match('/<i>/', $sentence)) {
+        $s = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$2', $sentence);
+        $prev = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$1', $sentence);
+        $next = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$3', $sentence);
+    } else {
+        $s = $sentence;
+    }
+    $words=explode(' ', $s);
+    $begins=explode('-',$beginlist);
+
+    $i = 0;
+    foreach ($words as $word) {
+        if (in_array($i, $begins)) {
+            $val = '';
+            if (!in_array($i-1, $begins)) {
+                $val .= "<strong>";
+            }
+            $val .= $words[$i];
+            if (!in_array($i+1, $begins)) {
+                $val .= "</strong>";
+            }
+            $words[$i]= $val;
+        }
+        $i++;
+    }
+    $hlsentence= implode(' ', $words);
+    if (isset($prev)||isset($next)) {
+      $hlsentence=$prev.' '.$hlsentence.' '.$next;
+    }
+    return $hlsentence;
 }
-?>

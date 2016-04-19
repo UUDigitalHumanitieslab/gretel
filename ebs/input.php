@@ -8,6 +8,7 @@ header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'ebs';
 $step = 1;
+$taalPortaal = true;
 
 $id = session_id();
 if (isset($_SESSION['example'])) {
@@ -20,7 +21,7 @@ require "$root/functions.php";
 require "$root/php/head.php";
 ?>
 </head>
-
+<?php flush(); ?>
 <?php require "$root/php/header.php"; ?>
     <form action="parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
@@ -41,14 +42,5 @@ require "$root/php/head.php";
     require "$root/php/footer.php";
     include "$root/scripts/AnalyticsTracking.php";
     ?>
-    <script src="<?php echo $home; ?>/js/TaalPortaal.js"></script>
-    <script>
-    $(document).ready(function() {
-        $('[name="clear"]').click(function() {
-            $(this).prev('[name="input"]').val("").focus();
-        });
-        taalPortaalFiller();
-    });
-    </script>
 </body>
 </html>

@@ -12,6 +12,7 @@ $step = 2;
 $continueConstraints = postVariablesSet(array('input', 'search'));
 
 if ($continueConstraints) {
+    $treeVisualizer = true;
     $id = session_id();
     $time = time();
     $_SESSION['sentid'] = "$id-$time";
@@ -25,10 +26,9 @@ if ($continueConstraints) {
 
 require "$root/functions.php";
 require "$root/php/head.php";
-
-if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
+?>
 </head>
-
+<?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
@@ -73,16 +73,14 @@ if ($continueConstraints) {
     getPreviousPageMessage(1);
 }
 
-require "$root/php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
-
-if ($continueConstraints) : ?>
-  <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+require "$root/php/footer.php";if ($continueConstraints) : ?>
   <script>
   $(document).ready(function() {
       $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml?$id-$time"; ?>');
   });
   </script>
-<?php endif; ?>
+<?php endif;
+include "$root/scripts/AnalyticsTracking.php";
+?>
 </body>
 </html>

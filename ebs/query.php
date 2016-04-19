@@ -8,7 +8,7 @@ header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'ebs';
 $step = 5;
-$notbflag = 0;
+$noTbFlag = 0;
 
 $id = session_id();
 $time = time();
@@ -29,7 +29,7 @@ if (isset($_POST['treebank'])) {
 } elseif (isset($_SESSION['treebank'])) {
     $treebank = $_SESSION['treebank'];
 } else {
-    $notbflag = 1;
+    $noTbFlag = 1;
     $treebank = '';
 }
 
@@ -41,7 +41,7 @@ if (isset($_POST[$subtb])) {
 } elseif (isset($_SESSION['subtb'])) {
     $components = $_SESSION['subtb'];
 } else {
-    $notbflag = 1;
+    $noTbFlag = 1;
 }
 
 if (isset($_POST['ct'])) {
@@ -54,14 +54,15 @@ if (isset($_SESSION['xpath'])) {
     $xpath = $_SESSION['xpath'];
 }
 
-$continueConstraints = !$notbflag && sessionVariablesSet(array('sentence', 'search', 'treebank', 'subtb', 'ct', 'xpath'));
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'search', 'treebank', 'subtb', 'ct', 'xpath'));
+
+if ($continueConstraints) $treeVisualizer = true;
 
 require "$root/functions.php";
 require "$root/php/head.php";
-
-if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
+?>
 </head>
-
+<?php flush(); ?>
 <?php require "$root/php/header.php"; ?>
 
 <?php if ($continueConstraints) :
@@ -70,17 +71,11 @@ if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/
   }
   $xpath = rtrim($xpath);
 
-  /*// log XPath
-  $log = fopen($grtllog, "a");  //concatenate
-  fwrite($log, "$date\t$user\t$id-$time\t$sm\t$treebank\tAUTOXP\t$xpath");
-  fclose($log);
-
     //log query tree
   $qtree = file_get_contents("$tmp/$id-sub.xml");
   $tlog = fopen("$log/gretel-querytrees.log", "a");  //concatenate
   fwrite($tlog, "<alpino_ds id=\"$id-$time\">$qtree\n</alpino_ds>\n");
   fclose($tlog);
-  */
 ?>
 
 <ul>
@@ -134,6 +129,7 @@ if ($continueConstraints) : ?>
     $(document).ready(function() {
       var xhr;
       $("form").submit(function(e) {
+          var $this = $(this);
         e.preventDefault();
         $(".loading-wrapper").addClass("active");
         var url = $(this).attr("action");
@@ -141,14 +137,13 @@ if ($continueConstraints) : ?>
           xhr.abort();
         }
         xhr = $.ajax({
-          type: "POST",
+          method: "POST",
           cache: false,
-          url: url,
-          success: function() {
-            window.location.href = '<?php echo "$home/$currentPage/"; ?>'+url;
-          },
+          data: $(this).serialize(),
+          url: '<?php echo "$home/php/post.php"; ?>',
           complete: function(xhr, status) {
             xhr = null;
+            window.location.href = '<?php echo "$home/$currentPage/"; ?>'+url;
           }
         });
       });

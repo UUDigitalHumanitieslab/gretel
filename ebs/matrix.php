@@ -12,6 +12,7 @@ $step = 3;
 $continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
 
 if ($continueConstraints) {
+    $treeVisualizer = true;
     $id = session_id();
     $time = time();
 
@@ -26,10 +27,9 @@ if ($continueConstraints) {
 
 require "$root/functions.php";
 require "$root/php/head.php";
-
-if ($continueConstraints) : ?><link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.css"><?php endif; ?>
+?>
 </head>
-
+<?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
@@ -95,39 +95,11 @@ endif;
 
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-
-if ($continueConstraints): ?>
-
-  <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
-  <script>
-  $(document).ready(function () {
-      // Specific implementation of the Tree Visualizer plugin for GrETEL:
-      // allows refreshing of page, opening tree in new window and so on
-  	var tvLink = $("a.tv-show-fs");
-
-      tvLink.each(function(index) {
-          $(this).attr("data-tv-url", $(this).attr("href"));
-          $(this).attr("href", "#tv-" + (index + 1));
-      });
-      tvLink.click(function(e) {
-          var $this = $(this);
-
-          window.history.replaceState("", document.title, window.location.pathname + window.location.search + $this.attr("href"));
-          $("body").treeVisualizer($this.data("tv-url"), {
-              normalView: false,
-              initFSOnClick: true
-          });
-          e.preventDefault();
-      });
-      var hash = window.location.hash;
-      if (hash) {
-          if (hash.indexOf("tv-") == 1) {
-              var index = hash.match(/\d+$/);
-              tvLink.eq(index[0] - 1).click();
-          }
-      }
-  });
-  </script>
+if ($continueConstraints) :
+?>
+    <div class="loading-wrapper">
+        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
+    </div>
 <?php endif; ?>
 </body>
 </html>

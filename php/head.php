@@ -10,11 +10,12 @@ ini_set('display_errors', 1); ?>
 <?php endif; ?>
 <link rel="shortcut icon" type="image/png" href="<?php echo $home; ?>/img/gretel_logo_trans.png">
 
-<script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed">
-<link rel="stylesheet" href="<?php echo $home; ?>/style/css/styles.css">
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/styles.min.css">
 
+<?php if (isset($treeVisualizer) && $treeVisualizer): ?>
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.min.css">
+<?php endif; ?>
 
 <?php // Prefetch links. Don't prefetch too much, only required stuff. ?>
 <?php if (isset($currentPage) && $currentPage != 'home'): ?>
