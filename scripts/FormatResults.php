@@ -19,7 +19,7 @@ function printCounts($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
     foreach ($HITS as $dbname => $h) {
         echo "<tr><td>$CORPUS[$dbname]</td><td>$h<td>$MS[$dbname]</td><td>$TOTALS[$dbname]</td></tr>";
     }
-    echo "<tr><td>Total</td><td>$TOTALCOUNTS[hits]<td><b>$TOTALCOUNTS[ms]</td><td>$TOTALCOUNTS[totals]</td></tr>";
+    echo "<tr><td>Total</td><td>$TOTALCOUNTS[hits]<td>$TOTALCOUNTS[ms]</td><td>$TOTALCOUNTS[totals]</td></tr>";
     echo "</table>";
 }
 

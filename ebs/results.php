@@ -20,6 +20,7 @@ if ($continueConstraints) {
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
     if ($treebank == "sonar") $subtreebank = $_SESSION['subtb'];
+    else $originalXp = $_SESSION['originalXp'];
     $sm = $_SESSION['search'];
     $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
@@ -31,8 +32,10 @@ if ($continueConstraints) {
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 
     require "$scripts/BaseXClient.php";
-    require "$scripts/TreebankSearch.php"; // functions to find treebank data in BaseX database and print them
-    require "$scripts/FormatResults.php"; // functions to format the treebank results
+    // functions to find treebank data in BaseX database and print them
+    require "$scripts/TreebankSearch.php";
+    // functions to format the treebank results
+    require "$scripts/FormatResults.php";
 }
 
 require "$root/functions.php";
@@ -47,15 +50,27 @@ if ($continueConstraints):
     // Clean up XPath
     $xpath = rtrim($xpath);
     $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
-    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]'); // deal with quotes/apos
+    // deal with quotes/apos
+    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
     $xpath = strtr("$xpath", $trans);
 
-    if (getenv('REMOTE_ADDR')) {
-        $user = getenv('REMOTE_ADDR');
-    } else {
-        $user = 'anonymous';
-    }
+    // Clean up $originalXp
+    $originalXp = rtrim($originalXp);
+    $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
+    $originalXp = strtr("$originalXp", $trans);
 
+    $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
+    $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
+
+    // log XPath. Was XPath changed by the user or not?
+    $xplog = fopen("$log/gretel-ebq.log", 'a');
+    if ($sm == "advanced" && $treebank != "sonar") {
+        fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpChanged\t$xpath\t$originalXp\n");
+    }
+    else {
+        fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpath\n");
+    }
+    fclose($xplog);
 
     // messages and documentation
     $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
@@ -71,16 +86,6 @@ if ($continueConstraints):
             echo $captcha."\n<br/><br/>";
             exit;
         }
-        /*
-        // log XPath :: which version? USERXP or AUTOXP
-        $xplog = fopen("$log/gretel-ebq.log", 'a'); //concatenate
-        fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\tUSERXP\t$xpath\n");
-        fclose($xplog);
-
-
-          $log = fopen($grtllog, "a");  //concatenate
-          fwrite($log, "$date\t$user\t$id-$time\t$sm\t$treebank\tAUTOXP\t$xpath");
-          fclose($log);*/
 
         if (is_array($_SESSION['subtb'])) {
             $subtreebanks = array_keys($_SESSION['subtb']);

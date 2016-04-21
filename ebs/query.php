@@ -98,7 +98,15 @@ require "$root/php/head.php";
     <?php endif; ?>
 
     <form action="results.php" method="post">
-    <?php $readonly = ($treebank == 'sonar') ? 'readonly' : ''; ?>
+    <?php
+    if ($treebank == 'sonar') {
+        $readonly = 'readonly';
+    }
+    else {
+        $readonly = '';
+        echo '<input type="hidden" name="originalXp" value="'.$xpath.'">';
+    }
+    ?>
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <input type="reset" value="Reset XPath">
@@ -127,44 +135,40 @@ if ($continueConstraints) : ?>
     <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
-      var xhr;
-      $("form").submit(function(e) {
-          var $this = $(this);
-        e.preventDefault();
-        $(".loading-wrapper").addClass("active");
-        var url = $(this).attr("action");
-        if(xhr) {
-          xhr.abort();
-        }
-        xhr = $.ajax({
-          method: "POST",
-          cache: false,
-          data: $(this).serialize(),
-          url: '<?php echo "$home/php/post.php"; ?>',
-          complete: function(xhr, status) {
-            xhr = null;
-            window.location.href = '<?php echo "$home/$currentPage/"; ?>'+url;
-          }
+        var xhr;
+        $("form").submit(function(e) {
+            var $this = $(this);
+            e.preventDefault();
+            $(".loading-wrapper").addClass("active");
+            var url = $this.attr("action");
+            if(xhr) xhr.abort();
+            xhr = $.ajax({
+                method: "POST",
+                cache: false,
+                data: $this.serialize(),
+                url: '<?php echo "$home/php/post.php"; ?>',
+                complete: function(xhr, status) {
+                    xhr = null;
+                    window.location.href = '<?php echo "$home/$currentPage/"; ?>'+url;
+                }
+            });
         });
-      });
-      $(".loading-wrapper button").click(function() {
-        $(".loading-wrapper").removeClass("active");
-        if(xhr) {
-          xhr.abort();
+
+        $(".loading-wrapper button").click(abortRequest);
+        window.addEventListener('unload', abortRequest);
+
+        function abortRequest() {
+            $(".loading-wrapper").removeClass("active");
+            if(xhr) {
+                xhr.abort();
+            }
         }
-      });
-      $(window).unload(function() {
-        $(".loading-wrapper").removeClass("active");
-        if(xhr) {
-          xhr.abort();
-        }
-      });
         <?php if ($sm == 'advanced'): ?>
             $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>', {extendedPOS: true});
         <?php else: ?>
             $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>');
         <?php endif; ?>
-    });
+      });
     </script>
 <?php endif; ?>
 </body>

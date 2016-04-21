@@ -19,7 +19,7 @@ $id=session_id();
 $date=date('d-m-Y');
 $time=time(); // time stamp
 
-// load configuration file 
+// load configuration file
 require("../config/config.php");
 
 // dir to external scripts
@@ -61,57 +61,57 @@ $subtreebanks=explode('-', $subtb);
 
 try {
    // get results
- 
+
   if (isset($limit)) {
     list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
     list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,$limit,$context);
   }
-   
+
   else {
     list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
     list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
   }
-  
+
   // print results
-  
+
   if ($print == "txt") {
     header("Content-Disposition: attachment; filename=DBresults.txt");
     header("Content-type:text/plain; charset=utf-8");
     echo "XPATH: $xpath\n\n";
     printMatchesTxt($sentences,$counthits,$idlist,$beginlist);
   }
-  
+
   elseif ($print == "csv") {
     header("Content-Disposition: attachment; filename=DBresults.csv");
-    header("Content-type:text/plain; charset=utf-8");   
-    
+    header("Content-type:text/plain; charset=utf-8");
+
      if ($TOTALCOUNTS[hits]==0) {
       print "NO MATCHES FOUND\n";
     }
-    
+
     else {
       printCountsCsv($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS); // print table with results
     }
   }
-  
+
   elseif ($print == "html" ) {
     header('Content-Type:text/html; charset=utf-8');
     $htmlopen='<html><head><title>Search Results</title></head><body>';
-    $htmlclose='</body></html>';    
+    $htmlclose='</body></html>';
     $printbuttons='<input type="button" Value="Print" onClick="window.print()"/>
        <input type="button" Value="Close Window" onClick="window.close()"/>';
     echo "$htmlopen\n";
     echo "$printbuttons\n";
 
-    echo "<h1>GrETEL Search Results</h1><hr/>\n<b>XPath: </b>$xpath<br/>\n";
+    echo "<h1>GrETEL Search Results</h1><hr/>\nXPath: $xpath<br/>\n";
     if ($_SESSION['search']!=="xpsearch" && isset($example)){
-      echo "<b>Based on input example: </b>$example<br/><br/>\n";
+      echo "Based on input example: $example<br/><br/>\n";
     }
     else {
       echo "<br/><br/>\n";
     }
-  
-  
+
+
     // format counts
     list($HITS)=NumFormatHash($HITS);
     list($MS)=NumFormatHash($MS);
@@ -121,17 +121,17 @@ try {
     printCountsPF($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS); // print counts
 
     printMatchesPF($sentences,$counthits,$idlist,$beginlist); // print matching sentences
-    
+
     echo "$printbuttons\n";
     echo $htmlclose;
   }
-  
+
   else {
     header("Content-Disposition: attachment; filename=DBresults.txt");
     header("Content-type:text/plain; charset=utf-8");
     print "An error occurred.\n";
   }
-  
+
 }
 
 catch (Exception $e) {
