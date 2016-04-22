@@ -11,11 +11,11 @@
 #########################################################################
 
 # argument 1 = XPath expression, e.g. //node[@cat="np" and node[@rel="det" and @pt="lid" and @lemma="een"] and node[@rel="hd" and @pt="n"]]
-# argument 2 = database name (bf-format), e.g. WRPEFnpdet%lid_hd%n 
+# argument 2 = database name (bf-format), e.g. WRPEFnpdet%lid_hd%n
 
 # Documentation: http://docs.basex.org/wiki/Clients
 
-$version='1.5'; 
+$version='1.5';
 
 use FindBin qw($Bin); # from CPAN
 require "$Bin/BaseXClient.pm";
@@ -30,7 +30,7 @@ our $showhits;
 our @basexpaths;
 our %dbname_server;
 
-my $xpath=shift(@ARGV); # get XPath expression 
+my $xpath=shift(@ARGV); # get XPath expression
 my $db=shift(@ARGV); # get db name
 my ($component)=$db=~/^([A-Z]{5})/;
 my $includes;
@@ -61,7 +61,7 @@ my $session = Session->new($dbhost, 1950, "admin", "admin"); # connect to BaseX 
 while (@$includes) {
     ($ms_ref,$includes)=&QuerySonar($xpath,$includes);
     my %matching_sentences = %$ms_ref; # dereference
-    
+
     if (keys %matching_sentences) {
 	foreach(keys %matching_sentences) {
 	    my $sid=$_;
@@ -94,10 +94,10 @@ sub QuerySonar {
     }
     $ALREADY{$db}=1;
    # print STDERR "Querying $db\n";
-    
+
     my @matching_sentences;
     my %matching_sentences=();
-  
+
     # GET INCLUDES
     $xq="/treebank/include";
 
@@ -112,10 +112,10 @@ sub QuerySonar {
 
     my $xqinclude='db:open("'.$db.'")'.$xq;
     my $query = $session->query($xqinclude);
-    
+
     $basexinclude=$query->execute();
     @basexinclude=split(/\n/,$basexinclude);
-	
+
     # close query
     $query->close();
     }
@@ -128,11 +128,12 @@ sub QuerySonar {
 
     # GET SENTENCES (SAMPLE)
 
+    my $position = ')[position() = 1 to 10]';
     my $var='declare variable $xp := (db:open("'.$db.'")'; # database name
     my $xp='/treebank/tree'.$xpath.');';
     my $lim='declare variable $xplim := (subsequence(db:open("'.$db.'")/treebank/tree'.$xpath.",1,$showhits));";
     my $nl='declare variable $nl := "&#10;";'; # newline character
-    my $opentag="<results>";
+    my $opentag="(<results>";
     my $hits='{let $h := (count(for $node in $xp return $node)) return concat($nl,"HITS:",$h,$nl)}'; # count matches
     my $sents='{
   (: return matching sentence IDs + node IDs :)
@@ -150,7 +151,7 @@ return
 )}';
     my $closetag="</results>";
 
-    my $input = $var.$xp.$lim.$nl.$opentag.$hits.$sents.$closetag; # xquery
+    my $input = $var.$xp.$lim.$nl.$opentag.$hits.$sents.$closetag.$position; # xquery
     my $querysent = $session->query($input);
     my $flag=undef;
     foreach (@basexpaths) {
@@ -161,13 +162,13 @@ return
     }
     if ($flag) {
 	$basexoutput=$querysent->execute();
-   
+
 	@basexoutput=split(/\n/,$basexoutput);
 	foreach (@basexoutput) {
 	}
-    
+
 	$querysent->close();
- 
+
 	if (@basexoutput>0) {
 	    foreach (@basexoutput) {
 		($newhits)=/HITS:(\d+)/;
@@ -199,11 +200,11 @@ return
 		    else {
 			$beginlist{$sid}=$begins;
 		    }
-		    	   
+
 		}
 	    }
-	}	    
+	}
     }
-    
+
     return (\%matching_sentences,$includes);
 }

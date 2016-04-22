@@ -1,11 +1,13 @@
 <?php
 require '../config/config.php';
 require "$root/helpers.php";
+require "$root/php/profiler.php";
 
 session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
+prof_flag("Start");
 $currentPage = 'ebs';
 $step = 6;
 
@@ -47,6 +49,7 @@ require "$root/php/head.php";
 require "$root/php/header.php";
 
 if ($continueConstraints):
+    prof_flag("Set variables");
     // Clean up XPath
     $xpath = rtrim($xpath);
     $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
@@ -62,6 +65,7 @@ if ($continueConstraints):
     $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
     $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
+    prof_flag("Log XPath");
     // log XPath. Was XPath changed by the user or not?
     $xplog = fopen("$log/gretel-ebq.log", 'a');
     if ($sm == "advanced" && $treebank != "sonar") {
@@ -78,6 +82,7 @@ if ($continueConstraints):
     $showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
     $captcha = "This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
 
+    prof_flag("Try block");
     try {
         $start = microtime(true);
 
@@ -103,16 +108,14 @@ if ($continueConstraints):
 
             // get results
             try {
+                prof_flag("GetCounts");
                 // get counts
                 list($HITS, $MS, $TOTALS, $TOTALCOUNTS) = GetCounts($xpath, $treebank, $subtreebanks, $session);
 
+                prof_flag("GetSentences");
                 // get sentences
-                if ($TOTALCOUNTS['hits'] > 20000 || $TOTALCOUNTS['ms'] > 5000) { // display subset if too many hits
-                    $limit = 500;
-                    list($sentences, $counthits, $idlist, $beginlist) = GetSentences($xpath, $treebank, $subtreebanks, $session, $limit, $context);
-                } elseif ($TOTALCOUNTS['hits'] != 0) {
-                    list($sentences, $counthits, $idlist, $beginlist) = GetSentences($xpath, $treebank, $subtreebanks, $session, 'none', $context);
-                }
+                list($sentences, $counthits, $idlist, $beginlist) = GetSentences($xpath, $treebank, $subtreebanks, $session, 'none', $context);
+
 
                 // print query
                 echo '<div><button type="button" value="Printer-friendly version" ' .
@@ -136,7 +139,7 @@ if ($continueConstraints):
                   list($MS) = NumFormatHash($MS);
                   list($TOTALS) = NumFormatHash($TOTALS);
                   list($TOTALCOUNTS) = NumFormatHash($TOTALCOUNTS);
-
+                echo 'test';
                   echo '<h3>Results</h3>'.
                   '<p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below. '.
                   'You can also see and download a distribution overview of the hits over the different treebanks.</p>' .
@@ -161,9 +164,11 @@ if ($continueConstraints):
                   echo '<p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank '.
                   'component in which the sentence occurs, the text number, and the location within the text (page + sentence number).</p>';
 
+                  prof_flag("Print matches");
                   printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree); // print matching sentence and hits per sentence
+                  prof_flag("Done");
+                  prof_print();
               }
-
               setContinueNavigation();
             $session->close();
           } catch (Exception $e) {
