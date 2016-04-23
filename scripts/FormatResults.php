@@ -74,12 +74,13 @@ function printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $s
     echo "</tbody></table></div>";
 }
 
-function printMatchesTxt($sentences, $counthits, $idlist, $beginlist)
+function printMatchesTxt($sentences, $counthits)
 {
     // NOTE: sentence IDs are the keys of all hashes
     foreach ($sentences as $id => $sentence) {
+      $counthits = array_map('trim', $counthits);
          // print matching sentence and hits per sentence
-        echo "$id\t$sentence\t[$counthits[$id]]\n";
+        echo "$id\t$sentence\t$counthits[$id]\n";
     }
 }
 

@@ -48,9 +48,9 @@ $context=$_SESSION['ct'];
 /***********************************************************/
 /* INCLUDES */
 
-require("$basexclient");
-require("$treebanksearch");
-require("$formatresults");
+require "$basexclient";
+require "$treebanksearch";
+require "$formatresults";
 
 /***********************************************************/
 
@@ -60,38 +60,19 @@ $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 $subtreebanks=explode('-', $subtb);
 
 try {
-   // get results
-
-  if (isset($limit)) {
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
-    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,$limit,$context);
-  }
-
-  else {
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
-    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
-  }
-
   // print results
-
   if ($print == "txt") {
-    header("Content-Disposition: attachment; filename=DBresults.txt");
     header("Content-type:text/plain; charset=utf-8");
-    echo "XPATH: $xpath\n\n";
-    printMatchesTxt($sentences,$counthits,$idlist,$beginlist);
+    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
+    echo "XPATH: $xpath\n";
+    printMatchesTxt($sentences,$counthits);
   }
 
   elseif ($print == "csv") {
-    header("Content-Disposition: attachment; filename=DBresults.csv");
     header("Content-type:text/plain; charset=utf-8");
-
-     if ($TOTALCOUNTS[hits]==0) {
-      print "NO MATCHES FOUND\n";
-    }
-
-    else {
-      printCountsCsv($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS); // print table with results
-    }
+    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
+    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
+    printCountsCsv($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS);
   }
 
   elseif ($print == "html" ) {

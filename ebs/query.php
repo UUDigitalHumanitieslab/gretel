@@ -91,11 +91,11 @@ require "$root/php/head.php";
     if ($treebank == 'sonar') : ?>
       <p>XPath expression, generated from the query tree.</p>
 
-    <?php else : ?>
+    <?php else : // $treebank == 'sonar'  ?>
       <p>XPath expression </b>generated from the query tree. You can adapt it if necessary.
       If you are dealing with a long query, the
       <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank">XPath beautifier</a> might come in handy.</p>
-    <?php endif; ?>
+    <?php endif; // $treebank == 'sonar' ?>
 
     <form action="results.php" method="post">
     <?php
@@ -104,15 +104,15 @@ require "$root/php/head.php";
     }
     else {
         $readonly = '';
-        echo '<input type="hidden" name="originalXp" value="'.$xpath.'">';
+        echo '<input type="hidden" name="original-xp" value="'.$xpath.'">';
     }
     ?>
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <input type="reset" value="Reset XPath">
-  <?php else : ?>
+  <?php else : // $sm == 'advcaned' ?>
     <form action="results.php" method="post">
-  <?php endif; ?>
+  <?php endif; // $sm == 'advcaned' ?>
 
     <?php setContinueNavigation(); ?>
   </form>
@@ -124,7 +124,7 @@ require "$root/php/head.php";
 
 <?php
     getPreviousPageMessage(4);
-endif;
+endif;  // $continueConstraints
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 

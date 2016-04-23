@@ -7,7 +7,6 @@ session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-prof_flag("Start");
 $currentPage = 'ebs';
 $step = 6;
 
@@ -21,8 +20,7 @@ if ($continueConstraints) {
     $sortTables = true;
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
-    if ($treebank == "sonar") $subtreebank = $_SESSION['subtb'];
-    else $originalXp = $_SESSION['originalXp'];
+    if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
     $sm = $_SESSION['search'];
     $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
@@ -31,13 +29,25 @@ if ($continueConstraints) {
     // get context option
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 
+    // Reset amounts the "fetch more results" button has been clicked
+    // Used in fetch-results.php
+    $_SESSION['queryIteration'] = 0;
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 
-    require "$scripts/BaseXClient.php";
-    // functions to find treebank data in BaseX database and print them
-    require "$scripts/TreebankSearch.php";
-    // functions to format the treebank results
-    require "$scripts/FormatResults.php";
+    $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
+    $exportxp = "$home/scripts/SaveXPath.php"; // script for downloading the XPath expression
+
+    /***********************/
+    /* SELECT SUBTREEBANKS */
+    /***********************/
+    if (is_array($_SESSION['subtb'])) {
+        $subtreebanks = array_keys($_SESSION['subtb']);
+        // get string of components
+        $components = implode(', ', $subtreebanks);
+        $export .= 'subtb='.$subtreebank;
+    } else {
+        $subtreebank = $_SESSION['subtb'];
+    }
 }
 
 require "$root/functions.php";
@@ -49,273 +59,68 @@ require "$root/php/head.php";
 require "$root/php/header.php";
 
 if ($continueConstraints):
-    prof_flag("Set variables");
-    // Clean up XPath
-    $xpath = rtrim($xpath);
-    $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
-    // deal with quotes/apos
-    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
-    $xpath = strtr("$xpath", $trans);
+  ?>
+  <div><a href="<?php echo $export.'&print=txt'; ?>" title="Printer-friendly version of all results"
+    download="gretel-results.txt">Download results</a></div>
 
-    // Clean up $originalXp
-    $originalXp = rtrim($originalXp);
-    $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
-    $originalXp = strtr("$originalXp", $trans);
+  <h3>Query</h3>
+  <p>You can <a href="<?php echo $exportxp; ?>" title="Save XPath query" download="gretel-xpath.txt">save the XPath query</a>
+    to use it as input for the XPath search mode.
+    This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
+    from scratch.</p>
+  <table>
+    <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
+    <tr><th>XPath</th><td><?php echo $xpath; ?></td></tr>
+    <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
+    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$components]"; ?></td></tr>
+    <?php elseif ($treebank == 'sonar'): ?>
+    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$subtreebank]"; ?></td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table>
 
-    $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
-    $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
+  <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
+    <h3>Results</h3>
+    <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
+      You can also see and download a distribution overview of the hits over the different treebanks.</p>
+      <!--
+    <table><tbody>
+      <tr><th>Hits</th><td>'.$TOTALCOUNTS['hits'].'</td></tr>
+      <tr><th>Matching sentences</th><td>'.$TOTALCOUNTS['ms'].'</td>
+      <tr><th>Sentences in treebank</th><td>'.$TOTALCOUNTS['totals'].'</td></tr>
+    </tbody></table>
+  -->
+    <a href="#restable" class="show_hide" id="restable">
+      <div id="show" class="showhide">Show hits distribution</div><div id="hide" class="showhide">Hide hits distribution</div>
+    </a>
+    <div class="slidingDiv">
+      <?php // printCounts($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS); ?>
+      <p class="temporary">Still counting</p>
+      <a href="<?php echo $export.'&print=csv'; ?>" title="Comma-separated file of detailed search results' (counts per treebank)"
+        download="gretel-distribution.txt">Download distribution</a>
+    </div>
+    <p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank component in which
+      the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
 
-    prof_flag("Log XPath");
-    // log XPath. Was XPath changed by the user or not?
-    $xplog = fopen("$log/gretel-ebq.log", 'a');
-    if ($sm == "advanced" && $treebank != "sonar") {
-        fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpChanged\t$xpath\t$originalXp\n");
-    }
-    else {
-        fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpath\n");
-    }
-    fclose($xplog);
+    <?php endif; // $treebank lassy and cgn ?>
+    <div class="results-wrapper" style="display: none">
+      <table id="results">
+        <thead>
+          <tr><th>ID</this>
+          <th>Sentence</th>
+          <th>Hits per sentence</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
 
-    // messages and documentation
-    $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
-    $exportxp = "$home/scripts/SaveXPath.php"; // script for downloading the XPath expression
-    $showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
-    $captcha = "This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
-
-    prof_flag("Try block");
-    try {
-        $start = microtime(true);
-
-        if (preg_match('/(http:\/\/.*)|(<\W+>)/', $xpath) == 1) { // check for spam
-            echo '<h3>Error</h3>';
-            echo $captcha."\n<br/><br/>";
-            exit;
-        }
-
-        if (is_array($_SESSION['subtb'])) {
-            $subtreebanks = array_keys($_SESSION['subtb']);
-            $subtb = implode('-', $subtreebanks);
-            $components = implode(', ', $subtreebanks); // get string of components
-            $export .= 'subtb='.$subtb;
-        } else {
-            $subtb = $_SESSION['subtb'];
-        }
-
-        /* FOR SMALL TREEBANKS */
-        if ($treebank == 'lassy' || $treebank == 'cgn') {
-            // create session
-            $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-            // get results
-            try {
-                prof_flag("GetCounts");
-                // get counts
-                list($HITS, $MS, $TOTALS, $TOTALCOUNTS) = GetCounts($xpath, $treebank, $subtreebanks, $session);
-
-                prof_flag("GetSentences");
-                // get sentences
-                list($sentences, $counthits, $idlist, $beginlist) = GetSentences($xpath, $treebank, $subtreebanks, $session, 'none', $context);
-
-
-                // print query
-                echo '<div><button type="button" value="Printer-friendly version" ' .
-                    'onclick="window.open(\''.$export.'&print=html\')">Printer-friendly version</button></div>';
-
-                echo '<h3>Query</h3>' .
-                    '<p>You can <a href="'.$exportxp.'" title="XPath query">save the XPath query</a> to use it as input for the XPath search mode. This allows you to use the ' .
-                    'same query for another (part of a) treebank or for a slightly modified search without having to start completely ' .
-                    'from scratch.</p>' .
-                    '<table><tbody>' .
-                    '<tr><th>Input example</th><td>'.$example.'</td></tr>' .
-                    '<tr><th>XPath</th><td>'.$xpath.'</td></tr>' .
-                    '<tr><th>Treebank</th><td>'.strtoupper($treebank).' ['.$components.']</td>' .
-                    '</tr></tbody></table>';
-
-                if ($TOTALCOUNTS['hits'] == 0) {
-                    echo "<strong>Results: </strong> ";
-                } else {
-                  // format counts
-                  list($HITS) = NumFormatHash($HITS);
-                  list($MS) = NumFormatHash($MS);
-                  list($TOTALS) = NumFormatHash($TOTALS);
-                  list($TOTALCOUNTS) = NumFormatHash($TOTALCOUNTS);
-                echo 'test';
-                  echo '<h3>Results</h3>'.
-                  '<p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below. '.
-                  'You can also see and download a distribution overview of the hits over the different treebanks.</p>' .
-                  '<table><tbody>'.
-                  '<tr><th>Hits</th><td>'.$TOTALCOUNTS['hits'].'</td><td><a href="#restable" class="show_hide" id="restable">'.
-                  '<div id="show" class="showhide">Show hits distribution</div><div id="hide" class="showhide">Hide hits distribution</div></a></td></tr>'.
-                  '<tr><th>Matching sentences</th><td>'.$TOTALCOUNTS['ms'].'</td><td><button onclick="window.open(\''.$export.'&print=txt\')" >Download</button>'.
-                  '</td>'.
-                  '<tr><th>Sentences in treebank</th><td>'.$TOTALCOUNTS['totals'].'</td><td></td></tr></tbody></table>';
-
-                  echo '<div class="slidingDiv">';  // show/hide div pt 1
-                  printCounts($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS); // print table hit distribution
-                  echo '<button onclick="window.open(\''.$export.'&print=csv\')" title="Comma-separated file of detailed search results'.
-                  ' (counts per treebank)">Download table</button>';
-                  echo '</div>'; // show/hide div pt 2
-
-                  if (isset($limit)) {
-                      echo "<p>Since there are too many results to display, a sample of $limit hits per treebank component is presented.</p>";
-                      $export .= '&limit='.$limit;
-                  }
-
-                  echo '<p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank '.
-                  'component in which the sentence occurs, the text number, and the location within the text (page + sentence number).</p>';
-
-                  prof_flag("Print matches");
-                  printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree); // print matching sentence and hits per sentence
-                  prof_flag("Done");
-                  prof_print();
-              }
-              setContinueNavigation();
-            $session->close();
-          } catch (Exception $e) {
-              catchAndThrowErrorMessage($e->getMessage());
-          }
-      }
-      /* FOR SONAR */
-      elseif ($treebank == 'sonar') {
-          // print query
-          echo '<h3>Query</h3>' .
-          '<p>You can <a href="'.$exportxp.'" title="XPath query">save the XPath query</a> to use it as input for the XPath search mode. This allows you to use the ' .
-          'same query for another (part of a) treebank or for a slightly modified search without having to start completely ' .
-          'from scratch.</p>' .
-          '<table><tbody>'.
-          '<tr><th>Input example</th><td>'.$example.'<td/></tr>'.
-          '<tr><th>XPath</th><td>'.$xpath.'</td></tr>'.
-          '<tr><th>Treebank</th><td>'.strtoupper($treebank).' ['.$subtreebank.']</td></tr></tbody></table>';
-
-          try {
-              $xpath = substr($xpath, 1); // remove first slash
-              // XPath2BreathFirst
-              $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
-              $basexdb = $subtreebank.$bf;
-
-              flush();
-              ob_flush();
-
-              // Query SoNaR
-              $limit = 100;
-              $endtime = microtime(true) + $limit;
-              $cmd = "perl $scripts/QuerySonar.pl '".$xpath."' $basexdb";
-
-              $pipes = array();
-              $descriptorspec = array(
-                  0 => array('pipe', 'r'), // stdin is a pipe that the child will read from
-                  1 => array('pipe', 'w'), // stdout is a pipe that the child will write to
-                  2 => array('pipe', 'w'), // stderr is a file to write to
-              );
-
-              $process = proc_open($cmd, $descriptorspec, $pipes) or die("Can't open process $cmd!");
-
-              echo '<p><strong>Results</strong></p>';
-              echo '<p id="prog"><strong>Search status: </strong>Processing...    <button ' .
-              'onclick="window.stop();">Stop searching</button></p>';
-              echo '<p id="hits"><strong>Hits: </strong>Still counting...</p>';
-              echo '<p id="sample"></p>';
-              echo '<p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID ' .
-              'refers to the treebank component in which the sentence occurs, the text number, and the location ' .
-              'within the text (page + sentence number).</p>';
-
-              // print matching sentences sample
-              echo '<div class="tableWrapper"><table id="example" class="sortable">'.
-              '<thead><tr><th class="pointer">Sentece ID</th><th class="pointer">Matching sentences</th>'.
-              '<th class="pointer">Hits</th></tr></thead>'.
-              '<tfoot><tr><th colspan="3"></th></tr></tfoot><tbody>';
-
-              $range = range(0, 100);
-              foreach ($range as $times) {
-                  if (ob_get_level() == 0) {
-                      ob_start();
-                      flush();
-                      $match = fgets($pipes[2]);
-                      if (!empty($match)) {
-                          $match = str_replace("\n", '', $match);
-                          var_dump($match);
-                          if (preg_match('/SAMPLE/',$match)) {
-                              $sample = explode("\t", $match);
-                              // end table
-                              echo '</tbody></table></div>';
-                              echo "<script>document.getElementById('sample').innerHTML ='The corpus sample displayed below contains ".
-                              $sample[1].' hits in '.$sample[2].' matching sentences <!-- ('.$sample[3]." hit(s) per sentence on average) -->';</script>";
-                          } else {
-                              $match = explode("\t", $match);
-                              list($sid, $matchsent, $counthits, $db, $idlist, $beginlist) = $match;
-
-                              $hlsentence = HighlightSentence($matchsent, $beginlist);
-                              $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&tb='.$treebank.'&db='.$db.'&id='.$idlist.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
-                              echo '<tr><td>'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td>'.$counthits."</td></tr>";
-                          }
-                      } else {
-                          echo '</tbody></table></div>';
-                      }
-                  }
-                  ob_flush();
-                  flush();
-                  ob_end_flush();
-              }
-
-              // print number of hits
-              do {
-                  $t = microtime(true);
-                  if (ob_get_level() == 0) {
-                      ob_start();
-                  }
-
-                  if (($output = fgets($pipes[1])) != false) {
-                      $output = str_replace("\n", '', $output);
-                      ob_flush();
-                      flush();
-
-                      if ($t < $endtime && $output != '__END__') {
-                          ob_flush();
-                          flush();
-                          echo "<script>document.getElementById('hits').innerHTML ='<strong>Hits: </strong>".$output."';</script>";
-                          ob_flush();
-                          flush();
-                          ob_end_flush();
-                      } elseif ($t > $endtime && $output != '__END__') {
-                          echo "<script>document.getElementById('prog').innerHTML ='<strong>Search status: </strong>processing stopped';</script>";
-                          ob_flush();
-                          flush();
-                          ob_end_flush();
-
-                          echo "<script>document.getElementById('hits').innerHTML ='<strong>Hits: </strong>".$output." counted so far';</script>";
-
-                          fclose($pipes[0]);
-                          fclose($pipes[1]);
-                          fclose($pipes[2]);
-                          proc_terminate($process); // terminate the process and continue with other tasks
-                          session_write_close();
-                      } elseif ($output == '__END__') {
-                          echo "<script>document.getElementById('prog').innerHTML ='<strong>Search status: </strong>finished!';</script>";
-                          ob_flush();
-                          flush();
-                          break; // exit do-while loop before end time
-                      } else {
-                          echo "<script>document.getElementById('prog').innerHTML ='Error';</script>";
-                          echo "Time: $t<br/>";
-                          ob_flush();
-                          flush();
-                      }
-                  }
-              } while ($t <= $endtime);
-              proc_close($process);
-
-              setContinueNavigation();
-          } catch (Exception $e) {
-              catchAndThrowErrorMessage($e->getMessage());
-          }
-      } else {
-          setErrorHeading();
-          echo '<p>An unknown treebank was selected so the search cannot continue.</p>';
-          getPreviousPageMessage(4);
-      }
-    } catch (Exception $e) {
-        catchAndThrowErrorMessage($e->getMessage());
-    }
+    <button class="more">Load more results</button>
+    <div class="error">
+      <p></p>
+    </div>
+<?php
+    setContinueNavigation();
 else: // $continueConstraints
     setErrorHeading();
     ?>
@@ -332,6 +137,61 @@ if ($continueConstraints) : ?>
     <div class="loading-wrapper">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
+    <div class="result"></div>
+    <script>
+      $(document).ready(function() {
+        getSentences();
+
+        $(".more").click(function() {
+          getSentences();
+          $(".more").prop("disabled", true);
+        });
+
+        function getSentences() {
+          $.get('<?php echo "$home/php/fetch-results.php"; ?>', function(json) {
+            var data = $.parseJSON(json);
+
+            if (!data.noresults) {
+              $.each(data.data, function(id, value) {
+                $("#results tbody").append('<tr><td>'+value[0]+'</td><td>'+value[1]+'</td><td>'+value[2]+'</td></tr>');
+              });
+              var hash = window.location.hash,
+                tvLink = $("a.tv-show-fs");
+
+              tvLink.not("[href^='#']").each(function(index) {
+                  $(this).attr("data-tv-url", $(this).attr("href"));
+                  $(this).attr("href", "#tv-" + (index + 1));
+              });
+
+              if (hash) {
+                  if (hash.indexOf("tv-") == 1) {
+                      var index = hash.match(/\d+$/);
+                      tvLink.eq(index[0] - 1).click();
+                  }
+              }
+              $(".results-wrapper").fadeIn("fast");
+              $(".more").prop("disabled", false);
+            }
+            else {
+              $("#results, .more").remove();
+              $(".error p").text("No results found!");
+              $(".error").fadeIn("slow");
+            }
+          });
+        }
+
+        $("#results tbody").on("click", "a.tv-show-fs", function(e) {
+            var $this = $(this);
+            $(".loading-wrapper").addClass("active");
+            window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
+            body.treeVisualizer($this.data("tv-url"), {
+                normalView: false,
+                initFSOnClick: true
+            });
+            e.preventDefault();
+        });
+      });
+    </script>
 <?php endif; ?>
 </body>
 </html>

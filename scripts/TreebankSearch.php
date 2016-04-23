@@ -125,16 +125,16 @@ function CreateXQueryCount($xpath, $db, $flag)
     }
 }
 
-function GetSentences($xpath, $treebank, $subtreebanks, $session, $limit, $context)
+function GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $queryIteration)
 {
+    global $resultlimit;
     // rename corpora to database names
     $database = Corpus2DB($subtreebanks, $treebank);
 
-    $resultlimit = 10;
     $nrofmatches = 0;
     foreach ($database as $db) {
         // create XQuery
-        $input = CreateXQuery($xpath, $db, $treebank, $context);
+        $input = CreateXQuery($xpath, $db, $treebank, $context, $queryIteration);
         // create query instance
         $query = $session->query($input);
 
@@ -188,22 +188,25 @@ function GetSentences($xpath, $treebank, $subtreebanks, $session, $limit, $conte
 
             $uniquebeginlist{$sentid} = $begins;
         }
-
         return array($sentences, $counthits, $idlist, $uniquebeginlist);
     } else {
         // in case there are no results found
-        return 'undef';
+        return false;
     }
 }
 
-function CreateXQuery($xpath, $db, $tb, $context)
-{ // create XQuery instance
+function CreateXQuery($xpath, $db, $tb, $context, $queryIteration)
+{
+    global $resultlimit;
+    $startPosition = 1 + ($queryIteration * $resultlimit);
+    $endPosition = $startPosition + $resultlimit;
+  // create XQuery instance
     $for = '(for $node in db:open("'.$db.'")/treebank';
     $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
     $sentence = 'let $sentence := ($node/ancestor::alpino_ds/sentence)';
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
-    $position = ')[position() = 1 to 10]';
+    $position = ')[position() = '.$startPosition.' to '.$endPosition.']';
     if ($context != 0) {
         $tb = strtoupper($tb);
         $dbs = $tb.'_ID_S';

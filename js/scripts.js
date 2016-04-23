@@ -21,11 +21,10 @@ $(document).ready(function() {
                 $(this).attr("data-tv-url", $(this).attr("href"));
                 $(this).attr("href", "#tv-" + (index + 1));
             });
-            tvLink.click(function(e) {
+            $("a.tv-show-fs").click(function(e) {
                 var $this = $(this);
                 $(".loading-wrapper").addClass("active");
-                window.history.replaceState("", document.title, window.location.pathname +
-                    window.location.search + $this.attr("href"));
+                window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
                 body.treeVisualizer($this.data("tv-url"), {
                     normalView: false,
                     initFSOnClick: true

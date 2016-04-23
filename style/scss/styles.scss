@@ -421,6 +421,12 @@ a.match {
             resize: horizontal;
         }
     }
+    &.step-6 {
+      .results-wrapper {
+        overflow-y: scroll;
+        max-height: 480px;
+      }
+    }
 }
 .ebs,
 .xps {

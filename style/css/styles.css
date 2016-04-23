@@ -941,6 +941,10 @@ a.match {
   width: 420px;
   resize: horizontal;
 }
+.ebs.step-6 .results-wrapper {
+  overflow-y: scroll;
+  max-height: 480px;
+}
 
 .ebs .table-wrapper,
 .xps .table-wrapper {
