@@ -103,12 +103,15 @@ if ($continueConstraints):
       the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
 
     <?php endif; // $treebank lassy and cgn ?>
+    <div class="error">
+      <p></p>
+    </div>
     <div class="results-wrapper" style="display: none">
       <table id="results">
         <thead>
           <tr><th>ID</this>
           <th>Sentence</th>
-          <th>Hits per sentence</th></tr>
+          <th>Hits</th></tr>
         </thead>
         <tbody>
         </tbody>
@@ -116,7 +119,7 @@ if ($continueConstraints):
     </div>
 
     <button class="more">Load more results</button>
-    <div class="error">
+    <div class="notice">
       <p></p>
     </div>
 <?php
@@ -150,10 +153,10 @@ if ($continueConstraints) : ?>
         function getSentences() {
           $.get('<?php echo "$home/php/fetch-results.php"; ?>', function(json) {
             var data = $.parseJSON(json);
-
-            if (!data.noresults) {
+            $("#results tbody .added").removeClass("added");
+            if (data.data) {
               $.each(data.data, function(id, value) {
-                $("#results tbody").append('<tr><td>'+value[0]+'</td><td>'+value[1]+'</td><td>'+value[2]+'</td></tr>');
+                $("#results tbody").append('<tr class="added"><td>'+value[0]+'</td><td>'+value[1]+'</td><td>'+value[2]+'</td></tr>');
               });
               var hash = window.location.hash,
                 tvLink = $("a.tv-show-fs");
@@ -173,9 +176,15 @@ if ($continueConstraints) : ?>
               $(".more").prop("disabled", false);
             }
             else {
-              $("#results, .more").remove();
-              $(".error p").text("No results found!");
-              $(".error").fadeIn("slow");
+              if ($("#results tbody").children().length == 0) {
+                $("#results, .more").remove();
+                $(".error p").text("No results found!");
+                $(".error").fadeIn("slow");
+              }
+              else {
+                $(".more").prop("disabled", true);
+                $(".notice p").text("All results have been found!");
+              }
             }
           });
         }

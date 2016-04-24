@@ -943,7 +943,15 @@ a.match {
 }
 .ebs.step-6 .results-wrapper {
   overflow-y: scroll;
-  max-height: 480px;
+  max-height: 640px;
+}
+.ebs.step-6 .results-wrapper tbody tr {
+  transition: background-color 400ms;
+  will-change: background-color;
+}
+.ebs.step-6 .results-wrapper tbody tr.added {
+  background-color: #F2F9DD;
+  transition: background-color 400ms;
 }
 
 .ebs .table-wrapper,

@@ -116,7 +116,6 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
           'error' => false,
           'error_msg' => '',
           'data' => '',
-          'noresults' => true,
         );
         echo json_encode($results);
       }
@@ -141,10 +140,8 @@ elseif ($treebank == 'sonar') {
     $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
     $basexdb = $subtreebank.$bf;
 
-    $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $queryIteration`;
-
+    $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $resultlimit $queryIteration`;
     var_dump($encodedResults);
-
     $results = json_decode($encodedResults, true);
 
     array_filter($results);

@@ -424,7 +424,17 @@ a.match {
     &.step-6 {
       .results-wrapper {
         overflow-y: scroll;
-        max-height: 480px;
+        max-height: 640px;
+        tbody {
+          tr {
+            transition: background-color 400ms;
+            will-change: background-color;
+            &.added {
+              background-color: #F2F9DD;
+              transition: background-color 400ms;
+            }
+          }
+        }
       }
     }
 }
