@@ -1,9 +1,7 @@
 <?php
 require '../config/config.php';
 require "$root/helpers.php";
-require "$root/php/profiler.php";
 
-session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
@@ -14,13 +12,15 @@ $id = session_id();
 $date = date('d-m-Y');
 $time = time();
 
-$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtb', 'xpath'));
+$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $sortTables = true;
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
-    if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
+    $component = $_SESSION['subtreebank'];
+    $component = implode(', ', $component);
+    if ($treebank != "sonar") $originalXp = $_POST['original-xp'];
     $sm = $_SESSION['search'];
     $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
@@ -36,18 +36,6 @@ if ($continueConstraints) {
 
     $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
     $exportxp = "$home/scripts/SaveXPath.php"; // script for downloading the XPath expression
-
-    /***********************/
-    /* SELECT SUBTREEBANKS */
-    /***********************/
-    if (is_array($_SESSION['subtb'])) {
-        $subtreebanks = array_keys($_SESSION['subtb']);
-        // get string of components
-        $components = implode(', ', $subtreebanks);
-        $export .= 'subtb='.$subtreebank;
-    } else {
-        $subtreebank = $_SESSION['subtb'];
-    }
 }
 
 require "$root/functions.php";
@@ -60,7 +48,7 @@ require "$root/php/header.php";
 
 if ($continueConstraints):
   ?>
-  <div><a href="<?php echo $export.'&print=txt'; ?>" title="Printer-friendly version of all results"
+  <div><a href="<?php echo $export.'print=txt'; ?>" title="Printer-friendly version of all results"
     download="gretel-results.txt">Download results</a></div>
 
   <h3>Query</h3>
@@ -70,11 +58,11 @@ if ($continueConstraints):
     from scratch.</p>
   <table>
     <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
-    <tr><th>XPath</th><td><?php echo $xpath; ?></td></tr>
+    <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
     <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
-    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$components]"; ?></td></tr>
+    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
     <?php elseif ($treebank == 'sonar'): ?>
-    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$subtreebank]"; ?></td></tr>
+    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
     <?php endif; ?>
     </tbody>
   </table>
@@ -106,22 +94,29 @@ if ($continueConstraints):
     <div class="error">
       <p></p>
     </div>
+    <div class="count"><p>Number of results: <strong>0</strong> / <span>--</span></p></div>
     <div class="results-wrapper" style="display: none">
-      <table id="results">
+      <table>
         <thead>
           <tr><th>ID</this>
-          <th>Sentence</th>
-          <th>Hits</th></tr>
+          <th>Sentence</th></tr>
         </thead>
         <tbody>
         </tbody>
       </table>
     </div>
-
-    <button class="more">Load more results</button>
+    <div class="btn-wrapper">
+        <div class="loading-wrapper tree-load-screen">
+            <div class="loading"></div>
+        </div>
+        <button class="stop">Stop searching</button>
+        <button class="continue" disabled>Continue searching</button>
+        <label><input type="checkbox" name="continue-bg"> Search on background</label>
+    </div>
     <div class="notice">
       <p></p>
     </div>
+
 <?php
     setContinueNavigation();
 else: // $continueConstraints
@@ -137,70 +132,19 @@ require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
-    <div class="loading-wrapper">
+    <div class="loading-wrapper tree-load-screen">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
-    <div class="result"></div>
+    <?php // Variables for JS
+    $vars = array(
+        'fetchResultsPath' => "$home/php/fetch-results.php",
+        'fetchCountsPath' => "$home/php/fetch-counts.php",
+    );
+    ?>
     <script>
-      $(document).ready(function() {
-        getSentences();
-
-        $(".more").click(function() {
-          getSentences();
-          $(".more").prop("disabled", true);
-        });
-
-        function getSentences() {
-          $.get('<?php echo "$home/php/fetch-results.php"; ?>', function(json) {
-            var data = $.parseJSON(json);
-            $("#results tbody .added").removeClass("added");
-            if (data.data) {
-              $.each(data.data, function(id, value) {
-                $("#results tbody").append('<tr class="added"><td>'+value[0]+'</td><td>'+value[1]+'</td><td>'+value[2]+'</td></tr>');
-              });
-              var hash = window.location.hash,
-                tvLink = $("a.tv-show-fs");
-
-              tvLink.not("[href^='#']").each(function(index) {
-                  $(this).attr("data-tv-url", $(this).attr("href"));
-                  $(this).attr("href", "#tv-" + (index + 1));
-              });
-
-              if (hash) {
-                  if (hash.indexOf("tv-") == 1) {
-                      var index = hash.match(/\d+$/);
-                      tvLink.eq(index[0] - 1).click();
-                  }
-              }
-              $(".results-wrapper").fadeIn("fast");
-              $(".more").prop("disabled", false);
-            }
-            else {
-              if ($("#results tbody").children().length == 0) {
-                $("#results, .more").remove();
-                $(".error p").text("No results found!");
-                $(".error").fadeIn("slow");
-              }
-              else {
-                $(".more").prop("disabled", true);
-                $(".notice p").text("All results have been found!");
-              }
-            }
-          });
-        }
-
-        $("#results tbody").on("click", "a.tv-show-fs", function(e) {
-            var $this = $(this);
-            $(".loading-wrapper").addClass("active");
-            window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
-            body.treeVisualizer($this.data("tv-url"), {
-                normalView: false,
-                initFSOnClick: true
-            });
-            e.preventDefault();
-        });
-      });
+    var phpVars = <?php echo json_encode($vars); ?>;
     </script>
+    <script src='<?php echo "$home/js/results.js"; ?>'></script>
 <?php endif; ?>
 </body>
 </html>

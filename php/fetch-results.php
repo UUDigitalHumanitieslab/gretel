@@ -2,7 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require '../config/config.php';
-require "$root/helpers.php";
 
 session_start();
 header('Content-Type:text/html; charset=utf-8');
@@ -10,14 +9,13 @@ header('Content-Type:text/html; charset=utf-8');
 /********************/
 /* SET UP VARIABLES */
 /********************/
-if (!$_SESSION['queryIteration']) {
-  $_SESSION['queryIteration'] = 0;
-}
-
-$queryIteration = $_SESSION['queryIteration'];
 $_SESSION['queryIteration']++;
+$queryIteration = $_SESSION['queryIteration'];
 
 $treebank = $_SESSION['treebank'];
+$component = $_SESSION['subtreebank'];
+$compString = implode("-", $component);
+
 // if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
 $sm = $_SESSION['search'];
 $exid = $_SESSION['sentid'];
@@ -36,6 +34,8 @@ $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
 $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
 $xpath = strtr("$xpath", $trans);
 
+$_SESSION['xpath'] = $xpath;
+
 // Clean up $originalXp
 // $originalXp = rtrim($originalXp);
 // $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
@@ -53,10 +53,10 @@ $showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
 // log XPath. Was XPath changed by the user or not?
 $xplog = fopen("$log/gretel-ebq.log", 'a');
 if ($sm == "advanced" && $treebank != "sonar") {
-    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpChanged\t$xpath\t$originalXp\n");
+    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$component\t$xpChanged\t$xpath\t$originalXp\n");
 }
 else {
-    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$xpath\n");
+    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$component\t$xpath\n");
 }
 fclose($xplog);
 
@@ -66,28 +66,14 @@ require "$scripts/TreebankSearch.php";
 // functions to format the treebank results
 require "$scripts/FormatResults.php";
 
-/***********************/
-/* SELECT SUBTREEBANKS */
-/***********************/
-if (is_array($_SESSION['subtb'])) {
-    $subtreebanks = array_keys($_SESSION['subtb']);
-    $subtreebank = implode('-', $subtreebanks);
-    // get string of components
-    $components = implode(', ', $subtreebanks);
-} else {
-    $subtreebank = $_SESSION['subtb'];
-}
-
 /**********************/
 /* QUERY LASSY OR CGN */
 /**********************/
 if ($treebank == 'lassy' || $treebank == 'cgn') {
   try {
-    // create session
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
     // get sentences
-    list($sentences, $counthits, $idlist, $beginlist) = GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $queryIteration);
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration);
 
     if (isset($sentences)) {
       array_filter($sentences);
@@ -95,14 +81,14 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
       foreach ($sentences as $id => $sentence) {
           $sid = trim($id);
           // highlight sentence
-          $hlsentence = HighlightSentence($sentence, $beginlist[$id]);
+          $hlsentence = HighlightSentence($sentence, $beginlist[$sid]);
           // deal with quotes/apos
           $trans = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $trans);
 
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
+          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$sid].'&tb='.$treebank.'&db='.$compString.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
 
-          $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $counthits[$id]);
+          $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
       }
         $results = array(
           'error' => false,
@@ -122,12 +108,11 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
   } catch (Exception $e) {
     $results = array(
       'error' => true,
-      'error_msg' => $e,
+      'error_msg' => $e->getMessage(),
       'data' => '',
     );
     echo json_encode($results);
   }
-  $session->close();
 }
 /***************/
 /* QUERY SONAR */
@@ -138,10 +123,10 @@ elseif ($treebank == 'sonar') {
     $xpath = substr($xpath, 1);
     // XPath2BreathFirst
     $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
-    $basexdb = $subtreebank.$bf;
+    $basexdb = $component.$bf;
 
     $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $resultlimit $queryIteration`;
-    var_dump($encodedResults);
+
     $results = json_decode($encodedResults, true);
 
     array_filter($results);
@@ -155,7 +140,8 @@ elseif ($treebank == 'sonar') {
       // deal with quotes/apos
       $trans = array('"' => '&quot;', "'" => "&apos;");
       $hlsentence = strtr($hlsentence, $trans);
-      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
+
+      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$compString.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
 
       $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $counthits[$id]);
     }
@@ -169,10 +155,9 @@ elseif ($treebank == 'sonar') {
   } catch (Exception $e) {
     $results = array(
       'error' => true,
-      'error_msg' => $e,
+      'error_msg' => $e->getMessage(),
       'data' => '',
     );
     echo json_encode($results);
   }
-  $session->close();
 }

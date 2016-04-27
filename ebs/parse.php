@@ -2,7 +2,6 @@
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 

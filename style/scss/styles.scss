@@ -301,7 +301,7 @@ table.sortable {
 }
 table.sortable thead {
     display: table-header-group;
-    background-color: grey;
+    background-color: gray;
 }
 .pointer {
     cursor: pointer;
@@ -309,11 +309,6 @@ table.sortable thead {
 a.match {
     color: $gretelgreen;
     text-decoration: none;
-    font-weight: bold;
-}
-/* mouse over */
-.match:hover {
-    color: grey;
     font-weight: bold;
 }
 /* loading image */
@@ -422,20 +417,29 @@ a.match {
         }
     }
     &.step-6 {
-      .results-wrapper {
-        overflow-y: scroll;
-        max-height: 640px;
-        tbody {
-          tr {
-            transition: background-color 400ms;
-            will-change: background-color;
-            &.added {
-              background-color: #F2F9DD;
-              transition: background-color 400ms;
+        .results-wrapper {
+            overflow-y: scroll;
+            max-height: 80vh;
+            table {
+                width: 100%;
             }
-          }
+            tr {
+                transition: background-color 1000ms;
+                will-change: background-color;
+                &.added {
+                    background-color: #F2F9DD;
+                }
+            }
         }
-      }
+        .btn-wrapper {
+            margin: 1em auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            > * {
+                margin-right: 1.67em;
+            }
+        }
     }
 }
 .ebs,
@@ -523,5 +527,14 @@ a.match {
         bottom: 0;
         height: 80px;
         border-radius: 50%;
+        svg {
+            overflow: visible !important;
+        }
+        circle {
+            transform: scale(1);
+            transform-origin: center center;
+            transition: transform 300ms;
+        }
+        &:hover circle {transform: scale(1.125);}
     }
 }

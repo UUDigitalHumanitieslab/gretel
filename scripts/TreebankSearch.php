@@ -1,42 +1,23 @@
 <?php
 
-function GetCounts($xpath, $treebank, $subtreebanks, $session)
+function GetCounts($xpath, $treebank, $subtreebank)
 {
+    global $dbhost, $dbport, $dbuser, $dbpwd;
+    $databases = Corpus2DB($subtreebank, $treebank);
+    $sum = 0;
+    // create session
+    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+    foreach ($databases as $database) {
+        $xquery = CreateXQueryCount($xpath, $database);
+        $query = $session->query($xquery);
+        $count = $query->execute();
 
-    // rename corpora to database names
-    $database = Corpus2DB($subtreebanks, $treebank);
-    $TOTAL = SetTotalSent($treebank);
+        $sum += $count;
 
-    foreach ($database as $db) {
-        // count matches
-        $xqhits = CreateXQueryCount($xpath, $db, 'hits');
-        $queryhits = $session->query($xqhits);
-        $cnthits = $queryhits->execute();
-
-        $HITS{$db} = $cnthits;
-
-        // count matching sentences
-        $xqms = CreateXQueryCount($xpath, $db, 'ms');
-        $queryms = $session->query($xqms);
-        $cntms = $queryms->execute();
-
-        $MS{$db} = $cntms;
-
-        // store total sentences of selected databases
-        $TOTALS{$db} = $TOTAL{$db};
+        $query->close();
     }
-
-    $queryhits->close();
-    $queryms->close();
-
-    // total counts //
-    // count total matches
-    $TOTALCOUNTS{'hits'} = array_sum($HITS);
-    // count total matching sentences
-    $TOTALCOUNTS{'ms'} = array_sum($MS);
-    // count total sentences in corpus
-    $TOTALCOUNTS{'totals'} = array_sum($TOTALS);
-    return array($HITS, $MS, $TOTALS, $TOTALCOUNTS);
+    $session->close();
+    return $sum;
 }
 
 function Corpus2DB($tblist, $treebank)
@@ -54,6 +35,7 @@ function Corpus2DB($tblist, $treebank)
 
         return $databases;
     }
+    return false;
 }
 
 function SetTotalSent($corpus)
@@ -101,35 +83,21 @@ function SetTotalSent($corpus)
     return $TOTAL;
 }
 
-function CreateXQueryCount($xpath, $db, $flag)
-{
-    // create XQuery instance
-    if ($flag == 'hits') {
-        // count hits
+function CreateXQueryCount($xpath, $db) {
         $for = 'count(for $node in db:open("'.$db.'")/treebank';
         $return = 'return $node)';
         $xquery = $for.$xpath.$return;
 
         return $xquery;
-    }
-    // count matching sentences
-    elseif ($flag == 'ms') {
-        $for = 'count(for $node in db:open("'.$db.'")';
-        // space after $filter !
-        $filter = '/ancestor::*[sentence]/sentence ';
-        $return = 'return $node)';
-
-        $xquery = $for.$xpath.$filter.$return;
-
-        return $xquery;
-    }
 }
 
-function GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $queryIteration)
+function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration)
 {
-    global $resultlimit;
+    global $resultlimit, $dbhost, $dbport, $dbuser, $dbpwd;
+    // create session
+    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
     // rename corpora to database names
-    $database = Corpus2DB($subtreebanks, $treebank);
+    $database = Corpus2DB($subtreebank, $treebank);
 
     $nrofmatches = 0;
     foreach ($database as $db) {
@@ -140,43 +108,36 @@ function GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $que
 
         // get results
         $match = $query->execute();
+        $query->close();
+
+        if (!$match) continue;
+
         // put matches into array
         $matches = explode('</match>', $match);
+        
         // remove empty elements from array
         $matches = array_filter($matches);
 
         // make a hash of all matching sentences, count hits per sentence and append matching IDs per sentence
         foreach ($matches as $m) {
-            if ($nrofmatches >= $resultlimit) {
-                $query->close();
-                break 2;
+            if ($queryIteration != "all") {
+                if ($nrofmatches >= $resultlimit) {
+                    break 2;
+                }
             }
             $m = str_replace('<match>', '', $m);
             trim($m);
             list($sentid, $sentence, $ids, $begins) = explode('||', $m);
 
-            if (!isset($counthits{$sentid})) {
-                $counthits{$sentid} = 0;
-            }
-
-            $counthits{$sentid}++;
             $sentences{$sentid} = $sentence;
+            $idlist{$sentid} = $ids;
+            $beginlist{$sentid} = $begins;
 
-            if (isset($idlist{$sentid})) {
-                $idlist{$sentid} .= '-'.$ids;
-            } else {
-                $idlist{$sentid} = $ids;
-            }
-
-            if (isset($beginlist{$sentid})) {
-                $beginlist{$sentid} .= '-'.$begins;
-            } else {
-                $beginlist{$sentid} = $begins;
-            }
             $nrofmatches++;
         }
-        $query->close();
     }
+
+    $session->close();
 
     // Make sure that the IDs returned is a list of unique values. Remove duplicates
     if (isset($sentences)) {
@@ -188,7 +149,7 @@ function GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $que
 
             $uniquebeginlist{$sentid} = $begins;
         }
-        return array($sentences, $counthits, $idlist, $uniquebeginlist);
+        return array($sentences, $idlist, $uniquebeginlist);
     } else {
         // in case there are no results found
         return false;
@@ -198,15 +159,20 @@ function GetSentences($xpath, $treebank, $subtreebanks, $session, $context, $que
 function CreateXQuery($xpath, $db, $tb, $context, $queryIteration)
 {
     global $resultlimit;
-    $startPosition = 1 + ($queryIteration * $resultlimit);
-    $endPosition = $startPosition + $resultlimit;
+
+    if ($queryIteration != "all") {
+        $endPosition = 1 + ($queryIteration * $resultlimit);
+        $startPosition = $endPosition - $resultlimit;
+
+        $openPosition = '(';
+        $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
+    }
   // create XQuery instance
-    $for = '(for $node in db:open("'.$db.'")/treebank';
+    $for = 'for $node in db:open("'.$db.'")/treebank';
     $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
     $sentence = 'let $sentence := ($node/ancestor::alpino_ds/sentence)';
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
-    $position = ')[position() = '.$startPosition.' to '.$endPosition.']';
     if ($context != 0) {
         $tb = strtoupper($tb);
         $dbs = $tb.'_ID_S';
@@ -223,10 +189,14 @@ function CreateXQuery($xpath, $db, $tb, $context, $queryIteration)
 
         $return = 'return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
 
-        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return.$position;
+        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
         $return = 'return <match>{data($sentid)}||{data($sentence)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
-        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$return.$position;
+        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$return;
+    }
+
+    if ($queryIteration != "all") {
+        $xquery = $openPosition.$xquery.$closePosition;
     }
 
     return $xquery;

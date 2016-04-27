@@ -51,36 +51,11 @@ function printCountsPF($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
     echo "</table>";
 }
 
-function printMatches($sentences, $counthits, $idlist, $beginlist, $treebank, $showtree)
-{
-    // NOTE: sentence IDs are the keys of all hashes
-    echo '<div class="tableWrapper"><table id="example" class="sortable"><thead>'.
-        '<tr><th class="pointer">Sentence ID</th><th class="pointer">Matching sentences</th>'.
-        '<th class="pointer">Hits</th></tr></thead>';
-    echo '<tbody>';
-    // print matching sentence and hits per sentence
-    foreach ($sentences as $id => $sentence) {
-        $sid = trim($id);
-        // highlight sentence
-        $hlsentence = HighlightSentence($sentence, $beginlist[$id]);
-        // deal with quotes/apos
-        $trans = array('"' => '&quot;', "'" => "&apos;");
-        $hlsentence = strtr($hlsentence, $trans);
-
-        $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
-
-        echo '<tr><td>'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td>'.$counthits[$id].'</td></tr>';
-    }
-    echo "</tbody></table></div>";
-}
-
-function printMatchesTxt($sentences, $counthits)
+function printMatchesTxt($sentences)
 {
     // NOTE: sentence IDs are the keys of all hashes
     foreach ($sentences as $id => $sentence) {
-      $counthits = array_map('trim', $counthits);
-         // print matching sentence and hits per sentence
-        echo "$id\t$sentence\t$counthits[$id]\n";
+        echo "$id\t$sentence\n";
     }
 }
 

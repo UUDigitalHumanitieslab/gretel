@@ -59,24 +59,32 @@ $(document).ready(function() {
                 });
             }
         } else if (body.hasClass("step-4")) {
-            $('.checkall').click(function() {
-                var checked = $(this).prop("checked");
-                $("input[name^='lassytb']:not([disabled])").prop("checked", checked);
-            });
-            $('.checkvlfunction').click(function() {
-                var checked = $(this).prop("checked");
-                $("input[name^='cgntb[v']:not([disabled])").prop("checked", checked);
-            });
-            $('.checknlfunction').click(function() {
-                var checked = $(this).prop("checked");
-                $("input[name^='cgntb[n']:not([disabled])").prop("checked", checked);
-            });
+            $("[type='checkbox'][data-check^='all']").change(function() {
+                var $this = $(this),
+                    checked = $this.prop("checked")
+                if ($this.is("[data-check='all-cgn-vl']")) {
+                    $(".cgn label:not(.disabled) [value^='v']").prop("checked", checked);
+                } else if ($this.is("[data-check='all-cgn-nl']")) {
+                    $(".cgn label:not(.disabled) [value^='n']").prop("checked", checked);
+                }
+                else {
+                    $(".lassy label:not(.disabled) [type='checkbox']").prop("checked", checked);
+                }
+            })
 
             $("[name='treebank']").change(function() {
                 var val = $(this).val();
                 $(".cgn, .lassy, .sonar").hide();
-                $("." + val).show();
+                $(".cgn, .lassy, .sonar").find("[type='checkbox'], [type='radio']").prop("disabled", true);
+                $("." + val).show().find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
             });
+
+            if (treebank) {
+                $("[value='"+treebank+"']").click();
+            }
+            else {
+                $("[value='lassy']").click();
+            }
         }
     }
 });

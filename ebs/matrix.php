@@ -2,7 +2,6 @@
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
@@ -54,8 +53,8 @@ if ($continueConstraints):
       </div>
 
   <h3>Options</h3>
-  <div class="label-wrapper"><label><input type="checkbox" name="order" value="on"> Respect word order</label></div>
-  <div class="label-wrapper"><label><input type="checkbox" name="topcat" value="on">
+  <div class="label-wrapper"><label><input type="checkbox" name="order"> Respect word order</label></div>
+  <div class="label-wrapper"><label><input type="checkbox" name="topcat">
   Ignore properties of the dominating node. Clicking this option allows you to search
   for more general patterns, e.g. search for both main clauses and subclauses.
   </label></div>

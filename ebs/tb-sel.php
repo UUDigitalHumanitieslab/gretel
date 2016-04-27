@@ -2,7 +2,6 @@
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private'); // avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
@@ -97,18 +96,18 @@ else: ?>
   <p>Which treebank do you want to query? Click on the treebank name to see its different components.</p>
   <form action="query.php" method="post">
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy" checked> Lassy</label></div>
+    <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
 
     <div class="cgn" style="display:none">
       <?php require "$scripts/cgn-tb.html"; ?>
       <h3>Option</h3>
-      <label><input type="checkbox" name="ct" value="on"> Include context (one sentence before and after the matching sentence)</label>
+      <label><input type="checkbox" name="ct"> Include context (one sentence before and after the matching sentence)</label>
     </div>
     <div class="lassy">
       <?php require "$scripts/lassy-tb.html"; ?>
       <h3>Option</h3>
-      <label><input type="checkbox" name="ct" value="on"> Include context (one sentence before and after the matching sentence)</label>
+      <label><input type="checkbox" name="ct"> Include context (one sentence before and after the matching sentence)</label>
     </div>
     <div class="sonar" style="display:none">
       <?php require "$scripts/sonar-tb.html"; ?>
@@ -118,8 +117,13 @@ else: ?>
 <?php endif; ?>
 
 <?php
+if ($continueConstraints) : ?>
+    <script>
+    var treebank = "<?php echo (isset($_SESSION['treebank'])) ? $_SESSION['treebank'] : ''; ?>";
+    </script>
+<?php endif;
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-?>
+ ?>
 </body>
 </html>

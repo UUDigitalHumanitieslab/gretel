@@ -2,7 +2,6 @@
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 

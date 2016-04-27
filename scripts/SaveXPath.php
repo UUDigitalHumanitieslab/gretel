@@ -24,8 +24,6 @@ $xpath=$_SESSION['xpath'];
 /***********************************************************/
 
 // get XPath
-
-header("Content-Disposition: attachment; filename=XPath.xp");
 header("Content-type:text/plain; charset=utf-8");
 
 print "$xpath\n";

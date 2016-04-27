@@ -20,52 +20,34 @@ $date=date('d-m-Y');
 $time=time(); // time stamp
 
 // load configuration file
-require("../config/config.php");
+require "../config/config.php";
 
 // dir to external scripts
 $basexclient="$scripts/BaseXClient.php";
 $treebanksearch="$scripts/TreebankSearch.php";
 $formatresults="$scripts/FormatResults.php";
 
-/* GET VARIABLES */
-$subtb=$_GET["subtb"]; // get subtreebanks
-if (getenv('limit')){
-  $limit=$_GET["limit"]; // get limit
-}
 $print=$_GET["print"]; // get print mode
 
 $treebank=$_SESSION['treebank']; // get treebank
 $xpath=$_SESSION['xpath']; // get xpath
-$example=$_SESSION['example']; // get input example
-$context=$_SESSION['ct'];
+$example=$_SESSION['example'];
+$context = ($_SESSION['ct'] == 'on') ? 1 : 0;
+$component = $_SESSION['subtreebank'];
 
- if ($_SESSION["ct"]=="on") {
-    $context=1;
-  }
-  else {
-    $context=0;
-  }
-/***********************************************************/
-/* INCLUDES */
-
-require "$basexclient";
-require "$treebanksearch";
-require "$formatresults";
-
-/***********************************************************/
-
-//create session
-$session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-$subtreebanks=explode('-', $subtb);
+require "$scripts/BaseXClient.php";
+require "$scripts/TreebankSearch.php";
+require "$scripts/FormatResults.php";
 
 try {
   // print results
   if ($print == "txt") {
     header("Content-type:text/plain; charset=utf-8");
-    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
-    echo "XPATH: $xpath\n";
-    printMatchesTxt($sentences,$counthits);
+
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, "all");
+
+    echo "$xpath\n";
+    printMatchesTxt($sentences);
   }
 
   elseif ($print == "csv") {
@@ -120,8 +102,5 @@ catch (Exception $e) {
   $error=$e->getMessage();
   echo $error;
 }
-
-// close session
-$session->close();
 
 ?>
