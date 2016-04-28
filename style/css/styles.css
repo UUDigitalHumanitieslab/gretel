@@ -941,6 +941,13 @@ a.match {
 }
 .ebs.step-6 .results-wrapper table {
   width: 100%;
+  table-layout: fixed;
+}
+.ebs.step-6 .results-wrapper table td:first-child, .ebs.step-6 .results-wrapper table th:first-child {
+  width: 30%;
+}
+.ebs.step-6 .results-wrapper table td:last-child, .ebs.step-6 .results-wrapper table th:last-child {
+  width: 70%;
 }
 .ebs.step-6 .results-wrapper tr {
   transition: background-color 1000ms;

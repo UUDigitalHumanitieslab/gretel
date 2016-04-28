@@ -422,6 +422,13 @@ a.match {
             max-height: 80vh;
             table {
                 width: 100%;
+                table-layout: fixed;
+                td:first-child, th:first-child {
+                  width: 30%;
+                }
+                td:last-child, th:last-child {
+                  width: 70%;
+                }
             }
             tr {
                 transition: background-color 1000ms;

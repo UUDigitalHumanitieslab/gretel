@@ -29,8 +29,6 @@ if ($continueConstraints) {
     // get context option
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 
-    // Reset amounts the "fetch more results" button has been clicked
-    // Used in fetch-results.php
     $_SESSION['queryIteration'] = 0;
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 

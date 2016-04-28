@@ -9,12 +9,21 @@ header('Content-Type:text/html; charset=utf-8');
 /********************/
 /* SET UP VARIABLES */
 /********************/
-$_SESSION['queryIteration']++;
+if (isset($_SESSION['queryIteration'])) {
+  $_SESSION['queryIteration']++;
+}
+else {
+  $_SESSION['queryIteration'] = 0;
+}
 $queryIteration = $_SESSION['queryIteration'];
+
+if (!isset($_SESSION['leftOvers'])) {
+  $_SESSION['leftOvers'] = array();
+}
+$leftOvers = $_SESSION['leftOvers'];
 
 $treebank = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
-$compString = implode("-", $component);
 
 // if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
 $sm = $_SESSION['search'];
@@ -73,20 +82,22 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
   try {
 
     // get sentences
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration);
+    list($sentences, $idlist, $beginlist, $dblist, $leftOvers) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $leftOvers);
+    $_SESSION['leftOvers'] = $leftOvers;
 
     if (isset($sentences)) {
       array_filter($sentences);
 
-      foreach ($sentences as $id => $sentence) {
-          $sid = trim($id);
+      foreach ($sentences as $sid => $sentence) {
           // highlight sentence
           $hlsentence = HighlightSentence($sentence, $beginlist[$sid]);
           // deal with quotes/apos
           $trans = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $trans);
 
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$sid].'&tb='.$treebank.'&db='.$compString.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
+          // remove the added identifier (see GetSentences) to use in the link
+          $sidString = strstr($sid, '-iter=', true) ?: $sid;
+          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&db='.$dblist[$sid].'&opt=tv-xml" target="_blank" >'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
       }
