@@ -1,14 +1,40 @@
 $(document).ready(function() {
     body = $("body");
+
+    $(window).resize(function() {
+        mobileMenu();
+    });
+
+    function mobileMenu() {
+        if ($(window).width() < 721) {
+            $(".primary-navigation").addClass("small");
+            $(".primary-navigation button").addClass("active").removeAttr("hidden");
+        } else {
+            $(".primary-navigation").removeClass("active small");
+            $(".primary-navigation button").removeClass("active").attr("hidden", "hidden");
+        }
+    }
+    mobileMenu();
+    
+    $(".primary-navigation button").click(function() {
+        $(".primary-navigation").toggleClass("active");
+    });
     /*******/
     /* EBS */
     /*******/
     // STEP 1: input.php
     if (body.hasClass("ebs")) {
         if (body.hasClass("step-1")) {
-            $('[name="clear"]').click(function() {
-                $(this).prev('[name="input"]').val("").focus();
+            $('[name="clear"]').click(function(e) {
+                $(this).prev('[name="input"]').val("").removeClass("has-content").focus();
+                e.preventDefault();
             });
+
+            $('[name="input"]').keyup(function() {
+                if ($(this).val()) $(this).addClass("has-content");
+                else $(this).removeClass("has-content");
+            }).keyup();
+
             taalPortaalFiller();
         }
         // STEP 3: matrix.php
@@ -66,8 +92,7 @@ $(document).ready(function() {
                     $(".cgn label:not(.disabled) [value^='v']").prop("checked", checked);
                 } else if ($this.is("[data-check='all-cgn-nl']")) {
                     $(".cgn label:not(.disabled) [value^='n']").prop("checked", checked);
-                }
-                else {
+                } else {
                     $(".lassy label:not(.disabled) [type='checkbox']").prop("checked", checked);
                 }
             })
@@ -80,9 +105,8 @@ $(document).ready(function() {
             });
 
             if (treebank) {
-                $("[value='"+treebank+"']").click();
-            }
-            else {
+                $("[value='" + treebank + "']").click();
+            } else {
                 $("[value='lassy']").click();
             }
         }

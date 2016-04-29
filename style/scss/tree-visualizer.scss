@@ -252,6 +252,7 @@
     }
 }
 .tree-visualizer {
+    position: relative;
     .tree {
         margin: 24px auto;
         padding: 24px;
@@ -262,9 +263,11 @@
             z-index: 9;
         }
     }
-    .tv-show-fs {
+    > .tv-show-fs {
         display: block;
-        margin: 24px auto;
+        position: absolute;
+        top: 0;
+        right: 0;
         @extend %button;
     }
 }

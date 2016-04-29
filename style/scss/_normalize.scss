@@ -438,6 +438,9 @@ input:not([type="button"]):not([type="reset"]):not([type="submit"]), textarea {
   &:focus, &:active {
     border-color: darken(#C0C0C0, 12%);
   }
+  &:invalid {
+      box-shadow: none;
+  }
 }
 
 button, input[type="button"], input[type="reset"], input[type="submit"] {

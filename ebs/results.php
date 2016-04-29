@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -20,8 +22,8 @@ if ($continueConstraints) {
     $treebank = $_SESSION['treebank'];
     $component = $_SESSION['subtreebank'];
     $component = implode(', ', $component);
-    if ($treebank != "sonar") $originalXp = $_POST['original-xp'];
     $sm = $_SESSION['search'];
+    if ($treebank != "sonar" && $sm == 'advanced') $originalXp = $_POST['original-xp'];
     $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
     $xpath = $_SESSION['xpath'];
@@ -30,6 +32,8 @@ if ($continueConstraints) {
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 
     $_SESSION['queryIteration'] = 0;
+    $_SESSION['leftOvers'] = array();
+
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 
     $export = "$home/scripts/SaveResults.php?"; // script for downloading the results
@@ -92,24 +96,29 @@ if ($continueConstraints):
     <div class="error">
       <p></p>
     </div>
-    <div class="count"><p>Number of results: <strong>0</strong> / <span>--</span></p></div>
-    <div class="results-wrapper" style="display: none">
-      <table>
-        <thead>
-          <tr><th>ID</this>
-          <th>Sentence</th></tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
+    <div class="dummy-controls" hidden>
+        <div class="content">
+        </div>
     </div>
-    <div class="btn-wrapper">
-        <div class="loading-wrapper tree-load-screen">
+    <nav class="controls">
+        <p class="count"># of results: <strong>0</strong> / <span>--</span></p>
+        <div class="loading-wrapper searching">
             <div class="loading"></div>
         </div>
         <button class="stop">Stop searching</button>
         <button class="continue" disabled>Continue searching</button>
         <label><input type="checkbox" name="continue-bg"> Search on background</label>
+        <button name="to-top"><i class="fa fa-arrow-up"></i></button>
+    </nav>
+    <div class="results-wrapper" style="display: none">
+      <table>
+        <thead>
+          <tr><th>ID</th>
+          <th>Sentence</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
     <div class="notice">
       <p></p>
@@ -130,12 +139,12 @@ require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
-    <div class="loading-wrapper tree-load-screen">
+    <div class="loading-wrapper fullscreen">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
     <?php // Variables for JS
     $vars = array(
-        'fetchResultsPath' => "$home/php/fetch-results.php",
+        'fetchResultsPath' => "$home/php/flush-results.php",
         'fetchCountsPath' => "$home/php/fetch-counts.php",
     );
     ?>

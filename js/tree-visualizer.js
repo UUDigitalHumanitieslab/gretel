@@ -148,9 +148,9 @@
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button>&#10005;</button></aside>';
+                    '<button><i class="fa fa-times"></i></button></aside>';
                 if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs">Fullscreen</button>';
+                    SSHTML += '<button class="tv-show-fs"><i class="fa fa-arrows-alt"></i></button>';
                 }
                 SS.append(SSHTML);
 
@@ -170,9 +170,9 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button>&#10005;</button></aside><div class="zoom-opts"><button class="zoom-out">-</button>' +
+                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts"><button class="zoom-out">-</button>' +
                     '<button class="zoom-default">Default</button><button class="zoom-in">+</button>' +
-                    '<button class="close">&#10005;</button></div>';
+                    '<button class="close"><i class="fa fa-times"></i></button></div>';
 
                 FS.append(FSHTML);
 

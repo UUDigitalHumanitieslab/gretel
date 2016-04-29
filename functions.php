@@ -153,44 +153,6 @@
       echo $output;
   }
 
-  function checkInputAndLog($logflag = 0)
-  {
-      $error_flag = 1;
-      global $input, $log, $user, $id, $sm, $home;
-
-      $mode = preg_match('/([^\\/]+)\\/input\\.php\\/?$/', $_SERVER['REQUEST_URI']);
-      if ($mode == 'ebs') {
-          $back = "<a href='$home/ebs/input.php'>Go to the input page.</a>";
-      } elseif ($mode == 'xps') {
-          $back = "<a href='$home/xps/input.php'>Go to the input page.</a>";
-      } else {
-          $back = "<a href='$home'>Go to the home page!</a>";
-      }
-
-      if (preg_match('/(http:\/\/.*)|(<.*)|(.*>)/', $input) == 1) {
-          echo "<p style='font-size: 18px;color:#DF5F5F'><strong>An error occurred!</strong></p>";
-          echo '<p>This is a suspicious input example; GrETEL does not accept URLs or HTML as input.</p>';
-          echo "<p>$back</p>";
-      } elseif (!$input || empty($input)) {
-          echo "<p style='font-size: 18px;color:#DF5F5F'><strong>An error occurred!</strong></p>";
-          echo '<p>Your input was empty. Please provide an input example.</p>';
-          echo "<p>$back</p>";
-      } else {
-          if (!$logflag) {
-              $date = date('d-m-Y');
-              $time = time();
-              $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
-
-              $log = fopen("$log/gretel-ebq.log", 'a');  //concatenate sentences
-        fwrite($log, "$date\t$user\t$id-$time\t$sm\t$input\n");
-              fclose($log);
-          }
-          $error_flag = 0;
-      }
-
-      return $error_flag;
-  }
-
   function buildEbsMatrix()
   {
       global $sentence, $sm,$matrixOptions;
@@ -237,10 +199,10 @@
       global $step, $currentPage, $ebsPages, $xpsPages, $is_bigstep;
       echo '<nav class="continue-btn-wrapper">';
       if ($is_bigstep) {
-          echo '<button onclick="history.go(-1); return false"><i>&larr;</i> Go back</button>';
+          echo '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go back</button>';
       }
       if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {
-          echo '<button type="submit">Continue <i>&rarr;</i></button>';
+          echo '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i></button>';
       }
       echo '</nav>';
   }

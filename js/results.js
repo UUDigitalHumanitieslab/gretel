@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var hash = window.location.hash,
         tvLink = $("a.tv-show-fs"),
-        elId = 0,
+        resultID = 0,
         stop = false,
         searchBgCheck = $('[name="continue-bg"]'),
         done = false;
@@ -11,6 +11,7 @@ $(document).ready(function() {
     setTimeout(function() {
         $.get(phpVars.fetchCountsPath, function(count) {
             if (count) {
+                count = numericSeparator(count);
                 $(".count span").text(count);
             }
         });
@@ -24,22 +25,25 @@ $(document).ready(function() {
     }
 
     function getSentences() {
+        $(".loading-wrapper.searching").addClass("active");
         $.get(phpVars.fetchResultsPath, function(json) {
             var data = $.parseJSON(json);
             $(".results-wrapper tbody .added").removeClass("added");
             if (data.data) {
+                if (!stop && !done) getSentences();
                 $.each(data.data, function(id, value) {
-                    elId++;
+                    resultID++;
                     var link = value[0];
 
-                    link = link.replace(/\bhref=\"([^"]+)\"/, "href=\"#tv-" + elId + "\" data-tv-url=\"$1\"");
+                    link = link.replace(/\bhref=\"([^"]+)\"/, "href=\"#tv-" + resultID + "\" data-tv-url=\"$1\"");
 
                     $(".results-wrapper tbody").append('<tr class="added"><td>' + link + '</td><td>' +
                         value[1] + '</td></tr>');
                 });
                 $(".results-wrapper").fadeIn("fast");
-                $(".count strong").text(elId);
-                if (!stop) getSentences();
+                resultIDString = numericSeparator(resultID);
+                $(".count strong").text(resultIDString);
+
             } else {
                 if (data.error) {
                     $(".btn-wrapper").remove();
@@ -54,11 +58,16 @@ $(document).ready(function() {
                     $(".btn-wrapper").find("button, input").prop("disabled", true);
                     $(".btn-wrapper").find("label").addClass("disabled");
                 }
+                $(".loading-wrapper.searching").removeClass("active");
                 done = true;
             }
         });
     }
 
+
+    function numericSeparator(integer) {
+        return integer.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+    }
 
     $(".results-wrapper tbody").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
@@ -74,6 +83,7 @@ $(document).ready(function() {
 
     $(".stop").click(function() {
         if (!stop && !done) {
+            $(".loading-wrapper.searching").removeClass("active");
             stop = true;
             $(".continue").prop("disabled", false);
             $(this).prop("disabled", true);
@@ -93,5 +103,29 @@ $(document).ready(function() {
         if (!searchBgCheck.is(":checked")) $(".continue").click()
     }).blur(function() {
         if (!searchBgCheck.is(":checked")) $(".stop").click();
+    });
+
+    var top = $(".controls")[0].getBoundingClientRect().top + $(".controls").scrollTop(),
+        h = $(".controls")[0].getBoundingClientRect().height,
+        dummy = $(".dummy-controls");
+
+    dummy.height(h);
+
+    $(window).scroll(function() {
+        var $this = $(this);
+
+        if ($this.scrollTop() >= top) {
+            dummy.addClass("active");
+            $(".controls").addClass("scroll");
+        } else {
+            dummy.removeClass("active");
+            $(".controls").removeClass("scroll");
+        }
+    });
+
+    $("[name='to-top']").click(function() {
+        $("html, body").animate({
+            scrollTop: 0
+        });
     });
 });

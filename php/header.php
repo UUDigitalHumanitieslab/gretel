@@ -14,6 +14,7 @@
                     <li><a href="<?php echo $home; ?>/documentation.php" title="Documentation"
                     <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
                 </ul>
+                <button name="show-menu" hidden><i class="fa fa-bars"></i></button>
             </nav>
         </header>
         <main>

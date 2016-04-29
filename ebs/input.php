@@ -16,6 +16,9 @@ if (isset($_SESSION['example'])) {
     $input = 'Dit is een zin.';
 }
 
+session_regenerate_id(FALSE);
+session_unset();
+
 require "$root/functions.php";
 require "$root/php/head.php";
 ?>
@@ -24,10 +27,10 @@ require "$root/php/head.php";
 <?php require "$root/php/header.php"; ?>
     <form action="parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
-        <p>
-          <input type="text" name="input" value="<?php echo $input; ?>" required>
-          <button type="button" name="clear">Clear</button>
-        </p>
+        <div class="input-wrapper">
+          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="<?php echo $input; ?>" required>
+          <button type="reset" name="clear" title="Empty the input field"><i class="fa fa-times"></i></button>
+      </div>
         <p>Select the <strong>search mode</strong> you want to use. <em>Basic search</em> doesn't
             require any knowledge of the used formal query language, but it also has less
             search options. <em>Advanced search</em> on the other hand allows a more specific

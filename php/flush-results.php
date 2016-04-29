@@ -9,17 +9,7 @@ header('Content-Type:text/html; charset=utf-8');
 /********************/
 /* SET UP VARIABLES */
 /********************/
-if (isset($_SESSION['queryIteration'])) {
-  $_SESSION['queryIteration']++;
-}
-else {
-  $_SESSION['queryIteration'] = 0;
-}
 $queryIteration = $_SESSION['queryIteration'];
-
-if (!isset($_SESSION['leftOvers'])) {
-  $_SESSION['leftOvers'] = array();
-}
 $leftOvers = $_SESSION['leftOvers'];
 
 $treebank = $_SESSION['treebank'];
@@ -82,8 +72,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
   try {
 
     // get sentences
-    list($sentences, $idlist, $beginlist, $dblist, $leftOvers) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $leftOvers);
-    $_SESSION['leftOvers'] = $leftOvers;
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $leftOvers);
 
     if (isset($sentences)) {
       array_filter($sentences);
@@ -97,7 +86,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
 
           // remove the added identifier (see GetSentences) to use in the link
           $sidString = strstr($sid, '-iter=', true) ?: $sid;
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&db='.$dblist[$sid].'&opt=tv-xml" target="_blank" >'.$sidString.'</a>';
+          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&opt=tv-xml" target="_blank" >'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
       }
