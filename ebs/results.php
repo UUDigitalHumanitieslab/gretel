@@ -11,8 +11,6 @@ $currentPage = 'ebs';
 $step = 6;
 
 $id = session_id();
-$date = date('d-m-Y');
-$time = time();
 
 $continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtreebank', 'xpath'));
 
@@ -43,6 +41,7 @@ if ($continueConstraints) {
 require "$root/functions.php";
 require "$root/php/head.php";
 ?>
+
 </head>
 <?php flush(); ?>
 <?php
@@ -58,17 +57,18 @@ if ($continueConstraints):
     to use it as input for the XPath search mode.
     This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
     from scratch.</p>
-  <table>
-    <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
-    <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
-    <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
-    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-    <?php elseif ($treebank == 'sonar'): ?>
-    <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-    <?php endif; ?>
-    </tbody>
-  </table>
-
+  <div class="table-wrapper">
+    <table>
+      <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
+      <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
+      <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
+      <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
+      <?php elseif ($treebank == 'sonar'): ?>
+      <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
+      <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
   <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
     <h3>Results</h3>
     <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
@@ -93,15 +93,21 @@ if ($continueConstraints):
       the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
 
     <?php endif; // $treebank lassy and cgn ?>
-    <div class="error">
-      <p></p>
-    </div>
+    <aside class="messages">
+      <div class="error">
+        <p></p>
+      </div>
+
+      <div class="notice">
+        <p></p>
+      </div>
+    </aside>
     <div class="dummy-controls" hidden>
         <div class="content">
         </div>
     </div>
     <nav class="controls">
-        <p class="count"># of results: <strong>0</strong> / <span>--</span></p>
+        <p class="count"># of results: <span><strong>0</strong> / <span>--</span><span></p>
         <div class="loading-wrapper searching">
             <div class="loading"></div>
         </div>
@@ -110,7 +116,7 @@ if ($continueConstraints):
         <label><input type="checkbox" name="continue-bg"> Search on background</label>
         <button name="to-top"><i class="fa fa-arrow-up"></i></button>
     </nav>
-    <div class="results-wrapper" style="display: none">
+    <div class="results-wrapper table-wrapper" style="display: none">
       <table>
         <thead>
           <tr><th>ID</th>
@@ -119,9 +125,6 @@ if ($continueConstraints):
         <tbody>
         </tbody>
       </table>
-    </div>
-    <div class="notice">
-      <p></p>
     </div>
 
 <?php
@@ -139,7 +142,7 @@ require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
-    <div class="loading-wrapper fullscreen">
+    <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
     <?php // Variables for JS

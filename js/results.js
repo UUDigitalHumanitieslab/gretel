@@ -12,7 +12,7 @@ $(document).ready(function() {
         $.get(phpVars.fetchCountsPath, function(count) {
             if (count) {
                 count = numericSeparator(count);
-                $(".count span").text(count);
+                $(".count strong + span").text(count);
             }
         });
     }, 5000);
@@ -45,20 +45,22 @@ $(document).ready(function() {
                 $(".count strong").text(resultIDString);
 
             } else {
+                $(".loading-wrapper.searching").removeClass("active");
+                $(".messages").addClass("active");
                 if (data.error) {
                     $(".btn-wrapper").remove();
                     $(".error p").text("Error! " + data.error_msg);
-                    $(".error").fadeIn("slow");
+                    $(".error").addClass("active");
                 } else if ($(".results-wrapper tbody").children().length == 0) {
                     $(".btn-wrapper").remove();
                     $(".error p").text("No results found!");
-                    $(".error").fadeIn("slow");
+                    $(".error").addClass("active");
                 } else {
                     $(".notice p").text("All results have been found!");
                     $(".btn-wrapper").find("button, input").prop("disabled", true);
                     $(".btn-wrapper").find("label").addClass("disabled");
+                    $(".notice").addClass("active");
                 }
-                $(".loading-wrapper.searching").removeClass("active");
                 done = true;
             }
         });
@@ -71,7 +73,7 @@ $(document).ready(function() {
 
     $(".results-wrapper tbody").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
-        $(".loading-wrapper").addClass("active");
+        $(".loading-wrapper.tv").addClass("active");
         window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
         body.treeVisualizer($this.data("tv-url"), {
             normalView: false,
@@ -98,34 +100,44 @@ $(document).ready(function() {
         }
     });
 
+    $("[name='to-top']").click(function() {
+        $("html, body").animate({
+            scrollTop: 0
+        });
+    });
 
+    var controls = $(".controls"),
+        top = controls[0].getBoundingClientRect().top + controls.scrollTop(),
+        h = controls[0].getBoundingClientRect().height,
+        dummy = $(".dummy-controls");
+
+    dummy.height(h);
+
+    $(window).resize($.throttle(250, setDummyVariables));
+    $(window).scroll($.throttle(250, scrollMenu));
     $(window).focus(function() {
         if (!searchBgCheck.is(":checked")) $(".continue").click()
     }).blur(function() {
         if (!searchBgCheck.is(":checked")) $(".stop").click();
     });
 
-    var top = $(".controls")[0].getBoundingClientRect().top + $(".controls").scrollTop(),
-        h = $(".controls")[0].getBoundingClientRect().height,
-        dummy = $(".dummy-controls");
+    function setDummyVariables() {
+        if (!controls.hasClass("scroll")) {
+            top = controls[0].getBoundingClientRect().top + controls.scrollTop();
+            h = controls[0].getBoundingClientRect().height;
+            dummy.height(h);
+        }
+    }
 
-    dummy.height(h);
-
-    $(window).scroll(function() {
-        var $this = $(this);
+    function scrollMenu() {
+        var $this = $(window);
 
         if ($this.scrollTop() >= top) {
             dummy.addClass("active");
-            $(".controls").addClass("scroll");
+            controls.addClass("scroll");
         } else {
             dummy.removeClass("active");
-            $(".controls").removeClass("scroll");
+            controls.removeClass("scroll");
         }
-    });
-
-    $("[name='to-top']").click(function() {
-        $("html, body").animate({
-            scrollTop: 0
-        });
-    });
+    }
 });

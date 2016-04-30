@@ -227,7 +227,7 @@
                         instance.addClass("active");
                     }
                     if (args.initFSOnClick) {
-                        $(".loading-wrapper").removeClass("active");
+                        $(".loading-wrapper.tv").removeClass("active");
                         FS.fadeIn(250);
                         sizeTreeFS();
 

@@ -96,7 +96,7 @@ require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 if ($continueConstraints) :
 ?>
-    <div class="loading-wrapper fullscreen">
+    <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
 <?php endif; ?>

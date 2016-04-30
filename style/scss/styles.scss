@@ -368,6 +368,7 @@ a {
             width: 360px;
             height: 360px;
             border-width: 18px;
+            border-color: #F7F7F7;
             background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
             background-position: bottom center;
             background-size: 74%;
@@ -386,9 +387,9 @@ a {
         flex-direction: column;
         width: 36px;
         height: 36px;
-        border: 6px solid #F7F7F7;
+        border: 6px solid #F5F5F5;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.67);
+        background: white;
         transition: transform 400ms;
         transform: scale(0);
         align-items: center;
@@ -436,6 +437,41 @@ a {
         }
     }
 }
+.table-wrapper {
+    max-width: 100%;
+    overflow: auto;
+}
+.messages {
+    text-align: center;
+    visibility: hidden;
+    pointer-events: none;
+    height: 0;
+    &.active {
+        visibility: visible;
+        height: 100%;
+        pointer-events: all;
+        margin: 24px auto;
+        > div.active {
+            transform: scale(1);
+        }
+    }
+    > div {
+        min-width: 80%;
+        display: inline-block;
+        transform: scale(0);
+        will-change: transform;
+        transition: transform 250ms;
+    }
+    .error {
+        background-color: #FBDDD4;
+        border: 1px solid #DF6B5F;
+    }
+    .notice {
+        background-color: #EEF7CF;
+        border: 1px solid #B2D241;
+    }
+}
+
 /* ============= */
 /* PAGE SPECIFIC */
 /* ============= */
@@ -579,6 +615,9 @@ a {
             }
             .count {
                 margin-right: auto;
+                > span {
+                    white-space: nowrap;
+                }
             }
             [name="to-top"] {
                 width: 34px;

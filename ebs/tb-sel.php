@@ -103,13 +103,9 @@ else: ?>
 
     <div class="cgn" style="display:none">
       <?php require "$scripts/cgn-tb.html"; ?>
-      <h3>Option</h3>
-      <label><input type="checkbox" name="ct"> Include context (one sentence before and after the matching sentence)</label>
     </div>
     <div class="lassy">
       <?php require "$scripts/lassy-tb.html"; ?>
-      <h3>Option</h3>
-      <label><input type="checkbox" name="ct"> Include context (one sentence before and after the matching sentence)</label>
     </div>
     <div class="sonar" style="display:none">
       <?php require "$scripts/sonar-tb.html"; ?>

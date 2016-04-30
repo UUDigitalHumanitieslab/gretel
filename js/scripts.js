@@ -1,9 +1,7 @@
 $(document).ready(function() {
     body = $("body");
 
-    $(window).resize(function() {
-        mobileMenu();
-    });
+    $(window).resize($.throttle(250, mobileMenu)).resize();
 
     function mobileMenu() {
         if ($(window).width() < 721) {
@@ -14,11 +12,20 @@ $(document).ready(function() {
             $(".primary-navigation button").removeClass("active").attr("hidden", "hidden");
         }
     }
-    mobileMenu();
-    
+
     $(".primary-navigation button").click(function() {
         $(".primary-navigation").toggleClass("active");
     });
+
+    $(document).click(function(e) {
+        var target = $(e.target);
+        if ($(".primary-navigation").hasClass("active")) {
+            if (!target.closest(".primary-navigation button, .primary-navigation ul").length) {
+                $(".primary-navigation").removeClass("active");
+            }
+        }
+    });
+
     /*******/
     /* EBS */
     /*******/
