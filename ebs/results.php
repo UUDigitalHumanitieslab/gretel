@@ -21,10 +21,30 @@ if ($continueConstraints) {
     $component = $_SESSION['subtreebank'];
     $component = implode(', ', $component);
     $sm = $_SESSION['search'];
-    if ($treebank != "sonar" && $sm == 'advanced') $originalXp = $_POST['original-xp'];
-    $exid = $_SESSION['sentid'];
     $example = $_SESSION['example'];
     $xpath = $_SESSION['xpath'];
+
+    // Clean up XPath
+    $xpath = rtrim($xpath);
+    $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
+    // Deal with quotes/apos
+    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
+    $xpath = strtr("$xpath", $trans);
+
+    $_SESSION['xpath'] = $xpath;
+
+    if ($sm == "advanced" && $treebank != "sonar") {
+      $originalXp = $_POST['original-xp'];
+      // Clean up $originalXp
+      $originalXp = rtrim($originalXp);
+      $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
+      $originalXp = strtr("$originalXp", $trans);
+
+      $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
+
+      $_SESSION['original-xp'] = $originalXp;
+      $_SESSION['xpChanged'] = $xpChanged;
+    }
 
     // get context option
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
@@ -148,6 +168,7 @@ if ($continueConstraints) : ?>
     <?php // Variables for JS
     $vars = array(
         'fetchResultsPath' => "$home/php/flush-results.php",
+        'getAllResultsPath' => "$home/php/get-all-results.php",
         'fetchCountsPath' => "$home/php/fetch-counts.php",
     );
     ?>

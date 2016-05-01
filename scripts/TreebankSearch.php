@@ -99,11 +99,12 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     global $resultlimit, $dbhost, $dbport, $dbuser, $dbpwd;
     $nrofmatches = 0;
 
-    $leftOvers = $_SESSION['leftOvers'];
     $dbIteration = $queryIteration[0];
     $endPosIteration = $queryIteration[1];
 
-    if (!empty($leftOvers)) {
+    if ($endPosIteration !== 'all') $leftOvers = $_SESSION['leftOvers'];
+
+    if (isset($leftOvers) && !empty($leftOvers)) {
         foreach ($leftOvers as $key => $m) {
             ++$nrofmatches;
 
@@ -121,7 +122,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
 
             unset($leftOvers[$key]);
 
-            if ($endPosIteration != 'all') {
+            if ($endPosIteration !== 'all') {
                 if ($nrofmatches >= $resultlimit) {
                     break;
                 }
@@ -140,8 +141,10 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
       for ($dbIteration; $dbIteration < $dbLength; ++$dbIteration) {
         $db = $database[$dbIteration];
         while (1) {
-          if ($endPosIteration != 'all') ++$endPosIteration;
+          if ($endPosIteration !== 'all') ++$endPosIteration;
+
           $input = CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration);
+
           // create query instance
           $query = $session->query($input);
 
@@ -150,7 +153,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
           $query->close();
 
           if (!$match) {
-            if ($endPosIteration != 'all') $endPosIteration = 0;
+            if ($endPosIteration !== 'all') $endPosIteration = 0;
             break;
           }
 
@@ -163,7 +166,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
           // make a hash of all matching sentences, count hits per sentence and append matching IDs per sentence
           $matchLength = count($matches);
           for ($i = 0; $i < $matchLength; ++$i) {
-            if ($endPosIteration != 'all') {
+            if ($endPosIteration !== 'all') {
               if ($nrofmatches >= $resultlimit) {
                 $overflow = array_slice($matches, $i);
                 $leftOvers = array_merge($leftOvers, $overflow);
@@ -187,7 +190,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
               $beginlist{$sentid} = $begins;
             }
           }
-          if ($endPosIteration = 'all') break; 
+          if ($endPosIteration === 'all') break;
         }
       }
       $session->close();
@@ -204,13 +207,16 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
 
             $uniquebeginlist{$sentid} = $begins;
         }
-        if ($leftOvers) {
+        if (isset($leftOvers) && !is_null($leftOvers)) {
             array_values(array_filter($leftOvers));
         } else {
             $leftOvers = array();
         }
-        $_SESSION['leftOvers'] = $leftOvers;
-        $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
+
+        if ($endPosIteration !== 'all') {
+          $_SESSION['leftOvers'] = $leftOvers;
+          $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
+        }
 
         return array($sentences, $idlist, $uniquebeginlist);
     } else {
@@ -252,7 +258,7 @@ function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
     }
 
     // Adds positioning values if we don't want ALL results at once
-    if ($endPosIteration != 'all') {
+    if ($endPosIteration !== 'all') {
       $endPosition = $endPosIteration * $resultlimit;
       $startPosition = $endPosition - $resultlimit + 1;
       $openPosition = '(';

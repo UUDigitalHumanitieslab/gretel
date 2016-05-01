@@ -9,22 +9,38 @@ header('Content-Type:text/html; charset=utf-8');
 /********************/
 /* SET UP VARIABLES */
 /********************/
-$queryIteration = $_SESSION['queryIteration'];
-$leftOvers = $_SESSION['leftOvers'];
-
 $treebank = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
 
 // if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
 $sm = $_SESSION['search'];
-$example = $_SESSION['example'];
 $xpath = $_SESSION['xpath'];
+if ($sm == "advanced" && $treebank != "sonar") $xpChanged = $_SESSION['xpChanged'];
 $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 
 $id = session_id();
+$date = date('d-m-Y');
+$time = time();
+
+$user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 // messages and documentation
 $showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
+
+/*************/
+/* LOG TREE */
+/************/
+// log XPath. Was XPath changed by the user or not?
+$xplog = fopen("$log/gretel-ebq.log", 'a');
+if ($sm == "advanced" && $treebank != "sonar") {
+  fwrite($xplog, "Date\tIP.address\tUnique.ID\tSearch.mode\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
+    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$component\t$xpChanged\t$xpath\t$originalXp\n");
+}
+else {
+  fwrite($xplog, "Date\tIP.address\tUnique.ID\tSearch.mode\tTreebank\tComponent\tXPath.searched\n");
+    fwrite($xplog, "$date\t$user\t$id-$time\t$sm\t$treebank\t$component\t$xpath\n");
+}
+fclose($xplog);
 
 require "$scripts/BaseXClient.php";
 // functions to find treebank data in BaseX database and print them
@@ -38,8 +54,8 @@ require "$scripts/FormatResults.php";
 if ($treebank == 'lassy' || $treebank == 'cgn') {
   try {
 
-    // get sentences
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration);
+    // get sentences, search for ALL sentences
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'));
 
     if (isset($sentences)) {
       array_filter($sentences);
@@ -92,7 +108,7 @@ elseif ($treebank == 'sonar') {
     $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
     $basexdb = $component.$bf;
 
-    $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $resultlimit $queryIteration`;
+    $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $resultlimit array(0, 'all')`;
 
     $results = json_decode($encodedResults, true);
 
