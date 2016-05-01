@@ -44,7 +44,7 @@ try {
   if ($print == "txt") {
     header("Content-type:text/plain; charset=utf-8");
 
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, "all");
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0,"all"));
 
     echo "$xpath\n";
     printMatchesTxt($sentences);

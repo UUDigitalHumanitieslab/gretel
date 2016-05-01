@@ -1,4 +1,5 @@
 <?php
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 function GetCounts($xpath, $treebank, $subtreebank)
@@ -18,14 +19,16 @@ function GetCounts($xpath, $treebank, $subtreebank)
         $query->close();
     }
     $session->close();
+
     return $sum;
 }
-function CreateXQueryCount($xpath, $db) {
-        $for = 'count(for $node in db:open("'.$db.'")/treebank';
-        $return = 'return $node)';
-        $xquery = $for.$xpath.$return;
+function CreateXQueryCount($xpath, $db)
+{
+    $for = 'count(for $node in db:open("'.$db.'")/treebank';
+    $return = 'return $node)';
+    $xquery = $for.$xpath.$return;
 
-        return $xquery;
+    return $xquery;
 }
 function Corpus2DB($tblist, $treebank)
 {
@@ -42,6 +45,7 @@ function Corpus2DB($tblist, $treebank)
 
         return $databases;
     }
+
     return false;
 }
 
@@ -90,38 +94,39 @@ function SetTotalSent($corpus)
     return $TOTAL;
 }
 
-
-
-function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration, $leftOvers)
+function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration)
 {
     global $resultlimit, $dbhost, $dbport, $dbuser, $dbpwd;
     $nrofmatches = 0;
 
+    $leftOvers = $_SESSION['leftOvers'];
+    $dbIteration = $queryIteration[0];
+    $endPosIteration = $queryIteration[1];
+
     if (!empty($leftOvers)) {
-      foreach($leftOvers as $key => $m) {
-        $nrofmatches++;
+        foreach ($leftOvers as $key => $m) {
+            ++$nrofmatches;
 
-        $m = str_replace('<match>', '', $m);
-        $m = trim($m);
-        list($sentid, $sentence, $ids, $begins) = explode('||', $m);
+            $m = str_replace('<match>', '', $m);
+            $m = trim($m);
+            list($sentid, $sentence, $ids, $begins) = explode('||', $m);
+            // Add unique identifier to avoid overlapping sentences w/ same ID
+            $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+leftover='.$nrofmatches;
 
-        // Add unique identifier to avoid overlapping sentences w/ same ID
-        $sentid .= '-iter='.$queryIteration.'+leftover='.$nrofmatches;
+            $sentid = trim($sentid);
 
-        $sentid = trim($sentid);
+            $sentences{$sentid} = $sentence;
+            $idlist{$sentid} = $ids;
+            $beginlist{$sentid} = $begins;
 
-        $sentences{$sentid} = $sentence;
-        $idlist{$sentid} = $ids;
-        $beginlist{$sentid} = $begins;
+            unset($leftOvers[$key]);
 
-        unset($leftOvers[$key]);
-
-        if ($queryIteration != "all") {
-            if ($nrofmatches >= $resultlimit) {
-              break;
+            if ($endPosIteration != 'all') {
+                if ($nrofmatches >= $resultlimit) {
+                    break;
+                }
             }
         }
-      }
     }
 
     if ($nrofmatches < $resultlimit) {
@@ -129,53 +134,60 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
       $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
       // rename corpora to database names
       $database = Corpus2DB($subtreebank, $treebank);
-      $_SESSION['queryIteration'] = ++$queryIteration;
-      foreach ($database as $db) {
-        // create XQuery
-        $input = CreateXQuery($xpath, $db, $treebank, $context, $queryIteration);
 
-        // create query instance
-        $query = $session->query($input);
+      $dbLength = count($database);
 
-        // get results
-        $match = $query->execute();
-        $query->close();
+      for ($dbIteration; $dbIteration < $dbLength; ++$dbIteration) {
+        $db = $database[$dbIteration];
+        while (1) {
+          if ($endPosIteration != 'all') ++$endPosIteration;
+          $input = CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration);
+          // create query instance
+          $query = $session->query($input);
 
-        if (!$match) continue;
+          // get results
+          $match = $query->execute();
+          $query->close();
 
-        // put matches into array
-        $matches = explode('</match>', $match);
+          if (!$match) {
+            if ($endPosIteration != 'all') $endPosIteration = 0;
+            break;
+          }
 
-        // remove empty elements from array
-        $matches = array_filter($matches);
+          // put matches into array
+          $matches = explode('</match>', $match);
 
-        // make a hash of all matching sentences, count hits per sentence and append matching IDs per sentence
-        $len = count($matches);
-        for($i = 0; $i < $len; $i++) {
-            if ($queryIteration != "all") {
+          // remove empty elements from array
+          $matches = array_filter($matches);
+
+          // make a hash of all matching sentences, count hits per sentence and append matching IDs per sentence
+          $matchLength = count($matches);
+          for ($i = 0; $i < $matchLength; ++$i) {
+            if ($endPosIteration != 'all') {
               if ($nrofmatches >= $resultlimit) {
-                $overflow = array_slice($matches, $i+1);
+                $overflow = array_slice($matches, $i);
                 $leftOvers = array_merge($leftOvers, $overflow);
-                break;
+                break 3;
               }
             }
-          $m = $matches[$i];
-          $m = str_replace('<match>', '', $m);
-          $m = trim($m);
-          list($sentid, $sentence, $ids, $begins) = explode('||', $m);
+            $m = $matches[$i];
+            $m = str_replace('<match>', '', $m);
+            $m = trim($m);
+            list($sentid, $sentence, $ids, $begins) = explode('||', $m);
 
-          if (isset($sentid, $sentence, $ids, $begins)) {
-              $nrofmatches++;
+            if (isset($sentid, $sentence, $ids, $begins)) {
+              ++$nrofmatches;
 
               // Add unique identifier to avoid overlapping sentences w/ same ID
-              $sentid .= '-iter='.$queryIteration.'+match='.$nrofmatches;
+              $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+match='.$nrofmatches;
 
               $sentid = trim($sentid);
-
               $sentences{$sentid} = $sentence;
               $idlist{$sentid} = $ids;
               $beginlist{$sentid} = $begins;
+            }
           }
+          if ($endPosIteration = 'all') break; 
         }
       }
       $session->close();
@@ -198,6 +210,8 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
             $leftOvers = array();
         }
         $_SESSION['leftOvers'] = $leftOvers;
+        $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
+
         return array($sentences, $idlist, $uniquebeginlist);
     } else {
         // in case there are no results to be found
@@ -205,16 +219,10 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     }
 }
 
-function CreateXQuery($xpath, $db, $tb, $context, $queryIteration)
+function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
 {
     global $resultlimit;
 
-    if ($queryIteration != "all") {
-        $endPosition = $queryIteration * $resultlimit ;
-        $startPosition = $endPosition - $resultlimit + 1;
-        $openPosition = '(';
-        $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
-    }
   // create XQuery instance
     $for = 'for $node in db:open("'.$db.'")/treebank';
     $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
@@ -244,8 +252,13 @@ function CreateXQuery($xpath, $db, $tb, $context, $queryIteration)
     }
 
     // Adds positioning values if we don't want ALL results at once
-    if ($queryIteration != "all") {
-        $xquery = $openPosition.$xquery.$closePosition;
+    if ($endPosIteration != 'all') {
+      $endPosition = $endPosIteration * $resultlimit;
+      $startPosition = $endPosition - $resultlimit + 1;
+      $openPosition = '(';
+      $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
+
+      $xquery = $openPosition.$xquery.$closePosition;
     }
 
     return $xquery;

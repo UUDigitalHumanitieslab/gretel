@@ -29,7 +29,7 @@ if ($continueConstraints) {
     // get context option
     $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 
-    $_SESSION['queryIteration'] = 0;
+    $_SESSION['queryIteration'] = array(0, 0);
     $_SESSION['leftOvers'] = array();
 
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");

@@ -55,7 +55,8 @@ function printMatchesTxt($sentences)
 {
     // NOTE: sentence IDs are the keys of all hashes
     foreach ($sentences as $id => $sentence) {
-        echo "$id\t$sentence\n";
+      $sidString = strstr($id, '-dbIter=', true) ?: $id;
+      echo "$sidString\t$sentence\n";
     }
 }
 
@@ -92,6 +93,8 @@ function HighlightSentence($sentence, $beginlist)
     $begins=explode('-',$beginlist);
 
     $i = 0;
+    // Instead of wrapping each individual word in a strong tag, merge sequences
+    // of words in one <strong>...</strong>
     foreach ($words as $word) {
         if (in_array($i, $begins)) {
             $val = '';

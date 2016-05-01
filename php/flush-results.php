@@ -26,6 +26,8 @@ $id = session_id();
 $date = date('d-m-Y');
 $time = time();
 
+$queryIteration = $_SESSION['queryIteration'];
+
 // Clean up XPath
 $xpath = rtrim($xpath);
 $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
@@ -72,7 +74,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
   try {
 
     // get sentences
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $leftOvers);
+    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration);
 
     if (isset($sentences)) {
       array_filter($sentences);
@@ -85,7 +87,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
           $hlsentence = strtr($hlsentence, $trans);
 
           // remove the added identifier (see GetSentences) to use in the link
-          $sidString = strstr($sid, '-iter=', true) ?: $sid;
+          $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
           $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&opt=tv-xml" target="_blank" >'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
