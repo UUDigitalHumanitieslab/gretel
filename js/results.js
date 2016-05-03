@@ -50,8 +50,10 @@ $(document).ready(function() {
                     }
                 })
                 .fail(function(jqXHR, textStatus, error) {
+                  if (error != 'abort') {
                     var string = "An error occurred: " + error + ".";
                     messageOnError(string);
+                  }
                 })
                 .always(function() {
                     if ((resultID == xResultsBeforeMore) && !done) {
@@ -86,8 +88,10 @@ $(document).ready(function() {
             }
         })
         .fail(function(jqXHR, textStatus, error) {
+          if (error != 'abort') {
             var string = "An error occurred: " + error + ".";
             messageOnError(string);
+          }
         })
         .always(function() {
             done = true;

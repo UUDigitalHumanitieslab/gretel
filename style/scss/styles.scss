@@ -723,6 +723,9 @@ dd {
             [name="to-top"] {
                 width: 34px;
             }
+            [type="number"] {
+              width: 60px;
+            }
         }
     }
 }
@@ -808,6 +811,7 @@ dd {
         bottom: 0;
         right: 0;
         height: 80px;
+        width: 67px;
         border-radius: 50%;
         svg {
             overflow: visible !important;
