@@ -53,7 +53,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
 
           // remove the added identifier (see GetSentences) to use in the link
           $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&opt=tv-xml" target="_blank" >'.$sidString.'</a>';
+          $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&opt=tv-xml" target="_blank">'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
       }

@@ -92,6 +92,68 @@ a {
         color: darken($gretelgreen, 12%);
     }
 }
+dl {
+    counter-reset: dt;
+}
+dt {
+    font-weight: bold;
+    margin-bottom: 1em;
+    &:before {
+        counter-increment: dt;
+        content: counter(dt) ". ";
+    }
+}
+dd {
+    border-left: 3px solid #BFA58A;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    position: relative;
+    font-size: 14px;
+    margin-left: 1em;
+    text-align: justify;
+    margin-bottom: 1.67em;
+    &:after {
+        content: "";
+        height: 3px;
+        background: #BFA58A;
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        width: 1em;
+    }
+}
+.filter-wrapper {
+    display: none;
+    position: absolute;
+    bottom: -1em;
+    transform: translateY(100%) translateX(-50%);
+    background: white;
+    padding: 0.8em;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
+    margin-right: 0 !important;
+    margin-left: -32px;
+    flex-wrap: wrap;
+    max-width: 225px;
+    justify-content: space-between;
+    &:before {
+        content: "";
+        position: absolute;
+        top: -11px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border: 12px solid;
+        border-color: transparent transparent white white;
+        box-shadow: -4px 4px 6px -2px rgba(0,0,0,0.08);
+        transform: rotate(135deg);
+        transform-origin: center center;
+        margin-left: -11px;
+    }
+    label {
+        display: block;
+        margin: 2px;
+    }
+}
 .page-header {
     display: flex;
     margin: 0 auto 0.34em;
@@ -427,6 +489,12 @@ a {
             }
         }
     }
+    &.searching {
+        display: none;
+        &.active {
+            display: flex;
+        }
+    }
 }
 #tree-output {
     .loading-wrapper {
@@ -461,6 +529,11 @@ a {
         transform: scale(0);
         will-change: transform;
         transition: transform 250ms;
+        padding: 0.8em;
+        p {
+            margin: 0;
+            padding: 0;
+        }
     }
     .error {
         background-color: #FBDDD4;
@@ -534,30 +607,57 @@ a {
             table {
                 width: 100%;
                 table-layout: fixed;
-                td:first-child,
-                th:first-child {
-                    width: 30%;
-                }
-                td:last-child,
-                th:last-child {
-                    width: 70%;
+
+                td, th {
+                    &:first-child {
+                        width: 60px;
+                    }
+                    &:nth-child(2) {
+                        width: 200px;
+                    }
+                    &:nth-child(3) {
+                        width: 110px;
+                    }
+                    &:last-child {
+                        min-width: 300px;
+                        width: calc(100% - 370px);
+                    }
                 }
             }
             tr {
                 transition: background-color 1000ms;
                 will-change: background-color;
+                &:nth-child(even) {background-color: #F7F7F7;}
                 &.added {
                     background-color: #F2F9DD;
                 }
+                &.empty {
+                    font-size: 16px;
+                    text-align: center;
+                    font-weight: bold;
+                    background-color: #F7F7F7;
+                    td {
+                        padding: 0.5em;
+                    }
+                }
+            }
+        }
+        [for="filter-components"] {
+            i {
+                transform-origin: center center;
+                transition: transform 150ms;
+            }
+            &.active {
+                i {
+                    transform: rotate(180deg);
+                }
+                + .filter-wrapper {display: flex;}
             }
         }
         .dummy-controls {
             position: relative;
             margin: auto auto 1.67em;
             display: none;
-            &.active {
-                display: block;
-            }
             &:after,
             &:before {
                 position: absolute;
@@ -596,6 +696,7 @@ a {
         }
         .controls {
             display: flex;
+            position: relative;
             margin: auto auto 1.67em;
             padding: 0.67em 26px;
             max-width: 1024px;
@@ -694,7 +795,7 @@ a {
             color: white;
         }
         span {
-            margin-left: 96px;
+            margin-right: 96px;
         }
     }
     [class^="logo-link"] {
@@ -705,6 +806,7 @@ a {
     .logo-link-gretel {
         position: absolute;
         bottom: 0;
+        right: 0;
         height: 80px;
         border-radius: 50%;
         svg {

@@ -18,11 +18,16 @@ if ($continueConstraints) {
     $sortTables = true;
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
-    $component = $_SESSION['subtreebank'];
-    $component = implode(', ', $component);
+    $componentArray = $_SESSION['subtreebank'];
+    $component = implode(', ', $componentArray);
     $sm = $_SESSION['search'];
     $example = $_SESSION['example'];
-    $xpath = $_SESSION['xpath'];
+
+    if (isset($_POST['xp'])) {
+        $xpath = $_POST['xp'];
+    } else {
+        $xpath = $_SESSION['xpath'];
+    }
 
     // Clean up XPath
     $xpath = rtrim($xpath);
@@ -34,7 +39,7 @@ if ($continueConstraints) {
     $_SESSION['xpath'] = $xpath;
 
     if ($sm == "advanced" && $treebank != "sonar") {
-      $originalXp = $_POST['original-xp'];
+      $originalXp = $_POST['originalXp'];
       // Clean up $originalXp
       $originalXp = rtrim($originalXp);
       $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
@@ -42,7 +47,7 @@ if ($continueConstraints) {
 
       $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
 
-      $_SESSION['original-xp'] = $originalXp;
+      $_SESSION['originalXp'] = $originalXp;
       $_SESSION['xpChanged'] = $xpChanged;
     }
 
@@ -128,19 +133,29 @@ if ($continueConstraints):
     </div>
     <nav class="controls">
         <p class="count"># of results: <span><strong>0</strong> / <span>--</span><span></p>
-        <div class="loading-wrapper searching">
+        <label for="go-to" class="disabled">Go to # <input type="number" id="go-to" name="go-to" min="1" max="500" value="1" disabled></label>
+        <label for="filter-components" class="disabled"><input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter <i class="fa fa-angle-down" aria-hidden="true"></i></label>
+        <div class="filter-wrapper">
+            <?php foreach ($componentArray as $comp) {
+                echo '<label class="disabled"><input type="checkbox" name="'.strtoupper($comp).'" checked disabled> '.strtoupper($comp).'</label>';
+            } ?>
+        </div>
+        <div class="loading-wrapper searching active">
             <div class="loading"></div>
         </div>
         <button class="stop">Stop searching</button>
         <button class="continue" disabled>Continue searching</button>
-        <label><input type="checkbox" name="continue-bg"> Search on background</label>
         <button name="to-top"><i class="fa fa-arrow-up"></i></button>
     </nav>
     <div class="results-wrapper table-wrapper" style="display: none">
       <table>
         <thead>
-          <tr><th>ID</th>
-          <th>Sentence</th></tr>
+          <tr>
+              <th>#</th>
+              <th>ID</th>
+              <th>Component</th>
+              <th>Sentence</th>
+          </tr>
         </thead>
         <tbody>
         </tbody>
@@ -166,14 +181,16 @@ if ($continueConstraints) : ?>
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
     <?php // Variables for JS
-    $vars = array(
+    $jsVars = array(
         'fetchResultsPath' => "$home/php/flush-results.php",
         'getAllResultsPath' => "$home/php/get-all-results.php",
         'fetchCountsPath' => "$home/php/fetch-counts.php",
+        'resultsLimit' => $resultsLimit,
+        'fetchHomePath' => $home,
     );
     ?>
     <script>
-    var phpVars = <?php echo json_encode($vars); ?>;
+        var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
     <script src='<?php echo "$home/js/results.js"; ?>'></script>
 <?php endif; ?>

@@ -41,6 +41,22 @@ require "$root/php/head.php";
                     </ul>
                 </article>
             </div>
+            <section id="faq">
+                <h2>Frequently Asked Questions</h2>
+                <dl>
+                    <dt id="faq-1">Why is the output limited to 500 sentences?</dt>
+                    <dd>The reason is two-fold. For one, it might take very long for a query with
+                    more than 500 results to finish. More importantly, though, the corpora provided by us are
+                    <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus
+                    as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
+                    literally download the whole corpus - which is not the intention of this project.</dd>
+
+                    <dt id="faq-1">For whom is GrETEL intended?</dt>
+                    <dd>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
+                    interested in searching through Lassy, CGN, or Sonar. However, the tool is especially dedicated to
+                    those looking for <em>specific linguistic patterns</em> in these corpora.</dd>
+                </dl>
+            </section>
         </main>
     </div>
 

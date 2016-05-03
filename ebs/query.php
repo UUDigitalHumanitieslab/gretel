@@ -95,7 +95,7 @@ require "$root/php/head.php";
     }
     else {
         $readonly = '';
-        echo '<input type="hidden" name="original-xp" value="'.$xpath.'">';
+        echo '<input type="hidden" name="originalXp" value="'.$xpath.'">';
     }
     ?>
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>

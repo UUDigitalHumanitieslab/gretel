@@ -96,7 +96,7 @@ function SetTotalSent($corpus)
 
 function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration)
 {
-    global $resultlimit, $dbhost, $dbport, $dbuser, $dbpwd;
+    global $flushLimit, $resultsLimit, $dbhost, $dbport, $dbuser, $dbpwd;
     $nrofmatches = 0;
 
     $dbIteration = $queryIteration[0];
@@ -123,14 +123,14 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
             unset($leftOvers[$key]);
 
             if ($endPosIteration !== 'all') {
-                if ($nrofmatches >= $resultlimit) {
+                if ($nrofmatches >= $flushLimit) {
                     break;
                 }
             }
         }
     }
 
-    if ($nrofmatches < $resultlimit) {
+    if ($nrofmatches < $flushLimit) {
       // create session
       $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
       // rename corpora to database names
@@ -166,12 +166,17 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
           // make a hash of all matching sentences, count hits per sentence and append matching IDs per sentence
           $matchLength = count($matches);
           for ($i = 0; $i < $matchLength; ++$i) {
-            if ($endPosIteration !== 'all') {
-              if ($nrofmatches >= $resultlimit) {
-                $overflow = array_slice($matches, $i);
-                $leftOvers = array_merge($leftOvers, $overflow);
-                break 3;
-              }
+            if ($endPosIteration === 'all') {
+                if ($nrofmatches >= $resultsLimit) {
+                    break 3;
+                }
+            }
+            else {
+                if ($nrofmatches >= $flushLimit) {
+                    $overflow = array_slice($matches, $i);
+                    $leftOvers = array_merge($leftOvers, $overflow);
+                    break 3;
+                }
             }
             $m = $matches[$i];
             $m = str_replace('<match>', '', $m);
@@ -227,7 +232,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
 
 function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
 {
-    global $resultlimit;
+    global $flushLimit, $resultsLimit;
 
   // create XQuery instance
     $for = 'for $node in db:open("'.$db.'")/treebank';
@@ -257,15 +262,20 @@ function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$return;
     }
 
-    // Adds positioning values if we don't want ALL results at once
-    if ($endPosIteration !== 'all') {
-      $endPosition = $endPosIteration * $resultlimit;
-      $startPosition = $endPosition - $resultlimit + 1;
-      $openPosition = '(';
-      $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
-
-      $xquery = $openPosition.$xquery.$closePosition;
+    // Adds positioning values:; limits possible output
+    $openPosition = '(';
+    // Never fetch more than the resultsLimit, not even with all
+    if ($endPosIteration === 'all') {
+        $closePosition = ')[position() = 1 to '.$resultsLimit.']';
     }
+    // Only fetch the given flushLimit, and increment on each iteration
+    else {
+        $endPosition = $endPosIteration * $flushLimit;
+        $startPosition = $endPosition - $flushLimit + 1;
+        $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
+    }
+
+    $xquery = $openPosition.$xquery.$closePosition;
 
     return $xquery;
 }
