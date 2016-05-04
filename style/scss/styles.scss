@@ -131,9 +131,9 @@ dd {
     padding: 0.8em;
     box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
     margin-right: 0 !important;
-    margin-left: -32px;
+    margin-left: -56px !important;
     flex-wrap: wrap;
-    max-width: 225px;
+    max-width: 220px;
     justify-content: space-between;
     &:before {
         content: "";
@@ -152,6 +152,47 @@ dd {
     label {
         display: block;
         margin: 2px;
+    }
+    @keyframes check-comps-fadeout {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+    [for='all-components'] {
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        text-align: center;
+        line-height: 36px;
+        position: absolute;
+        left: -4px;
+        top: -4px;
+        transform: translate(-50%, -50%);
+        background: #c0c0c0;
+        border: 1px solid #c0c0c0;
+        color: #969696;
+        margin: 0;
+        i {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 24px;
+            transform: translate(-50%, -50%);
+            color: #9FB72F;
+        }
+        &.active {
+            background: #EEF7CF;
+            border-color: #9FB72F;
+            color: #9FB72F;
+            i {
+                animation: check-comps-fadeout 2.25s forwards;
+            }
+        }
     }
 }
 .page-header {
@@ -544,7 +585,6 @@ dd {
         border: 1px solid #B2D241;
     }
 }
-
 /* ============= */
 /* PAGE SPECIFIC */
 /* ============= */
@@ -558,6 +598,27 @@ dd {
             padding: 0.67em;
             min-width: 240px;
             flex: 1;
+        }
+    }
+    @keyframes docs-target-arrow {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(150%);
+        }
+    }
+    dt:target {
+        &:after {
+            content: "\f104";
+            display: inline-block;
+            font: normal normal normal 14px/1 FontAwesome;
+            font-size: inherit;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            animation: docs-target-arrow 600ms alternate infinite;
+            margin-left: 5px;
         }
     }
 }
@@ -607,31 +668,29 @@ dd {
             table {
                 width: 100%;
                 table-layout: fixed;
-
-                td, th {
-                    &:first-child {
-                        width: 60px;
-                    }
-                    &:nth-child(2) {
-                        width: 200px;
-                    }
-                    &:nth-child(3) {
-                        width: 110px;
-                    }
-                    &:last-child {
-                        min-width: 300px;
-                        width: calc(100% - 370px);
+                tbody:not(.empty),
+                thead {
+                    td,
+                    th {
+                        &:first-child {
+                            width: 60px;
+                        }
+                        &:nth-child(2) {
+                            width: 200px;
+                        }
+                        &:nth-child(3) {
+                            width: 110px;
+                        }
+                        &:last-child {
+                            min-width: 300px;
+                            width: calc(100% - 370px);
+                        }
                     }
                 }
             }
-            tr {
-                transition: background-color 1000ms;
-                will-change: background-color;
-                &:nth-child(even) {background-color: #F7F7F7;}
-                &.added {
-                    background-color: #F2F9DD;
-                }
-                &.empty {
+            .empty {
+                display: none;
+                tr {
                     font-size: 16px;
                     text-align: center;
                     font-weight: bold;
@@ -639,6 +698,16 @@ dd {
                     td {
                         padding: 0.5em;
                     }
+                }
+            }
+            tr {
+                transition: background-color 1000ms;
+                will-change: background-color;
+                &:nth-child(even) {
+                    background-color: #F7F7F7;
+                }
+                &.added {
+                    background-color: #F2F9DD;
                 }
             }
         }
@@ -651,7 +720,9 @@ dd {
                 i {
                     transform: rotate(180deg);
                 }
-                + .filter-wrapper {display: flex;}
+                + .filter-wrapper {
+                    display: flex;
+                }
             }
         }
         .dummy-controls {
@@ -724,7 +795,7 @@ dd {
                 width: 34px;
             }
             [type="number"] {
-              width: 60px;
+                width: 60px;
             }
         }
     }

@@ -38,17 +38,17 @@ if ($continueConstraints) {
 
     $_SESSION['xpath'] = $xpath;
 
-    if ($sm == "advanced" && $treebank != "sonar") {
-      $originalXp = $_POST['originalXp'];
+    if ($sm == 'advanced' && $treebank != 'sonar') {
+        $originalXp = $_POST['originalXp'];
       // Clean up $originalXp
       $originalXp = rtrim($originalXp);
-      $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
-      $originalXp = strtr("$originalXp", $trans);
+        $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
+        $originalXp = strtr("$originalXp", $trans);
 
-      $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
+        $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
 
-      $_SESSION['originalXp'] = $originalXp;
-      $_SESSION['xpChanged'] = $xpChanged;
+        $_SESSION['originalXp'] = $originalXp;
+        $_SESSION['xpChanged'] = $xpChanged;
     }
 
     // get context option
@@ -74,26 +74,9 @@ require "$root/php/header.php";
 
 if ($continueConstraints):
   ?>
+  <section>
   <div><a href="<?php echo $export.'print=txt'; ?>" title="Printer-friendly version of all results"
     download="gretel-results.txt">Download results</a></div>
-
-  <h3>Query</h3>
-  <p>You can <a href="<?php echo $exportxp; ?>" title="Save XPath query" download="gretel-xpath.txt">save the XPath query</a>
-    to use it as input for the XPath search mode.
-    This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
-    from scratch.</p>
-  <div class="table-wrapper">
-    <table>
-      <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
-      <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
-      <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
-      <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-      <?php elseif ($treebank == 'sonar'): ?>
-      <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-      <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
   <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
     <h3>Results</h3>
     <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
@@ -134,10 +117,11 @@ if ($continueConstraints):
     <nav class="controls">
         <p class="count"># of results: <span><strong>0</strong> / <span>--</span><span></p>
         <label for="go-to" class="disabled">Go to # <input type="number" id="go-to" name="go-to" min="1" max="500" value="1" disabled></label>
-        <label for="filter-components" class="disabled"><input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter <i class="fa fa-angle-down" aria-hidden="true"></i></label>
+        <label for="filter-components" class="disabled"><input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter components <i class="fa fa-angle-down" aria-hidden="true"></i></label>
         <div class="filter-wrapper">
+            <label class="disabled active" for="all-components"><i class="fa fa-check" aria-hidden="true"></i><input type="checkbox" id="all-components" name="all-components" checked disabled hidden>All</label>
             <?php foreach ($componentArray as $comp) {
-                echo '<label class="disabled"><input type="checkbox" name="'.strtoupper($comp).'" checked disabled> '.strtoupper($comp).'</label>';
+                echo '<label class="disabled"><input type="checkbox" name="component" value="'.strtoupper($comp).'" checked disabled> '.strtoupper($comp).'</label>';
             } ?>
         </div>
         <div class="loading-wrapper searching active">
@@ -159,9 +143,31 @@ if ($continueConstraints):
         </thead>
         <tbody>
         </tbody>
+        <tbody class="empty">
+            <tr><td colspan="4">No results for the filters you specified.</td></tr>
+        </tbody>
       </table>
     </div>
-
+</section>
+<section>
+    <h3>Query</h3>
+    <p>You can <a href="<?php echo $exportxp; ?>" title="Save XPath query" download="gretel-xpath.txt">save the XPath query</a>
+        to use it as input for the XPath search mode.
+        This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
+        from scratch.</p>
+      <div class="table-wrapper">
+        <table>
+          <tbody><tr><th>Input example</th><td><?php echo $example; ?></td></tr>
+          <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
+          <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
+          <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
+          <?php elseif ($treebank == 'sonar'): ?>
+          <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
+          <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+  </section>
 <?php
     setContinueNavigation();
 else: // $continueConstraints

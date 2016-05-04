@@ -27,16 +27,16 @@ $(document).ready(function() {
                 .done(function(json) {
                     if (!done) {
                         var data = $.parseJSON(json);
-                        $(".results-wrapper tbody .added").removeClass("added");
+                        $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
                         if (data.data) {
                             loopResults(data.data, false);
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
-                            $(".results-wrapper tbody .added").removeClass("added");
+                            $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
                             $(".messages").addClass("active");
                             if (data.error) {
                                 messageOnError(data.error_msg)
-                            } else if ($(".results-wrapper tbody").children().length == 0) {
+                            } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                                 messageNoResultsFound();
                             } else {
                                 messageAllResultsFound();
@@ -70,7 +70,7 @@ $(document).ready(function() {
       xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
         .done(function(json) {
             var data = $.parseJSON(json);
-            $(".results-wrapper tbody .added").removeClass("added");
+            $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
             if (data.data) {
                 loopResults(data.data, true);
                 messageAllResultsFound();
@@ -82,7 +82,7 @@ $(document).ready(function() {
                 $(".messages").addClass("active");
                 if (data.error) {
                     messageOnError(data.error_msg);
-                } else if ($(".results-wrapper tbody").children().length == 0) {
+                } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                     messageNoResultsFound();
                 }
             }
@@ -102,18 +102,30 @@ $(document).ready(function() {
     setTimeout(function() {
         $.get(phpVars.fetchCountsPath, function(count) {
             if (count) {
-                $(".notice span small").remove();
+                count = parseInt(count);
+                $(".notice small").remove();
                 resultsCount = numericSeparator(count);
                 $(".count strong + span").text(resultsCount);
-                $(".notice span").text(resultsCount);
+                $(".notice strong").text(resultsCount);
 
                 doneCounting = true;
             }
         });
     }, timeoutBeforeCount);
 
+    /**
+     * Converts an integer with four or more digits to a comma-separated string
+     * @param {number} integer - Any (positive) integer
+     * @example
+     * // returns 1,234,567
+     * numericSeparator(1234567);
+     * @returns {string} Returns thhe string representation of the number.
+     */
     function numericSeparator(integer) {
-        return integer.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+        if (Number.isInteger(integer) && integer > 999) {
+            return integer.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+        }
+        return integer;
     }
 
     function messageAllResultsFound() {
@@ -121,7 +133,7 @@ $(document).ready(function() {
         $(".controls").find(".stop, .continue").prop("disabled", true);
         disableAndEnableInputs();
         var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small>(still counting)</small>'];
-        notice = '<span>' + stringCount[0] + '</span> result(s) have/has been found! ' + stringCount[1];
+        notice = '<strong>' + stringCount[0] + '</strong> result(s) have/has been found! ' + stringCount[1];
         if (resultID >= phpVars.resultsLimit) {
             notice += '<br>We have restricted the output to 500 hits. ' +
             'You can find the reason for this <a href="'+ phpVars.fetchHomePath +'/documentation.php#faq-1" ' +
@@ -166,7 +178,7 @@ $(document).ready(function() {
             done = true;
             resultID = 0;
 
-            $(".results-wrapper tbody").empty();
+            $(".results-wrapper tbody:not(.empty)").empty();
             $(".loading-wrapper.searching").removeClass("active");
         }
         $.each(sentences, function(id, value) {
@@ -196,7 +208,7 @@ $(document).ready(function() {
                 component = component.toUpperCase();
                 componentString  = componentString.toUpperCase();
 
-                $(".results-wrapper tbody").append('<tr data-result-id="'+resultID+'" data-component="'+componentString+'">' +
+                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="'+resultID+'" data-component="'+componentString+'">' +
                 '<td>'+resultID+'</td><td>'+link+'</td><td>' +
                 component + '</td><td>' + value[1] + '</td></tr>');
             }
@@ -238,7 +250,7 @@ $(document).ready(function() {
 
     $(".controls [name='go-to']").change(function() {
         var val = $(this).val(),
-            offset = $("tr[data-result-id='"+val+"']").offset(),
+            offset = $(".results-wrapper tbody:not(.empty) tr[data-result-id='"+val+"']").offset(),
             hControls = $(".controls").outerHeight();
 
             $("html, body").stop().animate({
@@ -261,16 +273,26 @@ $(document).ready(function() {
 
     $(".filter-wrapper [type='checkbox']").change(function() {
         var $this = $(this),
-            component = $(this).attr("name");
+            component = $this.val();
 
-        $(".results-wrapper tbody tr.empty").remove();
-        if ($this.is(":checked")) {
-            $(".results-wrapper tbody tr[data-component='"+component+"']").show();
-        } else {
-            $(".results-wrapper tbody tr[data-component='"+component+"']").hide();
-        }
-        if(!$this.siblings().addBack().is(":checked")) {
-            $(".results-wrapper tbody").append('<tr class="empty"><td colspan="4">No results for the filters you specified.</td></tr>');
+        if ($this.is("[name='component']")) {
+            if ($this.is(":checked")) {
+                $(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").show();
+            } else {
+                $(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").hide();
+            }
+            if(!$this.siblings("[name='component']").addBack().is(":checked")) {
+                $(".results-wrapper .empty").css("display", "table-row-group");
+                $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
+            }
+            else {
+                $(".results-wrapper .empty").hide();
+                $("[for='go-to']").removeClass("disabled").children("input").prop("disabled", false)
+                    .val($(".results-wrapper tbody:not(.empty) tr:first-child").attr("data-result-id"));
+            }
+        } else if ($this.is("#all-components")) {
+            $this.parent().toggleClass("active");
+            $(".filter-wrapper [type='checkbox'][name='component']:not([disabled])").prop("checked", $this.is(":checked")).change();
         }
     });
 
@@ -279,18 +301,16 @@ $(document).ready(function() {
         $("#go-to").attr("max", resultID);
 
         // Disable the checkboxes which don't have any results
-        $(".filter-wrapper [type='checkbox']").each(function() {
-            var component = $(this).attr("name"),
-                $this = $(this);
+        $(".filter-wrapper [type='checkbox'][name='component']").each(function() {
+            var $this = $(this),
+                component = $this.val();
 
-            if ($(".results-wrapper tbody tr[data-component='"+component+"']").length == 0) {
+            if ($(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").length == 0) {
                 $this.prop("disabled", true);
                 $this.prop("checked", false);
                 $this.parent("label").addClass("disabled");
             }
         });
-
-        console.log("called");
     }
 
     var controls = $(".controls"),
@@ -327,7 +347,7 @@ $(document).ready(function() {
     }
 
     /* Tree visualizer */
-    $(".results-wrapper tbody").on("click", "a.tv-show-fs", function(e) {
+    $(".results-wrapper tbody:not(.empty)").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
         $(".loading-wrapper.tv").addClass("active");
         window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));

@@ -47,7 +47,7 @@ try {
     list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0,"all"));
 
     echo "$xpath\n";
-    printMatchesTxt($sentences);
+    printMatchesTxt($sentences, $beginlist);
   }
 
   elseif ($print == "csv") {

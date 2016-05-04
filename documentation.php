@@ -51,7 +51,7 @@ require "$root/php/head.php";
                     as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
                     literally download the whole corpus - which is not the intention of this project.</dd>
 
-                    <dt id="faq-1">For whom is GrETEL intended?</dt>
+                    <dt id="faq-2">For whom is GrETEL intended?</dt>
                     <dd>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
                     interested in searching through Lassy, CGN, or Sonar. However, the tool is especially dedicated to
                     those looking for <em>specific linguistic patterns</em> in these corpora.</dd>

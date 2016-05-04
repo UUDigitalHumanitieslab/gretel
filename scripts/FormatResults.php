@@ -51,12 +51,13 @@ function printCountsPF($treebank, $HITS, $MS, $TOTALS, $TOTALCOUNTS)
     echo "</table>";
 }
 
-function printMatchesTxt($sentences)
+function printMatchesTxt($sentences, $beginlist)
 {
-    // NOTE: sentence IDs are the keys of all hashes
-    foreach ($sentences as $id => $sentence) {
-      $sidString = strstr($id, '-dbIter=', true) ?: $id;
-      echo "$sidString\t$sentence\n";
+    foreach ($sentences as $sid => $sentence) {
+        // Wrap each hit in a sentence in <hit> tags
+        $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'hit');
+        $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
+        echo "$sidString\t$hlsentence\n";
     }
 }
 
@@ -79,7 +80,7 @@ function printMatchesPF($sentences, $counthits, $idlist, $beginlist)
     echo "</tbody></table>";
 }
 
-function HighlightSentence($sentence, $beginlist)
+function HighlightSentence($sentence, $beginlist, $tag)
 {
 
     if (preg_match('/<i>/', $sentence)) {
@@ -99,11 +100,11 @@ function HighlightSentence($sentence, $beginlist)
         if (in_array($i, $begins)) {
             $val = '';
             if (!in_array($i-1, $begins)) {
-                $val .= "<strong>";
+                $val .= "<$tag>";
             }
             $val .= $words[$i];
             if (!in_array($i+1, $begins)) {
-                $val .= "</strong>";
+                $val .= "</$tag>";
             }
             $words[$i]= $val;
         }

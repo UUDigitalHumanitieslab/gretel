@@ -68,7 +68,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
 
       foreach ($sentences as $sid => $sentence) {
           // highlight sentence
-          $hlsentence = HighlightSentence($sentence, $beginlist[$sid]);
+          $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
           // deal with quotes/apos
           $trans = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $trans);
