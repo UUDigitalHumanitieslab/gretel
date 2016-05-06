@@ -1352,6 +1352,9 @@ dd:after {
   display: -ms-flexbox;
   display: flex;
 }
+.ebs.step-6 #go-to {
+  width: 48px;
+}
 .ebs.step-6 .dummy-controls {
   position: relative;
   margin: auto auto 1.67em;

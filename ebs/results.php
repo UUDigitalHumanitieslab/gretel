@@ -116,7 +116,7 @@ if ($continueConstraints):
     </div>
     <nav class="controls">
         <p class="count"># of results: <span><strong>0</strong> / <span>--</span><span></p>
-        <label for="go-to" class="disabled">Go to # <input type="number" id="go-to" name="go-to" min="1" max="500" value="1" disabled></label>
+        <form><label for="go-to" class="disabled">Go to # <input type="text" id="go-to" name="go-to" pattern="[0-9]+" value="1" disabled></label></form>
         <label for="filter-components" class="disabled"><input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter components <i class="fa fa-angle-down" aria-hidden="true"></i></label>
         <div class="filter-wrapper">
             <label class="disabled active" for="all-components"><i class="fa fa-check" aria-hidden="true"></i><input type="checkbox" id="all-components" name="all-components" checked disabled hidden>All</label>

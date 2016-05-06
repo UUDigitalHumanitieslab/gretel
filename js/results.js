@@ -1,3 +1,6 @@
+/**
+ * Documentation loosely based on the JSDoc standard
+ */
 $(document).ready(function() {
     var timeoutBeforeCount = 5000,
         timeoutBeforeMore = 7000,
@@ -50,10 +53,10 @@ $(document).ready(function() {
                     }
                 })
                 .fail(function(jqXHR, textStatus, error) {
-                  if (error != 'abort') {
-                    var string = "An error occurred: " + error + ".";
-                    messageOnError(string);
-                  }
+                    if (error != 'abort') {
+                        var string = "An error occurred: " + error + ".";
+                        messageOnError(string);
+                    }
                 })
                 .always(function() {
                     if ((resultID == xResultsBeforeMore) && !done) {
@@ -67,36 +70,36 @@ $(document).ready(function() {
     }, timeoutBeforeMore);
 
     function findAll() {
-      xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
-        .done(function(json) {
-            var data = $.parseJSON(json);
-            $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
-            if (data.data) {
-                loopResults(data.data, true);
-                messageAllResultsFound();
+        xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
+            .done(function(json) {
+                var data = $.parseJSON(json);
+                $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
+                if (data.data) {
+                    loopResults(data.data, true);
+                    messageAllResultsFound();
 
-                $(".stop").click();
-                clearTimeout(findAllTimeout);
-            } else {
-                $(".loading-wrapper.searching").removeClass("active");
-                $(".messages").addClass("active");
-                if (data.error) {
-                    messageOnError(data.error_msg);
-                } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
-                    messageNoResultsFound();
+                    $(".stop").click();
+                    clearTimeout(findAllTimeout);
+                } else {
+                    $(".loading-wrapper.searching").removeClass("active");
+                    $(".messages").addClass("active");
+                    if (data.error) {
+                        messageOnError(data.error_msg);
+                    } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
+                        messageNoResultsFound();
+                    }
                 }
-            }
-        })
-        .fail(function(jqXHR, textStatus, error) {
-          if (error != 'abort') {
-            var string = "An error occurred: " + error + ".";
-            messageOnError(string);
-          }
-        })
-        .always(function() {
-            done = true;
-            $(".stop").click();
-        });
+            })
+            .fail(function(jqXHR, textStatus, error) {
+                if (error != 'abort') {
+                    var string = "An error occurred: " + error + ".";
+                    messageOnError(string);
+                }
+            })
+            .always(function() {
+                done = true;
+                $(".stop").click();
+            });
     }
 
     setTimeout(function() {
@@ -136,8 +139,8 @@ $(document).ready(function() {
         notice = '<strong>' + stringCount[0] + '</strong> result(s) have/has been found! ' + stringCount[1];
         if (resultID >= phpVars.resultsLimit) {
             notice += '<br>We have restricted the output to 500 hits. ' +
-            'You can find the reason for this <a href="'+ phpVars.fetchHomePath +'/documentation.php#faq-1" ' +
-            'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
+                'You can find the reason for this <a href="' + phpVars.fetchHomePath + '/documentation.php#faq-1" ' +
+                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
         }
         $(".notice p").html(notice);
 
@@ -197,8 +200,7 @@ $(document).ready(function() {
 
                     componentString = component.replace(/-/g, '');
                     componentString = componentString.slice(0, 4);
-                }
-                else if (treebank == "cgn") {
+                } else if (treebank == "cgn") {
                     component = linkText.match(/([^<>\d]+)/)[1];
                     component = component.slice(1);
 
@@ -206,11 +208,11 @@ $(document).ready(function() {
                 }
 
                 component = component.toUpperCase();
-                componentString  = componentString.toUpperCase();
+                componentString = componentString.toUpperCase();
 
-                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="'+resultID+'" data-component="'+componentString+'">' +
-                '<td>'+resultID+'</td><td>'+link+'</td><td>' +
-                component + '</td><td>' + value[1] + '</td></tr>');
+                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="' + resultID + '" data-component="' + componentString + '">' +
+                    '<td>' + resultID + '</td><td>' + link + '</td><td>' +
+                    component + '</td><td>' + value[1] + '</td></tr>');
             }
         });
 
@@ -248,15 +250,29 @@ $(document).ready(function() {
         });
     });
 
-    $(".controls [name='go-to']").change(function() {
+    $(".controls [name='go-to']").keyup(function(e){
+        var keycode = e.keyCode;
+        // Reset customValidity on backspace or delete keys
+        if (keycode == 8 || keycode == 46) this.setCustomValidity("");
+    })
+    .change(function() {
         var val = $(this).val(),
-            offset = $(".results-wrapper tbody:not(.empty) tr[data-result-id='"+val+"']").offset(),
-            hControls = $(".controls").outerHeight();
+            row = $(".results-wrapper tbody:not(.empty) tr[data-result-id='" + val + "']");
+
+        if (!row.is(":visible")) {
+            this.setCustomValidity("Please choose a row that is visible. Some rows are hidden depending on the filters you set.");
+        } else {
+            this.setCustomValidity("");
+            var offset = row.offset(),
+                hControls = $(".controls").outerHeight();
 
             $("html, body").stop().animate({
                 scrollTop: offset.top - hControls
             });
+        }
     });
+
+    $(".controls form").submit(function(e) {e.preventDefault();});
 
     $(".controls [name='filter-components']").change(function() {
         $(this).parent().toggleClass("active");
@@ -271,41 +287,50 @@ $(document).ready(function() {
         }
     });
 
+    /**
+     *
     $(".filter-wrapper [type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();
 
         if ($this.is("[name='component']")) {
             if ($this.is(":checked")) {
-                $(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").show();
+                $(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").show();
             } else {
-                $(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").hide();
+                $(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").hide();
             }
-            if(!$this.siblings("[name='component']").addBack().is(":checked")) {
+
+            if (!$this.closest(".filter-wrapper").find("[name='component']").addBack().is(":checked")) {
                 $(".results-wrapper .empty").css("display", "table-row-group");
+                $("#all-components").prop("checked", false).parent().removeClass("active");
                 $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
-            }
-            else {
+            } else {
+                if ($(".filter-wrapper [name='component']:not([disabled])").length == $(".filter-wrapper [name='component']:not([disabled]):checked").length) {
+                    $("#all-components").prop("checked", true).parent().addClass("active");
+                }
+                else {
+                    $("#all-components").prop("checked", false).parent().removeClass("active");
+                }
                 $(".results-wrapper .empty").hide();
-                $("[for='go-to']").removeClass("disabled").children("input").prop("disabled", false)
-                    .val($(".results-wrapper tbody:not(.empty) tr:first-child").attr("data-result-id"));
+                $("[for='go-to']").removeClass("disabled").children("input").prop("disabled", false);
             }
         } else if ($this.is("#all-components")) {
             $this.parent().toggleClass("active");
             $(".filter-wrapper [type='checkbox'][name='component']:not([disabled])").prop("checked", $this.is(":checked")).change();
         }
+
+        $("#go-to").val($(".results-wrapper tbody:not(.empty) tr:visible").first().attr("data-result-id") || "--");
     });
 
     function disableAndEnableInputs() {
         $("[for='go-to'], [for='filter-components'], .filter-wrapper label").removeClass("disabled").children("input").prop("disabled", false);
-        $("#go-to").attr("max", resultID);
 
         // Disable the checkboxes which don't have any results
         $(".filter-wrapper [type='checkbox'][name='component']").each(function() {
             var $this = $(this),
                 component = $this.val();
 
-            if ($(".results-wrapper tbody:not(.empty) tr[data-component='"+component+"']").length == 0) {
+            if ($(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").length == 0) {
                 $this.prop("disabled", true);
                 $this.prop("checked", false);
                 $this.parent("label").addClass("disabled");
@@ -328,8 +353,7 @@ $(document).ready(function() {
             top = controls.offset().top;
             h = controls.outerHeight();
             dummy.height(h);
-        }
-        else {
+        } else {
             top = dummy.offset().top;
         }
     }
