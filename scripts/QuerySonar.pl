@@ -98,7 +98,7 @@ print $json;
 
 sub QuerySonar {
 	my ($xpath, $db, $includes) = @_;
-  unless ($db) {
+    unless ($db) {
     print STDERR "Something went wrong when querying $xpath "
       . "because the db is undefined\n";
   }

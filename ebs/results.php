@@ -18,8 +18,15 @@ if ($continueConstraints) {
     $sortTables = true;
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
-    $componentArray = $_SESSION['subtreebank'];
-    $component = implode(', ', $componentArray);
+    $components = $_SESSION['subtreebank'];
+
+    if (is_array($components)) {
+        $component = implode(', ', $components);
+    } else {
+        $component = $components;
+        $_SESSION['subtreebank'] = $component;
+    }
+    
     $sm = $_SESSION['search'];
     $example = $_SESSION['example'];
 
@@ -73,6 +80,10 @@ require "$root/php/head.php";
 require "$root/php/header.php";
 
 if ($continueConstraints):
+    if ($treebank == 'sonar') {
+        $bf = xpath2Bf($xpath);
+        $_SESSION['bf'] = $component . $bf;
+    }
   ?>
   <section>
   <div><a href="<?php echo $export.'print=txt'; ?>" title="Printer-friendly version of all results"
@@ -120,7 +131,7 @@ if ($continueConstraints):
         <label for="filter-components" class="disabled"><input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter components <i class="fa fa-angle-down" aria-hidden="true"></i></label>
         <div class="filter-wrapper">
             <label class="disabled active" for="all-components"><i class="fa fa-check" aria-hidden="true"></i><input type="checkbox" id="all-components" name="all-components" checked disabled hidden>All</label>
-            <?php foreach ($componentArray as $comp) {
+            <?php foreach ($components as $comp) {
                 echo '<label class="disabled"><input type="checkbox" name="component" value="'.strtoupper($comp).'" checked disabled> '.strtoupper($comp).'</label>';
             } ?>
         </div>

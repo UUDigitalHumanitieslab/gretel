@@ -2,30 +2,99 @@
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-function GetCounts($xpath, $treebank, $subtreebank)
+function GetCounts($xpath, $treebank, $subtreebank, $bf)
 {
-    global $dbhost, $dbport, $dbuser, $dbpwd;
-    $databases = Corpus2DB($subtreebank, $treebank);
+    global $dbhost, $dbport, $dbuser, $dbpwd,
+        $dbportSonar, $dbuserSonar, $dbpwdSonar, $dbnameServerSonar, $cats;
+
+    if ($treebank == "lassy" || $treebank == "cgn") {
+        $databases = Corpus2DB($subtreebank, $treebank);
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+    }
+    else {
+        $databases = array();
+        $dbhostSonar = $dbnameServerSonar[$subtreebank[0]];
+
+        if (strpos($bf, 'ALL') !== false) {
+          foreach ($cats as $cat) {
+            $dbcopy = preg_replace('ALL', $cat, $bf);
+            array_push($databases, $dbcopy);
+          }
+        }
+        else {
+          array_push($databases, $bf);
+        }
+        $session = new Session($dbhostSonar, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+    }
     $sum = 0;
-    // create session
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-    foreach ($databases as $database) {
-        $xquery = CreateXQueryCount($xpath, $database);
-        $query = $session->query($xquery);
-        $count = $query->execute();
 
-        $sum += $count;
+    for ($i = 0; $i < count($databases); $i++) {
+        $database = $databases[$i];
 
+        if (!empty($database)) {
+            $xquery = CreateXQueryCount($xpath, $database, $treebank);
+            $query = $session->query($xquery);
+            $count = $query->execute();
+
+            $sum += $count;
+
+            if ($treebank == 'sonar') {
+                getMoreIncludes($database, $databases, $session);
+            }
+        }
         $query->close();
     }
     $session->close();
 
     return $sum;
 }
-function CreateXQueryCount($xpath, $db)
+
+function getMoreIncludes($database, &$databases, $session) {
+    global $basexPathsSonar;
+    $dbflag = false;
+    foreach ($basexPathsSonar as $basex) {
+      if (file_exists("$basex/$database")) {
+        $dbflag = true;
+        break;
+      }
+    }
+    if ($dbflag) {
+      $xq  = '/treebank/include';
+      $xqinclude = 'db:open("' . $database . '")' . $xq;
+      $query = $session->query($xqinclude);
+
+      $basexinclude  = $query->execute();
+      $basexincludes = explode("\n", $basexinclude);
+
+      $query->close();
+
+      foreach ($basexincludes as $include) {
+  			$include = trim($include);
+            if (preg_match("/file=\"(.+)\"/", $include, $files)) {
+                $file = $files[1];
+
+                if (!IncludeAlreadyExists($file)) {
+                    array_push($databases, $file);
+                }
+            }
+        }
+    }
+    else {
+        // warn("database does not exist");
+    }
+}
+
+function includeAlreadyExists($include) {
+      if (isset($ALREADY{$include})) {return true;}
+      else {$ALREADY{$include} = 1;}
+
+      return false;
+}
+function CreateXQueryCount($xpath, $db, $treebank)
 {
     $for = 'count(for $node in db:open("'.$db.'")/treebank';
-    $return = 'return $node)';
+    if ($treebank == 'sonar') $for .= '/tree';
+    $return = ' return $node)';
     $xquery = $for.$xpath.$return;
 
     return $xquery;
@@ -230,6 +299,10 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     }
 }
 
+function GetSentencesSonar() {
+
+}
+
 function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
 {
     global $flushLimit, $resultsLimit;
@@ -254,18 +327,18 @@ function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
         $prevs = 'let $prevs := (db:open("'.$dbs.'")//s[id=$previd]/sentence)';
         $nexts = 'let $nexts := (db:open("'.$dbs.'")//s[id=$nextid]/sentence)';
 
-        $return = 'return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
+        $return = ' return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
 
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
-        $return = 'return <match>{data($sentid)}||{data($sentence)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
+        $return = ' return <match>{data($sentid)}||{data($sentence)}||{string-join($ids, \'-\')}||{string-join($begins, \'-\')}</match>';
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$return;
     }
 
     // Adds positioning values:; limits possible output
     $openPosition = '(';
     // Never fetch more than the resultsLimit, not even with all
-    if ($endPosIteration === 'all') {
+    if ($endPosIteration == 'all') {
         $closePosition = ')[position() = 1 to '.$resultsLimit.']';
     }
     // Only fetch the given flushLimit, and increment on each iteration

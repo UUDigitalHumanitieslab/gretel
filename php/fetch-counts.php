@@ -1,6 +1,6 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
 require "../config/config.php";
 
 require "$scripts/BaseXClient.php";
@@ -12,9 +12,13 @@ header('Content-Type:text/html; charset=utf-8');
 $xpath = $_SESSION['xpath'];
 $treebank  = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
-
-if ($treebank == "lassy" || $treebank == "cgn") {
-    $counts = GetCounts($xpath, $treebank, $component);
+if ($treebank == 'lassy' || $treebank == 'cgn') {
+    $counts = GetCounts($xpath, $treebank, $component, false);
+} else {
+    $bf = $_SESSION['bf'];
+    $xpath = substr($xpath, 1);
+    $counts = GetCounts($xpath, $treebank, $component, $bf);
 }
+
 
 echo $counts;
