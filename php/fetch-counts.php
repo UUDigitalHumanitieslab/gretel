@@ -12,13 +12,9 @@ header('Content-Type:text/html; charset=utf-8');
 $xpath = $_SESSION['xpath'];
 $treebank  = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
-if ($treebank == 'lassy' || $treebank == 'cgn') {
-    $counts = GetCounts($xpath, $treebank, $component, false);
-} else {
-    $bf = $_SESSION['bf'];
-    $xpath = substr($xpath, 1);
-    $counts = GetCounts($xpath, $treebank, $component, $bf);
-}
 
+$bf = ($treebank == 'sonar') ? $_SESSION['bf'] : false;
+
+$counts = GetCounts($xpath, $treebank, $component, $bf);
 
 echo $counts;

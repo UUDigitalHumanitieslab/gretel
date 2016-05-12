@@ -7,13 +7,10 @@ function GetCounts($xpath, $treebank, $subtreebank, $bf)
     global $dbhost, $dbport, $dbuser, $dbpwd,
         $dbportSonar, $dbuserSonar, $dbpwdSonar, $dbnameServerSonar, $cats;
 
-    if ($treebank == "lassy" || $treebank == "cgn") {
-        $databases = Corpus2DB($subtreebank, $treebank);
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-    }
-    else {
+    if ($treebank == 'sonar') {
         $databases = array();
-        $dbhostSonar = $dbnameServerSonar[$subtreebank[0]];
+        $component = substr($bf, 0, 5);
+        $dbhostSonar = $dbnameServerSonar{$component};
 
         if (strpos($bf, 'ALL') !== false) {
           foreach ($cats as $cat) {
@@ -26,10 +23,19 @@ function GetCounts($xpath, $treebank, $subtreebank, $bf)
         }
         $session = new Session($dbhostSonar, $dbportSonar, $dbuserSonar, $dbpwdSonar);
     }
+    else {
+        $databases = Corpus2DB($subtreebank, $treebank);
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+    }
+    
     $sum = 0;
 
     for ($i = 0; $i < count($databases); $i++) {
         $database = $databases[$i];
+
+        if ($treebank == 'sonar') {
+            getMoreIncludes($database, $databases, $session);
+        }
 
         if (!empty($database)) {
             $xquery = CreateXQueryCount($xpath, $database, $treebank);
@@ -37,10 +43,6 @@ function GetCounts($xpath, $treebank, $subtreebank, $bf)
             $count = $query->execute();
 
             $sum += $count;
-
-            if ($treebank == 'sonar') {
-                getMoreIncludes($database, $databases, $session);
-            }
         }
         $query->close();
     }
@@ -51,6 +53,7 @@ function GetCounts($xpath, $treebank, $subtreebank, $bf)
 
 function getMoreIncludes($database, &$databases, $session) {
     global $basexPathsSonar;
+
     $dbflag = false;
     foreach ($basexPathsSonar as $basex) {
       if (file_exists("$basex/$database")) {
@@ -58,6 +61,7 @@ function getMoreIncludes($database, &$databases, $session) {
         break;
       }
     }
+
     if ($dbflag) {
       $xq  = '/treebank/include';
       $xqinclude = 'db:open("' . $database . '")' . $xq;
@@ -73,7 +77,7 @@ function getMoreIncludes($database, &$databases, $session) {
             if (preg_match("/file=\"(.+)\"/", $include, $files)) {
                 $file = $files[1];
 
-                if (!IncludeAlreadyExists($file)) {
+                if (!includeAlreadyExists($file)) {
                     array_push($databases, $file);
                 }
             }
@@ -307,7 +311,7 @@ function CreateXQuery($xpath, $db, $tb, $context, $endPosIteration)
 {
     global $flushLimit, $resultsLimit;
 
-  // create XQuery instance
+    // create XQuery instance
     $for = 'for $node in db:open("'.$db.'")/treebank';
     $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
     $sentence = 'let $sentence := ($node/ancestor::alpino_ds/sentence)';

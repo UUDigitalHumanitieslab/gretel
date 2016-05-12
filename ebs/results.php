@@ -26,7 +26,7 @@ if ($continueConstraints) {
         $component = $components;
         $_SESSION['subtreebank'] = $component;
     }
-    
+
     $sm = $_SESSION['search'];
     $example = $_SESSION['example'];
 
@@ -43,6 +43,9 @@ if ($continueConstraints) {
     $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
     $xpath = strtr("$xpath", $trans);
 
+    if ($treebank == 'sonar') $xpath = preg_replace('/^\/{0,2}node/', '/node', $xpath);
+    else $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
+
     $_SESSION['xpath'] = $xpath;
 
     if ($sm == 'advanced' && $treebank != 'sonar') {
@@ -50,7 +53,10 @@ if ($continueConstraints) {
       // Clean up $originalXp
       $originalXp = rtrim($originalXp);
         $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
-        $originalXp = strtr("$originalXp", $trans);
+        $originalXp = strtr($originalXp, $trans);
+
+        if ($treebank == 'sonar') $originalXp = preg_replace('/^\/{0,2}node/', '/node', $originalXp);
+        else $originalXp = preg_replace('/^\/{0,2}node/', '//node', $originalXp);
 
         $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
 
