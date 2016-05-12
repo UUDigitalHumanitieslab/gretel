@@ -69,6 +69,8 @@ if ($continueConstraints) {
 
     $_SESSION['queryIteration'] = array(0, 0);
     $_SESSION['leftOvers'] = array();
+    $_SESSION['already'] = array();
+    if ($treebank == 'sonar') $_SESSION['includes'] = array();
 
     $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 
@@ -89,6 +91,7 @@ if ($continueConstraints):
     if ($treebank == 'sonar') {
         $bf = xpath2Bf($xpath);
         $_SESSION['bf'] = $component . $bf;
+        array_push($_SESSION['includes'], $_SESSION['bf']);
     }
   ?>
   <section>

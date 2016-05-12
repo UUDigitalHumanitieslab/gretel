@@ -31,14 +31,14 @@ $(document).ready(function() {
                     if (!done) {
                         var data = $.parseJSON(json);
                         $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
-                        if (data.data) {
+                        if (!data.error && data.data) {
                             loopResults(data.data, false);
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
                             $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
                             $(".messages").addClass("active");
                             if (data.error) {
-                                messageOnError(data.error_msg)
+                                messageOnError(data.data)
                             } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                                 messageNoResultsFound();
                             } else {
@@ -74,7 +74,7 @@ $(document).ready(function() {
             .done(function(json) {
                 var data = $.parseJSON(json);
                 $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
-                if (data.data) {
+                if (!data.error && data.data) {
                     loopResults(data.data, true);
                     messageAllResultsFound();
 
@@ -84,7 +84,7 @@ $(document).ready(function() {
                     $(".loading-wrapper.searching").removeClass("active");
                     $(".messages").addClass("active");
                     if (data.error) {
-                        messageOnError(data.error_msg);
+                        messageOnError(data.data);
                     } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                         messageNoResultsFound();
                     }
@@ -286,9 +286,7 @@ $(document).ready(function() {
             }
         }
     });
-
-    /**
-     *
+    
     $(".filter-wrapper [type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();

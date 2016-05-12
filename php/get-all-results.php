@@ -15,7 +15,11 @@ $treebank = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
 $componentString = implode('-', $component);
 
-// if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
+if ($treebank == 'sonar') {
+    $includes = $_SESSION['includes'];
+    $bf = $_SESSION['bf'];
+}
+
 $sm = $_SESSION['search'];
 $xpath = $_SESSION['xpath'];
 if ($sm == "advanced" && $treebank != "sonar") {
@@ -57,11 +61,19 @@ require "$scripts/FormatResults.php";
 /**********************/
 /* QUERY LASSY OR CGN */
 /**********************/
-if ($treebank == 'lassy' || $treebank == 'cgn') {
-  try {
 
-    // get sentences, search for ALL sentences
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'));
+  try {
+      if ($treebank == 'sonar') {
+          $dbhost = $dbnameServerSonar[$component[0]];
+          $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+          list($sentences, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
+          $session->close();
+      }
+      else {
+          $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+          list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
+          $session->close();
+      }
 
     if (isset($sentences)) {
       array_filter($sentences);
@@ -81,7 +93,6 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
       }
         $results = array(
           'error' => false,
-          'error_msg' => '',
           'data' => $resultsArray,
         );
         echo json_encode($results);
@@ -89,7 +100,6 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
       else {
         $results = array(
           'error' => false,
-          'error_msg' => '',
           'data' => '',
         );
         echo json_encode($results);
@@ -97,56 +107,7 @@ if ($treebank == 'lassy' || $treebank == 'cgn') {
   } catch (Exception $e) {
     $results = array(
       'error' => true,
-      'error_msg' => $e->getMessage(),
-      'data' => '',
+      'data' => $e->getMessage(),
     );
     echo json_encode($results);
   }
-}
-/***************/
-/* QUERY SONAR */
-/***************/
-elseif ($treebank == 'sonar') {
-  try {
-    // remove first slash
-    $xpath = substr($xpath, 1);
-    // XPath2BreathFirst
-    $bf = `perl $scripts/Alpino2BF.pl "$tmp/$id-sub-style.xml"`;
-    $basexdb = $component.$bf;
-
-    $encodedResults = `perl $scripts/QuerySonar.pl $xpath $basexdb $resultlimit array(0, 'all')`;
-
-    $results = json_decode($encodedResults, true);
-
-    array_filter($results);
-
-    foreach ($results as $sid => $match) {
-      $match = explode("\t", $match);
-      list($matchsent, $counthits, $db, $idlist, $beginlist) = $match;
-
-      // highlight sentence
-      $hlsentence = HighlightSentence($sentence, $beginlist[$sid]);
-      // deal with quotes/apos
-      $trans = array('"' => '&quot;', "'" => "&apos;");
-      $hlsentence = strtr($hlsentence, $trans);
-
-      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sid.'&id='.$idlist[$sid].'&tb='.$treebank.'&db='.$compString.'&opt=tv-xml" target="_blank" >'.$sid.'</a>';
-
-      $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $counthits[$sid]);
-    }
-
-    $results = array(
-      'error' => false,
-      'error_msg' => '',
-      'data' => $resultsArray,
-    );
-    echo json_encode($results);
-  } catch (Exception $e) {
-    $results = array(
-      'error' => true,
-      'error_msg' => $e->getMessage(),
-      'data' => '',
-    );
-    echo json_encode($results);
-  }
-}

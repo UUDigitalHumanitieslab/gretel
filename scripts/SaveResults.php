@@ -22,18 +22,20 @@ $time=time(); // time stamp
 // load configuration file
 require "../config/config.php";
 
-// dir to external scripts
-$basexclient="$scripts/BaseXClient.php";
-$treebanksearch="$scripts/TreebankSearch.php";
-$formatresults="$scripts/FormatResults.php";
+$print=$_GET["print"];
 
-$print=$_GET["print"]; // get print mode
-
-$treebank=$_SESSION['treebank']; // get treebank
-$xpath=$_SESSION['xpath']; // get xpath
-$example=$_SESSION['example'];
 $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
+
+$example = $_SESSION['example'];
+$treebank = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
+
+if ($treebank == 'sonar') {
+    $includes = $_SESSION['includes'];
+    $bf = $_SESSION['bf'];
+}
+
+$xpath = $_SESSION['xpath'];
 
 require "$scripts/BaseXClient.php";
 require "$scripts/TreebankSearch.php";
@@ -44,7 +46,17 @@ try {
   if ($print == "txt") {
     header("Content-type:text/plain; charset=utf-8");
 
-    list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0,"all"));
+    if ($treebank == 'sonar') {
+        $dbhost = $dbnameServerSonar[$component[0]];
+        $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+        list($sentences, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
+        $session->close();
+    }
+    else {
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
+        $session->close();
+    }
 
     echo "$xpath\n";
     printMatchesTxt($sentences, $beginlist);
