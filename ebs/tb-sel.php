@@ -38,15 +38,18 @@ if ($continueConstraints) {
     // add info annotation matrix to alpino parse
   foreach ($sentence as $begin => $word) {
       $postword = preg_replace('/\./', '_', $word);
-      if (isset($_POST["$postword--$begin"])) $postvalue = $_POST["$postword--$begin"];
 
       if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) { //for punctuation (!) . changes to _ (!)
           $xp = $lpxml->xpath("//node[@begin='$begin']");
       } else {
           $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");
       }
-      foreach ($xp as $x) {
-          $x->addAttribute('interesting', "$postvalue");
+
+      if (isset($_POST["$postword--$begin"])) {
+          $postvalue = $_POST["$postword--$begin"];
+          foreach ($xp as $x) {
+              $x->addAttribute('interesting', $postvalue);
+          }
       }
   }
   // save parse with @interesting annotations

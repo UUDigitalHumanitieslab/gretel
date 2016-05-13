@@ -20,6 +20,8 @@ if ($treebank == 'sonar') {
     $bf = $_SESSION['bf'];
 }
 
+$databaseString = $treebank;
+
 // if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
 $sm = $_SESSION['search'];
 $example = $_SESSION['example'];
@@ -42,15 +44,13 @@ try {
     if ($treebank == 'sonar') {
         $dbhost = $dbnameServerSonar{$component[0]};
         $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
-        list($sentences, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
-        $session->close();
+        list($sentences, $tblist, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
     }
     else {
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
         list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
-        $session->close();
     }
-
+    $session->close();
 if (isset($sentences)) {
   array_filter($sentences);
 
@@ -61,9 +61,17 @@ if (isset($sentences)) {
       $trans = array('"' => '&quot;', "'" => "&apos;");
       $hlsentence = strtr($hlsentence, $trans);
 
+      if ($treebank == 'sonar') $databaseString = $tblist[$sid];
+
       // remove the added identifier (see GetSentences) to use in the link
       $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
-      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.'?sid='.$sidString.'&id='.$idlist[$sid].'&tb='.$treebank.'&opt=tv-xml" target="_blank">'.$sidString.'</a>';
+
+      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.
+        '?sid='.$sidString.
+        '&tb='.$treebank.
+        '&db='.$databaseString.
+        '&id='.$idlist[$sid].
+        '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
 
       $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
   }

@@ -307,13 +307,16 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
 
             $m = str_replace('<match>', '', $m);
             $m = trim($m);
-            list($sentid, $sentence, $ids, $begins) = explode('||', $m);
+
+            list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $m);
+
             // Add unique identifier to avoid overlapping sentences w/ same ID
             $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+leftover='.$nrofmatches;
 
             $sentid = trim($sentid);
 
             $sentences{$sentid} = $sentence;
+            $tblist{$sentid} = $tb;
             $idlist{$sentid} = $ids;
             $beginlist{$sentid} = $begins;
 
@@ -343,7 +346,7 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
           $match = $query->execute();
           $query->close();
 
-          if (!$match) {
+          if (!isset($match)) {
             if ($endPosIteration !== 'all') $endPosIteration = 0;
             break;
           }
@@ -372,9 +375,12 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
             $m = $matches[$i];
             $m = str_replace('<match>', '', $m);
             $m = trim($m);
-            list($sentid, $sentence, $ids, $begins) = explode('||', $m);
 
-            if (isset($sentid, $sentence, $ids, $begins)) {
+            // TO DO; if content is ON
+
+            list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $m);
+
+            if (isset($sentid, $sentence, $tb, $ids, $begins)) {
               ++$nrofmatches;
 
               // Add unique identifier to avoid overlapping sentences w/ same ID
@@ -382,6 +388,7 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
 
               $sentid = trim($sentid);
               $sentences{$sentid} = $sentence;
+              $tblist{$sentid} = $tb;
               $idlist{$sentid} = $ids;
               $beginlist{$sentid} = $begins;
             }
@@ -404,7 +411,7 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
           $_SESSION['includes'] = $includes;
         }
 
-        return array($sentences, $idlist, $beginlist);
+        return array($sentences, $tblist, $idlist, $beginlist);
     } else {
         // in case there are no results to be found
         return false;
@@ -430,6 +437,9 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
         $sentence = 'let $sentence := ($node/ancestor::alpino_ds/sentence)';
     }
 
+
+    $returnTb = ($treebank == 'sonar') ? '||{data($tb)}' : '';
+
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
@@ -447,11 +457,13 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
         $prevs = 'let $prevs := (db:open("'.$dbs.'")//s[id=$previd]/sentence)';
         $nexts = 'let $nexts := (db:open("'.$dbs.'")//s[id=$nextid]/sentence)';
 
-        $return = ' return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
+        $return = ' return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}'
+            . $returnTb . '||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
 
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
-        $return = ' return <match>{data($sentid)}||{data($sentence)}||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
+        $return = ' return <match>{data($sentid)}||{data($sentence)}' . $returnTb
+            . '||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$return;
     }
 

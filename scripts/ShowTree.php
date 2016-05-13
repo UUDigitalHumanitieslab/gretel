@@ -34,97 +34,74 @@ if (isset($_GET["db"])) {
 /*********************************/
 header('Content-type: text/xml');
 
-require("../config/config.php"); // load configuration file
+require("../config/config.php");
 
-// Path to external scripts
-$scripts="$root/scripts"; // scripts dir
-$basexclient="$scripts/BaseXClient.php";
+require("$scripts/BaseXClient.php");
 
-// INCLUDE EXTERNAL SCRIPTS
-require("$basexclient");
-
-// connect to database
-if(!$treebank) { // if no treebank is set
+if(!$treebank) {
   echo "Treebank not found!</br>\n";
   exit;
 }
 
-// BaseX database variables
+try {
+    if ($treebank == 'sonar') {
+        preg_match('/^([A-Z]{5})/', $db, $component);
+        $dbhost = $dbnameServerSonar[$component[0]];
+        $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+        $queryPath = $db;
+    }
+    else {
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        $queryPath = strtoupper($treebank);
+        $queryPath .= '_ID';
+    }
 
-if ($treebank=='lassy' || $treebank=='cgn') {
+    $xquery = 'db:open("'.$queryPath.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
+    $query = $session->query($xquery);
+    $xml = $query->execute();
 
-  $db=strtoupper($treebank);
-  $db=$db.'_ID';
-  $xquery = 'db:open("'.$db.'")/treebank/alpino_ds[@id="'.$sentid.'"]'; // build XQuery
+    $query->close();
+    $session->close();
 
-  // create session
-  $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+    $trans = array("'" => '&apos;');
+    $xml=strtr($xml, $trans);
 
+    // build xpath
+    if(isset($idstring)) {
+      $part=preg_replace('/(\d+)/','@id="$1"',$idstring);
+      $xpart=str_replace('-',' or ',$part);
+      $xpath="//node[$xpart]";
+    }
+    elseif(isset($wstring)) {
+      $wstring=preg_replace('/^-*|-*$/','',$wstring); //remove - at beginning and/or end
+      $part=preg_replace('/(\w+)/','@word="$1" or @lemma="$1"',$wstring);
+      $xpart=str_replace('-',' or ',$part);
+      $xpath="//node[$xpart]";
+    }
+    else {
+      $xpath='//node[@rel="--"]';
+    }
+
+    if (isset($option) && $option=="xml") {
+        echo $xml;
+    }
+    else {
+      if (isset($option) && $option=="tv-xml") {
+          $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'tv-default'`;
+      }
+      elseif (isset($option) && $option=="zoom") {
+        $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'zsonar'`;
+      }
+      else {
+        $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'psonar'`;
+      }
+
+      $stylexml=simplexml_load_string($styletree);
+      echo $stylexml->asXML();
+    }
 }
-
-else { // for sonar
-
-  preg_match('/^([A-Z]{5})/', $db, $comp);
-  $component=$comp[0];
-  $dbhost2=$dbname_server[$component]; // get DBserver name
-
-  $xquery = 'db:open("'.$db.'")/treebank/alpino_ds[@id="'.$sentid.'"]'; // build XQuery
-
-  // create session
-  $session = new Session($dbhost2, $dbport2, $dbuser2, $dbpwd2);
-}
-
-// fetch tree
-$query = $session->query($xquery); // create query instance
-$xml=$query->execute();
-
-$query->close(); // close query instance
-$session->close(); // close session
-
-
-// deal with quotes
-$trans = array("'" => '&apos;' );
-$xml=strtr("$xml", $trans);
-
-// build xpath
-if(isset($idstring)) {
-  $part=preg_replace('/(\d+)/','@id="$1"',$idstring);
-  $xpart=str_replace('-',' or ',$part);
-  $xpath="//node[$xpart]";
-}
-
-elseif(isset($wstring)) {
-  $wstring=preg_replace('/^-*|-*$/','',$wstring); //remove - at beginning and/or end
-  $part=preg_replace('/(\w+)/','@word="$1" or @lemma="$1"',$wstring);
-  $xpart=str_replace('-',' or ',$part);
-  $xpath="//node[$xpart]";
-}
-
-else {
-  $xpath='//node[@rel="--"]';
-}
-
-
-// representation modes
-
-if (isset($option) && $option=="xml") {
-    echo $xml;
-}
-
-else {
-  if (isset($option) && $option=="tv-xml") {
-      $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'tv-default'`;
-  }
-  elseif (isset($option) && $option=="zoom") {
-    $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'zsonar'`;
-  }
-
-  else {
-    $styletree=`perl  $scripts/xml2tree.pl '$xml' '$xpath' 'psonar'`;
-  }
-
-  $stylexml=simplexml_load_string($styletree);
-  echo $stylexml->asXML();
+catch (Exception $e) {
+    echo $e->getMessage();
 }
 
 ?>

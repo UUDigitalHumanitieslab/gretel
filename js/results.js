@@ -2,9 +2,15 @@
  * Documentation loosely based on the JSDoc standard
  */
 $(document).ready(function() {
+    // Customizable attributes!
+    // Specify how long it should take for functions to session
+    // * Before counting ALL hits, independent of current fetched results (ms)
+    // * Before ALL results are being gathered on the background (ms), OR
+    // * Amount of hits before ALL results are being gathered (hits)
     var timeoutBeforeCount = 5000,
         timeoutBeforeMore = 7000,
         xResultsBeforeMore = 10;
+
     var hash = window.location.hash,
         tvLink = $("a.tv-show-fs"),
         xhrAllSentences,
@@ -16,13 +22,14 @@ $(document).ready(function() {
 
     getSentences();
 
+/* Open tree visualizer if a hash is persent in URL. Not implemented yet
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
             var index = hash.match(/\d+$/);
             tvLink.eq(index[0] - 1).click();
         }
     }
-
+*/
     function getSentences() {
         if (!done && (resultID <= phpVars.resultsLimit)) {
             $(".loading-wrapper.searching").addClass("active");
@@ -189,7 +196,7 @@ $(document).ready(function() {
                 resultID++;
                 var link = value[0];
                 link = link.replace(/\bhref=\"([^"]+)\"/, "href=\"#tv-" + resultID + "\" data-tv-url=\"$1\"");
-                var treebank = link.match(/(?:&tb=)([^&"=]+)/)[1],
+                var treebank = link.match(/(?:&db=)([^&"=]+)/)[1],
                     linkText = link.match(/(?:>)([^<>]+)(?:<\/a>)/)[1],
                     component = '',
                     componentString = '';
