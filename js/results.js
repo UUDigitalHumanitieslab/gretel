@@ -205,6 +205,9 @@ $(document).ready(function() {
                     component = component.slice(1);
 
                     componentString = component.replace(/-/g, '');
+                } else {
+                    component = linkText.match(/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/)[1];
+                    componentString = component.replace(/-/g, '');
                 }
 
                 component = component.toUpperCase();
@@ -286,7 +289,7 @@ $(document).ready(function() {
             }
         }
     });
-    
+
     $(".filter-wrapper [type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();

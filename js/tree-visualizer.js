@@ -230,7 +230,6 @@
                         $(".loading-wrapper.tv").removeClass("active");
                         FS.fadeIn(250);
                         sizeTreeFS();
-
                     }
                 });
         }
