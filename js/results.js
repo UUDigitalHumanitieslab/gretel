@@ -261,9 +261,16 @@ $(document).ready(function() {
     });
 
     $(".controls [name='go-to']").keyup(function(e){
-        var keycode = e.keyCode;
+        var keycode = e.keyCode,
+        $this = $(this);
         // Reset customValidity on backspace or delete keys
-        if (keycode == 8 || keycode == 46) this.setCustomValidity("");
+        if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
+            this.setCustomValidity("");
+            // UP arrow
+            if (keycode == 38) $this.val(parseInt($this.val(), 10)+1).change();
+            // DOWN arrow
+            if (keycode == 40) $this.val(parseInt($this.val(), 10)-1).change();
+        }
     })
     .change(function() {
         var val = $(this).val(),

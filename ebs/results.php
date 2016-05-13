@@ -15,7 +15,6 @@ $id = session_id();
 $continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
-    $sortTables = true;
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];

@@ -23,9 +23,5 @@
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
     <script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
 <?php endif; ?>
-<?php if (isset($sortTables) && $sortTables): ?>
-<script src="<?php echo $home; ?>/js/jquery.dataTables.js"></script>
-<script src="<?php echo $home; ?>/js/sorttable.js"></script>
-<?php endif; ?>
 <script src="<?php echo $home; ?>/js/min/scripts.min.js"></script>
 <?php endif; ?>

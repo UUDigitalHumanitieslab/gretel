@@ -73,12 +73,6 @@ $(document).ready(function() {
             }
 
             if (body.hasClass("step-6")) {
-                // Initialisation code dataTables
-                $('#example').dataTable({
-                    "sScrollY": "400px",
-                    "bPaginate": false
-                });
-
                 // Show and hide required elements
                 $(".slidingDiv").hide();
                 $(".show_hide").show();
