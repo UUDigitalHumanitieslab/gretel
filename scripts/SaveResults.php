@@ -37,6 +37,8 @@ if ($treebank == 'sonar') {
 
 $xpath = $_SESSION['xpath'];
 
+session_write_close();
+
 require "$scripts/BaseXClient.php";
 require "$scripts/TreebankSearch.php";
 require "$scripts/FormatResults.php";
@@ -49,14 +51,17 @@ try {
     if ($treebank == 'sonar') {
         $dbhost = $dbnameServerSonar[$component[0]];
         $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
-        list($sentences, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
-        $session->close();
+        list($sentences, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank,
+          $component, $includes, $context, array(0 , 'all'), $session);
     }
     else {
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
-        $session->close();
+        list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank,
+          $component, $context, array(0 , 'all'), $session);
     }
+
+    $session->close();
+    array_filter($sentences);
 
     echo "$xpath\n";
     printMatchesTxt($sentences, $beginlist);

@@ -36,8 +36,10 @@ $time = time();
 
 $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
+session_write_close();
+
 // messages and documentation
-$showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
+$showtree = "$home/scripts/ShowTree.php";
 
 /*************/
 /* LOG TREE */
@@ -78,10 +80,13 @@ require "$scripts/FormatResults.php";
 
     if (isset($sentences)) {
       array_filter($sentences);
-
+      // Write results to file so that they can be downloaded later on
+      $fh = fopen(" ", 'a');
+      fwrite($fh, "$xpath\n");
       foreach ($sentences as $sid => $sentence) {
           // highlight sentence
           $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
+          $hlsentenceDownload = HighlightSentence($sentence, $beginlist[$sid], 'hit');
           // deal with quotes/apos
           $trans = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $trans);
@@ -99,7 +104,10 @@ require "$scripts/FormatResults.php";
             '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
+
+          fwrite($fh, "$treebank\t$componentString\t$hlsentenceDownload\n");
       }
+      fclose($fh);
         $results = array(
           'error' => false,
           'data' => $resultsArray,

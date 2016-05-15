@@ -94,7 +94,7 @@ if ($continueConstraints):
     }
   ?>
   <section>
-  <div><a href="<?php echo $export.'print=txt'; ?>" title="Printer-friendly version of all results"
+  <div><a href='<?php echo "$home/tmp/${id}gretel-results.txt"; ?>' title="Printer-friendly version of all results"
     download="gretel-results.txt">Download results</a></div>
   <?php if ($treebank == 'lassy' || $treebank == 'cgn'): ?>
     <h3>Results</h3>

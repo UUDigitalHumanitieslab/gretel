@@ -87,7 +87,7 @@ function getMoreIncludes($database, &$databases, $session) {
 }
 
 function includeAlreadyExists($include) {
-    $ALREADY = $_SESSION['already'];
+  $ALREADY = $_SESSION['already'];
       if (isset($ALREADY{$include})) {return true;}
       else {
           $ALREADY{$include} = 1;

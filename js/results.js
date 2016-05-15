@@ -7,9 +7,9 @@ $(document).ready(function() {
     // * Before counting ALL hits, independent of current fetched results (ms)
     // * Before ALL results are being gathered on the background (ms), OR
     // * Amount of hits before ALL results are being gathered (hits)
-    var timeoutBeforeCount = 5000,
-        timeoutBeforeMore = 7000,
-        xResultsBeforeMore = 10;
+    var timeoutBeforeCount = 500,
+        timeoutBeforeMore = 700,
+        xResultsBeforeMore = 4;
 
     var hash = window.location.hash,
         tvLink = $("a.tv-show-fs"),
@@ -60,6 +60,8 @@ $(document).ready(function() {
                     }
                 })
                 .fail(function(jqXHR, textStatus, error) {
+                    // Edge triggers a fail when an XHR request is aborted
+                    // We don't want that, so if the error message is abort, ignore
                     if (error != 'abort') {
                         var string = "An error occurred: " + error + ".";
                         messageOnError(string);
@@ -77,6 +79,8 @@ $(document).ready(function() {
     }, timeoutBeforeMore);
 
     function findAll() {
+      localStorage.removeItem("downloadresults");
+
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
@@ -95,6 +99,9 @@ $(document).ready(function() {
                     } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                         messageNoResultsFound();
                     }
+                }
+                if (data.download) {
+                  localStorage.setItem("downloadresults", JSON.stringify(data.download));
                 }
             })
             .fail(function(jqXHR, textStatus, error) {
@@ -263,13 +270,15 @@ $(document).ready(function() {
     $(".controls [name='go-to']").keyup(function(e){
         var keycode = e.keyCode,
         $this = $(this);
-        // Reset customValidity on backspace or delete keys
+        // Reset customValidity on backspace or delete keys, or up and down arrows
+        // Additionally allow a user to move throguh rows by using up and down arrows in
+        // the input field
         if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
             this.setCustomValidity("");
             // UP arrow
-            if (keycode == 38) $this.val(parseInt($this.val(), 10)+1).change();
+            if (keycode == 38 && $this.val() < resultID) $this.val(parseInt($this.val(), 10)+1).change();
             // DOWN arrow
-            if (keycode == 40) $this.val(parseInt($this.val(), 10)-1).change();
+            if (keycode == 40 && $this.val() > 1) $this.val(parseInt($this.val(), 10)-1).change();
         }
     })
     .change(function() {

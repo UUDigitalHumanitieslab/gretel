@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 require '../config/config.php';
 
 session_start();
-header('Content-Type:text/html; charset=utf-8');
 
 /********************/
 /* SET UP VARIABLES */
@@ -22,7 +21,6 @@ if ($treebank == 'sonar') {
 
 $databaseString = $treebank;
 
-// if ($treebank != "sonar") $originalXp = $_SESSION['original-xp'];
 $sm = $_SESSION['search'];
 $example = $_SESSION['example'];
 $xpath = $_SESSION['xpath'];
@@ -51,30 +49,34 @@ try {
         list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
     }
     $session->close();
-if (isset($sentences)) {
-  array_filter($sentences);
+    session_write_close();
 
-  foreach ($sentences as $sid => $sentence) {
-      // highlight sentence
-      $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
-      // deal with quotes/apos
-      $trans = array('"' => '&quot;', "'" => "&apos;");
-      $hlsentence = strtr($hlsentence, $trans);
+  if (isset($sentences)) {
+    array_filter($sentences);
+    array_filter($beginlist);
+    array_filter($idlist);
 
-      if ($treebank == 'sonar') $databaseString = $tblist[$sid];
+    foreach ($sentences as $sid => $sentence) {
+        // highlight sentence
+        $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
+        // deal with quotes/apos
+        $trans = array('"' => '&quot;', "'" => "&apos;");
+        $hlsentence = strtr($hlsentence, $trans);
 
-      // remove the added identifier (see GetSentences) to use in the link
-      $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
+        if ($treebank == 'sonar') $databaseString = $tblist[$sid];
 
-      $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.
-        '?sid='.$sidString.
-        '&tb='.$treebank.
-        '&db='.$databaseString.
-        '&id='.$idlist[$sid].
-        '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
+        // remove the added identifier (see GetSentences) to use in the link
+        $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
 
-      $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
-  }
+        $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.
+          '?sid='.$sidString.
+          '&tb='.$treebank.
+          '&db='.$databaseString.
+          '&id='.$idlist[$sid].
+          '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
+
+        $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
+    }
     $results = array(
       'error' => false,
       'data' => $resultsArray,
@@ -89,6 +91,7 @@ if (isset($sentences)) {
     echo json_encode($results);
   }
 } catch (Exception $e) {
+  session_write_close();
     $results = array(
       'error' => true,
       'data' => $e->getMessage(),

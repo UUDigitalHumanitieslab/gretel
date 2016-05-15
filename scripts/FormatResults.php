@@ -90,12 +90,12 @@ function HighlightSentence($sentence, $beginlist, $tag)
     } else {
         $s = $sentence;
     }
-    $words=explode(' ', $s);
-    $begins=explode('-',$beginlist);
+    $words = explode(' ', $s);
+    $begins = explode('-',$beginlist);
 
     $i = 0;
     // Instead of wrapping each individual word in a strong tag, merge sequences
-    // of words in one <strong>...</strong>
+    // of words in one <tag>...</tag>
     foreach ($words as $word) {
         if (in_array($i, $begins)) {
             $val = '';

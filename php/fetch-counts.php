@@ -15,6 +15,8 @@ $component = $_SESSION['subtreebank'];
 
 $includes = ($treebank == 'sonar') ? $_SESSION['includes'] : false;
 
+session_write_close();
+
 if ($treebank == 'sonar') {
     $dbhost = $dbnameServerSonar{$component[0]};
     $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
