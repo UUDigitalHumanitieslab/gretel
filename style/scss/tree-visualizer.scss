@@ -346,18 +346,15 @@
     .zoom-opts {
         position: absolute;
         top: 12px;
-        right: 12px;
+        right: 30px;
         z-index: 9;
         padding: 12px;
         background: #F5F5F5;
-        opacity: 0.8;
-        transition: opacity 200ms;
         will-change: opacity;
         @extend %clearfix;
         &:hover {
             z-index: 12;
             box-shadow: 0 2px 4px rgba(0,0,0,.3);
-            opacity: 1;
         }
         button {
             position: relative;

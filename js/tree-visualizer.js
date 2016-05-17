@@ -170,8 +170,8 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts"><button class="zoom-out">-</button>' +
-                    '<button class="zoom-default">Default</button><button class="zoom-in">+</button>' +
+                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts"><button class="zoom-out"><i class="fa fa-search-minus" aria-hidden="true"></i></button>' +
+                    '<button class="zoom-default">Default</button><button class="zoom-in"><i class="fa fa-search-plus" aria-hidden="true"></i></button>' +
                     '<button class="close"><i class="fa fa-times"></i></button></div>';
 
                 FS.append(FSHTML);

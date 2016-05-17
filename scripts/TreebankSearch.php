@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 /**
  *
  * $databases is actually a copy of the first breadth-first pattern. One would
@@ -483,96 +481,4 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
     $xquery = $openPosition.$xquery.$closePosition;
 
     return $xquery;
-}
-
-function SetDB2Corpus($corpus)
-{
-    if ($corpus == 'lassy') {
-        $CORPUS['LASSY_ID_DPC'] = 'DPC';
-        $CORPUS['LASSY_ID_WIKI'] = 'Wikipedia';
-        $CORPUS['LASSY_ID_WRPE'] = 'WR-P-E';
-        $CORPUS['LASSY_ID_WRPP'] = 'WR-P-P';
-        $CORPUS['LASSY_ID_WSU'] = 'WS-U';
-    } elseif ($corpus == 'cgn') {
-        $CORPUS['CGN_ID_NA'] = 'NA';
-        $CORPUS['CGN_ID_NB'] = 'NB';
-        $CORPUS['CGN_ID_NC'] = 'NC';
-        $CORPUS['CGN_ID_NE'] = 'NE';
-        $CORPUS['CGN_ID_NF'] = 'NF';
-        $CORPUS['CGN_ID_NG'] = 'NG';
-        $CORPUS['CGN_ID_NH'] = 'NH';
-        $CORPUS['CGN_ID_NI'] = 'NI';
-        $CORPUS['CGN_ID_NJ'] = 'NJ';
-        $CORPUS['CGN_ID_NK'] = 'NK';
-        $CORPUS['CGN_ID_NL'] = 'NL';
-        $CORPUS['CGN_ID_NM'] = 'NM';
-        $CORPUS['CGN_ID_NN'] = 'NN';
-        $CORPUS['CGN_ID_VA'] = 'VA';
-        $CORPUS['CGN_ID_VB'] = 'VB';
-        $CORPUS['CGN_ID_VC'] = 'VC';
-        $CORPUS['CGN_ID_VD'] = 'VD';
-        $CORPUS['CGN_ID_VF'] = 'VF';
-        $CORPUS['CGN_ID_VG'] = 'VG';
-        $CORPUS['CGN_ID_VH'] = 'VH';
-        $CORPUS['CGN_ID_VI'] = 'VI';
-        $CORPUS['CGN_ID_VJ'] = 'VJ';
-        $CORPUS['CGN_ID_VK'] = 'VK';
-        $CORPUS['CGN_ID_VL'] = 'VL';
-        $CORPUS['CGN_ID_VM'] = 'VM';
-        $CORPUS['CGN_ID_VN'] = 'VN';
-        $CORPUS['CGN_ID_VO'] = 'VO';
-    } elseif ($corpus == 'sonar') {
-        $CORPUS['SONAR_ID_WRPEA_1'] = 'WRPEA_1';
-        $CORPUS['SONAR_ID_WRPEA_2'] = 'WRPEA_2';
-    } else {
-        return 'ERROR!';
-    }
-
-    return $CORPUS;
-}
-
-function SetDB2CorpusDetailed($corpus)
-{
-    if ($corpus == 'lassy') {
-        $CORPUS['LASSY_ID_DPC'] = 'DPC <span>(Dutch Parallel Corpus)</span>';
-        $CORPUS['LASSY_ID_WIKI'] = 'Wikipedia <span>(Dutch Wikipedia pages)</span>';
-        $CORPUS['LASSY_ID_WRPE'] = 'WR-P-E <span>(E-magazines, newsletters, teletext pages, web sites, Wikipedia)</span>';
-        $CORPUS['LASSY_ID_WRPP'] = 'WR-P-P <span>(Books, brochures, guides and manuals, legal texts, newspapers, periodicals and magazines, policy documents, proceedings, reports, surveys)</span>';
-        $CORPUS['LASSY_ID_WSU'] = 'WS-U <span>(Auto cues, news scripts, texts for the visually impaired)</span>';
-    } elseif ($corpus == 'cgn') {
-        $CORPUS['CGN_ID_NA'] = 'NA <span>(Spontaneous conversations (\'face-to-face\'))</span>';
-        $CORPUS['CGN_ID_NB'] = 'NB <span>(Interviews with teachers of Dutch)</span>';
-        $CORPUS['CGN_ID_NC'] = 'NC <span>(Telephone conversations (recorded via a switchboard))</span>';
-        $CORPUS['CGN_ID_NE'] = 'NE <span>(Simulated business negotiations)</span>';
-        $CORPUS['CGN_ID_NF'] = 'NF <span>(Interviews/discussions/debates (broadcast))</span>';
-        $CORPUS['CGN_ID_NG'] = 'NG <span>((Political) discussions/debates/meetings (non-broadcast))</span>';
-        $CORPUS['CGN_ID_NH'] = 'NH <span>(Lessons recorded in the classroom)</span>';
-        $CORPUS['CGN_ID_NI'] = 'NI <span>(Live (sports) commentaries (broadcast))</span>';
-        $CORPUS['CGN_ID_NJ'] = 'NJ <span>(Newsreports (broadcast))</span>';
-        $CORPUS['CGN_ID_NK'] = 'NK <span>(News (broadcast))</span>';
-        $CORPUS['CGN_ID_NL'] = 'NL <span>(Commentaries/columns/reviews (broadcast))</span>';
-        $CORPUS['CGN_ID_NM'] = 'NM <span>(Ceremonious speeches/sermons)</span>';
-        $CORPUS['CGN_ID_NN'] = 'NN <span>(Lectures/seminars)</span>';
-        $CORPUS['CGN_ID_VA'] = 'VA <span>(Spontaneous conversations (\'face-to-face\'))</span>';
-        $CORPUS['CGN_ID_VB'] = 'VB <span>(Interviews with teachers of Dutch)</span>';
-        $CORPUS['CGN_ID_VC'] = 'VC <span>(Telephone conversations (recorded via a switchboard))</span>';
-        $CORPUS['CGN_ID_VD'] = 'VD <span>(Telephone conversations (recorded on MD))</span>';
-        $CORPUS['CGN_ID_VF'] = 'VF <span>(Interviews/discussions/debates (broadcast))</span>';
-        $CORPUS['CGN_ID_VG'] = 'VG <span>((Political) discussions/debates/meetings (non-broadcast))</span>';
-        $CORPUS['CGN_ID_VH'] = 'VH <span>(Lessons recorded in the classroom)</span>';
-        $CORPUS['CGN_ID_VI'] = 'VI <span>(Live (sports) commentaries (broadcast))</span>';
-        $CORPUS['CGN_ID_VJ'] = 'VJ <span>(Newsreports (broadcast))</span>';
-        $CORPUS['CGN_ID_VK'] = 'VK <span>(News (broadcast))</span>';
-        $CORPUS['CGN_ID_VL'] = 'VL <span>(Commentaries/columns/reviews (broadcast))</span>';
-        $CORPUS['CGN_ID_VM'] = 'VM <span>(Ceremonious speeches/sermons)</span>';
-        $CORPUS['CGN_ID_VN'] = 'VN <span>(Lectures/seminars)</span>';
-        $CORPUS['CGN_ID_VO'] = 'VO <span>(Read speech)</span>';
-    } elseif ($corpus == 'sonar') {
-        $CORPUS['SONAR_ID_WRPEA_1'] = 'WRPEA_1';
-        $CORPUS['SONAR_ID_WRPEA_2'] = 'WRPEA_2';
-    } else {
-        return 'ERROR!';
-    }
-
-    return $CORPUS;
 }

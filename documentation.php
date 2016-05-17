@@ -55,6 +55,13 @@ require "$root/php/head.php";
                     <dd>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
                     interested in searching through Lassy, CGN, or Sonar. However, the tool is especially dedicated to
                     those looking for <em>specific linguistic patterns</em> in these corpora.</dd>
+
+                    <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
+                    <dd></dd>
+
+                    <dt id="faq-4">I would like to have additional functionality, or I want to provide other feedback.
+                        How can I contact you?</dt>
+                    <dd></dd>
                 </dl>
             </section>
         </main>

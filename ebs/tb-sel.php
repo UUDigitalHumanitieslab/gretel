@@ -4,6 +4,8 @@ ini_set('display_errors', 1);
 require '../config/config.php';
 require "$root/helpers.php";
 
+
+session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
@@ -107,7 +109,7 @@ else: ?>
     <div class="cgn" style="display:none">
       <?php require "$scripts/cgn-tb.html"; ?>
     </div>
-    <div class="lassy">
+    <div class="lassy" style="display:none">
       <?php require "$scripts/lassy-tb.html"; ?>
     </div>
     <div class="sonar" style="display:none">
@@ -118,11 +120,6 @@ else: ?>
 <?php endif; ?>
 
 <?php
-if ($continueConstraints) : ?>
-    <script>
-    var treebank = "<?php echo (isset($_SESSION['treebank'])) ? $_SESSION['treebank'] : ''; ?>";
-    </script>
-<?php endif;
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
  ?>

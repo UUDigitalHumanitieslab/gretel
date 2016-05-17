@@ -1121,6 +1121,7 @@ dd:after {
 }
 .loading-wrapper.searching {
   display: none;
+  z-index: 10;
 }
 .loading-wrapper.searching.active {
   display: -webkit-box;

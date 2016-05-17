@@ -12,8 +12,15 @@ $(document).ready(function() {
         xResultsBeforeMore = 4;
 
     var hash = window.location.hash,
+        $window = $(window),
         tvLink = $("a.tv-show-fs"),
-        xhrAllSentences,
+        controls = $(".controls"),
+        resultsWrapper = $(".results-wrapper"),
+        filterWrapper = $(".filter-wrapper"),
+        controls = $(".controls"),
+        dummy = $(".dummy-controls");
+
+    var xhrAllSentences,
         resultID = 0,
         resultsCount = 0,
         stop = false,
@@ -22,14 +29,6 @@ $(document).ready(function() {
 
     getSentences();
 
-/* Open tree visualizer if a hash is persent in URL. Not implemented yet
-    if (hash) {
-        if (hash.indexOf("tv-") == 1) {
-            var index = hash.match(/\d+$/);
-            tvLink.eq(index[0] - 1).click();
-        }
-    }
-*/
     function getSentences() {
         if (!done && (resultID <= phpVars.resultsLimit)) {
             $(".loading-wrapper.searching").addClass("active");
@@ -79,8 +78,6 @@ $(document).ready(function() {
     }, timeoutBeforeMore);
 
     function findAll() {
-      localStorage.removeItem("downloadresults");
-
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
@@ -99,9 +96,6 @@ $(document).ready(function() {
                     } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
                         messageNoResultsFound();
                     }
-                }
-                if (data.download) {
-                  localStorage.setItem("downloadresults", JSON.stringify(data.download));
                 }
             })
             .fail(function(jqXHR, textStatus, error) {
@@ -149,13 +143,15 @@ $(document).ready(function() {
         $(".loading-wrapper.searching").removeClass("active");
         $(".controls").find(".stop, .continue").prop("disabled", true);
         disableAndEnableInputs();
-        var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small>(still counting)</small>'];
+        var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small>(still counting, can take a while)</small>'];
         notice = '<strong>' + stringCount[0] + '</strong> result(s) have/has been found! ' + stringCount[1];
         if (resultID >= phpVars.resultsLimit) {
-            notice += '<br>We have restricted the output to 500 hits. ' +
+            notice += '<p>We have restricted the output to 500 hits. ' +
                 'You can find the reason for this <a href="' + phpVars.fetchHomePath + '/documentation.php#faq-1" ' +
-                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
+                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.</p>';
         }
+        notice += '<br><p>You can download a tab-separated file <a href="'+phpVars.downloadPath + '"' +
+            'title="Download results" target="_blank" download="gretel-results.txt">here</a>.';
         $(".notice p").html(notice);
 
         $(".messages").addClass("active");
@@ -317,44 +313,50 @@ $(document).ready(function() {
         var $this = $(this),
             component = $this.val();
 
+        $("#all-components").prop("indeterminate", false);
+
         if ($this.is("[name='component']")) {
+            // Show/hide designated components in results
             if ($this.is(":checked")) {
-                $(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").show();
+                resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").show();
             } else {
-                $(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").hide();
+                resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").hide();
             }
 
-            if (!$this.closest(".filter-wrapper").find("[name='component']").addBack().is(":checked")) {
-                $(".results-wrapper .empty").css("display", "table-row-group");
-                $("#all-components").prop("checked", false).parent().removeClass("active");
+            // If none of the component checkboxes are checked
+            if (!filterWrapper.find("[name='component']").is(":checked")) {
+                resultsWrapper.find(".empty").css("display", "table-row-group");
+                filterWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
                 $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
             } else {
-                if ($(".filter-wrapper [name='component']:not([disabled])").length == $(".filter-wrapper [name='component']:not([disabled]):checked").length) {
-                    $("#all-components").prop("checked", true).parent().addClass("active");
+                if (filterWrapper.find("[name='component']:not(:disabled)").length == filterWrapper.find("[name='component']:not(:disabled):checked").length) {
+                    filterWrapper.find("#all-components").prop("checked", true).parent().addClass("active");
                 }
                 else {
-                    $("#all-components").prop("checked", false).parent().removeClass("active");
+                    filterWrapper.find("#all-components").prop("checked", false).prop("indeterminate", true).parent().removeClass("active");
                 }
-                $(".results-wrapper .empty").hide();
+                resultsWrapper.find(".empty").hide();
                 $("[for='go-to']").removeClass("disabled").children("input").prop("disabled", false);
             }
-        } else if ($this.is("#all-components")) {
+        }
+        // One checkbox to rule them all
+        else if ($this.is("#all-components")) {
             $this.parent().toggleClass("active");
-            $(".filter-wrapper [type='checkbox'][name='component']:not([disabled])").prop("checked", $this.is(":checked")).change();
+            filterWrapper.find("[type='checkbox'][name='component']:not(:disabled)").prop("checked", $this.is(":checked")).change();
         }
 
-        $("#go-to").val($(".results-wrapper tbody:not(.empty) tr:visible").first().attr("data-result-id") || "--");
+        $("#go-to").val(resultsWrapper.find("tbody:not(.empty) tr:visible").first().attr("data-result-id") || "--");
     });
 
     function disableAndEnableInputs() {
         $("[for='go-to'], [for='filter-components'], .filter-wrapper label").removeClass("disabled").children("input").prop("disabled", false);
 
         // Disable the checkboxes which don't have any results
-        $(".filter-wrapper [type='checkbox'][name='component']").each(function() {
+        filterWrapper.find("[type='checkbox'][name='component']").each(function() {
             var $this = $(this),
                 component = $this.val();
 
-            if ($(".results-wrapper tbody:not(.empty) tr[data-component='" + component + "']").length == 0) {
+            if (resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").length == 0) {
                 $this.prop("disabled", true);
                 $this.prop("checked", false);
                 $this.parent("label").addClass("disabled");
@@ -362,30 +364,26 @@ $(document).ready(function() {
         });
     }
 
-    var controls = $(".controls"),
-        top = controls[0].getBoundingClientRect().top + controls.scrollTop(),
-        h = controls[0].getBoundingClientRect().height,
-        dummy = $(".dummy-controls");
+    var controlsTop = controls[0].getBoundingClientRect().top + controls.scrollTop(),
+        controlsHeight = controls[0].getBoundingClientRect().height;
 
-    dummy.height(h);
+    dummy.height(controlsHeight);
 
-    $(window).resize($.throttle(250, setDummyVariables));
-    $(window).scroll($.throttle(250, scrollMenu));
+    $window.resize($.throttle(250, setDummyVariables));
+    $window.scroll($.throttle(250, scrollMenu));
 
     function setDummyVariables() {
         if (!controls.hasClass("scroll")) {
-            top = controls.offset().top;
-            h = controls.outerHeight();
-            dummy.height(h);
+            controlsTop = controls.offset().top;
+            controlsHeight = controls.outerHeight();
+            dummy.height(controlsHeight);
         } else {
-            top = dummy.offset().top;
+            controlsTop = dummy.offset().top;
         }
     }
 
     function scrollMenu() {
-        var $this = $(window);
-
-        if ($this.scrollTop() >= top) {
+        if ($window.scrollTop() >= controlsTop) {
             dummy.show();
             controls.addClass("scroll");
         } else {
@@ -395,11 +393,10 @@ $(document).ready(function() {
     }
 
     /* Tree visualizer */
-    $(".results-wrapper tbody:not(.empty)").on("click", "a.tv-show-fs", function(e) {
+    resultsWrapper.find("tbody:not(.empty)").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
         $(".loading-wrapper.tv").addClass("active");
-        window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
-        body.treeVisualizer($this.data("tv-url"), {
+        $("body").treeVisualizer($this.data("tv-url"), {
             normalView: false,
             initFSOnClick: true,
             fsFontSize: 12
