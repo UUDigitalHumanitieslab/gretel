@@ -1,9 +1,7 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 require '../config/config.php';
 require "$root/helpers.php";
-
 
 session_cache_limiter('private');
 session_start();

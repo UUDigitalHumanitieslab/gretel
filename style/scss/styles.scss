@@ -439,7 +439,6 @@ dd {
     z-index: 2;
     opacity: 0;
     transition: opacity 600ms;
-    will-change: opacity;
     &.active {
         opacity: 1;
     }
@@ -627,17 +626,17 @@ dd {
 .ebs {
     &.step-1 {
         .input-wrapper {
-            position: relative;
+            display: flex;
+            align-items: flex-start;
             button {
-                position: absolute;
                 width: 40px;
+                height: 40px;
                 background: darken(#C0C0C0, 12%);
                 text-align: center;
                 opacity: 0;
                 transition: opacity 300ms;
                 transform: translateX(-100%);
                 pointer-events: none;
-                will-change: opacity;
                 &:hover {
                     background: darken(#C0C0C0, 15%);
                 }
@@ -645,16 +644,15 @@ dd {
                     background: darken(#C0C0C0, 17%);
                 }
             }
-        }
-        input[type="text"] {
-            padding-right: 36px;
-            max-width: calc(100% - 60px);
-            width: 420px;
-            resize: horizontal;
-            &.has-content {
-                + button {
-                    opacity: 1;
-                    pointer-events: all;
+            input[type="text"] {
+                padding-right: 44px;
+                height: 40px;
+                width: 420px;
+                &.has-content {
+                    + button {
+                        opacity: 1;
+                        pointer-events: all;
+                    }
                 }
             }
         }
@@ -662,6 +660,18 @@ dd {
     &.step-3 {
         thead td {
             background: #F0F0F0;
+        }
+    }
+    &.step-5 {
+        textarea[name="xp"] {
+            margin-right: 16px;
+            min-width: 320px;
+            min-height: 100px;
+            width: 50%;
+            color: inherit;
+            vertical-align: top;
+            font-family: monospace;
+            resize: vertical;
         }
     }
     &.step-6 {
@@ -796,26 +806,30 @@ dd {
             [name="to-top"] {
                 width: 34px;
             }
-            [type="number"] {
-                width: 60px;
+        }
+    }
+}
+.xps {
+    &.step-1 {
+        .input-wrapper {
+            display: flex;
+            align-items: flex-start;
+            button {
+                width: 40px;
+                height: 40px;
+                text-align: center;
+                margin-left: 12px;
+            }
+            textarea {
+                min-height: 100px;
+                min-width: 560px;
+                font-family: monospace;
             }
         }
     }
 }
 .ebs,
 .xps {
-    &.step-5 {
-        textarea[name="xp"] {
-            margin-right: 16px;
-            min-width: 320px;
-            min-height: 100px;
-            width: 50%;
-            color: inherit;
-            vertical-align: top;
-            font-family: monospace;
-            resize: vertical;
-        }
-    }
     .progress-header {
         display: flex;
         margin-top: 1em;
@@ -847,6 +861,7 @@ dd {
         }
     }
 }
+
 .page-footer {
     display: flex;
     flex-direction: column;

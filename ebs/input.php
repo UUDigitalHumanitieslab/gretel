@@ -16,9 +16,6 @@ if (isset($_SESSION['example'])) {
     $input = 'Dit is een zin.';
 }
 
-session_regenerate_id(FALSE);
-session_unset();
-
 require "$root/functions.php";
 require "$root/php/head.php";
 ?>

@@ -984,7 +984,6 @@ dd:after {
   opacity: 0;
   -webkit-transition: opacity 600ms;
   transition: opacity 600ms;
-  will-change: opacity;
 }
 #tree-output.active {
   opacity: 1;
@@ -1246,11 +1245,18 @@ dd:after {
 
 /* EBS, XPS */
 .ebs.step-1 .input-wrapper {
-  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
 }
 .ebs.step-1 .input-wrapper button {
-  position: absolute;
   width: 40px;
+  height: 40px;
   background: #a1a1a1;
   text-align: center;
   opacity: 0;
@@ -1260,7 +1266,6 @@ dd:after {
       -ms-transform: translateX(-100%);
           transform: translateX(-100%);
   pointer-events: none;
-  will-change: opacity;
 }
 .ebs.step-1 .input-wrapper button:hover {
   background: #9a9a9a;
@@ -1268,18 +1273,27 @@ dd:after {
 .ebs.step-1 .input-wrapper button:active {
   background: #959595;
 }
-.ebs.step-1 input[type="text"] {
-  padding-right: 36px;
-  max-width: calc(100% - 60px);
+.ebs.step-1 .input-wrapper input[type="text"] {
+  padding-right: 44px;
+  height: 40px;
   width: 420px;
-  resize: horizontal;
 }
-.ebs.step-1 input[type="text"].has-content + button {
+.ebs.step-1 .input-wrapper input[type="text"].has-content + button {
   opacity: 1;
   pointer-events: all;
 }
 .ebs.step-3 thead td {
   background: #F0F0F0;
+}
+.ebs.step-5 textarea[name="xp"] {
+  margin-right: 16px;
+  min-width: 320px;
+  min-height: 100px;
+  width: 50%;
+  color: inherit;
+  vertical-align: top;
+  font-family: monospace;
+  resize: vertical;
 }
 .ebs.step-6 .results-wrapper table {
   width: 100%;
@@ -1437,21 +1451,29 @@ dd:after {
 .ebs.step-6 .controls [name="to-top"] {
   width: 34px;
 }
-.ebs.step-6 .controls [type="number"] {
-  width: 60px;
+
+.xps.step-1 .input-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+.xps.step-1 .input-wrapper button {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  margin-left: 12px;
+}
+.xps.step-1 .input-wrapper textarea {
+  min-height: 100px;
+  min-width: 560px;
+  font-family: monospace;
 }
 
-.ebs.step-5 textarea[name="xp"],
-.xps.step-5 textarea[name="xp"] {
-  margin-right: 16px;
-  min-width: 320px;
-  min-height: 100px;
-  width: 50%;
-  color: inherit;
-  vertical-align: top;
-  font-family: monospace;
-  resize: vertical;
-}
 .ebs .progress-header,
 .xps .progress-header {
   display: -webkit-box;
