@@ -1,9 +1,17 @@
 @import "normalize";
 @import "clearfix";
 @import "variables";
+%fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 *,
-*:after,
-*:before {
+*::after,
+*::before {
     box-sizing: border-box;
 }
 body {
@@ -16,7 +24,7 @@ body {
     font-family: $fontbody;
     line-height: 1.625;
     align-items: center;
-    &:before {
+    &::before {
         position: fixed;
         top: 36px;
         left: 50%;
@@ -98,7 +106,7 @@ dl {
 dt {
     font-weight: bold;
     margin-bottom: 1em;
-    &:before {
+    &::before {
         counter-increment: dt;
         content: counter(dt) ". ";
     }
@@ -112,7 +120,7 @@ dd {
     margin-left: 1em;
     text-align: justify;
     margin-bottom: 1.67em;
-    &:after {
+    &::after {
         content: "";
         height: 3px;
         background: #BFA58A;
@@ -135,7 +143,7 @@ dd {
     flex-wrap: wrap;
     max-width: 220px;
     justify-content: space-between;
-    &:before {
+    &::before {
         content: "";
         position: absolute;
         top: -11px;
@@ -202,11 +210,21 @@ dd {
     border-bottom: 1px dotted #968A7A;
     justify-content: space-between;
     align-items: center;
+    position: relative;
     h1 {
         margin: 0;
         white-space: nowrap;
         font-size: 2em;
         flex: 1;
+    }
+    h2 {
+        position: absolute;
+        left: 24px;
+        bottom: 0;
+        font-family: $fontbody;
+        font-weight: 300;
+        margin: 0;
+        font-size: smaller;
     }
 }
 .primary-navigation {
@@ -237,12 +255,12 @@ dd {
                 &.active,
                 &:hover {
                     color: darken($textmain, 12%);
-                    transform: scale(1.25);
-                    &:after {
+                    transform: scale(1.125);
+                    &::after {
                         width: 67%;
                     }
                 }
-                &:after {
+                &::after {
                     position: absolute;
                     bottom: -2px;
                     left: 50%;
@@ -283,7 +301,7 @@ dd {
                         background: #F5F5F5;
                         border-left-color: #DDD;
                     }
-                    &:after {
+                    &::after {
                         display: none;
                     }
                 }
@@ -393,8 +411,8 @@ dd {
                 /* Arrows for breadcrumbs; not on last child */
                 a {
                     padding-right: 10px;
-                    &:after,
-                    &:before {
+                    &::after,
+                    &::before {
                         position: absolute;
                         top: 50%;
                         left: 100%;
@@ -409,7 +427,7 @@ dd {
                         content: " ";
                         transform: translateX(-67%);
                     }
-                    &:after {
+                    &::after {
                         z-index: 2;
                         margin-left: -1px;
                         border-left-color: #C0C0C0;
@@ -423,11 +441,11 @@ dd {
                 position: relative;
                 z-index: 3;
             }
-            &.active:not(:last-child) a:after,
-            &:not(:last-child):not(.no-hover):hover a:after {
+            &.active:not(:last-child) a::after,
+            &:not(:last-child):not(.no-hover):hover a::after {
                 border-left-color: #B6D54B;
             }
-            &.done:not(:last-child) a:after {
+            &.done:not(:last-child) a::after {
                 border-left-color: darken(#C0C0C0, 12%);
             }
         }
@@ -474,7 +492,7 @@ dd {
             background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
             background-position: bottom center;
             background-size: 74%;
-            &:after {
+            &::after {
                 top: -18px;
                 right: -18px;
                 bottom: -18px;
@@ -497,7 +515,7 @@ dd {
         align-items: center;
         justify-content: center;
         will-change: transform;
-        &:after {
+        &::after {
             position: absolute;
             top: -6px;
             right: -6px;
@@ -524,7 +542,7 @@ dd {
         pointer-events: all;
         .loading {
             transform: scale(1);
-            &:after {
+            &::after {
                 animation: load-rotate 2.4s linear infinite;
             }
         }
@@ -609,14 +627,9 @@ dd {
         }
     }
     dt:target {
-        &:after {
+        &::after {
+            @extend %fa;
             content: "\f104";
-            display: inline-block;
-            font: normal normal normal 14px/1 FontAwesome;
-            font-size: inherit;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             animation: docs-target-arrow 600ms alternate infinite;
             margin-left: 5px;
         }
@@ -736,13 +749,15 @@ dd {
                 }
             }
         }
-        #go-to {width: 48px;}
+        #go-to {
+            width: 48px;
+        }
         .dummy-controls {
             position: relative;
             margin: auto auto 1.67em;
             display: none;
-            &:after,
-            &:before {
+            &::after,
+            &::before {
                 position: absolute;
                 bottom: 0;
                 width: 100%;
@@ -751,7 +766,7 @@ dd {
                 background-size: 40px 100%;
                 content: "";
             }
-            &:after {
+            &::after {
                 top: 0;
                 bottom: auto;
             }
@@ -761,8 +776,8 @@ dd {
                 right: 0;
                 bottom: 0;
                 left: 0;
-                &:after,
-                &:before {
+                &::after,
+                &::before {
                     position: absolute;
                     left: 0;
                     width: 8px;
@@ -771,7 +786,7 @@ dd {
                     background-size: 100% 40px;
                     content: "";
                 }
-                &:after {
+                &::after {
                     right: 0;
                     left: auto;
                 }
@@ -861,32 +876,56 @@ dd {
         }
     }
 }
-
 .page-footer {
-    display: flex;
-    flex-direction: column;
     margin-top: 24px;
-    /* Firefox: */
-    min-height: 48px;
-    max-width: none;
-    max-height: 48px;
     width: 100%;
-    height: 48px;
-    background: #BFA58A;
-    flex: 1;
-    align-items: center;
+    background: #7E6748;
+    flex: 0;
     .content {
         position: relative;
+        margin: 0 auto;
         display: flex;
-        padding: 0;
+        padding: 12px;
         background: transparent;
         color: white;
-        align-items: center;
+        align-items: flex-start;
+        justify-content: space-around;
+        font-size: smaller;
         a {
             color: white;
         }
-        span {
-            margin-right: 96px;
+    }
+    address {
+        font-style: normal;
+        font-size: small;
+        ul {
+            list-style: none;
+            padding-left: 26px;
+            li {
+                position: relative;
+                &::before {
+                    @extend %fa;
+                    position: absolute;
+                    left: -12px;
+                    transform: translateX(-100%);
+                    line-height: 1.625;
+                }
+            }
+        }
+        .address {
+            margin-bottom: 6px;
+            &::before {
+                content: "\f041";
+            }
+        }
+        .web::before {
+            content: "\f0c1";
+        }
+        .tel::before {
+            content: "\f095";
+        }
+        .fax::before {
+            content: "\f1ac";
         }
     }
     [class^="logo-link"] {
@@ -894,23 +933,24 @@ dd {
         border: 0 none;
         box-shadow: none;
     }
-    .logo-link-gretel {
+    .logo-wrapper {
         position: absolute;
         bottom: 0;
-        right: 0;
-        height: 80px;
-        width: 67px;
-        border-radius: 50%;
+        left: 50%;
+        transform: translateX(-20%);
         svg {
             overflow: visible !important;
+            height: 100px;
+            width: 83px;
         }
         circle {
-            transition: transform 300ms;
-            transform: scale(1);
-            transform-origin: center center;
-        }
-        &:hover circle {
             transform: scale(1.125);
+            transform-origin: center center;
+            stroke: white;
+            stroke-width: 10px;
+        }
+        path {
+            fill: rgba(#655745, 0.89);
         }
     }
 }

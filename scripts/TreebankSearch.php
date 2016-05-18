@@ -5,7 +5,7 @@
  * $databases is actually a copy of the first breadth-first pattern. One would
  * argue that includes was a better name. However, to keep some cohesion between
  * SONAR on the one hand and CGN and Lassy on the other, we call both the includes
- * as well as the result of Corpus2DB databases
+ * as well as the result of Corpus2DB "databases"
  *
  */
 function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)

@@ -31,7 +31,7 @@ require "$root/php/head.php";
                 The formal (XPath) query is automatically generated. In this type of search Three different
                 corpora can be queried: CGN, Lassy, and SoNaR.</p>
 
-            <h3><a href="<?php echo $home; ?>/xps/input-xp.php">XPath search</a></h3>
+            <h3><a href="<?php echo $home; ?>/xps/input.php">XPath search</a></h3>
 
             <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
                 XPath search tool only when you are an experienced XPath user! Also note that because of the size of

@@ -80,47 +80,77 @@ $(document).ready(function() {
                 $("#hide").toggle();
             });
         }
-    } else if ((body.hasClass("ebs") && body.hasClass("step-4"))
-        || (body.hasClass("xps") && body.hasClass("step-2"))) {
-        $("[type='checkbox'], [type='radio']").change(function() {
+    } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {
+
+        // Main treebank selection (CGN, Lassy, SONAR)
+        $("[type='radio']").change(function() {
             var $this = $(this),
-                tableWrapper = $this.closest(".table-wrapper");
-
-            // For subtreebanks with checkboxes (Lassy and CGN only)
-            if ($this.is("[name='subtreebank[]']")) {
-                var subtreebank = tableWrapper.find("[name='subtreebank[]']");
-                tableWrapper.find("[data-check^='all']").prop("indeterminate", false);
-
-                // If all component checkboxes are checked
-                if (subtreebank.filter(":not(:disabled)").length == subtreebank.filter(":not(:disabled):checked").length) {
-                    tableWrapper.find("[data-check^='all']").prop("checked", true);
-                }
-                // If no checkboxes are checked
-                else if (subtreebank.filter(":checked").length == 0) {
-                    tableWrapper.find("[data-check^='all']").prop("checked", false);
-                } else {
-                    tableWrapper.find("[data-check^='all']").prop("indeterminate", true);
-                }
-            }
-            // For treebank selection (Lassy, CGN, SONAR radio buttons)
-            else if ($this.is("[name='treebank']")) {
-                var val = $(this).val();
+                value = $this.val();
+            if ($this.is("[name='treebank']")) {
                 $(".cgn, .lassy, .sonar").hide();
                 $(".cgn, .lassy, .sonar").find("[type='checkbox'], [type='radio']").prop("disabled", true);
-                $("." + val).show().find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
-            } else if ($this.is("[data-check^='all']")) {
+                $("." + value).show().find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
+            }
+        });
+
+        // Selecting subtreebanks
+        $("[type='checkbox']").change(function() {
+            var $this = $(this);
+
+            // If this is not a check-all checkbox
+            if (!$this.is("[data-check^='all']")) {
+                console.log("not check-all");
+
+                // For subtreebanks with checkboxes (Lassy and CGN only, they have checkboxes)
+                if ($this.is("[name='subtreebank[]']")) {
+                    var checkboxAll,
+                        treebank = $this.attr("data-treebank"),
+                        tableWrapper = $this.closest(".table-wrapper"),
+                        value = $this.val(),
+                        valStartsWith = value.substring(0, 1);
+
+                    if (valStartsWith == "n") {
+                        checkboxAll = tableWrapper.find("[data-check='all-cgn-nl']");
+                    } else if (valStartsWith == "v") {
+                        checkboxAll = tableWrapper.find("[data-check='all-cgn-vl']");
+                    } else {
+                        checkboxAll = tableWrapper.find("[data-check='all-lassy']");
+                    }
+
+                    var subtreebanks = tableWrapper.find("[name='subtreebank[]']"),
+                        cgnValueString = (treebank == 'cgn') ? "[value^='" + valStartsWith + "']" : "";
+
+                    // If all component checkboxes are checked
+                    if (subtreebanks.filter(cgnValueString + ":not(:disabled)").length == subtreebanks.filter(cgnValueString + ":not(:disabled):checked").length) {
+                        checkboxAll.prop("indeterminate", false);
+                        checkboxAll.prop("checked", true);
+                    }
+                    // If no checkboxes are checked
+                    else if (subtreebanks.filter(cgnValueString + ":checked").length == 0) {
+                        checkboxAll.prop("indeterminate", false);
+                        checkboxAll.prop("checked", false);
+                    }
+                    // In all other cases (i.e. some checked some not checked)
+                    else {
+                        checkboxAll.prop("indeterminate", true);
+                    }
+                }
+            }
+            // If this is a check-all checkbox
+            else {
                 var checked = $this.prop("checked");
 
                 if ($this.is("[data-check='all-cgn-vl']")) {
-                    $(".cgn label:not(.disabled) [value^='v']").prop("checked", checked);
+                    $(".cgn label:not(.disabled) [type='checkbox'][value^='v']").prop("checked", checked);
                 } else if ($this.is("[data-check='all-cgn-nl']")) {
-                    $(".cgn label:not(.disabled) [value^='n']").prop("checked", checked);
+                    $(".cgn label:not(.disabled) [type='checkbox'][value^='n']").prop("checked", checked);
                 } else {
                     $(".lassy label:not(.disabled) [type='checkbox']").prop("checked", checked);
                 }
             }
         });
 
+        // On document ready, set active treebank (from cache or not)
         if ($("[type='radio'][name='treebank']:checked").length == 0) {
             $("[type='radio'][name='treebank'][value='lassy']").click().change();
         } else {

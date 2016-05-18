@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<?php error_reporting(E_ALL);
-ini_set('display_errors', 1); ?>
 <head>
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="">
@@ -15,10 +13,13 @@ ini_set('display_errors', 1); ?>
 <link rel="stylesheet" href="<?php echo $home; ?>/style/css/styles.min.css">
 
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
-<link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.min.css">
+  <link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.min.css">
 <?php endif; ?>
 
-<?php // Prefetch links. Don't prefetch too much, only required stuff. ?>
+<?php
+  // Prefetch links. Don't prefetch too much, only required required pages such as
+  // the home page, or the next page in the process
+?>
 <?php if (isset($currentPage) && $currentPage != 'home'): ?>
     <link rel="prefetch" href="<?php echo $home; ?>">
 <?php else:
@@ -29,6 +30,7 @@ ini_set('display_errors', 1); ?>
     <link rel="prefetch" href="<?php echo $home; ?>/xps/<?php echo $xpsKeys[0]; ?>">
     <link rel="prefetch" href="<?php echo $home; ?>/documentation.php">
 <?php endif;?>
+
 
 <?php if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})):
     $keys = array_keys(${$currentPage.'Pages'});

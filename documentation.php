@@ -59,9 +59,11 @@ require "$root/php/head.php";
                     <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
                     <dd></dd>
 
-                    <dt id="faq-4">I would like to have additional functionality, or I want to provide other feedback.
+                    <dt id="faq-4">I would like to have access to additional functionality, or I want to provide other feedback.
                         How can I contact you?</dt>
-                    <dd></dd>
+                    <dd>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
+                      questions, or general feedback you are welcome to give us a ring, or send us an email. You can find contact information on
+                      <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage">CCL's website</a>.</dd>
                 </dl>
             </section>
         </main>

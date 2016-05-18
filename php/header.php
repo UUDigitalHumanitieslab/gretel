@@ -1,8 +1,8 @@
 <body <?php setBodyClasses(); ?>>
     <div id="container">
         <header class="page-header">
-            <h1>GrETEL 2.0</h1>
-
+            <h1>GrETEL</h1>
+            <h2>Greedy Extraction of Trees for Empirical Linguistics</h2>
             <nav class="primary-navigation">
                 <ul>
                     <li><a href="<?php echo $home; ?>/index.php" title="Home"
