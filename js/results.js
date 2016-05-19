@@ -255,14 +255,6 @@ $(document).ready(function() {
         }
     });
 
-
-
-    $(".controls [name='to-top']").click(function() {
-        $("html, body").animate({
-            scrollTop: 0
-        });
-    });
-
     $(".controls [name='go-to']").keyup(function(e){
         var keycode = e.keyCode,
         $this = $(this);

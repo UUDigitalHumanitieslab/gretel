@@ -3,6 +3,12 @@ $(document).ready(function() {
 
     $(window).resize($.throttle(250, mobileMenu)).resize();
 
+    $("[name='to-top']").click(function() {
+        $("html, body").animate({
+            scrollTop: 0
+        });
+    });
+
     function mobileMenu() {
         if ($(window).width() < 721) {
             $(".primary-navigation").addClass("small");

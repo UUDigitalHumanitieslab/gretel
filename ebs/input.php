@@ -10,7 +10,7 @@ $step = 1;
 $taalPortaal = true;
 
 $id = session_id();
-if (isset($_SESSION['example'])) {
+if (!empty($_SESSION['example'])) {
     $input = $_SESSION['example'];
 } else {
     $input = 'Dit is een zin.';

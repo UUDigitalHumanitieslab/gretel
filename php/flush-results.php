@@ -21,10 +21,15 @@ if ($treebank == 'sonar') {
 
 $databaseString = $treebank;
 
-$sm = $_SESSION['search'];
-$example = $_SESSION['example'];
+if ($_SESSION['ebsxps'] == 'ebs') {
+    $sm = $_SESSION['search'];
+    $example = $_SESSION['example'];
+}
 $xpath = $_SESSION['xpath'];
-$context = ($_SESSION['ct'] == 'on') ? 1 : 0;
+
+// get context option
+$context = isset($_SESSION['ct']) ? true : false;
+if ($treebank == 'sonar') $context = false;
 
 $id = session_id();
 

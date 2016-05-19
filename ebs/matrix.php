@@ -90,7 +90,7 @@ else:
     <p>It seems that you did not enter an input sentence or you did not select a search mode in step 1. It is
      is also possible that you came to this page directly without first entering an input example.</p>
 <?php
-getPreviousPageMessage(1);
+setPreviousPageMessage(1);
 endif;
 
 require "$root/php/footer.php";

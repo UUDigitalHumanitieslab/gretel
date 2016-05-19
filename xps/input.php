@@ -10,8 +10,9 @@ $step = 1;
 $taalPortaal = true;
 
 $id = session_id();
-if (isset($_SESSION['xpath'])) {
+if (!empty($_SESSION['xpath'])) {
     $xpath = $_SESSION['xpath'];
+    $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
 } else {
     $xpath = '//node[@rel="su" and @cat="np" and node[@pt="n" and @ntype="eigen"]]';
 }

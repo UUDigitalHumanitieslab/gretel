@@ -441,8 +441,8 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
-    if ($context != 0) {
-        $tb = strtoupper($tb);
+    if ($context) {
+        $tb = strtoupper($treebank);
         $dbs = $tb.'_ID_S';
 
         $text = 'let $text := fn:replace($sentid[1], \'(.+)(\d+)\', \'$1\')';
@@ -455,7 +455,7 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
         $prevs = 'let $prevs := (db:open("'.$dbs.'")//s[id=$previd]/sentence)';
         $nexts = 'let $nexts := (db:open("'.$dbs.'")//s[id=$nextid]/sentence)';
 
-        $return = ' return <match>{data($sentid)}||{data($prevs)}<i>{data($sentence)}</i>{data($nexts)}'
+        $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             . $returnTb . '||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
 
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;

@@ -19,7 +19,7 @@ if ($continueConstraints) {
     $xpath = (isset($_POST['xpath'])) ? $_POST['xpath'] : $_SESSION['xpath'];
 
     $isSpam = preg_match('/(https?:\/\/)|(<\W+>)/', $xpath);
-    $_SESSION['search'] = "xpsearch";
+    $_SESSION['ebsxps'] = 'xps';
 }
 
 require "$root/functions.php";
@@ -67,7 +67,7 @@ else {
         setErrorHeading(); ?>
         <p>No search instruction could be generated, since you did not enter a valid XPath query.
             It is also possible that you came to this page directly without first entering a query.</p>
-        <?php getPreviousPageMessage(1);
+        <?php setPreviousPageMessage(1);
     endif;
 }
 ?>

@@ -90,7 +90,7 @@ if ($continueConstraints) {
     <p>No search instruction could be generated, since nothing was indicated in the matrix or no sentence was entered.
         It is also possible that you came to this page directly without first entering an input example.</p>
 <?php
-    getPreviousPageMessage(1);
+    setPreviousPageMessage(3);
 else: ?>
   <p>You can search an entire treebank (default), or select just one or more components.
     For SoNaR it is currently only possible to select one component at a time. Due to pre-processing difficulties

@@ -10,7 +10,8 @@
           Blijde Inkomststraat 21 box 3315<br>
           3000 Leuven<br>
           Belgium<br></li>
-          <li class="web"><a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage">Centre for Computational Linguistics</a></li>
+          <li class="web"><a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage"
+              target="_blank">Centre for Computational Linguistics</a></li>
           <li class="tel"  title="Phone number">+32-16-325088</li>
           <li class="fax" title="Fax address">+32-16-325098</li>
         </ul>
@@ -29,8 +30,11 @@
               <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
           </ul>
       </nav>
-      <aside class="logo-wrapper">
-          <?php include "$root/php/logo-code-gretel.php"; ?>
+      <aside class="other">
+          <button name="to-top" title="Go to the top of the page"><i class="fa fa-arrow-up"></i></button>
+              <div class="logo-wrapper">
+                  <?php include "$root/php/logo-code-gretel.php"; ?>
+              </div>
       </aside>
     </div>
 </footer>

@@ -22,6 +22,8 @@ if ($continueConstraints) {
 
     $_SESSION['search'] = $_POST['search'];
     $sm = $_SESSION['search'];
+
+    $_SESSION['ebsxps'] = 'ebs';
 }
 
 require "$root/functions.php";
@@ -48,10 +50,10 @@ if ($continueConstraints) {
 
   <p>You find the structure of the <strong>tagged</strong>
     and <strong>parsed</strong> sentence below.
-    Tagging indicates <em>word classes</em>, like <strong>n</strong> (noun)
+    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun)
     and parsing shows <em>dependencies</em> (or relations),
-     like <strong>su</strong> (subject) and <em>constituents</em>,
-     like <strong>np</strong> (noun phrase).
+     such as <code>su</code> (subject) and <em>constituents</em>,
+     such as <code>np</code> (noun phrase).
   </p>
 
   <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
@@ -70,10 +72,11 @@ if ($continueConstraints) {
     setErrorHeading('variables undefined');
     echo '<p>It seems that you did not enter an input sentence or did not select a search mode. It is also
     possible that you came to this page directly without first entering an input example.</p>';
-    getPreviousPageMessage(1);
+    setPreviousPageMessage(1);
 }
 
-require "$root/php/footer.php";if ($continueConstraints) : ?>
+require "$root/php/footer.php";
+if ($continueConstraints) : ?>
   <script>
   $(document).ready(function() {
       $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml?$id-$time"; ?>');

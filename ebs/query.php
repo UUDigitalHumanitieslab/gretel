@@ -43,9 +43,7 @@ if ($continueConstraints) {
     $xpath = $_SESSION['xpath'];
 
     if (isset($_POST['ct'])) {
-        $_SESSION['ct'] = 'on';
-    } else {
-        $_SESSION['ct'] = 'off';
+        $_SESSION['ct'] = true;
     }
 }
 
@@ -112,7 +110,7 @@ require "$root/php/head.php";
     possible that you came to this page directly without first entering an input example.</p>
 
 <?php
-    getPreviousPageMessage(4);
+    setPreviousPageMessage(4);
 endif;  // $continueConstraints
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";

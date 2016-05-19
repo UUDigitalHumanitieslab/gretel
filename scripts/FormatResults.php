@@ -83,10 +83,10 @@ function printMatchesPF($sentences, $counthits, $idlist, $beginlist)
 function HighlightSentence($sentence, $beginlist, $tag)
 {
 
-    if (preg_match('/<i>/', $sentence)) {
-        $s = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$2', $sentence);
-        $prev = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$1', $sentence);
-        $next = preg_replace("/(.*<i>)(.*?)(<\/i>.*)/", '$3', $sentence);
+    if (preg_match('/<em>/', $sentence)) {
+        $s = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$2', $sentence);
+        $prev = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$1', $sentence);
+        $next = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$3', $sentence);
     } else {
         $s = $sentence;
     }
