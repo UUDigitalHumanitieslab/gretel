@@ -13,6 +13,7 @@ $currentPage = 'xps';
 $step = 3;
 
 $id = session_id();
+$noTbFlag = 0;
 
 if (isset($_POST['treebank'])) {
     $treebank = $_POST['treebank'];
@@ -40,10 +41,10 @@ if ($continueConstraints) {
     $xpath = $_SESSION['xpath'];
 
     if (is_array($components)) {
-        $component = implode(', ', $components);
+        $componentsString = implode(', ', $components);
     } else {
-        $component = $components;
-        $_SESSION['subtreebank'] = $component;
+        $componentsString = $components;
+        $_SESSION['subtreebank'] = $componentsString;
     }
 
     // get context option
@@ -67,7 +68,7 @@ if ($continueConstraints):
   ?>
 
   <section>
-      <h3>Query overview</h3>
+      <h2>Query overview</h2>
       <p>You can <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' title="Save XPath query" target="_blank" download="gretel-xpath.txt">save the XPath query</a>
           to use it as input for the XPath search mode.
           This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
@@ -76,13 +77,13 @@ if ($continueConstraints):
           <table>
             <tbody><tr><th>Input example</th><td><em><?php echo $example; ?></em></td></tr>
             <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
-            <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
+            <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$componentsString]"; ?></td></tr>
             </tbody>
           </table>
         </div>
     </section>
   <section>
-    <h3>Results</h3>
+    <h2>Results</h2>
     <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
       You can also see and download a distribution overview of the hits over the different treebanks.</p>
 

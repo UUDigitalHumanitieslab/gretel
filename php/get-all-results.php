@@ -81,7 +81,7 @@ require "$scripts/FormatResults.php";
     if (isset($sentences)) {
       array_filter($sentences);
       // Write results to file so that they can be downloaded later on
-      $fh = fopen(" ", 'a');
+      $fh = fopen("$tmp/${id}gretel-results.txt", 'a');
       fwrite($fh, "$xpath\n");
       foreach ($sentences as $sid => $sentence) {
           // highlight sentence

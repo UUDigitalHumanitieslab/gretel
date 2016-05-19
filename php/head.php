@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="">
