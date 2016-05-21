@@ -15,8 +15,10 @@ require "$root/php/head.php";
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
                 search engine we highly recommend that you first take a look at
-                <a href="<?php echo $home; ?>/documentation.php">the documentation on the topic</a>.
-                Tutorials as well as scientific papers are available.</p>
+                <a href="<?php echo $home; ?>/documentation.php" title="Documentation">the documentation on the topic</a>.
+                Tutorials as well as scientific papers are available.
+                On that page you can also find a section called
+                <a href="<?php echo $home; ?>/documentation.php#faq" title="Frequently Asked Questions">Frequently Asked Questions</a>.</p>
             <p> The tool allows to search in treebanks without knowledge about the tree representations, treebank
                 query languages, nor the specific linguistic theories in the treebank. The user provides the query
                 engine with an example sentence, marking which parts of the sentence are the focus of the query.
@@ -39,7 +41,7 @@ require "$root/php/head.php";
                 possible complexity of XPath code. Lassy and CGN are available.</p>
 
             <p>Please cite the following paper if you are using GrETEL for your research:</p>
-            <blockquote style="border-left: 4px solid #968A7A; padding-left: 1em;">Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+            <blockquote>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
                 <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a>
                 In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
                 Istanbul, Turkey. pp. 3161-3167</p></blockquote>

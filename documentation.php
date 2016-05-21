@@ -9,9 +9,11 @@ require "$root/php/head.php";
 </head>
 
         <?php require "$root/php/header.php"; ?>
-            <p>Explanatory paragraph</p>
+            <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
+                frequently asked questions, and other information. If you have any more questions, you can always
+                <a href="#faq-4" title="FAQ how to contact us">contact us</a>.</p>
             <p>As stated on the home page, we would ask you to cite the following paper if you are using GrETEL for your research:</p>
-            <blockquote style="border-left: 4px solid #968A7A; padding-left: 1em;">Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+            <blockquote>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
                 <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" title="Example-Based Treebank Querying" target="_blank">"Example-Based Treebank Querying"</a>
                 In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
                 Istanbul, Turkey. pp. 3161-3167</p></blockquote>
@@ -45,38 +47,51 @@ require "$root/php/head.php";
                 <h2>Frequently Asked Questions</h2>
                 <dl>
                     <dt id="faq-1">Why is the output limited to 500 sentences?</dt>
-                    <dd>The reason is two-fold. For one, it might take very long for a query with
+                    <dd><p>The reason is two-fold. For one, it might take very long for a query with
                     more than 500 results to finish. More importantly, though, the corpora provided by us are
                     <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus
                     as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
-                    literally download the whole corpus - which is not the intention of this project.</dd>
+                    literally download the whole corpus - which is not the intention of this project.</p></dd>
 
                     <dt id="faq-2">For whom is GrETEL intended?</dt>
-                    <dd>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
+                    <dd><p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
                     interested in searching through Lassy, CGN, or Sonar. However, the tool is especially dedicated to
-                    those looking for <em>specific linguistic patterns</em> in these corpora.</dd>
+                    those looking for <em>specific linguistic patterns</em> in these corpora.</p></dd>
 
                     <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
                     <dd></dd>
 
                     <dt id="faq-4">How can I contact you?</dt>
-                    <dd>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
+                    <dd><p>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
                       questions, or general feedback you are welcome to give us a ring, or send us an email. You can find contact information on
                       <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage" target="_blank">CCL's website</a> or
-                      in the footer of this website.</dd>
+                      in the footer of this website.</p></dd>
 
-                     <dt id="faq-3">Why does XPath generated for SONAR only have one leading slash, when the code for Lassy and CGN has two?</dt>
-                     <dd>It has to do with how XPath structures work on the one hand, and how we optimised the SONAR database on the other. The
+                     <dt id="faq-5">Why does XPath generated for SONAR only have one leading slash, when the code for Lassy and CGN has two?</dt>
+                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SONAR database on the other. The
                          first question is rather easy to understand: a double slash makes sure that the following pattern is searched for in all
                          descendants of the current node (or implied root), whereas the single slash restricts the search to its direct children.
-                         How that difference is relevant for SONAR has been described in the paper cited below.
-                         <blockquote>Vincent Vandeghinste and Liesbeth Augustinus. (2014).
+                         How that difference is relevant for SONAR has been described in the paper cited below.</p>
+                         <blockquote style="padding: 0;border: 0 none;">Vincent Vandeghinste and Liesbeth Augustinus. (2014).
                              <a href="http://www.lrec-conf.org/proceedings/lrec2014/workshops/LREC2014Workshop-CMLC2%20Proceedings-rev2.pdf#page=20"
                              title="Making Large Treebanks Searchable. The SoNaR case." target="_blank">"Making Large Treebanks Searchable. The SoNaR case."</a>
                              In: Marc Kupietz, Hanno Biber, Harald Lüngen, Piotr Bański, Evelyn Breiteneder, Karlheinz Mörth, Andreas Witt &amp; Jani Takhsha (eds.),
                              <em>Proceedings of the LREC2014 2nd workshop on Challenges in the management of large corpora (CMLC-2)</em>. Reykjavik, Iceland. pp. 15-20.
                          </blockquote>
                      </dd>
+
+                     <dt id="faq-6">What information can be found in the results file that I can download?</dt>
+                     <dd><p>The document contains the first 500 results that match your query. Each sentence is preceded by the corpus that was used
+                         (Lassy, CGN, or SONAR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
+                         that was used to find the results. This can be useful if you want to do a similar query later on. Each sentence also contains
+                         <code>&lt;hit&gt;</code> tags surrounding the actual structure that you looked for, similar to how the web page shows these
+                         parts in boldface.</p>
+                         <p>Note that due to how the corpora are parsed, some oddities may occur. For instance, punctuation is left out
+                         in the dependency structure (all punctuation is attached to the topmost node), which means that in a orthographic structure
+                         the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>. Below is an example of such a punctuation gap; multiple
+                         <code>&lt;hit&gt;</code> tags but only a single genuine match. This is due to how the corpora is parsed.</p>
+
+                      </dd>
                 </dl>
             </section>
         </main>

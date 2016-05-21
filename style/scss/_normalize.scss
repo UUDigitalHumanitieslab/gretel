@@ -1,4 +1,5 @@
-/*! normalize.css v4.0.0 | MIT License | github.com/necolas/normalize.css */
+/*! normalize.css v4.0.0 | MIT License | github.com/necolas/normalize.css | Highly modified by Bram Vanroy*/
+
 
 /**
  * 1. Change the default font family in all browsers (opinionated).
@@ -456,7 +457,10 @@ button, input[type="button"], input[type="reset"], input[type="submit"] {
 
 label, input[type="checkbox"], input[type="radio"], button {
   cursor: pointer;
-  &[disabled], &.disabled {cursor: not-allowed;}
+  &[disabled], &.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+  }
 }
 label.disabled, button[disabled] {
   color: lighten(#565656, 25%);

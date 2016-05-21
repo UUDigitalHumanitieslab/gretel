@@ -73,6 +73,25 @@ try {
         // remove the added identifier (see GetSentences) to use in the link
         $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
 
+        // subtreebank where the sentence was found:
+        if ($treebank == "lassy") {
+            preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $component);
+            $component = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $component[1]);
+
+            $componentString = str_replace('-', '', $component);
+            $componentString = substr($componentString, 0, 4);
+        } else if ($treebank == "cgn") {
+            preg_match('/([^<>\d]+)/', $sidString, $component);
+            $component = substr($component[1], 1);
+
+            $componentString = str_replace('-', '', $component);
+        } else {
+            preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $component);
+            $componentString = str_replace('-', '', $component[1]);
+        }
+
+        $componentString = strtoupper($componentString);
+
         $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.
           '?sid='.$sidString.
           '&tb='.$treebank.
@@ -80,7 +99,7 @@ try {
           '&id='.$idlist[$sid].
           '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
 
-        $resultsArray{$sid} = array($sentenceidlink, $hlsentence);
+          $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentString);
     }
     $results = array(
       'error' => false,

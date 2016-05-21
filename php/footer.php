@@ -29,6 +29,10 @@
               <li><a href="<?php echo $home; ?>/documentation.php" title="Documentation"
               <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
           </ul>
+          <a href="https://github.com/CCL-KULeuven/gretel" title="GrETEL on GitHub" class="github-link" target="_blank">
+              <span>GrETEL is available on GitHub!</span>
+              <i class="fa fa-github fa-3x" aria-hidden="true"></i>
+          </a>
       </nav>
       <aside class="other">
           <button name="to-top" title="Go to the top of the page"><i class="fa fa-arrow-up"></i></button>

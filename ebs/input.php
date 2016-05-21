@@ -5,6 +5,10 @@ require "$root/helpers.php";
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
+// Unset previous session ID, we don't want one session to span multiple queries
+session_regenerate_id(FALSE);
+session_unset();
+
 $currentPage = 'ebs';
 $step = 1;
 $taalPortaal = true;

@@ -1,28 +1,17 @@
 <?php
 session_start();
 
-/*
-SaveResults.php
-
- script exports query results to a file (as txt/csv)
- obligatory arguments: print mode, subtreebanks
- optional argument: limit (search results)
-
- version 0.2 date: 15.10.2014  RELEASED WITH GrETEL2.0
- written by Liesbeth Augustinus (c) 2014
- for the GrETEL2.0 project
-*/
-
-/***********************************************************/
- /* VARIABLES */
 $id=session_id();
 $date=date('d-m-Y');
-$time=time(); // time stamp
+$time=time();
 
-// load configuration file
 require "../config/config.php";
-
-$print=$_GET["print"];
+if (isset($_GET["print"])) {
+    $print = $_GET["print"];
+}
+else {
+    $print = "html";
+}
 
 $context = ($_SESSION['ct'] == 'on') ? 1 : 0;
 

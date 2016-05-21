@@ -114,7 +114,7 @@ $(document).ready(function() {
         $.get(phpVars.fetchCountsPath, function(count) {
             if (count) {
                 count = parseInt(count);
-                $(".notice small").remove();
+                $(".notice .still-counting").remove();
                 resultsCount = numericSeparator(count);
                 $(".count strong + span").text(resultsCount);
                 $(".notice strong").text(resultsCount);
@@ -142,17 +142,20 @@ $(document).ready(function() {
     function messageAllResultsFound() {
         $(".loading-wrapper.searching").removeClass("active");
         $(".controls").find(".stop, .continue").prop("disabled", true);
+        $(".notice").html("<p></p>");
         disableAndEnableInputs();
-        var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small>(still counting, can take a while)</small>'];
+        var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small class="still-counting">(still counting, can take a while)</small>'];
         notice = '<strong>' + stringCount[0] + '</strong> result(s) have/has been found! ' + stringCount[1];
         if (resultID >= phpVars.resultsLimit) {
-            notice += '<p>We have restricted the output to 500 hits. ' +
+            notice += '<br>We have restricted the output to 500 hits. ' +
                 'You can find the reason for this <a href="' + phpVars.fetchHomePath + '/documentation.php#faq-1" ' +
-                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.</p>';
+                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
         }
-        notice += '<br><p>You can download a tab-separated file <a href="'+phpVars.downloadPath + '"' +
-            'title="Download results" target="_blank" download="gretel-results.txt">here</a>.';
-        $(".notice p").html(notice);
+        notice += '<br><a href="'+phpVars.downloadPath + '"' +
+            'title="Download results" class="download-link" target="_blank" download="gretel-results.txt">' +
+            '<i class="fa fa-arrow-down"></i> Download results</a>';
+        $(".notice p").html(notice).after('<small><a href="' + phpVars.fetchHomePath + '/documentation.php#faq-6" '+
+        'style="float: right;" title="FAQ: what is inside the download file" target="_blank">What is inside this file?</a></small>');
 
         $(".messages").addClass("active");
         $(".notice").addClass("active");
@@ -199,33 +202,10 @@ $(document).ready(function() {
                 resultID++;
                 var link = value[0];
                 link = link.replace(/\bhref=\"([^"]+)\"/, "href=\"#tv-" + resultID + "\" data-tv-url=\"$1\"");
-                var treebank = link.match(/(?:&db=)([^&"=]+)/)[1],
-                    linkText = link.match(/(?:>)([^<>]+)(?:<\/a>)/)[1],
-                    component = '',
-                    componentString = '';
 
-                if (treebank == "lassy") {
-                    component = linkText.match(/([^<>]+?)(?:-\d+(?:-|\.).*)/)[1];
-                    component = component.replace(/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/, '$1');
-
-                    componentString = component.replace(/-/g, '');
-                    componentString = componentString.slice(0, 4);
-                } else if (treebank == "cgn") {
-                    component = linkText.match(/([^<>\d]+)/)[1];
-                    component = component.slice(1);
-
-                    componentString = component.replace(/-/g, '');
-                } else {
-                    component = linkText.match(/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/)[1];
-                    componentString = component.replace(/-/g, '');
-                }
-
-                component = component.toUpperCase();
-                componentString = componentString.toUpperCase();
-
-                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="' + resultID + '" data-component="' + componentString + '">' +
+                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="' + resultID + '" data-component="'+value[2]+'">' +
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
-                    component + '</td><td>' + value[1] + '</td></tr>');
+                    value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
         });
 

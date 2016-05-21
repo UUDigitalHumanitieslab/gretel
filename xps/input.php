@@ -5,6 +5,10 @@ require "$root/helpers.php";
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
+// Unset previous session ID, we don't want one session to span multiple queries
+session_regenerate_id(FALSE);
+session_unset();
+
 $currentPage = 'xps';
 $step = 1;
 $taalPortaal = true;
@@ -14,7 +18,7 @@ if (!empty($_SESSION['xpath'])) {
     $xpath = $_SESSION['xpath'];
     $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
 } else {
-    $xpath = '//node[@rel="su" and @cat="np" and node[@pt="n" and @ntype="eigen"]]';
+    $xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
 }
 
 require "$root/functions.php";

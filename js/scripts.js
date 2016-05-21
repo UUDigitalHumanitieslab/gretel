@@ -34,13 +34,23 @@ $(document).ready(function() {
 
     if (body.hasClass("step-1")) {
         $('[name="clear"]').click(function(e) {
-            $(this).prev('[name="input"], textarea').val("").removeClass("has-content").focus();
+            var $this = $(this);
+            $this.prev('[name="input"], textarea').val("").addClass("no-content").focus();
+            $this.prop("disabled", true);
+            // Prevent form submission
             e.preventDefault();
         });
 
-        $('[name="input"]').keyup(function() {
-            if ($(this).val()) $(this).addClass("has-content");
-            else $(this).removeClass("has-content");
+        $('[name="input"], textarea').keyup(function() {
+            var $this = $(this);
+            if ($this.val()) {
+                $this.removeClass("no-content");
+                $this.next('[name="clear"]').prop("disabled", false);
+            }
+            else {
+                $this.addClass("no-content");
+                $this.next('[name="clear"]').prop("disabled", true);
+            }
         }).keyup();
 
         taalPortaalFiller();
