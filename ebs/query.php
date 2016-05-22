@@ -76,12 +76,13 @@ require "$root/php/head.php";
 <?php
   if ($sm == 'advanced') :
     if ($treebank == 'sonar') : ?>
-      <p>XPath expression, generated from the query tree.</p>
+      <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
+        below is provided to show you the structure that is assigned to your input example.</p>
 
     <?php else : ?>
-      <p>XPath expression </b>generated from the query tree. You can adapt it if necessary.
+      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing! 
       If you are dealing with a long query, the
-      <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank">XPath beautifier</a> might come in handy.</p>
+      <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
     <?php endif; ?>
 
     <form action="results.php" method="post">
@@ -96,7 +97,7 @@ require "$root/php/head.php";
     ?>
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
-    <input type="reset" value="Reset XPath">
+    <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
   <?php else : // $sm == 'advcaned' ?>
     <form action="results.php" method="post">
   <?php endif; // $sm == 'advcaned' ?>

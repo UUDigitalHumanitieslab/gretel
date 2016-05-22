@@ -33,8 +33,6 @@ if ($treebank == 'sonar') $context = false;
 
 $id = session_id();
 
-// messages and documentation
-$showtree = "$home/scripts/ShowTree.php"; // script for displaying syntax trees
 
 require "$scripts/BaseXClient.php";
 // functions to find treebank data in BaseX database and print them
@@ -92,12 +90,12 @@ try {
 
         $componentString = strtoupper($componentString);
 
-        $sentenceidlink = '<a class="tv-show-fs" href="'.$showtree.
+        $sentenceidlink = '<a class="tv-show-fs" href="'.$home.'/scripts/ShowTree.php'.
           '?sid='.$sidString.
           '&tb='.$treebank.
           '&db='.$databaseString.
           '&id='.$idlist[$sid].
-          '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
+          '" target="_blank">'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentString);
     }

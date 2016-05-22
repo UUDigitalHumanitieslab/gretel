@@ -70,7 +70,6 @@
 .tree-visualizer .tree,
 .tree-visualizer-fs .tree {
   overflow: auto;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -100,9 +99,9 @@
   -webkit-column-gap: 24px;
      -moz-column-gap: 24px;
           column-gap: 24px;
-  -webkit-column-rule: 1px solid #CCC;
-     -moz-column-rule: 1px solid #CCC;
-          column-rule: 1px solid #CCC;
+  -webkit-column-rule: 1px solid #ccc;
+     -moz-column-rule: 1px solid #ccc;
+          column-rule: 1px solid #ccc;
 }
 
 .tree-visualizer .tree + .tooltip > ul li,
@@ -144,7 +143,6 @@
   text-align: center;
   font-size: 14px;
   line-height: 1;
-  -webkit-transition: -webkit-transform 200ms;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
@@ -180,7 +178,7 @@
   left: 50%;
   width: 0;
   height: 1em;
-  border-left: 1px solid #CCC;
+  border-left: 1px solid #ccc;
   content: "";
 }
 
@@ -209,7 +207,7 @@
   right: 50%;
   width: 50%;
   height: 1em;
-  border-top: 1px solid #CCC;
+  border-top: 1px solid #ccc;
   content: "";
 }
 
@@ -217,7 +215,7 @@
 .tree-visualizer-fs .tree li:after {
   right: auto;
   left: 50%;
-  border-left: 1px solid #CCC;
+  border-left: 1px solid #ccc;
 }
 
 .tree-visualizer .tree li.first-child:before,
@@ -227,7 +225,7 @@
 
 .tree-visualizer .tree li.last-child:before,
 .tree-visualizer-fs .tree li.last-child:before {
-  border-right: 1px solid #CCC;
+  border-right: 1px solid #ccc;
 }
 
 .tree-visualizer .tree li.last-child:after,
@@ -249,18 +247,16 @@
 .tree-visualizer .tree li.highlight a, .tree-visualizer .tree li.highlight a.only-child,
 .tree-visualizer-fs .tree li.highlight a,
 .tree-visualizer-fs .tree li.highlight a.only-child {
-  border-color: #CCC;
-  background: #CCC;
+  background: #C7BDB1;
   color: white;
-  text-shadow: none;
+  border-color: transparent;
 }
 
 .tree-visualizer .tree li.highlight a:hover, .tree-visualizer .tree li.highlight a.only-child:hover,
 .tree-visualizer-fs .tree li.highlight a:hover,
 .tree-visualizer-fs .tree li.highlight a.only-child:hover {
-  border-color: #b3b3b3;
-  background: #b3b3b3;
-  color: #3d3d3d;
+  background: #9C8A73;
+  color: white;
 }
 
 .tree-visualizer .tree li.highlight a:hover.hovered span:nth-child(2),
@@ -277,12 +273,11 @@
 .tree-visualizer-fs .tree li a {
   display: inline-block;
   padding: 0.5em 1em;
-  border: 1px solid #CCC;
-  border-bottom: 2px solid #e0e0e0;
   border-radius: 4em;
   background: white;
   color: #565656;
   text-decoration: none;
+  border: 1px solid #ccc;
   position: relative;
   z-index: 2;
 }
@@ -303,19 +298,14 @@
 .tree-visualizer-fs .tree li a.hovered,
 .tree-visualizer-fs .tree li a:hover,
 .tree-visualizer-fs .tree li a:hover + ol li a {
-  border: 1px solid #A4C52E;
-  border-bottom-width: 2px;
-  background: #A4C52E;
-  color: white;
+  background: #e0e0e0;
 }
 
 .tree-visualizer .tree li a:hover + ol li.highlight a, .tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
-  border-color: #b3b3b3;
-  background: #b3b3b3;
-  color: #3d3d3d;
-  text-shadow: none;
+  background: #9C8A73;
+  color: white;
 }
 
 .tree-visualizer .tree li a.hovered span:nth-child(2),
@@ -334,17 +324,13 @@
 
 .tree-visualizer .tree li a:hover + ol li a.only-child,
 .tree-visualizer-fs .tree li a:hover + ol li a.only-child {
-  border: 1px solid #708720;
-  border-bottom-width: 2px;
-  background: #708720;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  background: #dedede;
 }
 
 .tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
-  border-color: #bfbfbf;
-  background: #bfbfbf;
-  text-shadow: none;
+  background: #9C8A73;
+  color: white;
 }
 
 .tree-visualizer .tree li a:hover + ol:before,
@@ -355,23 +341,19 @@
 .tree-visualizer-fs .tree li a:hover + ol li:after,
 .tree-visualizer-fs .tree li a:hover + ol li:before,
 .tree-visualizer-fs .tree li a:hover + ol ol:before {
-  border-color: #b9d650;
+  border-color: #ddd;
 }
 
 .tree-visualizer .tree li a.only-child,
 .tree-visualizer-fs .tree li a.only-child {
-  color: #A4C52E;
+  color: #9C8A73;
   font-weight: bold;
 }
 
 .tree-visualizer .tree li a.only-child.hovered, .tree-visualizer .tree li a.only-child:hover,
 .tree-visualizer-fs .tree li a.only-child.hovered,
 .tree-visualizer-fs .tree li a.only-child:hover {
-  border: 1px solid #7b9322;
-  border-bottom-width: 2px;
-  background: #7b9322;
-  color: white;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  background: #dedede;
 }
 
 .tree-visualizer .tree li span,
@@ -415,20 +397,15 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -436,7 +413,7 @@
 
 .tree-visualizer-fs .sentence {
   background: #e8e8e8;
-  border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid #ccc;
   padding: 12px;
   line-height: 1.6;
   width: 100vw;
@@ -456,7 +433,6 @@
 }
 
 .tree-visualizer-fs .tree.small a {
-  -webkit-transition: -webkit-transform 150ms;
   transition: -webkit-transform 150ms;
   transition: transform 150ms;
   transition: transform 150ms, -webkit-transform 150ms;
@@ -472,7 +448,6 @@
 }
 
 .tree-visualizer-fs .tree.small a.only-child ~ span {
-  -webkit-transition: -webkit-transform 150ms;
   transition: -webkit-transform 150ms;
   transition: transform 150ms;
   transition: transform 150ms, -webkit-transform 150ms;
@@ -544,7 +519,6 @@
   color: #DF5F5F;
   text-shadow: none;
   line-height: 1;
-  -webkit-transition: -webkit-transform 200ms;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;

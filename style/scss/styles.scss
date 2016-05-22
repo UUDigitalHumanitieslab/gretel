@@ -10,15 +10,11 @@
     -moz-osx-font-smoothing: grayscale;
 }
 ::selection {
-    background: #7E6748;
+    background: #c0c0c0;
     color: white;
 }
-input[type='text'],
-textarea {
-    &::selection {
-        background: #B2D241;
-    }
-}
+
+
 blockquote {
     margin-left: 1em;
     padding-left: 1em;
@@ -696,6 +692,11 @@ dd {
             vertical-align: top;
             font-family: monospace;
             resize: vertical;
+            &[readonly] {
+              resize: none;
+            color: #C0C0C0;
+            cursor: not-allowed;
+            }
         }
     }
 }

@@ -452,23 +452,13 @@ label.disabled, button[disabled] {
 }
 
 ::-moz-selection {
-  background: #7E6748;
+  background: #c0c0c0;
   color: white;
 }
 
 ::selection {
-  background: #7E6748;
+  background: #c0c0c0;
   color: white;
-}
-
-input[type='text']::-moz-selection,
-textarea::-moz-selection {
-  background: #B2D241;
-}
-
-input[type='text']::selection,
-textarea::selection {
-  background: #B2D241;
 }
 
 blockquote {
@@ -484,12 +474,9 @@ blockquote {
 }
 
 body {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
@@ -499,7 +486,6 @@ body {
   color: #565656;
   font-family: "Open Sans", sans-serif;
   line-height: 1.625;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -636,7 +622,6 @@ dd::after {
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -720,18 +705,15 @@ dd::after {
 
 .page-header {
   position: relative;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 0 auto 0.34em;
   padding-bottom: 0.89em;
   border-bottom: 1px dotted #968A7A;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -740,7 +722,6 @@ dd::after {
   margin: 0;
   white-space: nowrap;
   font-size: 2em;
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -756,13 +737,11 @@ dd::after {
 }
 
 .primary-navigation {
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
 .primary-navigation ul {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -775,7 +754,6 @@ dd::after {
 }
 .primary-navigation ul li {
   text-align: center;
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -792,7 +770,6 @@ dd::after {
   white-space: nowrap;
   font-weight: 300;
   font-size: 16px;
-  -webkit-transition: -webkit-transform 200ms;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
@@ -815,7 +792,6 @@ dd::after {
   width: 0;
   border-bottom: 1px solid #565656;
   content: "";
-  -webkit-transition: width 200ms;
   transition: width 200ms;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
@@ -824,12 +800,9 @@ dd::after {
 .primary-navigation.small {
   position: relative;
   z-index: 5;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: reverse;
   -webkit-flex-direction: column-reverse;
       -ms-flex-direction: column-reverse;
           flex-direction: column-reverse;
@@ -839,8 +812,6 @@ dd::after {
   position: absolute;
   right: 0;
   display: none;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
@@ -877,13 +848,11 @@ dd::after {
           align-self: flex-end;
 }
 .primary-navigation.small button i {
-  -webkit-transition: -webkit-transform 200ms;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
 }
 .primary-navigation.small.active ul {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -901,7 +870,6 @@ dd::after {
   max-width: 1024px;
   width: 100%;
   background: #fff;
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -909,15 +877,12 @@ dd::after {
 
 /* Progress bar */
 .secondary-navigation {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1032,7 +997,6 @@ dd::after {
   z-index: 2;
   min-height: 180px;
   opacity: 0;
-  -webkit-transition: opacity 600ms;
   transition: opacity 600ms;
 }
 #tree-output.active {
@@ -1062,17 +1026,14 @@ dd::after {
 }
 .loading-wrapper {
   z-index: 11;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   visibility: hidden;
   pointer-events: none;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -1103,12 +1064,9 @@ dd::after {
 }
 .loading-wrapper .loading {
   z-index: 100;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
@@ -1117,18 +1075,15 @@ dd::after {
   border: 6px solid #F5F5F5;
   border-radius: 50%;
   background: white;
-  -webkit-transition: -webkit-transform 400ms;
   transition: -webkit-transform 400ms;
   transition: transform 400ms;
   transition: transform 400ms, -webkit-transform 400ms;
   -webkit-transform: scale(0);
       -ms-transform: scale(0);
           transform: scale(0);
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: center;
   -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -1173,7 +1128,6 @@ dd::after {
   display: none;
 }
 .loading-wrapper.searching.active {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1213,7 +1167,6 @@ dd::after {
   display: inline-block;
   padding: 0.8em;
   min-width: 80%;
-  -webkit-transition: -webkit-transform 250ms;
   transition: -webkit-transform 250ms;
   transition: transform 250ms;
   transition: transform 250ms, -webkit-transform 250ms;
@@ -1240,14 +1193,12 @@ dd::after {
 /* ============= */
 /* DOCUMENTATION */
 .docs .flex-content {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-wrap: wrap;
       -ms-flex-wrap: wrap;
           flex-wrap: wrap;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -1255,7 +1206,6 @@ dd::after {
 .docs .flex-content article {
   padding: 0.67em;
   min-width: 240px;
-  -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -1309,11 +1259,9 @@ dd::after {
   }
 }
 .ebs.step-1 .input-wrapper {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: start;
   -webkit-align-items: flex-start;
       -ms-flex-align: start;
           align-items: flex-start;
@@ -1344,6 +1292,11 @@ dd::after {
   vertical-align: top;
   font-family: monospace;
   resize: vertical;
+}
+.ebs.step-5 textarea[name="xp"][readonly] {
+  resize: none;
+  color: #C0C0C0;
+  cursor: not-allowed;
 }
 
 .results-wrapper table {
@@ -1388,7 +1341,6 @@ dd::after {
   padding: 0.5em;
 }
 .results-wrapper tr {
-  -webkit-transition: background-color 1000ms;
   transition: background-color 1000ms;
   will-change: background-color;
 }
@@ -1400,7 +1352,6 @@ dd::after {
 }
 
 [for="filter-components"] i {
-  -webkit-transition: -webkit-transform 150ms;
   transition: -webkit-transform 150ms;
   transition: transform 150ms;
   transition: transform 150ms, -webkit-transform 150ms;
@@ -1414,7 +1365,6 @@ dd::after {
           transform: rotate(180deg);
 }
 [for="filter-components"].active + .filter-wrapper {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1434,7 +1384,6 @@ dd::after {
   bottom: 0;
   width: 100%;
   height: 8px;
-  background-image: -webkit-linear-gradient(left, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
   background-image: linear-gradient(to right, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
   background-size: 40px 100%;
   content: "";
@@ -1455,7 +1404,6 @@ dd::after {
   left: 0;
   width: 8px;
   height: 100%;
-  background-image: -webkit-linear-gradient(top, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
   background-image: linear-gradient(to bottom, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
   background-size: 100% 40px;
   content: "";
@@ -1468,7 +1416,6 @@ dd::after {
 .ebs.step-6 .controls,
 .xps.step-3 .controls {
   position: relative;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1478,11 +1425,9 @@ dd::after {
   width: 100%;
   background: #eee;
   font-size: 12px;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-box-pack: end;
   -webkit-justify-content: flex-end;
       -ms-flex-pack: end;
           justify-content: flex-end;
@@ -1585,11 +1530,9 @@ dd::after {
 }
 
 .xps.step-1 .input-wrapper {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: start;
   -webkit-align-items: flex-start;
       -ms-flex-align: start;
           align-items: flex-start;
@@ -1612,17 +1555,14 @@ dd::after {
 
 .ebs .progress-header,
 .xps .progress-header {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin-top: 1em;
   white-space: nowrap;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
@@ -1643,7 +1583,6 @@ dd::after {
 }
 .ebs .continue-btn-wrapper,
 .xps .continue-btn-wrapper {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1662,14 +1601,12 @@ dd::after {
   margin-top: 24px;
   width: 100%;
   background: #7E6748;
-  -webkit-box-flex: 0;
   -webkit-flex: 0;
       -ms-flex: 0;
           flex: 0;
 }
 .page-footer .content {
   position: relative;
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1678,7 +1615,6 @@ dd::after {
   background: transparent;
   color: white;
   font-size: smaller;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -1745,22 +1681,17 @@ dd::after {
   color: #7E6748;
 }
 .page-footer .other {
-  display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   padding-top: 20px;
   min-width: 100px;
-  -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;

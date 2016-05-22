@@ -125,12 +125,12 @@ require "$scripts/FormatResults.php";
 
           // For Lassy and CGN tb and db are identical (i.e. lassy & lassy, or cgn & cgn).
           // For Sonar tb is sonar, and db something like WRPEC0000019treebank
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$home. '/scripts/ShowTree.php'.
+          $sentenceidlink = '<a class="tv-show-fs" href="'.$home.'/scripts/ShowTree.php'.
             '?sid='.$sidString.
             '&tb='.$treebank.
             '&db='.$databaseString.
             '&id='.$idlist[$sid].
-            '&opt=tv-xml" target="_blank">'.$sidString.'</a>';
+            '" target="_blank">'.$sidString.'</a>';
 
           $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentString);
 

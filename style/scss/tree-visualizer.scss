@@ -4,13 +4,12 @@
  *
  * @author Bram Vanroy
  */
-@import "tv-variables";
 @import "tv-buttons";
 @import "clearfix";
 .tree-visualizer,
 .tree-visualizer-fs {
     box-sizing: border-box;
-    color: $text_main;
+    color: #565656;
     text-align: center;
     * {
         box-sizing: border-box;
@@ -24,7 +23,7 @@
     .tv-error {
         margin-top: 24px;
         padding: 8px 16px;
-        background: $error;
+        background: #DF5F5F;
         color: white;
         text-align: center;
         text-shadow: 0 1px rgba(0,0,0,0.32);
@@ -53,7 +52,7 @@
                 list-style: none;
                 columns: 2;
                 column-gap: 24px;
-                column-rule: 1px solid $tree_branch;
+                column-rule: 1px solid #ccc;
                 li {
                     white-space: nowrap;
                 }
@@ -80,7 +79,7 @@
                 height: 30px;
                 border: 0;
                 border-radius: 50%;
-                background: $error;
+                background: #DF5F5F;
                 color: white;
                 text-align: center;
                 font-size: 14px;
@@ -88,11 +87,11 @@
                 transition: transform 200ms;
                 transform: translate(50%, -50%);
                 &:hover {
-                    background: darken($error, 4%);
+                    background: darken(#DF5F5F, 4%);
                     transform: translate(50%, -50%) scale(1.23);
                 }
                 &:active {
-                    background: darken($error, 8%);
+                    background: darken(#DF5F5F, 8%);
                 }
             }
         }
@@ -106,7 +105,7 @@
                 left: 50%;
                 width: 0;
                 height: 1em;
-                border-left: 1px solid $tree_branch;
+                border-left: 1px solid #ccc;
                 content: "";
             }
         }
@@ -129,13 +128,13 @@
                 right: 50%;
                 width: 50%;
                 height: 1em;
-                border-top: 1px solid $tree_branch;
+                border-top: 1px solid #ccc;
                 content: "";
             }
             &:after {
                 right: auto;
                 left: 50%;
-                border-left: 1px solid $tree_branch;
+                border-left: 1px solid #ccc;
             }
             &.first-child {
                 &:before {
@@ -144,7 +143,7 @@
             }
             &.last-child {
                 &:before {
-                    border-right: 1px solid $tree_branch;
+                    border-right: 1px solid #ccc;
                 }
                 &:after {
                     border: 0 none;
@@ -159,17 +158,15 @@
             }
             &.highlight {
                 a, a.only-child {
-                    border-color: $tree_branch;
-                    background: $tree_branch;
-                    color: white;
-                    text-shadow: none;
+                  background: #C7BDB1;
+                  color: white;
+                  border-color: transparent;
                     &:hover {
-                        border-color: darken($tree_branch, 10%);
-                        background: darken($tree_branch, 10%);
-                        color: darken($text_main,  10%);
+                        background: #9C8A73;
+                        color: white;
                         &.hovered span:nth-child(2),
                         &:hover span:nth-child(2) {
-                            color: darken($text_main,  10%);
+                            color: darken(#565656,  10%);
                         }
                     }
                 }
@@ -177,32 +174,26 @@
             a {
                 display: inline-block;
                 padding: 0.5em 1em;
-                border: 1px solid $tree_branch;
-                border-bottom: 2px solid lighten($tree_branch,8%);
                 border-radius: 4em;
                 background: white;
-                color: $text_main;
+                color: #565656;
                 text-decoration: none;
+                border: 1px solid #ccc;
                 position: relative;
                 z-index: 2;
                 &:hover {font-weight: normal;}
                 span:nth-child(2) {
-                    color: $text_main;
+                    color: #565656;
                     font-weight: normal;
                 }
                 &.hovered,
                 &:hover,
                 &:hover + ol li a {
-                    border: 1px solid $tree_highlight;
-                    border-bottom-width: 2px;
-                    background: $tree_highlight;
-                    color: white;
+                    background: #e0e0e0;
                 }
                 &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
-                    border-color: darken($tree_branch, 10%);
-                    background: darken($tree_branch, 10%);
-                    color: darken($text_main,  10%);
-                    text-shadow: none;
+                    background: #9C8A73;
+                    color: white;
                 }
                 &.hovered span:nth-child(2),
                 &:hover + ol li a span:nth-child(2),
@@ -210,37 +201,29 @@
                     color: white;
                 }
                 &:hover + ol li.highlight a span:nth-child(2), {
-                    color: darken($text_main,  10%);
+                    color: darken(#565656,  10%);
                 }
                 &:hover + ol li a.only-child {
-                    border: 1px solid darken($tree_highlight,15%);
-                    border-bottom-width: 2px;
-                    background: darken($tree_highlight,15%);
-                    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+                    background: #dedede;
                 }
                 &:hover + ol li.highlight a.only-child {
-                    border-color: darken($tree_branch, 5%);
-                    background: darken($tree_branch, 5%);
-                    text-shadow: none;
+                    background: #9C8A73;
+                    color: white;
                 }
                 &:hover + ol {
                      &:before,
                     li:after,
                     li:before,
                     ol:before {
-                        border-color: lighten($tree_highlight,10%);
+                        border-color: #ddd;
                     }
                 }
                 &.only-child {
-                    color: $tree_highlight;
+                    color: #9C8A73;
                     font-weight: bold;
                     &.hovered,
                     &:hover {
-                        border: 1px solid darken($tree_highlight,12%);
-                        border-bottom-width: 2px;
-                        background: darken($tree_highlight,12%);
-                        color: white;
-                        text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+                        background: #dedede;
                     }
                 }
             }
@@ -289,7 +272,7 @@
     justify-content: center;
     .sentence {
         background: darken(#F5F5F5, 5%);
-        border-bottom: 1px solid $tree_branch;
+        border-bottom: 1px solid #ccc;
         padding: 12px;
         line-height: 1.6;
         width: 100vw;
@@ -369,22 +352,22 @@
                 margin-left: 12px;
                 width: 34px;
                 height: 34px;
-                border: 2px solid $error;
+                border: 2px solid #DF5F5F;
                 border-radius: 50%;
                 background: transparent;
-                color: $error;
+                color: #DF5F5F;
                 text-shadow: none;
                 line-height: 1;
                 transition: transform 200ms;
                 &:hover {
-                    background: $error;
+                    background: #DF5F5F;
                     color: white;
                     transform: scale(1.23);
                 }
                 &:active {
                     top: auto;
-                    border: 2px solid darken($error, 8%);
-                    background: darken($error, 8%);
+                    border: 2px solid darken(#DF5F5F, 8%);
+                    background: darken(#DF5F5F, 8%);
                 }
             }
             &.zoom-default {

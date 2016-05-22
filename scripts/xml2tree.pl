@@ -9,7 +9,6 @@
 
 # arg 1: xml-tree
 # arg 2: xpath
-# arg 3: style
 
 use strict;
 use XML::Twig::XPath;
@@ -19,28 +18,6 @@ my $twig = XML::Twig::XPath->new( pretty_print => 'indented' );
 
 my $inputxml = $ARGV[0];
 my $inputxp  = $ARGV[1];
-my $style    = $ARGV[2];
-
-# style for sonar
-if ( $style eq "psonar" ) {
-    # plain
-    $style = "../style/xsl/xml2tree-sonar.xsl";
-}
-elsif ( $style eq "zsonar" ) {
-    #zoom
-    $style = "../style/xsl/xml2tree-sonar-zoom.xsl";
-}
-elsif ( $style eq "ptsonar" ) {
-    # extended postags
-    $style = "../style/xsl/xml2tree-sonar-postag.xsl";
-}
-elsif ( $style eq "tv-default" ) {
-    # do nothing
-}
-else {
-    # default (plain Alpino style)
-    $style = "../style/xsl/xml2tree-alpino-plain.xsl";
-}
 
 if ( $inputxml =~ /^<alpino_ds/ ) {
     # build it (xml-string)
@@ -51,7 +28,6 @@ else {
     $twig->parsefile("$inputxml");
 }
 
-unless ( $style eq "tv-default" ) { $twig->add_stylesheet( xsl => $style ); }
 my $root     = $twig->root;
 my $sentence = $root->first_child('sentence');
 my @xpath    = $twig->find_nodes($inputxp);
