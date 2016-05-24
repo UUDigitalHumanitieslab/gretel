@@ -7,34 +7,31 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 4;
 
 $continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
-$id = session_id();
 
 if ($continueConstraints) {
-    // Set input sentence to variable
-    $input = $_SESSION['example'];
-    // Set tokenized input sentence to variable
-    $tokinput = $_SESSION['sentence'];
-    $sentence = explode(' ', $tokinput);
-    // Set search mode to variable
-    $sm = $_SESSION['search'];
+  $id = session_id();
+  $input = $_SESSION['example'];
+  $searchMode = $_SESSION['search'];
 
-    $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
+  $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 }
 
 require "$root/functions.php";
 require "$root/php/head.php";
-
 ?>
 </head>
 <?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
-if ($continueConstraints) {
+if ($continueConstraints) :
+    // Set tokenized input sentence to variable
+  $tokinput = $_SESSION['sentence'];
+  $sentence = explode(' ', $tokinput);
     // add info annotation matrix to alpino parse
   foreach ($sentence as $begin => $word) {
       $postword = preg_replace('/\./', '_', $word);
@@ -55,12 +52,11 @@ if ($continueConstraints) {
   // save parse with @interesting annotations
   $inttree = fopen("$tmp/$id-int.xml", 'w');
   $tree = $lpxml->asXML();
-  fwrite($inttree, "$tree");
+  fwrite($inttree, "$tree\n");
   fclose($inttree);
 
-  // get query tree
+  // Remove top category?
   if (isset($_POST['topcat'])) {
-      $topcat = $_POST['topcat'];
       $remove = '-r relcat';
   } else {
       $remove = '-r rel';
@@ -75,15 +71,15 @@ if ($continueConstraints) {
       $order = ' ';
   }
 
-  // get XPath
+  // generate XPath from sentence
   $attsout = '-ex postag,begin,end'; // attributes to be excluded from XPath
   $xpath = `perl -CS $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
   $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath); // underspecify empty attribute values
   $_SESSION['xpath'] = $xpath;
-}
-?>
 
-<?php if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints) :
+  session_write_close();
+
+  if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints) :
     setErrorHeading();
 ?>
 
@@ -105,21 +101,29 @@ else: ?>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
 
     <div class="cgn" style="display:none">
-      <?php require "$scripts/cgn-tb.html"; ?>
+      <?php require "$scripts/tb-cgn.php"; ?>
     </div>
     <div class="lassy" style="display:none">
-      <?php require "$scripts/lassy-tb.html"; ?>
+      <?php require "$scripts/tb-lassy.php"; ?>
     </div>
     <div class="sonar" style="display:none">
-      <?php require "$scripts/sonar-tb.html"; ?>
+      <?php require "$scripts/tb-sonar.php"; ?>
     </div>
     <?php setContinueNavigation(); ?>
   </form>
 <?php endif; ?>
 
 <?php
+else:
+  session_write_close();
+  setErrorHeading(); ?>
+  <p>No search instruction could be generated, since you did not enter a sentence.
+    It is also possible that you came to this page directly without first entering a query.</p>
+  <?php setPreviousPageMessage($step - 1);
+endif;
+
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
- ?>
+?>
 </body>
 </html>

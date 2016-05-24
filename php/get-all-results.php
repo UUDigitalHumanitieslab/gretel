@@ -19,17 +19,16 @@ $databaseString = $treebank;
 
 $xpath = $_SESSION['xpath'];
 if ($_SESSION['ebsxps'] == 'ebs') {
-    $sm = $_SESSION['search'];
+    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
-    if ($sm == "advanced" && $treebank != "sonar") {
+    if ($searchMode == "advanced" && $treebank != "sonar") {
         $xpChanged = $_SESSION['xpChanged'];
         $originalXp = $_SESSION['originalXp'];
     }
 }
 
 // get context option
-$context = isset($_SESSION['ct']) ? true : false;
-if ($treebank == 'sonar') $context = false;
+$context = $_SESSION['ct'];
 
 $id = session_id();
 $date = date('d-m-Y');
@@ -41,13 +40,13 @@ session_write_close();
 
 if ($_SESSION['ebsxps'] == 'ebs') {
     $xplog = fopen("$log/gretel-ebq.log", 'a');
-    if ($sm == "advanced" && $treebank != "sonar") {
+    if ($searchMode == "advanced" && $treebank != "sonar") {
       // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
-        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$sm\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
+        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
     }
     else {
         // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.searched\n");
-        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$sm\t$treebank\t$componentString\t$xpath\n");
+        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpath\n");
     }
     fclose($xplog);
 }
@@ -77,7 +76,7 @@ require "$scripts/FormatResults.php";
     if (isset($sentences)) {
       array_filter($sentences);
       // Write results to file so that they can be downloaded later on
-      // Only do this if the file does not already exist (e.g. when user refreshes)
+      // If the file already exists, remove it and re-create it (just to be sure)
       $fileName = "$tmp/${id}gretel-results.txt";
       if (file_exists($fileName)) {
           unlink($fileName);

@@ -22,16 +22,13 @@ if ($treebank == 'sonar') {
 $databaseString = $treebank;
 
 if ($_SESSION['ebsxps'] == 'ebs') {
-    $sm = $_SESSION['search'];
+    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
 }
 $xpath = $_SESSION['xpath'];
 
 // get context option
-$context = isset($_SESSION['ct']) ? true : false;
-if ($treebank == 'sonar') $context = false;
-
-$id = session_id();
+$context = $_SESSION['ct'];
 
 
 require "$scripts/BaseXClient.php";

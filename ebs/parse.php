@@ -1,4 +1,14 @@
 <?php
+/**
+ * EBS STEP 2: Displays a parse of the input sentence.
+ *
+ *
+ *
+ * @author Liesbeth Augustinus
+ * @author Bram Vanroy
+ *
+ * @see /functions.php  buildEbsMatrix(), isSpam()
+ */
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -6,7 +16,7 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 2;
 
 $continueConstraints = postVariablesSet(array('input', 'search'));
@@ -14,16 +24,12 @@ $continueConstraints = postVariablesSet(array('input', 'search'));
 if ($continueConstraints) {
     $treeVisualizer = true;
     $id = session_id();
-    $time = time();
-    $_SESSION['sentid'] = "$id-$time";
 
     $input = $_POST['input'];
     $_SESSION['example'] = $input;
 
-    $_SESSION['search'] = $_POST['search'];
-    $sm = $_SESSION['search'];
-
-    $_SESSION['ebsxps'] = 'ebs';
+    $searchMode = $_POST['search'];
+    $_SESSION['search'] = $searchMode;
 }
 
 require "$root/functions.php";
@@ -33,8 +39,6 @@ require "$root/php/head.php";
 <?php flush(); ?>
 <?php
 require "$root/php/header.php";
-
-// $error_flag = checkInputAndLog(1);
 
 if ($continueConstraints) {
     require "$scripts/Tokenizer.php";
@@ -79,7 +83,7 @@ require "$root/php/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(document).ready(function() {
-      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml?$id-$time"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml"; ?>');
   });
   </script>
 <?php endif;

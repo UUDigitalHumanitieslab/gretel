@@ -37,7 +37,7 @@
       <aside class="other">
           <button name="to-top" title="Go to the top of the page"><i class="fa fa-arrow-up"></i></button>
               <div class="logo-wrapper">
-                  <?php include "$root/php/logo-code-gretel.php"; ?>
+                  <?php include "$root/img/logo-image-gretel.svg"; ?>
               </div>
       </aside>
     </div>

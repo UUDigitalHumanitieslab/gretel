@@ -9,7 +9,7 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'xps';
+$currentPage = $_SESSION['ebsxps'];
 $step = 3;
 
 $id = session_id();

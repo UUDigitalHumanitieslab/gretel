@@ -1,4 +1,16 @@
 <?php
+/**
+ * EBS STEP 1: Takes a sentence as input from a user, which is processed in the next steps.
+ *
+ * A user inputs a valid XPath structure that will be queried in Basex. The XPath is
+ * briefly validated before submitting (in js/scripts.js) check opening/closing tags match),
+ * and fully parsed in the next step(s). A user can choose for a basic search, or an
+ * adcanced search which will provide more options.
+ *
+ * @author Liesbeth Augustinus
+ * @author Bram Vanroy
+ */
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -9,11 +21,15 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$currentPage = 'ebs';
+$_SESSION['ebsxps'] = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 1;
 $taalPortaal = true;
 
 $id = session_id();
+$time = time();
+$_SESSION['queryid'] = "$id-$time";
+
 if (!empty($_SESSION['example'])) {
     $input = $_SESSION['example'];
 } else {
@@ -36,8 +52,8 @@ require "$root/php/head.php";
             require any knowledge of the used formal query language, but it also has less
             search options. <em>Advanced search</em> on the other hand allows a more specific
             search and offers you the possibility to adapt the automatically generated XPath query.</p>
-        <div class="label-wrapper"><label><input type="radio" name="search" value="basic" checked> Basic search</label></div>
-        <div class="label-wrapper"><label><input type="radio" name="search" value="advanced"> Advanced search</label></div>
+        <div class="label-wrapper"><label title="No prior XPath knowledge required, less search options"><input type="radio" name="search" value="basic" checked> Basic search</label></div>
+        <div class="label-wrapper"><label title="Prior XPath knowledge required, more search options"><input type="radio" name="search" value="advanced"> Advanced search</label></div>
         <?php setContinueNavigation(); ?>
     </form>
 

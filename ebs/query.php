@@ -6,12 +6,10 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 5;
-$noTbFlag = 0;
 
-$id = session_id();
-$time = time();
+$noTbFlag = 0;
 
 if (isset($_POST['treebank'])) {
     $treebank = $_POST['treebank'];
@@ -23,29 +21,33 @@ if (isset($_POST['treebank'])) {
     $treebank = '';
 }
 
-if (isset($_POST['subtreebank'])) {
-    $component = $_POST['subtreebank'];
-    $_SESSION['subtreebank'] = $component;
-} elseif (isset($_SESSION['subtreebank'])) {
-    $component = $_SESSION['subtreebank'];
-} else {
-    $noTbFlag = 1;
+if (!$noTbFlag) {
+    if (isset($_POST['subtreebank'])) {
+        $component = $_POST['subtreebank'];
+        $_SESSION['subtreebank'] = $component;
+    } elseif (isset($_SESSION['subtreebank'])) {
+        $component = $_SESSION['subtreebank'];
+    } else {
+        $noTbFlag = 1;
+    }
 }
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'search', 'treebank', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
+    $id = session_id();
+    $queryId = $_SESSION['queryid'];
     $treeVisualizer = true;
 
     $tokinput = $_SESSION['sentence'];
 
-    $sm = $_SESSION['search'];
+    $searchMode = $_SESSION['search'];
     $xpath = $_SESSION['xpath'];
 
-    if (isset($_POST['ct'])) {
-        $_SESSION['ct'] = true;
-    }
+    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
 }
+
+session_write_close();
 
 require "$root/functions.php";
 require "$root/php/head.php";
@@ -60,8 +62,8 @@ require "$root/php/head.php";
 
     //log query tree
   $qtree = file_get_contents("$tmp/$id-sub.xml");
-  $tlog = fopen("$log/gretel-querytrees.log", "a");  //concatenate
-  fwrite($tlog, "<alpino_ds id=\"$id-$time\">$qtree\n</alpino_ds>\n");
+  $tlog = fopen("$log/gretel-querytrees.log", 'a');  //concatenate
+  fwrite($tlog, "<alpino_ds id=\"$queryId\">$qtree\n</alpino_ds>\n");
   fclose($tlog);
 ?>
 
@@ -74,13 +76,13 @@ require "$root/php/head.php";
 <div id="tree-output"></div>
 
 <?php
-  if ($sm == 'advanced') :
+  if ($searchMode == 'advanced') :
     if ($treebank == 'sonar') : ?>
       <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
         below is provided to show you the structure that is assigned to your input example.</p>
 
     <?php else : ?>
-      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing! 
+      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing!
       If you are dealing with a long query, the
       <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
     <?php endif; ?>
@@ -89,8 +91,7 @@ require "$root/php/head.php";
     <?php
     if ($treebank == 'sonar') {
         $readonly = 'readonly';
-    }
-    else {
+    } else {
         $readonly = '';
         echo '<input type="hidden" name="originalXp" value="'.$xpath.'">';
     }
@@ -98,9 +99,9 @@ require "$root/php/head.php";
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
-  <?php else : // $sm == 'advcaned' ?>
+  <?php else : // $searchMode == 'advcaned' ?>
     <form action="results.php" method="post">
-  <?php endif; // $sm == 'advcaned' ?>
+  <?php endif; // $searchMode == 'advcaned' ?>
 
     <?php setContinueNavigation(); ?>
   </form>
@@ -120,10 +121,10 @@ if ($continueConstraints) : ?>
     <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
-        <?php if ($sm == 'advanced'): ?>
-            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>', {extendedPOS: true});
+        <?php if ($searchMode == 'advanced'): ?>
+            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml" ?>', {extendedPOS: true});
         <?php else: ?>
-            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml?$id-$time" ?>');
+            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml" ?>');
         <?php endif; ?>
       });
     </script>

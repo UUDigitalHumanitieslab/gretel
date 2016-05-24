@@ -64,25 +64,27 @@
     {
         global $currentPage, $step;
         if (isset($currentPage)) {
+          $pageTitle = "";
             if ($currentPage == 'home') {
-                $pageTitle = 'GrETEL | An example based search engine for corpora';
+                $pageTitle .= 'GrETEL | An example based search engine for corpora';
             } else {
                 if ($currentPage == 'ebs' || $currentPage == 'xps') {
+                  if (isset($step)) {
+                      $pageTitle .= "Step $step | ";
+                  }
                     if ($currentPage == 'ebs') {
-                        $pageTitle = 'Example-based search';
+                        $pageTitle .= 'Example-based search | ';
                     } else {
-                        $pageTitle = 'XPath search';
+                        $pageTitle .= 'XPath search | ';
                     }
-                    if (isset($step)) {
-                        $pageTitle .= " | Step $step";
-                    }
+
                 } elseif ($currentPage == 'docs') {
-                    $pageTitle = 'Documentation';
+                    $pageTitle .= 'Documentation';
                 }
                 $pageTitle .= ' | GrETEL';
             }
         } else {
-            $pageTitle = 'GrETEL | An example based search engine for corpora';
+            $pageTitle .= 'GrETEL | An example based search engine for corpora';
         }
         echo $pageTitle;
     }
@@ -122,7 +124,7 @@
 
       if ($index < $step && $index > 0) {
           $diff = $index - $step;
-          return 'onclick="history.go('.$diff.'); return false"';
+          return 'onclick="window.history.go('.$diff.'); return false;"';
       }
   }
 
@@ -155,7 +157,7 @@
 
   function buildEbsMatrix()
   {
-      global $sentence, $sm,$matrixOptions;
+      global $sentence, $searchMode,$matrixOptions;
 
       $tableHTML = '<table><thead><tr><th>sentence</th>';
 
@@ -167,7 +169,7 @@
       foreach ($matrixOptions as $array) {
           ++$i;
           foreach ($array as $th => $val) {
-              if ($sm == 'basic' && $i == 2) {
+              if ($searchMode == 'basic' && $i == 2) {
                   break;
               }
               if ($i >= 2) {
@@ -210,7 +212,7 @@
   function xpath2Bf($xpath) {
       $bfresult;
       // Divide XPath in top-most level, and the rest (its "descendants")
-      if (preg_match("/^\/\/node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
+      if (preg_match("/^\/\/?node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
            list(, $topattrs, $descendants) = $items;
 
            $topcat;
@@ -319,4 +321,14 @@
      }
 
      return $bfresult;
+  }
+
+  function isSpam($string) {
+    // NOTE: backslash needs to be escaped twice
+    $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
+    $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
+    if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
+      return true;
+    }
+    return false;
   }

@@ -1,6 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -8,12 +7,10 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 6;
 
-$id = session_id();
-
-$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'sentid', 'example', 'subtreebank', 'xpath'));
+$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
@@ -27,7 +24,7 @@ if ($continueConstraints) {
         $_SESSION['subtreebank'] = $component;
     }
 
-    $sm = $_SESSION['search'];
+    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
 
     if (isset($_POST['xp'])) {
@@ -40,7 +37,7 @@ if ($continueConstraints) {
     $xpath = rtrim($xpath);
     $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
     // Deal with quotes/apos
-    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
+    $trans = array("='" => '="', "' " => '" ', "']" => '"]');
     $xpath = strtr("$xpath", $trans);
 
     if ($treebank == 'sonar') $xpath = preg_replace('/^\/{0,2}node/', '/node', $xpath);
@@ -48,7 +45,7 @@ if ($continueConstraints) {
 
     $_SESSION['xpath'] = $xpath;
 
-    if ($sm == 'advanced' && $treebank != 'sonar') {
+    if ($searchMode == 'advanced' && $treebank != 'sonar') {
         $originalXp = $_POST['originalXp'];
       // Clean up $originalXp
       $originalXp = rtrim($originalXp);
@@ -64,18 +61,31 @@ if ($continueConstraints) {
         $_SESSION['xpChanged'] = $xpChanged;
     }
 
-    // get context option
-    $context = isset($_SESSION['ct']) ? true : false;
-    if ($treebank == 'sonar') $context = false;
-
+    $context = $_SESSION['ct'];
     $_SESSION['queryIteration'] = array(0, 0);
     $_SESSION['leftOvers'] = array();
     $_SESSION['already'] = array();
+
     if ($treebank == 'sonar') $_SESSION['includes'] = array();
 }
 
 require "$root/functions.php";
 require "$root/php/head.php";
+
+if ($continueConstraints) {
+  if ($treebank == 'sonar') {
+    $bf = xpath2Bf($xpath);
+    if (!empty($bf)) {
+      $_SESSION['bf'] = $component . $bf;
+      array_push($_SESSION['includes'], $_SESSION['bf']);
+    }
+    // Do not continue if $bf is empty/not set
+    else {
+      $continueConstraints = false;
+    }
+  }
+}
+session_write_close();
 ?>
 
 </head>
@@ -84,12 +94,7 @@ require "$root/php/head.php";
 require "$root/php/header.php";
 
 if ($continueConstraints):
-    if ($treebank == 'sonar') {
-        $bf = xpath2Bf($xpath);
-        $_SESSION['bf'] = $component . $bf;
-        array_push($_SESSION['includes'], $_SESSION['bf']);
-    }
-  ?>
+?>
 
   <section>
       <h3>Query overview</h3>
@@ -133,7 +138,6 @@ else: // $continueConstraints
     setPreviousPageMessage(4);
 
 endif;
-session_write_close();
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 

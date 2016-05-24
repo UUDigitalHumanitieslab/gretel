@@ -189,6 +189,17 @@ $(document).ready(function() {
         });
     }
 
+    function showTvFsOnLoad() {
+      var tvLink = $("a.tv-show-fs"),
+        hash = window.location.hash;
+      if (hash && !$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
+          if (hash.indexOf("tv-") == 1) {
+              var index = hash.match(/\d+$/);
+              tvLink.eq(index[0] - 1).click();
+          }
+      }
+    }
+
     function loopResults(sentences, returnAllResults) {
         if (returnAllResults) {
             done = true;
@@ -207,6 +218,7 @@ $(document).ready(function() {
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
                     value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
+            showTvFsOnLoad();
         });
 
         $(".results-wrapper").fadeIn("fast");
@@ -365,7 +377,7 @@ $(document).ready(function() {
     }
 
     /* Tree visualizer */
-    resultsWrapper.find("tbody:not(.empty)").on("click", "a.tv-show-fs", function(e) {
+    resultsWrapper.find("tbody").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
         $(".loading-wrapper.tv").addClass("active");
         $("body").treeVisualizer($this.data("tv-url"), {
@@ -375,4 +387,12 @@ $(document).ready(function() {
         });
         e.preventDefault();
     });
+
+    if (hash) {
+        if (hash.indexOf("tv-") == 1) {
+          $(".messages").addClass("active");
+          $(".notice").html("<p>It seems that you want to open a tree in a new window. "
+           + "The tree first needs to be found again, but as soon as it is found it will pop up.</p>").addClass("active");
+        }
+    }
 });

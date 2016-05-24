@@ -1,4 +1,22 @@
 <?php
+/**
+ * EBS STEP 3: Shows the user a matrix where they can select word-per-word information
+ * that they want queried.
+ *
+ * The sentence given in the previous step is tokenized. Based on the tokens, a matrix is build.
+ * The user can select what information is information for them, e.g. lemma, pos-tag, word,
+ * and so on. If `advanced search` was selected in the first step, more options are avaiable.
+ *
+ *Also two search-wide options are available:
+ * 1. Respect word order;
+ * 2. Ignore properties of top node.
+ *
+ * @author Liesbeth Augustinus
+ * @author Bram Vanroy
+ *
+ * @see /functions.php  buildEbsMatrix(), isSpam()
+ */
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -6,7 +24,7 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'ebs';
+$currentPage = $_SESSION['ebsxps'];
 $step = 3;
 
 $continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
@@ -14,26 +32,26 @@ $continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'
 if ($continueConstraints) {
     $treeVisualizer = true;
     $id = session_id();
-    $time = time();
 
-    // Set input sentence to variable
     $input = $_SESSION['example'];
-    // Set tokenized input sentence to variable
-    $tokinput = $_SESSION['sentence'];
-    $sentence = explode(' ', $tokinput);
-    // Set search mode to variable
-    $sm = $_SESSION['search'];
+    $searchMode = $_SESSION['search'];
 }
 
 require "$root/functions.php";
 require "$root/php/head.php";
+
+// Check if $input contains email addresses or website URLs
+$isSpam = ($continueConstraints) ? isSpam($input) : false;
 ?>
 </head>
 <?php flush(); ?>
 <?php
 require "$root/php/header.php";
 
-if ($continueConstraints):
+if ($continueConstraints && !$spam):
+  // Set tokenized input sentence to variable
+  $tokinput = $_SESSION['sentence'];
+  $sentence = explode(' ', $tokinput);
 ?>
   <form action="tb-sel.php" method="post">
       <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
@@ -42,7 +60,7 @@ if ($continueConstraints):
       </p>
       <p>If you would like to review the dependency structure of your input example,
           you can view a dependency parse of that sentence in the tree structure given
-          <a href='<?php echo "$home/tmp/$id.xml?$id-$time"; ?>' target="_blank" class="tv-show-fs">here</a>.
+          <a href='<?php echo "$home/tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.
       </p>
       <p>Indicate the relevant  parts of the sentence, i.e. the parts you are interested in. If you have chosen
           <em>advanced mode</em> in step 1 you have two more options to choose from, namely
@@ -75,7 +93,7 @@ if ($continueConstraints):
     <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
         It may be included in the results, but it is not necessary.</li>
 
-    <?php if ($sm == 'advanced'): ?>
+    <?php if ($searchMode == 'advanced'): ?>
         <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
       <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the search instruction.
           They will not be included in the results.</li>
@@ -85,17 +103,20 @@ if ($continueConstraints):
 </form>
 <?php
 else:
-    setErrorHeading('variables undefined');
-?>
-    <p>It seems that you did not enter an input sentence or you did not select a search mode in step 1. It is
-     is also possible that you came to this page directly without first entering an input example.</p>
-<?php
-setPreviousPageMessage(1);
+    if ($isSpam):
+        setErrorHeading("Spam detected"); ?>
+        <p>Your input example contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
+    <?php else:
+        setErrorHeading(); ?>
+        <p>No search instruction could be generated, since you did not enter a sentence.
+            It is also possible that you came to this page directly without first entering a query.</p>
+    <?php endif;
+    setPreviousPageMessage($step-1);
 endif;
 
 require "$root/php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-if ($continueConstraints) :
+if ($continueConstraints && !$spam) :
 ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>

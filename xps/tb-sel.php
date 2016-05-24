@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 require '../config/config.php';
 require "$root/helpers.php";
@@ -9,7 +7,7 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = 'xps';
+$currentPage = $_SESSION['ebsxps'];
 $step = 2;
 
 $continueConstraints = isset($_POST['xpath']) || isset($_SESSION['xpath']);
@@ -17,13 +15,13 @@ $id = session_id();
 
 if ($continueConstraints) {
     $xpath = (isset($_POST['xpath'])) ? $_POST['xpath'] : $_SESSION['xpath'];
-
-    $isSpam = preg_match('/(https?:\/\/)|(<\W+>)/', $xpath);
-    $_SESSION['ebsxps'] = 'xps';
 }
 
 require "$root/functions.php";
 require "$root/php/head.php";
+
+// Check if $xpath contains email addresses or website URLs
+$isSpam = ($continueConstraints) ? isSpam($xpath) : false;
 
 ?>
 </head>
@@ -50,10 +48,10 @@ if ($continueConstraints && !$isSpam) {
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
 
     <div class="cgn" style="display:none">
-      <?php require "$scripts/cgn-tb.html"; ?>
+      <?php require "$scripts/tb-cgn.php"; ?>
     </div>
     <div class="lassy" style="display:none">
-      <?php require "$scripts/lassy-tb.html"; ?>
+      <?php require "$scripts/tb-lassy.php"; ?>
     </div>
     <?php setContinueNavigation(); ?>
   </form>
@@ -62,13 +60,14 @@ if ($continueConstraints && !$isSpam) {
 else {
     if ($isSpam):
         setErrorHeading("Spam detected"); ?>
-        <p>Your input example contained a hyperlink and is seen as spam. Therefore we will not allow you to continue. </p>
+        <p>Your input example contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
     <?php else:
         setErrorHeading(); ?>
         <p>No search instruction could be generated, since you did not enter a valid XPath query.
             It is also possible that you came to this page directly without first entering a query.</p>
-        <?php setPreviousPageMessage(1);
+    <?php
     endif;
+    setPreviousPageMessage($step-1);
 }
 ?>
 

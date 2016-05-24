@@ -30,11 +30,11 @@ else {
 
 my $root     = $twig->root;
 my $sentence = $root->first_child('sentence');
-my @xpath    = $twig->find_nodes($inputxp);
+my @xpath    = $twig->find_nodes("$inputxp");
 
 if (@xpath) {
     foreach my $node (@xpath) {
-        $node->set_att( highlight => "yes" );
+        $node->set_att(highlight => "yes");
     }
 }
 
@@ -43,9 +43,9 @@ else {
     print ERROR "Can't find $inputxp\n";
     close(ERROR);
     my $backupxp = '//node[@rel="top"]';
-    @xpath = $twig->find_nodes($backupxp);
+    @xpath = $twig->find_nodes("$backupxp");
     foreach my $node (@xpath) {
-        $node->set_att( highlight => "yes" );
+        $node->set_att(highlight => "yes");
     }
 }
 $twig->print();

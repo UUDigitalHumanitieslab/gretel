@@ -150,7 +150,7 @@
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
                     '<button><i class="fa fa-times"></i></button></aside>';
                 if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs"><i class="fa fa-arrows-alt"></i></button>';
+                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode"><i class="fa fa-arrows-alt"></i></button>';
                 }
                 SS.append(SSHTML);
 

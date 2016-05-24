@@ -299,5 +299,4 @@
     </tbody>
 </table>
 </div>
-<h3>Option</h3>
-<label><input type="checkbox" name="ct"> Include context (one sentence before and after the matching sentence)</label>
+<?php require "$scripts/tb-options.php"; ?>

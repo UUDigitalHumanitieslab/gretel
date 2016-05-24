@@ -499,7 +499,36 @@ body::before {
   margin-left: -695px;
   width: 374px;
   height: 450px;
-  content: url("../../img/logo-image-gretel.svg");
+  content: url("../../img/logo-image-gretel-curve.svg");
+}
+
+/* SVG LOGOS */
+svg[class^="logo-"] {
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.logo-gretel circle {
+  fill: rgba(168, 205, 40, 0.78);
+}
+.logo-gretel path {
+  fill: #7E6748;
+}
+
+.logo-kuleuven rect:first-of-type {
+  fill: #54BCEB;
+}
+.logo-kuleuven rect:nth-of-type(2) {
+  fill: #00407A;
+}
+.logo-kuleuven path,
+.logo-kuleuven rect:nth-of-type(3) {
+  fill: #FFF;
+}
+
+.logo-ccl {
+  fill: #fff;
 }
 
 table {
@@ -531,6 +560,40 @@ table tr.advanced th {
 }
 table label {
   white-space: nowrap;
+}
+
+label[data-title] {
+  position: relative;
+}
+label[data-title]:hover::after, label[data-title]:hover::before {
+  position: absolute;
+  display: block;
+}
+label[data-title]:hover::before {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  display: block;
+  padding: 4px 6px;
+  max-width: 200px;
+  width: 100vw;
+  border-radius: 3px;
+  background: #C0C0C0;
+  color: white;
+  content: attr(data-title);
+  font-size: 12px;
+  -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+          transform: translateY(-100%);
+}
+label[data-title]:hover::after {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  border: solid;
+  border-width: 5px 5px 0 5px;
+  border-color: #C0C0C0 transparent;
+  content: "";
 }
 
 h1,
@@ -1098,7 +1161,7 @@ dd::after {
   border: 6px solid transparent;
   border-top-color: #D6E69D;
   border-radius: 50%;
-  content: '';
+  content: "";
   will-change: transform;
 }
 .loading-wrapper .loading p {
@@ -1166,7 +1229,7 @@ dd::after {
 .messages > div {
   display: inline-block;
   padding: 0.8em;
-  min-width: 80%;
+  width: 72%;
   transition: -webkit-transform 250ms;
   transition: transform 250ms;
   transition: transform 250ms, -webkit-transform 250ms;
@@ -1283,9 +1346,13 @@ dd::after {
 .ebs.step-3 thead td {
   background: #F0F0F0;
 }
+.ebs.step-3 tbody td {
+  text-align: center;
+  cursor: pointer;
+}
 .ebs.step-5 textarea[name="xp"] {
   margin-right: 16px;
-  min-width: 320px;
+  width: 320px;
   min-height: 100px;
   width: 50%;
   color: inherit;
@@ -1294,8 +1361,8 @@ dd::after {
   resize: vertical;
 }
 .ebs.step-5 textarea[name="xp"][readonly] {
-  resize: none;
   color: #C0C0C0;
+  resize: none;
   cursor: not-allowed;
 }
 

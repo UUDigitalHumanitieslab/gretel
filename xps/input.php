@@ -1,4 +1,15 @@
 <?php
+/**
+ * Takes XPath input from a user to query in a BaseX Client.
+ *
+ * A user inputs a valid XPath structure that will be queried in Basex. The XPath is
+ * briefly validated before submitting (in js/scripts.js) check opening/closing tags match),
+ * and fully parsed in the next step(s).
+ *
+ * @author Liesbeth Augustinus
+ * @author Bram Vanroy
+ */
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -9,7 +20,8 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$currentPage = 'xps';
+$_SESSION['ebsxps'] = 'xps';
+$currentPage = $_SESSION['ebsxps'];
 $step = 1;
 $taalPortaal = true;
 
