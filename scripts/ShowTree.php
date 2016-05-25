@@ -33,7 +33,7 @@ if (isset($_GET['db'])) {
 require '../config/config.php';
 require "$scripts/BaseXClient.php";
 
-//header('Content-type: text/xml');
+header('Content-type: text/xml');
 
 try {
     if ($treebank == 'sonar') {

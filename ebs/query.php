@@ -50,11 +50,11 @@ if ($continueConstraints) {
 session_write_close();
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$root/php/header.php"; ?>
+<?php require "$php/header.php"; ?>
 
 <?php if ($continueConstraints) :
     $component = implode(', ', $component);
@@ -114,7 +114,7 @@ require "$root/php/head.php";
 <?php
     setPreviousPageMessage(4);
 endif;  // $continueConstraints
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>

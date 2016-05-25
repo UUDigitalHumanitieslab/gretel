@@ -38,6 +38,7 @@ body {
     font-family: $fontbody;
     line-height: 1.625;
     align-items: center;
+    overflow-x: hidden;
 
     &::before {
         position: fixed;
@@ -48,16 +49,16 @@ body {
         margin-left: -695px;
         width: 374px;
         height: 450px;
-        content: url("../../img/logo-image-gretel-curve.svg");
+        content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
     }
 }
-
 /* SVG LOGOS */
 svg[class^="logo-"] {
-      height: 100%;
-      display: block;
-      pointer-events: none;
+    height: 100%;
+    display: block;
+    pointer-events: none;
 }
+
 .logo-gretel {
     circle {
         fill: rgba(168,205,40,0.78);
@@ -142,7 +143,7 @@ label[data-title] {
             left: 0;
             display: block;
             padding: 4px 6px;
-            max-width: 200px;
+            max-width: 320px;
             width: 100vw;
             border-radius: 3px;
             background: #C0C0C0;
@@ -655,7 +656,7 @@ dd {
             height: 360px;
             border-width: 18px;
             border-color: #F7F7F7;
-            background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
+            background: rgba(255, 255, 255, 0.67) url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
             background-position: bottom center;
             background-size: 74%;
 
@@ -700,6 +701,9 @@ dd {
         p {
             text-align: center;
             font-weight: 700;
+            color: #FFF;
+            text-shadow: 0 0 24px #42392C, 0 2px 4px rgba(66,57,44,0.48);
+            font-size: 24px;
         }
 
         button {
@@ -814,13 +818,31 @@ dd {
             transform: translateX(150%);
         }
     }
+    @keyframes docs-target-fadein {
+        from {
+            transform: scale(10);
+            transform-origin: center center;
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 
     dt:target {
+        animation: docs-target-fadein 600ms forwards;
+
         &::after {
             margin-left: 5px;
             content: "\f104";
             animation: docs-target-arrow 600ms alternate infinite;
             @extend %fa;
+        }
+
+        + dd {
+            animation: docs-target-fadein 600ms forwards;
         }
     }
 }
@@ -1159,7 +1181,7 @@ dd {
 
     .continue-btn-wrapper {
         display: flex;
-        margin-top: 1em;
+        margin-top: 1.6em;
 
         button {
             &:not([type="submit"]) {
@@ -1304,13 +1326,12 @@ dd {
                 overflow: visible !important;
                 width: 107px;
                 height: 128px;
+                display: block;
             }
 
             circle {
                 transform: scale(1.125);
                 transform-origin: center center;
-                stroke: white;
-                stroke-width: 8px;
             }
 
             path {

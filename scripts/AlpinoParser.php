@@ -1,11 +1,12 @@
-<!-- AlpinoParser.php -->
-<!-- version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
 <?php
+/**
+ * version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0
+ * written by Liesbeth Augustinus (c) 2014
+ * for the GrETEL2.0 project
+ */
+
 function Alpino($sentence,$id) {
-  require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $alpinoTreebank)
+  require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $tmp)
 
   $descriptorspec = array(
 			  0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
@@ -15,7 +16,7 @@ function Alpino($sentence,$id) {
 
   $cwd = '/';
   $env = array('ALPINO_HOME' => "$alpinoHome");
-  $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $alpinoTreebank -parse";
+  $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
 
   $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
@@ -45,7 +46,6 @@ function Alpino($sentence,$id) {
     //    echo "command returned $return_value\n";
   }
 
-  return "$alpinoTreebank/$id.xml"; //return parse location
+  return "$tmp/$id.xml"; //return parse location
 
 }
-?>

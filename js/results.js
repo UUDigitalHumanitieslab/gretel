@@ -7,8 +7,8 @@ $(document).ready(function() {
     // * Before counting ALL hits, independent of current fetched results (ms)
     // * Before ALL results are being gathered on the background (ms), OR
     // * Amount of hits before ALL results are being gathered (hits)
-    var timeoutBeforeCount = 500,
-        timeoutBeforeMore = 700,
+    var timeoutBeforeCount = 200,
+        timeoutBeforeMore = 300,
         xResultsBeforeMore = 4;
 
     var hash = window.location.hash,
@@ -23,7 +23,6 @@ $(document).ready(function() {
     var xhrAllSentences,
         resultID = 0,
         resultsCount = 0,
-        stop = false,
         done = false,
         doneCounting = false;
 
@@ -53,7 +52,6 @@ $(document).ready(function() {
                             }
 
                             done = true;
-                            $(".stop").click();
                             if (xhrAllSentences) xhrAllSentences.abort();
                         }
                     }
@@ -86,7 +84,6 @@ $(document).ready(function() {
                     loopResults(data.data, true);
                     messageAllResultsFound();
 
-                    $(".stop").click();
                     clearTimeout(findAllTimeout);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
@@ -106,7 +103,6 @@ $(document).ready(function() {
             })
             .always(function() {
                 done = true;
-                $(".stop").click();
             });
     }
 
@@ -141,7 +137,6 @@ $(document).ready(function() {
 
     function messageAllResultsFound() {
         $(".loading-wrapper.searching").removeClass("active");
-        $(".controls").find(".stop, .continue").prop("disabled", true);
         $(".notice").html("<p></p>");
         disableAndEnableInputs();
         var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small class="still-counting">(still counting, can take a while)</small>'];
@@ -225,27 +220,10 @@ $(document).ready(function() {
         resultIDString = numericSeparator(resultID);
         $(".count strong").text(resultIDString);
 
-        if (!stop && !returnAllResults) {
+        if (!returnAllResults) {
             getSentences();
         }
     }
-
-    $(".stop").click(function() {
-        if (!stop) {
-            stop = true;
-            $(".loading-wrapper.searching").removeClass("active");
-            $(this).prop("disabled", true);
-            $(".continue").prop("disabled", done);
-        }
-    });
-    $(".continue").click(function() {
-        if (stop && !done) {
-            stop = false;
-            $(".stop").prop("disabled", false);
-            $(this).prop("disabled", true);
-            getSentences();
-        }
-    });
 
     $(".controls [name='go-to']").keyup(function(e){
         var keycode = e.keyCode,

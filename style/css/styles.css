@@ -489,6 +489,7 @@ body {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+  overflow-x: hidden;
 }
 body::before {
   position: fixed;
@@ -499,7 +500,7 @@ body::before {
   margin-left: -695px;
   width: 374px;
   height: 450px;
-  content: url("../../img/logo-image-gretel-curve.svg");
+  content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
 }
 
 /* SVG LOGOS */
@@ -575,7 +576,7 @@ label[data-title]:hover::before {
   left: 0;
   display: block;
   padding: 4px 6px;
-  max-width: 200px;
+  max-width: 320px;
   width: 100vw;
   border-radius: 3px;
   background: #C0C0C0;
@@ -1114,7 +1115,7 @@ dd::after {
   height: 360px;
   border-width: 18px;
   border-color: #F7F7F7;
-  background: rgba(255, 255, 255, 0.67) url("../../img/logo-image-gretel.svg") no-repeat;
+  background: rgba(255, 255, 255, 0.67) url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
   background-position: bottom center;
   background-size: 74%;
 }
@@ -1167,6 +1168,9 @@ dd::after {
 .loading-wrapper .loading p {
   text-align: center;
   font-weight: 700;
+  color: #FFF;
+  text-shadow: 0 0 24px #42392C, 0 2px 4px rgba(66, 57, 44, 0.48);
+  font-size: 24px;
 }
 .loading-wrapper .loading button {
   position: relative;
@@ -1293,11 +1297,47 @@ dd::after {
             transform: translateX(150%);
   }
 }
+@-webkit-keyframes docs-target-fadein {
+  from {
+    -webkit-transform: scale(10);
+            transform: scale(10);
+    -webkit-transform-origin: center center;
+            transform-origin: center center;
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes docs-target-fadein {
+  from {
+    -webkit-transform: scale(10);
+            transform: scale(10);
+    -webkit-transform-origin: center center;
+            transform-origin: center center;
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    opacity: 1;
+  }
+}
+.docs dt:target {
+  -webkit-animation: docs-target-fadein 600ms forwards;
+          animation: docs-target-fadein 600ms forwards;
+}
 .docs dt:target::after {
   margin-left: 5px;
   content: "\f104";
   -webkit-animation: docs-target-arrow 600ms alternate infinite;
           animation: docs-target-arrow 600ms alternate infinite;
+}
+.docs dt:target + dd {
+  -webkit-animation: docs-target-fadein 600ms forwards;
+          animation: docs-target-fadein 600ms forwards;
 }
 
 /* EBS, XPS */
@@ -1653,7 +1693,7 @@ dd::after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  margin-top: 1em;
+  margin-top: 1.6em;
 }
 .ebs .continue-btn-wrapper button:not([type="submit"]),
 .xps .continue-btn-wrapper button:not([type="submit"]) {
@@ -1787,6 +1827,7 @@ dd::after {
   overflow: visible !important;
   width: 107px;
   height: 128px;
+  display: block;
 }
 .page-footer .other .logo-wrapper circle {
   -webkit-transform: scale(1.125);
@@ -1795,8 +1836,6 @@ dd::after {
   -webkit-transform-origin: center center;
       -ms-transform-origin: center center;
           transform-origin: center center;
-  stroke: white;
-  stroke-width: 8px;
 }
 .page-footer .other .logo-wrapper path {
   fill: #655745;

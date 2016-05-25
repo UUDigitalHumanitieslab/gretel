@@ -21,12 +21,12 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints) :
     // Set tokenized input sentence to variable
@@ -122,7 +122,7 @@ else:
   <?php setPreviousPageMessage($step - 1);
 endif;
 
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 ?>
 </body>

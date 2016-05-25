@@ -18,7 +18,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 
 // Check if $xpath contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
@@ -27,7 +27,7 @@ $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints && !$isSpam) {
     // Clean up XPath
@@ -72,7 +72,7 @@ else {
 ?>
 
 <?php
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 ?>
 </body>

@@ -21,7 +21,7 @@
       $message = '<p>You can ';
       if (isset($currentPage)) {
           $keys = array_keys(${$currentPage.'Pages'});
-          $href = $home.'/'.$currentPage.'/'. $keys[$goToStep - 1];
+          $href = $home.'/'.$currentPage.'/'.$keys[$goToStep - 1];
 
           $message .= "go to <a href='$href' title='Previous page'>step $goToStep</a> or ";
       }
@@ -64,20 +64,19 @@
     {
         global $currentPage, $step;
         if (isset($currentPage)) {
-          $pageTitle = "";
+            $pageTitle = '';
             if ($currentPage == 'home') {
                 $pageTitle .= 'GrETEL | An example based search engine for corpora';
             } else {
                 if ($currentPage == 'ebs' || $currentPage == 'xps') {
-                  if (isset($step)) {
-                      $pageTitle .= "Step $step | ";
-                  }
+                    if (isset($step)) {
+                        $pageTitle .= "Step $step | ";
+                    }
                     if ($currentPage == 'ebs') {
                         $pageTitle .= 'Example-based search | ';
                     } else {
                         $pageTitle .= 'XPath search | ';
                     }
-
                 } elseif ($currentPage == 'docs') {
                     $pageTitle .= 'Documentation';
                 }
@@ -119,11 +118,13 @@
       }
   }
 
-  function setProgressGoBack($index) {
+  function setProgressGoBack($index)
+  {
       global $step;
 
       if ($index < $step && $index > 0) {
           $diff = $index - $step;
+
           return 'onclick="window.history.go('.$diff.'); return false;"';
       }
   }
@@ -141,8 +142,7 @@
               $onclick = setProgressGoBack($i);
               $output .= '<li '.$class.'><a href="'.$home.'/ebs/'.$uri.'" '.$onclick.'>'.$i.
                 '<span> - '.$title.'</span></a></li>';
-          }
-      else:
+          } else:
           foreach ($xpsPages as $uri => $title) {
               ++$i;
               $class = setProgressClasses($i);
@@ -209,13 +209,14 @@
       echo '</nav>';
   }
 
-  function xpath2Bf($xpath) {
+  function xpath2Bf($xpath)
+  {
       $bfresult;
       // Divide XPath in top-most level, and the rest (its "descendants")
       if (preg_match("/^\/\/?node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
-           list(, $topattrs, $descendants) = $items;
+          list(, $topattrs, $descendants) = $items;
 
-           $topcat;
+          $topcat;
            // Find category of top node
            // CAVEAT: only takes one cat into account and not OR constructions
            if ($topattrs && preg_match("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
@@ -233,17 +234,19 @@
                $descendants = preg_replace("/(?:and)?number\(\@begin\).*?\@begin\)/", '', $descendants);
 
                $depth = 0;
-               $children = "";
+               $children = '';
                $charlength = strlen($descendants);
 
                // Goes through each character of the string and keeps track of the
                // depth we're in. If the depth is two or more, we don't take those
                // characters into account. Output is $children that contains only
                // nodes from the second level (i.e. "children" of top node)
-               for ($pos = 0; $pos < $charlength; $pos++) {
+               for ($pos = 0; $pos < $charlength; ++$pos) {
                    $char = substr($descendants, $pos, 1);
 
-                   if ($char == "[") { $depth++; }
+                   if ($char == '[') {
+                       ++$depth;
+                   }
 
                    // If we're less than 2 levels deep: keep characters in string
                    if ($depth < 2) {
@@ -253,12 +256,14 @@
                    // If we're deeper: don't include string, and possibly remove
                    // trailing start node of a deeper level
                    else {
-                       $children = preg_replace("/(and )?node$/", '', $children);
+                       $children = preg_replace('/(and )?node$/', '', $children);
                    }
 
                  // Only decrement depth after operations to ensure closing brackets
                  // of nodes that are too deep are excluded
-                   if ($char == "]") { $depth--; }
+                   if ($char == ']') {
+                       --$depth;
+                   }
                }
 
                // At the end of the loop depth ought to be zero
@@ -270,8 +275,8 @@
               // and manipulate the string accordingly, i.e. multiply when necessary
               // e.g. count(node[@pt="n"]) > 1 -> node[@pt="n"] and node[@pt="n"]
                $children = preg_replace_callback("/(count\((.*)\) *> *([1-9]+))/",
-                function($matches) {
-                    return $matches[2] . str_repeat(" and " . $matches[2], $matches[3]);
+                function ($matches) {
+                    return $matches[2].str_repeat(' and '.$matches[2], $matches[3]);
                 }, $children);
 
                $dfpatterns = array();
@@ -296,10 +301,11 @@
                    // incomplete, and thus not usable
                    if ($rel) {
                        $dfpattern = "$rel[1]%";
-                       if ($cat[1]) { $dfpattern .= $cat[1]; }
+                       if ($cat[1]) {
+                           $dfpattern .= $cat[1];
+                       }
                        array_push($dfpatterns, $dfpattern);
-                   }
-                   else {
+                   } else {
                        // warn("No rel attribute on child: $xpline in file $xpathfile\n");
                    }
                }  // end foreach
@@ -308,27 +314,65 @@
                    // Sort array alphabetically
                    sort($dfpatterns);
                    $dfpatternjoin = implode('_', $dfpatterns);
-                   $bfresult = $topcat . $dfpatternjoin;
+                   $bfresult = $topcat.$dfpatternjoin;
+               } else {
+                   $bfresult = $topcat;
                }
-               else { $bfresult = $topcat; }
            }    // end if ($descendants)
            else {
                $bfresult = $topcat;
            }
+      } else {
+          $bfresult = false;
       }
-     else {
-         $bfresult = false;
-     }
 
-     return $bfresult;
+      return $bfresult;
   }
 
-  function isSpam($string) {
-    // NOTE: backslash needs to be escaped twice
+  function isSpam($string)
+  {
+      // NOTE: backslash needs to be escaped twice
     $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
-    $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
-    if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
-      return true;
-    }
-    return false;
+      $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
+      if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
+          return true;
+      }
+
+      return false;
+  }
+
+  function Tokenize($sentence)
+  {
+      $addspace = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence); //add space before and after punctuation marks
+    $addspace = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $addspace); // deal with ...
+    $cfs = preg_replace('/^\s*(.*)/', '$1', $addspace); //delete first space
+    $cls = preg_replace('/(.*?)\s*$/', '$1', $cfs); //delete last space
+    $tinput = preg_replace('/\s+/', ' ', $cls);// change multiple spaces to single space
+    return $tinput;
+  }
+
+  function ModifyLemma($parse, $id, $tmp)
+  {
+      $input = fopen("$parse", 'r');
+      $output = fopen("$tmp/$id-pt.xml", 'w');
+      $xml = simpledom_load_file("$parse"); //read alpino parse
+
+    $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin'); //sort terminal nodes by 'begin' attribute
+
+    $i = 0;
+      foreach ($pts as $pt) {
+          if ($pt !== 'let') {
+              $lemma = $pts[$i]->getAttribute('lemma');
+              $newlemma = preg_replace('/_DIM/', '', $lemma); // remove _DIM from lemmas (for diminutives)
+        $newlemma = preg_replace('/_/', '', $newlemma); // remove _ from lemmas (for compounds)
+        $pts[$i]->setAttribute('lemma', "$newlemma"); // add lemma
+          }
+          ++$i;
+      }
+
+      $tree = $xml->asXML();
+      fwrite($output, "$tree");
+      fclose($output);
+
+      return "$tmp/$id-pt.xml"; //return parse location
   }

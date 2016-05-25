@@ -38,7 +38,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 
 // Check if $input contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($input) : false;
@@ -46,7 +46,7 @@ $isSpam = ($continueConstraints) ? isSpam($input) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints && !$spam):
   // Set tokenized input sentence to variable
@@ -72,11 +72,15 @@ if ($continueConstraints && !$spam):
       </div>
 
   <h3>Options</h3>
-  <div class="label-wrapper"><label><input type="checkbox" name="order"> Respect word order</label></div>
-  <div class="label-wrapper"><label><input type="checkbox" name="topcat">
-  Ignore properties of the dominating node. Clicking this option allows you to search
-  for more general patterns, e.g. search for both main clauses and subclauses.
+  <div class="label-wrapper"><label title="Only search for patterns that have the same word order as your input example">
+    <input type="checkbox" name="order"> Respect word order
   </label></div>
+  <div class="label-wrapper">
+    <label title="Search for more general patterns by ignoring the properties of the top node,
+      e.g. search for both main clauses and subclauses">
+      <input type="checkbox" name="topcat"> Ignore properties of the dominating node
+    </label>
+  </div>
 
   <h3>Guidelines</h3>
   <ul>
@@ -114,7 +118,7 @@ else:
     setPreviousPageMessage($step-1);
 endif;
 
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 if ($continueConstraints && !$spam) :
 ?>

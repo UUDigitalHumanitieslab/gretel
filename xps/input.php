@@ -34,11 +34,11 @@ if (!empty($_SESSION['xpath'])) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$root/php/header.php"; ?>
+<?php require "$php/header.php"; ?>
     <form action="tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
@@ -49,7 +49,7 @@ require "$root/php/head.php";
     </form>
 
     <?php
-    require "$root/php/footer.php";
+    require "$php/footer.php";
     include "$root/scripts/AnalyticsTracking.php";
     ?>
 </body>

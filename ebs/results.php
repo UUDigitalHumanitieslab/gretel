@@ -70,7 +70,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
@@ -91,15 +91,14 @@ session_write_close();
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints):
 ?>
 
   <section>
       <h3>Query overview</h3>
-      <p>You can <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' title="Save XPath query" target="_blank" download="gretel-xpath.txt">save the XPath query</a>
-          to use it as input for the XPath search mode.
+      <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
           This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
           from scratch.</p>
         <div class="table-wrapper">
@@ -114,6 +113,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
+        <a href='<?php echo "$scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-arrow-down"></i> Save XPath</a>
     </section>
   <section>
     <h3>Results</h3>
@@ -123,9 +123,9 @@ if ($continueConstraints):
     <p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank component in which
       the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
 
-      <?php include "$root/php/results-messages.php"; ?>
-      <?php include "$root/php/results-controls.php"; ?>
-      <?php require "$root/php/results-table-wrapper.php"; ?>
+      <?php include "$php/results-messages.php"; ?>
+      <?php include "$php/results-controls.php"; ?>
+      <?php require "$php/results-table-wrapper.php"; ?>
 </section>
 <?php
     setContinueNavigation();
@@ -138,7 +138,7 @@ else: // $continueConstraints
     setPreviousPageMessage(4);
 
 endif;
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>

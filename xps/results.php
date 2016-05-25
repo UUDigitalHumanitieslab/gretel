@@ -49,7 +49,7 @@ if ($continueConstraints) {
 
 
     // get context option
-    $context = isset($_POST['ct']) ? true : false;
+    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
 
     $_SESSION['queryIteration'] = array(0, 0);
     $_SESSION['leftOvers'] = array();
@@ -57,13 +57,13 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 ?>
 
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints):
   ?>
@@ -90,9 +90,9 @@ if ($continueConstraints):
     <p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank component in which
       the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
 
-    <?php include "$root/php/results-messages.php"; ?>
-    <?php include "$root/php/results-controls.php"; ?>
-    <?php require "$root/php/results-table-wrapper.php"; ?>
+    <?php include "$php/results-messages.php"; ?>
+    <?php include "$php/results-controls.php"; ?>
+    <?php require "$php/results-table-wrapper.php"; ?>
 </section>
 <?php
     setContinueNavigation();
@@ -106,7 +106,7 @@ else: // $continueConstraints
 
 endif;
 session_write_close();
-require "$root/php/footer.php";
+require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>

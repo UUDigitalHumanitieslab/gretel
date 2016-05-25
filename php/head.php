@@ -11,10 +11,10 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" integrity="sha384-hQpvDQiCJaD2H465dQfA717v7lu5qHWtDbWNPvaTJ0ID5xnPUlVXnKzq7b8YUkbN" crossorigin="anonymous">
-<link rel="stylesheet" href="<?php echo $home; ?>/style/css/styles.min.css">
+<link rel="stylesheet" href="<?php echo $home; ?>/style/css/min/styles.min.css">
 
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
-  <link rel="stylesheet" href="<?php echo $home; ?>/style/css/tree-visualizer.min.css">
+  <link rel="stylesheet" href="<?php echo $home; ?>/style/css/min/tree-visualizer.min.css">
 <?php endif; ?>
 
 <?php

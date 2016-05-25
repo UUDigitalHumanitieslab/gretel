@@ -59,7 +59,7 @@
         // Close fullscreen if a user clicks on an empty area
         FS.click(function(e) {
             var target = $(e.target);
-            if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts, .sentence").length) {
+            if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts-wrapper, .sentence").length) {
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
@@ -170,15 +170,16 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts"><button class="zoom-out"><i class="fa fa-search-minus" aria-hidden="true"></i></button>' +
+                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts-wrapper"><a href="'+xml+'" target="_blank" title="Show XML">Show XML</a>'+
+                    '<div class="zoom-opts"><button class="zoom-out"><i class="fa fa-search-minus" aria-hidden="true"></i></button>' +
                     '<button class="zoom-default">Default</button><button class="zoom-in"><i class="fa fa-search-plus" aria-hidden="true"></i></button>' +
-                    '<button class="close"><i class="fa fa-times"></i></button></div>';
+                    '<button class="close"><i class="fa fa-times"></i></button></div></div>';
 
                 FS.append(FSHTML);
 
                 treeFS = FS.children(".tree");
                 tooltipFS = FS.children(".tooltip");
-                zoomOpts = FS.children(".zoom-opts");
+                zoomOpts = FS.find(".zoom-opts");
 
                 if (args.sentence != "") {
                     treeFS.before('<div class="sentence">' + decodeURI(args.sentence) + '</div>');
@@ -375,7 +376,7 @@
                             h: treeRect.height
                         };
                     if (animate) {
-                        tooltip.animate({
+                        tooltip.stop(true).animate({
                             "left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
                             "top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10)
                         }, 250);

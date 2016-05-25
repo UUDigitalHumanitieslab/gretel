@@ -33,18 +33,16 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$root/php/head.php";
+require "$php/head.php";
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require "$root/php/header.php";
+require "$php/header.php";
 
 if ($continueConstraints) {
-    require "$scripts/Tokenizer.php";
     require "$scripts/SimpleDOM.php";
     require "$scripts/AlpinoParser.php";
-    require "$scripts/ModifyLemma.php";
 
     $tokinput = Tokenize($input);
     $_SESSION['sentence'] = $tokinput;
@@ -79,7 +77,7 @@ if ($continueConstraints) {
     setPreviousPageMessage(1);
 }
 
-require "$root/php/footer.php";
+require "$php/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(document).ready(function() {
