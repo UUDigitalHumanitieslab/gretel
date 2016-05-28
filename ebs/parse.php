@@ -9,6 +9,9 @@
  *
  * @see /functions.php  buildEbsMatrix(), isSpam()
  */
+
+ error_reporting(E_ALL);
+ini_set("display_errors", 1);
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -46,8 +49,9 @@ if ($continueConstraints) {
 
     $tokinput = Tokenize($input);
     $_SESSION['sentence'] = $tokinput;
+
     $parse = Alpino($tokinput, $id);
-    $parseloc = ModifyLemma($parse, $id, $tmp);
+    ModifyLemma($parse, $id, $tmp);
 ?>
 
   <p>You find the structure of the <strong>tagged</strong>

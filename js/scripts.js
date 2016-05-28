@@ -1,11 +1,12 @@
 $(document).ready(function() {
     var body = $("body"),
         nav1 = $(".primary-navigation"),
+        nav2 = $(".secondary-navigation"),
         $window = $(window),
         $document = $(document);
 
     $("#old-ie-script").remove();
-    
+
     $window.resize($.throttle(250, mobileMenu)).resize();
 
     $("label[title]").each(function(i, el) {
@@ -42,6 +43,14 @@ $(document).ready(function() {
             }
         }
     });
+
+    if (body.hasClass("ebs") || body.hasClass("xps")) {
+      // Prevent event bubbling: do NOT allow users to click forward
+      // into a next step
+       nav2.find(".progressbar li.no-hover a").click(function(e) {
+        e.preventDefault();
+      });
+    }
 
     if (body.hasClass("step-1")) {
         var clearBtn = $("[name='clear']");

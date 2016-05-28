@@ -972,9 +972,14 @@ dd::after {
 .secondary-navigation .progressbar li.no-hover {
   cursor: default;
   pointer-events: none;
+  /* Edge: prevent event bubbling. Also need JS */
 }
 .secondary-navigation .progressbar li.no-hover:not(.active) a {
   color: rgba(255, 255, 255, 0.74);
+}
+.secondary-navigation .progressbar li.no-hover a, .secondary-navigation .progressbar li.no-hover a * {
+  pointer-events: none;
+  cursor: default;
 }
 .secondary-navigation .progressbar li a {
   position: relative;

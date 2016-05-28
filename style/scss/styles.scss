@@ -513,6 +513,11 @@ dd {
                 &:not(.active) a {
                     color: rgba(white, 0.74);
                 }
+                /* Edge: prevent event bubbling. Also need JS */
+                a, a * {
+                  pointer-events: none;
+                  cursor: default;
+                }
             }
 
             a {
