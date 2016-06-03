@@ -59,7 +59,19 @@ require "$php/head.php";
                     those looking for <em>specific linguistic patterns</em> in these corpora.</p></dd>
 
                     <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
-                    <dd></dd>
+                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN (Corpus Gesproken Nederlands), and SoNaR.</p>
+                      <ul>
+                        <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blannk" title="The project page of Lassy Small">Lassy Small</a>
+                          was the first corpus to be supported in GrETEL. It is a one-million words corpus
+                          that consists of written data. All of its annotations have been manually checked and verified.</li>
+                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_Dutch/start.htm" target="_blannk" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
+                          or CGN for short, is a corpus of one million words that consists of transcribed Dutch speech.
+                          All the provided annotations have been manually checked and verified.</li>
+                        <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blannk" title="The project page of SoNaR">SoNaR</a>,
+                          is different from Lassy and the CGN in that it is much larger. It is a corpus that consists of 25 components of written data,
+                        amounting to 500 million words. Because of its size, the syntactic annotations have not been manually verified.</li>
+                      </ul>
+                    </dd>
 
                     <dt id="faq-4">How can I contact you?</dt>
                     <dd><p>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
@@ -88,8 +100,7 @@ require "$php/head.php";
                          parts in boldface.</p>
                          <p>Note that due to how the corpora are parsed, some oddities may occur. For instance, punctuation is left out
                          in the dependency structure (all punctuation is attached to the topmost node), which means that in a orthographic structure
-                         the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>. Below is an example of such a punctuation gap; multiple
-                         <code>&lt;hit&gt;</code> tags but only a single genuine match. This is due to how the corpora is parsed.</p>
+                         the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>.</p>
 
                       </dd>
                 </dl>
