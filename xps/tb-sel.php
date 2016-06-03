@@ -42,7 +42,8 @@ if ($continueConstraints && !$isSpam) {
   <p>You can search an entire treebank (default), or select just one or more components. Due to pre-processing difficulties
     some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
 
-  <p>Which treebank do you want to query? Click on the treebank name to see its different components.</p>
+    <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
+    on these treebanks, you can find their project websites in <a href='<?php echo "$home/documentation.php#faq-3"; ?>'>our FAQ</a>.</p>
   <form action="results.php" method="post">
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>

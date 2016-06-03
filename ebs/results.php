@@ -10,13 +10,15 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = $_SESSION['ebsxps'];
 $step = 6;
 
+$id = session_id();
+
 $continueConstraints = sessionVariablesSet(array('treebank', 'search', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
-
+    
     if (is_array($components)) {
         $component = implode(', ', $components);
     } else {
