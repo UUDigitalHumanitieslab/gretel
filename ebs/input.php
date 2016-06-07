@@ -52,8 +52,18 @@ require "$php/head.php";
             require any knowledge of the used formal query language, but it also has less
             search options. <em>Advanced search</em> on the other hand allows a more specific
             search and offers you the possibility to adapt the automatically generated XPath query.</p>
-        <div class="label-wrapper"><label title="No prior XPath knowledge required, but provides less search options"><input type="radio" name="search" value="basic" checked> Basic search</label></div>
-        <div class="label-wrapper"><label title="Prior XPath knowledge required, but offers more search options"><input type="radio" name="search" value="advanced"> Advanced search</label></div>
+        <div class="label-wrapper">
+          <label><input type="radio" name="search" value="basic" checked> Basic search</label>
+          <div class="help-tooltip" data-title="No prior XPath knowledge required, but provides less search options">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="label-wrapper">
+          <label><input type="radio" name="search" value="advanced"> Advanced search</label>
+          <div class="help-tooltip" data-title="Prior XPath knowledge required, but offers more search options">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+          </div>
+        </div>
         <?php setContinueNavigation(); ?>
     </form>
 

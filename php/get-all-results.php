@@ -97,7 +97,7 @@ require "$scripts/FormatResults.php";
         $removeEm = array('<em>' => '', '</em>' => '');
         $hlsentenceDownload = strtr($hlsentenceDownload, $removeEm);
 
-        // E.g. WRPEC0000019treebank
+          // E.g. WRPEC0000019treebank
           if ($treebank == 'sonar') $databaseString = $tblist[$sid];
 
           // remove the added identifier (see GetSentences) to use in the link

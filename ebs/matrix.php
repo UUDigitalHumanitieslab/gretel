@@ -72,14 +72,22 @@ if ($continueConstraints && !$spam):
       </div>
 
   <h3>Options</h3>
-  <div class="label-wrapper"><label title="Only search for patterns that have the same word order as your input example">
-    <input type="checkbox" name="order"> Respect word order
-  </label></div>
   <div class="label-wrapper">
-    <label title="Search for more general patterns by ignoring the properties of the top node,
-      e.g. search for both main clauses and subclauses">
+    <label>
+    <input type="checkbox" name="order"> Respect word order
+    </label>
+    <div class="help-tooltip" data-title="Only search for patterns that have the same word order as your input example">
+      <i class="fa fa-info-circle" aria-hidden="true"></i>
+    </div>
+  </div>
+  <div class="label-wrapper">
+    <label>
       <input type="checkbox" name="topcat"> Ignore properties of the dominating node
     </label>
+    <div class="help-tooltip" data-title="Search for more general patterns by ignoring the properties of the top node,
+      e.g. search for both main clauses and subclauses">
+      <i class="fa fa-info-circle" aria-hidden="true"></i>
+    </div>
   </div>
 
   <h3>Guidelines</h3>

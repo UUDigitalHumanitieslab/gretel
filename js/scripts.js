@@ -5,14 +5,8 @@ $(document).ready(function() {
         $document = $(document);
 
     $("#old-ie-script").remove();
-    
-    $window.resize($.throttle(250, mobileMenu)).resize();
 
-    $("label[title]").each(function(i, el) {
-        var $el = $(el);
-        $el.attr("data-title", $el.attr("title"));
-        $el.removeAttr("title");
-    });
+    $window.resize($.throttle(250, mobileMenu)).resize();
 
     $("[name='to-top']").click(function() {
         $("html, body").animate({

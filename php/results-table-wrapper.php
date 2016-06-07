@@ -1,4 +1,4 @@
-<div class="results-wrapper table-wrapper" style="display: none">
+<div class="table-wrapper" style="display: none">
   <table>
     <thead>
       <tr>

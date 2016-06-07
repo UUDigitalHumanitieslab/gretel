@@ -18,7 +18,7 @@ if ($continueConstraints) {
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
-    
+
     if (is_array($components)) {
         $component = implode(', ', $components);
     } else {
@@ -117,17 +117,49 @@ if ($continueConstraints):
         </div>
         <a href='<?php echo "$scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-arrow-down"></i> Save XPath</a>
     </section>
-  <section>
+  <section id="results-section">
     <h3>Results</h3>
-    <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
-      You can also see and download a distribution overview of the hits over the different treebanks.</p>
-
-    <p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank component in which
-      the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
-
+    <?php if ($treebank != 'sonar'): ?>
+      <article class="distribution-wrapper" style="display: none">
+        <p>The table below presents a distribution overview of the number of hits
+          per component, also showing the complete amount of sentences that were
+          looked through. This may be useful for data analysis, especially if you
+          are interested in comparing different treebank components.
+        </p>
+        <p>For example, if you want to know whether a syntactic construction in
+          spoken language is more frequent in Netherlandic Dutch or Belgian
+          Dutch, you can compare the <em>NL</em> and <em>VL</em> parts of that corpus.
+        </p>
+        <p>You can download a comma-separated distribution overview from the download
+          link below.
+        </p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                  <th>Treebank</th>
+                  <th>Hits</th>
+                  <th># sentences in treebank</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <a href='<?php echo "$home/tmp/${id}gretel-distribution.csv"; ?>' class="download-link" title="Save distribution" target="_blank" download="gretel-distribution.csv"><i class="fa fa-arrow-down"></i> Save distribution</a>
+      </article>
+    <?php endif; ?>
+    <article class="results-wrapper">
       <?php include "$php/results-messages.php"; ?>
+
+      <p><strong>Click on a sentence ID</strong> to view the tree structure. The
+        sentence ID refers to the treebank component in which the sentence occurs,
+        the text number, and the location within the text
+        (<em>p</em> page numbers, <em>s</em> sentence number).
+      </p>
       <?php include "$php/results-controls.php"; ?>
       <?php require "$php/results-table-wrapper.php"; ?>
+    </article>
 </section>
 <?php
     setContinueNavigation();

@@ -109,8 +109,8 @@
   white-space: nowrap;
 }
 
-.tree-visualizer .tree + .tooltip:after,
-.tree-visualizer-fs .tree + .tooltip:after {
+.tree-visualizer .tree + .tooltip::after,
+.tree-visualizer-fs .tree + .tooltip::after {
   position: absolute;
   bottom: -24px;
   left: 50%;
@@ -171,8 +171,8 @@
   padding-top: 1em;
 }
 
-.tree-visualizer .tree ol ol:before,
-.tree-visualizer-fs .tree ol ol:before {
+.tree-visualizer .tree ol ol::before,
+.tree-visualizer-fs .tree ol ol::before {
   position: absolute;
   top: 0;
   left: 50%;
@@ -199,9 +199,9 @@
   text-align: center;
 }
 
-.tree-visualizer .tree li:after, .tree-visualizer .tree li:before,
-.tree-visualizer-fs .tree li:after,
-.tree-visualizer-fs .tree li:before {
+.tree-visualizer .tree li::after, .tree-visualizer .tree li::before,
+.tree-visualizer-fs .tree li::after,
+.tree-visualizer-fs .tree li::before {
   position: absolute;
   top: 0;
   right: 50%;
@@ -211,25 +211,25 @@
   content: "";
 }
 
-.tree-visualizer .tree li:after,
-.tree-visualizer-fs .tree li:after {
+.tree-visualizer .tree li::after,
+.tree-visualizer-fs .tree li::after {
   right: auto;
   left: 50%;
   border-left: 1px solid #ccc;
 }
 
-.tree-visualizer .tree li.first-child:before,
-.tree-visualizer-fs .tree li.first-child:before {
+.tree-visualizer .tree li.first-child::before,
+.tree-visualizer-fs .tree li.first-child::before {
   border: 0 none;
 }
 
-.tree-visualizer .tree li.last-child:before,
-.tree-visualizer-fs .tree li.last-child:before {
+.tree-visualizer .tree li.last-child::before,
+.tree-visualizer-fs .tree li.last-child::before {
   border-right: 1px solid #ccc;
 }
 
-.tree-visualizer .tree li.last-child:after,
-.tree-visualizer-fs .tree li.last-child:after {
+.tree-visualizer .tree li.last-child::after,
+.tree-visualizer-fs .tree li.last-child::after {
   border: 0 none;
 }
 
@@ -238,9 +238,9 @@
   padding-top: 0;
 }
 
-.tree-visualizer .tree li.only-child:after, .tree-visualizer .tree li.only-child:before,
-.tree-visualizer-fs .tree li.only-child:after,
-.tree-visualizer-fs .tree li.only-child:before {
+.tree-visualizer .tree li.only-child::after, .tree-visualizer .tree li.only-child::before,
+.tree-visualizer-fs .tree li.only-child::after,
+.tree-visualizer-fs .tree li.only-child::before {
   display: none;
 }
 
@@ -253,21 +253,24 @@
   border-color: transparent;
 }
 
-.tree-visualizer .tree li.highlight a:hover,
+.tree-visualizer .tree li.highlight a:hover, .tree-visualizer .tree li.highlight a.hovered,
 .tree-visualizer .tree li.highlight a.only-child:hover,
+.tree-visualizer .tree li.highlight a.only-child.hovered,
 .tree-visualizer-fs .tree li.highlight a:hover,
-.tree-visualizer-fs .tree li.highlight a.only-child:hover {
+.tree-visualizer-fs .tree li.highlight a.hovered,
+.tree-visualizer-fs .tree li.highlight a.only-child:hover,
+.tree-visualizer-fs .tree li.highlight a.only-child.hovered {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li.highlight a:hover.hovered span:nth-child(2), .tree-visualizer .tree li.highlight a:hover:hover span:nth-child(2),
-.tree-visualizer .tree li.highlight a.only-child:hover.hovered span:nth-child(2),
-.tree-visualizer .tree li.highlight a.only-child:hover:hover span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a:hover.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a:hover:hover span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child:hover.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child:hover:hover span:nth-child(2) {
+.tree-visualizer .tree li.highlight a:hover span:nth-child(2), .tree-visualizer .tree li.highlight a.hovered span:nth-child(2),
+.tree-visualizer .tree li.highlight a.only-child:hover span:nth-child(2),
+.tree-visualizer .tree li.highlight a.only-child.hovered span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a:hover span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a.hovered span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a.only-child:hover span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a.only-child.hovered span:nth-child(2) {
   color: #3d3d3d;
 }
 
@@ -282,11 +285,6 @@
   border: 1px solid #ccc;
   position: relative;
   z-index: 2;
-}
-
-.tree-visualizer .tree li a:hover,
-.tree-visualizer-fs .tree li a:hover {
-  font-weight: normal;
 }
 
 .tree-visualizer .tree li a span:nth-child(2),
@@ -307,14 +305,6 @@
   background: #e0e0e0;
 }
 
-.tree-visualizer .tree li a.hovered,
-.tree-visualizer-fs .tree li a.hovered {
-  background: #8E7F6B;
-  color: #FFF;
-  text-shadow: 0 -1px rgba(0, 0, 0, 0.4);
-  border-color: transparent;
-}
-
 .tree-visualizer .tree li a:hover + ol li.highlight a, .tree-visualizer .tree li a:hover + ol li.highlight a.only-child, .tree-visualizer .tree li a.hovered + ol li.highlight a, .tree-visualizer .tree li a.hovered + ol li.highlight a.only-child,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child,
@@ -324,19 +314,24 @@
   color: white;
 }
 
-.tree-visualizer .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer .tree li a.hovered span:nth-child(2), .tree-visualizer .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer .tree li a:hover span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered span:nth-child(2),
+.tree-visualizer .tree li a:hover + ol li a span:nth-child(2),
+.tree-visualizer .tree li a:hover span:nth-child(2), .tree-visualizer .tree li a.hovered + ol li a span:nth-child(2),
+.tree-visualizer .tree li a.hovered span:nth-child(2),
 .tree-visualizer-fs .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover span:nth-child(2) {
+.tree-visualizer-fs .tree li a:hover span:nth-child(2),
+.tree-visualizer-fs .tree li a.hovered + ol li a span:nth-child(2),
+.tree-visualizer-fs .tree li a.hovered span:nth-child(2) {
   color: white;
 }
 
-.tree-visualizer .tree li a,
+.tree-visualizer .tree li a.hovered,
+.tree-visualizer-fs .tree li a.hovered {
+  background: #8E7F6B;
+  color: #FFF !important;
+  border-color: transparent;
+}
+
 .tree-visualizer .tree li a:hover + ol li.highlight a span:nth-child(2), .tree-visualizer .tree li a.hovered + ol li.highlight a span:nth-child(2),
-.tree-visualizer-fs .tree li a,
 .tree-visualizer-fs .tree li a:hover + ol li.highlight a span:nth-child(2),
 .tree-visualizer-fs .tree li a.hovered + ol li.highlight a span:nth-child(2) {
   color: #3d3d3d;
@@ -355,21 +350,21 @@
   color: white;
 }
 
-.tree-visualizer .tree li a:hover + ol:before,
-.tree-visualizer .tree li a:hover + ol li:after,
-.tree-visualizer .tree li a:hover + ol li:before,
-.tree-visualizer .tree li a:hover + ol ol:before, .tree-visualizer .tree li a.hovered + ol:before,
-.tree-visualizer .tree li a.hovered + ol li:after,
-.tree-visualizer .tree li a.hovered + ol li:before,
-.tree-visualizer .tree li a.hovered + ol ol:before,
-.tree-visualizer-fs .tree li a:hover + ol:before,
-.tree-visualizer-fs .tree li a:hover + ol li:after,
-.tree-visualizer-fs .tree li a:hover + ol li:before,
-.tree-visualizer-fs .tree li a:hover + ol ol:before,
-.tree-visualizer-fs .tree li a.hovered + ol:before,
-.tree-visualizer-fs .tree li a.hovered + ol li:after,
-.tree-visualizer-fs .tree li a.hovered + ol li:before,
-.tree-visualizer-fs .tree li a.hovered + ol ol:before {
+.tree-visualizer .tree li a:hover + ol::before,
+.tree-visualizer .tree li a:hover + ol li::after,
+.tree-visualizer .tree li a:hover + ol li::before,
+.tree-visualizer .tree li a:hover + ol ol::before, .tree-visualizer .tree li a.hovered + ol::before,
+.tree-visualizer .tree li a.hovered + ol li::after,
+.tree-visualizer .tree li a.hovered + ol li::before,
+.tree-visualizer .tree li a.hovered + ol ol::before,
+.tree-visualizer-fs .tree li a:hover + ol::before,
+.tree-visualizer-fs .tree li a:hover + ol li::after,
+.tree-visualizer-fs .tree li a:hover + ol li::before,
+.tree-visualizer-fs .tree li a:hover + ol ol::before,
+.tree-visualizer-fs .tree li a.hovered + ol::before,
+.tree-visualizer-fs .tree li a.hovered + ol li::after,
+.tree-visualizer-fs .tree li a.hovered + ol li::before,
+.tree-visualizer-fs .tree li a.hovered + ol ol::before {
   border-color: #ddd;
 }
 
@@ -377,12 +372,6 @@
 .tree-visualizer-fs .tree li a.only-child {
   color: #9C8A73;
   font-weight: bold;
-}
-
-.tree-visualizer .tree li a.only-child.hovered, .tree-visualizer .tree li a.only-child:hover,
-.tree-visualizer-fs .tree li a.only-child.hovered,
-.tree-visualizer-fs .tree li a.only-child:hover {
-  background: #dedede;
 }
 
 .tree-visualizer .tree li span,

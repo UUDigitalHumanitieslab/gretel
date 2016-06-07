@@ -84,16 +84,18 @@ if ($continueConstraints):
     </section>
   <section>
     <h3>Results</h3>
-    <p>It is possible to dowload a tab-separated file of sentence IDs, matching sentences, and hits per sentence from the table below.
-      You can also see and download a distribution overview of the hits over the different treebanks.</p>
+    <article class="results-wrapper">
+      <?php include "$php/results-messages.php"; ?>
 
-    <p><strong>Click on a sentence ID</strong> to view the tree structure. The sentence ID refers to the treebank component in which
-      the sentence occurs, the text number, and the location within the text (page + sentence number).</p>
-
-    <?php include "$php/results-messages.php"; ?>
-    <?php include "$php/results-controls.php"; ?>
-    <?php require "$php/results-table-wrapper.php"; ?>
-</section>
+      <p><strong>Click on a sentence ID</strong> to view the tree structure. The
+        sentence ID refers to the treebank component in which the sentence occurs,
+        the text number, and the location within the text
+        (<em>p</em> page numbers, <em>s</em> sentence number).
+      </p>
+      <?php include "$php/results-controls.php"; ?>
+      <?php require "$php/results-table-wrapper.php"; ?>
+    </article>
+  </section>
 <?php
     setContinueNavigation();
 else: // $continueConstraints

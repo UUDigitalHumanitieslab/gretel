@@ -67,7 +67,7 @@
                 }
             }
 
-            &:after {
+            &::after {
                 position: absolute;
                 bottom: -24px;
                 left: 50%;
@@ -114,7 +114,7 @@
             display: table;
             padding-top: 1em;
 
-            ol:before {
+            ol::before {
                 position: absolute;
                 top: 0;
                 left: 50%;
@@ -139,8 +139,8 @@
             vertical-align: top;
             text-align: center;
 
-            &:after,
-            &:before {
+            &::after,
+            &::before {
                 position: absolute;
                 top: 0;
                 right: 50%;
@@ -150,24 +150,24 @@
                 content: "";
             }
 
-            &:after {
+            &::after {
                 right: auto;
                 left: 50%;
                 border-left: 1px solid #ccc;
             }
 
             &.first-child {
-                &:before {
+                &::before {
                     border: 0 none;
                 }
             }
 
             &.last-child {
-                &:before {
+                &::before {
                     border-right: 1px solid #ccc;
                 }
 
-                &:after {
+                &::after {
                     border: 0 none;
                 }
             }
@@ -175,8 +175,8 @@
             &.only-child {
                 padding-top: 0;
 
-                &:after,
-                &:before {
+                &::after,
+                &::before {
                     display: none;
                 }
             }
@@ -188,14 +188,10 @@
                     color: white;
                     border-color: transparent;
 
-                    &:hover {
+                    &:hover, &.hovered {
                         background: #9C8A73;
                         color: white;
-
-                        &.hovered,
-                        &:hover  {
-                          span:nth-child(2) {color: darken(#565656, 10%);}
-                        }
+                        span:nth-child(2) {color: darken(#565656, 10%);}
                     }
                 }
             }
@@ -211,10 +207,6 @@
                 position: relative;
                 z-index: 2;
 
-                &:hover {
-                    font-weight: normal;
-                }
-
                 span:nth-child(2) {
                     color: #565656;
                     font-weight: normal;
@@ -224,32 +216,23 @@
                 &.hovered {
                     background: #e0e0e0;
                      + ol li a {background: #e0e0e0;}
+                     + ol li.highlight a,  + ol li.highlight a.only-child {
+                       background: #9C8A73;
+                       color: white;
+                     }
+                     + ol li a span:nth-child(2),
+                     span:nth-child(2) {
+                       color: white;
+                     }
                 }
 
                 &.hovered {
                     background: #8E7F6B;
-                    color: #FFF;
-                    text-shadow: 0 -1px rgba(0,0,0,0.4);
+                    color: #FFF !important;
                     border-color: rgba(0, 0, 0, 0);
                 }
 
-                &:hover,
-                &.hovered  {
-                  + ol li.highlight a,  + ol li.highlight a.only-child {
-                    background: #9C8A73;
-                    color: white;
-                  }
-                }
 
-                &.hovered,
-                &:hover {
-                  + ol li a span:nth-child(2),
-                  span:nth-child(2) {
-                    color: white;
-                  }
-                }
-
-                ,
                 &:hover + ol li.highlight a span:nth-child(2), &.hovered + ol li.highlight a span:nth-child(2) {
                     color: darken(#565656, 10%);
                 }
@@ -264,10 +247,10 @@
                 }
 
                 &:hover + ol, &.hovered + ol {
-                    &:before,
-                    li:after,
-                    li:before,
-                    ol:before {
+                    &::before,
+                    li::after,
+                    li::before,
+                    ol::before {
                         border-color: #ddd;
                     }
                 }
@@ -275,11 +258,6 @@
                 &.only-child {
                     color: #9C8A73;
                     font-weight: bold;
-
-                    &.hovered,
-                    &:hover {
-                        background: #dedede;
-                    }
                 }
             }
 
