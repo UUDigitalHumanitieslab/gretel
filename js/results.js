@@ -7,8 +7,7 @@ $(document).ready(function() {
     // * Before counting ALL hits, independent of current fetched results (ms)
     // * Before ALL results are being gathered on the background (ms), OR
     // * Amount of hits before ALL results are being gathered (hits)
-    var timeoutBeforeCount = 200,
-        timeoutBeforeMore = 300,
+    var timeoutBeforeMore = 500,
         xResultsBeforeMore = 4;
 
     var hash = window.location.hash,
@@ -35,16 +34,16 @@ $(document).ready(function() {
                 .done(function(json) {
                     if (!done) {
                         var data = $.parseJSON(json);
-                        $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
+                        resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                         if (!data.error && data.data) {
                             loopResults(data.data, false);
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
-                            $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
+                            resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                             $(".messages").addClass("active");
                             if (data.error) {
                                 messageOnError(data.data)
-                            } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
+                            } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
                                 messageNoResultsFound();
                             } else {
                                 messageAllResultsFound();
@@ -60,7 +59,9 @@ $(document).ready(function() {
                     // Edge triggers a fail when an XHR request is aborted
                     // We don't want that, so if the error message is abort, ignore
                     if (error != 'abort') {
-                        var string = "An error occurred: " + error + ".";
+                        var string = "An error occurred";
+                        if (error != '') string += ": " + error + ".";
+
                         messageOnError(string);
                     }
                 })
@@ -79,7 +80,7 @@ $(document).ready(function() {
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
-                $(".results-wrapper tbody:not(.empty) .added").removeClass("added");
+                resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                 if (!data.error && data.data) {
                     loopResults(data.data, true);
                     messageAllResultsFound();
@@ -90,12 +91,14 @@ $(document).ready(function() {
                     $(".messages").addClass("active");
                     if (data.error) {
                         messageOnError(data.data);
-                    } else if ($(".results-wrapper tbody:not(.empty)").children().length == 0) {
+                    } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
                         messageNoResultsFound();
                     }
                 }
             })
             .fail(function(jqXHR, textStatus, error) {
+                // Edge triggers a fail when an XHR request is aborted
+                // We don't want that, so if the error message is abort, ignore
                 if (error != 'abort') {
                     var string = "An error occurred: " + error + ".";
                     messageOnError(string);
@@ -106,19 +109,41 @@ $(document).ready(function() {
             });
     }
 
-    setTimeout(function() {
-        $.get(phpVars.fetchCountsPath, function(count) {
-            if (count) {
-                count = parseInt(count);
-                $(".notice .still-counting").remove();
-                resultsCount = numericSeparator(count);
-                $(".count strong + span").text(resultsCount);
-                $(".notice strong").text(resultsCount);
+    $.ajax(phpVars.fetchCountsPath)
+        .done(function(json) {
+            var data = $.parseJSON(json),
+                sum = data[0],
+                totalArray = data[1];
 
-                doneCounting = true;
+            $(".notice .still-counting").remove();
+            sum = numericSeparator(parseInt(sum));
+            $(".count strong + span, .notice strong").text(sum);
+            resultsCount = sum;
+
+            if (sum > 0) {
+                // Length of associative array (Object in JS)
+                var size = Object.keys(totalArray).length;
+                if (typeof totalArray !== 'undefined' && size > 0) {
+                    for (var database in totalArray) {
+                        var databaseString = database.split("_")[2],
+                            componentHits = numericSeparator(parseInt(totalArray[database][0])),
+                            componentTotal = numericSeparator(parseInt(totalArray[database][1]));
+
+                        $(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
+                    }
+                    $(".distribution-wrapper").show();
+                }
             }
+        })
+        .fail(function() {
+            if (error != 'abort') {
+                var string = "An error occurred: " + error + ".";
+                messageOnError(string);
+            }
+        })
+        .always(function() {
+            doneCounting = true;
         });
-    }, timeoutBeforeCount);
 
     /**
      * Converts an integer with four or more digits to a comma-separated string
@@ -146,11 +171,11 @@ $(document).ready(function() {
                 'You can find the reason for this <a href="' + phpVars.fetchHomePath + '/documentation.php#faq-1" ' +
                 'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
         }
-        notice += '<br><a href="'+phpVars.downloadPath + '"' +
+        notice += '<br><a href="' + phpVars.downloadPath + '"' +
             'title="Download results" class="download-link" target="_blank" download="gretel-results.txt">' +
-            '<i class="fa fa-arrow-down"></i> Download results</a>';
-        $(".notice p").html(notice).after('<small><a href="' + phpVars.fetchHomePath + '/documentation.php#faq-6" '+
-        'style="float: right;" title="FAQ: what is inside the download file" target="_blank">What is inside this file?</a></small>');
+            '<i class="fa fa-arrow-down"></i> Save results</a>';
+        $(".notice p").html(notice).after('<small><a href="' + phpVars.fetchHomePath + '/documentation.php#faq-6" ' +
+            'style="float: right;" title="FAQ: what is inside the download file" target="_blank">What is inside this file?</a></small>');
 
         $(".messages").addClass("active");
         $(".notice").addClass("active");
@@ -158,41 +183,40 @@ $(document).ready(function() {
         $(".notice").one("transitionend", function() {
             setDummyVariables();
         });
+
+        $("html, body").stop().animate({
+            scrollTop: $("#results-section").offset().top
+        }, 250, function() {
+            $window.scroll();
+        });
     }
 
     function messageNoResultsFound() {
-        $(".controls").remove();
+        resultsWrapper.children("p").add(".controls").remove();
+
         $(".error p").text("No results found!");
 
         $(".messages").addClass("active");
         $(".error").addClass("active");
-
-        $(".error").one("transitionend", function() {
-            setDummyVariables();
-        });
     }
 
     function messageOnError(error) {
-        $(".controls").remove();
+        resultsWrapper.children("p").add(".controls").remove();
         $(".error p").text("Error! " + error);
 
         $(".messages").addClass("active");
         $(".error").addClass("active");
-
-        $(".error").one("transitionend", function() {
-            setDummyVariables();
-        });
     }
 
     function showTvFsOnLoad() {
-      var tvLink = $("a.tv-show-fs"),
-        hash = window.location.hash;
-      if (hash && !$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
-          if (hash.indexOf("tv-") == 1) {
-              var index = hash.match(/\d+$/);
-              tvLink.eq(index[0] - 1).click();
-          }
-      }
+        var tvLink = $("a.tv-show-fs"),
+            hash = window.location.hash;
+        if (hash && !$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
+            if (hash.indexOf("tv-") == 1) {
+                var index = hash.match(/\d+$/);
+                tvLink.eq(index[0] - 1).click();
+            }
+        }
     }
 
     function loopResults(sentences, returnAllResults) {
@@ -200,7 +224,7 @@ $(document).ready(function() {
             done = true;
             resultID = 0;
 
-            $(".results-wrapper tbody:not(.empty)").empty();
+            resultsWrapper.find("tbody:not(.empty)").empty();
             $(".loading-wrapper.searching").removeClass("active");
         }
         $.each(sentences, function(id, value) {
@@ -209,14 +233,14 @@ $(document).ready(function() {
                 var link = value[0];
                 link = link.replace(/\bhref=\"([^"]+)\"/, "href=\"#tv-" + resultID + "\" data-tv-url=\"$1\"");
 
-                $(".results-wrapper tbody:not(.empty)").append('<tr data-result-id="' + resultID + '" data-component="'+value[2]+'">' +
+                resultsWrapper.find("tbody:not(.empty)").append('<tr data-result-id="' + resultID + '" data-component="' + value[2] + '">' +
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
                     value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
             showTvFsOnLoad();
         });
 
-        $(".results-wrapper").fadeIn("fast");
+        resultsWrapper.find(".table-wrapper").fadeIn("fast");
         resultIDString = numericSeparator(resultID);
         $(".count strong").text(resultIDString);
 
@@ -225,38 +249,40 @@ $(document).ready(function() {
         }
     }
 
-    $(".controls [name='go-to']").keyup(function(e){
-        var keycode = e.keyCode,
-        $this = $(this);
-        // Reset customValidity on backspace or delete keys, or up and down arrows
-        // Additionally allow a user to move throguh rows by using up and down arrows in
-        // the input field
-        if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
-            this.setCustomValidity("");
-            // UP arrow
-            if (keycode == 38 && $this.val() < resultID) $this.val(parseInt($this.val(), 10)+1).change();
-            // DOWN arrow
-            if (keycode == 40 && $this.val() > 1) $this.val(parseInt($this.val(), 10)-1).change();
-        }
-    })
-    .change(function() {
-        var val = $(this).val(),
-            row = $(".results-wrapper tbody:not(.empty) tr[data-result-id='" + val + "']");
+    $(".controls [name='go-to']").keyup(function(e) {
+            var keycode = e.keyCode,
+                $this = $(this);
+            // Reset customValidity on backspace or delete keys, or up and down arrows
+            // Additionally allow a user to move throguh rows by using up and down arrows in
+            // the input field
+            if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
+                this.setCustomValidity("");
+                // UP arrow
+                if (keycode == 38 && $this.val() < resultID) $this.val(parseInt($this.val(), 10) + 1).change();
+                // DOWN arrow
+                if (keycode == 40 && $this.val() > 1) $this.val(parseInt($this.val(), 10) - 1).change();
+            }
+        })
+        .change(function() {
+            var val = $(this).val(),
+                row = resultsWrapper.find("tbody:not(.empty) tr[data-result-id='" + val + "']");
 
-        if (!row.is(":visible")) {
-            this.setCustomValidity("Please choose a row that is visible. Some rows are hidden depending on the filters you set.");
-        } else {
-            this.setCustomValidity("");
-            var offset = row.offset(),
-                hControls = $(".controls").outerHeight();
+            if (!row.is(":visible")) {
+                this.setCustomValidity("Please choose a row that is visible. Some rows are hidden depending on the filters you set.");
+            } else {
+                this.setCustomValidity("");
+                var offset = row.offset(),
+                    hControls = $(".controls").outerHeight();
 
-            $("html, body").stop().animate({
-                scrollTop: offset.top - hControls
-            });
-        }
+                $("html, body").stop().animate({
+                    scrollTop: offset.top - hControls
+                }, 150);
+            }
+        });
+
+    $(".controls form").submit(function(e) {
+        e.preventDefault();
     });
-
-    $(".controls form").submit(function(e) {e.preventDefault();});
 
     $(".controls [name='filter-components']").change(function() {
         $(this).parent().toggleClass("active");
@@ -293,8 +319,7 @@ $(document).ready(function() {
             } else {
                 if (filterWrapper.find("[name='component']:not(:disabled)").length == filterWrapper.find("[name='component']:not(:disabled):checked").length) {
                     filterWrapper.find("#all-components").prop("checked", true).parent().addClass("active");
-                }
-                else {
+                } else {
                     filterWrapper.find("#all-components").prop("checked", false).prop("indeterminate", true).parent().removeClass("active");
                 }
                 resultsWrapper.find(".empty").hide();
@@ -333,6 +358,10 @@ $(document).ready(function() {
 
     $window.resize($.throttle(250, setDummyVariables));
     $window.scroll($.throttle(250, scrollMenu));
+    // Abort searching request, so we can start a new request more quickly
+    window.addEventListener("beforeunload", function() {
+        if (xhrAllSentences) xhrAllSentences.abort();
+    });
 
     function setDummyVariables() {
         if (!controls.hasClass("scroll")) {
@@ -368,9 +397,8 @@ $(document).ready(function() {
 
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
-          $(".messages").addClass("active");
-          $(".notice").html("<p>It seems that you want to open a tree in a new window. "
-           + "The tree first needs to be found again, but as soon as it is found it will pop up.</p>").addClass("active");
+            $(".messages").addClass("active");
+            $(".notice").html("<p>It seems that you want to open a tree in a new window. " + "The tree first needs to be found again, but as soon as it is found it will pop up.</p>").addClass("active");
         }
     }
 });

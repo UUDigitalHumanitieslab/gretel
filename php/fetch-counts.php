@@ -1,13 +1,16 @@
 <?php
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require "../config/config.php";
 
 require "$scripts/BaseXClient.php";
+require "$scripts/TreebankCount.php";
 require "$scripts/TreebankSearch.php";
 
 session_start();
 header('Content-Type:text/html; charset=utf-8');
+
+$id = session_id();
 
 $xpath = $_SESSION['xpath'];
 $treebank  = $_SESSION['treebank'];
@@ -25,7 +28,18 @@ else {
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 }
 
-$counts = GetCounts($xpath, $treebank, $component, $includes, $session);
+list($sum, $counts) = GetCounts($xpath, $treebank, $component, $includes, $session);
 $session->close();
 
-echo $counts;
+if ($treebank != 'sonar') {
+  // Add a distribution to the list:
+  // Instead of simply returning the amount of hits, return an array of
+  // each database with the amounts of hits per database, and the total
+  // # of sentences for that database
+  $total = getTotalSentences($treebank);
+  foreach ($counts as $database => $dbcount) {
+    $counts[$database] = array($dbcount, $total[$database]);
+  }
+  createCsvCounts($sum, $counts);
+}
+echo json_encode(array($sum, $counts));
