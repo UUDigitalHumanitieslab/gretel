@@ -2,7 +2,7 @@
     <div id="container">
         <header class="page-header">
             <h1>GrETEL</h1>
-            <h2>Greedy Extraction of Trees for Empirical Linguistics</h2>
+            <p>Greedy Extraction of Trees for Empirical Linguistics</p>
             <nav class="primary-navigation">
                 <ul>
                     <li><a href="<?php echo $home; ?>" title="Home"
