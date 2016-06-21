@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
 <title><?php setPageTitle(); ?></title>
-<meta name="description" content="">
+<meta name="description" content="GrETEL is an online tool that facilitates the exploitation of treebanks,
+  large pieces of text that are syntactically annotated, by only requiring an input example instead of a formal query, or hard to understand computer code.">
+<meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, grind, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics">
 
 <?php if ($is_bigstep): ?>
   <meta name="robots" content="noindex">
 <?php endif; ?>
-<link rel="shortcut icon" type="image/png" href="<?php echo $home; ?>/img/gretel_logo_trans.png">
+
+<link rel="icon" type="image/png" href="<?php echo $home; ?>/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="<?php echo $home; ?>/favicon-16x16.png" sizes="16x16">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" integrity="sha384-hQpvDQiCJaD2H465dQfA717v7lu5qHWtDbWNPvaTJ0ID5xnPUlVXnKzq7b8YUkbN" crossorigin="anonymous">
@@ -23,6 +27,11 @@
 ?>
 <?php if (isset($currentPage) && $currentPage != 'home'): ?>
     <link rel="prefetch" href="<?php echo $home; ?>">
+    <?php if (isset($step) && $step < count(${$currentPage.'Pages'})):
+        $keys = array_keys(${$currentPage.'Pages'});
+    ?>
+        <link rel="prefetch" href='<?php echo $home.'/'.$currentPage.'/'.$keys[$step]; ?>'>
+    <?php endif;?>
 <?php else:
     $ebsKeys = array_keys($ebsPages);
     $xpsKeys = array_keys($xpsPages);
@@ -30,11 +39,4 @@
     <link rel="prefetch" href="<?php echo $home; ?>/ebs/<?php echo $ebsKeys[0]; ?>">
     <link rel="prefetch" href="<?php echo $home; ?>/xps/<?php echo $xpsKeys[0]; ?>">
     <link rel="prefetch" href="<?php echo $home; ?>/documentation.php">
-<?php endif;?>
-
-
-<?php if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})):
-    $keys = array_keys(${$currentPage.'Pages'});
-?>
-    <link rel="prefetch" href='<?php echo $home.'/'.$currentPage.'/'.$keys[$step]; ?>'>
 <?php endif;?>
