@@ -126,6 +126,8 @@ else:
     setPreviousPageMessage($step-1);
 endif;
 
+session_write_close();
+
 require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 if ($continueConstraints && !$spam) :

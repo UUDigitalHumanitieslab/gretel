@@ -18,9 +18,10 @@
             </nav>
         </header>
         <main>
-          <header <?php if ($is_search) echo 'class="progress-header"'; ?>>
+
+          <header <?php if ($is_search && isset($pageHeading)) echo 'class="progress-header"'; ?>>
             <h1>
-              <?php echo $pageHeading; ?>
+              <?php if (isset($pageHeading)) echo $pageHeading; ?>
               <?php if ($is_search && $is_bigstep && isset($searchMode)) echo "<span>$searchMode search mode</span>"; ?>
             </h1>
             <?php if ($is_search) require "$php/secondary-navigation.php"; ?>

@@ -39,19 +39,23 @@ body {
     line-height: 1.625;
     align-items: center;
     overflow-x: hidden;
-
-    &::before {
-        position: fixed;
-        top: 36px;
-        left: 50%;
-        z-index: -1;
-        display: block;
-        margin-left: -695px;
-        width: 374px;
-        height: 450px;
-        content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
-    }
 }
+
+@media all and (min-width: 1200px) {
+  body::before {
+      position: fixed;
+      top: 36px;
+      left: 50%;
+      z-index: -1;
+      display: block;
+      margin-left: -695px;
+      width: 374px;
+      height: 450px;
+      content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
+  }
+}
+
+
 /* SVG LOGOS */
 svg[class^="logo-"] {
     height: 100%;
@@ -784,6 +788,10 @@ dd {
     .error {
         border: 1px solid #DF6B5F;
         background-color: #FBDDD4;
+        a {
+          border-bottom-color: #DF6B5F;
+          color: #DF6B5F;
+        }
     }
 
     .notice {

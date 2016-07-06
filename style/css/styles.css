@@ -496,16 +496,18 @@ body {
   overflow-x: hidden;
 }
 
-body::before {
-  position: fixed;
-  top: 36px;
-  left: 50%;
-  z-index: -1;
-  display: block;
-  margin-left: -695px;
-  width: 374px;
-  height: 450px;
-  content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
+@media all and (min-width: 1200px) {
+  body::before {
+    position: fixed;
+    top: 36px;
+    left: 50%;
+    z-index: -1;
+    display: block;
+    margin-left: -695px;
+    width: 374px;
+    height: 450px;
+    content: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel-curve.svg");
+  }
 }
 
 /* SVG LOGOS */
@@ -1326,6 +1328,11 @@ dd::after {
 .messages .error {
   border: 1px solid #DF6B5F;
   background-color: #FBDDD4;
+}
+
+.messages .error a {
+  border-bottom-color: #DF6B5F;
+  color: #DF6B5F;
 }
 
 .messages .notice {

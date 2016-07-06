@@ -11,7 +11,6 @@
  */
 require '../config/config.php';
 require "$root/helpers.php";
-
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
@@ -76,6 +75,8 @@ if ($continueConstraints) {
     possible that you came to this page directly without first entering an input example.</p>';
     setPreviousPageMessage(1);
 }
+
+session_write_close();
 
 require "$php/footer.php";
 if ($continueConstraints) : ?>

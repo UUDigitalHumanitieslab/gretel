@@ -16,7 +16,7 @@ $(document).ready(function() {
         controls = $(".controls"),
         resultsWrapper = $(".results-wrapper"),
         filterWrapper = $(".filter-wrapper"),
-        controls = $(".controls"),
+        messages = $(".messages"),
         dummy = $(".dummy-controls");
 
     var xhrAllSentences,
@@ -40,7 +40,7 @@ $(document).ready(function() {
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
                             resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
-                            $(".messages").addClass("active");
+                            $(".messages").addClass("active").children("div").removeClass("error notice");
                             if (data.error) {
                                 messageOnError(data.data)
                             } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
@@ -77,18 +77,18 @@ $(document).ready(function() {
     }, timeoutBeforeMore);
 
     function findAll() {
+      if (xhrAllSentences) return;
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
                 resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                 if (!data.error && data.data) {
                     loopResults(data.data, true);
-                    messageAllResultsFound();
 
                     clearTimeout(findAllTimeout);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
-                    $(".messages").addClass("active");
+                    $(".messages").addClass("active").children("div").removeClass("error notice");
                     if (data.error) {
                         messageOnError(data.data);
                     } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
@@ -115,12 +115,16 @@ $(document).ready(function() {
                 sum = data[0],
                 totalArray = data[1];
 
-            $(".notice .still-counting").remove();
-            sum = numericSeparator(parseInt(sum));
-            $(".count strong + span, .notice strong").text(sum);
             resultsCount = sum;
 
-            if (sum > 0) {
+            sum = numericSeparator(parseInt(sum));
+            controls.find(".count strong + span").text(sum);
+            messages.find(".amount-hits").text(sum);
+            messages.find(".is-still-counting").remove();
+
+
+
+            if (resultsCount > 0) {
                 // Length of associative array (Object in JS)
                 var size = Object.keys(totalArray).length;
                 if (typeof totalArray !== 'undefined' && size > 0) {
@@ -132,6 +136,9 @@ $(document).ready(function() {
                         $(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
                     }
                     $(".distribution-wrapper").show();
+                }
+                if (resultsCount > phpVars.resultsLimit) {
+                  messages.find(".is-restricted").show();
                 }
             }
         })
@@ -161,51 +168,46 @@ $(document).ready(function() {
     }
 
     function messageAllResultsFound() {
-        $(".loading-wrapper.searching").removeClass("active");
-        $(".notice").html("<p></p>");
         disableAndEnableInputs();
-        var stringCount = doneCounting ? [resultsCount, ''] : ['--', '<small class="still-counting">(still counting, can take a while)</small>'];
-        notice = '<strong>' + stringCount[0] + '</strong> result(s) have/has been found! ' + stringCount[1];
-        if (resultID >= phpVars.resultsLimit) {
-            notice += '<br>We have restricted the output to 500 hits. ' +
-                'You can find the reason for this <a href="' + phpVars.fetchHomePath + '/documentation.php#faq-1" ' +
-                'title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.';
-        }
-        notice += '<br><a href="' + phpVars.downloadPath + '"' +
-            'title="Download results" class="download-link" target="_blank" download="gretel-results.txt">' +
-            '<i class="fa fa-arrow-down"></i> Save results</a>';
-        $(".notice p").html(notice).after('<small><a href="' + phpVars.fetchHomePath + '/documentation.php#faq-6" ' +
-            'style="float: right;" title="FAQ: what is inside the download file" target="_blank">What is inside this file?</a></small>');
 
-        $(".messages").addClass("active");
-        $(".notice").addClass("active");
+        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #results-found', function() {
+          if (doneCounting) {
+            messages.find(".amount-hits").html(resultsCount);
+            messages.find(".is-still-counting").remove();
+          }
 
-        $(".notice").one("transitionend", function() {
-            setDummyVariables();
-        });
+          if (resultsCount > phpVars.resultsLimit || resultID == phpVars.resultsLimit) {
+            messages.find(".is-restricted").show();
+          }
 
-        $("html, body").stop().animate({
-            scrollTop: $("#results-section").offset().top
-        }, 250, function() {
-            $window.scroll();
+          messages.addClass("active").children("div").removeClass("error").addClass("notice active");
+          messages.find(".notice").one("transitionend", function() {
+              setDummyVariables();
+          });
+
+          $("html, body").stop().animate({
+              scrollTop: $("#results-section").offset().top,
+          }, 250, function() {
+              $window.scroll();
+          });
         });
     }
 
     function messageNoResultsFound() {
-        resultsWrapper.children("p").add(".controls").remove();
+        resultsWrapper.children("p").add(controls).add(dummy).remove();
 
-        $(".error p").text("No results found!");
-
-        $(".messages").addClass("active");
-        $(".error").addClass("active");
+        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #no-results-found', function() {
+          messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+        });
     }
 
     function messageOnError(error) {
-        resultsWrapper.children("p").add(".controls").remove();
-        $(".error p").text("Error! " + error);
+        resultsWrapper.children("p").add(controls).add(dummy).remove();
 
-        $(".messages").addClass("active");
-        $(".error").addClass("active");
+        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #error', function() {
+          messages.find(".error-msg").text(error);
+          messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+        });
     }
 
     function showTvFsOnLoad() {
@@ -242,14 +244,17 @@ $(document).ready(function() {
 
         resultsWrapper.find(".table-wrapper").fadeIn("fast");
         resultIDString = numericSeparator(resultID);
-        $(".count strong").text(resultIDString);
+        controls.find(".count strong").text(resultIDString);
 
         if (!returnAllResults) {
             getSentences();
         }
+        else {
+          messageAllResultsFound();
+        }
     }
 
-    $(".controls [name='go-to']").keyup(function(e) {
+    controls.find("[name='go-to']").keyup(function(e) {
             var keycode = e.keyCode,
                 $this = $(this);
             // Reset customValidity on backspace or delete keys, or up and down arrows
@@ -397,8 +402,9 @@ $(document).ready(function() {
 
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
-            $(".messages").addClass("active");
-            $(".notice").html("<p>It seems that you want to open a tree in a new window. " + "The tree first needs to be found again, but as soon as it is found it will pop up.</p>").addClass("active");
+            messages.load(phpVars.fetchHomePath + '/php/results-messages.php #looking-for-tree', function() {
+              messages.addClass("active").children("div").removeClass("error").addClass("notice active");
+            });
         }
     }
 });

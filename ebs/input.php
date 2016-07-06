@@ -21,8 +21,9 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$_SESSION['ebsxps'] = 'ebs';
-$currentPage = $_SESSION['ebsxps'];
+$currentPage = 'ebs';
+$_SESSION['ebsxps'] = $currentPage;
+
 $step = 1;
 $taalPortaal = true;
 

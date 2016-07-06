@@ -85,7 +85,8 @@ if ($continueConstraints):
   <section>
     <h3>Results</h3>
     <article class="results-wrapper">
-      <?php include "$php/results-messages.php"; ?>
+      <aside class="messages">
+      </aside>
 
       <p><strong>Click on a sentence ID</strong> to view the tree structure. The
         sentence ID refers to the treebank component in which the sentence occurs,

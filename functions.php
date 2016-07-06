@@ -23,9 +23,11 @@
           $keys = array_keys(${$currentPage.'Pages'});
           $href = $home.'/'.$currentPage.'/'.$keys[$goToStep - 1];
 
-          $message .= "go to <a href='$href' title='Previous page'>step $goToStep</a> or ";
+          $message .= "go to <a href='$href' title='Go to a previous step'>step $goToStep</a> ";
+
+          if ($goToStep == 1) $message .= "and try a new example ";
       }
-      $message .= "go directly to <a href='$home' title='Go to the homepage'>to the homepage</a>.</p>";
+      $message .= "or go directly to <a href='$home' title='Go to the homepage'>to the homepage</a>.</p>";
       echo $message;
   }
 
@@ -63,8 +65,8 @@
     function setPageTitle()
     {
         global $currentPage, $step;
+        $pageTitle = '';
         if (isset($currentPage)) {
-            $pageTitle = '';
             if ($currentPage == 'home') {
                 $pageTitle .= 'GrETEL | An example based search engine for corpora';
             } else {

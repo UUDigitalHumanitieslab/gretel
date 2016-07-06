@@ -32,20 +32,19 @@ function getMoreIncludes($database, &$databases, $session) {
             }
         }
     }
-    else {
-        // warn("database does not exist");
-    }
 }
 
 function includeAlreadyExists($include) {
   $ALREADY = $_SESSION['already'];
-      if (isset($ALREADY{$include})) {return true;}
-      else {
-          $ALREADY{$include} = 1;
-          $_SESSION['already'] = $ALREADY;
-      }
+  if (isset($ALREADY{$include})) {
+    return true;
+  }
+  else {
+    $ALREADY{$include} = 1;
+    $_SESSION['already'] = $ALREADY;
+  }
 
-      return false;
+  return false;
 }
 
 function Corpus2DB($tblist, $treebank)

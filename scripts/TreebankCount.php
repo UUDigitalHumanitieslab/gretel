@@ -14,7 +14,7 @@ function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)
         if (strpos($bf, 'ALL') !== false) {
             array_shift($databases);
             foreach ($cats as $cat) {
-                $dbcopy = preg_replace('ALL', $cat, $bf);
+                $dbcopy = str_replace('ALL', $cat, $bf);
                 array_push($databases, $dbcopy);
             }
         }
@@ -48,7 +48,6 @@ function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)
 
     if ($treebank != 'sonar') {
       $sum = array_sum($counts);
-      createCsvCounts($sum, $counts);
     }
 
     return array($sum, $counts);

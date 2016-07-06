@@ -115,7 +115,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "$scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-arrow-down"></i> Save XPath</a>
+        <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-arrow-down"></i> Save XPath</a>
     </section>
   <section id="results-section">
     <h3>Results</h3>
@@ -150,7 +150,8 @@ if ($continueConstraints):
       </article>
     <?php endif; ?>
     <article class="results-wrapper">
-      <?php include "$php/results-messages.php"; ?>
+      <aside class="messages">
+      </aside>
 
       <p><strong>Click on a sentence ID</strong> to view the tree structure. The
         sentence ID refers to the treebank component in which the sentence occurs,
