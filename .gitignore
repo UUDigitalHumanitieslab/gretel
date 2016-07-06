@@ -4,6 +4,7 @@ config/
 log/
 tmp/
 parsers/
+thesis-bram/
 
 prepros.cfg
 todo.txt
