@@ -1,10 +1,8 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require '../config/config.php';
 
 session_start();
-header('Content-Type:text/html; charset=utf-8');
+set_time_limit(0);
 
 $treebank = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
@@ -18,7 +16,8 @@ if ($treebank == 'sonar') {
 $databaseString = $treebank;
 
 $xpath = $_SESSION['xpath'];
-if ($_SESSION['ebsxps'] == 'ebs') {
+$ebsxps = $_SESSION['ebsxps'];
+if ($ebsxps == 'ebs') {
     $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
     if ($searchMode == "advanced" && $treebank != "sonar") {
@@ -30,19 +29,19 @@ if ($_SESSION['ebsxps'] == 'ebs') {
 // get context option
 $context = $_SESSION['ct'];
 
+session_write_close();
+
 $id = session_id();
 $date = date('d-m-Y');
 $time = time();
 
 $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
-session_write_close();
-
-if ($_SESSION['ebsxps'] == 'ebs') {
-    $xplog = fopen("$log/gretel-ebq.log", 'a');
+if ($ebsxps == 'ebs') {
+    $xplog = fopen("$log/gretel-ebq.log", 'w');
     if ($searchMode == "advanced" && $treebank != "sonar") {
       // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
-        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
+      fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
     }
     else {
         // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.searched\n");
@@ -51,7 +50,7 @@ if ($_SESSION['ebsxps'] == 'ebs') {
     fclose($xplog);
 }
 else {
-    $xplog = fopen("$log/gretel-xps.log", 'a');
+    $xplog = fopen("$log/gretel-xps.log", 'w');
     fwrite($xplog, "$date\t$user\t$id-$time\t$treebank\t$componentString\t$xpath\n");
     fclose($xplog);
 }
@@ -59,7 +58,6 @@ else {
 require "$scripts/BaseXClient.php";
 require "$scripts/TreebankSearch.php";
 require "$scripts/FormatResults.php";
-
 
   try {
       if ($treebank == 'sonar') {
@@ -141,6 +139,7 @@ require "$scripts/FormatResults.php";
           'error' => false,
           'data' => $resultsArray,
         );
+        header_remove('Set-Cookie');
         echo json_encode($results);
       }
       else {
@@ -148,6 +147,7 @@ require "$scripts/FormatResults.php";
           'error' => false,
           'data' => '',
         );
+        header_remove('Set-Cookie');
         echo json_encode($results);
       }
   } catch (Exception $e) {
@@ -155,5 +155,6 @@ require "$scripts/FormatResults.php";
       'error' => true,
       'data' => $e->getMessage(),
     );
+    header_remove('Set-Cookie');
     echo json_encode($results);
   }

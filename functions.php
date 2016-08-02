@@ -171,22 +171,39 @@
       foreach ($matrixOptions as $array) {
           ++$i;
           foreach ($array as $th => $val) {
+            // Don't show array 2 (advanced options)
               if ($searchMode == 'basic' && $i == 2) {
+                  continue;
+              }
+
+              switch($i) {
+                case 2:
+                  $class = 'advanced';
                   break;
+                case 3:
+                  $class = 'case-sensitive';
+                  break;
+                default:
+                  $class = '';
               }
-              if ($i >= 2) {
-                  $tableHTML .= '<tr class="advanced">';
-              } else {
-                  $tableHTML .= '<tr>';
-              }
+
+              $tableHTML .= "<tr class='$class'>";
 
               $tableHTML .= "<th>$th</th>";
               foreach ($sentence as $key => $word) {
-                  $is_puc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
+                  $isPunc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
                   $word = htmlspecialchars($word, ENT_QUOTES);
-                  if (($val == 'pos' & !$is_puc) || $val == 'na' && $is_puc) {
+                  if (($val == 'pos' & !$isPunc) || $val == 'na' && $isPunc) {
                       $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val' checked></td>";
-                  } else {
+                  }
+                  elseif ($val == 'cs') {
+                    $tableHTML .= "<td class='disabled'>";
+                    if (!$isPunc) {
+                      $tableHTML .= "<input type='checkbox' name='$word--$key' value='$val' disabled>";
+                    }
+                    $tableHTML .= "</td>";
+                  }
+                  else {
                       $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val'></td>";
                   }
               }

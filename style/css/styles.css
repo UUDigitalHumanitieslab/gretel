@@ -568,10 +568,21 @@ table th[colspan="2"] {
   text-align: center;
 }
 
-table tr.advanced td,
 table tr.advanced th {
-  border-color: #F7F7F7;
+  background: #e8e1d8;
+}
+
+table tr.advanced td {
   background: #F7F7F7;
+}
+
+table tr.case-sensitive th {
+  background: #F0F0F0;
+}
+
+table tr.case-sensitive td,
+table tr.case-sensitive th {
+  border-top-width: 3px;
 }
 
 table label {
@@ -1488,6 +1499,10 @@ dd::after {
 .ebs.step-3 tbody td {
   text-align: center;
   cursor: pointer;
+}
+
+.ebs.step-3 tbody td.disabled {
+  cursor: not-allowed;
 }
 
 .ebs.step-5 textarea[name="xp"] {

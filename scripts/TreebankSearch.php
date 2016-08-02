@@ -35,16 +35,18 @@ function getMoreIncludes($database, &$databases, $session) {
 }
 
 function includeAlreadyExists($include) {
+  session_start();
   $ALREADY = $_SESSION['already'];
   if (isset($ALREADY{$include})) {
+    session_write_close();
     return true;
   }
   else {
     $ALREADY{$include} = 1;
     $_SESSION['already'] = $ALREADY;
+    session_write_close();
+    return false;
   }
-
-  return false;
 }
 
 function Corpus2DB($tblist, $treebank)
@@ -76,7 +78,11 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     $dbIteration = $queryIteration[0];
     $endPosIteration = $queryIteration[1];
 
-    if ($endPosIteration !== 'all') $leftOvers = $_SESSION['leftOvers'];
+    if ($endPosIteration !== 'all') {
+        session_start();
+        $leftOvers = $_SESSION['leftOvers'];
+        session_write_close();
+    }
 
     if (isset($leftOvers) && !empty($leftOvers)) {
         foreach ($leftOvers as $key => $m) {
@@ -180,8 +186,10 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
         }
 
         if ($endPosIteration !== 'all') {
+          session_start();
           $_SESSION['leftOvers'] = $leftOvers;
           $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
+          session_write_close();
         }
 
         return array($sentences, $idlist, $beginlist);
@@ -198,7 +206,11 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
     $dbIteration = $queryIteration[0];
     $endPosIteration = $queryIteration[1];
 
-    if ($endPosIteration !== 'all') $leftOvers = $_SESSION['leftOvers'];
+    if ($endPosIteration !== 'all') {
+      session_start();
+      $leftOvers = $_SESSION['leftOvers'];
+      session_write_close();
+    }
 
     if (isset($leftOvers) && !empty($leftOvers)) {
         foreach ($leftOvers as $key => $m) {
@@ -305,15 +317,14 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
         }
 
         if ($endPosIteration !== 'all') {
+          session_start();
           $_SESSION['leftOvers'] = $leftOvers;
           $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
           $_SESSION['includes'] = $includes;
+          session_write_close();
         }
 
         return array($sentences, $tblist, $idlist, $beginlist);
-    } else {
-        // in case there are no results to be found
-        return false;
     }
 }
 

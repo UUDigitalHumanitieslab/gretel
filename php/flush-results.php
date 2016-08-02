@@ -1,9 +1,8 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require '../config/config.php';
 
 session_start();
+set_time_limit(0);
 
 /********************/
 /* SET UP VARIABLES */
@@ -30,11 +29,10 @@ $xpath = $_SESSION['xpath'];
 // get context option
 $context = $_SESSION['ct'];
 
+session_write_close();
 
 require "$scripts/BaseXClient.php";
-// functions to find treebank data in BaseX database and print them
 require "$scripts/TreebankSearch.php";
-// functions to format the treebank results
 require "$scripts/FormatResults.php";
 
 
@@ -49,7 +47,6 @@ try {
         list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
     }
     $session->close();
-    session_write_close();
 
   if (isset($sentences)) {
     array_filter($sentences);
@@ -100,6 +97,7 @@ try {
       'error' => false,
       'data' => $resultsArray,
     );
+    header_remove('Set-Cookie');
     echo json_encode($results);
   }
   else {
@@ -107,13 +105,14 @@ try {
       'error' => false,
       'data' => '',
     );
+    header_remove('Set-Cookie');
     echo json_encode($results);
   }
 } catch (Exception $e) {
-  session_write_close();
     $results = array(
       'error' => true,
       'data' => $e->getMessage(),
     );
+    header_remove('Set-Cookie');
     echo json_encode($results);
 }

@@ -12,6 +12,7 @@ $(document).ready(function() {
 
     var hash = window.location.hash,
         $window = $(window),
+        $document = $(document),
         tvLink = $("a.tv-show-fs"),
         controls = $(".controls"),
         resultsWrapper = $(".results-wrapper"),
@@ -20,6 +21,7 @@ $(document).ready(function() {
         dummy = $(".dummy-controls");
 
     var xhrAllSentences,
+        xhrFetchSentences,
         resultID = 0,
         resultsCount = 0,
         done = false,
@@ -30,7 +32,7 @@ $(document).ready(function() {
     function getSentences() {
         if (!done && (resultID <= phpVars.resultsLimit)) {
             $(".loading-wrapper.searching").addClass("active");
-            $.ajax(phpVars.fetchResultsPath)
+            xhrFetchSentences = $.ajax(phpVars.fetchResultsPath)
                 .done(function(json) {
                     if (!done) {
                         var data = $.parseJSON(json);
@@ -77,7 +79,7 @@ $(document).ready(function() {
     }, timeoutBeforeMore);
 
     function findAll() {
-      if (xhrAllSentences) return;
+        if (xhrAllSentences) return;
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
@@ -106,10 +108,11 @@ $(document).ready(function() {
             })
             .always(function() {
                 done = true;
+                if (xhrFetchSentences) xhrFetchSentences.abort();
             });
     }
 
-    $.ajax(phpVars.fetchCountsPath)
+    var xhrCount = $.ajax(phpVars.fetchCountsPath)
         .done(function(json) {
             var data = $.parseJSON(json),
                 sum = data[0],
@@ -122,8 +125,7 @@ $(document).ready(function() {
             messages.find(".amount-hits").text(sum);
             messages.find(".is-still-counting").remove();
 
-
-
+            // Prepare distribution table. ONLY for lassy and cgn
             if (resultsCount > 0) {
                 // Length of associative array (Object in JS)
                 var size = Object.keys(totalArray).length;
@@ -138,11 +140,11 @@ $(document).ready(function() {
                     $(".distribution-wrapper").show();
                 }
                 if (resultsCount > phpVars.resultsLimit) {
-                  messages.find(".is-restricted").show();
+                    messages.find(".is-restricted").show();
                 }
             }
         })
-        .fail(function() {
+        .fail(function(jqXHR, textStatus, error) {
             if (error != 'abort') {
                 var string = "An error occurred: " + error + ".";
                 messageOnError(string);
@@ -171,25 +173,25 @@ $(document).ready(function() {
         disableAndEnableInputs();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #results-found', function() {
-          if (doneCounting) {
-            messages.find(".amount-hits").html(resultsCount);
-            messages.find(".is-still-counting").remove();
-          }
+            if (doneCounting) {
+                messages.find(".amount-hits").html(numericSeparator(parseInt(resultsCount)));
+                messages.find(".is-still-counting").remove();
+            }
 
-          if (resultsCount > phpVars.resultsLimit || resultID == phpVars.resultsLimit) {
-            messages.find(".is-restricted").show();
-          }
+            if (resultsCount > phpVars.resultsLimit || resultID == phpVars.resultsLimit) {
+                messages.find(".is-restricted").show();
+            }
 
-          messages.addClass("active").children("div").removeClass("error").addClass("notice active");
-          messages.find(".notice").one("transitionend", function() {
-              setDummyVariables();
-          });
+            messages.addClass("active").children("div").removeClass("error").addClass("notice active");
+            messages.find(".notice").one("transitionend", function() {
+                setDummyVariables();
+            });
 
-          $("html, body").stop().animate({
-              scrollTop: $("#results-section").offset().top,
-          }, 250, function() {
-              $window.scroll();
-          });
+            $("html, body").stop().animate({
+                scrollTop: $("#results-section").offset().top,
+            }, 250, function() {
+                $window.scroll();
+            });
         });
     }
 
@@ -197,7 +199,7 @@ $(document).ready(function() {
         resultsWrapper.children("p").add(controls).add(dummy).remove();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #no-results-found', function() {
-          messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+            messages.addClass("active").children("div").removeClass("notice").addClass("error active");
         });
     }
 
@@ -205,8 +207,8 @@ $(document).ready(function() {
         resultsWrapper.children("p").add(controls).add(dummy).remove();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #error', function() {
-          messages.find(".error-msg").text(error);
-          messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+            messages.find(".error-msg").text(error);
+            messages.addClass("active").children("div").removeClass("notice").addClass("error active");
         });
     }
 
@@ -246,11 +248,10 @@ $(document).ready(function() {
         resultIDString = numericSeparator(resultID);
         controls.find(".count strong").text(resultIDString);
 
-        if (!returnAllResults) {
+        if (!returnAllResults && !done) {
             getSentences();
-        }
-        else {
-          messageAllResultsFound();
+        } else {
+            messageAllResultsFound();
         }
     }
 
@@ -293,7 +294,7 @@ $(document).ready(function() {
         $(this).parent().toggleClass("active");
     });
 
-    $(document).click(function(e) {
+    $document.click(function(e) {
         if ($(".controls [for='filter-components']").hasClass("active")) {
             var target = $(e.target);
             if (!target.closest(".filter-wrapper, .controls [for='filter-components']").length) {
@@ -364,9 +365,27 @@ $(document).ready(function() {
     $window.resize($.throttle(250, setDummyVariables));
     $window.scroll($.throttle(250, scrollMenu));
     // Abort searching request, so we can start a new request more quickly
+    // Use vanilla JS with beforeunload and jQuery unload to maximise effectiveness
     window.addEventListener("beforeunload", function() {
-        if (xhrAllSentences) xhrAllSentences.abort();
+        unLoadRequests();
     });
+
+    $window.unload(function() {
+      unLoadRequests();
+    });
+
+    // Because we are actually going back in history, some browsers might not
+    // call the unload event
+    $(".secondary-navigation a").click(function() {
+        unLoadRequests();
+    });
+
+    function unLoadRequests() {
+        if (xhrAllSentences) xhrAllSentences.abort();
+        if (xhrCount) xhrCount.abort();
+        if (xhrFetchSentences) xhrFetchSentences.abort();
+        done = true;
+    }
 
     function setDummyVariables() {
         if (!controls.hasClass("scroll")) {
@@ -403,7 +422,7 @@ $(document).ready(function() {
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
             messages.load(phpVars.fetchHomePath + '/php/results-messages.php #looking-for-tree', function() {
-              messages.addClass("active").children("div").removeClass("error").addClass("notice active");
+                messages.addClass("active").children("div").removeClass("error").addClass("notice active");
             });
         }
     }

@@ -48,7 +48,7 @@ $isSpam = ($continueConstraints) ? isSpam($input) : false;
 <?php
 require "$php/header.php";
 
-if ($continueConstraints && !$spam):
+if ($continueConstraints && !$isSpam):
   // Set tokenized input sentence to variable
   $tokinput = $_SESSION['sentence'];
   $sentence = explode(' ', $tokinput);
@@ -92,25 +92,28 @@ if ($continueConstraints && !$spam):
 
   <h3>Guidelines</h3>
   <ul>
-    <li><strong>word</strong>: The exact word form. This is a case sensitive feature.</li>
+    <li><strong>word</strong>: The exact word form. <strong>This is a case sensitive feature.</strong></li>
     <li><strong>lemma</strong>: Word form that generalizes over inflected forms.
-    For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
-    <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.
-    Lemma is case insensitive (except for proper names).</li>
+      For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
+      <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.
+      <strong>Lemma is case insensitive (except for proper names).</strong></li>
     <li><strong>word class</strong>: Short Dutch part-of-speech tag.
     The different tags are: <code>n</code> (noun), <code>ww</code> (verb), <code>adj</code> (adjective),
     <code>lid</code> (article), <code>vnw</code> (pronoun), <code>vg</code> (conjunction),
     <code>bw</code> (adverb), <code>tw</code> (numeral), <code>vz</code> (preposition),
     <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
     <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
-        It may be included in the results, but it is not necessary.</li>
+        It may be included in the results, but it is not requierd that it is present.</li>
 
     <?php if ($searchMode == 'advanced'): ?>
-        <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <tt>N(soort,mv,basis), WW(pv,tgw,ev),  VNW(pers,pron,nomin,vol,2v,ev)</tt>.</li>
-      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the search instruction.
-          They will not be included in the results.</li>
+        <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
+      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
     <?php endif; ?>
   </ul>
+  <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive, and so can proper names as a <code>lemma</code>.
+    By default case-sensitivity is <em>disabled</em> (case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.
+    Obviously, this option is not available for punctiation.</p>
+  </p>
   <?php setContinueNavigation(); ?>
 </form>
 <?php
@@ -130,7 +133,7 @@ session_write_close();
 
 require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-if ($continueConstraints && !$spam) :
+if ($continueConstraints && !$isSpam) :
 ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>

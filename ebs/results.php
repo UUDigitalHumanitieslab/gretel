@@ -36,14 +36,15 @@ if ($continueConstraints) {
     }
 
     // Clean up XPath
+    $xpath = html_entity_decode($xpath, ENT_QUOTES);
     $xpath = rtrim($xpath);
     $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
     // Deal with quotes/apos
     $trans = array("='" => '="', "' " => '" ', "']" => '"]');
     $xpath = strtr("$xpath", $trans);
 
-    if ($treebank == 'sonar') $xpath = preg_replace('/^\/{0,2}node/', '/node', $xpath);
-    else $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
+    if ($treebank == 'sonar') $xpath = preg_replace('/^\/*node/', '/node', $xpath);
+    else $xpath = preg_replace('/^\/*node/', '//node', $xpath);
 
     $_SESSION['xpath'] = $xpath;
 

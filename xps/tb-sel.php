@@ -36,7 +36,7 @@ if ($continueConstraints && !$isSpam) {
     // Deal with quotes/apos
     $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
     $xpath = strtr($xpath, $trans);
-    $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
+    $xpath = preg_replace('/^\/*node/', '//node', $xpath);
     $_SESSION['xpath'] = $xpath;
 ?>
   <p>You can search an entire treebank (default), or select just one or more components. Due to pre-processing difficulties

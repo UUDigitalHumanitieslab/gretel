@@ -31,9 +31,8 @@ if (isset($_GET['db'])) {
 }
 
 require '../config/config.php';
+require "$root/helpers.php";
 require "$scripts/BaseXClient.php";
-
-header('Content-type: text/xml');
 
 try {
     if ($treebank == 'sonar') {
@@ -73,7 +72,10 @@ try {
 
     $styletree = `perl $scripts/xml2tree.pl '$xml' '$xpath'`;
     $stylexml = simplexml_load_string($styletree);
-    echo $stylexml->asXML();
+
+    var_dump_pre($xml);
+
+    // echo $stylexml->asXML();
 } catch (Exception $e) {
     echo $e->getMessage();
 }
