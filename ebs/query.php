@@ -93,15 +93,16 @@ require "$php/head.php";
         $readonly = 'readonly';
     } else {
         $readonly = '';
-        echo '<input type="hidden" name="originalXp" value="'.$xpath.'">';
+        $htmlXpath = htmlentities($xpath, ENT_QUOTES);
+        echo '<input type="hidden" name="originalXp" value="'.$htmlXpath.'">';
     }
     ?>
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
-  <?php else : // $searchMode == 'advcaned' ?>
+  <?php else : ?>
     <form action="results.php" method="post">
-  <?php endif; // $searchMode == 'advcaned' ?>
+  <?php endif; // $searchMode == 'advanced' ?>
 
     <?php setContinueNavigation(); ?>
   </form>
