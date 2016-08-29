@@ -13,6 +13,9 @@
  * @author Bram Vanroy
  */
 
+header("Content-Type: text/plain");
+set_time_limit(0);
+
 // Set variables
 if (isset($_GET['sid'])) {
     $sentid = $_GET['sid'];
@@ -73,7 +76,7 @@ try {
     $styletree = `perl $scripts/xml2tree.pl '$xml' '$xpath'`;
     $stylexml = simplexml_load_string($styletree);
 
-    var_dump_pre($xml);
+    print_r($xml);
 
     // echo $stylexml->asXML();
 } catch (Exception $e) {
