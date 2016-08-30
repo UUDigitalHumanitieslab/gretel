@@ -12,8 +12,8 @@
 <link rel="icon" type="image/png" href="<?php echo $home; ?>/favicon-32x32.png" sizes="32x32">
 <link rel="icon" type="image/png" href="<?php echo $home; ?>/favicon-16x16.png" sizes="16x16">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" integrity="sha384-hQpvDQiCJaD2H465dQfA717v7lu5qHWtDbWNPvaTJ0ID5xnPUlVXnKzq7b8YUkbN" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,400italic|Roboto+Condensed:400">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <link rel="stylesheet" href="<?php echo $home; ?>/style/css/min/styles.min.css">
 
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
