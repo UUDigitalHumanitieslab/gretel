@@ -31,11 +31,11 @@
           </ul>
           <!-- <a href="https://github.com/CCL-KULeuven/gretel" title="GrETEL on GitHub" class="github-link" target="_blank">
               <span>GrETEL is available on GitHub!</span>
-              <i class="fa fa-github fa-3x" aria-hidden="true"></i>
+              <i class="fa fa-fw fa-github fa-3x" aria-hidden="true"></i>
           </a> -->
       </nav>
       <aside class="other">
-          <button name="to-top" title="Go to the top of the page"><i class="fa fa-arrow-up"></i></button>
+          <button name="to-top" title="Go to the top of the page"><i class="fa fa-fw fa-arrow-up"></i></button>
               <div class="logo-wrapper">
                   <?php include "$root/img/logo-image-gretel.svg"; ?>
               </div>
@@ -60,7 +60,7 @@ if (isIE) {
     + 'We highly encourage you to <a href="http://browsehappy.com/" title="Choose a new browser">update or change your browser</a> to enjoy a '
     + 'faster, safer, and more fun Internet experience.</p>'
     + '<p>After updating or changing your browser, we invite you to come back to our website and use GrETEL as it was intended to be used.</p>'
-    + '<i class="fa fa-internet-explorer" aria-hidden="true"></i></div>';
+    + '<i class="fa fa-fw fa-internet-explorer" aria-hidden="true"></i></div>';
 
 }
 </script>

@@ -116,7 +116,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-arrow-down"></i> Save XPath</a>
+        <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-fw fa-arrow-down"></i> Save XPath</a>
     </section>
   <section id="results-section">
     <h3>Results</h3>
@@ -147,7 +147,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "$home/tmp/${id}gretel-distribution.csv"; ?>' class="download-link" title="Save distribution" target="_blank" download="gretel-distribution.csv"><i class="fa fa-arrow-down"></i> Save distribution</a>
+        <a href='<?php echo "$home/tmp/${id}gretel-distribution.csv"; ?>' class="download-link" title="Save distribution" target="_blank" download="gretel-distribution.csv"><i class="fa fa-fw fa-arrow-down"></i> Save distribution</a>
       </article>
     <?php endif; ?>
     <article class="results-wrapper">

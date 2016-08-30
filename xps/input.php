@@ -43,7 +43,7 @@ require "$php/head.php";
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
             <textarea name="xpath" wrap="soft" required><?php echo $xpath; ?></textarea>
-            <button type="reset" name="clear" title="Empty the input field"><i class="fa fa-times"></i></button>
+            <button type="reset" name="clear" title="Empty the input field"><i class="fa fa-fw fa-times"></i></button>
         </div>
         <?php setContinueNavigation(); ?>
     </form>

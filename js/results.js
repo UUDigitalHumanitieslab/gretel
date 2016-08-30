@@ -3,7 +3,7 @@
  */
 $(document).ready(function() {
     // Customizable attributes!
-    // Specify how long it should take for functions to session
+    // Specify how long it should take for functions to start
     // * Before counting ALL hits, independent of current fetched results (ms)
     // * Before ALL results are being gathered on the background (ms), OR
     // * Amount of hits before ALL results are being gathered (hits)

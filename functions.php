@@ -220,10 +220,10 @@
       global $step, $currentPage, $ebsPages, $xpsPages, $is_bigstep;
       echo '<nav class="continue-btn-wrapper">';
       if ($is_bigstep) {
-          echo '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go back</button>';
+          echo '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i> Go back</button>';
       }
       if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {
-          echo '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-arrow-right" aria-hidden="true"></i></button>';
+          echo '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-fw fa-arrow-right" aria-hidden="true"></i></button>';
       }
       echo '</nav>';
   }

@@ -13,10 +13,15 @@ require "$php/head.php";
                 frequently asked questions, and other information. If you have any more questions, you can always
                 <a href="#faq-4" title="FAQ how to contact us">contact us</a>.</p>
             <p>As stated on the home page, we would ask you to cite the following paper if you are using GrETEL for your research:</p>
-            <blockquote>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+            <blockquote>
+              <i class="fa fa-file-text-o" aria-hidden="true"></i>
+              <p>
+                Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
                 <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" title="Example-Based Treebank Querying" target="_blank">"Example-Based Treebank Querying"</a>
                 In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
-                Istanbul, Turkey. pp. 3161-3167</p></blockquote>
+                Istanbul, Turkey. pp. 3161-3167
+              </p>
+            </blockquote>
             <div class="flex-content">
                 <article>
                     <h2>Tutorials</h2>
@@ -79,22 +84,25 @@ require "$php/head.php";
                       <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage" target="_blank">CCL's website</a> or
                       in the footer of this website.</p></dd>
 
-                     <dt id="faq-5">Why does XPath generated for SONAR only have one leading slash, when the code for Lassy and CGN has two?</dt>
-                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SONAR database on the other. The
+                     <dt id="faq-5">Why does XPath generated for SoNaR only have one leading slash, when the code for Lassy and CGN has two?</dt>
+                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other. The
                          first question is rather easy to understand: a double slash makes sure that the following pattern is searched for in all
                          descendants of the current node (or implied root), whereas the single slash restricts the search to its direct children.
-                         How that difference is relevant for SONAR has been described in the paper cited below.</p>
-                         <blockquote style="padding: 0;border: 0 none;">Vincent Vandeghinste and Liesbeth Augustinus. (2014).
+                         How that difference is relevant for SoNaR has been described in the paper cited below.</p>
+                         <blockquote>
+                           <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                           <p>Vincent Vandeghinste and Liesbeth Augustinus. (2014).
                              <a href="http://www.lrec-conf.org/proceedings/lrec2014/workshops/LREC2014Workshop-CMLC2%20Proceedings-rev2.pdf#page=20"
                              title="Making Large Treebanks Searchable. The SoNaR case." target="_blank">"Making Large Treebanks Searchable. The SoNaR case."</a>
                              In: Marc Kupietz, Hanno Biber, Harald Lüngen, Piotr Bański, Evelyn Breiteneder, Karlheinz Mörth, Andreas Witt &amp; Jani Takhsha (eds.),
                              <em>Proceedings of the LREC2014 2nd workshop on Challenges in the management of large corpora (CMLC-2)</em>. Reykjavik, Iceland. pp. 15-20.
+                           </p>
                          </blockquote>
                      </dd>
 
                      <dt id="faq-6">What information can be found in the results file that I can download?</dt>
                      <dd><p>The document contains the first 500 results that match your query. Each sentence is preceded by the corpus that was used
-                         (Lassy, CGN, or SONAR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
+                         (Lassy, CGN, or SoNaR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
                          that was used to find the results. This can be useful if you want to do a similar query later on. Each sentence also contains
                          <code>&lt;hit&gt;</code> tags surrounding the actual structure that you looked for, similar to how the web page shows these
                          parts in boldface.</p>

@@ -148,9 +148,9 @@
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-times"></i></button></aside>';
+                    '<button><i class="fa fa-fw fa-times"></i></button></aside>';
                 if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode"><i class="fa fa-arrows-alt"></i></button>';
+                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode"><i class="fa fa-fw fa-arrows-alt"></i></button>';
                 }
                 SS.append(SSHTML);
 
@@ -170,10 +170,10 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-times"></i></button></aside><div class="zoom-opts-wrapper"><a href="'+xml+'" target="_blank" title="Show XML">Show XML</a>'+
-                    '<div class="zoom-opts"><button class="zoom-out"><i class="fa fa-search-minus" aria-hidden="true"></i></button>' +
-                    '<button class="zoom-default">Default</button><button class="zoom-in"><i class="fa fa-search-plus" aria-hidden="true"></i></button>' +
-                    '<button class="close"><i class="fa fa-times"></i></button></div></div>';
+                    '<button><i class="fa fa-fw fa-times"></i></button></aside><div class="zoom-opts-wrapper"><a href="' + xml + '" target="_blank" title="Show XML">Show XML</a>' +
+                    '<div class="zoom-opts"><button class="zoom-out"><i class="fa fa-fw fa-search-minus" aria-hidden="true"></i></button>' +
+                    '<button class="zoom-default">Default</button><button class="zoom-in"><i class="fa fa-fw fa-search-plus" aria-hidden="true"></i></button>' +
+                    '<button class="close"><i class="fa fa-fw fa-times"></i></button></div></div>';
 
                 FS.append(FSHTML);
 
@@ -201,7 +201,8 @@
             $.ajax({
                     type: "GET",
                     url: src,
-                    dataType: "xml"
+                    dataType: "xml",
+                    cache: false
                 })
                 .done(function(data) {
                     if (data == null) {
@@ -220,6 +221,7 @@
                         msg = 'Internal Server Error.<br>If the problem persists, contact us.';
                     } else {
                         msg = 'Uncaught Error.<br>Please try again at another time.';
+                        msg += jqXHR.status + ' ' + textStatus + ' ' + errorThrown;
                     }
                     errorHandle(msg);
                 })
@@ -455,5 +457,21 @@
                 return el.get();
             }));
         }
+    }
+
+    // Borrowed from https://github.com/janl/mustache.js/blob/master/mustache.js#L60
+    var entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
+
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"'\/]/g, function(s) {
+            return entityMap[s];
+        });
     }
 }(jQuery));

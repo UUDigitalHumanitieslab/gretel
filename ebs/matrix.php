@@ -77,7 +77,7 @@ if ($continueConstraints && !$isSpam):
     <input type="checkbox" name="order"> Respect word order
     </label>
     <div class="help-tooltip" data-title="Only search for patterns that have the same word order as your input example">
-      <i class="fa fa-info-circle" aria-hidden="true"></i>
+      <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
     </div>
   </div>
   <div class="label-wrapper">
@@ -86,7 +86,7 @@ if ($continueConstraints && !$isSpam):
     </label>
     <div class="help-tooltip" data-title="Search for more general patterns by ignoring the properties of the top node,
       e.g. search for both main clauses and subclauses">
-      <i class="fa fa-info-circle" aria-hidden="true"></i>
+      <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
     </div>
   </div>
 

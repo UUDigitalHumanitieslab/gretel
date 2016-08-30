@@ -31,7 +31,7 @@ require "$root/functions.php";
         <a href='<?php echo "$home/documentation.php#faq-1"; ?>' title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.<br>
       </span>
       <a href="<?php echo $downloadPath; ?>" title="Download results" class="download-link" target="_blank" download="gretel-results.txt">
-        <i class="fa fa-arrow-down"></i> Save results</a>
+        <i class="fa fa-fw fa-arrow-down"></i> Save results</a>
     </p>
     <small>
       <a href='<?php echo "$home/documentation.php#faq-6"; ?>' style="float: right;" title="FAQ: what is inside the download file" target="_blank">What is inside this file?</a>

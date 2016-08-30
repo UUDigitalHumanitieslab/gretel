@@ -41,10 +41,14 @@ require "$php/head.php";
                 possible complexity of XPath code. Lassy and CGN are available.</p>
 
             <p>Please cite the following paper if you are using GrETEL for your research:</p>
-            <blockquote>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+            <blockquote>
+              <i class="fa fa-file-text-o" aria-hidden="true"></i>
+              <p>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
                 <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a>
                 In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
-                Istanbul, Turkey. pp. 3161-3167</p></blockquote>
+                Istanbul, Turkey. pp. 3161-3167
+              </p>
+            </blockquote>
         </main>
     </div>
 
