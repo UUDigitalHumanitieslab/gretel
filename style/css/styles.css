@@ -410,6 +410,7 @@ input:not([type="button"]):not([type="reset"]):not([type="submit"]), textarea {
   padding: 6px 8px;
   border: 1px solid #C0C0C0;
   background: white;
+  border-radius: 4px;
 }
 
 input:not([type="button"]):not([type="reset"]):not([type="submit"]):focus, input:not([type="button"]):not([type="reset"]):not([type="submit"]):active, textarea:focus, textarea:active {
@@ -422,14 +423,15 @@ input:not([type="button"]):not([type="reset"]):not([type="submit"]):invalid, tex
 
 button, input[type="button"], input[type="reset"], input[type="submit"] {
   background: #C0C0C0;
+  border: 0 none;
   color: white;
-  border: 1px solid #C0C0C0;
   padding: 6px 8px;
+  border-radius: 4px;
 }
 
 button:not([disabled]):not(.disabled):hover, input[type="button"]:not([disabled]):not(.disabled):hover, input[type="reset"]:not([disabled]):not(.disabled):hover, input[type="submit"]:not([disabled]):not(.disabled):hover {
   background: #a1a1a1;
-  border: 1px solid #a1a1a1;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.12);
 }
 
 label, input[type="checkbox"], input[type="radio"], button {
@@ -455,20 +457,30 @@ label.disabled, button[disabled] {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-moz-selection {
-  background: #c0c0c0;
-  color: white;
-}
-
-::selection {
-  background: #c0c0c0;
-  color: white;
-}
-
 blockquote {
-  margin-left: 1em;
-  padding-left: 1em;
-  border-left: 4px solid #968A7A;
+  margin: 1.25em auto;
+  border: 1px solid;
+  padding: 0.67em 1.34em 0.89em;
+  max-width: 76%;
+  border-radius: 4px;
+  font-size: 88%;
+  border-bottom-width: 2px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  text-align: left;
+}
+
+blockquote p {
+  margin: 0;
+}
+
+blockquote i.fa {
+  font-size: 36px;
+  margin-right: 24px;
 }
 
 *,
@@ -523,23 +535,6 @@ svg[class^="logo-"] {
 
 .logo-gretel path {
   fill: #7E6748;
-}
-
-.logo-kuleuven rect:first-of-type {
-  fill: #54BCEB;
-}
-
-.logo-kuleuven rect:nth-of-type(2) {
-  fill: #00407A;
-}
-
-.logo-kuleuven path,
-.logo-kuleuven rect:nth-of-type(3) {
-  fill: #FFF;
-}
-
-.logo-ccl {
-  fill: #fff;
 }
 
 table {
@@ -629,6 +624,9 @@ h2,
 h3,
 h4 {
   font-family: "Roboto Condensed", sans-serif;
+  -webkit-font-kerning: normal;
+          font-kerning: normal;
+  font-weight: 400;
 }
 
 h1 {
@@ -652,15 +650,24 @@ h4 {
   font-size: 1.125em;
 }
 
+p code {
+  font-size: 0.8em;
+  background: #FAFAFA;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  border-bottom-width: 2px;
+  padding: 0.25em 0.34em;
+}
+
 a {
-  border-bottom: 1px dotted;
-  color: #9FB548;
+  border-bottom: 1px solid;
+  color: #7E6748;
   text-decoration: none;
 }
 
 a:hover {
   border-bottom: 0 none;
-  color: #798937;
+  color: #574732;
 }
 
 dl {
@@ -678,28 +685,13 @@ dt::before {
 }
 
 dd {
-  position: relative;
   margin-bottom: 1.67em;
-  margin-left: 1em;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  border-left: 3px solid #BFA58A;
+  margin-left: 1.16em;
   text-align: justify;
-  font-size: 14px;
 }
 
 dd p:last-child {
   margin-bottom: 0;
-}
-
-dd::after {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 1em;
-  height: 3px;
-  background: #BFA58A;
-  content: "";
 }
 
 .filter-wrapper {
@@ -879,7 +871,7 @@ dd::after {
   color: #565656;
   white-space: nowrap;
   font-weight: 300;
-  font-size: 16px;
+  font-size: 15px;
   transition: -webkit-transform 200ms;
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
@@ -926,6 +918,8 @@ dd::after {
 .primary-navigation.small ul {
   position: absolute;
   right: 0;
+  top: 48px;
+  border-radius: 4px;
   display: none;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
@@ -997,6 +991,7 @@ dd::after {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  border-radius: 0 0 6px 6px;
 }
 
 /* Progress bar */
@@ -1024,6 +1019,14 @@ dd::after {
   display: inline-block;
   padding: 0;
   background: #C0C0C0;
+}
+
+.secondary-navigation .progressbar li:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.secondary-navigation .progressbar li:last-child {
+  border-radius: 0 4px 4px 0;
 }
 
 .secondary-navigation .progressbar li.done {
@@ -1060,7 +1063,7 @@ dd::after {
     font-size: 14px;
   }
   .secondary-navigation .progressbar li {
-    border-radius: 50%;
+    border-radius: 50% !important;
   }
   .secondary-navigation .progressbar li:not(:last-child) {
     margin-right: 8px;
@@ -1365,6 +1368,7 @@ dd::after {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  font-size: 88%;
 }
 
 .docs .flex-content article {
@@ -1397,51 +1401,11 @@ dd::after {
   }
 }
 
-@-webkit-keyframes docs-target-fadein {
-  from {
-    -webkit-transform: scale(10);
-            transform: scale(10);
-    -webkit-transform-origin: center center;
-            transform-origin: center center;
-    opacity: 0;
-  }
-  to {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes docs-target-fadein {
-  from {
-    -webkit-transform: scale(10);
-            transform: scale(10);
-    -webkit-transform-origin: center center;
-            transform-origin: center center;
-    opacity: 0;
-  }
-  to {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.docs dt:target {
-  -webkit-animation: docs-target-fadein 600ms forwards;
-          animation: docs-target-fadein 600ms forwards;
-}
-
 .docs dt:target::after {
   margin-left: 5px;
   content: "\f104";
   -webkit-animation: docs-target-arrow 600ms alternate infinite;
           animation: docs-target-arrow 600ms alternate infinite;
-}
-
-.docs dt:target + dd {
-  -webkit-animation: docs-target-fadein 600ms forwards;
-          animation: docs-target-fadein 600ms forwards;
 }
 
 /* EBS, XPS */
@@ -1478,13 +1442,14 @@ dd::after {
 .ebs.step-1 .input-wrapper button {
   width: 40px;
   height: 40px;
+  border-radius: 0 4px 4px 0;
   text-align: center;
 }
 
 .ebs.step-1 .input-wrapper input[type="text"] {
-  padding-right: 44px;
   width: 420px;
   height: 40px;
+  border-radius: 4px 0 0 4px;
 }
 
 .ebs.step-1 .input-wrapper input[type="text"].no-content + button i {
@@ -1767,6 +1732,7 @@ dd::after {
   color: #FFFFFF;
   font-weight: bold;
   font-size: 14px;
+  border-radius: 4px;
 }
 
 .ebs.step-6 .download-link i,
@@ -1891,6 +1857,10 @@ dd::after {
   color: white;
 }
 
+.page-footer .content h3 {
+  text-shadow: 0 1px rgba(0, 0, 0, 0.12);
+}
+
 .page-footer address ul,
 .page-footer nav ul {
   padding-left: 26px;
@@ -1942,26 +1912,6 @@ dd::after {
 
 .page-footer nav ul li::before {
   content: "\f054";
-}
-
-.page-footer .github-link {
-  display: block;
-  padding: 6px 8px;
-  border: 2px solid white;
-  text-align: center;
-}
-
-.page-footer .github-link > :first-child {
-  margin-right: 6px;
-}
-
-.page-footer .github-link > * {
-  vertical-align: middle;
-}
-
-.page-footer .github-link:hover {
-  background: white;
-  color: #7E6748;
 }
 
 .page-footer .other {

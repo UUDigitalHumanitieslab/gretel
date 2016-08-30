@@ -436,6 +436,7 @@ input:not([type="button"]):not([type="reset"]):not([type="submit"]), textarea {
   padding: 6px 8px;
   border: 1px solid #C0C0C0;
   background: white;
+  border-radius: 4px;
   &:focus, &:active {
     border-color: darken(#C0C0C0, 12%);
   }
@@ -446,12 +447,13 @@ input:not([type="button"]):not([type="reset"]):not([type="submit"]), textarea {
 
 button, input[type="button"], input[type="reset"], input[type="submit"] {
   background: #C0C0C0;
+  border: 0 none;
   color: white;
-  border: 1px solid #C0C0C0;
   padding: 6px 8px;
+  border-radius: 4px;
   &:not([disabled]):not(.disabled):hover {
     background: darken(#C0C0C0, 12%);
-    border: 1px solid darken(#C0C0C0, 12%);
+    text-shadow: 0 1px rgba(0,0,0,0.12);
   }
 }
 

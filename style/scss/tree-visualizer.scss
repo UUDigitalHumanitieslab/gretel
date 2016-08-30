@@ -1,6 +1,5 @@
 /**
- * (S)CSS file for the Tree Visualizer. You can change the colours of the
- * tree in _tv-variables.scss.
+ * (S)CSS file for the Tree Visualizer.
  *
  * @author Bram Vanroy
  */
@@ -43,6 +42,7 @@
         overflow: auto;
         display: flex;
         box-sizing: content-box;
+        border-radius: 4px;
 
         + .tooltip {
             position: fixed;
@@ -278,7 +278,6 @@
         min-height: 240px;
         background: #F7F7F7;
         font-size: 12px;
-
         + .tooltip {
             z-index: 9;
         }
@@ -287,10 +286,11 @@
     > .tv-show-fs {
         display: block;
         position: absolute;
-        top: 0;
-        right: 0;
+        top: 8px;
+        right: 8px;
         width: 40px;
         height: 40px;
+        border-radius: 4px;
         text-align: center;
         @extend %button;
     }
@@ -398,6 +398,7 @@
     .zoom-opts {
         padding: 12px;
         background: #F5F5F5;
+        border-radius: 4px;
         @extend %clearfix;
 
         &:hover {
@@ -439,7 +440,8 @@
                     background: darken(#DF5F5F, 8%);
                 }
             }
-
+            &.zoom-out {border-radius: 4px 0 0 4px;}
+            &.zoom-in {border-radius: 0 4px 4px 0;}
             &.zoom-default {
                 padding: 0 8px;
                 width: auto;

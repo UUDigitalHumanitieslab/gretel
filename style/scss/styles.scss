@@ -11,15 +11,23 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
-    background: #c0c0c0;
-    color: white;
-}
-
 blockquote {
-    margin-left: 1em;
-    padding-left: 1em;
-    border-left: 4px solid #968A7A;
+  margin: 1.25em auto;
+  border: 1px solid;
+  padding: 0.67em 1.34em 0.89em;
+  max-width: 76%;
+  border-radius: 4px;
+  font-size: 88%;
+  border-bottom-width: 2px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  p {margin: 0;}
+  i.fa {
+    font-size: 36px;
+    margin-right: 24px;
+  }
+
 }
 
 *,
@@ -68,25 +76,6 @@ svg[class^="logo-"] {
     path {
         fill: #7E6748;
     }
-}
-
-.logo-kuleuven {
-    rect:first-of-type {
-        fill: #54BCEB;
-    }
-
-    rect:nth-of-type(2) {
-        fill: #00407A;
-    }
-
-    path,
-    rect:nth-of-type(3) {
-        fill: #FFF;
-    }
-}
-
-.logo-ccl {
-    fill: #fff;
 }
 
 table {
@@ -182,6 +171,8 @@ h2,
 h3,
 h4 {
     font-family: $fontheadings;
+    font-kerning: normal;
+    font-weight: 400;
 }
 
 h1 {
@@ -205,14 +196,25 @@ h4 {
     font-size: 1.125em;
 }
 
+p {
+  code {
+    font-size: 0.8em;
+    background: #FAFAFA;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    border-bottom-width: 2px;
+    padding: 0.25em 0.34em;
+  }
+}
+
 a {
-    border-bottom: 1px dotted;
-    color: $gretelgreen;
+    border-bottom: 1px solid;
+    color: #7E6748;
     text-decoration: none;
 
     &:hover {
         border-bottom: 0 none;
-        color: darken($gretelgreen, 12%);
+        color: darken(#7E6748, 12%);
     }
 }
 
@@ -231,27 +233,12 @@ dt {
 }
 
 dd {
-    position: relative;
-    margin-bottom: 1.67em;
-    margin-left: 1em;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    border-left: 3px solid #BFA58A;
-    text-align: justify;
-    font-size: 14px;
+  margin-bottom: 1.67em;
+  margin-left: 1.16em;
+  text-align: justify;
 
     p:last-child {
         margin-bottom: 0;
-    }
-
-    &::after {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 1em;
-        height: 3px;
-        background: #BFA58A;
-        content: "";
     }
 }
 
@@ -389,7 +376,7 @@ dd {
                 color: $textmain;
                 white-space: nowrap;
                 font-weight: 300;
-                font-size: 16px;
+                font-size: 15px;
                 transition: transform 200ms;
                 will-change: transform;
 
@@ -428,6 +415,8 @@ dd {
         ul {
             position: absolute;
             right: 0;
+            top: 48px;
+            border-radius: 4px;
             display: none;
             flex-direction: column;
             border: 1px solid #DDD;
@@ -490,6 +479,7 @@ dd {
     width: 100%;
     background: #fff;
     flex: 1;
+    border-radius: 0 0 6px 6px;
 }
 /* Progress bar */
 .secondary-navigation {
@@ -508,6 +498,9 @@ dd {
             display: inline-block;
             padding: 0;
             background: #C0C0C0;
+
+            &:first-child {border-radius: 4px 0 0 4px;}
+            &:last-child {border-radius: 0 4px 4px 0;}
 
             &.done {
                 background-color: darken(#C0C0C0, 12%);
@@ -546,7 +539,7 @@ dd {
         font-size: 14px;
 
         li {
-            border-radius: 50%;
+            border-radius: 50% !important;
 
             &:not(:last-child) {
                 margin-right: 8px;
@@ -819,7 +812,7 @@ dd {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-
+        font-size: 88%;
         article {
             padding: 0.67em;
             min-width: 240px;
@@ -835,31 +828,13 @@ dd {
             transform: translateX(150%);
         }
     }
-    @keyframes docs-target-fadein {
-        from {
-            transform: scale(10);
-            transform-origin: center center;
-            opacity: 0;
-        }
-
-        to {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
 
     dt:target {
-        animation: docs-target-fadein 600ms forwards;
-
         &::after {
             margin-left: 5px;
             content: "\f104";
             animation: docs-target-arrow 600ms alternate infinite;
             @extend %fa;
-        }
-
-        + dd {
-            animation: docs-target-fadein 600ms forwards;
         }
     }
 }
@@ -883,13 +858,14 @@ dd {
             button {
                 width: 40px;
                 height: 40px;
+                border-radius: 0 4px 4px 0;
                 text-align: center;
             }
 
             input[type="text"] {
-                padding-right: 44px;
                 width: 420px;
                 height: 40px;
+                border-radius: 4px 0 0 4px;
 
                 &.no-content {
                     + button {
@@ -1138,6 +1114,7 @@ dd {
         color: #FFFFFF;
         font-weight: bold;
         font-size: 14px;
+        border-radius: 4px;
 
         i {
             margin-right: 4px;
@@ -1241,6 +1218,10 @@ dd {
         a {
             color: white;
         }
+
+        h3 {
+          text-shadow: 0 1px rgba(0,0,0,0.12);
+        }
     }
 
     address,
@@ -1292,28 +1273,6 @@ dd {
 
         li::before {
             content: "\f054";
-        }
-    }
-
-    .github-link {
-        display: block;
-        padding: 6px 8px;
-        border: 2px solid white;
-        text-align: center;
-
-        > {
-            :first-child {
-                margin-right: 6px;
-            }
-
-            * {
-                vertical-align: middle;
-            }
-        }
-
-        &:hover {
-            background: white;
-            color: #7E6748;
         }
     }
 
