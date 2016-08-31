@@ -64,7 +64,7 @@ if ($continueConstraints) {
 
   <form action="matrix.php" method="post" enctype="multipart/form-data">
     <p>If the analysis is different from what you expected, you can enter
-      <a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search">another input example</a>.
+      <a href="ebs/input.php" title="Example-based search">another input example</a>.
     </p>
     <?php setContinueNavigation(); ?>
   </form>
@@ -82,7 +82,7 @@ require "$php/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(document).ready(function() {
-      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>');
   });
   </script>
 <?php endif;

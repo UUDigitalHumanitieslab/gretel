@@ -75,7 +75,7 @@ require "$scripts/FormatResults.php";
       array_filter($sentences);
       // Write results to file so that they can be downloaded later on
       // If the file already exists, remove it and re-create it (just to be sure)
-      $fileName = "$tmp/${id}gretel-results.txt";
+      $fileName = "$tmp/$id-gretel-results.txt";
       if (file_exists($fileName)) {
           unlink($fileName);
       }
@@ -122,7 +122,7 @@ require "$scripts/FormatResults.php";
 
           // For Lassy and CGN tb and db are identical (i.e. lassy & lassy, or cgn & cgn).
           // For Sonar tb is sonar, and db something like WRPEC0000019treebank
-          $sentenceidlink = '<a class="tv-show-fs" href="'.$home.'/scripts/ShowTree.php'.
+          $sentenceidlink = '<a class="tv-show-fs" href="scripts/ShowTree.php'.
             '?sid='.$sidString.
             '&tb='.$treebank.
             '&db='.$databaseString.

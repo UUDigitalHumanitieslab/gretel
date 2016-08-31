@@ -17,17 +17,17 @@
 
   function setPreviousPageMessage($goToStep)
   {
-      global $home, $currentPage, $ebsPages, $xpsPages;
+      global $currentPage, $ebsPages, $xpsPages;
       $message = '<p>You can ';
       if (isset($currentPage)) {
           $keys = array_keys(${$currentPage.'Pages'});
-          $href = $home.'/'.$currentPage.'/'.$keys[$goToStep - 1];
+          $href = $currentPage.'/'.$keys[$goToStep - 1];
 
           $message .= "go to <a href='$href' title='Go to a previous step'>step $goToStep</a> ";
 
           if ($goToStep == 1) $message .= "and try a new example ";
       }
-      $message .= "or go directly to <a href='$home' title='Go to the homepage'>to the homepage</a>.</p>";
+      $message .= "or go directly to <a href='index.php' title='Go to the homepage'>the homepage</a>.</p>";
       echo $message;
   }
 
@@ -133,7 +133,7 @@
 
   function buildProgressList()
   {
-      global $step, $home, $ebsPages, $xpsPages, $currentPage;
+      global $step, $ebsPages, $xpsPages, $currentPage;
       $i = 0;
 
       $output = '<ul class="progressbar">';
@@ -142,14 +142,14 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="'.$home.'/ebs/'.$uri.'" '.$onclick.'>'.$i.
+              $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.'>'.$i.
                 '<span> - '.$title.'</span></a></li>';
           } else:
           foreach ($xpsPages as $uri => $title) {
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="'.$home.'/xps/'.$uri.'" '.$onclick.'>'.$i.
+              $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.'>'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
       endif;

@@ -21,7 +21,7 @@ require "$root/functions.php";
   $fetchResultsPath = "$home/php/flush-results.php";
   $getAllResultsPath = "$home/php/get-all-results.php";
   $fetchCountsPath = "$home/php/fetch-counts.php";
-  $downloadPath = "$home/tmp/${id}gretel-results.txt";
+  $downloadPath = "$home/tmp/$id-gretel-results.txt";
   ?>
 
   <div id="results-found">

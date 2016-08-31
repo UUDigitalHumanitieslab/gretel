@@ -15,10 +15,10 @@ require "$php/head.php";
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
                 search engine we highly recommend that you first take a look at
-                <a href="<?php echo $home; ?>/documentation.php" title="Documentation">the documentation on the topic</a>.
+                <a href="documentation.php" title="Documentation">the documentation on the topic</a>.
                 Tutorials as well as scientific papers are available.
                 On that page you can also find a section called
-                <a href="<?php echo $home; ?>/documentation.php#faq" title="Frequently Asked Questions">Frequently Asked Questions</a>.</p>
+                <a href="documentation.php#faq" title="Frequently Asked Questions">Frequently Asked Questions</a>.</p>
             <p> The tool allows to search in treebanks without knowledge about the tree representations, treebank
                 query languages, nor the specific linguistic theories in the treebank. The user provides the query
                 engine with an example sentence, marking which parts of the sentence are the focus of the query.
@@ -26,14 +26,14 @@ require "$php/head.php";
                 under focus the treebank is queried for the extracted subtree. GrETEL then returns sentences similar
                 to the input example. GrETEL is available in two formats:</p>
 
-            <h3><a href="<?php echo $home; ?>/ebs/input.php">Example-based search</a></h3>
+            <h3><a href="ebs/input.php">Example-based search</a></h3>
 
             <p>In this search mode you can use a natural language example as a starting point for searching
                 a treebank with limited knowledge about tree representations and formal query languages.
                 The formal (XPath) query is automatically generated. In this type of search Three different
                 corpora can be queried: CGN, Lassy, and SoNaR.</p>
 
-            <h3><a href="<?php echo $home; ?>/xps/input.php">XPath search</a></h3>
+            <h3><a href="xps/input.php">XPath search</a></h3>
 
             <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
                 XPath search tool only when you are an experienced XPath user! Also note that because of the size of

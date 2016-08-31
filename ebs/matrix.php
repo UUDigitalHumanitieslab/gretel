@@ -60,7 +60,7 @@ if ($continueConstraints && !$isSpam):
       </p>
       <p>If you would like to review the dependency structure of your input example,
           you can view a dependency parse of that sentence in the tree structure given
-          <a href='<?php echo "$home/tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.
+          <a href='<?php echo "tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.
       </p>
       <p>Indicate the relevant  parts of the sentence, i.e. the parts you are interested in. If you have chosen
           <em>advanced mode</em> in step 1 you have two more options to choose from, namely

@@ -70,7 +70,7 @@ if ($continueConstraints):
 
   <section>
       <h3>Query overview</h3>
-      <p>You can <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' title="Save XPath query" target="_blank" download="gretel-xpath.txt">save the XPath query</a>
+      <p>You can <a href="scripts/SaveXPath.php" title="Save XPath query" target="_blank" download="gretel-xpath.txt">save the XPath query</a>
           to use it as input for the XPath search mode.
           This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
           from scratch.</p>
@@ -121,7 +121,7 @@ if ($continueConstraints) : ?>
         'fetchResultsPath' => "$home/php/flush-results.php",
         'getAllResultsPath' => "$home/php/get-all-results.php",
         'fetchCountsPath' => "$home/php/fetch-counts.php",
-        'downloadPath' => "$home/tmp/${id}gretel-results.txt",
+        'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,
     );
@@ -129,7 +129,7 @@ if ($continueConstraints) : ?>
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
-    <script src='<?php echo "$home/js/results.js"; ?>'></script>
+    <script src="js/results.js"></script>
 <?php endif; ?>
 </body>
 </html>

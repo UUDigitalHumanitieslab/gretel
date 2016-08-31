@@ -5,13 +5,13 @@
             <p>Greedy Extraction of Trees for Empirical Linguistics</p>
             <nav class="primary-navigation">
                 <ul>
-                    <li><a href="<?php echo $home; ?>" title="Home"
+                    <li><a href="index.php" title="Home"
                     <?php if ($currentPage == "home") echo 'class="active"'; ?>>Home</a></li>
-                    <li><a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search"
+                    <li><a href="ebs/input.php" title="Example-based search"
                     <?php if ($currentPage == "ebs") echo 'class="active"'; ?>>Example-based search</a></li>
-                    <li><a href="<?php echo $home; ?>/xps/input.php" title="XPath search"
+                    <li><a href="xps/input.php" title="XPath search"
                     <?php if ($currentPage == "xps") echo 'class="active"'; ?>>XPath search</a></li>
-                    <li><a href="<?php echo $home; ?>/documentation.php" title="Documentation"
+                    <li><a href="documentation.php" title="Documentation"
                     <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
                 </ul>
                 <button name="show-menu" hidden><i class="fa fa-fw fa-bars"></i></button>

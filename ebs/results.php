@@ -116,7 +116,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "$home/scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-fw fa-arrow-down"></i> Save XPath</a>
+        <a href='<?php echo "scripts/SaveXPath.php"; ?>' class="download-link" title="Save XPath query" target="_blank" download="gretel-xpath.txt"><i class="fa fa-fw fa-arrow-down"></i> Save XPath</a>
     </section>
   <section id="results-section">
     <h3>Results</h3>
@@ -147,7 +147,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "$home/tmp/${id}gretel-distribution.csv"; ?>' class="download-link" title="Save distribution" target="_blank" download="gretel-distribution.csv"><i class="fa fa-fw fa-arrow-down"></i> Save distribution</a>
+        <a href='<?php echo "tmp/$id-gretel-distribution.csv"; ?>' class="download-link" title="Save distribution" target="_blank" download="gretel-distribution.csv"><i class="fa fa-fw fa-arrow-down"></i> Save distribution</a>
       </article>
     <?php endif; ?>
     <article class="results-wrapper">
@@ -186,7 +186,7 @@ if ($continueConstraints) : ?>
         'fetchResultsPath' => "$home/php/flush-results.php",
         'getAllResultsPath' => "$home/php/get-all-results.php",
         'fetchCountsPath' => "$home/php/fetch-counts.php",
-        'downloadPath' => "$home/tmp/${id}gretel-results.txt",
+        'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,
     );
@@ -194,7 +194,7 @@ if ($continueConstraints) : ?>
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
-    <script src='<?php echo "$home/js/results.js"; ?>'></script>
+    <script src="js/results.js"></script>
 <?php endif; ?>
 </body>
 </html>

@@ -119,13 +119,13 @@ require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
 
 if ($continueConstraints) : ?>
-    <script src="<?php echo $home; ?>/js/tree-visualizer.js"></script>
+    <script src="js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
         <?php if ($searchMode == 'advanced'): ?>
-            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml" ?>', {extendedPOS: true});
+            $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
         <?php else: ?>
-            $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-sub.xml" ?>');
+            $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>');
         <?php endif; ?>
       });
     </script>

@@ -20,13 +20,13 @@
       <nav class="footer-navigation">
         <h3>Navigation</h3>
           <ul>
-              <li><a href="<?php echo $home; ?>/index.php" title="Homepage Gretel" rel="home"
+              <li><a href="index.php" title="Homepage Gretel" rel="home"
               <?php if ($currentPage == "home") echo 'class="active"'; ?>>Home</a></li>
-              <li><a href="<?php echo $home; ?>/ebs/input.php" title="Example-based search"
+              <li><a href="ebs/input.php" title="Example-based search"
               <?php if ($currentPage == "ebs") echo 'class="active"'; ?>>Example-based search</a></li>
-              <li><a href="<?php echo $home; ?>/xps/input.php" title="XPath search"
+              <li><a href="xps/input.php" title="XPath search"
               <?php if ($currentPage == "xps") echo 'class="active"'; ?>>XPath search</a></li>
-              <li><a href="<?php echo $home; ?>/documentation.php" title="Documentation"
+              <li><a href="documentation.php" title="Documentation"
               <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
           </ul>
           <!-- <a href="https://github.com/CCL-KULeuven/gretel" title="GrETEL on GitHub" class="github-link" target="_blank">
@@ -52,7 +52,7 @@ var ua = window.navigator.userAgent,
 
 if (isIE) {
   var ieStyle = document.createElement("link");
-  ieStyle.href = '<?php echo "$home/style/css/min/ie.min.css"; ?>';
+  ieStyle.href = '<?php echo "style/css/min/ie.min.css"; ?>';
   ieStyle.rel = "stylesheet";
 
   document.getElementsByTagName('head')[0].appendChild(ieStyle);
@@ -68,9 +68,9 @@ if (isIE) {
 <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
 <?php if (isset($taalPortaal) && $taalPortaal): ?>
-    <script src="<?php echo $home; ?>/js/min/taalportaal.min.js"></script>
+    <script src="js/min/taalportaal.min.js"></script>
 <?php endif; ?>
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
-    <script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
+    <script src="js/min/tree-visualizer.min.js"></script>
 <?php endif; ?>
-<script src="<?php echo $home; ?>/js/min/scripts.min.js"></script>
+<script src="js/min/scripts.min.js"></script>

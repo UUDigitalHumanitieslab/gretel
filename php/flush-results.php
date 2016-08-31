@@ -84,7 +84,7 @@ try {
 
         $componentString = strtoupper($componentString);
 
-        $sentenceidlink = '<a class="tv-show-fs" href="'.$home.'/scripts/ShowTree.php'.
+        $sentenceidlink = '<a class="tv-show-fs" href="scripts/ShowTree.php'.
           '?sid='.$sidString.
           '&tb='.$treebank.
           '&db='.$databaseString.

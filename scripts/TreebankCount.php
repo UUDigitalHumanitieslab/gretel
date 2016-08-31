@@ -59,7 +59,7 @@ function createCsvCounts($sum, $counts) {
     // Save distribution to file
     // Write results to file so that they can be downloaded later on
     // If the file already exists, remove it and re-create it (just to be sure)
-    $fileName = "$tmp/${id}gretel-distribution.csv";
+    $fileName = "$tmp/$id-gretel-distribution.csv";
     if (file_exists($fileName)) {
         unlink($fileName);
     }
