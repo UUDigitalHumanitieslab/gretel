@@ -624,8 +624,6 @@ h2,
 h3,
 h4 {
   font-family: "Roboto Condensed", sans-serif;
-  -webkit-font-kerning: normal;
-          font-kerning: normal;
   font-weight: 400;
 }
 
