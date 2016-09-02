@@ -142,14 +142,14 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.'>'.$i.
+              $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           } else:
           foreach ($xpsPages as $uri => $title) {
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.'>'.$i.
+              $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
       endif;
