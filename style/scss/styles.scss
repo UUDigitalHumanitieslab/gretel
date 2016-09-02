@@ -922,7 +922,7 @@ dd {
 }
 
 #query-overview .flex-content {
-  align-items: center;
+    align-items: center;
 }
 
 #query-overview .flex-content > *,
@@ -938,35 +938,40 @@ dd {
 
 #query-overview p {
     border-radius: 4px;
-        background: #FAFAFA;
-        border: 1px solid #dedede;
+    background: #FAFAFA;
+    border: 1px solid #dedede;
+    font-size: 88%;
 }
 
 #results {
     .results-download-wrapper {
-      &:not(.active) {
-        background: #FAFAFA;
-        border: 1px solid #dedede;
-        border-radius: 4px;
-        position: relative;
+        &:not(.active) {
+            background: #FAFAFA;
+            border: 1px solid #dedede;
+            border-radius: 4px;
+            position: relative;
 
-        &::after {
-            content: "Searching";
-            font-size: 48px;
-            font-weight: 700;
-            color: rgb(232, 232, 232);
-            text-shadow: 0 1px rgba(0,0,0,.16), 0 -1px rgb(255,255,255), 0 1px 4px rgba(0,0,0,0.1);
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%,-50%);
+            &::after {
+                content: "Searching";
+                font-size: 48px;
+                font-weight: 700;
+                color: rgb(232, 232, 232);
+                text-shadow: 0 -1px rgba(0,0,0,.16), 0 1px rgb(255,255,255), 0 -1px 4px rgba(0,0,0,0.1);
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%,-50%);
+                z-index: 0;
+            }
         }
-      }
+
         > div {
             display: none;
+            z-index: 1;
+            position: relative;
         }
 
-        h4 {
+        h3 {
             margin-top: 0;
             text-align: left;
         }
@@ -1171,6 +1176,7 @@ dd {
 
         &.scroll {
             position: fixed;
+            z-index: 10;
             border-radius: 0;
             top: 0;
             left: 50%;
@@ -1220,7 +1226,7 @@ dd {
 
     .download-link {
         display: inline-block;
-        margin: 12px auto 4px;
+        margin: 20px auto 12px;
         padding: 12px;
         border: 0 none;
         background: #96846C;
@@ -1246,6 +1252,41 @@ dd {
             i {
                 animation: download-arrow 500ms forwards;
             }
+        }
+    }
+    @keyframes notification-blink {
+        from {
+            transform: scale(0.92);
+        }
+
+        to {
+            transform: translateX(1);
+        }
+    }
+
+    .notification-wrapper {
+        display: none;
+        animation: notification-blink 700ms alternate infinite;
+        background: #eeeeee;
+        padding: 16px;
+        border-radius: 4px;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        box-shadow: inset 0 -1px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0,0,0,.08), 0 0 12px rgba(0,0,0,.08);
+        font-weight: 700;
+        z-index: 10;
+
+        a {
+            color: #565656;
+
+            &:hover {
+                color: #444;
+            }
+        }
+
+        button {
+            margin-left: 12px;
         }
     }
 }

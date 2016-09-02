@@ -19,6 +19,7 @@ $(document).ready(function() {
         filterWrapper = $(".filter-wrapper"),
         downloadWrapper = $(".results-download-wrapper"),
         messages = downloadWrapper.find(".messages"),
+        notificationWrapper = $(".notification-wrapper"),
         dummy = $(".dummy-controls");
 
     var xhrAllSentences,
@@ -187,6 +188,7 @@ $(document).ready(function() {
 
             messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
             downloadWrapper.addClass("active");
+            notificationWrapper.show();
         });
     }
 
@@ -422,4 +424,17 @@ $(document).ready(function() {
             });
         }
     }
+
+    /* Notifications */
+    notificationWrapper.find("button").click(function() {
+        notificationWrapper.hide();
+    });
+    notificationWrapper.find("a").click(function(e) {
+      e.preventDefault();
+
+      $("html, body").stop().animate({
+          scrollTop: $("#results").offset().top
+      }, 150);
+      notificationWrapper.hide();
+    });
 });
