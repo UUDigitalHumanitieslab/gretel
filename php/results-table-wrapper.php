@@ -1,4 +1,4 @@
-<div class="table-wrapper" style="display: none">
+<div class="table-wrapper">
   <table>
     <thead>
       <tr>

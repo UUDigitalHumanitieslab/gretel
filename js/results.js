@@ -15,9 +15,10 @@ $(document).ready(function() {
         $document = $(document),
         tvLink = $("a.tv-show-fs"),
         controls = $(".controls"),
-        resultsWrapper = $(".results-wrapper"),
+        resultsWrapper = $(".results-ajax-wrapper"),
         filterWrapper = $(".filter-wrapper"),
-        messages = $(".messages"),
+        downloadWrapper = $(".results-download-wrapper"),
+        messages = downloadWrapper.find(".messages"),
         dummy = $(".dummy-controls");
 
     var xhrAllSentences,
@@ -42,7 +43,8 @@ $(document).ready(function() {
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
                             resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
-                            $(".messages").addClass("active").children("div").removeClass("error notice");
+                            messages.children("div").removeClass("error notice").closest(".results-messages-wrapper").addClass("active");
+                            downloadWrapper.addClass("active");
                             if (data.error) {
                                 messageOnError(data.data)
                             } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
@@ -90,7 +92,8 @@ $(document).ready(function() {
                     clearTimeout(findAllTimeout);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
-                    $(".messages").addClass("active").children("div").removeClass("error notice");
+                    messages.children("div").removeClass("error notice").closest(".results-messages-wrapper").show();
+                    downloadWrapper.addClass("active");
                     if (data.error) {
                         messageOnError(data.data);
                     } else if (resultsWrapper.find("tbody:not(.empty)").children().length == 0) {
@@ -135,9 +138,9 @@ $(document).ready(function() {
                             componentHits = numericSeparator(parseInt(totalArray[database][0])),
                             componentTotal = numericSeparator(parseInt(totalArray[database][1]));
 
-                        $(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
+                        downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
                     }
-                    $(".distribution-wrapper").show();
+                    downloadWrapper.find(".distribution-wrapper").show();
                 }
                 if (resultsCount > phpVars.resultsLimit) {
                     messages.find(".is-restricted").show();
@@ -182,16 +185,8 @@ $(document).ready(function() {
                 messages.find(".is-restricted").show();
             }
 
-            messages.addClass("active").children("div").removeClass("error").addClass("notice active");
-            messages.find(".notice").one("transitionend", function() {
-                setDummyVariables();
-            });
-
-            $("html, body").stop().animate({
-                scrollTop: $("#results-section").offset().top,
-            }, 250, function() {
-                $window.scroll();
-            });
+            messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
+            downloadWrapper.addClass("active");
         });
     }
 
@@ -199,16 +194,17 @@ $(document).ready(function() {
         resultsWrapper.children("p").add(controls).add(dummy).remove();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #no-results-found', function() {
-            messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+            messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
     }
 
     function messageOnError(error) {
-        resultsWrapper.children("p").add(controls).add(dummy).remove();
+        resultsWrapper.add(controls).add(dummy).remove();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
-            messages.addClass("active").children("div").removeClass("notice").addClass("error active");
+            messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
+            downloadWrapper.addClass("active");
         });
     }
 
@@ -244,7 +240,6 @@ $(document).ready(function() {
             showTvFsOnLoad();
         });
 
-        resultsWrapper.find(".table-wrapper").fadeIn("fast");
         resultIDString = numericSeparator(resultID);
         controls.find(".count strong").text(resultIDString);
 
@@ -278,7 +273,7 @@ $(document).ready(function() {
             } else {
                 this.setCustomValidity("");
                 var offset = row.offset(),
-                    hControls = $(".controls").outerHeight();
+                    hControls = controls.outerHeight();
 
                 $("html, body").stop().animate({
                     scrollTop: offset.top - hControls
@@ -422,7 +417,8 @@ $(document).ready(function() {
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
             messages.load(phpVars.fetchHomePath + '/php/results-messages.php #looking-for-tree', function() {
-                messages.addClass("active").children("div").removeClass("error").addClass("notice active");
+                messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
+                downloadWrapper.addClass("active");
             });
         }
     }
