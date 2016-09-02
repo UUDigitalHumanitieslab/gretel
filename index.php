@@ -10,7 +10,6 @@ require "$php/head.php";
 </head>
 
         <?php require "$php/header.php"; ?>
-
             <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
@@ -24,8 +23,9 @@ require "$php/head.php";
                 engine with an example sentence, marking which parts of the sentence are the focus of the query.
                 Through automated parsing of the example sentence and subtree extraction of the sentence part
                 under focus the treebank is queried for the extracted subtree. GrETEL then returns sentences similar
-                to the input example. GrETEL is available in two formats:</p>
+                to the input example.</p>
 
+            <p><strong style="font-size: 88%">GrETEL provides two search approaches, introduced below.</strong></p>
             <h3><a href="ebs/input.php">Example-based search</a></h3>
 
             <p>In this search mode you can use a natural language example as a starting point for searching
@@ -40,15 +40,26 @@ require "$php/head.php";
                 the corpus, SoNaR is not accessible in this search mode because of the scale of the corpus and the
                 possible complexity of XPath code. Lassy and CGN are available.</p>
 
-            <p>Please cite the following paper if you are using GrETEL for your research:</p>
-            <blockquote>
-              <i class="fa fa-file-text-o" aria-hidden="true"></i>
-              <p>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
-                <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a>
-                In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012).
-                Istanbul, Turkey. pp. 3161-3167
-              </p>
-            </blockquote>
+                <div class="citation-wrapper">
+                <p style="margin-top:0">Please cite the following paper if you are using GrETEL for your research. More documentation such as
+                  tutorials, papers, and slides can be found on
+                  <a href="documentation.php" title="GrETEL documentation">the documentations page</a>.</p>
+                <cite>
+                  <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
+                    title="Example-Based Treebank Querying" target="_blank">
+                    <span class="stack">
+                      <i class="fa fa-file-text-o"></i>
+                      <i class="fa fa-download"></i>
+                    </span>
+                    <span class="sr-only">Example-Based Treebank Querying</span>
+                 </a>
+                  <p>
+                    Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+                    <strong>"Example-Based Treebank Querying"</strong>. In: <em>Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012)</em>.
+                    Istanbul, Turkey. pp. 3161-3167.
+                  </p>
+                </cite>
+              </div>
         </main>
     </div>
 
