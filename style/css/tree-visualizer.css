@@ -3,26 +3,6 @@
  *
  * @author Bram Vanroy
  */
-.tree-visualizer > .tv-show-fs, .tree-visualizer-fs .zoom-opts button {
-  background: #C0C0C0;
-  color: white;
-  border: 1px solid #C0C0C0;
-  padding: 6px 8px;
-}
-
-.tree-visualizer > .tv-show-fs:hover, .tree-visualizer-fs .zoom-opts button:hover {
-  background: #a1a1a1;
-}
-
-.tree-visualizer > .tv-show-fs:active, .tree-visualizer-fs .zoom-opts button:active {
-  background: #979797;
-}
-
-.tree-visualizer > [disabled].tv-show-fs, .tree-visualizer-fs .zoom-opts button[disabled] {
-  border-bottom-color: #dfdfdf;
-  cursor: not-allowed;
-}
-
 .tree-visualizer-fs .zoom-opts:after {
   content: "";
   display: table;
@@ -253,24 +233,24 @@
   border-color: transparent;
 }
 
-.tree-visualizer .tree li.highlight a:hover, .tree-visualizer .tree li.highlight a.hovered,
-.tree-visualizer .tree li.highlight a.only-child:hover,
+.tree-visualizer .tree li.highlight a.hovered, .tree-visualizer .tree li.highlight a:hover,
 .tree-visualizer .tree li.highlight a.only-child.hovered,
-.tree-visualizer-fs .tree li.highlight a:hover,
+.tree-visualizer .tree li.highlight a.only-child:hover,
 .tree-visualizer-fs .tree li.highlight a.hovered,
-.tree-visualizer-fs .tree li.highlight a.only-child:hover,
-.tree-visualizer-fs .tree li.highlight a.only-child.hovered {
+.tree-visualizer-fs .tree li.highlight a:hover,
+.tree-visualizer-fs .tree li.highlight a.only-child.hovered,
+.tree-visualizer-fs .tree li.highlight a.only-child:hover {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li.highlight a:hover span:nth-child(2), .tree-visualizer .tree li.highlight a.hovered span:nth-child(2),
-.tree-visualizer .tree li.highlight a.only-child:hover span:nth-child(2),
+.tree-visualizer .tree li.highlight a.hovered span:nth-child(2), .tree-visualizer .tree li.highlight a:hover span:nth-child(2),
 .tree-visualizer .tree li.highlight a.only-child.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a:hover span:nth-child(2),
+.tree-visualizer .tree li.highlight a.only-child:hover span:nth-child(2),
 .tree-visualizer-fs .tree li.highlight a.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child:hover span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child.hovered span:nth-child(2) {
+.tree-visualizer-fs .tree li.highlight a:hover span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a.only-child.hovered span:nth-child(2),
+.tree-visualizer-fs .tree li.highlight a.only-child:hover span:nth-child(2) {
   color: #3d3d3d;
 }
 
@@ -293,34 +273,36 @@
   font-weight: normal;
 }
 
-.tree-visualizer .tree li a:hover, .tree-visualizer .tree li a.hovered,
-.tree-visualizer-fs .tree li a:hover,
-.tree-visualizer-fs .tree li a.hovered {
+.tree-visualizer .tree li a.hovered, .tree-visualizer .tree li a:hover,
+.tree-visualizer-fs .tree li a.hovered,
+.tree-visualizer-fs .tree li a:hover {
   background: #e0e0e0;
 }
 
-.tree-visualizer .tree li a:hover + ol li a, .tree-visualizer .tree li a.hovered + ol li a,
-.tree-visualizer-fs .tree li a:hover + ol li a,
-.tree-visualizer-fs .tree li a.hovered + ol li a {
+.tree-visualizer .tree li a.hovered + ol li a, .tree-visualizer .tree li a:hover + ol li a,
+.tree-visualizer-fs .tree li a.hovered + ol li a,
+.tree-visualizer-fs .tree li a:hover + ol li a {
   background: #e0e0e0;
 }
 
-.tree-visualizer .tree li a:hover + ol li.highlight a, .tree-visualizer .tree li a:hover + ol li.highlight a.only-child, .tree-visualizer .tree li a.hovered + ol li.highlight a, .tree-visualizer .tree li a.hovered + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child,
+.tree-visualizer .tree li a.hovered + ol li.highlight a,
+.tree-visualizer .tree li a.hovered + ol li.highlight a.only-child, .tree-visualizer .tree li a:hover + ol li.highlight a,
+.tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
 .tree-visualizer-fs .tree li a.hovered + ol li.highlight a,
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child {
+.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child,
+.tree-visualizer-fs .tree li a:hover + ol li.highlight a,
+.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer .tree li a:hover span:nth-child(2), .tree-visualizer .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer .tree li a.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover span:nth-child(2),
+.tree-visualizer .tree li a.hovered + ol li a span:nth-child(2),
+.tree-visualizer .tree li a.hovered span:nth-child(2), .tree-visualizer .tree li a:hover + ol li a span:nth-child(2),
+.tree-visualizer .tree li a:hover span:nth-child(2),
 .tree-visualizer-fs .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered span:nth-child(2) {
+.tree-visualizer-fs .tree li a.hovered span:nth-child(2),
+.tree-visualizer-fs .tree li a:hover + ol li a span:nth-child(2),
+.tree-visualizer-fs .tree li a:hover span:nth-child(2) {
   color: white;
 }
 
@@ -331,40 +313,44 @@
   border-color: transparent;
 }
 
-.tree-visualizer .tree li a:hover + ol li.highlight a span:nth-child(2), .tree-visualizer .tree li a.hovered + ol li.highlight a span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a span:nth-child(2) {
+.tree-visualizer .tree li a.hovered + ol li.highlight a span:nth-child(2),
+.tree-visualizer .tree li a:hover + ol li.highlight a span:nth-child(2),
+.tree-visualizer-fs .tree li a.hovered + ol li.highlight a span:nth-child(2),
+.tree-visualizer-fs .tree li a:hover + ol li.highlight a span:nth-child(2) {
   color: #3d3d3d;
 }
 
-.tree-visualizer .tree li a:hover + ol li a.only-child, .tree-visualizer .tree li a.hovered + ol li a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li a.only-child,
-.tree-visualizer-fs .tree li a.hovered + ol li a.only-child {
+.tree-visualizer .tree li a.hovered + ol li a.only-child,
+.tree-visualizer .tree li a:hover + ol li a.only-child,
+.tree-visualizer-fs .tree li a.hovered + ol li a.only-child,
+.tree-visualizer-fs .tree li a:hover + ol li a.only-child {
   background: #dedede;
 }
 
-.tree-visualizer .tree li a:hover + ol li.highlight a.only-child, .tree-visualizer .tree li a.hovered + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child {
+.tree-visualizer .tree li a.hovered + ol li.highlight a.only-child,
+.tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
+.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child,
+.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li a:hover + ol::before,
-.tree-visualizer .tree li a:hover + ol li::after,
-.tree-visualizer .tree li a:hover + ol li::before,
-.tree-visualizer .tree li a:hover + ol ol::before, .tree-visualizer .tree li a.hovered + ol::before,
+.tree-visualizer .tree li a.hovered + ol::before,
 .tree-visualizer .tree li a.hovered + ol li::after,
 .tree-visualizer .tree li a.hovered + ol li::before,
 .tree-visualizer .tree li a.hovered + ol ol::before,
-.tree-visualizer-fs .tree li a:hover + ol::before,
-.tree-visualizer-fs .tree li a:hover + ol li::after,
-.tree-visualizer-fs .tree li a:hover + ol li::before,
-.tree-visualizer-fs .tree li a:hover + ol ol::before,
+.tree-visualizer .tree li a:hover + ol::before,
+.tree-visualizer .tree li a:hover + ol li::after,
+.tree-visualizer .tree li a:hover + ol li::before,
+.tree-visualizer .tree li a:hover + ol ol::before,
 .tree-visualizer-fs .tree li a.hovered + ol::before,
 .tree-visualizer-fs .tree li a.hovered + ol li::after,
 .tree-visualizer-fs .tree li a.hovered + ol li::before,
-.tree-visualizer-fs .tree li a.hovered + ol ol::before {
+.tree-visualizer-fs .tree li a.hovered + ol ol::before,
+.tree-visualizer-fs .tree li a:hover + ol::before,
+.tree-visualizer-fs .tree li a:hover + ol li::after,
+.tree-visualizer-fs .tree li a:hover + ol li::before,
+.tree-visualizer-fs .tree li a:hover + ol ol::before {
   border-color: #ddd;
 }
 
@@ -412,7 +398,6 @@
   top: 0;
   left: 0;
   z-index: 10;
-  padding: 84px 36px 48px;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
@@ -441,10 +426,11 @@
 .tree-visualizer-fs .tree {
   position: relative;
   z-index: 11;
-  padding: 12px;
   min-width: 480px;
   min-height: 180px;
   background: #F5F5F5;
+  transition: width 200ms, height 200ms;
+  overflow: scroll;
 }
 
 .tree-visualizer-fs .tree.small {

@@ -3,8 +3,13 @@
  *
  * @author Bram Vanroy
  */
-@import "tv-buttons";
-@import "clearfix";
+%clearfix {
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
 
 .tree-visualizer,
 .tree-visualizer-fs {
@@ -188,10 +193,14 @@
                     color: white;
                     border-color: transparent;
 
-                    &:hover, &.hovered {
+                    &.hovered,
+                    &:hover {
                         background: #9C8A73;
                         color: white;
-                        span:nth-child(2) {color: darken(#565656, 10%);}
+
+                        span:nth-child(2) {
+                            color: darken(#565656, 10%);
+                        }
                     }
                 }
             }
@@ -212,18 +221,24 @@
                     font-weight: normal;
                 }
 
-                &:hover,
-                &.hovered {
+                &.hovered,
+                &:hover {
                     background: #e0e0e0;
-                     + ol li a {background: #e0e0e0;}
-                     + ol li.highlight a,  + ol li.highlight a.only-child {
-                       background: #9C8A73;
-                       color: white;
-                     }
-                     + ol li a span:nth-child(2),
-                     span:nth-child(2) {
-                       color: white;
-                     }
+
+                    + ol li a {
+                        background: #e0e0e0;
+                    }
+
+                    + ol li.highlight a,
+                    + ol li.highlight a.only-child {
+                        background: #9C8A73;
+                        color: white;
+                    }
+
+                    + ol li a span:nth-child(2),
+                    span:nth-child(2) {
+                        color: white;
+                    }
                 }
 
                 &.hovered {
@@ -232,21 +247,24 @@
                     border-color: rgba(0, 0, 0, 0);
                 }
 
-
-                &:hover + ol li.highlight a span:nth-child(2), &.hovered + ol li.highlight a span:nth-child(2) {
+                &.hovered + ol li.highlight a span:nth-child(2),
+                &:hover + ol li.highlight a span:nth-child(2) {
                     color: darken(#565656, 10%);
                 }
 
-                &:hover + ol li a.only-child, &.hovered + ol li a.only-child {
+                &.hovered + ol li a.only-child,
+                &:hover + ol li a.only-child {
                     background: #dedede;
                 }
 
-                &:hover + ol li.highlight a.only-child, &.hovered + ol li.highlight a.only-child {
+                &.hovered + ol li.highlight a.only-child,
+                &:hover + ol li.highlight a.only-child {
                     background: #9C8A73;
                     color: white;
                 }
 
-                &:hover + ol, &.hovered + ol {
+                &.hovered + ol,
+                &:hover + ol {
                     &::before,
                     li::after,
                     li::before,
@@ -278,6 +296,7 @@
         min-height: 240px;
         background: #F7F7F7;
         font-size: 12px;
+
         + .tooltip {
             z-index: 9;
         }
@@ -292,7 +311,6 @@
         height: 40px;
         border-radius: 4px;
         text-align: center;
-        @extend %button;
     }
 }
 
@@ -301,7 +319,6 @@
     top: 0;
     left: 0;
     z-index: 10;
-    padding: 84px 36px 48px;
     width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.6);
@@ -321,10 +338,11 @@
     .tree {
         position: relative;
         z-index: 11;
-        padding: 12px;
         min-width: 480px;
         min-height: 180px;
         background: #F5F5F5;
+        transition: width 200ms, height 200ms;
+        overflow: scroll;
 
         &.small {
             overflow-y: scroll;
@@ -382,19 +400,22 @@
             }
         }
     }
+
     .zoom-opts-wrapper {
-    	position: absolute;
-    	top: 12px;
-    	right: 30px;
-    	z-index: 9;
-    	display: flex;
-    	align-items: center;
-      a {
-      	font-weight: bold;
-      	color: white;
-        margin-right: 16px;
-      }
+        position: absolute;
+        top: 12px;
+        right: 30px;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+
+        a {
+            font-weight: bold;
+            color: white;
+            margin-right: 16px;
+        }
     }
+
     .zoom-opts {
         padding: 12px;
         background: #F5F5F5;
@@ -413,7 +434,6 @@
             padding: 0;
             width: 36px;
             height: 36px;
-            @extend %button;
 
             &.close {
                 margin-right: 0;
@@ -440,8 +460,15 @@
                     background: darken(#DF5F5F, 8%);
                 }
             }
-            &.zoom-out {border-radius: 4px 0 0 4px;}
-            &.zoom-in {border-radius: 0 4px 4px 0;}
+
+            &.zoom-out {
+                border-radius: 4px 0 0 4px;
+            }
+
+            &.zoom-in {
+                border-radius: 0 4px 4px 0;
+            }
+
             &.zoom-default {
                 padding: 0 8px;
                 width: auto;

@@ -27,8 +27,22 @@
             anyTree,
             anyTooltip,
             zoomOpts,
-            sentenceContainer;
+            sentenceContainer,
+            fontFitSize, tooltipTimeout;
         var $window = $(window);
+
+        var FSPadding = {
+                top: 84,
+                right: 36,
+                bottom: 48,
+                left: 36
+            },
+            FSTreePadding = {
+                top: 12,
+                right: 12,
+                bottom: 12,
+                left: 12
+            };
 
         if (args.normalView || args.fsView) {
             instance.children(".tree-visualizer, .tree-visualizer-fs").remove();
@@ -47,7 +61,9 @@
                 if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
 
                 FS.fadeIn(250);
-                sizeTreeFS();
+
+                fontFitSize = null;
+                fontToFit();
                 e.preventDefault();
             });
         }
@@ -70,7 +86,6 @@
         // Zooming
         zoomOpts.find("button").click(function() {
             var $this = $(this);
-
             if ($this.is(".close")) {
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
@@ -78,6 +93,7 @@
                 });
                 if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
             } else {
+                clearTimeout(tooltipTimeout);
                 fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
                 sizeTreeFS();
                 var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
@@ -85,14 +101,21 @@
                 animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
                 animationSpeed += 50;
 
-                setTimeout(function() {
+                tooltipTimeout = setTimeout(function() {
                     tooltipPosition(true);
                 }, animationSpeed);
             }
         });
 
         // Make the tree-visualizer-fs tree responsive
-        if (args.fsView) $window.on("resize", sizeTreeFS);
+        if (args.fsView) {
+            $window.on("resize", function() {
+
+                if (treeFS.is(":visible")) {
+                    sizeTreeFS
+                }
+            });
+        }
 
         anyTree.on("click", "a", function(e) {
             var $this = $(this),
@@ -189,6 +212,18 @@
                 views.push(FS);
                 trees.push(treeFS);
                 tooltips.push(tooltipFS);
+                FS.css({
+                    "padding-top": FSPadding.top,
+                    "padding-right": FSPadding.right,
+                    "padding-bottom": FSPadding.bottom,
+                    "padding-left": FSPadding.left
+                });
+                treeFS.css({
+                    "padding-top": FSTreePadding.top,
+                    "padding-right": FSTreePadding.right,
+                    "padding-bottom": FSTreePadding.bottom,
+                    "padding-left": FSTreePadding.left
+                });
             }
             anyTree = jqArrayToJqObject(trees);
             anyTooltip = jqArrayToJqObject(tooltips);
@@ -231,8 +266,10 @@
                     }
                     if (args.initFSOnClick) {
                         $(".loading-wrapper.tv").removeClass("active");
-                        FS.fadeIn(250);
-                        sizeTreeFS();
+                        FS.fadeIn(250, function() {
+                            fontFitSize = null;
+                            fontToFit();
+                        });
                     }
                 });
         }
@@ -318,7 +355,7 @@
             var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
             if (currentFontSize <= 4) {
                 zoomOpts.find("button.zoom-out").prop("disabled", true);
-            } else if (currentFontSize >= 32) {
+            } else if (currentFontSize >= 20) {
                 zoomOpts.find("button.zoom-in").prop("disabled", true);
             } else {
                 zoomOpts.find("button").prop("disabled", false);
@@ -334,17 +371,41 @@
         }
 
         function fontSizeTreeFS(mode) {
-            if (treeFS.is(":visible")) {
-                if (mode == 'zoom-default') treeFS.css("fontSize", args.fsFontSize + "px");
-                else {
-                    var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
-                    if (mode == 'zoom-in') {
-                        treeFS.css("fontSize", currentFontSize + 2 + "px");
-                    } else if (mode == 'zoom-out') {
-                        treeFS.css("fontSize", currentFontSize - 2 + "px");
-                    }
+            if (mode == 'zoom-default') {
+                fontFitSize = null;
+                fontToFit();
+            } else {
+                var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
+                if (mode == 'zoom-in') {
+                    treeFS.css("fontSize", currentFontSize + 2 + "px");
+                } else if (mode == 'zoom-out') {
+                    treeFS.css("fontSize", currentFontSize - 2 + "px");
                 }
-                noMoreZooming();
+            }
+            noMoreZooming();
+        }
+
+        function fontToFit() {
+            var currentFontSize = parseInt(treeFS.css("fontSize"), 10),
+                el = treeFS[0],
+                scrollw = el.scrollWidth,
+                scrollh = el.scrollHeight,
+                w = treeFS.outerWidth(),
+                h = treeFS.outerHeight();
+                console.log("called");
+            if (((scrollh > h) || (scrollw > w)) && (currentFontSize > 1)) {
+              console.log("large");
+              console.log(scrollh + " " + h);
+                if (fontFitSize == null) fontFitSize = "large";
+                treeFS.css("fontSize", currentFontSize - 1 + "px");
+                sizeTreeFS();
+                if (fontFitSize == "large") fontToFit();
+            } else if (fontFitSize != "large") {
+                if (fontFitSize == null) fontFitSize = "small";
+                treeFS.css("fontSize", currentFontSize + 1 + "px");
+                console.log(fontFitSize + currentFontSize);
+                sizeTreeFS();
+                fontToFit();
             }
         }
 
@@ -402,36 +463,21 @@
             }
         }
 
-        /* Set width of the tree-visualizer-fs elements
-        Can't be done in CSS without losing other functionality.
-        IF you know a way, make a pull request!
-        */
         function sizeTreeFS() {
-            if (treeFS.is(":visible")) {
-                var padR = parseInt(treeFS.css("paddingRight"), 10) || 0,
-                    padL = parseInt(treeFS.css("paddingLeft"), 10) || 0,
-                    padT = parseInt(treeFS.css("paddingTop"), 10) || 0,
-                    padB = parseInt(treeFS.css("paddingBottom"), 10) || 0,
-                    FSpadR = parseInt(FS.css("paddingRight"), 10) || 0,
-                    FSpadL = parseInt(FS.css("paddingLeft"), 10) || 0,
-                    FSpadT = parseInt(FS.css("paddingTop"), 10) || 0,
-                    FSpadB = parseInt(FS.css("paddingBottom"), 10) || 0,
-                    children = treeFS.children("ol"),
-                    w = $window;
+            var rect = treeFS.children("ol")[0].getBoundingClientRect();
 
-                treeFS.css({
-                    "width": children[0].getBoundingClientRect().width + padR + padL,
-                    "width": children[0].getBoundingClientRect().width + padR + padL,
-                    "height": children[0].getBoundingClientRect().height + padT + padB,
-                    "max-width": w.width() - FSpadR - FSpadL,
-                    "max-height": w.height() - FSpadT - FSpadB
-                });
+            treeFS.css({
+                "width": rect.width + FSTreePadding.right + FSTreePadding.left,
+                "height": rect.height + FSTreePadding.top + FSTreePadding.bottom,
+                "max-width": $window.width() - FSPadding.right - FSPadding.left,
+                "max-height": $window.height() - FSPadding.top - FSPadding.bottom
+            });
 
-                if (args.sentence != "") {
-                    treeFS.css("max-height", w.height() - FSpadT - FSpadB - (sentenceContainer[0].getBoundingClientRect().height * 2));
-                    sentenceContainer.css("max-width", treeFS[0].getBoundingClientRect().width);
-                }
+            if (args.sentence != "") {
+                treeFS.css("max-height", $window.height() - FSPadding.top - FSPadding.bottom - (sentenceContainer[0].getBoundingClientRect().height * 2));
+                sentenceContainer.css("max-width", treeFS[0].getBoundingClientRect().width);
             }
+
         }
 
         function errorHandle(message) {
@@ -457,21 +503,5 @@
                 return el.get();
             }));
         }
-    }
-
-    // Borrowed from https://github.com/janl/mustache.js/blob/master/mustache.js#L60
-    var entityMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': '&quot;',
-        "'": '&#39;',
-        "/": '&#x2F;'
-    };
-
-    function escapeHtml(string) {
-        return String(string).replace(/[&<>"'\/]/g, function(s) {
-            return entityMap[s];
-        });
     }
 }(jQuery));

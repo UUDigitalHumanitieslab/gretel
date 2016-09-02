@@ -17,7 +17,7 @@ function taalPortaalFiller() {
 	if (getUrlVars()["tpinput"]) {
 		// Decode URI into readable string
 		var tpinput = decodeURIComponent(getUrlVars()["tpinput"]);
-		
+
 		//Verschillende opties voor de verschillende pagina's:
 		//(1) gretel voor lassy, gretel voor cgn: inputveld heeft id=example:
 		$('#example').val(tpinput);
