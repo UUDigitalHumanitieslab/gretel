@@ -43,7 +43,7 @@ require "$php/head.php";
 </head>
 <?php flush(); ?>
 <?php require "$php/header.php"; ?>
-    <form action="parse.php" method="post" enctype="multipart/form-data">
+    <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
           <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="<?php echo $input; ?>" required>

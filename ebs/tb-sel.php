@@ -95,8 +95,9 @@ else: ?>
     If this is fixed in an updated version of SoNaR, those components will be included as well.</p>
 
   <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
-  on these treebanks, you can find their project websites in <a href='<?php echo "documentation.php#faq-3"; ?>'>our FAQ</a>.</p>
-  <form action="query.php" method="post">
+  on these treebanks, you can find their project websites in <a href="documentation.php#faq-3"
+  title="Where can I find more information about the corpora available in GrETEL?">our FAQ</a>.</p>
+  <form action="ebs/query.php" method="post">
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>

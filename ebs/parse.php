@@ -13,7 +13,6 @@ require '../config/config.php';
 require "$root/helpers.php";
 session_cache_limiter('private');
 session_start();
-header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = $_SESSION['ebsxps'];
 $step = 2;
@@ -29,6 +28,8 @@ if ($continueConstraints) {
 
     $searchMode = $_POST['search'];
     $_SESSION['search'] = $searchMode;
+
+    require "$scripts/SimpleDOM.php";
 }
 
 require "$root/functions.php";
@@ -40,7 +41,6 @@ require "$php/head.php";
 require "$php/header.php";
 
 if ($continueConstraints) {
-    require "$scripts/SimpleDOM.php";
     require "$scripts/AlpinoParser.php";
 
     $tokinput = Tokenize($input);
@@ -62,7 +62,7 @@ if ($continueConstraints) {
   <div id="tree-output">
   </div>
 
-  <form action="matrix.php" method="post" enctype="multipart/form-data">
+  <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
     <p>If the analysis is different from what you expected, you can enter
       <a href="ebs/input.php" title="Example-based search">another input example</a>.
     </p>

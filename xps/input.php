@@ -39,7 +39,7 @@ require "$php/head.php";
 </head>
 <?php flush(); ?>
 <?php require "$php/header.php"; ?>
-    <form action="tb-sel.php" method="post" enctype="multipart/form-data">
+    <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
             <textarea name="xpath" wrap="soft" required><?php echo $xpath; ?></textarea>

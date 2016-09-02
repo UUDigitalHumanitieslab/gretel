@@ -53,7 +53,7 @@ if ($continueConstraints && !$isSpam):
   $tokinput = $_SESSION['sentence'];
   $sentence = explode(' ', $tokinput);
 ?>
-  <form action="tb-sel.php" method="post">
+  <form action="ebs/tb-sel.php" method="post">
       <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
           The latter do not need to be represented in the search results. The obligatory elements have to be included in
           the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form.

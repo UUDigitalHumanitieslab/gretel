@@ -87,7 +87,7 @@ require "$php/head.php";
       <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
     <?php endif; ?>
 
-    <form action="results.php" method="post">
+    <form action="ebs/results.php" method="post">
     <?php
     if ($treebank == 'sonar') {
         $readonly = 'readonly';
@@ -101,7 +101,7 @@ require "$php/head.php";
 
     <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
   <?php else : ?>
-    <form action="results.php" method="post">
+    <form action="ebs/results.php" method="post">
   <?php endif; // $searchMode == 'advanced' ?>
 
     <?php setContinueNavigation(); ?>
