@@ -100,7 +100,7 @@ if ($continueConstraints):
 ?>
 
   <section id="query-overview">
-      <h3>Query overview</h3>
+      <h2>Query overview</h2>
       <div class="flex-content">
       <div>
         <div class="table-wrapper">
@@ -124,7 +124,7 @@ if ($continueConstraints):
       </div>
     </section>
   <section id="results">
-    <h3>Results overview</h3>
+    <h2>Results overview</h2>
     <div class="content">
       <div class="results-explanation">
         <p>When GrETEL has finished looking up your query, a message will apear
@@ -152,13 +152,13 @@ if ($continueConstraints):
       </div>
       <div class="results-download-wrapper">
         <div class="results-messages-wrapper">
-          <h4>Download results</h4>
+          <h3>Download results</h3>
           <div class="messages">
           </div>
         </div>
         <?php if ($treebank != 'sonar'): ?>
         <div class="distribution-wrapper">
-        <h4>Distribution list</h4>
+        <h3>Distribution list</h3>
         <div class="table-wrapper">
           <table>
             <thead>
@@ -180,7 +180,7 @@ if ($continueConstraints):
     </div>
     </div>
     <div class="results-ajax-wrapper">
-      <h3>All results</h3>
+      <h2>All results</h2>
       <p><strong>Click on a sentence ID</strong> to view the tree structure. The
         sentence ID refers to the treebank component in which the sentence occurs,
         the text number, and the location within the text
@@ -208,6 +208,7 @@ if ($continueConstraints) : ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
+    <?php include "$php/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
         'fetchResultsPath' => "$home/php/flush-results.php",
