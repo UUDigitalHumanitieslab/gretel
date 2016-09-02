@@ -61,7 +61,7 @@ try {
       '&' => '&amp;',
       "'" => '&apos;',);
 
-    $xml = str_replace(array_keys($replaceValues), array_values($replaceValues), $xml);
+    $xml = strtr($xml, $replaceValues);
 
     if (isset($idstring)) {
         $part = preg_replace('/(\d+)/', '@id="$1"', $idstring);
