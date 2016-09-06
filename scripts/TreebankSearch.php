@@ -394,3 +394,40 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
 
     return $xquery;
 }
+
+function HighlightSentence($sentence, $beginlist, $tag)
+{
+
+    if (preg_match('/<em>/', $sentence)) {
+        $s = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$2', $sentence);
+        $prev = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$1', $sentence);
+        $next = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$3', $sentence);
+    } else {
+        $s = $sentence;
+    }
+    $words = explode(' ', $s);
+    $begins = explode('-',$beginlist);
+
+    $i = 0;
+    // Instead of wrapping each individual word in a strong tag, merge sequences
+    // of words in one <tag>...</tag>
+    foreach ($words as $word) {
+        if (in_array($i, $begins)) {
+            $val = '';
+            if (!in_array($i-1, $begins)) {
+                $val .= "<$tag>";
+            }
+            $val .= $words[$i];
+            if (!in_array($i+1, $begins)) {
+                $val .= "</$tag>";
+            }
+            $words[$i]= $val;
+        }
+        $i++;
+    }
+    $hlsentence= implode(' ', $words);
+    if (isset($prev)||isset($next)) {
+      $hlsentence=$prev.' '.$hlsentence.' '.$next;
+    }
+    return $hlsentence;
+}

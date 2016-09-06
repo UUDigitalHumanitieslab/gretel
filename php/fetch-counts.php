@@ -43,5 +43,4 @@ if ($treebank != 'sonar') {
     createCsvCounts($sum, $counts);
   }
 }
-header_remove('Set-Cookie');
 echo json_encode(array($sum, $counts));

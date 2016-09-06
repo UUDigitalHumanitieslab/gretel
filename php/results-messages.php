@@ -26,7 +26,7 @@ require "$root/functions.php";
 
   <div id="results-found">
     <p>
-      <strong class="amount-hits">--</strong> result(s) have/has been found! <small class="is-still-counting">(still counting, can take a while)</small><br>
+      <strong class="amount-hits">--</strong> result(s) have/has been found! <br> <small class="is-still-counting">Still counting the total amount of hits. This can take a while but you can already download the first 500 results by clicking the button below.</small><br>
       <span class="is-restricted" style="display: none;">We have restricted the output to 500 hits. You can find the reason for this
         <a href='<?php echo "$home/documentation.php#faq-1"; ?>' title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.<br>
       </span>

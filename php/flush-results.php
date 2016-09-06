@@ -33,8 +33,6 @@ session_write_close();
 
 require "$scripts/BaseXClient.php";
 require "$scripts/TreebankSearch.php";
-require "$scripts/FormatResults.php";
-
 
 try {
     if ($treebank == 'sonar') {

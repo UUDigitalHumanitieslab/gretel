@@ -57,7 +57,6 @@ else {
 
 require "$scripts/BaseXClient.php";
 require "$scripts/TreebankSearch.php";
-require "$scripts/FormatResults.php";
 
   try {
       if ($treebank == 'sonar') {
@@ -86,14 +85,14 @@ require "$scripts/FormatResults.php";
       foreach ($sentences as $sid => $sentence) {
           // highlight sentence
           $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
-          $hlsentenceDownload = HighlightSentence($sentence, $beginlist[$sid], 'hit');
+
+          $changeTags = array('<em>' => '', '</em>' => '', '<strong>' => '<hit>', '</strong>' => '</hit>');
+          $hlsentenceDownload = strtr($hlsentence, $changeTags);
+
           // deal with quotes/apos
           $transformQuotes = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $transformQuotes);
 
-          // In the file-to-save the <em>-tags are not necessary
-        $removeEm = array('<em>' => '', '</em>' => '');
-        $hlsentenceDownload = strtr($hlsentenceDownload, $removeEm);
 
           // E.g. WRPEC0000019treebank
           if ($treebank == 'sonar') $databaseString = $tblist[$sid];
@@ -139,7 +138,6 @@ require "$scripts/FormatResults.php";
           'error' => false,
           'data' => $resultsArray,
         );
-        header_remove('Set-Cookie');
         echo json_encode($results);
       }
       else {
@@ -147,7 +145,6 @@ require "$scripts/FormatResults.php";
           'error' => false,
           'data' => '',
         );
-        header_remove('Set-Cookie');
         echo json_encode($results);
       }
   } catch (Exception $e) {
@@ -155,6 +152,5 @@ require "$scripts/FormatResults.php";
       'error' => true,
       'data' => $e->getMessage(),
     );
-    header_remove('Set-Cookie');
     echo json_encode($results);
   }
