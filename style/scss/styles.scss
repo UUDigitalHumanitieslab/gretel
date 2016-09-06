@@ -39,7 +39,7 @@ cite {
         }
     }
 
-    span.stack {
+    .stack {
         position: relative;
     }
 
@@ -366,6 +366,22 @@ dd {
         white-space: nowrap;
         font-size: 2em;
         flex: 1;
+
+        sup {
+            font-family: $fontbody;
+            font-weight: 400;
+            font-size: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            background: #b6d54b;
+            color: white;
+            width: 28px;
+            height: 28px;
+            text-align: center;
+            line-height: 28px;
+            vertical-align: super;
+            position: static;
+        }
     }
 
     > p {
