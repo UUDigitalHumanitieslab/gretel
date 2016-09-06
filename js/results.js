@@ -26,8 +26,11 @@ $(document).ready(function() {
         xhrFetchSentences,
         resultID = 0,
         resultsCount = 0,
+        xhrCount,
         done = false,
         doneCounting = false;
+
+    var windowsHasHash = window.location.hash;
 
     getSentences();
 
@@ -52,9 +55,9 @@ $(document).ready(function() {
                                 messageNoResultsFound();
                             } else {
                                 messageAllResultsFound();
-                                clearTimeout(findAllTimeout);
                             }
 
+                            clearTimeout(findAllTimeout);
                             done = true;
                             if (xhrAllSentences) xhrAllSentences.abort();
                         }
@@ -83,14 +86,13 @@ $(document).ready(function() {
 
     function findAll() {
         if (xhrAllSentences) return;
+        clearTimeout(findAllTimeout);
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
                 resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                 if (!data.error && data.data) {
                     loopResults(data.data, true);
-
-                    clearTimeout(findAllTimeout);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
                     messages.children("div").removeClass("error notice").closest(".results-messages-wrapper").show();
@@ -116,47 +118,51 @@ $(document).ready(function() {
             });
     }
 
-    var xhrCount = $.ajax(phpVars.fetchCountsPath)
-        .done(function(json) {
-            var data = $.parseJSON(json),
-                sum = data[0],
-                totalArray = data[1];
 
-            resultsCount = sum;
+    function countAll() {
+        xhrCount = $.ajax(phpVars.fetchCountsPath)
+            .done(function(json) {
+                var data = $.parseJSON(json),
+                    sum = data[0],
+                    totalArray = data[1];
 
-            sum = numericSeparator(parseInt(sum));
-            controls.find(".count strong + span").text(sum);
-            messages.find(".amount-hits").text(sum);
-            messages.find(".is-still-counting").remove();
+                resultsCount = sum;
 
-            // Prepare distribution table. ONLY for lassy and cgn
-            if (resultsCount > 0) {
-                // Length of associative array (Object in JS)
-                var size = Object.keys(totalArray).length;
-                if (typeof totalArray !== 'undefined' && size > 0) {
-                    for (var database in totalArray) {
-                        var databaseString = database.split("_")[2],
-                            componentHits = numericSeparator(parseInt(totalArray[database][0])),
-                            componentTotal = numericSeparator(parseInt(totalArray[database][1]));
+                sum = numericSeparator(parseInt(sum));
 
-                        downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
+                controls.find(".count strong + span").text(sum);
+                messages.find(".amount-hits").text(sum);
+                messages.find(".is-still-counting").remove();
+
+                // Prepare distribution table. ONLY for lassy and cgn
+                if (resultsCount > 0) {
+                    // Length of associative array (Object in JS)
+                    var size = Object.keys(totalArray).length;
+                    if (typeof totalArray !== 'undefined' && size > 0) {
+                        for (var database in totalArray) {
+                            var databaseString = database.split("_")[2],
+                                componentHits = numericSeparator(parseInt(totalArray[database][0])),
+                                componentTotal = numericSeparator(parseInt(totalArray[database][1]));
+
+                            downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
+                        }
+                        downloadWrapper.find(".distribution-wrapper").show();
                     }
-                    downloadWrapper.find(".distribution-wrapper").show();
+                    if (resultsCount > phpVars.resultsLimit) {
+                        messages.find(".is-restricted").show();
+                    }
                 }
-                if (resultsCount > phpVars.resultsLimit) {
-                    messages.find(".is-restricted").show();
+            })
+            .fail(function(jqXHR, textStatus, error) {
+                if (error != 'abort') {
+                    var string = "An error occurred: " + error + ".";
+                    messageOnError(string);
                 }
-            }
-        })
-        .fail(function(jqXHR, textStatus, error) {
-            if (error != 'abort') {
-                var string = "An error occurred: " + error + ".";
-                messageOnError(string);
-            }
-        })
-        .always(function() {
-            doneCounting = true;
-        });
+            })
+            .always(function() {
+                doneCounting = true;
+            });
+    }
 
     /**
      * Converts an integer with four or more digits to a comma-separated string
@@ -184,6 +190,14 @@ $(document).ready(function() {
 
             if (resultsCount > phpVars.resultsLimit || resultID == phpVars.resultsLimit) {
                 messages.find(".is-restricted").show();
+                /* More than resultsLimit hits, so start counting! */
+                countAll();
+            } else {
+                countString = controls.find(".count strong").text();
+
+                controls.find(".count strong + span").text(countString);
+                messages.find(".amount-hits").text(countString);
+                messages.find(".is-still-counting").remove();
             }
 
             messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
@@ -213,7 +227,7 @@ $(document).ready(function() {
     function showTvFsOnLoad() {
         var tvLink = $("a.tv-show-fs"),
             hash = window.location.hash;
-        if (hash && !$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
+        if (!$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
             if (hash.indexOf("tv-") == 1) {
                 var index = hash.match(/\d+$/);
                 tvLink.eq(index[0] - 1).click();
@@ -239,10 +253,10 @@ $(document).ready(function() {
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
                     value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
-            showTvFsOnLoad();
+            if (windowsHasHash) showTvFsOnLoad();
         });
 
-        resultIDString = numericSeparator(resultID);
+        resultIDString = numericSeparator(parseInt(resultID));
         controls.find(".count strong").text(resultIDString);
 
         if (!returnAllResults && !done) {
@@ -359,6 +373,29 @@ $(document).ready(function() {
 
     dummy.height(controlsHeight);
 
+    (function() {
+        var observeTarget = $("#results .results-download-wrapper")[0],
+            observeTimeout;
+
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                clearTimeout(observeTimeout);
+                observeTimeout = setTimeout(function() {
+                    setDummyVariables();
+                }, 500);
+            });
+        });
+
+        var config = {
+            attributes: true,
+            childList: true,
+            characterData: true,
+            subtree: true
+        };
+
+        observer.observe(observeTarget, config);
+    })();
+
     $window.resize($.throttle(250, setDummyVariables));
     $window.scroll($.throttle(250, scrollMenu));
     // Abort searching request, so we can start a new request more quickly
@@ -368,7 +405,7 @@ $(document).ready(function() {
     });
 
     $window.unload(function() {
-      unLoadRequests();
+        unLoadRequests();
     });
 
     // Because we are actually going back in history, some browsers might not
@@ -430,11 +467,11 @@ $(document).ready(function() {
         notificationWrapper.hide();
     });
     notificationWrapper.find("a").click(function(e) {
-      e.preventDefault();
+        e.preventDefault();
 
-      $("html, body").stop().animate({
-          scrollTop: $("#results").offset().top
-      }, 150);
-      notificationWrapper.hide();
+        $("html, body").stop().animate({
+            scrollTop: $("#results").offset().top
+        }, 150);
+        notificationWrapper.fadeOut("fast");
     });
 });
