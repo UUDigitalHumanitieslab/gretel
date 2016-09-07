@@ -1,5 +1,5 @@
-@import "normalize";
 @import "variables";
+@import "normalize";
 
 %fa {
     display: inline-block;
@@ -145,7 +145,7 @@ table {
 
         &.case-sensitive {
             th {
-                background: #F0F0F0;
+                background: lighten(#dad1c7, 12%);
             }
 
             td,
@@ -218,10 +218,6 @@ h2 {
 }
 
 h3 {
-    font-size: 1.25em;
-}
-
-h4 {
     font-size: 1.125em;
 }
 
@@ -368,17 +364,16 @@ dd {
         flex: 1;
 
         sup {
-            font-family: $fontbody;
-            font-weight: 400;
-            font-size: 12px;
+            font-size: 14px;
             border-radius: 50%;
+            font-weight: bolder;
             display: inline-block;
             background: #b6d54b;
             color: white;
             width: 28px;
             height: 28px;
             text-align: center;
-            line-height: 28px;
+            line-height: 29px;
             vertical-align: super;
             position: static;
         }
@@ -542,7 +537,7 @@ dd {
         li {
             display: inline-block;
             padding: 0;
-            background: #C0C0C0;
+            background: #f0f0f0;
 
             &:first-child {
                 border-radius: 4px 0 0 4px;
@@ -553,7 +548,7 @@ dd {
             }
 
             &.done {
-                background-color: darken(#C0C0C0, 12%);
+                background-color: #96846c;
             }
 
             &.active,
@@ -566,7 +561,7 @@ dd {
                 pointer-events: none;
 
                 &:not(.active) a {
-                    color: rgba(white, 0.74);
+                    color: rgba($textmain,0.64);
                 }
             }
 
@@ -642,7 +637,7 @@ dd {
                     &::after {
                         z-index: 2;
                         margin-left: -1px;
-                        border-left-color: #C0C0C0;
+                        border-left-color: #f0f0f0;
                     }
                 }
             }
@@ -662,7 +657,7 @@ dd {
             }
 
             &.done:not(:last-child) a::after {
-                border-left-color: darken(#C0C0C0, 12%);
+                border-left-color: #96846c;
             }
         }
     }
@@ -932,6 +927,17 @@ dd {
     margin-bottom: 36px;
 }
 
+#results .content {
+  &.error, &.no-results {
+    padding-bottom: 0;
+    border-bottom: 0 none;
+    margin-bottom: 0;
+
+    .results-explanation {display: none;}
+    h3 {display: none;}
+  }
+}
+
 #query-overview .flex-content,
 #results .content {
     display: flex;
@@ -946,11 +952,20 @@ dd {
     flex: 1;
 }
 
+.results-explanation {
+  text-align: justify;
+  p:first-child {
+    margin-top: 0;
+  }
+}
+
 #query-overview p,
 .results-download-wrapper {
     margin: 0 0 0 36px;
     padding: 12px;
 }
+
+.results-download-wrapper {padding-top: 0;}
 
 #query-overview p {
     border-radius: 4px;
@@ -1006,7 +1021,7 @@ dd {
     .messages {
         max-width: 520px;
         font-size: 88%;
-        margin-bottom: 36px;
+        margin: 0 auto 36px;
 
         &.active {
             display: block;

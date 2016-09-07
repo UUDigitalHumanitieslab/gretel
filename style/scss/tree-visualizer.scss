@@ -342,7 +342,6 @@
         min-height: 180px;
         background: #F5F5F5;
         transition: width 200ms, height 200ms;
-        overflow: scroll;
 
         &.small {
             overflow-y: scroll;

@@ -1,8 +1,8 @@
-html, body {
-  margin: 0;
-  padding: 0;
+body,
+html {
+    margin: 0;
+    padding: 0;
 }
-
 
 article,
 aside,
@@ -16,193 +16,210 @@ menu,
 nav,
 section,
 summary {
-  display: block;
+    display: block;
 }
 
-/**
- * Add the correct vertical alignment in Chrome, Firefox, and Opera.
- */
-
-progress {
-  vertical-align: baseline;
-}
-
-
-
-template,
-[hidden] {
-  display: none;
+[hidden],
+template {
+    display: none;
 }
 
 a {
-  background-color: transparent;
-  &:active, &:hover {outline-width: 0;}
+    background-color: transparent;
+
+    &:active,
+    &:hover {
+        outline-width: 0;
+    }
 }
 
 abbr[title] {
-  border-bottom: none;
-  text-decoration: underline;
-  text-decoration: underline dotted;
+    border-bottom: none;
+    text-decoration: underline;
+    text-decoration: underline dotted;
 }
 
 b,
 strong {
-  font-weight: bolder;
+    font-weight: bolder;
 }
 
 h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
+    font-size: 2em;
+    margin: 0.67em 0;
 }
+
 small {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 sub,
 sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
 }
 
 sub {
-  bottom: -0.25em;
+    bottom: -0.25em;
 }
 
 sup {
-  top: -0.5em;
+    top: -0.5em;
 }
 
 img {
-  border-style: none;
+    border-style: none;
 }
 
 svg:not(:root) {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 code,
 kbd,
 pre,
 samp {
-  font-family: monospace, monospace;
-  font-size: 1em;
+    font-family: monospace, monospace;
+    font-size: 1em;
 }
 
 button,
 input,
 select,
 textarea {
-  font: inherit;
+    font: inherit;
     margin: 0;
 }
 
 button,
 select {
-  text-transform: none;
+    text-transform: none;
 }
 
-button,
 [type="button"],
 [type="reset"],
-[type="submit"] {
-  cursor: pointer;
+[type="submit"],
+button {
+    cursor: pointer;
 }
 
 [disabled] {
-  cursor: not-allowed;
+    cursor: not-allowed;
 }
 
 button::-moz-focus-inner,
 input::-moz-focus-inner {
-  border: 0;
-  padding: 0;
+    border: 0;
+    padding: 0;
 }
+
 button:-moz-focusring,
 input:-moz-focusring {
-  outline: 1px dotted ButtonText;
+    outline: 1px dotted ButtonText;
 }
 
 fieldset {
-  border: 1px solid #c0c0c0;
-  margin: 0 2px;
-  padding: 0.35em 0.625em 0.75em;
+    border: 1px solid #ad9f8e;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
 }
 
 legend {
-  box-sizing: border-box;
-  color: inherit;
-  display: table;
-  max-width: 100%;
-  padding: 0;
-  white-space: normal;
+    box-sizing: border-box;
+    color: inherit;
+    display: table;
+    max-width: 100%;
+    padding: 0;
+    white-space: normal;
 }
 
 textarea {
-  overflow: auto;
+    overflow: auto;
 }
 
 [type="checkbox"],
 [type="radio"] {
-  box-sizing: border-box;
-  padding: 0;
-  vertical-align: middle;
+    box-sizing: border-box;
+    padding: 0;
+    vertical-align: middle;
 }
 
 [type="number"]::-webkit-inner-spin-button,
 [type="number"]::-webkit-outer-spin-button {
-  height: auto;
+    height: auto;
 }
 
 [type="search"] {
-  -webkit-appearance: textfield;
+    -webkit-appearance: textfield;
 }
 
-button, input, textarea {
+button,
+input,
+textarea {
     &:focus {
         outline: 0 none;
     }
 }
 
-input:not([type="button"]):not([type="reset"]):not([type="submit"]), textarea {
-  padding: 6px 8px;
-  border: 1px solid #C0C0C0;
-  background: white;
-  border-radius: 4px;
-  &:focus, &:active {
-    border-color: darken(#C0C0C0, 12%);
-  }
-  &:invalid {
-      box-shadow: none;
-  }
+input:not([type="button"]):not([type="reset"]):not([type="submit"]),
+textarea {
+    padding: 6px 8px;
+    border: 1px solid #ad9f8e;
+    background: white;
+    border-radius: 4px;
+
+    &:active,
+    &:focus {
+        border-color: darken(#ad9f8e, 12%);
+    }
+
+    &:invalid {
+        box-shadow: none;
+    }
 }
 
-button, input[type="button"], input[type="reset"], input[type="submit"] {
-  background: #C0C0C0;
-  box-shadow: inset 0 -1px rgba(0,0,0,.24);
-  border: 0 none;
-  color: white;
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 0 none;
-  &:not([disabled]):not(.disabled):hover {
-    background: darken(#C0C0C0, 12%);
-    text-shadow: 0 1px rgba(0,0,0,0.12);
-  }
-  &:active {
-    box-shadow:  none;
-    transform: translateY(1px);
-  }
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+    background: #ad9f8e;
+    box-shadow: inset 0 -1px rgba(0,0,0,.24);
+    border: 0 none;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 0 none;
+
+    &:not([disabled]):not(.disabled):hover {
+        background: darken(#ad9f8e, 12%);
+        text-shadow: 0 1px rgba(0,0,0,0.12);
+    }
+
+    &:active {
+        box-shadow: none;
+        transform: translateY(1px);
+    }
 }
 
-label, input[type="checkbox"], input[type="radio"], button {
-  cursor: pointer;
-  &[disabled], &.disabled {
-      cursor: not-allowed;
-      pointer-events: none;
-  }
+button,
+input[type="checkbox"],
+input[type="radio"],
+label {
+    cursor: pointer;
+
+    &.disabled,
+    &[disabled] {
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 }
-label.disabled, button[disabled] {
-  color: lighten(#565656, 25%);
+
+button[disabled] {
+    color: #e4dbd1;
+    box-shadow: none;
+    background: #c5bbae;
 }
+
+label.disabled {color: lighten($textmain, 48%);}
