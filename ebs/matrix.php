@@ -5,7 +5,7 @@
  *
  * The sentence given in the previous step is tokenized. Based on the tokens, a matrix is build.
  * The user can select what information is information for them, e.g. lemma, pos-tag, word,
- * and so on. If `advanced search` was selected in the first step, more options are avaiable.
+ * and so on..
  *
  *Also two search-wide options are available:
  * 1. Respect word order;
@@ -27,14 +27,13 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = $_SESSION['ebsxps'];
 $step = 3;
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
+$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
     $id = session_id();
 
     $input = $_SESSION['example'];
-    $searchMode = $_SESSION['search'];
 }
 
 require "$root/functions.php";
@@ -104,11 +103,8 @@ if ($continueConstraints && !$isSpam):
     <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
     <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
         It may be included in the results, but it is not requierd that it is present.</li>
-
-    <?php if ($searchMode == 'advanced'): ?>
-        <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
-      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
-    <?php endif; ?>
+    <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
+    <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
   </ul>
   <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive, and so can proper names as a <code>lemma</code>.
     By default case-sensitivity is <em>disabled</em> (case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.

@@ -17,7 +17,7 @@ session_start();
 $currentPage = $_SESSION['ebsxps'];
 $step = 2;
 
-$continueConstraints = postVariablesSet(array('input', 'search'));
+$continueConstraints = isset($_POST['input']);
 
 if ($continueConstraints) {
     $treeVisualizer = true;
@@ -25,9 +25,6 @@ if ($continueConstraints) {
 
     $input = $_POST['input'];
     $_SESSION['example'] = $input;
-
-    $searchMode = $_POST['search'];
-    $_SESSION['search'] = $searchMode;
 
     require "$scripts/SimpleDOM.php";
 }
@@ -71,7 +68,7 @@ if ($continueConstraints) {
 <?php
 } else {
     setErrorHeading('variables undefined');
-    echo '<p>It seems that you did not enter an input sentence or did not select a search mode. It is also
+    echo '<p>It seems that you did not enter an input sentence. It is also
     possible that you came to this page directly without first entering an input example.</p>';
     setPreviousPageMessage(1);
 }
