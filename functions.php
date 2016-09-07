@@ -159,7 +159,7 @@
 
   function buildEbsMatrix()
   {
-      global $sentence, $searchMode,$matrixOptions;
+      global $sentence, $matrixOptions;
 
       $tableHTML = '<table><thead><tr><th>sentence</th>';
 
@@ -171,11 +171,6 @@
       foreach ($matrixOptions as $array) {
           ++$i;
           foreach ($array as $th => $val) {
-            // Don't show array 2 (advanced options)
-              if ($searchMode == 'basic' && $i == 2) {
-                  continue;
-              }
-
               switch($i) {
                 case 2:
                   $class = 'advanced';

@@ -18,9 +18,8 @@ $databaseString = $treebank;
 $xpath = $_SESSION['xpath'];
 $ebsxps = $_SESSION['ebsxps'];
 if ($ebsxps == 'ebs') {
-    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
-    if ($searchMode == "advanced" && $treebank != "sonar") {
+    if ($treebank != "sonar") {
         $xpChanged = $_SESSION['xpChanged'];
         $originalXp = $_SESSION['originalXp'];
     }
@@ -39,13 +38,13 @@ $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 if ($ebsxps == 'ebs') {
     $xplog = fopen("$log/gretel-ebq.log", 'w');
-    if ($searchMode == "advanced" && $treebank != "sonar") {
-      // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
-      fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
+    if ($treebank != "sonar") {
+      // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
+      fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
     }
     else {
-        // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tSearch.mode\tTreebank\tComponent\tXPath.searched\n");
-        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$searchMode\t$treebank\t$componentString\t$xpath\n");
+        // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.searched\n");
+        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpath\n");
     }
     fclose($xplog);
 }
