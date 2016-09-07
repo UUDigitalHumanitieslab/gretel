@@ -40,15 +40,15 @@ require "$php/header.php";
 if ($continueConstraints) {
     require "$scripts/AlpinoParser.php";
 
+    // Prepare/clean up input to be tokenized in next step
     $tokinput = Tokenize($input);
     $_SESSION['sentence'] = $tokinput;
     $parse = Alpino($tokinput, $id);
     $parseloc = ModifyLemma($parse, $id, $tmp);
 ?>
 
-  <p>You find the structure of the <strong>tagged</strong>
-    and <strong>parsed</strong> sentence below.
-    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun)
+  <p>You find the structure of the tagged and parsed sentence below.
+    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun),
     and parsing shows <em>dependencies</em> (or relations),
      such as <code>su</code> (subject) and <em>constituents</em>,
      such as <code>np</code> (noun phrase).
@@ -61,7 +61,7 @@ if ($continueConstraints) {
 
   <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
     <p>If the analysis is different from what you expected, you can enter
-      <a href="ebs/input.php" title="Example-based search">another input example</a>.
+      <a href="ebs/input.php" title="Example-based search">a new input example</a>.
     </p>
     <?php setContinueNavigation(); ?>
   </form>

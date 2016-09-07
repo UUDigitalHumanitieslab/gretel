@@ -53,17 +53,8 @@ if ($continueConstraints && !$isSpam):
   $sentence = explode(' ', $tokinput);
 ?>
   <form action="ebs/tb-sel.php" method="post">
-      <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
-          The latter do not need to be represented in the search results. The obligatory elements have to be included in
-          the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form.
-      </p>
-      <p>If you would like to review the dependency structure of your input example,
-          you can view a dependency parse of that sentence in the tree structure given
-          <a href='<?php echo "tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.
-      </p>
-      <p>Indicate the relevant  parts of the sentence, i.e. the parts you are interested in. If you have chosen
-          <em>advanced mode</em> in step 1 you have two more options to choose from, namely
-          <em>detailed word class</em> and <em>not in search</em>. A detailed description of each option is
+      <p>In the matrix below, the sentence you entered has been tokenized, i.e. divided into elements that are separated by spaces.
+        Indicate the relevant parts of the sentence, i.e. the parts you are interested in. A detailed description of each option is
           given at the bottom of this page.
       </p>
       <div class="table-wrapper">
@@ -77,6 +68,7 @@ if ($continueConstraints && !$isSpam):
     </label>
     <div class="help-tooltip" data-title="Only search for patterns that have the same word order as your input example">
       <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+      <span class="sr-only">Only search for patterns that have the same word order as your input example</span>
     </div>
   </div>
   <div class="label-wrapper">
@@ -86,6 +78,8 @@ if ($continueConstraints && !$isSpam):
     <div class="help-tooltip" data-title="Search for more general patterns by ignoring the properties of the top node,
       e.g. search for both main clauses and subclauses">
       <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+      <span class="sr-only">Search for more general patterns by ignoring the properties of the top node,
+        e.g. search for both main clauses and subclauses</span>
     </div>
   </div>
 

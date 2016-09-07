@@ -31,12 +31,6 @@ $id = session_id();
 $time = time();
 $_SESSION['queryid'] = "$id-$time";
 
-if (!empty($_SESSION['example'])) {
-    $input = $_SESSION['example'];
-} else {
-    $input = 'Dit is een zin.';
-}
-
 require "$root/functions.php";
 require "$php/head.php";
 ?>
@@ -44,11 +38,11 @@ require "$php/head.php";
 <?php flush(); ?>
 <?php require "$php/header.php"; ?>
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
-        <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
+        <p>Enter a sentence, phrase, or constituent containing the (syntactic) characteristics you are looking for.</p>
         <div class="input-wrapper">
-          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="<?php echo $input; ?>" required>
+          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="Dit is een zin." required>
           <button type="reset" name="clear" title="Empty the input field">
-            <i class="fa fa-fw fa-times "></i>
+            <i class="fa fa-fw fa-times"></i>
             <span class="sr-only">Empty the input field</span>
           </button>
       </div>
