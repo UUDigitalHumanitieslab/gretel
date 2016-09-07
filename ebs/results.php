@@ -218,7 +218,7 @@ if ($continueConstraints) : ?>
     $jsVars = array(
         'fetchResultsPath' => "$home/php/flush-results.php",
         'getAllResultsPath' => "$home/php/get-all-results.php",
-        'fetchCountsPath' => "$home/php/fetch-counts.php",
+        'fetchCountsPath' => "$home/php/get-counts.php",
         'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,
