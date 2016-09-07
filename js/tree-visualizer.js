@@ -57,13 +57,15 @@
         if (!args.initFSOnClick) {
             // Show tree-visualizer-fs tree
             instance.find(".tv-show-fs").click(function(e) {
+                var $this = $(this);
                 anyTooltip.css("top", "-100%").children("ul").empty();
                 if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
 
-                FS.fadeIn(250);
+                FS.fadeIn(250, function() {
+                    fontFitSize = null;
+                    fontToFit();
+                });
 
-                fontFitSize = null;
-                fontToFit();
                 e.preventDefault();
             });
         }
@@ -372,8 +374,14 @@
 
         function fontSizeTreeFS(mode) {
             if (mode == 'zoom-default') {
-                fontFitSize = null;
-                fontToFit();
+                var activeItem = instance.find(".tv-fs-toggled");
+
+                if (activeItem.length && activeItem.data("tv-fontsize") > 0) {
+                    treeFS.css("fontSize", activeItem.data("tv-fontsize") + "px");
+                } else {
+                    fontFitSize = null;
+                    fontToFit();
+                }
             } else {
                 var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
                 if (mode == 'zoom-in') {
@@ -386,27 +394,29 @@
         }
 
         function fontToFit() {
+            sizeTreeFS();
             var currentFontSize = parseInt(treeFS.css("fontSize"), 10),
                 el = treeFS[0],
                 scrollw = el.scrollWidth,
                 scrollh = el.scrollHeight,
                 w = treeFS.outerWidth(),
                 h = treeFS.outerHeight();
-                console.log("called");
-            if (((scrollh > h) || (scrollw > w)) && (currentFontSize > 1)) {
-              console.log("large");
-              console.log(scrollh + " " + h);
+            if (((scrollh > h) || (scrollw > w)) && (currentFontSize > 4)) {
                 if (fontFitSize == null) fontFitSize = "large";
                 treeFS.css("fontSize", currentFontSize - 1 + "px");
                 sizeTreeFS();
-                if (fontFitSize == "large") fontToFit();
+                if (fontFitSize == "large") {
+                    fontToFit();
+                }
             } else if (fontFitSize != "large") {
                 if (fontFitSize == null) fontFitSize = "small";
                 treeFS.css("fontSize", currentFontSize + 1 + "px");
-                console.log(fontFitSize + currentFontSize);
                 sizeTreeFS();
                 fontToFit();
             }
+
+            instance.find(".tv-fs-toggled").attr("data-tv-fontsize", parseInt(treeFS.css("fontSize"), 10));
+            noMoreZooming();
         }
 
         function tooltipPosition(animate) {

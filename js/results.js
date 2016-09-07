@@ -28,9 +28,11 @@ $(document).ready(function() {
         resultsCount = 0,
         xhrCount,
         done = false,
-        doneCounting = false;
+        doneCounting = false,
+        activeIndexResults = 0;
 
-    var windowsHasHash = window.location.hash;
+    var windowsHasHash = window.location.hash,
+        visibleResultsIDArray = [];
 
     getSentences();
 
@@ -181,6 +183,7 @@ $(document).ready(function() {
 
     function messageAllResultsFound() {
         disableAndEnableInputs();
+        refillVisibleResults();
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #results-found', function() {
             if (doneCounting) {
@@ -188,9 +191,8 @@ $(document).ready(function() {
                 messages.find(".is-still-counting").remove();
             }
 
-            if (resultsCount > phpVars.resultsLimit || resultID == phpVars.resultsLimit) {
-                messages.find(".is-restricted").show();
-                /* More than resultsLimit hits, so start counting! */
+            /* High likelihood of having more than the limit hits */
+            if (resultID == phpVars.resultsLimit) {
                 countAll();
             } else {
                 countString = controls.find(".count strong").text();
@@ -207,7 +209,8 @@ $(document).ready(function() {
     }
 
     function messageNoResultsFound() {
-        resultsWrapper.children("p").add(controls).add(dummy).remove();
+        resultsWrapper.add(controls).add(dummy).remove();
+        $("#results .content").addClass("no-results");
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #no-results-found', function() {
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
@@ -216,11 +219,11 @@ $(document).ready(function() {
 
     function messageOnError(error) {
         resultsWrapper.add(controls).add(dummy).remove();
+        $("#results .content").addClass("error");
 
         messages.load(phpVars.fetchHomePath + '/php/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
-            downloadWrapper.addClass("active");
         });
     }
 
@@ -266,6 +269,8 @@ $(document).ready(function() {
         }
     }
 
+
+
     controls.find("[name='go-to']").keyup(function(e) {
             var keycode = e.keyCode,
                 $this = $(this);
@@ -275,14 +280,23 @@ $(document).ready(function() {
             if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
                 this.setCustomValidity("");
                 // UP arrow
-                if (keycode == 38 && $this.val() < resultID) $this.val(parseInt($this.val(), 10) + 1).change();
+                if (keycode == 38 && $this.val() < visibleResultsIDArray[visibleResultsIDArray.length - 1]) {
+                    activeIndexResults++;
+                    $this.val(visibleResultsIDArray[activeIndexResults]).change();
+                    controls.find("form").submit();
+                }
                 // DOWN arrow
-                if (keycode == 40 && $this.val() > 1) $this.val(parseInt($this.val(), 10) - 1).change();
+                else if (keycode == 40 && $this.val() > visibleResultsIDArray[0]) {
+                    activeIndexResults--;
+                    $this.val(visibleResultsIDArray[activeIndexResults]).change();
+                    controls.find("form").submit();
+                }
             }
         })
         .change(function() {
             var val = $(this).val(),
                 row = resultsWrapper.find("tbody:not(.empty) tr[data-result-id='" + val + "']");
+
 
             if (!row.is(":visible")) {
                 this.setCustomValidity("Please choose a row that is visible. Some rows are hidden depending on the filters you set.");
@@ -294,14 +308,16 @@ $(document).ready(function() {
                 $("html, body").stop().animate({
                     scrollTop: offset.top - hControls
                 }, 150);
+                activeIndexResults = activeIndexResults.indexOf(val);
             }
         });
 
-    $(".controls form").submit(function(e) {
+    controls.find("form").submit(function(e) {
         e.preventDefault();
+        $("#go-to").change();
     });
 
-    $(".controls [name='filter-components']").change(function() {
+    controls.find("[name='filter-components']").change(function() {
         $(this).parent().toggleClass("active");
     });
 
@@ -330,6 +346,7 @@ $(document).ready(function() {
 
             // If none of the component checkboxes are checked
             if (!filterWrapper.find("[name='component']").is(":checked")) {
+                activeIndexResults = false;
                 resultsWrapper.find(".empty").css("display", "table-row-group");
                 filterWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
                 $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
@@ -348,16 +365,26 @@ $(document).ready(function() {
             $this.parent().toggleClass("active");
             filterWrapper.find("[type='checkbox'][name='component']:not(:disabled)").prop("checked", $this.is(":checked")).change();
         }
-
-        $("#go-to").val(resultsWrapper.find("tbody:not(.empty) tr:visible").first().attr("data-result-id") || "--");
+        refillVisibleResults();
     });
+
+    function refillVisibleResults() {
+        visibleResultsIDArray = [];
+        resultsWrapper.find("tbody:not(.empty) tr:visible").each(function(index, el) {
+            visibleResultsIDArray.push(parseInt($(el).data("result-id"), 10));
+        });
+        if (activeIndexResults != 0) {
+            activeIndexResults = 0;
+            $("#go-to").val(visibleResultsIDArray[0] || "--").change();
+        }
+    }
 
     function disableAndEnableInputs() {
         $("[for='go-to'], [for='filter-components'], .filter-wrapper label").removeClass("disabled").children("input").prop("disabled", false);
 
         // Disable the checkboxes which don't have any results
-        filterWrapper.find("[type='checkbox'][name='component']").each(function() {
-            var $this = $(this),
+        filterWrapper.find("[type='checkbox'][name='component']").each(function(i, el) {
+            var $this = $(el),
                 component = $this.val();
 
             if (resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").length == 0) {
@@ -444,6 +471,14 @@ $(document).ready(function() {
     /* Tree visualizer */
     resultsWrapper.find("tbody").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
+
+        resultsWrapper.find("tbody a.tv-show-fs").removeClass("tv-fs-toggled");
+        $this.addClass("tv-fs-toggled");
+
+        if (!this.hasAttribute("data-tv-fontsize")) {
+            $this.attr("data-tv-fontsize", 0);
+        }
+
         $(".loading-wrapper.tv").addClass("active");
         $("body").treeVisualizer($this.data("tv-url"), {
             normalView: false,
