@@ -127,26 +127,31 @@ if ($continueConstraints):
     <h2>Results overview</h2>
     <div class="content">
       <div class="results-explanation">
-        <p>When GrETEL has finished looking up your query, a message will apear
-          that the results have been found and are ready to be downloaded as a text file.</p>
-
-          <p>The document contains the first 500 results that match your query. Each sentence is preceded by the corpus that was used
-              (Lassy, CGN, or SoNaR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
-              that was used to find the results. This can be useful if you want to do a similar query later on. Each sentence also contains
-              <code>&lt;hit&gt;</code> tags surrounding the actual structure that you looked for, similar to how the web page shows these
-              parts in boldface in the table below.</p>
-              <p>Note that due to how the corpora are parsed, some oddities may occur. For instance, punctuation is left out
-              in the dependency structure (all punctuation is attached to the topmost node), which means that in a orthographic structure
-              the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>.</p>
-
+          <p>
+            After the search is complete, you can download a file that contains the first 500 results that match your query.
+            The results are limited to 500. The reason for this is two-fold. For one, it might take very long for a query with
+            more than 500 results to finish. More importantly, though, the corpora provided by us are
+            <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus
+            as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
+            literally download the whole corpus &mdash; which is not the intention of this project.</p>
+            <p>
+            In the file, each sentence is preceded by the corpus that was used
+            (Lassy, CGN, or SoNaR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
+            that was used to find the results. This can be useful if you want to do a similar query later on. Each sentence also contains
+            <code>&lt;hit&gt;</code> tags surrounding the actual structure that you looked for, similar to how the web page shows these
+            parts in boldface in the table below.</p>
+            <p>Note that due to how the corpora are parsed, some oddities may occur. For instance, punctuation is left out
+            in the dependency structure (all punctuation is attached to the topmost node), which means that in a orthographic structure
+            the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>.</p>
         <?php if ($treebank != 'sonar'): ?>
         <p>A distribution overview of the number of hits
-          per component is also provided. This may be useful for data analysis,
+          per component is also provided. This overview is not limited to the first 500 hits.
+          A distribution list may be useful for data analysis,
           especially if you are interested in comparing different treebank components.
           For example, if you want to know whether a syntactic construction in
           spoken language is more frequent in Netherlandic Dutch or Belgian
           Dutch, you can compare the <em>NL</em> and <em>VL</em> parts of that corpus.
-          You will be alerted when this list is generated so you can download it.
+          <strong>Generating the distribution list may take more time than finding the results.</strong>
         </p>
         <?php endif; ?>
       </div>
