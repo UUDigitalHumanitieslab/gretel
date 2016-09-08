@@ -17,7 +17,7 @@ session_start();
 $currentPage = $_SESSION['ebsxps'];
 $step = 2;
 
-$continueConstraints = postVariablesSet(array('input', 'search'));
+$continueConstraints = isset($_POST['input']);
 
 if ($continueConstraints) {
     $treeVisualizer = true;
@@ -25,9 +25,6 @@ if ($continueConstraints) {
 
     $input = $_POST['input'];
     $_SESSION['example'] = $input;
-
-    $searchMode = $_POST['search'];
-    $_SESSION['search'] = $searchMode;
 
     require "$scripts/SimpleDOM.php";
 }
@@ -43,15 +40,15 @@ require "$php/header.php";
 if ($continueConstraints) {
     require "$scripts/AlpinoParser.php";
 
+    // Prepare/clean up input to be tokenized in next step
     $tokinput = Tokenize($input);
     $_SESSION['sentence'] = $tokinput;
     $parse = Alpino($tokinput, $id);
     $parseloc = ModifyLemma($parse, $id, $tmp);
 ?>
 
-  <p>You find the structure of the <strong>tagged</strong>
-    and <strong>parsed</strong> sentence below.
-    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun)
+  <p>You find the structure of the tagged and parsed sentence below.
+    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun),
     and parsing shows <em>dependencies</em> (or relations),
      such as <code>su</code> (subject) and <em>constituents</em>,
      such as <code>np</code> (noun phrase).
@@ -64,14 +61,14 @@ if ($continueConstraints) {
 
   <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
     <p>If the analysis is different from what you expected, you can enter
-      <a href="ebs/input.php" title="Example-based search">another input example</a>.
+      <a href="ebs/input.php" title="Example-based search">a new input example</a>.
     </p>
     <?php setContinueNavigation(); ?>
   </form>
 <?php
 } else {
     setErrorHeading('variables undefined');
-    echo '<p>It seems that you did not enter an input sentence or did not select a search mode. It is also
+    echo '<p>It seems that you did not enter an input sentence. It is also
     possible that you came to this page directly without first entering an input example.</p>';
     setPreviousPageMessage(1);
 }

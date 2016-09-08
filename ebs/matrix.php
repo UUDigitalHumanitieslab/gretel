@@ -5,7 +5,7 @@
  *
  * The sentence given in the previous step is tokenized. Based on the tokens, a matrix is build.
  * The user can select what information is information for them, e.g. lemma, pos-tag, word,
- * and so on. If `advanced search` was selected in the first step, more options are avaiable.
+ * and so on..
  *
  *Also two search-wide options are available:
  * 1. Respect word order;
@@ -27,14 +27,13 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = $_SESSION['ebsxps'];
 $step = 3;
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
+$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
     $id = session_id();
 
     $input = $_SESSION['example'];
-    $searchMode = $_SESSION['search'];
 }
 
 require "$root/functions.php";
@@ -54,17 +53,8 @@ if ($continueConstraints && !$isSpam):
   $sentence = explode(' ', $tokinput);
 ?>
   <form action="ebs/tb-sel.php" method="post">
-      <p>In the matrix below, the elements of the sentence you entered are divided in obligatory ones and optional ones.
-          The latter do not need to be represented in the search results. The obligatory elements have to be included in
-          the results, be it as an element of the same word class, any form of a specific lemma, or a specific word form.
-      </p>
-      <p>If you would like to review the dependency structure of your input example,
-          you can view a dependency parse of that sentence in the tree structure given
-          <a href='<?php echo "tmp/$id.xml"; ?>' target="_blank" class="tv-show-fs">here</a>.
-      </p>
-      <p>Indicate the relevant  parts of the sentence, i.e. the parts you are interested in. If you have chosen
-          <em>advanced mode</em> in step 1 you have two more options to choose from, namely
-          <em>detailed word class</em> and <em>not in search</em>. A detailed description of each option is
+      <p>In the matrix below, the sentence you entered has been tokenized, i.e. divided into elements that are separated by spaces.
+        Indicate the relevant parts of the sentence, i.e. the parts you are interested in. A detailed description of each option is
           given at the bottom of this page.
       </p>
       <div class="table-wrapper">
@@ -78,6 +68,7 @@ if ($continueConstraints && !$isSpam):
     </label>
     <div class="help-tooltip" data-title="Only search for patterns that have the same word order as your input example">
       <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+      <span class="sr-only">Only search for patterns that have the same word order as your input example</span>
     </div>
   </div>
   <div class="label-wrapper">
@@ -87,6 +78,8 @@ if ($continueConstraints && !$isSpam):
     <div class="help-tooltip" data-title="Search for more general patterns by ignoring the properties of the top node,
       e.g. search for both main clauses and subclauses">
       <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+      <span class="sr-only">Search for more general patterns by ignoring the properties of the top node,
+        e.g. search for both main clauses and subclauses</span>
     </div>
   </div>
 
@@ -104,11 +97,8 @@ if ($continueConstraints && !$isSpam):
     <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
     <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
         It may be included in the results, but it is not requierd that it is present.</li>
-
-    <?php if ($searchMode == 'advanced'): ?>
-        <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
-      <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
-    <?php endif; ?>
+    <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
+    <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
   </ul>
   <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive, and so can proper names as a <code>lemma</code>.
     By default case-sensitivity is <em>disabled</em> (case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.

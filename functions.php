@@ -92,7 +92,7 @@
 
   function setBodyClasses()
   {
-      global $currentPage, $step;
+      global $currentPage, $step, $ebsPages, $xpsPages;
       if (isset($currentPage)) {
           $class = 'class="';
           $class .= $currentPage;
@@ -100,6 +100,8 @@
               if (isset($step)) {
                   $class .= " step-$step";
               }
+              $pageType = array_values(${$currentPage.'Pages'});
+              $class .= ' ' . strtolower($pageType[$step-1]);
           }
           $class .= '"';
       } else {
@@ -159,7 +161,7 @@
 
   function buildEbsMatrix()
   {
-      global $sentence, $searchMode,$matrixOptions;
+      global $sentence, $matrixOptions;
 
       $tableHTML = '<table><thead><tr><th>sentence</th>';
 
@@ -167,35 +169,19 @@
           $tableHTML .= "<td>$word</td>";
       }
       $tableHTML .= '</tr></thead><tbody>';
+
       $i = 0;
-      foreach ($matrixOptions as $array) {
-          ++$i;
-          foreach ($array as $th => $val) {
-            // Don't show array 2 (advanced options)
-              if ($searchMode == 'basic' && $i == 2) {
-                  continue;
-              }
-
-              switch($i) {
-                case 2:
-                  $class = 'advanced';
-                  break;
-                case 3:
-                  $class = 'case-sensitive';
-                  break;
-                default:
-                  $class = '';
-              }
-
-              $tableHTML .= "<tr class='$class'>";
-
-              $tableHTML .= "<th>$th</th>";
+      foreach ($matrixOptions as $thValArray) {
+        $i++;
+          foreach ($thValArray as $th => $val) {
+              $tableHTML .= "<tr class='row-group-$i'><th>$th</th>";
               foreach ($sentence as $key => $word) {
                   $isPunc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
                   $word = htmlspecialchars($word, ENT_QUOTES);
-                  if (($val == 'pos' & !$isPunc) || $val == 'na' && $isPunc) {
+                  if (($val == 'pos' & !$isPunc) || ($val == 'na' && $isPunc)) {
                       $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val' checked></td>";
                   }
+                  // Case sensitive
                   elseif ($val == 'cs') {
                     $tableHTML .= "<td class='disabled'>";
                     if (!$isPunc) {
@@ -286,9 +272,11 @@
                }
 
                // At the end of the loop depth ought to be zero
+               /*
                if ($depth != 0) {
-                   // warn("XPath not correct: $xpline in file $xpathfile\n");
+                   // warn("XPath not correct");
                }
+               */
 
               // Check if there is a count present
               // and manipulate the string accordingly, i.e. multiply when necessary
@@ -324,8 +312,6 @@
                            $dfpattern .= $cat[1];
                        }
                        array_push($dfpatterns, $dfpattern);
-                   } else {
-                       // warn("No rel attribute on child: $xpline in file $xpathfile\n");
                    }
                }  // end foreach
 
@@ -350,48 +336,54 @@
 
   function isSpam($string)
   {
-      // NOTE: backslash needs to be escaped twice
+    // NOTE: backslash needs to be escaped twice
     $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
-      $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
-      if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
-          return true;
-      }
+    $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
 
-      return false;
+    if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
+      return true;
+    }
+    return false;
   }
 
   function Tokenize($sentence)
   {
-      $addspace = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence); //add space before and after punctuation marks
-    $addspace = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $addspace); // deal with ...
-    $cfs = preg_replace('/^\s*(.*)/', '$1', $addspace); //delete first space
-    $cls = preg_replace('/(.*?)\s*$/', '$1', $cfs); //delete last space
-    $tinput = preg_replace('/\s+/', ' ', $cls);// change multiple spaces to single space
-    return $tinput;
+    // Add space before and after punctuation marks
+    $sentence = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence);
+    // Deal wth ...
+    $sentence = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $sentence);
+    // Delete first and last space(s)
+    $sentence = preg_replace('/^\s*(.*?)\s*$/', '$1', $sentence);
+    // Change multiple spaces to single space
+    $sentence = preg_replace('/\s+/', ' ', $sentence);
+    return $sentence;
   }
 
   function ModifyLemma($parse, $id, $tmp)
   {
-      $input = fopen("$parse", 'r');
-      $output = fopen("$tmp/$id-pt.xml", 'w');
-      $xml = simpledom_load_file("$parse"); //read alpino parse
+      $parseloc = "$tmp/$id-pt.xml";
+      $input = fopen($parse, 'r');
+      $output = fopen($parseloc, 'w');
+      // Read alpino parse
+      $xml = simpledom_load_file($parse);
+      // Sort terminal nodes by 'begin' attribute
+      $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin');
 
-    $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin'); //sort terminal nodes by 'begin' attribute
-
-    $i = 0;
       foreach ($pts as $pt) {
-          if ($pt !== 'let') {
-              $lemma = $pts[$i]->getAttribute('lemma');
-              $newlemma = preg_replace('/_DIM/', '', $lemma); // remove _DIM from lemmas (for diminutives)
-        $newlemma = preg_replace('/_/', '', $newlemma); // remove _ from lemmas (for compounds)
-        $pts[$i]->setAttribute('lemma', "$newlemma"); // add lemma
+          if ($pt != 'let') {
+              $lemma = $pt->getAttribute('lemma');
+              // Remove _DIM from lemmas (for diminutives)
+              $lemma = preg_replace('/_DIM/', '', $lemma);
+              // Remove _ from lemmas (for compounds)
+              $lemma = preg_replace('/_/', '', $lemma);
+              // Add lemma
+              $pt->setAttribute('lemma', $lemma);
           }
-          ++$i;
       }
 
       $tree = $xml->asXML();
-      fwrite($output, "$tree");
+      fwrite($output, $tree);
       fclose($output);
 
-      return "$tmp/$id-pt.xml"; //return parse location
+      return $parseloc;
   }

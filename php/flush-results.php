@@ -21,7 +21,6 @@ if ($treebank == 'sonar') {
 $databaseString = $treebank;
 
 if ($_SESSION['ebsxps'] == 'ebs') {
-    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
 }
 $xpath = $_SESSION['xpath'];

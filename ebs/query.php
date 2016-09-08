@@ -32,7 +32,7 @@ if (!$noTbFlag) {
     }
 }
 
-$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'search', 'treebank', 'subtreebank', 'xpath'));
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $id = session_id();
@@ -41,7 +41,6 @@ if ($continueConstraints) {
 
     $tokinput = $_SESSION['sentence'];
 
-    $searchMode = $_SESSION['search'];
     $xpath = $_SESSION['xpath'];
 
     $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
@@ -76,7 +75,6 @@ require "$php/head.php";
 <div id="tree-output"></div>
 
 <?php
-  if ($searchMode == 'advanced') :
     if ($treebank == 'sonar') : ?>
       <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
         below is provided to show you the structure that is assigned to your input example.</p>
@@ -100,10 +98,6 @@ require "$php/head.php";
     <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
 
     <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
-  <?php else : ?>
-    <form action="ebs/results.php" method="post">
-  <?php endif; // $searchMode == 'advanced' ?>
-
     <?php setContinueNavigation(); ?>
   </form>
 <?php else: // $continueConstraints
@@ -122,12 +116,8 @@ if ($continueConstraints) : ?>
     <script src="js/tree-visualizer.js"></script>
     <script>
     $(document).ready(function() {
-        <?php if ($searchMode == 'advanced'): ?>
-            $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
-        <?php else: ?>
-            $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>');
-        <?php endif; ?>
-      });
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
+    });
     </script>
 <?php endif; ?>
 </body>

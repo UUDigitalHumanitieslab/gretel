@@ -10,12 +10,11 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = $_SESSION['ebsxps'];
 $step = 4;
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence', 'search'));
+$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
 if ($continueConstraints) {
   $id = session_id();
   $input = $_SESSION['example'];
-  $searchMode = $_SESSION['search'];
 
   $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
 }
@@ -36,7 +35,7 @@ if ($continueConstraints) :
   foreach ($sentence as $begin => $word) {
       $postword = preg_replace('/\./', '_', $word);
 
-      if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) { //for punctuation (!) . changes to _ (!)
+      if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) {
           $xp = $lpxml->xpath("//node[@begin='$begin']");
       } else {
           $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");

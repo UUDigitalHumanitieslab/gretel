@@ -22,7 +22,6 @@
           <header <?php if ($is_search && isset($pageHeading)) echo 'class="progress-header"'; ?>>
             <h1>
               <?php if (isset($pageHeading)) echo $pageHeading; ?>
-              <?php if ($is_search && $is_bigstep && isset($searchMode)) echo "<span>$searchMode search mode</span>"; ?>
             </h1>
             <?php if ($is_search) require "$php/secondary-navigation.php"; ?>
           </header>

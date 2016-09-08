@@ -31,12 +31,6 @@ $id = session_id();
 $time = time();
 $_SESSION['queryid'] = "$id-$time";
 
-if (!empty($_SESSION['example'])) {
-    $input = $_SESSION['example'];
-} else {
-    $input = 'Dit is een zin.';
-}
-
 require "$root/functions.php";
 require "$php/head.php";
 ?>
@@ -44,32 +38,14 @@ require "$php/head.php";
 <?php flush(); ?>
 <?php require "$php/header.php"; ?>
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
-        <p>Enter a <strong>sentence</strong> containing the (syntactic) characteristics you are looking for:</p>
+        <p>Enter a sentence, phrase, or constituent containing the (syntactic) characteristics you are looking for.</p>
         <div class="input-wrapper">
-          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="<?php echo $input; ?>" required>
+          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="Dit is een zin." required>
           <button type="reset" name="clear" title="Empty the input field">
-            <i class="fa fa-fw fa-times "></i>
+            <i class="fa fa-fw fa-times"></i>
             <span class="sr-only">Empty the input field</span>
           </button>
       </div>
-        <p>Select the <strong>search mode</strong> you want to use. <em>Basic search</em> doesn't
-            require any knowledge of the used formal query language, but it also has less
-            search options. <em>Advanced search</em> on the other hand allows a more specific
-            search and offers you the possibility to adapt the automatically generated XPath query.</p>
-        <div class="label-wrapper">
-          <label><input type="radio" name="search" value="basic" checked> Basic search</label>
-          <div class="help-tooltip" data-title="No prior XPath knowledge required, but provides less search options">
-            <i class="fa fa-fw fa-info-circle " aria-hidden="true"></i>
-            <span class="sr-only">No prior XPath knowledge required, but provides less search options for basic search</span>
-          </div>
-        </div>
-        <div class="label-wrapper">
-          <label><input type="radio" name="search" value="advanced"> Advanced search</label>
-          <div class="help-tooltip" data-title="Prior XPath knowledge required, but offers more search options">
-            <i class="fa fa-fw fa-info-circle " aria-hidden="true"></i>
-            <span class="sr-only">Prior XPath knowledge required for advanced search, but offers more search options</span>
-          </div>
-        </div>
         <?php setContinueNavigation(); ?>
     </form>
 

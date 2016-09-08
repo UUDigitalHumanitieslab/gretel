@@ -12,7 +12,7 @@ $step = 6;
 
 $id = session_id();
 
-$continueConstraints = sessionVariablesSet(array('treebank', 'search', 'queryid', 'example', 'subtreebank', 'xpath'));
+$continueConstraints = sessionVariablesSet(array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
@@ -26,7 +26,6 @@ if ($continueConstraints) {
         $_SESSION['subtreebank'] = $component;
     }
 
-    $searchMode = $_SESSION['search'];
     $example = $_SESSION['example'];
 
     if (isset($_POST['xp'])) {
@@ -48,7 +47,7 @@ if ($continueConstraints) {
 
     $_SESSION['xpath'] = $xpath;
 
-    if ($searchMode == 'advanced' && $treebank != 'sonar') {
+    if ($treebank != 'sonar') {
         $originalXp = $_POST['originalXp'];
       // Clean up $originalXp
       $originalXp = rtrim($originalXp);
@@ -115,7 +114,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "scripts/SaveXPath.php"; ?>' class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
+        <a href="scripts/SaveXPath.php" class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
           <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download XPath</a>
       </div>
         <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
