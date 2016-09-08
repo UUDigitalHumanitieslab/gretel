@@ -174,7 +174,8 @@
       foreach ($matrixOptions as $thValArray) {
         $i++;
           foreach ($thValArray as $th => $val) {
-              $tableHTML .= "<tr class='row-group-$i'><th>$th</th>";
+              $csClass = ($val == 'cs') ? 'case-sensitive' : '';
+              $tableHTML .= "<tr class='row-group-$i $csClass'><th>$th</th>";
               foreach ($sentence as $key => $word) {
                   $isPunc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
                   $word = htmlspecialchars($word, ENT_QUOTES);
@@ -185,7 +186,7 @@
                   elseif ($val == 'cs') {
                     $tableHTML .= "<td class='disabled'>";
                     if (!$isPunc) {
-                      $tableHTML .= "<input type='checkbox' name='$word--$key' value='$val' disabled>";
+                      $tableHTML .= "<input type='checkbox' name='$word--$key-case' value='$val' disabled>";
                     }
                     $tableHTML .= "</td>";
                   }
@@ -372,10 +373,8 @@
       foreach ($pts as $pt) {
           if ($pt != 'let') {
               $lemma = $pt->getAttribute('lemma');
-              // Remove _DIM from lemmas (for diminutives)
-              $lemma = preg_replace('/_DIM/', '', $lemma);
-              // Remove _ from lemmas (for compounds)
-              $lemma = preg_replace('/_/', '', $lemma);
+              // Remove _ from lemmas (for compounds) & remove _DIM from lemmas (for diminutives)
+              $lemma = preg_replace('/_(DIM)?/', '', $lemma);
               // Add lemma
               $pt->setAttribute('lemma', $lemma);
           }
@@ -386,4 +385,26 @@
       fclose($output);
 
       return $parseloc;
+  }
+
+  function applyCs($xpath) {
+    if (strpos($xpath, '@cs="no"') !== false) {
+      preg_match_all("/(?<=node\[).*?(?=node\[|\])/", $xpath, $matches);
+      foreach ($matches[0] as $match) {
+        if (strpos($match, '@cs="no"') !== false) {
+          $dummyMatch = preg_replace('/(?: and )?@cs="no"/', '', $match);
+
+            if (strpos($dummyMatch, '@word="') !== false) {
+                $dummyMatch = str_replace('@word="', 'lower-case(@word)="', $dummyMatch);
+            }
+
+            if (strpos($dummyMatch, '@lemma="') !== false) {
+                $dummyMatch = str_replace('@lemma="', 'lower-case(@lemma)="', $dummyMatch);
+            }
+
+            $xpath = preg_replace('/'.preg_quote($match, '/').'/', $dummyMatch, $xpath, 1);
+        }
+      }
+    }
+    return $xpath;
   }
