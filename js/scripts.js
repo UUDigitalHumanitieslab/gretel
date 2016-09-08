@@ -83,27 +83,7 @@ $(document).ready(function() {
                 this.setCustomValidity("");
             });
         }
-    } else if (body.hasClass("ebs") && body.hasClass("step-3")) {
-        // Specific implementation of the Tree Visualizer plugin for GrETEL:
-        // allows refreshing of page, opening tree in new window and so on
-        var tvLink = $("a.tv-show-fs");
-
-        tvLink.each(function(index) {
-            var $this = $(this);
-            $this.attr("data-tv-url", $this.attr("href"));
-            $this.attr("href", "#tv-" + (index + 1));
-        });
-        $("a.tv-show-fs").click(function(e) {
-            var $this = $(this);
-            $(".loading-wrapper").addClass("active");
-            window.history.replaceState("", document.title, window.location.pathname + $this.attr("href"));
-            body.treeVisualizer($this.data("tv-url"), {
-                normalView: false,
-                initFSOnClick: true
-            });
-            e.preventDefault();
-        });
-
+    } else if (body.hasClass("matrix")) {
         // Allow cell clicks to go down to the inputs, but prevent clicks on the input
         // going up. Otherwise, we'll get stuck in an infinite loop
         $("tbody td").click(function() {
@@ -112,28 +92,26 @@ $(document).ready(function() {
             e.stopPropagation();
         });
 
+        $(".table-wrapper .case-sensitive input[type='checkbox']").each(function(i, el) {
+          var $el = $(el);
+          if ($el.is(":checked")) {
+            $el.prop("disabled", false).parent("td").removeClass("disabled");
+          }
+        })
+
+
         // Enable disable the option for case-sensitivity
-        $(".table-wrapper input[type='radio']").change(function() {
+        $(".table-wrapper input[type='radio']").click(function() {
           var $this = $(this),
-          val = $this.val(),
+            val = $this.val(),
             i = $this.parent("td").index(),
             checkCell = $(".table-wrapper .case-sensitive td:nth-child("+(i+1)+")")
 
-          if (val == "token" || val == "lemma") {
-            if ($this.is(":checked")) {
-              checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
-            }
-            else {
-              checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
-            }
+          if (val == "token") {
+            checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
           }
           else {
-            if ($this.is(":checked")) {
-              checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
-            }
-            else {
-              checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
-            }
+            checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
           }
         });
     } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {

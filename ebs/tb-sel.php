@@ -43,8 +43,10 @@ if ($continueConstraints) :
 
       if (isset($_POST["$postword--$begin"])) {
           $postvalue = $_POST["$postword--$begin"];
+          $isCS = isset($_POST["$postword--$begin-case"]) ? "yes" : "no";
           foreach ($xp as $x) {
               $x->addAttribute('interesting', $postvalue);
+              $x->addAttribute('cs', $isCS);
           }
       }
   }
@@ -74,6 +76,8 @@ if ($continueConstraints) :
   $attsout = '-ex postag,begin,end'; // attributes to be excluded from XPath
   $xpath = `perl -CS $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
   $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath); // underspecify empty attribute values
+  // Apply case (in)sensitivity where necessary
+  $xpath = applyCs($xpath);
   $_SESSION['xpath'] = $xpath;
 
   session_write_close();

@@ -30,7 +30,6 @@ $step = 3;
 $continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
 if ($continueConstraints) {
-    $treeVisualizer = true;
     $id = session_id();
 
     $input = $_SESSION['example'];
@@ -85,7 +84,7 @@ if ($continueConstraints && !$isSpam):
 
   <h3>Guidelines</h3>
   <ul>
-    <li><strong>word</strong>: The exact word form. <strong>This is a case sensitive feature.</strong></li>
+    <li><strong>word</strong>: The exact word form. <strong>This is a case sensitive feature (cf. below).</strong></li>
     <li><strong>lemma</strong>: Word form that generalizes over inflected forms.
       For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
       <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.
@@ -95,14 +94,14 @@ if ($continueConstraints && !$isSpam):
     <code>lid</code> (article), <code>vnw</code> (pronoun), <code>vg</code> (conjunction),
     <code>bw</code> (adverb), <code>tw</code> (numeral), <code>vz</code> (preposition),
     <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
-    <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
-        It may be included in the results, but it is not requierd that it is present.</li>
     <li><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
-    <li><strong>NOT in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
+    <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
+        It may be included in the results, but it is not required that it is present.</li>
+    <li><strong>not in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
   </ul>
-  <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive, and so can proper names as a <code>lemma</code>.
-    By default case-sensitivity is <em>disabled</em> (case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.
-    Obviously, this option is not available for punctiation.</p>
+  <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive. Looking for case-insensitive proper nouns by their lemma is not possible.
+    By default case-sensitivity is <em>disabled</em> (the search is case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.
+    Obviously, this option is only available for the <code>word</code> feature.</p>
   </p>
   <?php setContinueNavigation(); ?>
 </form>
@@ -123,11 +122,6 @@ session_write_close();
 
 require "$php/footer.php";
 include "$root/scripts/AnalyticsTracking.php";
-if ($continueConstraints && !$isSpam) :
 ?>
-    <div class="loading-wrapper fullscreen tv">
-        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
-    </div>
-<?php endif; ?>
 </body>
 </html>
