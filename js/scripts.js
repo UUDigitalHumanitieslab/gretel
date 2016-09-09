@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
     var body = $("body"),
         nav1 = $(".primary-navigation"),
         $window = $(window),
@@ -17,10 +17,10 @@ $(document).ready(function() {
     function mobileMenu() {
         if ($window.width() < 721) {
             nav1.addClass("small");
-            nav1.find("button").addClass("active").prop("hidden", false);
+            nav1.find("button").addClass("active");
         } else {
             nav1.removeClass("active small");
-            nav1.find("button").removeClass("active").prop("hidden", true);
+            nav1.find("button").removeClass("active");
         }
     }
 
@@ -190,7 +190,4 @@ $(document).ready(function() {
             $("[type='radio'][name='treebank']:checked").click().change();
         }
     }
-
-
-
 });
