@@ -101,7 +101,6 @@ $tree=$twig->children;
 @children=$tree->children;
 $children[1]->cut;
 $subtree=&process_twig($root,$refpos,$mode,$split);
-$subtree=&apply_cs($subtree);
 $subtree=&cut_unary($subtree);
 
 # remove top node attributes
@@ -140,27 +139,6 @@ sub cut_unary {
 	}
 }
 
-# For the nodes that have an attribute cs=no lower-case the values
-# Later, in a PHP function applyCs() we'll then modify the generated XPath
-sub apply_cs {
-	my ($twig)=@_;
-  my @csnodes = $twig->findnodes('//[@cs]');
-  for my $csnode (@csnodes) {
-    if ($csnode->{'att'}->{'cs'} eq 'yes') {
-      $csnode->del_att('cs');
-    }
-    else {
-      if ((defined($csnode->{'att'}->{'word'}))) {
-          $lcword = lc $csnode->{'att'}->{'word'};
-          $csnode->set_att('word', $lcword);
-          $lclemma = lc $csnode->{'att'}->{'lemma'};
-          $csnode->set_att('lemma', $lclemma);
-      }
-    }
-  }
-  return $twig;
-}
-
 sub process_twig {
 	my ($twig,$refpos,$mode,$split) = @_;
 	my @children=$twig->children();
@@ -196,12 +174,11 @@ sub process_twig {
 			    }
 			    if ($interesting eq 'lemma') {
 				$int{root}++;
-      $int{cs}++;
 			    }
 			    if ($interesting eq 'token') {
 				$int{root}++;
 				$int{word}++;
-      $int{cs}++;
+        $int{casesensitive}++;
 			    }
 			}
 
@@ -218,12 +195,11 @@ sub process_twig {
 			    }
 			    if ($interesting eq 'lemma') {
 				$int{lemma}++;
-      $int{cs}++;
 			    }
 			    if ($interesting eq 'token') {
 				$int{lemma}++;
 				$int{word}++;
-      $int{cs}++;
+        $int{casesensitive}++;
 			    }
 			}
 
@@ -240,12 +216,11 @@ sub process_twig {
 			    }
 			    if ($interesting eq 'lemma') {
 				$int{lemma}++;
-      $int{cs}++;
 			    }
 			    if ($interesting eq 'token') {
 				$int{lemma}++;
 				$int{word}++;
-      $int{cs}++;
+        $int{casesensitive}++;
 			    }
 			    if ($interesting eq 'not') {
 				$twig->set_att("not")=>"relpt";
@@ -268,6 +243,7 @@ sub process_twig {
 			    if ($interesting eq 'token') {
 				$int{root}++;
 				$int{word}++;
+        $int{casesensitive}++;
 			    }
 			}
 

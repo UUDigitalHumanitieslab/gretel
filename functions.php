@@ -177,21 +177,22 @@
               $csClass = ($val == 'cs') ? 'case-sensitive' : '';
               $tableHTML .= "<tr class='row-group-$i $csClass'><th>$th</th>";
               foreach ($sentence as $key => $word) {
-                  $isPunc = preg_match("/[\.\,\?\!\:\]\[\(\)\-]/", $word);
+                  $isPunc = preg_match("/[\p{P}|^$=`´<>~]/u", $word);
+                  $puncClass = $isPunc ? 'punctuation' : '';
                   $word = htmlspecialchars($word, ENT_QUOTES);
                   if (($val == 'pos' & !$isPunc) || ($val == 'na' && $isPunc)) {
-                      $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val' checked></td>";
+                      $tableHTML .= "<td class='$puncClass'><input type='radio' name='$word--$key' value='$val' checked></td>";
                   }
                   // Case sensitive
                   elseif ($val == 'cs') {
-                    $tableHTML .= "<td class='disabled'>";
+                    $tableHTML .= "<td class='disabled $puncClass'>";
                     if (!$isPunc) {
                       $tableHTML .= "<input type='checkbox' name='$word--$key-case' value='$val' disabled>";
                     }
                     $tableHTML .= "</td>";
                   }
                   else {
-                      $tableHTML .= "<td><input type='radio' name='$word--$key' value='$val'></td>";
+                      $tableHTML .= "<td class='$puncClass'><input type='radio' name='$word--$key' value='$val'></td>";
                   }
               }
               $tableHTML .= '</tr>';
@@ -388,18 +389,16 @@
   }
 
   function applyCs($xpath) {
-    if (strpos($xpath, '@cs="no"') !== false) {
+    if (strpos($xpath, '@casesensitive="no"') !== false) {
       preg_match_all("/(?<=node\[).*?(?=node\[|\])/", $xpath, $matches);
       foreach ($matches[0] as $match) {
-        if (strpos($match, '@cs="no"') !== false) {
-          $dummyMatch = preg_replace('/(?: and )?@cs="no"/', '', $match);
-
-            if (strpos($dummyMatch, '@word="') !== false) {
-                $dummyMatch = str_replace('@word="', 'lower-case(@word)="', $dummyMatch);
-            }
-
-            if (strpos($dummyMatch, '@lemma="') !== false) {
-                $dummyMatch = str_replace('@lemma="', 'lower-case(@lemma)="', $dummyMatch);
+        if (strpos($match, '@casesensitive="no"') !== false) {
+          $dummyMatch = preg_replace('/(?: and )?@casesensitive="no"/', '', $match);
+            if (strpos($dummyMatch, '@word') !== false || strpos($dummyMatch, '@lemma') !== false) {
+              // Wrap attribute in lower-case(), and lower-case the value
+              $dummyMatch = preg_replace_callback('/@(word|lemma)="([^"]+)"/', function($matches) {
+                 return 'lower-case(@'. $matches[1]. ')="'.strtolower($matches[2]).'"';
+               }, $dummyMatch);
             }
 
             $xpath = preg_replace('/'.preg_quote($match, '/').'/', $dummyMatch, $xpath, 1);

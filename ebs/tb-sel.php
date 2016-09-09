@@ -43,10 +43,11 @@ if ($continueConstraints) :
 
       if (isset($_POST["$postword--$begin"])) {
           $postvalue = $_POST["$postword--$begin"];
-          $isCS = isset($_POST["$postword--$begin-case"]) ? "yes" : "no";
           foreach ($xp as $x) {
               $x->addAttribute('interesting', $postvalue);
-              $x->addAttribute('cs', $isCS);
+              if ($postvalue == 'token' && !isset($_POST["$postword--$begin-case"])) {
+                $x->addAttribute('casesensitive', 'no');
+              }
           }
       }
   }
