@@ -24,21 +24,24 @@ if ($continueConstraints) {
     $id = session_id();
 
     $input = $_POST['input'];
-    $_SESSION['example'] = $input;
-
-    require "$scripts/SimpleDOM.php";
 }
 
 require "$root/functions.php";
 require "$php/head.php";
+
+// Check if $input contains email addresses or website URLs
+$isSpam = ($continueConstraints) ? isSpam($input) : false;
 ?>
 </head>
 <?php flush(); ?>
 <?php
 require "$php/header.php";
 
-if ($continueConstraints) {
+if ($continueConstraints && !$isSpam) {
     require "$scripts/AlpinoParser.php";
+    require "$scripts/SimpleDOM.php";
+
+    $_SESSION['example'] = $input;
 
     // Prepare/clean up input to be tokenized in next step
     $tokinput = Tokenize($input);
@@ -67,10 +70,15 @@ if ($continueConstraints) {
   </form>
 <?php
 } else {
-    setErrorHeading('variables undefined');
-    echo '<p>It seems that you did not enter an input sentence. It is also
-    possible that you came to this page directly without first entering an input example.</p>';
-    setPreviousPageMessage(1);
+    if ($isSpam):
+        setErrorHeading("spam detected"); ?>
+        <p>Your input example contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
+    <?php else:
+        setErrorHeading('variables undefined'); ?>
+        <p>It seems that you did not enter an input sentence. It is also
+        possible that you came to this page directly without first entering an input example.</p>
+    <?php endif;
+    setPreviousPageMessage($step-1);
 }
 
 session_write_close();
@@ -78,7 +86,7 @@ session_write_close();
 require "$php/footer.php";
 if ($continueConstraints) : ?>
   <script>
-  $(document).ready(function() {
+  $(function() {
       $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>');
   });
   </script>
