@@ -1,9 +1,12 @@
 <?php
   // Returns true if we're on an ebs or xps page
-  $is_search = (isset($currentPage) && ($currentPage == 'ebs' || $currentPage == 'xps')) ? 1 : 0;
+  $isSearch = (isset($currentPage) && ($currentPage == 'ebs' || $currentPage == 'xps')) ? 1 : 0;
 
   // Returns true if we're on a page with step > 1
-  $is_bigstep = (isset($step) && $step > 1) ? 1 : 0;
+  $isBigStep = (isset($step) && $step > 1) ? 1 : 0;
+
+  $isHome = (isset($currentPage) && $currentPage == 'home') ? 1 : 0;
+  $isDocs = (isset($currentPage) && $currentPage == 'docs') ? 1 : 0;
 
   function setErrorHeading($string = '')
   {
@@ -205,9 +208,9 @@
 
   function setContinueNavigation()
   {
-      global $step, $currentPage, $ebsPages, $xpsPages, $is_bigstep;
+      global $step, $currentPage, $ebsPages, $xpsPages, $isBigStep;
       echo '<nav class="continue-btn-wrapper">';
-      if ($is_bigstep) {
+      if ($isBigStep) {
           echo '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i> Go back</button>';
       }
       if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {

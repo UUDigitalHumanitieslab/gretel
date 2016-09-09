@@ -115,7 +115,7 @@ include "$root/scripts/AnalyticsTracking.php";
 if ($continueConstraints) : ?>
     <script src="js/tree-visualizer.js"></script>
     <script>
-    $(document).ready(function() {
+    $(function(){
       $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
     });
     </script>
