@@ -95,7 +95,7 @@ require "$php/head.php";
         echo '<input type="hidden" name="originalXp" value="'.$htmlXpath.'">';
     }
     ?>
-    <textarea name="xp" wrap="soft" <?php echo $readonly;?>><?php echo $xpath; ?></textarea>
+    <textarea name="xp" wrap="soft" <?php echo $readonly;?> spellcheck="false"><?php echo $xpath; ?></textarea>
 
     <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
     <?php setContinueNavigation(); ?>

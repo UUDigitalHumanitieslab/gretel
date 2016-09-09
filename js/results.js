@@ -141,13 +141,18 @@ $(document).ready(function() {
                     // Length of associative array (Object in JS)
                     var size = Object.keys(totalArray).length;
                     if (typeof totalArray !== 'undefined' && size > 0) {
+                      var hitsSum = 0,
+                        totalSum = 0;
                         for (var database in totalArray) {
                             var databaseString = database.split("_")[2],
                                 componentHits = numericSeparator(parseInt(totalArray[database][0])),
                                 componentTotal = numericSeparator(parseInt(totalArray[database][1]));
 
+                            hitsSum += parseInt(totalArray[database][0]);
+                            totalSum += parseInt(totalArray[database][1]);
                             downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
                         }
+                        downloadWrapper.find(".distribution-wrapper tbody").append('<tr><th>Total</th><th>' + numericSeparator(hitsSum) + '</th><th>' + numericSeparator(totalSum) + '</th></tr>');
                         downloadWrapper.find(".distribution-wrapper").show();
                     }
                     if (resultsCount > phpVars.resultsLimit) {

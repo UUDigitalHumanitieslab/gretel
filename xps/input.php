@@ -42,7 +42,7 @@ require "$php/head.php";
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
-            <textarea name="xpath" wrap="soft" required><?php echo $xpath; ?></textarea>
+            <textarea name="xpath" wrap="soft" required spellcheck="false"><?php echo $xpath; ?></textarea>
             <button type="reset" name="clear" title="Empty the input field"><i class="fa fa-fw fa-times"></i></button>
         </div>
         <?php setContinueNavigation(); ?>

@@ -87,8 +87,7 @@ if ($continueConstraints && !$isSpam):
     <li><strong>word</strong>: The exact word form. <strong>This is a case sensitive feature (cf. below).</strong></li>
     <li><strong>lemma</strong>: Word form that generalizes over inflected forms.
       For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
-      <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.
-      <strong>Lemma is case insensitive (except for proper names).</strong></li>
+      <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.</li>
     <li><strong>word class</strong>: Short Dutch part-of-speech tag.
     The different tags are: <code>n</code> (noun), <code>ww</code> (verb), <code>adj</code> (adjective),
     <code>lid</code> (article), <code>vnw</code> (pronoun), <code>vg</code> (conjunction),
@@ -99,9 +98,9 @@ if ($continueConstraints && !$isSpam):
         It may be included in the results, but it is not required that it is present.</li>
     <li><strong>not in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
   </ul>
-  <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive. Looking for case-insensitive proper nouns by their lemma is not possible.
+  <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive.
     By default case-sensitivity is <em>disabled</em> (the search is case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.
-    Obviously, this option is only available for the <code>word</code> feature.</p>
+    Obviously, this option is only available for the <code>word</code> feature and not for punctuation.</p>
   </p>
   <?php setContinueNavigation(); ?>
 </form>

@@ -95,23 +95,25 @@ $(document).ready(function() {
         $(".table-wrapper .case-sensitive input[type='checkbox']").each(function(i, el) {
           var $el = $(el);
           if ($el.is(":checked")) {
-            $el.prop("disabled", false).parent("td").removeClass("disabled");
+            $el.prop("disabled", false).parent("td:not(.punctuation)").removeClass("disabled");
           }
-        })
-
+        });
 
         // Enable disable the option for case-sensitivity
         $(".table-wrapper input[type='radio']").click(function() {
           var $this = $(this),
             val = $this.val(),
-            i = $this.parent("td").index(),
+            mother = $this.parent("td:not(.punctuation)"),
+            i = mother.index(),
             checkCell = $(".table-wrapper .case-sensitive td:nth-child("+(i+1)+")")
 
-          if (val == "token") {
-            checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
-          }
-          else {
-            checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
+          if (mother.length) {
+            if (val == "token") {
+              checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
+            }
+            else {
+              checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
+            }
           }
         });
     } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {
