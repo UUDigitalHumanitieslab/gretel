@@ -325,7 +325,7 @@
                     li = $this.parent("li");
 
                 if (li.data("rel")) {
-                    $this.append("<span>" + li.data("rel") + "<span>");
+                    $this.append("<span>" + li.data("rel") + "</span>");
                     if (li.data("index")) $this.append("<span>" + li.data("index") + "</span>");
                 }
 
