@@ -444,10 +444,12 @@
 }
 
 .tree-visualizer-fs .tree.small a.hovered, .tree-visualizer-fs .tree.small a:hover {
-  -webkit-transform: scale(1.9);
-      -ms-transform: scale(1.9);
-          transform: scale(1.9);
+  -webkit-transform: scale(2);
+      -ms-transform: scale(2);
+          transform: scale(2);
   z-index: 3;
+  background: #8e7f6b;
+  color: #FFF !important;
   border-color: transparent !important;
 }
 
@@ -473,12 +475,10 @@
   -webkit-transform: scale(3);
       -ms-transform: scale(3);
           transform: scale(3);
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .tree-visualizer-fs .tree.x-small a.only-child.hovered, .tree-visualizer-fs .tree.x-small a.only-child:hover {
   margin-bottom: 5em;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .tree-visualizer-fs .tree.x-small a.only-child.hovered ~ span, .tree-visualizer-fs .tree.x-small a.only-child:hover ~ span {

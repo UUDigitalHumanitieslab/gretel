@@ -748,9 +748,23 @@ dd p:last-child {
           transform: translateX(-50%);
 }
 
+.primary-navigation button {
+  display: none;
+  width: 40px;
+  -webkit-align-self: flex-end;
+      -ms-flex-item-align: end;
+          align-self: flex-end;
+}
+
+.primary-navigation button i {
+  transition: -webkit-transform 200ms;
+  transition: transform 200ms;
+  transition: transform 200ms, -webkit-transform 200ms;
+}
+
 .primary-navigation.small {
   position: relative;
-  z-index: 5;
+  z-index: 1;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -802,16 +816,7 @@ dd p:last-child {
 }
 
 .primary-navigation.small button {
-  width: 40px;
-  -webkit-align-self: flex-end;
-      -ms-flex-item-align: end;
-          align-self: flex-end;
-}
-
-.primary-navigation.small button i {
-  transition: -webkit-transform 200ms;
-  transition: transform 200ms;
-  transition: transform 200ms, -webkit-transform 200ms;
+  display: block;
 }
 
 .primary-navigation.small.active ul {
@@ -904,6 +909,9 @@ dd p:last-child {
 
 /* Circular - small circles on small screen size */
 @media all and (max-width: 1239px) {
+  .page-header {
+    padding-bottom: 1.25em;
+  }
   .secondary-navigation .progressbar {
     font-size: 14px;
   }
@@ -1150,6 +1158,52 @@ dd p:last-child {
 /* PAGE SPECIFIC */
 /* ============= */
 /* HOME */
+.docs main header,
+.home main header {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.docs main header .project-web-wrapper a,
+.home main header .project-web-wrapper a {
+  background: #ad9f8e;
+  box-shadow: inset 0 -1px rgba(0, 0, 0, 0.24);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 0 none;
+  display: block;
+  font-size: 88%;
+}
+
+.docs main header .project-web-wrapper a i,
+.home main header .project-web-wrapper a i {
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.docs main header .project-web-wrapper a:hover,
+.home main header .project-web-wrapper a:hover {
+  background: #93816b;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.docs main header .project-web-wrapper a:active,
+.home main header .project-web-wrapper a:active {
+  box-shadow: none;
+  -webkit-transform: translateY(1px);
+      -ms-transform: translateY(1px);
+          transform: translateY(1px);
+}
+
 .home .citation-wrapper {
   padding-top: 36px;
   border-top: 1px solid #eaeaea;
@@ -1381,6 +1435,7 @@ dd p:last-child {
   border: 1px solid #dedede;
   border-radius: 4px;
   position: relative;
+  min-height: 190px;
 }
 
 #results .results-download-wrapper:not(.active)::after {
@@ -1404,7 +1459,8 @@ dd p:last-child {
   position: relative;
 }
 
-#results .results-download-wrapper h3, #results .results-download-wrapper .distribution-wrapper .table-wrapper {
+#results .results-download-wrapper .distribution-wrapper .table-wrapper,
+#results .results-download-wrapper h3 {
   margin-top: 0;
   text-align: left;
 }
@@ -1798,6 +1854,30 @@ dd p:last-child {
 .xps.step-1 .input-wrapper button:active i {
   -webkit-animation: reset-btn-rotate 300ms;
           animation: reset-btn-rotate 300ms;
+}
+
+@media all and (max-width: 768px) {
+  #query-overview .flex-content,
+  #results .content {
+    display: block;
+  }
+  #query-overview p,
+  .results-download-wrapper {
+    margin: 20px auto 0;
+    padding: 12px;
+  }
+  #results .messages {
+    margin: 0 auto;
+  }
+  .results .download-link {
+    margin-bottom: 0;
+  }
+  .results-download-wrapper {
+    padding: 0;
+  }
+  .distribution-wrapper {
+    margin-top: 12px;
+  }
 }
 
 .ebs .progress-header,
