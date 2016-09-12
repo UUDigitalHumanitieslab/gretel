@@ -52,10 +52,15 @@ if ($continueConstraints) :
       }
   }
   // save parse with @interesting annotations
-  $inttree = fopen("$tmp/$id-int.xml", 'w');
+  $treefileName = "$tmp/$id-int.xml";
+  if (file_exists($treefileName)) {
+      unlink($treefileName);
+  }
   $tree = $lpxml->asXML();
-  fwrite($inttree, "$tree\n");
-  fclose($inttree);
+
+  $treeFh = fopen($treefileName, 'w');
+  fwrite($treeFh, "$tree\n");
+  fclose($treeFh);
 
   // Remove top category?
   if (isset($_POST['topcat'])) {

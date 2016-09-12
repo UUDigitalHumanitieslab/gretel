@@ -343,9 +343,8 @@
   {
     // NOTE: backslash needs to be escaped twice
     $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
-    $emailRegex = '/[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+/';
 
-    if (preg_match($websiteRegex, $string) || preg_match($emailRegex, $string)) {
+    if (preg_match($websiteRegex, $string) || filter_var($string, FILTER_VALIDATE_EMAIL)) {
       return true;
     }
     return false;
@@ -367,7 +366,6 @@
   function ModifyLemma($parse, $id, $tmp)
   {
       $parseloc = "$tmp/$id-pt.xml";
-      $input = fopen($parse, 'r');
       $output = fopen($parseloc, 'w');
       // Read alpino parse
       $xml = simpledom_load_file($parse);
