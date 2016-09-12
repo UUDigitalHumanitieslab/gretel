@@ -20,12 +20,12 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints) :
     // Set tokenized input sentence to variable
@@ -69,7 +69,7 @@ if ($continueConstraints) :
       $remove = '-r rel';
   }
 
-  `perl -CS $scripts/GetSubtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
+  `perl -CS $root/preparatory-scripts/get-subtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
 
   if (isset($_POST['order'])) {
       $order = '-order';
@@ -80,7 +80,7 @@ if ($continueConstraints) :
 
   // generate XPath from sentence
   $attsout = '-ex postag,begin,end'; // attributes to be excluded from XPath
-  $xpath = `perl -CS $scripts/XPathGenerator.pl -xml $tmp/$id-sub.xml $attsout $order`;
+  $xpath = `perl -CS $root/preparatory-scripts/xpath-generator.pl -xml $tmp/$id-sub.xml $attsout $order`;
   $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath); // underspecify empty attribute values
   // Apply case (in)sensitivity where necessary
   $xpath = applyCs($xpath);
@@ -112,13 +112,13 @@ else: ?>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
 
     <div class="cgn" style="display:none">
-      <?php require "$scripts/tb-cgn.php"; ?>
+      <?php require "$root/front-end-includes/tb-cgn.php"; ?>
     </div>
     <div class="lassy" style="display:none">
-      <?php require "$scripts/tb-lassy.php"; ?>
+      <?php require "$root/front-end-includes/tb-lassy.php"; ?>
     </div>
     <div class="sonar" style="display:none">
-      <?php require "$scripts/tb-sonar.php"; ?>
+      <?php require "$root/front-end-includes/tb-sonar.php"; ?>
     </div>
     <?php setContinueNavigation(); ?>
   </form>
@@ -133,8 +133,8 @@ else:
   <?php setPreviousPageMessage($step - 1);
 endif;
 
-require "$php/footer.php";
-include "$root/scripts/analytics-tracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

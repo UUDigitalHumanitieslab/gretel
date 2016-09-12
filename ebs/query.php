@@ -49,11 +49,11 @@ if ($continueConstraints) {
 session_write_close();
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$php/header.php"; ?>
+<?php require "$root/front-end-includes/header.php"; ?>
 
 <?php if ($continueConstraints) :
   $component = implode(', ', $component);
@@ -109,8 +109,8 @@ require "$php/head.php";
 <?php
     setPreviousPageMessage(4);
 endif;  // $continueConstraints
-require "$php/footer.php";
-include "$root/scripts/analytics-tracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints) : ?>
     <script src="js/tree-visualizer.js"></script>

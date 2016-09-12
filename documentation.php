@@ -4,11 +4,11 @@ $currentPage="docs";
 
 require "$root/functions.php";
 
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 
-        <?php require "$php/header.php"; ?>
+        <?php require "$root/front-end-includes/header.php"; ?>
             <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
                 frequently asked questions, and other information. If you have any more questions, you can always
                 <a href="#faq-4" title="FAQ how to contact us">contact us</a>.</p>
@@ -117,8 +117,8 @@ require "$php/head.php";
     </div>
 
     <?php
-    require "$php/footer.php";
-    include "$root/scripts/analytics-tracking.php";
+    require "$root/front-end-includes/footer.php";
+    include "$root/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

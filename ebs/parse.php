@@ -27,7 +27,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 
 // Check if $input contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($input) : false;
@@ -35,11 +35,11 @@ $isSpam = ($continueConstraints) ? isSpam($input) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam) {
-    require "$scripts/alpino-parser.php";
-    require "$scripts/simple-dom.php";
+    require "$root/preparatory-scripts/alpino-parser.php";
+    require "$root/preparatory-scripts/simple-dom.php";
 
     $_SESSION['example'] = $input;
 
@@ -83,7 +83,7 @@ if ($continueConstraints && !$isSpam) {
 
 session_write_close();
 
-require "$php/footer.php";
+require "$root/front-end-includes/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(function() {
@@ -91,7 +91,7 @@ if ($continueConstraints) : ?>
   });
   </script>
 <?php endif;
-include "$root/scripts/analytics-tracking.php";
+include "$root/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

@@ -18,7 +18,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 
 // Check if $xpath contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
@@ -27,7 +27,7 @@ $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam) {
     // Clean up XPath
@@ -49,10 +49,10 @@ if ($continueConstraints && !$isSpam) {
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
 
     <div class="cgn" style="display:none">
-      <?php require "$scripts/tb-cgn.php"; ?>
+      <?php require "$root/front-end-includes/tb-cgn.php"; ?>
     </div>
     <div class="lassy" style="display:none">
-      <?php require "$scripts/tb-lassy.php"; ?>
+      <?php require "$root/front-end-includes/tb-lassy.php"; ?>
     </div>
     <?php setContinueNavigation(); ?>
   </form>
@@ -73,8 +73,8 @@ else {
 ?>
 
 <?php
-require "$php/footer.php";
-include "$root/scripts/analytics-tracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

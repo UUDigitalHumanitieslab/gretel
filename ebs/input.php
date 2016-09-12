@@ -32,11 +32,11 @@ $time = time();
 $_SESSION['queryid'] = "$id-$time";
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$php/header.php"; ?>
+<?php require "$root/front-end-includes/header.php"; ?>
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a sentence, phrase, or constituent containing the (syntactic) characteristics you are looking for.</p>
         <div class="input-wrapper">
@@ -50,8 +50,8 @@ require "$php/head.php";
     </form>
 
     <?php
-    require "$php/footer.php";
-    include "$root/scripts/analytics-tracking.php";
+    require "$root/front-end-includes/footer.php";
+    include "$root/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

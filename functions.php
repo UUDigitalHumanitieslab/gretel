@@ -29,8 +29,9 @@
           $message .= "go to <a href='$href' title='Go to a previous step'>step $goToStep</a> ";
 
           if ($goToStep == 1) $message .= "and try a new example ";
+          $message .= "or ";
       }
-      $message .= "or go directly to <a href='index.php' title='Go to the homepage'>the homepage</a>.</p>";
+      $message .= "go directly to <a href='index.php' title='Go to the homepage'>the homepage</a>.</p>";
       echo $message;
   }
 

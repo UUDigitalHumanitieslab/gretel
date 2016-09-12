@@ -27,7 +27,7 @@
               <?php if (isset($pageHeading)) echo $pageHeading; ?>
             </h1>
             <?php if ($isSearch) {
-              require "$php/secondary-navigation.php";
+              require "$root/front-end-includes/secondary-navigation.php";
             }
             else if ($isHome || $isDocs) {?>
               <div class="project-web-wrapper">

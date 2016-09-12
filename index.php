@@ -5,11 +5,11 @@ require "$root/helpers.php";
 $currentPage = 'home';
 require "$root/functions.php";
 
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 
-        <?php require "$php/header.php"; ?>
+        <?php require "$root/front-end-includes/header.php"; ?>
             <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
@@ -64,8 +64,8 @@ require "$php/head.php";
     </div>
 
     <?php
-    require "$php/footer.php";
-    include "$root/scripts/analytics-tracking.php";
+    require "$root/front-end-includes/footer.php";
+    include "$root/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

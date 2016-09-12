@@ -36,13 +36,13 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints):
   // Set tokenized input sentence to variable
@@ -112,8 +112,8 @@ endif;
 
 session_write_close();
 
-require "$php/footer.php";
-include "$root/scripts/analytics-tracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

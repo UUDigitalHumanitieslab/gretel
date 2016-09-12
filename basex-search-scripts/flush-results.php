@@ -26,7 +26,7 @@ $context = $_SESSION['ct'];
 
 session_write_close();
 
-require "$scripts/basex-client.php";
+require "$root/basex-search-scripts/basex-client.php";
 require "$scripts/treebank-search.php";
 
 try {
@@ -77,7 +77,7 @@ try {
 
         $componentString = strtoupper($componentString);
 
-        $sentenceidlink = '<a class="tv-show-fs" href="scripts/show-tree.php'.
+        $sentenceidlink = '<a class="tv-show-fs" href="front-end-includes/show-tree.php'.
           '?sid='.$sidString.
           '&tb='.$treebank.
           '&db='.$databaseString.

@@ -72,7 +72,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
@@ -93,7 +93,7 @@ session_write_close();
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints):
 ?>
@@ -114,7 +114,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href="scripts/save-xpath.php" class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
+        <a href="front-end-includes/save-xpath.php" class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
           <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download XPath</a>
       </div>
         <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
@@ -190,8 +190,8 @@ if ($continueConstraints):
         the text number, and the location within the text
         (<em>p</em> page numbers, <em>s</em> sentence number).
       </p>
-      <?php include "$php/results-controls.php"; ?>
-      <?php require "$php/results-table-wrapper.php"; ?>
+      <?php include "$root/front-end-includes/results-controls.php"; ?>
+      <?php require "$root/front-end-includes/results-table-wrapper.php"; ?>
     </div>
 </section>
 <?php
@@ -205,14 +205,14 @@ else: // $continueConstraints
     setPreviousPageMessage(4);
 
 endif;
-require "$php/footer.php";
-include "$root/scripts/analytics-tracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints) : ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
-    <?php include "$php/notifications.php"; ?>
+    <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
         'fetchResultsPath' => "$home/php/flush-results.php",

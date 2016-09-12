@@ -299,4 +299,4 @@
     </tbody>
 </table>
 </div>
-<?php require "$scripts/tb-options.php"; ?>
+<?php require "$root/front-end-includes/tb-options.php"; ?>

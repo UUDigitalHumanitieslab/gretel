@@ -1,7 +1,7 @@
 <?php
 require "../config/config.php";
 
-require "$scripts/basex-client.php";
+require "$root/basex-search-scripts/basex-client.php";
 require "$scripts/treebank-count.php";
 require "$scripts/treebank-search.php";
 

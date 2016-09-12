@@ -190,7 +190,7 @@ $(function(){
         disableAndEnableInputs();
         refillVisibleResults();
 
-        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #results-found', function() {
+        messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #results-found', function() {
             if (doneCounting) {
                 messages.find(".amount-hits").html(numericSeparator(parseInt(resultsCount)));
                 messages.find(".is-still-counting").remove();
@@ -217,7 +217,7 @@ $(function(){
         resultsWrapper.add(controls).add(dummy).remove();
         $("#results .content").addClass("no-results");
 
-        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #no-results-found', function() {
+        messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
     }
@@ -226,7 +226,7 @@ $(function(){
         resultsWrapper.add(controls).add(dummy).remove();
         $("#results .content").addClass("error");
 
-        messages.load(phpVars.fetchHomePath + '/php/results-messages.php #error', function() {
+        messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
@@ -495,7 +495,7 @@ $(function(){
 
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
-            messages.load(phpVars.fetchHomePath + '/php/results-messages.php #looking-for-tree', function() {
+            messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #looking-for-tree', function() {
                 messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
                 downloadWrapper.addClass("active");
             });
