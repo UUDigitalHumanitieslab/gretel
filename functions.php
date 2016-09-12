@@ -219,7 +219,7 @@
       echo '</nav>';
   }
 
-  function xpath2Bf($xpath)
+  function xpathToBreadthFirst($xpath)
   {
       $bfresult;
       // Divide XPath in top-most level, and the rest (its "descendants")
@@ -350,7 +350,7 @@
     return false;
   }
 
-  function Tokenize($sentence)
+  function tokenize($sentence)
   {
     // Add space before and after punctuation marks
     $sentence = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence);
@@ -363,7 +363,7 @@
     return $sentence;
   }
 
-  function ModifyLemma($parse, $id, $tmp)
+  function modifyLemma($parse, $id, $tmp)
   {
       $parseloc = "$tmp/$id-pt.xml";
       $output = fopen($parseloc, 'w');

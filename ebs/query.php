@@ -59,7 +59,7 @@ require "$php/head.php";
   $component = implode(', ', $component);
   $xpath = rtrim($xpath);
 
-  //log query tree
+  // Log query tree
   $qTree = file_get_contents("$tmp/$id-sub.xml");
   $treeLog = fopen("$log/gretel-querytrees.log", 'a');
   fwrite($treeLog, "<alpino_ds id=\"$queryId\">$qTree\n</alpino_ds>\n");
@@ -110,7 +110,7 @@ require "$php/head.php";
     setPreviousPageMessage(4);
 endif;  // $continueConstraints
 require "$php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
+include "$root/scripts/analytics-tracking.php";
 
 if ($continueConstraints) : ?>
     <script src="js/tree-visualizer.js"></script>

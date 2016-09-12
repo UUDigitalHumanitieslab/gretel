@@ -1,9 +1,9 @@
 <?php
 require "../config/config.php";
 
-require "$scripts/BaseXClient.php";
-require "$scripts/TreebankCount.php";
-require "$scripts/TreebankSearch.php";
+require "$scripts/basex-client.php";
+require "$scripts/treebank-count.php";
+require "$scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);
@@ -26,7 +26,7 @@ else {
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 }
 
-list($sum, $counts) = GetCounts($xpath, $treebank, $component, $includes, $session);
+list($sum, $counts) = getCounts($xpath, $treebank, $component, $includes, $session);
 
 $session->close();
 

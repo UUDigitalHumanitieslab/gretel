@@ -36,7 +36,7 @@ if (isset($_GET['db'])) {
 
 require '../config/config.php';
 require "$root/helpers.php";
-require "$scripts/BaseXClient.php";
+require "$scripts/basex-client.php";
 
 try {
     if ($treebank == 'sonar') {

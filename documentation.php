@@ -118,7 +118,7 @@ require "$php/head.php";
 
     <?php
     require "$php/footer.php";
-    include "$root/scripts/AnalyticsTracking.php";
+    include "$root/scripts/analytics-tracking.php";
     ?>
 </body>
 </html>

@@ -19,10 +19,6 @@ if ($treebank == 'sonar') {
 }
 
 $databaseString = $treebank;
-
-if ($_SESSION['ebsxps'] == 'ebs') {
-    $example = $_SESSION['example'];
-}
 $xpath = $_SESSION['xpath'];
 
 // get context option
@@ -30,18 +26,18 @@ $context = $_SESSION['ct'];
 
 session_write_close();
 
-require "$scripts/BaseXClient.php";
-require "$scripts/TreebankSearch.php";
+require "$scripts/basex-client.php";
+require "$scripts/treebank-search.php";
 
 try {
     if ($treebank == 'sonar') {
         $dbhost = $dbnameServerSonar{$component[0]};
         $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
-        list($sentences, $tblist, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
+        list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
     }
     else {
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
+        list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
     }
     $session->close();
 
@@ -52,14 +48,14 @@ try {
 
     foreach ($sentences as $sid => $sentence) {
         // highlight sentence
-        $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
+        $hlsentence = highlightSentence($sentence, $beginlist[$sid], 'strong');
         // deal with quotes/apos
         $trans = array('"' => '&quot;', "'" => "&apos;");
         $hlsentence = strtr($hlsentence, $trans);
 
         if ($treebank == 'sonar') $databaseString = $tblist[$sid];
 
-        // remove the added identifier (see GetSentences) to use in the link
+        // remove the added identifier (see getSentences) to use in the link
         $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
 
         // subtreebank where the sentence was found:
@@ -81,7 +77,7 @@ try {
 
         $componentString = strtoupper($componentString);
 
-        $sentenceidlink = '<a class="tv-show-fs" href="scripts/ShowTree.php'.
+        $sentenceidlink = '<a class="tv-show-fs" href="scripts/show-tree.php'.
           '?sid='.$sidString.
           '&tb='.$treebank.
           '&db='.$databaseString.
@@ -94,7 +90,6 @@ try {
       'error' => false,
       'data' => $resultsArray,
     );
-    header_remove('Set-Cookie');
     echo json_encode($results);
   }
   else {
@@ -102,7 +97,6 @@ try {
       'error' => false,
       'data' => '',
     );
-    header_remove('Set-Cookie');
     echo json_encode($results);
   }
 } catch (Exception $e) {
@@ -110,6 +104,5 @@ try {
       'error' => true,
       'data' => $e->getMessage(),
     );
-    header_remove('Set-Cookie');
     echo json_encode($results);
 }

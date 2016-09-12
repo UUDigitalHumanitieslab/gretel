@@ -3,10 +3,10 @@
  * $databases is actually a copy of the first breadth-first pattern. One would
  * argue that includes was a better name. However, to keep some cohesion between
  * SONAR on the one hand and CGN and Lassy on the other, we call both the includes
- * as well as the result of Corpus2DB "databases"
+ * as well as the result of corpusToDatabase "databases"
  *
  */
-function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)
+function getCounts($xpath, $treebank, $subtreebank, $databases, $session)
 {
     global $cats;
     if ($treebank == 'sonar') {
@@ -20,7 +20,7 @@ function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)
         }
     }
     else {
-        $databases = Corpus2DB($subtreebank, $treebank);
+        $databases = corpusToDatabase($subtreebank, $treebank);
     }
     $sum = 0;
     $counts = array();
@@ -32,7 +32,7 @@ function GetCounts($xpath, $treebank, $subtreebank, $databases, $session)
         }
 
         if (!empty($database)) {
-            $xquery = CreateXQueryCount($xpath, $database, $treebank);
+            $xquery = createXqueryCount($xpath, $database, $treebank);
             $query = $session->query($xquery);
 
             if ($treebank != 'sonar') {
@@ -76,7 +76,7 @@ function createCsvCounts($sum, $counts) {
   }
 }
 
-function CreateXQueryCount($xpath, $db, $treebank)
+function createXqueryCount($xpath, $db, $treebank)
 {
     $for = 'count(for $node in db:open("'.$db.'")/treebank';
     if ($treebank == 'sonar') $for .= '/tree';

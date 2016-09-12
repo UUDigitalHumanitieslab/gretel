@@ -5,7 +5,7 @@
  * for the GrETEL2.0 project
  */
 
-function Alpino($sentence,$id) {
+function alpino($sentence,$id) {
   require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $tmp)
 
   $descriptorspec = array(

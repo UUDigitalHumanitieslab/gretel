@@ -37,7 +37,7 @@ $time = time();
 $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 if ($ebsxps == 'ebs') {
-    $xplog = fopen("$log/gretel-ebq.log", 'w');
+    $xplog = fopen("$log/gretel-ebq.log", 'a');
     if ($treebank != "sonar") {
       // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
       fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
@@ -49,23 +49,23 @@ if ($ebsxps == 'ebs') {
     fclose($xplog);
 }
 else {
-    $xplog = fopen("$log/gretel-xps.log", 'w');
+    $xplog = fopen("$log/gretel-xps.log", 'a');
     fwrite($xplog, "$date\t$user\t$id-$time\t$treebank\t$componentString\t$xpath\n");
     fclose($xplog);
 }
 
-require "$scripts/BaseXClient.php";
-require "$scripts/TreebankSearch.php";
+require "$scripts/basex-client.php";
+require "$scripts/treebank-search.php";
 
   try {
       if ($treebank == 'sonar') {
           $dbhost = $dbnameServerSonar[$component[0]];
           $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
-          list($sentences, $tblist, $idlist, $beginlist) = GetSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
+          list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
       }
       else {
           $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-          list($sentences, $idlist, $beginlist) = GetSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
+          list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
       }
       $session->close();
 
@@ -83,7 +83,7 @@ require "$scripts/TreebankSearch.php";
 
       foreach ($sentences as $sid => $sentence) {
           // highlight sentence
-          $hlsentence = HighlightSentence($sentence, $beginlist[$sid], 'strong');
+          $hlsentence = highlightSentence($sentence, $beginlist[$sid], 'strong');
 
           $changeTags = array('<em>' => '', '</em>' => '', '<strong>' => '<hit>', '</strong>' => '</hit>');
           $hlsentenceDownload = strtr($hlsentence, $changeTags);
@@ -120,7 +120,7 @@ require "$scripts/TreebankSearch.php";
 
           // For Lassy and CGN tb and db are identical (i.e. lassy & lassy, or cgn & cgn).
           // For Sonar tb is sonar, and db something like WRPEC0000019treebank
-          $sentenceidlink = '<a class="tv-show-fs" href="scripts/ShowTree.php'.
+          $sentenceidlink = '<a class="tv-show-fs" href="scripts/show-tree.php'.
             '?sid='.$sidString.
             '&tb='.$treebank.
             '&db='.$databaseString.

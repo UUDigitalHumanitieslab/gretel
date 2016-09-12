@@ -83,7 +83,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href='<?php echo "scripts/SaveXPath.php"; ?>' class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
+        <a href='<?php echo "scripts/save-xpath.php"; ?>' class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
           <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download XPath</a>
       </div>
         <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
@@ -171,7 +171,7 @@ else: // $continueConstraints
 endif;
 session_write_close();
 require "$php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
+include "$root/scripts/analytics-tracking.php";
 
 if ($continueConstraints) : ?>
     <div class="loading-wrapper fullscreen tv">

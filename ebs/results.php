@@ -76,7 +76,7 @@ require "$php/head.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
-    $bf = xpath2Bf($xpath);
+    $bf = xpathToBreadthFirst($xpath);
     if (!empty($bf)) {
       $_SESSION['bf'] = $component . $bf;
       array_push($_SESSION['includes'], $_SESSION['bf']);
@@ -114,7 +114,7 @@ if ($continueConstraints):
             </tbody>
           </table>
         </div>
-        <a href="scripts/SaveXPath.php" class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
+        <a href="scripts/save-xpath.php" class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
           <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download XPath</a>
       </div>
         <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
@@ -206,7 +206,7 @@ else: // $continueConstraints
 
 endif;
 require "$php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
+include "$root/scripts/analytics-tracking.php";
 
 if ($continueConstraints) : ?>
     <div class="loading-wrapper fullscreen tv">

@@ -38,16 +38,16 @@ $isSpam = ($continueConstraints) ? isSpam($input) : false;
 require "$php/header.php";
 
 if ($continueConstraints && !$isSpam) {
-    require "$scripts/AlpinoParser.php";
-    require "$scripts/SimpleDOM.php";
+    require "$scripts/alpino-parser.php";
+    require "$scripts/simple-dom.php";
 
     $_SESSION['example'] = $input;
 
     // Prepare/clean up input to be tokenized in next step
-    $tokinput = Tokenize($input);
+    $tokinput = tokenize($input);
     $_SESSION['sentence'] = $tokinput;
-    $parse = Alpino($tokinput, $id);
-    $parseloc = ModifyLemma($parse, $id, $tmp);
+    $parse = alpino($tokinput, $id);
+    $parseloc = modifyLemma($parse, $id, $tmp);
 ?>
 
   <p>You find the structure of the tagged and parsed sentence below.
@@ -91,7 +91,7 @@ if ($continueConstraints) : ?>
   });
   </script>
 <?php endif;
-include "$root/scripts/AnalyticsTracking.php";
+include "$root/scripts/analytics-tracking.php";
 ?>
 </body>
 </html>

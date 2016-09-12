@@ -49,7 +49,7 @@ function includeAlreadyExists($include) {
   }
 }
 
-function Corpus2DB($tblist, $treebank)
+function corpusToDatabase($tblist, $treebank)
 {
     // rename corpora to database names
     $databases = array();
@@ -70,7 +70,7 @@ function Corpus2DB($tblist, $treebank)
 
 
 
-function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration, $session)
+function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration, $session)
 {
     global $flushLimit, $resultsLimit;
     $nrofmatches = 0;
@@ -112,7 +112,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
 
     if ($nrofmatches < $flushLimit) {
       // rename corpora to database names
-      $database = Corpus2DB($subtreebank, $treebank);
+      $database = corpusToDatabase($subtreebank, $treebank);
 
       $dbLength = count($database);
 
@@ -121,7 +121,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
-          $input = CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration);
+          $input = createXquery($xpath, $db, $treebank, $context, $endPosIteration);
 
           // create query instance
           $query = $session->query($input);
@@ -199,7 +199,7 @@ function GetSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     }
 }
 
-function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session) {
+function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session) {
     global $flushLimit, $resultsLimit;
     $nrofmatches = 0;
 
@@ -248,7 +248,7 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
-          $input = CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration);
+          $input = createXquery($xpath, $db, $treebank, $context, $endPosIteration);
 
           // create query instance
           $query = $session->query($input);
@@ -328,7 +328,7 @@ function GetSentencesSonar($xpath, $treebank, $component, $includes, $context, $
     }
 }
 
-function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
+function createXquery($xpath, $db, $treebank, $context, $endPosIteration)
 {
     global $flushLimit, $resultsLimit;
 
@@ -395,13 +395,14 @@ function CreateXQuery($xpath, $db, $treebank, $context, $endPosIteration)
     return $xquery;
 }
 
-function HighlightSentence($sentence, $beginlist, $tag)
+function highlightSentence($sentence, $beginlist, $tag)
 {
 
     if (preg_match('/<em>/', $sentence)) {
-        $s = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$2', $sentence);
-        $prev = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$1', $sentence);
-        $next = preg_replace("/(.*<em>)(.*?)(<\/em>.*)/", '$3', $sentence);
+      preg_match("/(.*<em>)(.*?)(<\/em>.*)/", $sentence, $groups);
+        $s = $groups[2];
+        $prev = $groups[1];
+        $next = $groups[3];
     } else {
         $s = $sentence;
     }
@@ -427,7 +428,7 @@ function HighlightSentence($sentence, $beginlist, $tag)
     }
     $hlsentence= implode(' ', $words);
     if (isset($prev)||isset($next)) {
-      $hlsentence=$prev.' '.$hlsentence.' '.$next;
+      $hlsentence = $prev.' '.$hlsentence.' '.$next;
     }
     return $hlsentence;
 }
