@@ -56,14 +56,14 @@ require "$php/head.php";
 <?php require "$php/header.php"; ?>
 
 <?php if ($continueConstraints) :
-    $component = implode(', ', $component);
+  $component = implode(', ', $component);
   $xpath = rtrim($xpath);
 
-    //log query tree
-  $qtree = file_get_contents("$tmp/$id-sub.xml");
-  $tlog = fopen("$log/gretel-querytrees.log", 'a');  //concatenate
-  fwrite($tlog, "<alpino_ds id=\"$queryId\">$qtree\n</alpino_ds>\n");
-  fclose($tlog);
+  //log query tree
+  $qTree = file_get_contents("$tmp/$id-sub.xml");
+  $treeLog = fopen("$log/gretel-querytrees.log", 'a');
+  fwrite($treeLog, "<alpino_ds id=\"$queryId\">$qTree\n</alpino_ds>\n");
+  fclose($treeLog);
 ?>
 
 <ul>
@@ -115,7 +115,7 @@ include "$root/scripts/AnalyticsTracking.php";
 if ($continueConstraints) : ?>
     <script src="js/tree-visualizer.js"></script>
     <script>
-    $(document).ready(function() {
+    $(function(){
       $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
     });
     </script>

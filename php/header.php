@@ -14,15 +14,26 @@
                     <li><a href="documentation.php" title="Documentation"
                     <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
                 </ul>
-                <button name="show-menu" hidden><i class="fa fa-fw fa-bars"></i></button>
+                <button name="show-menu">
+                  <i class="fa fa-fw fa-bars" aria-hidden="true"></i>
+                  <span class="sr-only">Open the mobile menu</span>
+                </button>
             </nav>
         </header>
         <main>
 
-          <header <?php if ($is_search && isset($pageHeading)) echo 'class="progress-header"'; ?>>
+          <header <?php if ($isSearch && isset($pageHeading)) echo 'class="progress-header"'; ?>>
             <h1>
               <?php if (isset($pageHeading)) echo $pageHeading; ?>
             </h1>
-            <?php if ($is_search) require "$php/secondary-navigation.php"; ?>
+            <?php if ($isSearch) {
+              require "$php/secondary-navigation.php";
+            }
+            else if ($isHome || $isDocs) {?>
+              <div class="project-web-wrapper">
+                <a href="http://gretel.ccl.kuleuven.be/project/" title="Go to the project website" target="_blank">GrETEL project website<i class="fa fa-external-link" aria-hidden="true"></i></a>
+              </div>
+            <?php }
+            ?>
           </header>
-          <?php if ($is_search) echo "<h2><span>Step $step:</span> " . $searchStepHeadings[$step-1] . "</h2>"; ?>
+          <?php if ($isSearch) echo "<h2><span>Step $step:</span> " . $searchStepHeadings[$step-1] . "</h2>"; ?>

@@ -38,15 +38,13 @@ if ($continueConstraints) {
 require "$root/functions.php";
 require "$php/head.php";
 
-// Check if $input contains email addresses or website URLs
-$isSpam = ($continueConstraints) ? isSpam($input) : false;
 ?>
 </head>
 <?php flush(); ?>
 <?php
 require "$php/header.php";
 
-if ($continueConstraints && !$isSpam):
+if ($continueConstraints):
   // Set tokenized input sentence to variable
   $tokinput = $_SESSION['sentence'];
   $sentence = explode(' ', $tokinput);
@@ -106,15 +104,10 @@ if ($continueConstraints && !$isSpam):
 </form>
 <?php
 else:
-    if ($isSpam):
-        setErrorHeading("Spam detected"); ?>
-        <p>Your input example contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
-    <?php else:
-        setErrorHeading(); ?>
-        <p>No search instruction could be generated, since you did not enter a sentence.
-            It is also possible that you came to this page directly without first entering a query.</p>
-    <?php endif;
-    setPreviousPageMessage($step-1);
+  setErrorHeading(); ?>
+  <p>No search instruction could be generated, since you did not enter a sentence.
+    It is also possible that you came to this page directly without first entering a query.</p>
+  <?php setPreviousPageMessage($step-1);
 endif;
 
 session_write_close();

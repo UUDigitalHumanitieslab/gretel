@@ -1,7 +1,7 @@
 /**
  * Documentation loosely based on the JSDoc standard
  */
-$(document).ready(function() {
+$(function(){
     // Customizable attributes!
     // Specify how long it should take for functions to start
     // * Before counting ALL hits, independent of current fetched results (ms)

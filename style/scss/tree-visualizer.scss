@@ -352,8 +352,10 @@
 
                 &.hovered,
                 &:hover {
-                    transform: scale(1.9);
+                    transform: scale(2);
                     z-index: 3;
+                    background: #8e7f6b;
+                    color: #FFF!important;
                     border-color: transparent !important;
                 }
 
@@ -381,14 +383,12 @@
                 &.hovered,
                 &:hover {
                     transform: scale(3);
-                    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
                 }
 
                 &.only-child {
                     &.hovered,
                     &:hover {
                         margin-bottom: 5em;
-                        text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 
                         ~ span {
                             transform: scale(3);
