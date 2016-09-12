@@ -1,181 +1,124 @@
-<!DOCTYPE html>
-<!-- query.php -->
-<!-- query summary -->
-
-<!-- version 0.7 date: 01.03.2013  log subtrees -->
-<!-- version 0.6 date: 12.12.2014  page loader added -->
-<!-- version 0.5 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
-<head>
 <?php
-/* Display errors*/
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1);
-require 'header.php';?>
+require '../config/config.php';
+require "$root/helpers.php";
 
-<script>
-$(document).ready(function(){
-    $('button[type="submit"]').click(function(){
-        $(".loading").show();
-    });
-});
-</script>
-</head>
-
-<body>
-<div class="loading" style="display:none;">
-<p>Loading... Please wait</p>
-</div>
-
-<div id="container">
-<?php
-session_cache_limiter('private'); // avoids page reload when going back
+session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-/***********************************************************/
- /* VARIABLES */
-$id= session_id();
-$date=date('d-m-Y');
-$time=time();
-$sm=$_SESSION['search'];
+$currentPage = $_SESSION['ebsxps'];
+$step = 5;
 
-// navigation
-$start="input.php";
-$next="results.php";
-$step=5;
-$title="<h1>Step 5: Query Overview</h1><hr/>";
-$new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
-$back='<button type="button" value="Back" onclick="goBack()">Back</button>';
-$continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
+$noTbFlag = 0;
 
-// log files
-$grtllog="$log/gretel-ebq.log";
-$treelog="$log/gretel-querytrees.log";
-
-if ($_POST['treebank']) {
-  $treebank=$_POST['treebank'];
-  $_SESSION['treebank']="$treebank";
-}
-else {
-  $treebank=$_SESSION['treebank'];
+if (isset($_POST['treebank'])) {
+    $treebank = $_POST['treebank'];
+    $_SESSION['treebank'] = $treebank;
+} elseif (isset($_SESSION['treebank'])) {
+    $treebank = $_SESSION['treebank'];
+} else {
+    $noTbFlag = 1;
+    $treebank = '';
 }
 
-// get subtreebanks
-$subtb=$treebank.'tb';
-
-if ($_POST[$subtb]) {
-  $components=$_POST[$subtb];
-  $_SESSION['subtb']=$components;
-}
-elseif (isset($_SESSION['subtb'])) {
-  $components=$_SESSION['subtb'];
-}
-
-else {
-  echo "<h1>Error</h1>";
-  echo "Please select at least one subtreebank\n<br/><br/>";
-  echo $back;
-  exit;
+if (!$noTbFlag) {
+    if (isset($_POST['subtreebank'])) {
+        $component = $_POST['subtreebank'];
+        $_SESSION['subtreebank'] = $component;
+    } elseif (isset($_SESSION['subtreebank'])) {
+        $component = $_SESSION['subtreebank'];
+    } else {
+        $noTbFlag = 1;
+    }
 }
 
-// get context option
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
 
-if (isset($_POST["ct"])) {
-  $_SESSION["ct"]="on";
-}
-else {
-  $_SESSION["ct"]="off";
-}
+if ($continueConstraints) {
+    $id = session_id();
+    $queryId = $_SESSION['queryid'];
+    $treeVisualizer = true;
 
-if (getenv('REMOTE_ADDR')){
-$user = getenv('REMOTE_ADDR');
-}
-else {
-$user="anonymous";
+    $tokinput = $_SESSION['sentence'];
+
+    $xpath = $_SESSION['xpath'];
+
+    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
 }
 
-if ($treebank!=="sonar") {
-   $components=implode( ', ' , array_keys($components)); // get string of components
-}
+session_write_close();
 
+require "$root/functions.php";
+require "$php/head.php";
+?>
+</head>
+<?php flush(); ?>
+<?php require "$php/header.php"; ?>
 
-/***********************************************************/
-/* INCLUDES */
-require("$navigation");
-/***********************************************************/
-
-// get input sentence
-$sentence=$_SESSION['sentence'];
-
-// get search mode
-$sm=$_SESSION['search'];
-
-// get XPath
-$xpath=$_SESSION['xpath'];
-
-if ($xpath) {
-chop($xpath);
-
-// log XPath
-$log = fopen($grtllog, "a");  //concatenate
-fwrite($log, "$date\t$user\t$id-$time\t$sm\t$treebank\tAUTOXP\t$xpath");
-fclose($log);
+<?php if ($continueConstraints) :
+  $component = implode(', ', $component);
+  $xpath = rtrim($xpath);
 
   //log query tree
-$qtree = file_get_contents("$tmp/$id-sub.xml");
-$tlog = fopen($treelog, "a");  //concatenate
-fwrite($tlog, "<alpino_ds id=\"$id-$time\">$qtree\n</alpino_ds>\n");
-fclose($tlog);
-
-
-//print input sentence and treebank
-echo "$title";
-echo "<b>Input example:</b> <i>$sentence</i><br/><br/>\n";
-
-echo "<b>Treebank:</b> ".strtoupper($treebank)."<br/>\n";
-echo "<b>Components:</b> ".strtoupper($components)."<br/><br/>\n";
-
-if ($_SESSION['search']=="advanced") { // print XPath expression in advanced search mode
-
-  if ($treebank=="sonar") {
-    echo '<br/><b>XPath expression </b>generated from the query tree.<br/>';
-  }
-
-  else {
-    echo '<br/><b>XPath expression </b>generated from the query tree. You can adapt it if necessary. If you are dealing with a long query the <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank">XPath beautifier</a> might come in handy. <br/>';
-  }
-
-  echo '<form action="'.$next.'" method="post">';
-  if ($treebank == "sonar") {
-    echo '<textarea rows="4" cols="100" name="xp" wrap="soft" readonly>'.$xpath.'</textarea><br/>';
-}
-  else {
-    echo '<textarea rows="4" cols="100" name="xp" wrap="soft">'.$xpath.'</textarea>';
-  }
-
-  echo '<input type="reset" value="Reset XPath"/> ';
-}
-
-echo '
-<form action="'.$next.'" method="post">
-';
-
-echo '<br/><br/>';
-
-echo $new.$back.$continue;
-echo '</form>';
-}
-
+  $qTree = file_get_contents("$tmp/$id-sub.xml");
+  $treeLog = fopen("$log/gretel-querytrees.log", 'a');
+  fwrite($treeLog, "<alpino_ds id=\"$queryId\">$qTree\n</alpino_ds>\n");
+  fclose($treeLog);
 ?>
-</div>
-<script src="<?php echo $root; ?>/js/min/tree-visualizer.js"></script>
-<script>
-$.treeVisualizer("<?php echo $tmp/$id; ?>-sub.xml", {
-    container: "#tree-output"
-});
-</script>
+
+<ul>
+<li>Input example: <em><?php echo $tokinput; ?></em></li>
+<li>Treebank: <?php echo strtoupper($treebank); ?></li>
+<li>Components: <?php echo strtoupper($component); ?></li>
+</ul>
+
+<div id="tree-output"></div>
+
+<?php
+    if ($treebank == 'sonar') : ?>
+      <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
+        below is provided to show you the structure that is assigned to your input example.</p>
+
+    <?php else : ?>
+      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing!
+      If you are dealing with a long query, the
+      <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
+    <?php endif; ?>
+
+    <form action="ebs/results.php" method="post">
+    <?php
+    if ($treebank == 'sonar') {
+        $readonly = 'readonly';
+    } else {
+        $readonly = '';
+        $htmlXpath = htmlentities($xpath, ENT_QUOTES);
+        echo '<input type="hidden" name="originalXp" value="'.$htmlXpath.'">';
+    }
+    ?>
+    <textarea name="xp" wrap="soft" <?php echo $readonly;?> spellcheck="false"><?php echo $xpath; ?></textarea>
+
+    <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
+    <?php setContinueNavigation(); ?>
+  </form>
+<?php else: // $continueConstraints
+    setErrorHeading();
+?>
+    <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
+    possible that you came to this page directly without first entering an input example.</p>
+
+<?php
+    setPreviousPageMessage(4);
+endif;  // $continueConstraints
+require "$php/footer.php";
+include "$root/scripts/AnalyticsTracking.php";
+
+if ($continueConstraints) : ?>
+    <script src="js/tree-visualizer.js"></script>
+    <script>
+    $(function(){
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-sub.xml" ?>', {extendedPOS: true});
+    });
+    </script>
+<?php endif; ?>
 </body>
 </html>

@@ -1,72 +1,71 @@
-<html>
-<!-- index.php -->
-<!-- GrETEL info -->
+<?php
+require 'config/config.php';
 
-<!-- version 0.3 date: 17.11.2014  Documentation added -->
-<!-- version 0.2 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
+require "$root/helpers.php";
+$currentPage = 'home';
+require "$root/functions.php";
 
-<head>
-<title>GrETEL 2.0</title>
-<link rel="stylesheet" type="text/css" href="style/css/gretel.css"></link>
-<link rel="stylesheet" type="text/css" href="style/css/tooltip.css"></link>
-<link href="http://fonts.googleapis.com/css?family=Oswald:400,300,700|Carrois+Gothic" rel="stylesheet" type="text/css">
-<link rel="shortcut icon" type="image/png" href="img/gretel_logo_trans.png" />
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript" src="js/tooltip.js" ></script>
-<script type="text/javascript" src="js/browserDetection.js" ></script>
-<?php include_once("scripts/AnalyticsTracking.php") ?>
+require "$php/head.php";
+?>
 </head>
 
-<body>
-<div id="container">
-<div id="ccl-logo">
-<a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60"></img></a>
-</div>
+        <?php require "$php/header.php"; ?>
+            <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
+                <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
+                the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
+                search engine we highly recommend that you first take a look at
+                <a href="documentation.php" title="Documentation">the documentation on the topic</a>.
+                Tutorials as well as scientific papers are available.
+                On that page you can also find a section called
+                <a href="documentation.php#faq" title="Frequently Asked Questions">Frequently Asked Questions</a>.</p>
+            <p> The tool allows to search in treebanks without knowledge about the tree representations, treebank
+                query languages, nor the specific linguistic theories in the treebank. The user provides the query
+                engine with an example sentence, marking which parts of the sentence are the focus of the query.
+                Through automated parsing of the example sentence and subtree extraction of the sentence part
+                under focus the treebank is queried for the extracted subtree. GrETEL then returns sentences similar
+                to the input example.</p>
 
-<h1>GrETEL 2.0</h1>
-<hr>
+            <p><strong style="font-size: 88%">GrETEL provides two search approaches, introduced below.</strong></p>
+            <h3><a href="ebs/input.php">Example-based search</a></h3>
 
-<h2>What is GrETEL?</h2>
+            <p>In this search mode you can use a natural language example as a starting point for searching
+                a treebank with limited knowledge about tree representations and formal query languages.
+                The formal (XPath) query is automatically generated. In this type of search Three different
+                corpora can be queried: CGN, Lassy, and SoNaR.</p>
 
-<p>GrETEL stands for <b>Gr</b>eedy <b>E</b>xtraction of <b>T</b>rees for <b>E</b>mpirical <b>L</b>inguistics. It is a user-friendly search engine for the exploitation of treebanks. It comes in two formats:</br>
+            <h3><a href="xps/input.php">XPath search</a></h3>
 
-<h4><a href="ebs/input.php">Example-based search</a></h4>
+            <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
+                XPath search tool only when you are an experienced XPath user! Also note that because of the size of
+                the corpus, SoNaR is not accessible in this search mode because of the scale of the corpus and the
+                possible complexity of XPath code. Lassy and CGN are available.</p>
 
-<p>In this search mode you can use a natural language example as a starting point for searching a treebank<a href="#" class="clickMe" tooltip="A text corpus with syntactic annotations"> <sup>[?]</sup></a> with limited knowledge about tree representations and formal query languages.<a href="#" class="clickMe" tooltip="The formal (XPath) query is automatically generated"> <sup>[?]</sup></a></br>
+                <div class="citation-wrapper">
+                <p style="margin-top:0">Please cite the following paper if you are using GrETEL for your research. More documentation such as
+                  tutorials, papers, and slides can be found on
+                  <a href="documentation.php" title="GrETEL documentation">the documentations page</a>.</p>
+                <cite>
+                  <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
+                    title="Example-Based Treebank Querying" target="_blank">
+                    <span class="stack">
+                      <i class="fa fa-file-text-o"></i>
+                      <i class="fa fa-download"></i>
+                    </span>
+                    <span class="sr-only">Example-Based Treebank Querying</span>
+                 </a>
+                  <p>
+                    Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
+                    <strong>"Example-Based Treebank Querying"</strong>. In: <em>Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012)</em>.
+                    Istanbul, Turkey. pp. 3161-3167.
+                  </p>
+                </cite>
+              </div>
+        </main>
+    </div>
 
-<h4><a href="xps/input-xp.php">XPath search</a></h4>
-
-<p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the XPath search tool only when you are an experienced XPath user!</p>
-<br/>
-
-<p>Please <b>cite</b> the following paper if you are using GrETEL for your research:<br/><br/>
-Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a> In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012). Istanbul, Turkey. pp. 3161-3167</p>
-
-<h2>Documentation</h2>
-<h4>Tutorials</h4>
-<ul>
-<li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf" target="_blank">Slides</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial-handson.pdf" target="_blank">Exercises</a></li>
-<li><a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf" target="_blank">CLARIN Educational Module</a></li>
-<li><a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html" target="_blank">Combined Case Study MIMORE - GrETEL</a></li>
-</ul>
-
-<h4>Information</h4>
-<ul>
-<li><a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and documentation</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications and Talks</a></li>
-</ul>
-
-<h4>Related tools</h4>
-<ul>
-<li><a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a></li>
-</ul>
-
-</div>
+    <?php
+    require "$php/footer.php";
+    include "$root/scripts/AnalyticsTracking.php";
+    ?>
 </body>
 </html>

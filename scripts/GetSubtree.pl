@@ -17,7 +17,7 @@
 #     - cat: remove top cat
 #     - relcat: remove top rel and top cat
 #
-# -m (mode): 
+# -m (mode):
 #           - alpino (default): rel, cat, pos, root, token, begin
 #           - lassy: rel, cat, pos, postag, root, token, begin
 #           - cgn: rel, cat, pt, postag, lemma, token, begin
@@ -31,7 +31,7 @@ use Getopt::Long;
 use XML::Twig;
 
 my $prog = "XML Subtree Generator";
-my $date = "July 31, 2013";    
+my $date = "July 31, 2013";
 my $author = "Liesbeth Augustinus";
 my $versionnr = "1.3";
 
@@ -103,7 +103,7 @@ $children[1]->cut;
 $subtree=&process_twig($root,$refpos,$mode,$split);
 $subtree=&cut_unary($subtree);
 
-# remove top node attributes 
+# remove top node attributes
 if ($options) {
     my $top=$subtree;
     if ($options eq "relcat") {
@@ -142,18 +142,18 @@ sub cut_unary {
 sub process_twig {
 	my ($twig,$refpos,$mode,$split) = @_;
 	my @children=$twig->children();
-	my %int;	
+	my %int;
 	foreach my $child(@children){
 		# print
 		my $result = process_twig($child,$refpos,$mode,$split);
 		unless ($result) {
-			$child->cut;	
+			$child->cut;
 		}
 		else {
 			$twig->{att}->{interesting}='cat';
-		}		
+		}
 	}
-	
+
 	if ((defined($twig->{att}->{interesting})) &&
 		($twig->{'att'}->{'interesting'} ne 'na')) {
 			my $interesting=$twig->{'att'}->{'interesting'}; # value of @interesting attribute
@@ -165,7 +165,7 @@ sub process_twig {
 			    $int{rel}++; # always include rel
 			    $int{pos}++; # always include pos
 			    $int{begin}++; # always include begin
-			    
+
 			    if ($interesting eq 'cat') {
 				$int{cat}++;
 			    }
@@ -178,9 +178,10 @@ sub process_twig {
 			    if ($interesting eq 'token') {
 				$int{root}++;
 				$int{word}++;
-			    }			
+        $int{casesensitive}++;
+			    }
 			}
-			
+
 			elsif ($mode eq 'cgn') {
 			    $int{rel}++; # always include rel
 			    $int{pt}++; # always include pt
@@ -198,7 +199,8 @@ sub process_twig {
 			    if ($interesting eq 'token') {
 				$int{lemma}++;
 				$int{word}++;
-			    }			
+        $int{casesensitive}++;
+			    }
 			}
 
 			elsif ($mode eq 'sonar') {
@@ -218,11 +220,12 @@ sub process_twig {
 			    if ($interesting eq 'token') {
 				$int{lemma}++;
 				$int{word}++;
+        $int{casesensitive}++;
 			    }
 			    if ($interesting eq 'not') {
 				$twig->set_att("not")=>"relpt";
 				$int{not}++;
-				
+
 			    }
 			}
 
@@ -240,33 +243,34 @@ sub process_twig {
 			    if ($interesting eq 'token') {
 				$int{root}++;
 				$int{word}++;
-			    }			
+        $int{casesensitive}++;
+			    }
 			}
-			
+
 			foreach (keys %$hash) {
 					unless ($int{$_}) {
 						$twig->del_att($_);
-					}	
+					}
 			}
 
 			if ($split==1) { # split up postags
 			    if ($twig->{'att'}->{'postag'}) {
 				my $cgntag=$twig->{'att'}->{'postag'}; # get CGN postag
 				my @split=&split_one_tag($cgntag,$refpos); # split tag into separate attribute-value pairs
-				
+
 				if (@split) {
 				    foreach $s(@split) {
 					my ($att,$val) = split(/\|/,$s);
 					$twig->set_att($att=>"$val");  # add new elements
 				    }
 				}
-			    }	
+			    }
 			}
-			
-			
+
+
 			return $twig;
 	}
-	
+
 	else {
 		return undef;
 	}
@@ -284,8 +288,8 @@ sub split_one_tag {
     my @pts= split(/,/,$pts);   # split parts
     my @parts;
     foreach $val(@pts) {
-		
-	if ($pt ne "BW" || $pt ne "TSW"|| $pt ne "LET") { 
+
+	if ($pt ne "BW" || $pt ne "TSW"|| $pt ne "LET") {
 	    $feature=$refpos{$pt};
 	    $att=$$feature{$val};   # same as $att=$feature->{$val};
 	}
@@ -294,18 +298,18 @@ sub split_one_tag {
 	    # do nothing if $pt equals BW, TSW or LET
 	    return undef;
 	}
-	
+
 	$attval=$att."|".$val; # combine attribute-value
 	push(@parts, $attval);
     }
-    
+
     return @parts; # return array of attribute-value pairs
 }
 
 
 sub initialize {
     # hashes with value-attribute pairs
-   
+
     my %n = ('soort'=> 'ntype',
 	     'eigen'=> 'ntype',
 	     'ev'=> 'getal',
@@ -354,7 +358,7 @@ sub initialize {
 	      'zonder-n'=> 'getal-n',
 	      'mv-n'=> 'getal-n'
 	);
-    
+
      my %tw = ('hoofd'=> 'numtype',
 	       'rang'=> 'numtype',
 	       'prenom'=> 'positie',
@@ -367,7 +371,7 @@ sub initialize {
 	       'stan'=> 'naamval',
 	       'bijz'=>'naamval'
 	 );
-     
+
 
      my %vnw = ('pers'=> 'vwtype',
 		'refl'=> 'vwtype',
@@ -432,7 +436,7 @@ sub initialize {
 		'dim' => 'graad'
 	 );
 
-    
+
      my %lid = ('bep'=> 'lwtype',
 		'onbep'=> 'lwtype',
 		'stan'=>'naamval',
@@ -445,8 +449,8 @@ sub initialize {
 		'rest3'=> 'npagr',
 		'evf'=> 'npagr',
 		'mv'=> 'npagr'
-		); 
-     
+		);
+
     my %vz = ('init'=> 'vztype',
 	      'versm'=> 'vztype',
 	      'fin'=> 'vztype'
@@ -455,7 +459,7 @@ sub initialize {
     my %vg = ('neven'=> 'vgtype',
 	      'onder'=> 'vgtype'
 	);
-    
+
     my %spec = ('afgebr'=> 'spectype',
 		'onverst'=> 'spectype',
 		'vreemd'=> 'spectype',
@@ -466,7 +470,7 @@ sub initialize {
 		'afk'=> 'spectype',
 		'symb'=> 'spectype'
 	);
-    
+
     # hash of hash references
     $refpos{"N"}={%n};
     $refpos{"ADJ"}={%adj};

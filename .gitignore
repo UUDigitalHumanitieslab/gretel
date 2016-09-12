@@ -4,4 +4,8 @@ config/
 log/
 tmp/
 parsers/
+thesis-bram/
+gendervariatie/
 
+prepros.cfg
+todo.txt

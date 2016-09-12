@@ -1,24 +1,25 @@
-<!-- AlpinoParser.php -->
-<!-- version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
 <?php
-function Alpino($sentence,$id) { 
-  require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $alpinoTreebank)
+/**
+ * version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0
+ * written by Liesbeth Augustinus (c) 2014
+ * for the GrETEL2.0 project
+ */
+
+function Alpino($sentence,$id) {
+  require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $tmp)
 
   $descriptorspec = array(
 			  0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 			  1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
 			  2 => array("file", "/tmp/alpino.log", "a") // stderr is a file to write to
 			  );
-  
+
   $cwd = '/';
   $env = array('ALPINO_HOME' => "$alpinoHome");
-  $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $alpinoTreebank -parse";
-  
+  $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
+
   $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
-  
+
   if (!is_resource($process)) {
    die('error');
   }
@@ -37,15 +38,14 @@ function Alpino($sentence,$id) {
       //       echo $buffer."\n";
     }
     fclose($pipes[1]);
-    
+
     // It is important that you close any pipes before calling
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
-    
+
     //    echo "command returned $return_value\n";
   }
-   
-  return "$alpinoTreebank/$id.xml"; //return parse location 
+
+  return "$tmp/$id.xml"; //return parse location
 
 }
-?>
