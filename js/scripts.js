@@ -6,7 +6,12 @@ $(function() {
 
     $("#old-ie-script").remove();
 
-    $window.resize($.throttle(250, mobileMenu)).resize();
+    $window.resize($.throttle(500, function() {
+        mobileMenu();
+        helpTooltipPosition();
+    })).resize();
+    $window.scroll($.throttle(500, helpTooltipPosition)).scroll();
+
 
     $("[name='to-top']").click(function() {
         $("html, body").animate({
@@ -29,13 +34,34 @@ $(function() {
     });
 
     $document.click(function(e) {
-        var target = $(e.target);
         if (nav1.hasClass("active")) {
-            if (!target.closest(nav1.find("button"), nav1.find("ul")).length) {
+            if (!$(e.target).closest(nav1.find("button"), nav1.find("ul")).length) {
                 nav1.removeClass("active");
             }
         }
     });
+
+    function helpTooltipPosition() {
+        $(".help-tooltip[data-title]").each(function(i, el) {
+            var $this = $(el),
+                rect = el.getBoundingClientRect(),
+                $w = $window.width(),
+                $h = $window.height();
+            $this.addClass("hang-right hang-left hang-bottom hang-top");
+            if (($w - rect.right <= 320) || (rect.top <= 160) || ($h - rect.bottom <= 160)) {
+                $this.removeClass("hang-right");
+            }
+            if ((rect.left <= 320) || (rect.top <= 160) || ($h - rect.bottom <= 160)) {
+                $this.removeClass("hang-left");
+            }
+            if (($h - rect.bottom <= 320) || ($w - rect.right <= 160) || (rect.left <= 160)) {
+                $this.removeClass("hang-bottom");
+            }
+            if ((rect.top <= 320) || ($w - rect.right <= 160) || (rect.left <= 160)) {
+                $this.removeClass("hang-top");
+            }
+        });
+    }
 
     if (body.hasClass("step-1")) {
         var clearBtn = $("[name='clear']");
@@ -84,6 +110,32 @@ $(function() {
             });
         }
     } else if (body.hasClass("matrix")) {
+        var input = $("[name='xpath']");
+        // Check whether the XPath has the same amount of opening and closing tags
+        // If not, throw custom validation error message
+        $("[type='submit']").click(function() {
+            var openBrackets = (input.val().match(/\[/g) || "").length,
+                closeBrackets = (input.val().match(/\]/g) || "").length;
+            if (openBrackets == closeBrackets) {
+                input[0].setCustomValidity("");
+            } else {
+                if (openBrackets > closeBrackets) {
+                    input[0].setCustomValidity("Fix XPath inconsistency: missing ] or unnecessary [ (x" + (openBrackets - closeBrackets) + ")");
+                }
+                if (openBrackets < closeBrackets) {
+                    input[0].setCustomValidity("Fix XPath inconsistency: missing [ or unnecessary ] (x" + (closeBrackets - openBrackets) + ")");
+                }
+            }
+        });
+
+        input.keyup(function() {
+            this.setCustomValidity("");
+        });
+
+        $("form").submit(getTreePath());
+
+        var getTreePathXHR;
+        getTreePath();
         // Allow cell clicks to go down to the inputs, but prevent clicks on the input
         // going up. Otherwise, we'll get stuck in an infinite loop
         $("tbody td").click(function() {
@@ -93,29 +145,114 @@ $(function() {
         });
 
         $(".table-wrapper .case-sensitive input[type='checkbox']").each(function(i, el) {
-          var $el = $(el);
-          if ($el.is(":checked")) {
-            $el.prop("disabled", false).parent("td:not(.punctuation)").removeClass("disabled");
-          }
+            var $el = $(el);
+            if ($el.is(":checked")) {
+                $el.prop("disabled", false).parent("td:not(.punctuation)").removeClass("disabled");
+            }
         });
 
         // Enable disable the option for case-sensitivity
         $(".table-wrapper input[type='radio']").click(function() {
-          var $this = $(this),
-            val = $this.val(),
-            mother = $this.parent("td:not(.punctuation)"),
-            i = mother.index(),
-            checkCell = $(".table-wrapper .case-sensitive td:nth-child("+(i+1)+")")
+            var $this = $(this),
+                mother = $this.parent("td:not(.punctuation)"),
+                checkCell = $(".table-wrapper .case-sensitive td:nth-child(" + (mother.index() + 1) + ")")
 
-          if (mother.length) {
-            if (val == "token") {
-              checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
+            if (mother.length) {
+                if ($this.val() == "token") {
+                    checkCell.removeClass("disabled").children("input[type='checkbox']").prop("disabled", false);
+                } else {
+                    checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
+                }
             }
-            else {
-              checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
-            }
-          }
         });
+        $("main form input[type='radio'], main form input[type='checkbox']").change(function() {
+            getTreePath();
+        });
+
+        var advancedBtn = $(".advanced-btn-wrapper button"),
+            advancedRow = $(".table-wrapper tr.advanced-option");
+
+        advancedBtn.click(function() {
+            $(".advanced-option:not(tr)").toggle();
+            advancedRow.toggleClass("visible-row");
+            var str;
+            if (advancedRow.hasClass("visible-row")) {
+                str = 'Hide advanced options';
+                adjustTextareaHeight($("#xpath"));
+                helpTooltipPosition();
+            } else {
+                str = 'Show advanced options';
+            }
+            advancedBtn.attr("title", str).children("span").text(str);
+        });
+
+        // Open in beautifier
+        $(".xpath-wrapper a").click(function(e) {
+            e.preventDefault();
+            var href = $(this).attr('href');
+            postXpath($("#xpath").serialize(), href);
+        });
+
+        $(".xpath-wrapper input[type='reset']").click(function(e) {
+            e.preventDefault();
+            $("#xpath").val($(".xpath-wrapper input[name='originalXp']").val()).change();
+            $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").removeClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", false);
+            $('[name="manualMode"]').val("false");
+            $(".xpath-wrapper textarea").on("mousedown", editWarningOnClick);
+        });
+
+        $(".xpath-wrapper textarea").on("mousedown", editWarningOnClick);
+
+        function editWarningOnClick() {
+            var popupClass = "edit-warning",
+                popupId;
+            if ($("." + popupClass).length == 0) {
+                var html = "<p>Editing the XPath will disable all options including the selection table and the tree representation. Furthermore, you will <strong>not</strong> be able to select SoNaR as the corpus of interest.</p>" +
+                    "<p><strong>Only edit this code if you know what you are doing!</strong></p>";
+                html += "<small>You can re-enable all options and reset XPath to the the original structure by pressing the button <em>Reset XPath</em></small>";
+
+                popupId = fillPopup(html, true, popupClass);
+            }
+
+            var popup = $("." + popupClass);
+
+            if (!Cookies.get('popup-continue-' + popupId)) {
+
+                showPopup(popup, $("#xpath"));
+                popup.find("button.continue").click(function() {
+                    $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
+                    $('[name="manualMode"]').val("true");
+                    $(".xpath-wrapper textarea").off("mousedown");
+                });
+            } else {
+                $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
+                $('[name="manualMode"]').val("true");
+                $(".xpath-wrapper textarea").off("mousedown");
+            }
+        }
+
+        function postXpath(xpath, href) {
+            $.ajax({
+                type: 'POST',
+                url: 'http://bramvanroy.be/projects/xpath-beautifier/php/receive-post.php',
+                crossDomain: true,
+                data: xpath,
+                headers: {
+                    "cache-control": "no-cache"
+                },
+                xhrFields: {
+                    withCredentials: true
+                }
+            }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
+                var newTab = window.open(href, '_blank');
+                if (newTab) {
+                    newTab.focus();
+                } else {
+                    alert('Your browser blocked opening a new window. Please allow pop-ups for this website. We will never show advertisements.');
+                }
+            });
+        }
+
     } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {
         // Main treebank selection (CGN, Lassy, SONAR)
         $("[type='radio']").change(function() {
@@ -190,4 +327,141 @@ $(function() {
             $("[type='radio'][name='treebank']:checked").click().change();
         }
     }
+
+    function getTreePath() {
+        if (getTreePathXHR) getTreePathXHR.abort();
+
+        getTreePathXHR = $.ajax({
+                url: getTreePathScript,
+                method: "POST",
+                data: $("main form").serialize()
+            })
+            .done(function(json) {
+                var data = $.parseJSON(json);
+
+                if (data.location) {
+                    $("#tree-output").treeVisualizer(data.location, {
+                        extendedPOS: true
+                    });
+                }
+
+                if (data.xpath) {
+                    $("#xpath, .xpath-wrapper input[name='originalXp']").val(data.xpath);
+                    adjustTextareaHeight($("#xpath"));
+                }
+            })
+            .fail(function(jqXHR, textStatus, error) {
+                if (error != 'abort') {}
+            })
+            .always(function() {});
+    }
+
+    function adjustTextareaHeight($el) {
+        $el.height(0).outerHeight($el[0].scrollHeight + 2);
+    }
+
+    function fillPopup(html, cancelOption, additionalClass) {
+        var popupId = 1;
+        while (true) {
+            if ($("[data-popup-id='" + popupId + "'").length) {
+                popupId++;
+            } else {
+                var popup = document.createElement("aside");
+                $(popup).html(html).attr({
+                    "data-popup-id": popupId,
+                    "class": "popup"
+                }).hide().appendTo("#popup-wrapper");
+                $(popup).append('<div class="btn-wrapper"><button title="Continue editing XPath" type="button" class="continue">Continue</button></div>');
+                if (cancelOption) {
+                    $(popup).children(".btn-wrapper").prepend('<button title="Close this pop-up" type="button" class="cancel">Cancel</button>');
+                }
+
+                if (additionalClass) {
+                    $(popup).addClass(additionalClass);
+                }
+                break;
+            }
+        }
+
+        if ($("#popup-overlay").length == 0) {
+            var overlay = document.createElement("div");
+            $(overlay).attr("id", "popup-overlay").hide().appendTo("#popup-wrapper");
+        }
+
+        return popupId;
+    }
+
+
+    /**
+     * Mixed usage of offset and getBoundingClientRect
+     * - offset: relative to document, does not take scrolling into account
+     * - getBoundingClientRect: relative to viewport, takes scrolling into account
+     * For the available space in the VIEWPORT, getBoundingClientRect is needed
+     * For the actual, absolute, positioning, the offset is required
+     */
+    function showPopup($popup, $target) {
+        $popup.css({
+            visibility: "hidden",
+            display: "block"
+        });
+
+        var w = $window.width(),
+            h = $window.height(),
+            tRect = $target[0].getBoundingClientRect(),
+            tOff = $target.offset(),
+            tRectR = w - tRect.right,
+            tRectB = h - tRect.bottom,
+            pRect = $popup[0].getBoundingClientRect(),
+            diffW = (tRect.width - pRect.width) / 2,
+            diffH = (tRect.height - pRect.height) / 2,
+            m = 16;
+
+        $popup.removeClass("hang-right hang-left hang-bottom hang-top");
+
+        if ((tRect.top > pRect.height + m) && (tRectR > pRect.width / 2) && (tRect.left > pRect.width / 2)) {
+            $popup.addClass("hang-top");
+            $popup.css({
+                "left": tOff.left + diffW,
+                "top": tOff.top - pRect.height - m
+            });
+        } else if ((tRect.left > pRect.width + m) && (tRect.top > pRect.height / 2) && (tRectB > pRect.height / 2)) {
+            $popup.addClass("hang-left");
+            $popup.css({
+                "left": tOff.left - pRect.width - m,
+                "top": tOff.top + diffH
+            });
+        } else if ((tRectR > pRect.width + m) && (tRect.top > pRect.height / 2) && (tRectB > pRect.height / 2)) {
+            $popup.addClass("hang-right");
+            $popup.css({
+                "left": tOff.left + tRect.width + m,
+                "top": tOff.top + diffH
+            });
+        } else {
+            $popup.addClass("hang-bottom");
+            $popup.css({
+                "left": tOff.left + diffW,
+                "top": tOff.top + tRect.height + m
+            });
+        }
+
+        $popup.css("visibility", "visible");
+        $("#popup-overlay").show();
+    }
+
+    function hidePopup($popup) {
+        $popup.fadeOut("fast");
+        $("#popup-overlay").hide();
+    }
+
+    $("#popup-wrapper").on("click", "button.cancel, button.continue", function() {
+        var $this = $(this),
+            popup = $this.closest(".popup"),
+            popupId = popup.data("popup-id");
+
+        if ($this.hasClass("continue")) {
+            Cookies.set('popup-continue-' + popupId, 'true');
+            console.log("hasClass " + popupId);
+        }
+        hidePopup(popup);
+    });
 });
