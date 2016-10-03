@@ -5,7 +5,7 @@
 <meta name="description" content="GrETEL is an online tool that facilitates the exploitation of treebanks, large pieces of text that are syntactically annotated, by only requiring an input example instead of a formal query, or hard to understand computer code.">
 <meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, grind, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics">
 
-<?php if ($isBigStep): ?>
+<?php if (isBigStep()): ?>
   <meta name="robots" content="noindex">
 <?php endif; ?>
 
@@ -22,10 +22,10 @@
 <?php endif; ?>
 
 <?php
-  // Prefetch links. Don't prefetch too much, only required required pages such as
+  // Prefetch links. Don't prefetch too much, only required pages such as
   // the home page, or the next page in the process
 ?>
-<?php if (isset($currentPage) && $currentPage != 'home'): ?>
+<?php if (!isHome()): ?>
     <link rel="prefetch" href="index.php">
     <?php if (isset($step) && $step < count(${$currentPage.'Pages'})):
         $keys = array_keys(${$currentPage.'Pages'});
@@ -41,11 +41,11 @@
     <link rel="prefetch" href="documentation.php">
 <?php endif;?>
 
-
+<?php
+  // Load low-priority fonts asynchronously and add classes to HTML element when finished
+ ?>
 <script>
-    var html = document.getElementsByTagName("html")[0];
-
-    html.classList.remove("no-js");
+    document.getElementsByTagName("html")[0].classList.remove("no-js");
 
     WebFontConfig = {
         google: {
@@ -56,7 +56,20 @@
             urls: ["https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"]
         },
         classes: false,
-        events: false
+        fontactive: function(familyName, fvd) {
+          if (familyName == "FontAwesome") {
+            var faNodes = document.querySelectorAll(".fa");
+            for (var i = 0; i < faNodes.length; ++i) {
+              faNodes[i].classList.add("loaded");
+            }
+          }
+        },
+        fontinactive: function(familyName, fvd) {
+          var faNodes = document.querySelectorAll(".fa");
+          for (var i = 0; i < faNodes.length; ++i) {
+            faNodes[i].classList.add("failed");
+          }
+        }
     };
 
     (function(d) {
