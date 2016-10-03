@@ -1,10 +1,10 @@
 <?php
-require 'config/config.php';
 
-require "$root/helpers.php";
 $currentPage = 'home';
-require "$root/functions.php";
 
+require 'config/config.php';
+require "$root/helpers.php";
+require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 ?>
 </head>
@@ -46,12 +46,12 @@ require "$root/front-end-includes/head.php";
                   <a href="documentation.php" title="GrETEL documentation">the documentations page</a>.</p>
                 <cite>
                   <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
-                    title="Example-Based Treebank Querying" target="_blank">
+                    title="Download Example-Based Treebank Querying" target="_blank">
                     <span class="stack">
                       <i class="fa fa-file-text-o"></i>
                       <i class="fa fa-download"></i>
                     </span>
-                    <span class="sr-only">Example-Based Treebank Querying</span>
+                    <span class="sr-only">Download Example-Based Treebank Querying</span>
                  </a>
                   <p>
                     Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).

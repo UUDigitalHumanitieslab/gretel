@@ -27,7 +27,7 @@ $context = $_SESSION['ct'];
 session_write_close();
 
 require "$root/basex-search-scripts/basex-client.php";
-require "$scripts/treebank-search.php";
+require "$root/basex-search-scripts/treebank-search.php";
 
 try {
     if ($treebank == 'sonar') {

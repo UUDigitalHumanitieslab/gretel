@@ -1,9 +1,10 @@
 <?php
-require "config/config.php";
+
 $currentPage="docs";
 
+require "config/config.php";
+require "$root/helpers.php";
 require "$root/functions.php";
-
 require "$root/front-end-includes/head.php";
 ?>
 </head>
@@ -11,7 +12,7 @@ require "$root/front-end-includes/head.php";
         <?php require "$root/front-end-includes/header.php"; ?>
             <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
                 frequently asked questions, and other information. If you have any more questions, you can always
-                <a href="#faq-4" title="FAQ how to contact us">contact us</a>.</p>
+                <a href="documentation.php#faq-4" title="FAQ how to contact us">contact us</a>.</p>
             <p>As stated on the home page, we would ask you to cite the following paper if you are using GrETEL for your research.</p>
             <cite>
               <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
@@ -20,7 +21,7 @@ require "$root/front-end-includes/head.php";
                 <i class="fa fa-file-text-o"></i>
                 <i class="fa fa-download"></i>
               </span>
-                <span class="sr-only">Example-Based Treebank Querying</span>
+              <span class="sr-only">Example-Based Treebank Querying</span>
              </a>
               <p>
                 Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).

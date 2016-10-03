@@ -2,8 +2,8 @@
 require "../config/config.php";
 
 require "$root/basex-search-scripts/basex-client.php";
-require "$scripts/treebank-count.php";
-require "$scripts/treebank-search.php";
+require "$root/basex-search-scripts/treebank-count.php";
+require "$root/basex-search-scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);

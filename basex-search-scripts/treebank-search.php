@@ -54,18 +54,14 @@ function corpusToDatabase($tblist, $treebank)
     // rename corpora to database names
     $databases = array();
 
-    if ($treebank) {
-        foreach ($tblist as $tb) {
-            $treebank = strtoupper($treebank);
-            $tb = strtoupper($tb);
-            $tb = $treebank.'_ID_'.$tb;
-            array_push($databases, "$tb");
-        }
+      foreach ($tblist as $tb) {
+          $treebank = strtoupper($treebank);
+          $tb = strtoupper($tb);
+          $tb = $treebank.'_ID_'.$tb;
+          array_push($databases, $tb);
+      }
 
-        return $databases;
-    }
-
-    return false;
+      return $databases;
 }
 
 
@@ -332,7 +328,6 @@ function createXquery($xpath, $db, $treebank, $context, $endPosIteration)
 {
     global $flushLimit, $resultsLimit;
 
-    // create XQuery instance
     $for = 'for $node in db:open("'.$db.'")/treebank';
     if ($treebank == 'sonar') {
         $for .= "/tree";

@@ -20,108 +20,36 @@
 
 ############################################################################
 
-use Getopt::Long;
 use XML::Twig;
 
-my $prog = "Alpino-XML XPath Generator";
-my $date = "September, 13, 2013";    
-my $author = "Vincent Vandeghinste & Liesbeth Augustinus";
-my $versionnr = "1.5";
+my ($inputxml, $order) = @ARGV;
 
-# get command line options
-
-GetOptions("order", "o",
-	   "root", "r",
-           "help", "h",
-           "version", "v",
-	   "xml=s",
-	   "in=s",
-	   "ex=s"
-           );
-
-if (($opt_v) || ($opt_version)) {
-    print "$prog\n";
-    print "Version $versionnr\n";
-    print "(c) $author, $date\n";
-    exit(0);
-    }
-
-if (($opt_h) || ($opt_help)) {
-    print "$prog\n";
-    print "Version $versionnr\n";
-    print "(c) $author, $date\n";
-    print "\n";
-    print "Command-line options:\n";
-    print "\n";
-    print "--help | -h:\tdisplays this information\n";
-    print "--version | -v:\tdisplays version info\n";
-    print "\n";
-    print "--xml (path to) XML file\n";
-    print "--order | -o:\ttakes word order into account\n";
-    print "--root | -r:\t excludes root node from the XPath expression\n";
-    print "-in:\t attributes to be included in the XPath expression\n";
-    print "-ex:\tattributes to be excluded from the XPath expression\n";
-    print "\n";
-    print "The script takes one argument, i.e. a path to an XML file\n";
-    print "\n";
-    exit(0);
+if ($order eq 'false') {
+	$order = 0;
+}
+else {
+	$order = 1;
 }
 
-if (($opt_r) || ($opt_root)) {
-    $rt=1;
-}
+my $twig=XML::Twig->new('pretty_print' => 'indented');    # create the twig
 
-if (($opt_o) || ($opt_order)) {
-    $order=1;
-}
-
-if ($opt_in) {
-    $attsin=$opt_in;
-}
-if ($opt_ex) {
-    $attsout=$opt_ex;
-    $attsout=~s/\,/\|/g;
-    $attsout=~s/(\w+)/\($1\)/g;
-}
-
-if (!($opt_xml)) {
-    print "You need to specify an XML file with -xml.\n";
-    exit(-1);
-}
-
-# get XML
-$inputxml=$opt_xml;
-
-my $twig=XML::Twig->new(pretty_print => 'indented');    # create the twig
-
-$twig->parsefile("$inputxml");
+$twig->parsefile($inputxml);
 
 my $root=$twig->root;
 my $subtree;
 
-if ($rt) {   
-    @children=$root->children;
-    if (scalar(@children)>1) {
-	die "There is more than one child under the root node, so the -root option does not work.\n";
-    }
-    else {
-    $subtree=$root->first_child; # leave out root node (only works if one child under top node)
-    }
-}
+  if ($root->get_xpath('/alpino_ds')) { # for ALPINO XML, leave out the alpino_ds node
+$subtree=$root->first_child;
+  }
+  else {
+$subtree=$root; # start at root node
+  }
 
-else {
-    if ($root->get_xpath('/alpino_ds')) { # for ALPINO XML, leave out the alpino_ds node
-	$subtree=$root->first_child;
-    }
-    else {
-	$subtree=$root; # start at root node
-    }
-}
 
 # generate XPath expression
 
-my $topxpath=GetXPath($subtree,$attsin,$attsout);
-$xpath=ProcessTree($subtree,$order,$attsin,$attsout);
+my $topxpath=GetXPath($subtree);
+$xpath=ProcessTree($subtree,$order);
 
 
 if ($xpath && $topxpath) { # if more than one node is selected
@@ -144,20 +72,21 @@ else {
 if ($xpath=~/not/) { # exclude nodes using not-function
     $xpath =~ s/\sand\s\@not=".*?"//g;
 }
-print "$xpath\n";
 
-  
+print $xpath;
+
+
 sub ProcessTree {
-    my ($tree,$order,$attsin,$attsout)=@_;
+    my ($tree,$order)=@_;
     my ($xpath,$nextpath,$childxpath);
     my @children=$tree->children;
     my (@childxpaths,%COUNTS,%ALREADY);
     if (@children>0) {
 	foreach (@children) {
-	    $childxpath=GetXPath($_,$attsin,$attsout);
-	    
+	    $childxpath=GetXPath($_);
+
 	    if ($childxpath) {
-		$lower=&ProcessTree($_,$order,$attsin,$attsout);
+		$lower=&ProcessTree($_,$order);
 		if ($lower) {
 		    $childxpath.=' and '.$lower.']';
 		}
@@ -168,11 +97,11 @@ sub ProcessTree {
 			$childxpath='not('.$childxpath.')';
 			$childxpath =~ s/\sand\s\@not=".*?"//;
 		    }
-		    
+
 		}
 		$COUNTS{$childxpath}++;
 		push(@childxpaths,$childxpath);
-		
+
 	    }
 	}
 	if (@childxpaths) {
@@ -192,7 +121,7 @@ sub ProcessTree {
 		    $ALREADY{$childxpaths[$i]}=1;
 		}
 
-	    }		
+	    }
 	    $xpath=join(' and ',@childxpaths);
 	}
 	else {
@@ -205,7 +134,7 @@ sub ProcessTree {
 	    $xpath='number(@begin)';
 	    ($next_term,$nextpath)=&FindNextTerminalToCompare($tree);
 	    if ($next_term) {
-		if ($tree->{att}->{begin} < $next_term->{att}->{begin}) {
+		if ($tree->{'att'}->{'begin'} < $next_term->{'att'}->{'begin'}) {
 		    $xpath.=" < ";
 		}
 		else {
@@ -256,12 +185,7 @@ sub FindNextLeafNode {
     my ($node)=@_;
     my @children=$node->children;
     my $childpath;
-    my $xpath=GetXPath($node,$attsin,$attsout).']';
-    
-#   if ($xpath=~/not/) { # exclude nodes using not-function
-#			$xpath='not('.$xpath.')';
-#			$xpath =~ s/\sand\s\@not=".*?"//;
-#		    }
+    my $xpath=GetXPath($node).']';
 
     if (@children>0) {
 	($node,$childpath)=FindNextLeafNode($children[0]);
@@ -275,56 +199,27 @@ sub FindNextLeafNode {
 }
 
 sub GetXPath {
-    my ($tree,$attsin,$attsout)=@_;
-    my $att=$tree->{att};
+    my ($tree)=@_;
+    my $att=$tree->{'att'};
     my @atts;
 
-    if (!$attsin && !$attsout) {
-	foreach (keys %$att) {  # all attributes are included in the XPath expression
-		push(@atts,"@".$_."=\"".$$att{$_}."\"");
-	}
-    }
-    
-    elsif ($attsin && !$attsout) {
-	@attsin=split(",",$attsin);
-	foreach (@attsin) {  # the attributes defined in the array are included in the XPath expression
-		if (defined($att->{$_})) {
-		    push(@atts,"@".$_."=\"".$$att{$_}."\"");
-	    }
-	}	
-    }
-    
-    elsif (!$attsin && $attsout) {
 	foreach (keys %$att) {   # all attributes are included in the XPath expression...
-	    unless (/$attsout/) {    # ...except these ones
-		push(@atts,"@".$_."=\"".$$att{$_}."\"");
+	    unless (/postag|begin|end/) {    # ...except these ones
+				push(@atts,"@".$_."=\"".$$att{$_}."\"");
 	    }
-	}
-    }
-
-    else { 
-	@attsin=split(",",$attsin);
-	foreach (@attsin) {
-	    unless (/$attsout/) {
-		if (defined($att->{$_})) {
-		    push(@atts,"@".$_."=\"".$$att{$_}."\""); # regular attributes
 		}
-	    }
-	}
-    }
-    
+
     my $xstring;
-    
-    if (scalar(@atts)==0) { # no matching attributes found
-	return undef;
+
+    if (!@atts) { # no matching attributes found
+		return undef;
     }
 
-    else { # one or more attributes found 
+    else { # one or more attributes found
 	my $string=join(" and ",@atts);
 	$xstring="node[".$string;
 
 	return $xstring;
     }
-    
-}
 
+}

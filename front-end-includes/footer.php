@@ -14,6 +14,7 @@
               target="_blank">Centre for Computational Linguistics</a></li>
           <li class="tel"  title="Phone number">+32-16-325088</li>
           <li class="fax" title="Fax address">+32-16-325098</li>
+          <li class="email"><a href="mailto:gretel@ccl.kuleuven.be" title="Email us">gretel@ccl.kuleuven.be</a></li>
         </ul>
         </address>
       </aside>
@@ -29,22 +30,23 @@
               <li><a href="documentation.php" title="Documentation"
               <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
           </ul>
-          <!-- <a href="https://github.com/CCL-KULeuven/gretel" title="GrETEL on GitHub" class="github-link" target="_blank">
-              <span>GrETEL is available on GitHub!</span>
-              <i class="fa fa-fw fa-github fa-3x" aria-hidden="true"></i>
-          </a> -->
       </nav>
       <aside class="other">
           <button name="to-top" title="Go to the top of the page"><i class="fa fa-fw fa-arrow-up"></i></button>
-              <div class="logo-wrapper">
-                  <?php include "$root/img/logo-image-gretel.svg"; ?>
-              </div>
+          <div class="logo-wrapper">
+            <?php include "$root/img/logo-image-gretel.svg"; ?>
+          </div>
       </aside>
     </div>
 </footer>
 
+<div id="popup-wrapper"></div>
+
+<?php
+  // Check if we're on IE, if so display a warning message
+  // WE DO NOT SUPPORT IE (but we do support the newer Edge)
+ ?>
 <script id="old-ie-script">
-// Check if we're on Internet Explorer
 var ua = window.navigator.userAgent,
   msie = ua.indexOf('MSIE '),
   trident = ua.indexOf('Trident/'),
@@ -65,8 +67,9 @@ if (isIE) {
 }
 </script>
 
-<script   src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js"></script>
 <?php if (isset($taalPortaal) && $taalPortaal): ?>
     <script src="js/min/taalportaal.min.js"></script>
 <?php endif; ?>

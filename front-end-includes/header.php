@@ -1,7 +1,7 @@
 <body <?php setBodyClasses(); ?>>
     <div id="container">
         <header class="page-header">
-            <h1>GrETEL <sup>3.0</<sup></h1>
+            <h1>GrETEL <sup>3</<sup></h1>
             <p>Greedy Extraction of Trees for Empirical Linguistics</p>
             <nav class="primary-navigation">
                 <ul>
@@ -22,18 +22,18 @@
         </header>
         <main>
 
-          <header <?php if ($isSearch && isset($pageHeading)) echo 'class="progress-header"'; ?>>
+          <header <?php if (isSearch() && isset($pageHeading)) echo 'class="progress-header"'; ?>>
             <h1>
               <?php if (isset($pageHeading)) echo $pageHeading; ?>
             </h1>
-            <?php if ($isSearch) {
+            <?php if (isSearch()) {
               require "$root/front-end-includes/secondary-navigation.php";
             }
-            else if ($isHome || $isDocs) {?>
+            else if (isHome() || isDocs()) {?>
               <div class="project-web-wrapper">
                 <a href="http://gretel.ccl.kuleuven.be/project/" title="Go to the project website" target="_blank">GrETEL project website<i class="fa fa-external-link" aria-hidden="true"></i></a>
               </div>
             <?php }
             ?>
           </header>
-          <?php if ($isSearch) echo "<h2><span>Step $step:</span> " . $searchStepHeadings[$step-1] . "</h2>"; ?>
+          <?php if (isSearch()) echo "<h2><span>Step $step:</span> " . $searchStepHeadings[$step-1] . "</h2>"; ?>
