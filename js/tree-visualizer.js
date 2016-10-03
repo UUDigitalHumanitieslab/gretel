@@ -29,7 +29,8 @@
             zoomOpts,
             sentenceContainer,
             fontFitSize, tooltipTimeout;
-        var $window = $(window);
+        var $window = $(window),
+          $body = $("body");
 
         var FSPadding = {
                 top: 84,
@@ -111,34 +112,36 @@
 
         // Make the tree-visualizer-fs tree responsive
         if (args.fsView) {
-            $window.on("resize", function() {
-
+            $window.on("resize", $.debounce(250, function() {
                 if (treeFS.is(":visible")) {
-                    sizeTreeFS
+                    sizeTreeFS();
                 }
-            });
+            }));
         }
 
         anyTree.on("click", "a", function(e) {
-            var $this = $(this),
-                listItem = $this.parent("li"),
-                data = listItem.data(),
-                tree = $this.closest(".tree"),
-                treeLeafs = tree.find("a"),
-                tooltipList = tree.next(".tooltip").children("ul");
+            if (!$(this).hasClass("ignored")) {
+                var $this = $(this),
+                    listItem = $this.parent("li"),
+                    data = listItem.data(),
+                    tree = $this.closest(".tree"),
+                    treeLeafs = tree.find("a"),
+                    tooltipList = tree.next(".tooltip").children("ul"),
+                    i;
 
-            tooltipList.empty();
-            treeLeafs.removeClass("hovered");
-            $this.addClass("hovered");
-            var i;
-            for (i in data) {
-                if (data.hasOwnProperty(i)) {
-                    $("<li>", {
-                        html: "<strong>" + i + "</strong>: " + data[i]
-                    }).prependTo(tooltipList);
+                tooltipList.empty();
+                treeLeafs.removeClass("hovered");
+                $this.addClass("hovered");
+
+                for (i in data) {
+                    if (data.hasOwnProperty(i)) {
+                        $("<li>", {
+                            html: "<strong>" + i + "</strong>: " + data[i]
+                        }).prependTo(tooltipList);
+                    }
                 }
+                tooltipPosition();
             }
-            tooltipPosition();
 
             e.preventDefault();
         });
@@ -146,7 +149,7 @@
         anyTree.on("mouseout", "a.hovered", function() {
             var $this = $(this);
             if ($this.closest(".tree").hasClass("small")) {
-                $this.on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function() {
+                $this.on("transitionend", function() {
                     tooltipPosition(true);
                 });
             }
@@ -173,9 +176,11 @@
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-fw fa-times"></i></button></aside>';
+                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times loaded"></i>' +
+                    '<span class="sr-only">Close this tooltip</span></button></aside>';
                 if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode"><i class="fa fa-fw fa-arrows-alt"></i></button>';
+                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode" type="button"><i class="fa fa-fw fa-arrows-alt loaded"></i>' +
+                        '<span class="sr-only">Open the tree in fullscreen mode</span></button>';
                 }
                 SS.append(SSHTML);
 
@@ -195,10 +200,11 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button><i class="fa fa-fw fa-times"></i></button></aside><div class="zoom-opts-wrapper"><a href="' + xml + '" target="_blank" title="Show XML">Show XML</a>' +
-                    '<div class="zoom-opts"><button class="zoom-out"><i class="fa fa-fw fa-search-minus" aria-hidden="true"></i></button>' +
-                    '<button class="zoom-default">Default</button><button class="zoom-in"><i class="fa fa-fw fa-search-plus" aria-hidden="true"></i></button>' +
-                    '<button class="close"><i class="fa fa-fw fa-times"></i></button></div></div>';
+                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times loaded"></i>' +
+                    '<span class="sr-only">Close this tooltip</span></button></aside><div class="zoom-opts-wrapper"><a href="' + xml + '" target="_blank" title="Show XML">Show XML</a>' +
+                    '<div class="zoom-opts"><button class="zoom-out" type="button"><i class="fa fa-fw fa-search-minus loaded" aria-hidden="true"></i></button>' +
+                    '<button class="zoom-default" type="button">Default</button><button class="zoom-in" type="button"><i class="fa fa-fw fa-search-plus loaded" aria-hidden="true"></i></button>' +
+                    '<button title="Close fullscreen mode" type="button" class="close"><i class="fa fa-fw fa-times loaded"></i><span class="sr-only">Closen fullscreen mode</span></button></div></div>';
 
                 FS.append(FSHTML);
 
@@ -251,13 +257,13 @@
                 .fail(function(jqXHR, textStatus, errorThrown) {
                     var msg = '';
                     if (jqXHR.status === 0) {
-                        msg = 'Not connect to the Internet.<br>Verify your network connection.';
+                        msg = 'Not connected to the Internet.<br>Verify your network connection.';
                     } else if (jqXHR.status == 404) {
                         msg = 'Requested XML file not found.<br>Try again with another query.';
                     } else if (jqXHR.status == 500) {
                         msg = 'Internal Server Error.<br>If the problem persists, contact us.';
                     } else {
-                        msg = 'Uncaught Error.<br>Please try again at another time.';
+                        msg = 'Uncaught Error.<br>Please try again at another time.<br>';
                         msg += jqXHR.status + ' ' + textStatus + ' ' + errorThrown;
                     }
                     errorHandle(msg);
@@ -304,10 +310,10 @@
                     // Some data-attributes have initial spaces. Get rid of them
                     if (a.nodeName == "highlight") {
                         newItem.addClass("highlight");
-                    } else {
-                        if (a.nodeName != "begin" && a.nodeName != "end") {
-                            newItem.attr("data-" + a.nodeName, a.value.replace(/^\s(.+)/g, "$1"));
-                        }
+                    } else if (a.nodeName == "not") {
+                        newItem.addClass("excluded");
+                    } else if (a.nodeName != "begin" && a.nodeName != "end") {
+                        newItem.attr("data-" + a.nodeName, a.value.replace(/^\s(.+)/, "$1"));
                     }
                 }
                 if ($(this).children("node").length) {
@@ -319,32 +325,57 @@
         }
 
         // Small modifications to the tree
+        // Only add certain things (e.g. CS) on the matrix page
         function treeModifier() {
             anyTree.find("a").each(function() {
                 var $this = $(this),
                     li = $this.parent("li");
 
+                if ($body.hasClass("matrix") && li.data("word")) {
+                    if (li.data("caseinsensitive")) {
+                        li.data("word", li.data("word").toLowerCase());
+                        li.data("lemma", li.data("lemma").toLowerCase());
+                    } else {
+                        $this.addClass("cs");
+                    }
+                }
+
                 if (li.data("rel")) {
-                    $this.append("<span>" + li.data("rel") + "</span>");
-                    if (li.data("index")) $this.append("<span>" + li.data("index") + "</span>");
+                    $this.append("<span class='rel'>" + li.data("rel") + "</span>");
+                    if (li.data("index")) $this.append("<span class='index'>" + li.data("index") + "</span>");
                 }
 
                 if (li.data("postag") && args.extendedPOS) {
-                    $this.append("<span>" + li.data("postag") + "</span>");
+                    $this.append("<span class='postag'>" + li.data("postag") + "</span>");
                 } else if (li.data("pt")) {
                     if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pt"));
-                    else $this.append("<span>" + li.data("pt") + "</span>");
+                    else $this.append("<span class='pt'>" + li.data("pt") + "</span>");
                 } else if (li.data("cat")) {
-                    if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
-                    else $this.append("<span>" + li.data("cat") + "</span>");
+                    if (li.data("cat") == " ") {
+                        li.removeAttr("data-cat");
+                        li.removeData("cat");
+                        $this.addClass("ignored").text("?").attr("title", "Top node's properties will be ignored");
+                    } else {
+                        if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
+                        else $this.append("<span class='cat'>" + li.data("cat") + "</span>");
+                    }
                 }
 
                 if ($this.is(":only-child")) {
-                    if (li.data("lemma")) li.append("<span>" + li.data("lemma") + "</span>");
-                    if (li.data("word")) li.append("<span><em>" + li.data("word") + "</em></span>");
+                    if (li.data("lemma")) li.append("<span class='lemma'>" + li.data("lemma") + "</span>");
+                    if (li.data("word")) {
+                        var csTitle = ($body.hasClass("matrix") && !li.data("caseinsensitive")) ? ' title="Case sensitive word"' : '';
+                        li.append("<span class='word'><em" + csTitle + ">" + li.data("word") + "</em></span>");
+                    }
                     // addClass because after appending new children, it isn't necessarily the
                     // only child any longer
                     $this.addClass("only-child");
+                }
+
+
+                if (li.data("caseinsensitive")) {
+                    li.removeAttr("data-caseinsensitive");
+                    li.removeData("caseinsensitive");
                 }
             });
 
@@ -357,6 +388,7 @@
             var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
             if (currentFontSize <= 4) {
                 zoomOpts.find("button.zoom-out").prop("disabled", true);
+                treeFS.css("fontSize", "4px");
             } else if (currentFontSize >= 20) {
                 zoomOpts.find("button.zoom-in").prop("disabled", true);
             } else {
@@ -487,7 +519,6 @@
                 treeFS.css("max-height", $window.height() - FSPadding.top - FSPadding.bottom - (sentenceContainer[0].getBoundingClientRect().height * 2));
                 sentenceContainer.css("max-width", treeFS[0].getBoundingClientRect().width);
             }
-
         }
 
         function errorHandle(message) {
