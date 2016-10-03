@@ -1,8 +1,12 @@
-/**
- * (S)CSS file for the Tree Visualizer.
- *
- * @author Bram Vanroy
- */
+%fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 %clearfix {
     &:after {
         content: "";
@@ -54,12 +58,12 @@
             top: -100%;
             left: 0;
             z-index: 11;
-            padding: 12px;
-            border: 6px solid white;
+            padding: 10px;
+            border: 5px solid white;
             background: darken(#F5F5F5, 2%);
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             text-align: left;
-
+            border-radius: 5px;
             > ul {
                 padding: 0 8px;
                 list-style: none;
@@ -205,6 +209,63 @@
                 }
             }
 
+            &.excluded {
+              &::after,
+              &::before {
+                  border-top: 1px dotted red;
+              }
+
+              &::after {
+                  border-left: 1px dotted red;
+              }
+
+              &.first-child {
+                  &::before {
+                      border: 0 none;
+                  }
+              }
+
+              &.last-child {
+                  &::before {
+                      border-right: 1px dotted red;
+                  }
+
+                  &::after {
+                      border: 0 none;
+                  }
+              }
+
+                a {
+                    span {
+                        opacity: 0.36;
+                    }
+
+                    &::before {
+                        content: "NOT";
+                        position: absolute;
+                        top: 0;
+                        text-align: center;
+                        width: 100%;
+                        left: 0;
+                        top: 50%;
+                        transform: translateY(-50%) scale(1);
+                        color: #cd2b2b;
+                        font-size: 120%;
+                        transition: transform 200ms;
+                    }
+                    &:hover {
+                      span {opacity: 1;}
+                      &::before {
+                        transform: translateY(-50%) scale(0);
+                        pointer-events: none;
+                      }
+                    }
+                    &.hovered {
+                      background-color: rgba(142, 127, 107, 0.36);
+                    }
+                }
+            }
+
             a {
                 display: inline-block;
                 padding: 0.5em 1em;
@@ -223,10 +284,10 @@
 
                 &.hovered,
                 &:hover {
-                    background: #e0e0e0;
+                    background: #ccc;
 
                     + ol li a {
-                        background: #e0e0e0;
+                        background: #ccc;
                     }
 
                     + ol li.highlight a,
@@ -254,7 +315,8 @@
 
                 &.hovered + ol li a.only-child,
                 &:hover + ol li a.only-child {
-                    background: #dedede;
+                    background: #ccc;
+                    color: white;
                 }
 
                 &.hovered + ol li.highlight a.only-child,
@@ -276,6 +338,25 @@
                 &.only-child {
                     color: #9C8A73;
                     font-weight: bold;
+                    &:hover {
+                      span:first-child {
+                          color: #565656;
+                      }
+                    }
+                }
+                &.cs ~ .word em {
+                  cursor: help;
+                  &::before {
+                    content: "\f031";
+                    @extend %fa;
+                    margin-right: 0.36em;
+                    color: #222;
+                  }
+                }
+                &.ignored {
+                  cursor: help;
+                  opacity: 0.67;
+                  + ol::before {border-left: 1px dotted #ccc;}
                 }
             }
 
@@ -291,7 +372,6 @@
     position: relative;
 
     .tree {
-        margin: 24px auto;
         padding: 24px;
         min-height: 240px;
         background: #F7F7F7;
@@ -342,9 +422,10 @@
         min-height: 180px;
         background: #F5F5F5;
         transition: width 200ms, height 200ms;
+        will-change: width, height;
+        overflow: scroll;
 
         &.small {
-            overflow-y: scroll;
 
             a {
                 transition: transform 150ms;
@@ -360,8 +441,9 @@
                 }
 
                 &.only-child {
+                    transition: transform 150ms, margin-bottom 200ms;
                     ~ span {
-                        transition: transform 150ms;
+                        transition: transform 150ms, margin-top 200ms;
                     }
 
                     &.hovered,
