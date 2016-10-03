@@ -1,23 +1,24 @@
 <?php
 
+$currentPage = 'ebs';
+$step = 4;
+
 require '../config/config.php';
 require "$root/helpers.php";
+require "$root/preparatory-scripts/prep-functions.php";
 
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = $_SESSION['ebsxps'];
-$step = 4;
+$continueConstraints = sessionVariablesSet(array('example', 'sentence')) && postVariablesSet(array('manualMode', 'originalXp'));
+$continueConstraints = $continueConstraints && (isset($_POST['xpath']) || isset($_SESSION['xpath']));
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
+$xpath = isset($_POST['xpath']) ? $_POST['xpath'] : $_SESSION['xpath'];
 
-if ($continueConstraints) {
-  $id = session_id();
-  $input = $_SESSION['example'];
+$isSpam = isSpam($xpath);
 
-  $lpxml = simplexml_load_file("$tmp/$id-pt.xml");
-}
+$id = session_id();
 
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
@@ -27,64 +28,35 @@ require "$root/front-end-includes/head.php";
 <?php
 require "$root/front-end-includes/header.php";
 
-if ($continueConstraints) :
-    // Set tokenized input sentence to variable
-  $tokinput = $_SESSION['sentence'];
-  $sentence = explode(' ', $tokinput);
-    // add info annotation matrix to alpino parse
-  foreach ($sentence as $begin => $word) {
-      $postword = preg_replace('/\./', '_', $word);
+if ($continueConstraints && !$isSpam):
+  $originalXp = $_POST['originalXp'];
+  $manualMode = ($_POST['manualMode'] == 'false') ? false : true;
+  $_SESSION['manualMode'] = $manualMode;
 
-      if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) {
-          $xp = $lpxml->xpath("//node[@begin='$begin']");
-      } else {
-          $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");
-      }
+  // Clean up XPath and original XPath
+  $trans = array("='" => '="', "' " => '" ', "']" => '"]', array("\r", "\n", "\t") => ' ');
 
-      if (isset($_POST["$postword--$begin"])) {
-          $postvalue = $_POST["$postword--$begin"];
-          foreach ($xp as $x) {
-              $x->addAttribute('interesting', $postvalue);
-              if ($postvalue == 'token' && !isset($_POST["$postword--$begin-case"])) {
-                $x->addAttribute('casesensitive', 'no');
-              }
-          }
-      }
+  $xpath = strtr($xpath, $trans);
+  $originalXp = strtr($originalXp, $trans);
+
+  $xpath = rtrim($xpath);
+  $originalXp = rtrim($originalXp);
+
+  if ($treebank == 'sonar') {
+    $xpath = preg_replace('/^\/*node/', '/node', $xpath);
+    $originalXp = preg_replace('/^\/{0,2}node/', '/node', $originalXp);
   }
-  // save parse with @interesting annotations
-  $treefileName = "$tmp/$id-int.xml";
-  if (file_exists($treefileName)) {
-      unlink($treefileName);
-  }
-  $tree = $lpxml->asXML();
-
-  $treeFh = fopen($treefileName, 'w');
-  fwrite($treeFh, "$tree\n");
-  fclose($treeFh);
-
-  // Remove top category?
-  if (isset($_POST['topcat'])) {
-      $remove = '-r relcat';
-  } else {
-      $remove = '-r rel';
+  else {
+    $xpath = preg_replace('/^\/*node/', '//node', $xpath);
+    $originalXp = preg_replace('/^\/{0,2}node/', '//node', $originalXp);
   }
 
-  `perl -CS $root/preparatory-scripts/get-subtree.pl -xml $tmp/$id-int.xml -m "sonar" $remove -split > $tmp/$id-sub.xml`;
+  // Check if the XPath was edited by the user or not
+  $xpChanged = ($xpath == $originalXp) ? false : true;
 
-  if (isset($_POST['order'])) {
-      $order = '-order';
-      $_SESSION['order'] = 'on';
-  } else {
-      $order = ' ';
-  }
-
-  // generate XPath from sentence
-  $attsout = '-ex postag,begin,end'; // attributes to be excluded from XPath
-  $xpath = `perl -CS $root/preparatory-scripts/xpath-generator.pl -xml $tmp/$id-sub.xml $attsout $order`;
-  $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath); // underspecify empty attribute values
-  // Apply case (in)sensitivity where necessary
-  $xpath = applyCs($xpath);
   $_SESSION['xpath'] = $xpath;
+  $_SESSION['originalXp'] = $originalXp;
+  $_SESSION['xpChanged'] = $xpChanged;
 
   session_write_close();
 
@@ -109,7 +81,12 @@ else: ?>
   <form action="ebs/query.php" method="post">
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
     <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
+    <?php if (!$xpChanged): ?>
+      <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
+      <div class="sonar" style="display:none">
+        <?php require "$root/front-end-includes/tb-sonar.php"; ?>
+      </div>
+    <?php endif; ?>
 
     <div class="cgn" style="display:none">
       <?php require "$root/front-end-includes/tb-cgn.php"; ?>
@@ -117,20 +94,22 @@ else: ?>
     <div class="lassy" style="display:none">
       <?php require "$root/front-end-includes/tb-lassy.php"; ?>
     </div>
-    <div class="sonar" style="display:none">
-      <?php require "$root/front-end-includes/tb-sonar.php"; ?>
-    </div>
+
     <?php setContinueNavigation(); ?>
   </form>
 <?php endif; ?>
 
 <?php
 else:
-  session_write_close();
+  if($isSpam):
+    setErrorHeading("spam detected"); ?>
+    <p>Your XPath contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
+  <?php else:
   setErrorHeading(); ?>
-  <p>No search instruction could be generated, since you did not enter a sentence.
+  <p>No search instruction could be generated since you did not enter a sentence.
     It is also possible that you came to this page directly without first entering a query.</p>
-  <?php setPreviousPageMessage($step - 1);
+  <?php endif;
+    setPreviousPageMessage($step - 1);
 endif;
 
 require "$root/front-end-includes/footer.php";

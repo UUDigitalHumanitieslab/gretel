@@ -10,6 +10,9 @@
  * @author Bram Vanroy
  */
 
+$currentPage = 'xps';
+$step = 1;
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -20,18 +23,10 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$_SESSION['ebsxps'] = 'xps';
-$currentPage = $_SESSION['ebsxps'];
-$step = 1;
 $taalPortaal = true;
 
 $id = session_id();
-if (!empty($_SESSION['xpath'])) {
-    $xpath = $_SESSION['xpath'];
-    $xpath = preg_replace('/^\/{0,2}node/', '//node', $xpath);
-} else {
-    $xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
-}
+$xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
 
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
@@ -43,7 +38,10 @@ require "$root/front-end-includes/head.php";
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
             <textarea name="xpath" wrap="soft" required spellcheck="false"><?php echo $xpath; ?></textarea>
-            <button type="reset" name="clear" title="Empty the input field"><i class="fa fa-fw fa-times"></i></button>
+            <button type="reset" name="clear" title="Empty the input field">
+              <i class="fa fa-fw fa-times"></i>
+              <span class="sr-only">Empty the input field</span>
+            </button>
         </div>
         <?php setContinueNavigation(); ?>
     </form>

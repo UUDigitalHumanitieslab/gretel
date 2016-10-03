@@ -1,14 +1,14 @@
 <?php
 
+$currentPage = 'ebs';
+$step = 6;
+
 require '../config/config.php';
 require "$root/helpers.php";
 
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
-
-$currentPage = $_SESSION['ebsxps'];
-$step = 6;
 
 $id = session_id();
 
@@ -18,6 +18,7 @@ if ($continueConstraints) {
     $treeVisualizer = true;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
+    $xpath = $_SESSION['xpath'];
 
     if (is_array($components)) {
         $component = implode(', ', $components);
@@ -27,41 +28,6 @@ if ($continueConstraints) {
     }
 
     $example = $_SESSION['example'];
-
-    if (isset($_POST['xp'])) {
-        $xpath = $_POST['xp'];
-    } else {
-        $xpath = $_SESSION['xpath'];
-    }
-
-    // Clean up XPath
-    $xpath = html_entity_decode($xpath, ENT_QUOTES);
-    $xpath = rtrim($xpath);
-    $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
-    // Deal with quotes/apos
-    $trans = array("='" => '="', "' " => '" ', "']" => '"]');
-    $xpath = strtr("$xpath", $trans);
-
-    if ($treebank == 'sonar') $xpath = preg_replace('/^\/*node/', '/node', $xpath);
-    else $xpath = preg_replace('/^\/*node/', '//node', $xpath);
-
-    $_SESSION['xpath'] = $xpath;
-
-    if ($treebank != 'sonar') {
-        $originalXp = $_POST['originalXp'];
-      // Clean up $originalXp
-      $originalXp = rtrim($originalXp);
-        $originalXp = str_replace(array("\r", "\n", "\t"), ' ', $originalXp);
-        $originalXp = strtr($originalXp, $trans);
-
-        if ($treebank == 'sonar') $originalXp = preg_replace('/^\/{0,2}node/', '/node', $originalXp);
-        else $originalXp = preg_replace('/^\/{0,2}node/', '//node', $originalXp);
-
-        $xpChanged = ($xpath == $originalXp) ? 'no' : 'yes';
-
-        $_SESSION['originalXp'] = $originalXp;
-        $_SESSION['xpChanged'] = $xpChanged;
-    }
 
     $context = $_SESSION['ct'];
     $_SESSION['queryIteration'] = array(0, 0);
@@ -73,6 +39,7 @@ if ($continueConstraints) {
 
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
+require "$root/preparatory-scripts/prep-functions.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
@@ -105,12 +72,8 @@ if ($continueConstraints):
         <div class="table-wrapper">
           <table>
             <tbody><tr><th>Input example</th><td><em><?php echo $example; ?></em></td></tr>
-            <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
-            <?php if ($treebank == 'sonar'): ?>
+            <tr><th>XPath</th><td><code style="font-size: 88%"><?php echo $xpath; ?></code></td></tr>
             <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-            <?php else: ?>
-            <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-            <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -215,9 +178,9 @@ if ($continueConstraints) : ?>
     <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
-        'fetchResultsPath' => "$home/php/flush-results.php",
-        'getAllResultsPath' => "$home/php/get-all-results.php",
-        'fetchCountsPath' => "$home/php/get-counts.php",
+        'fetchResultsPath' => "$home/basex-search-scripts/flush-results.php",
+        'getAllResultsPath' => "$home/basex-search-scripts/get-all-results.php",
+        'fetchCountsPath' => "$home/basex-search-scripts/get-counts.php",
         'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,

@@ -11,6 +11,9 @@
  * @author Bram Vanroy
  */
 
+$currentPage = 'ebs';
+$step = 1;
+
 require '../config/config.php';
 require "$root/helpers.php";
 
@@ -21,10 +24,6 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$currentPage = 'ebs';
-$_SESSION['ebsxps'] = $currentPage;
-
-$step = 1;
 $taalPortaal = true;
 
 $id = session_id();

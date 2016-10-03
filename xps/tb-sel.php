@@ -1,14 +1,15 @@
 <?php
 
+$currentPage = 'xps';
+$step = 2;
+
 require '../config/config.php';
 require "$root/helpers.php";
+require "$root/preparatory-scripts/prep-functions.php";
 
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
-
-$currentPage = $_SESSION['ebsxps'];
-$step = 2;
 
 $continueConstraints = isset($_POST['xpath']) || isset($_SESSION['xpath']);
 $id = session_id();
@@ -22,8 +23,8 @@ require "$root/front-end-includes/head.php";
 
 // Check if $xpath contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
-
 ?>
+<link rel="prefetch" href="js/min/results.min.js">
 </head>
 <?php flush(); ?>
 <?php

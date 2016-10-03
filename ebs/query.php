@@ -1,13 +1,14 @@
 <?php
+
+$currentPage = 'ebs';
+$step = 5;
+
 require '../config/config.php';
 require "$root/helpers.php";
 
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
-
-$currentPage = $_SESSION['ebsxps'];
-$step = 5;
 
 $noTbFlag = 0;
 
@@ -32,7 +33,7 @@ if (!$noTbFlag) {
     }
 }
 
-$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath', 'manualMode'));
 
 if ($continueConstraints) {
     $id = session_id();
@@ -40,8 +41,10 @@ if ($continueConstraints) {
     $treeVisualizer = true;
 
     $tokinput = $_SESSION['sentence'];
+    $manualMode = $_SESSION['manualMode'];
 
     $xpath = $_SESSION['xpath'];
+    $xpChanged = $_SESSION['xpChanged'];
 
     $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
 }
@@ -51,10 +54,11 @@ session_write_close();
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 ?>
+
+<link rel="prefetch" href="js/min/results.min.js">
 </head>
 <?php flush(); ?>
 <?php require "$root/front-end-includes/header.php"; ?>
-
 <?php if ($continueConstraints) :
   $component = implode(', ', $component);
   $xpath = rtrim($xpath);
@@ -66,40 +70,23 @@ require "$root/front-end-includes/head.php";
   fclose($treeLog);
 ?>
 
+<h3>Input</h3>
 <ul>
 <li>Input example: <em><?php echo $tokinput; ?></em></li>
 <li>Treebank: <?php echo strtoupper($treebank); ?></li>
 <li>Components: <?php echo strtoupper($component); ?></li>
 </ul>
 
+<?php if (!$xpChanged): ?>
+  <h3>Query tree</h3>
 <div id="tree-output"></div>
+<?php endif; ?>
 
-<?php
-    if ($treebank == 'sonar') : ?>
-      <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
-        below is provided to show you the structure that is assigned to your input example.</p>
-
-    <?php else : ?>
-      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing!
-      If you are dealing with a long query, the
-      <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
-    <?php endif; ?>
-
+  <h3>XPath expression<?php if (!$xpChanged): ?>, generated from the query tree<?php endif; ?></h3>
+  <div class="generated-xpath"><code><?php echo $xpath; ?></code></div>
     <form action="ebs/results.php" method="post">
-    <?php
-    if ($treebank == 'sonar') {
-        $readonly = 'readonly';
-    } else {
-        $readonly = '';
-        $htmlXpath = htmlentities($xpath, ENT_QUOTES);
-        echo '<input type="hidden" name="originalXp" value="'.$htmlXpath.'">';
-    }
-    ?>
-    <textarea name="xp" wrap="soft" <?php echo $readonly;?> spellcheck="false"><?php echo $xpath; ?></textarea>
-
-    <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
     <?php setContinueNavigation(); ?>
-  </form>
+    </form>
 <?php else: // $continueConstraints
     setErrorHeading();
 ?>
@@ -112,7 +99,7 @@ endif;  // $continueConstraints
 require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) : ?>
+if ($continueConstraints && !$xpChanged) : ?>
     <script src="js/tree-visualizer.js"></script>
     <script>
     $(function(){

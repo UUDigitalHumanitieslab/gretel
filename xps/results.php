@@ -1,6 +1,7 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
+$currentPage = 'xps';
+$step = 3;
 
 require '../config/config.php';
 require "$root/helpers.php";
@@ -9,8 +10,7 @@ session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = $_SESSION['ebsxps'];
-$step = 3;
+$_SESSION['ebsxps'] = $currentPage;
 
 $id = session_id();
 $noTbFlag = 0;
@@ -180,9 +180,9 @@ if ($continueConstraints) : ?>
     <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
-        'fetchResultsPath' => "$home/php/flush-results.php",
-        'getAllResultsPath' => "$home/php/get-all-results.php",
-        'fetchCountsPath' => "$home/php/get-counts.php",
+        'fetchResultsPath' => "$home/basex-search-scripts/flush-results.php",
+        'getAllResultsPath' => "$home/basex-search-scripts/get-all-results.php",
+        'fetchCountsPath' => "$home/basex-search-scripts/get-counts.php",
         'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,
