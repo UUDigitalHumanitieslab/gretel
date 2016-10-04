@@ -4,6 +4,21 @@ html {
   padding: 0;
 }
 
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
 [hidden],
 template {
   display: none;
@@ -15,6 +30,12 @@ a {
 
 a:active, a:hover {
   outline-width: 0;
+}
+
+abbr[title] {
+  border-bottom: none;
+  text-decoration: underline;
+  text-decoration: underline dotted;
 }
 
 b,
@@ -71,6 +92,11 @@ textarea {
   margin: 0;
 }
 
+button,
+select {
+  text-transform: none;
+}
+
 [type="button"],
 [type="reset"],
 [type="submit"],
@@ -88,6 +114,26 @@ input::-moz-focus-inner {
   padding: 0;
 }
 
+button:-moz-focusring,
+input:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+fieldset {
+  border: 1px solid #ad9f8e;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+
+legend {
+  box-sizing: border-box;
+  color: inherit;
+  display: table;
+  max-width: 100%;
+  padding: 0;
+  white-space: normal;
+}
+
 textarea {
   overflow: auto;
 }
@@ -97,6 +143,11 @@ textarea {
   box-sizing: border-box;
   padding: 0;
   vertical-align: middle;
+}
+
+[type="number"]::-webkit-inner-spin-button,
+[type="number"]::-webkit-outer-spin-button {
+  height: auto;
 }
 
 [type="search"] {
@@ -625,11 +676,6 @@ p code {
   border-radius: 4px;
   background: #FAFAFA;
   font-size: 0.8em;
-}
-
-.generated-xpath {
-  border-bottom-width: 1px;
-  max-width: 640px;
 }
 
 a {

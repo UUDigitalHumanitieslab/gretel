@@ -204,19 +204,20 @@ $(function() {
         $(".xpath-wrapper textarea").on("mousedown", editWarningOnClick);
 
         function editWarningOnClick() {
-            var popupClass = "edit-warning";
+            var popupClass = "edit-warning",
+                popupId;
             if ($("." + popupClass).length == 0) {
                 var html = "<p>Editing the XPath will disable all options including the selection table and the tree representation. Furthermore, you will <strong>not</strong> be able to select SoNaR as the corpus of interest.</p>" +
                     "<p><strong>Only edit this code if you know what you are doing!</strong></p>";
                 html += "<small>You can re-enable all options and reset XPath to the the original structure by pressing the button <em>Reset XPath</em></small>";
 
-                fillPopup(html, true, popupClass);
+                popupId = fillPopup(html, true, popupClass);
             }
 
-            var popup = $("." + popupClass),
-                popupId = popup.data("popup-id");
+            var popup = $("." + popupClass);
 
             if (!Cookies.get('popup-continue-' + popupId)) {
+
                 showPopup(popup, $("#xpath"));
                 popup.find("button.continue").click(function() {
                     $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
@@ -386,6 +387,8 @@ $(function() {
             var overlay = document.createElement("div");
             $(overlay).attr("id", "popup-overlay").hide().appendTo("#popup-wrapper");
         }
+
+        return popupId;
     }
 
 
@@ -457,6 +460,7 @@ $(function() {
 
         if ($this.hasClass("continue")) {
             Cookies.set('popup-continue-' + popupId, 'true');
+            console.log("hasClass " + popupId);
         }
         hidePopup(popup);
     });
