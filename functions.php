@@ -217,11 +217,16 @@
   }
 
   // Returns associative array containing at least the machine and the port
-  function getSonarServerInfo($component) {
-    global $sonarComponentGroups;
-    if (array_key_exists($component, $sonarComponentGroups)) {
-      return $sonarComponentGroups{$component};
-    } elseif (in_array($component, $sonarComponentGroups{REST}{components})) {
-      return $sonarComponentGroups{REST};
+  function getSonarServerInfo($corpus, $component) {
+    global $databaseGroups;
+    // Lassy and CGN
+    if (!$component && array_key_exists($corpus, $databaseGroups)) {
+      return $sonarComponentGroups{$corpus};
+    }
+    // Sonar components
+    elseif (array_key_exists($component, $databaseGroups{$corpus})) {
+      return $databaseGroups{$component};
+    } elseif (in_array($component, $sonarComponentGroups{'REST'}{'components'})) {
+      return $sonarComponentGroups{'REST'};
     }
   }

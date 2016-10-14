@@ -18,13 +18,16 @@ $includes = ($treebank == 'sonar') ? $_SESSION['includes'] : false;
 
 session_write_close();
 
+$serverInfo;
 if ($treebank == 'sonar') {
-    $dbhost = $dbnameServerSonar{$component[0]};
-    $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+  $serverInfo = getSonarServerInfo($treebank, $component);
+} else {
+  $serverInfo = getSonarServerInfo($treebank, false);
 }
-else {
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-}
+
+$dbhost = $serverInfo{'machine'};
+$dbport = $serverInfo{'port'};
+$session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
 list($sum, $counts) = getCounts($xpath, $treebank, $component, $includes, $session);
 

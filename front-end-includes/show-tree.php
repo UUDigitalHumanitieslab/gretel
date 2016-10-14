@@ -39,16 +39,20 @@ require "$root/helpers.php";
 require "$root/basex-search-scripts/basex-client.php";
 
 try {
-    if ($treebank == 'sonar') {
-        preg_match('/^([A-Z]{5})/', $db, $component);
-        $dbhost = $dbnameServerSonar[$component[0]];
-        $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
-        $queryPath = $db;
-    } else {
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        $queryPath = strtoupper($treebank);
-        $queryPath .= '_ID';
-    }
+  $serverInfo;
+  if ($treebank == 'sonar') {
+    preg_match('/^([A-Z]{5})/', $db, $component);
+    $serverInfo = getSonarServerInfo($treebank, $component);
+    $queryPath = $db;
+  } else {
+    $serverInfo = getSonarServerInfo($treebank, false);
+    $queryPath = strtoupper($treebank);
+    $queryPath .= '_ID';
+  }
+
+  $dbhost = $serverInfo{'machine'};
+  $dbport = $serverInfo{'port'};
+  $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
     $xquery = 'db:open("'.$queryPath.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
     $query = $session->query($xquery);
