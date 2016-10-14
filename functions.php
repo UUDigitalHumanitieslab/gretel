@@ -215,3 +215,13 @@
 
       echo $navString;
   }
+
+  // Returns associative array containing at least the machine and the port
+  function getSonarServerInfo($component) {
+    global $sonarComponentGroups;
+    if (array_key_exists($component, $sonarComponentGroups)) {
+      return $sonarComponentGroups{$component};
+    } elseif (in_array($component, $sonarComponentGroups{REST}{components})) {
+      return $sonarComponentGroups{REST};
+    }
+  }

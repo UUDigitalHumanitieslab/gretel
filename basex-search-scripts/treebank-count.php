@@ -125,7 +125,7 @@ function getTotalSentences($corpus)
         $TOTAL['CGN_ID_VO'] = '3256';
         $TOTAL['TOTAL'] = '129923';
     } else {
-        return undefined;
+        return false;
     }
 
     return $TOTAL;

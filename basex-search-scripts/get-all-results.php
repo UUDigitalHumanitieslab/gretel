@@ -59,8 +59,10 @@ require "$root/basex-search-scripts/treebank-search.php";
 
   try {
       if ($treebank == 'sonar') {
-          $dbhost = $dbnameServerSonar[$component[0]];
-          $session = new Session($dbhost, $dbportSonar, $dbuserSonar, $dbpwdSonar);
+        $serverInfo = getSonarServerInfo($component);
+          $dbhostSonar = $serverInfo{machine};
+          $dbportSonar = $serverInfo{port};
+          $session = new Session($dbhostSonar, $dbportSonar, $dbuserSonar, $dbpwdSonar);
           list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
       }
       else {

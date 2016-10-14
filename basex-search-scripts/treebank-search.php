@@ -1,36 +1,25 @@
 <?php
 
 function getMoreIncludes($database, &$databases, $session) {
-    global $basexPathsSonar;
+    $xq = '/treebank/include';
+    $xqinclude = 'db:open("' . $database . '")' . $xq;
+    $query = $session->query($xqinclude);
 
-    $dbflag = false;
-    foreach ($basexPathsSonar as $basex) {
-      if (file_exists("$basex/$database")) {
-        $dbflag = true;
-        break;
-      }
-    }
+    $basexinclude  = $query->execute();
+    $basexincludes = explode("\n", $basexinclude);
 
-    if ($dbflag) {
-      $xq  = '/treebank/include';
-      $xqinclude = 'db:open("' . $database . '")' . $xq;
-      $query = $session->query($xqinclude);
+    $query->close();
 
-      $basexinclude  = $query->execute();
-      $basexincludes = explode("\n", $basexinclude);
+    $pattern = '/file=\"(.+)\"/';
+    foreach ($basexincludes as $include) {
+			$include = trim($include);
+      if (!empty($include) && preg_match($pattern, $include, $files)) {
+        $file = $files[1];
 
-      $query->close();
-
-      foreach ($basexincludes as $include) {
-  			$include = trim($include);
-            if (!empty($include) && preg_match("/file=\"(.+)\"/", $include, $files)) {
-                $file = $files[1];
-
-                if (!includeAlreadyExists($file)) {
-                    array_push($databases, $file);
-                }
-            }
+        if (!includeAlreadyExists($file)) {
+          array_push($databases, $file);
         }
+      }
     }
 }
 
@@ -63,8 +52,6 @@ function corpusToDatabase($tblist, $treebank)
 
       return $databases;
 }
-
-
 
 function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration, $session)
 {
@@ -117,7 +104,7 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
-          $input = createXquery($xpath, $db, $treebank, $context, $endPosIteration);
+          $input = createXquery($xpath, $db, $treebank, false, $context, $endPosIteration);
 
           // create query instance
           $query = $session->query($input);
@@ -244,7 +231,7 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
-          $input = createXquery($xpath, $db, $treebank, $context, $endPosIteration);
+          $input = createXquery($xpath, $db, $treebank, $component, $context, $endPosIteration);
 
           // create query instance
           $query = $session->query($input);
@@ -324,7 +311,7 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
     }
 }
 
-function createXquery($xpath, $db, $treebank, $context, $endPosIteration)
+function createXquery($xpath, $db, $treebank, $component, $context, $endPosIteration)
 {
     global $flushLimit, $resultsLimit;
 
@@ -334,7 +321,7 @@ function createXquery($xpath, $db, $treebank, $context, $endPosIteration)
         $sentid = 'let $sentid := ($node/ancestor::tree/@id)';
         $sentence = '
     return
-    for $sentence in (db:open("sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
+    for $sentence in (db:open("'.$component.'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
         let $tb := ($sentence/@part)';
     }
     else {
@@ -392,8 +379,7 @@ function createXquery($xpath, $db, $treebank, $context, $endPosIteration)
 
 function highlightSentence($sentence, $beginlist, $tag)
 {
-
-    if (preg_match('/<em>/', $sentence)) {
+    if (strpos($sentence, '<em>') !== false) {
       preg_match("/(.*<em>)(.*?)(<\/em>.*)/", $sentence, $groups);
         $s = $groups[2];
         $prev = $groups[1];
@@ -405,7 +391,7 @@ function highlightSentence($sentence, $beginlist, $tag)
     $begins = explode('-',$beginlist);
 
     $i = 0;
-    // Instead of wrapping each individual word in a strong tag, merge sequences
+    // Instead of wrapping each individual word in a tag, merge sequences
     // of words in one <tag>...</tag>
     foreach ($words as $word) {
         if (in_array($i, $begins)) {
