@@ -321,7 +321,7 @@ function createXquery($xpath, $db, $treebank, $component, $context, $endPosItera
         $sentid = 'let $sentid := ($node/ancestor::tree/@id)';
         $sentence = '
     return
-    for $sentence in (db:open("'.$component.'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
+    for $sentence in (db:open("'.$component[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
         let $tb := ($sentence/@part)';
     }
     else {
@@ -336,18 +336,29 @@ function createXquery($xpath, $db, $treebank, $component, $context, $endPosItera
     $begins = 'let $begins := ($node//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
     if ($context) {
-        $tb = strtoupper($treebank);
-        $dbs = $tb.'_ID_S';
+      if ($treebank != 'sonar') {
+        $dbs = strtoupper($treebank).'_ID_S';
+      } else {
+        $dbs = $component[0].'sentence2treebank';
+      }
 
-        $text = 'let $text := fn:replace($sentid[1], \'(.+)(\d+)\', \'$1\')';
-        $snr = 'let $snr := fn:replace($sentid[1], \'(.+)(\d+)\', \'$2\')';
+        $text = 'let $text := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$1\')';
+        $snr = 'let $snr := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$2\')';
         $prev = 'let $prev := (number($snr)-1)';
         $next = 'let $next := (number($snr)+1)';
         $previd = 'let $previd := concat($text, $prev)';
         $nextid = 'let $nextid := concat($text, $next)';
 
-        $prevs = 'let $prevs := (db:open("'.$dbs.'")//s[id=$previd]/sentence)';
-        $nexts = 'let $nexts := (db:open("'.$dbs.'")//s[id=$nextid]/sentence)';
+        $prevs = 'let $prevs := (db:open("'.$dbs.'")';
+        $nexts = 'let $nexts := (db:open("'.$dbs.'")';
+
+        if ($treebank != 'sonar') {
+          $prevs .= '//s[id=$previd]/sentence)';
+          $nexts .= '//s[id=$nextid]/sentence)';
+        } else {
+          $prevs .= '/sentence2treebank/sentence[@nr=$previd])';
+          $nexts .= '/sentence2treebank/sentence[@nr=$nextid])';
+        }
 
         $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             . $returnTb . '||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';

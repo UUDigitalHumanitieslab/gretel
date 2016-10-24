@@ -69,4 +69,3 @@
     </tbody>
 </table>
 </div>
-<?php require "$root/front-end-includes/tb-options.php"; ?>
