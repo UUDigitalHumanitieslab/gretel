@@ -33,7 +33,8 @@ if (!$noTbFlag) {
     }
 }
 
-$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath', 'manualMode'));
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath',
+  'originalXp', 'manualMode', 'xpChanged'));
 
 if ($continueConstraints) {
     $id = session_id();
@@ -44,9 +45,19 @@ if ($continueConstraints) {
     $manualMode = $_SESSION['manualMode'];
 
     $xpath = $_SESSION['xpath'];
+    $originalXp = $_SESSION['originalXp'];
     $xpChanged = $_SESSION['xpChanged'];
+    if ($treebank == 'sonar') {
+      $xpath = preg_replace('/^\/*/', '/', $xpath);
+      $originalXp = preg_replace('/^\/*/', '/', $originalXp);
+    }
+    else {
+      $xpath = preg_replace('/^\/*/', '//', $xpath);
+      $originalXp = preg_replace('/^\/*/', '//', $originalXp);
+    }
 
-    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
+    $_SESSION['xpath'] = $xpath;
+    $_SESSION['originalXp'] = $originalXp;
 }
 
 session_write_close();

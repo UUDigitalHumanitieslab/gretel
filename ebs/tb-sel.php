@@ -14,11 +14,15 @@ header('Content-Type:text/html; charset=utf-8');
 $continueConstraints = sessionVariablesSet(array('example', 'sentence')) && postVariablesSet(array('manualMode', 'originalXp'));
 $continueConstraints = $continueConstraints && (isset($_POST['xpath']) || isset($_SESSION['xpath']));
 
-$xpath = isset($_POST['xpath']) ? $_POST['xpath'] : $_SESSION['xpath'];
+$isSpam = false;
 
-$isSpam = isSpam($xpath);
+if ($continueConstraints) {
+  $xpath = isset($_POST['xpath']) ? $_POST['xpath'] : $_SESSION['xpath'];
 
-$id = session_id();
+  $isSpam = isSpam($xpath);
+
+  $id = session_id();
+}
 
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
@@ -33,8 +37,10 @@ if ($continueConstraints && !$isSpam):
   $manualMode = ($_POST['manualMode'] == 'false') ? false : true;
   $_SESSION['manualMode'] = $manualMode;
 
+  $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
+
   // Clean up XPath and original XPath
-  $trans = array("='" => '="', "' " => '" ', "']" => '"]', array("\r", "\n", "\t") => ' ');
+  $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
 
   $xpath = strtr($xpath, $trans);
   $originalXp = strtr($originalXp, $trans);
@@ -42,25 +48,20 @@ if ($continueConstraints && !$isSpam):
   $xpath = rtrim($xpath);
   $originalXp = rtrim($originalXp);
 
-  if ($treebank == 'sonar') {
-    $xpath = preg_replace('/^\/*node/', '/node', $xpath);
-    $originalXp = preg_replace('/^\/{0,2}node/', '/node', $originalXp);
-  }
-  else {
-    $xpath = preg_replace('/^\/*node/', '//node', $xpath);
-    $originalXp = preg_replace('/^\/{0,2}node/', '//node', $originalXp);
-  }
+  $xpath = preg_replace('/^\/*/', '', $xpath);
+  $originalXp = preg_replace('/^\/*/', '', $originalXp);
 
   // Check if the XPath was edited by the user or not
   $xpChanged = ($xpath == $originalXp) ? false : true;
 
+  $_SESSION['xpChanged'] = $xpChanged;
+
   $_SESSION['xpath'] = $xpath;
   $_SESSION['originalXp'] = $originalXp;
-  $_SESSION['xpChanged'] = $xpChanged;
 
   session_write_close();
 
-  if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints) :
+  if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints):
     setErrorHeading();
 ?>
 
