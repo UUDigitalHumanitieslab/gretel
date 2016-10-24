@@ -415,8 +415,8 @@ p code {
 }
 
 .generated-xpath {
-  border-bottom-width: 1px;
-  max-width: 640px;
+    max-width: 640px;
+    border-bottom-width: 1px;
 }
 
 a {
@@ -1172,23 +1172,33 @@ dd {
     }
 }
 
-#query-overview,
-#results .content {
-    margin-bottom: 36px;
-    padding-bottom: 36px;
-    border-bottom: 1px solid #eaeaea;
+#results-menu {
+    ul {
+        display: inline;
+        padding: 0;
+        list-style: none;
+
+        li {
+            display: inline-block;
+
+            a {
+                border-bottom-style: dotted;
+            }
+
+            &:not(:last-child):after {
+                margin: 0 4px;
+                content: ' - ';
+            }
+        }
+    }
 }
 
-#results .content {
+#download .content {
     &.error,
     &.no-results {
         margin-bottom: 0;
         padding-bottom: 0;
         border-bottom: 0 none;
-
-        .results-explanation {
-            display: none;
-        }
 
         h3 {
             display: none;
@@ -1196,51 +1206,29 @@ dd {
     }
 }
 
-#query-overview .flex-content,
-#results .content {
-    display: flex;
-}
-
+#download .content,
 #query-overview .flex-content {
-    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
 }
 
-#query-overview .flex-content > *,
-#results .content > div {
-    flex: 1;
+#query-overview {
+    .flex-content {
+        align-items: flex-start;
+    }
 
-    &:first-child {
-        flex: 1.34;
+    p {
+        margin: 0 0 0 36px;
+        padding: 12px;
+        border: 1px solid #dedede;
+        border-radius: 4px;
+        background: #FAFAFA;
+        font-size: 88%;
     }
 }
 
-.results-explanation {
-    text-align: justify;
-
-    p:first-child {
-        margin-top: 0;
-    }
-}
-
-#query-overview p,
-.results-download-wrapper {
-    margin: 0 0 0 36px;
-    padding: 12px;
-}
-
-.results-download-wrapper {
-    padding-top: 0;
-}
-
-#query-overview p {
-    border: 1px solid #dedede;
-    border-radius: 4px;
-    background: #FAFAFA;
-    font-size: 88%;
-}
-
-#results {
-    .results-download-wrapper {
+#download {
+    .content {
         &:not(.active) {
             position: relative;
             min-height: 190px;
@@ -1257,7 +1245,7 @@ dd {
                 content: "Searching";
                 text-shadow: 0 -1px rgba(0,0,0,.16), 0 1px rgb(255,255,255), 0 -1px 4px rgba(0,0,0,0.1);
                 font-weight: 700;
-                font-size: 48px;
+                font-size: 36px;
                 transform: translate(-50%,-50%);
             }
         }
@@ -1268,26 +1256,28 @@ dd {
             display: none;
         }
 
-        .distribution-wrapper .table-wrapper,
         h3 {
             margin-top: 0;
             text-align: left;
         }
 
         .distribution-wrapper {
-            text-align: center;
+            margin-left: 36px;
 
             .table-wrapper {
+                font-size: 88%;
+
                 table {
                     margin: 0 auto;
+                    font-size: 88%;
                 }
             }
         }
     }
 
     .messages {
-        margin: 0 auto 36px;
-        max-width: 520px;
+        margin: 0 auto;
+        padding: 12px;
         font-size: 88%;
 
         &.active {
@@ -1333,6 +1323,12 @@ dd {
 
 .results {
     .results-ajax-wrapper {
+        margin: 36px auto;
+
+        .table-wrapper {
+            max-height: 70vh;
+        }
+
         table {
             width: 100%;
             table-layout: fixed;
@@ -1377,9 +1373,6 @@ dd {
         }
 
         tr {
-            transition: background-color 1000ms;
-            will-change: background-color;
-
             &:nth-child(even) {
                 background-color: #F7F7F7;
             }
@@ -1505,15 +1498,6 @@ dd {
         align-items: center;
         justify-content: flex-end;
 
-        &.scroll {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            z-index: 10;
-            border-radius: 0;
-            transform: translateX(-50%);
-        }
-
         > *:not(:last-child) {
             margin-right: 1.34em;
         }
@@ -1523,58 +1507,6 @@ dd {
 
             > span {
                 white-space: nowrap;
-            }
-        }
-
-        [name="to-top"] {
-            width: 31px;
-            height: 31px;
-        }
-    }
-
-    .dummy-controls {
-        position: relative;
-        display: none;
-        margin: auto auto 1.67em;
-
-        &::after,
-        &::before {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 8px;
-            background-image: linear-gradient(to right, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
-            background-size: 40px 100%;
-            content: "";
-        }
-
-        &::after {
-            top: 0;
-            bottom: auto;
-        }
-
-        .content {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            border-bottom: 0 none !important;
-
-            &::after,
-            &::before {
-                position: absolute;
-                left: 0;
-                width: 8px;
-                height: 100%;
-                background-image: linear-gradient(to bottom, transparent 0%, transparent 50%, #EEE 50%, #EEE 100%);
-                background-size: 100% 40px;
-                content: "";
-            }
-
-            &::after {
-                right: 0;
-                left: auto;
             }
         }
     }
@@ -1699,8 +1631,8 @@ dd {
     }
 }
 @media all and (max-width: 768px) {
-    #query-overview .flex-content,
-    #results .content {
+    #download .content,
+    #query-overview .flex-content {
         display: block;
     }
 
@@ -1708,10 +1640,6 @@ dd {
     .results-download-wrapper {
         margin: 20px auto 0;
         padding: 12px;
-    }
-
-    #results .messages {
-        margin: 0 auto;
     }
 
     .results .download-link {
@@ -1834,6 +1762,7 @@ dd {
         .fax::before {
             content: "\f1ac";
         }
+
         .email::before {
             content: "\f0e0";
         }
