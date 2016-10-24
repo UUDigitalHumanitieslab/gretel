@@ -132,10 +132,16 @@ $(function() {
             this.setCustomValidity("");
         });
 
-        $("form").submit(getTreePath());
+
 
         var getTreePathXHR;
         getTreePath();
+
+        $("main form input[type='radio'], main form input[type='checkbox']:not([name='ct'])").change(function() {
+            getTreePath();
+        });
+        $("form").submit(getTreePath());
+
         // Allow cell clicks to go down to the inputs, but prevent clicks on the input
         // going up. Otherwise, we'll get stuck in an infinite loop
         $("tbody td").click(function() {
@@ -164,9 +170,6 @@ $(function() {
                     checkCell.addClass("disabled").children("input[type='checkbox']").prop("checked", false).prop("disabled", true);
                 }
             }
-        });
-        $("main form input[type='radio'], main form input[type='checkbox']").change(function() {
-            getTreePath();
         });
 
         var advancedBtn = $(".advanced-btn-wrapper button"),
@@ -208,7 +211,7 @@ $(function() {
             if ($("." + popupClass).length == 0) {
                 var html = "<p>Editing the XPath will disable all options including the selection table and the tree representation. Furthermore, you will <strong>not</strong> be able to select SoNaR as the corpus of interest.</p>" +
                     "<p><strong>Only edit this code if you know what you are doing!</strong></p>";
-                html += "<small>You can re-enable all options and reset XPath to the the original structure by pressing the button <em>Reset XPath</em></small>";
+                html += "<small>You can re-enable all options and reset XPath to the last unmodified structure by pressing the button <em>Reset XPath</em></small>";
 
                 fillPopup(html, true, popupClass);
             }
