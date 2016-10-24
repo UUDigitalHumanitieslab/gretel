@@ -80,6 +80,15 @@ if ($continueConstraints):
             <span class="sr-only">Only search for patterns that have the same word order as your input example</span>
           </div>
         </div>
+        <div class="label-wrapper">
+          <label>
+            <input type="checkbox" name="ct" value="on" aria-describedby="ct-tooltip"> Include context in results
+          </label>
+          <div class="help-tooltip" id="ct-tooltip" data-title="In the results, show the sentence before and after the matching sentence to provide a broader context">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+            <span class="sr-only">In the results, show the sentence before and after the matching sentence to provide a broader context</span>
+          </div>
+        </div>
         <div class="label-wrapper advanced-option">
           <label>
             <input type="checkbox" name="topcat" aria-describedby="topcat-tooltip"> Ignore properties of the dominating node
@@ -95,7 +104,7 @@ if ($continueConstraints):
         <h3 class="advanced-option">Modify XPath</h3>
         <input type="hidden" name="originalXp" value="">
         <input type="hidden" name="manualMode" value="false">
-        
+
         <textarea id="xpath" class="advanced-option" name="xpath" spellcheck="false" wrap="soft" required></textarea>
         <div class="open-beautifier-wrapper advanced-option">
           <input type="reset" value="Reset XPath" style="font-size: 88%">
