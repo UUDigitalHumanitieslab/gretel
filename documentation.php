@@ -77,7 +77,7 @@ require "$root/front-end-includes/head.php";
                         <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank" title="The project page of Lassy Small">Lassy Small</a>
                           was the first corpus to be supported in GrETEL. It is a one-million words corpus
                           that consists of written data. All of its annotations have been manually checked and verified.</li>
-                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_Dutch/start.htm" target="_blank" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
+                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm" target="_blank" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
                           or CGN for short, is a corpus of one million words that consists of transcribed Dutch speech.
                           All the provided annotations have been manually checked and verified.</li>
                         <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank" title="The project page of SoNaR">SoNaR</a>,
