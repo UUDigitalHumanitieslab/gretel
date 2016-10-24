@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
 <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
 
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700:latin|Roboto+Condensed:400:latin" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400:latin|Roboto+Condensed:400:latin" rel="stylesheet">
 <link rel="stylesheet" href="style/css/min/styles.min.css">
 
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
@@ -25,8 +25,7 @@
   // Prefetch links. Don't prefetch too much, only required pages such as
   // the home page, or the next page in the process
 ?>
-<?php if (!isHome()): ?>
-    <link rel="prefetch" href="index.php">
+<?php if (isSearch()): ?>
     <?php if (isset($step) && $step < count(${$currentPage.'Pages'})):
         $keys = array_keys(${$currentPage.'Pages'});
     ?>
@@ -38,7 +37,6 @@
 ?>
     <link rel="prefetch" href="ebs/<?php echo $ebsKeys[0]; ?>">
     <link rel="prefetch" href="xps/<?php echo $xpsKeys[0]; ?>">
-    <link rel="prefetch" href="documentation.php">
 <?php endif;?>
 
 <?php
@@ -49,7 +47,7 @@
 
     WebFontConfig = {
         google: {
-            families: ["Roboto+Mono:400:latin"]
+            families: ["Roboto+Mono:400:latin", "Open+Sans:300,700:latin"]
         },
         custom: {
             families: ["FontAwesome"],
