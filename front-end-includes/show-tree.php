@@ -36,13 +36,14 @@ if (isset($_GET['db'])) {
 
 require '../config/config.php';
 require "$root/helpers.php";
+require "$root/functions.php";
 require "$root/basex-search-scripts/basex-client.php";
 
 try {
   $serverInfo;
   if ($treebank == 'sonar') {
     preg_match('/^([A-Z]{5})/', $db, $component);
-    $serverInfo = getSonarServerInfo($treebank, $component);
+    $serverInfo = getSonarServerInfo($treebank, $component[0]);
     $queryPath = $db;
   } else {
     $serverInfo = getSonarServerInfo($treebank, false);
@@ -53,17 +54,16 @@ try {
   $dbhost = $serverInfo{'machine'};
   $dbport = $serverInfo{'port'};
   $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+  $xquery = 'db:open("'.$queryPath.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
+  $query = $session->query($xquery);
+  $xml = $query->execute();
 
-    $xquery = 'db:open("'.$queryPath.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
-    $query = $session->query($xquery);
-    $xml = $query->execute();
-
-    $query->close();
-    $session->close();
+  $query->close();
+  $session->close();
 
     $replaceValues = array(
       '&' => '&amp;',
-      "'" => '&apos;',);
+      "'" => '&apos;');
 
     $xml = strtr($xml, $replaceValues);
 
