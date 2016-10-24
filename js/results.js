@@ -17,10 +17,9 @@ $(function(){
         controls = $(".controls"),
         resultsWrapper = $(".results-ajax-wrapper"),
         filterWrapper = $(".filter-wrapper"),
-        downloadWrapper = $(".results-download-wrapper"),
+        downloadWrapper = $("#download .content"),
         messages = downloadWrapper.find(".messages"),
-        notificationWrapper = $(".notification-wrapper"),
-        dummy = $(".dummy-controls");
+        notificationWrapper = $(".notification-wrapper");
 
     var xhrAllSentences,
         xhrFetchSentences,
@@ -214,7 +213,7 @@ $(function(){
     }
 
     function messageNoResultsFound() {
-        resultsWrapper.add(controls).add(dummy).remove();
+        resultsWrapper.add(controls).remove();
         $("#results .content").addClass("no-results");
 
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
@@ -223,7 +222,7 @@ $(function(){
     }
 
     function messageOnError(error) {
-        resultsWrapper.add(controls).add(dummy).remove();
+        resultsWrapper.add(controls).remove();
         $("#results .content").addClass("error");
 
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
@@ -400,36 +399,6 @@ $(function(){
         });
     }
 
-    var controlsTop = controls[0].getBoundingClientRect().top + controls.scrollTop(),
-        controlsHeight = controls[0].getBoundingClientRect().height;
-
-    dummy.height(controlsHeight);
-
-    (function() {
-        var observeTarget = $("#results .results-download-wrapper")[0],
-            observeTimeout;
-
-        var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                clearTimeout(observeTimeout);
-                observeTimeout = setTimeout(function() {
-                    setDummyVariables();
-                }, 500);
-            });
-        });
-
-        var config = {
-            attributes: true,
-            childList: true,
-            characterData: true,
-            subtree: true
-        };
-
-        observer.observe(observeTarget, config);
-    })();
-
-    $window.resize($.throttle(250, setDummyVariables));
-    $window.scroll($.throttle(250, scrollMenu));
     // Abort searching request, so we can start a new request more quickly
     // Use vanilla JS with beforeunload and jQuery unload to maximise effectiveness
     window.addEventListener("beforeunload", function() {
@@ -451,26 +420,6 @@ $(function(){
         if (xhrCount) xhrCount.abort();
         if (xhrFetchSentences) xhrFetchSentences.abort();
         done = true;
-    }
-
-    function setDummyVariables() {
-        if (!controls.hasClass("scroll")) {
-            controlsTop = controls.offset().top;
-            controlsHeight = controls.outerHeight();
-            dummy.height(controlsHeight);
-        } else {
-            controlsTop = dummy.offset().top;
-        }
-    }
-
-    function scrollMenu() {
-        if ($window.scrollTop() >= controlsTop) {
-            dummy.show();
-            controls.addClass("scroll");
-        } else {
-            dummy.hide();
-            controls.removeClass("scroll");
-        }
     }
 
     /* Tree visualizer */

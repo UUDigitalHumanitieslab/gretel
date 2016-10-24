@@ -1,7 +1,3 @@
-<div class="dummy-controls" hidden>
-    <div class="content">
-    </div>
-</div>
 <nav class="controls">
     <p class="count"># of results: <strong>0</strong> / <span>--</span></p>
     <form><label for="go-to" class="disabled">Go to # <input type="text" id="go-to" name="go-to" pattern="[0-9]+" value="1" disabled></label></form>
@@ -17,5 +13,4 @@
     <div class="loading-wrapper searching active">
         <div class="loading"></div>
     </div>
-    <button name="to-top" title="Go to the top of the page"><i class="fa fa-fw fa-arrow-up"></i></button>
 </nav>
