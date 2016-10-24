@@ -29,7 +29,7 @@ require "$root/functions.php";
 
       <p>
         <a href="<?php echo $downloadPath; ?>" title="Download results" class="download-link" target="_blank" download="gretel-results.txt">
-        <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download results</a>
+        <i class="fa fa-fw loaded fa-download" aria-hidden="true"></i> Download results</a>
     </p>
   </div>
   <div id="no-results-found">
