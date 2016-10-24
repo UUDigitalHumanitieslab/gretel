@@ -1,5 +1,6 @@
 <?php
 require '../config/config.php';
+require "$root/functions.php";
 
 session_start();
 set_time_limit(0);
@@ -31,7 +32,7 @@ require "$root/basex-search-scripts/treebank-search.php";
 
 try {
     if ($treebank == 'sonar') {
-      $serverInfo = getSonarServerInfo($treebank, $component);
+      $serverInfo = getSonarServerInfo($treebank, $component[0]);
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
@@ -47,10 +48,6 @@ try {
     $session->close();
 
   if (isset($sentences)) {
-    array_filter($sentences);
-    array_filter($beginlist);
-    array_filter($idlist);
-
     foreach ($sentences as $sid => $sentence) {
         // highlight sentence
         $hlsentence = highlightSentence($sentence, $beginlist[$sid], 'strong');
@@ -65,19 +62,19 @@ try {
 
         // subtreebank where the sentence was found:
         if ($treebank == "lassy") {
-            preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $component);
-            $component = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $component[1]);
+            preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentFromRegex);
+            $componentFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentFromRegex[1]);
 
-            $componentString = str_replace('-', '', $component);
+            $componentString = str_replace('-', '', $componentFromRegex);
             $componentString = substr($componentString, 0, 4);
         } else if ($treebank == "cgn") {
-            preg_match('/([^<>\d]+)/', $sidString, $component);
-            $component = substr($component[1], 1);
+            preg_match('/([^<>\d]+)/', $sidString, $componentFromRegex);
+            $componentFromRegex = substr($componentFromRegex[1], 1);
 
-            $componentString = str_replace('-', '', $component);
+            $componentString = str_replace('-', '', $componentFromRegex);
         } else {
-            preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $component);
-            $componentString = str_replace('-', '', $component[1]);
+            preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $componentFromRegex);
+            $componentString = str_replace('-', '', $componentFromRegex[1]);
         }
 
         $componentString = strtoupper($componentString);

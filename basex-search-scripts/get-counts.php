@@ -1,5 +1,6 @@
 <?php
 require "../config/config.php";
+require "$root/functions.php";
 
 require "$root/basex-search-scripts/basex-client.php";
 require "$root/basex-search-scripts/treebank-count.php";
@@ -18,9 +19,8 @@ $includes = ($treebank == 'sonar') ? $_SESSION['includes'] : false;
 
 session_write_close();
 
-$serverInfo;
 if ($treebank == 'sonar') {
-  $serverInfo = getSonarServerInfo($treebank, $component);
+  $serverInfo = getSonarServerInfo($treebank, $component[0]);
 } else {
   $serverInfo = getSonarServerInfo($treebank, false);
 }

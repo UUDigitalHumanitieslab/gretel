@@ -1,5 +1,6 @@
 <?php
 require '../config/config.php';
+require "$root/functions.php";
 
 session_start();
 set_time_limit(0);
@@ -59,7 +60,7 @@ require "$root/basex-search-scripts/treebank-search.php";
 
   try {
       if ($treebank == 'sonar') {
-        $serverInfo = getSonarServerInfo($treebank, $component);
+        $serverInfo = getSonarServerInfo($treebank, $component[0]);
           $dbhost = $serverInfo{'machine'};
           $dbport = $serverInfo{'port'};
           $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
@@ -75,7 +76,6 @@ require "$root/basex-search-scripts/treebank-search.php";
       $session->close();
 
     if (isset($sentences)) {
-      array_filter($sentences);
       // Write results to file so that they can be downloaded later on
       // If the file already exists, remove it and re-create it (just to be sure)
       $fileName = "$tmp/$id-gretel-results.txt";
@@ -106,19 +106,19 @@ require "$root/basex-search-scripts/treebank-search.php";
 
           // subtreebank where the sentence was found:
           if ($treebank == "lassy") {
-              preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $component);
-              $component = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $component[1]);
+              preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentFromRegex);
+              $componentFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentFromRegex[1]);
 
-              $componentString = str_replace('-', '', $component);
+              $componentString = str_replace('-', '', $componentFromRegex);
               $componentString = substr($componentString, 0, 4);
           } else if ($treebank == "cgn") {
-              preg_match('/([^<>\d]+)/', $sidString, $component);
-              $component = substr($component[1], 1);
+              preg_match('/([^<>\d]+)/', $sidString, $componentFromRegex);
+              $componentFromRegex = substr($componentFromRegex[1], 1);
 
-              $componentString = str_replace('-', '', $component);
-          } else {
-              preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $component);
-              $componentString = str_replace('-', '', $component[1]);
+              $componentString = str_replace('-', '', $componentFromRegex);
+          } else if ($treebank == "sonar") {
+              preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $componentFromRegex);
+              $componentString = str_replace('-', '', $componentFromRegex[1]);
           }
 
           $componentString = strtoupper($componentString);
