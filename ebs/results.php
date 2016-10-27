@@ -12,6 +12,7 @@ header('Content-Type:text/html; charset=utf-8');
 
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
+$firstDatabaseExists = true;
 
 $continueConstraints = sessionVariablesSet(array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
 
@@ -38,16 +39,34 @@ if ($continueConstraints) {
     if ($treebank == 'sonar') $_SESSION['includes'] = array();
 }
 
+require "$root/basex-search-scripts/basex-client.php";
+require "$root/preparatory-scripts/prep-functions.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
-require "$root/preparatory-scripts/prep-functions.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
     if ($bf) {
-      $_SESSION['bf'] = $component . $bf;
-      array_push($_SESSION['includes'], $_SESSION['bf']);
+      $databaseName = $component . $bf;
+      $_SESSION['bf'] = $databaseName;
+      array_push($_SESSION['includes'], $databaseName);
+      $serverInfo = getServerInfo('sonar', $component);
+
+      $dbhost = $serverInfo{'machine'};
+      $dbport = $serverInfo{'port'};
+      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+
+      // db:exists returns a string 'false', still need to convert to bool
+      $firstDatabaseExists = $session->query("db:exists('$databaseName')")->execute();
+
+      if ($firstDatabaseExists == 'false') {
+        $firstDatabaseExists = false;
+        $continueConstraints = false;
+      } else {
+        $firstDatabaseExists = true;
+      }
+      $session->close();
     }
     // Do not continue if $bf is empty/not set
     else {
@@ -67,13 +86,17 @@ if ($continueConstraints):
   require "$root/front-end-includes/results-shared-content.php";
   setContinueNavigation();
 else: // $continueConstraints
+  if (!$firstDatabaseExists):
+    setErrorHeading('No results found'); ?>
+    <p>The query you constructed did not yield any results. Such a structure does not exist in the selected component.</p>
+  <?php else:
     setErrorHeading();
     ?>
     <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
         possible that you came to this page directly without first entering an input example.</p>
     <?php
     setPreviousPageMessage(4);
-
+  endif;
 endif;
 require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
