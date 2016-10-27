@@ -20,9 +20,9 @@ $includes = ($treebank == 'sonar') ? $_SESSION['includes'] : false;
 session_write_close();
 
 if ($treebank == 'sonar') {
-  $serverInfo = getSonarServerInfo($treebank, $component[0]);
+  $serverInfo = getServerInfo($treebank, $component[0]);
 } else {
-  $serverInfo = getSonarServerInfo($treebank, false);
+  $serverInfo = getServerInfo($treebank, false);
 }
 
 $dbhost = $serverInfo{'machine'};
@@ -46,4 +46,7 @@ if ($treebank != 'sonar') {
     createCsvCounts($sum, $counts);
   }
 }
+
+header_remove('Set-Cookie');
+
 echo json_encode(array($sum, $counts));

@@ -28,10 +28,9 @@ if ($ebsxps == 'ebs') {
 
 // get context option
 $context = $_SESSION['ct'];
-
+$id = session_id();
 session_write_close();
 
-$id = session_id();
 $date = date('d-m-Y');
 $time = time();
 
@@ -60,18 +59,18 @@ require "$root/basex-search-scripts/treebank-search.php";
 
   try {
       if ($treebank == 'sonar') {
-        $serverInfo = getSonarServerInfo($treebank, $component[0]);
-          $dbhost = $serverInfo{'machine'};
-          $dbport = $serverInfo{'port'};
-          $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-          list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
+        $serverInfo = getServerInfo($treebank, $component[0]);
+        $dbhost = $serverInfo{'machine'};
+        $dbport = $serverInfo{'port'};
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
       }
       else {
-        $serverInfo = getSonarServerInfo($treebank, false);
-          $dbhost = $serverInfo{'machine'};
-          $dbport = $serverInfo{'port'};
-          $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-          list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
+        $serverInfo = getServerInfo($treebank, false);
+        $dbhost = $serverInfo{'machine'};
+        $dbport = $serverInfo{'port'};
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
       }
       $session->close();
 
@@ -142,6 +141,9 @@ require "$root/basex-search-scripts/treebank-search.php";
           'error' => false,
           'data' => $resultsArray,
         );
+        // Chrome will keep all cookies and flush 'em at the end which in turn
+        // will results in a HEADERS_TOO_BIG error -> unset cookies
+        header_remove('Set-Cookie');
         echo json_encode($results);
       }
       else {
@@ -149,6 +151,7 @@ require "$root/basex-search-scripts/treebank-search.php";
           'error' => false,
           'data' => '',
         );
+        header_remove('Set-Cookie');
         echo json_encode($results);
       }
   } catch (Exception $e) {
@@ -156,5 +159,6 @@ require "$root/basex-search-scripts/treebank-search.php";
       'error' => true,
       'data' => $e->getMessage(),
     );
+    header_remove('Set-Cookie');
     echo json_encode($results);
   }
