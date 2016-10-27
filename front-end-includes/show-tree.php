@@ -43,10 +43,10 @@ try {
   $serverInfo;
   if ($treebank == 'sonar') {
     preg_match('/^([A-Z]{5})/', $db, $component);
-    $serverInfo = getSonarServerInfo($treebank, $component[0]);
+    $serverInfo = getServerInfo($treebank, $component[0]);
     $queryPath = $db;
   } else {
-    $serverInfo = getSonarServerInfo($treebank, false);
+    $serverInfo = getServerInfo($treebank, false);
     $queryPath = strtoupper($treebank);
     $queryPath .= '_ID';
   }
