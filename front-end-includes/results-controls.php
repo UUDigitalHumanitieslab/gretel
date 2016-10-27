@@ -1,6 +1,6 @@
 <nav class="controls">
     <p class="count"># of results: <strong>0</strong> / <span>--</span></p>
-    <form><label for="go-to" class="disabled">Go to # <input type="text" id="go-to" name="go-to" pattern="[0-9]+" value="1" disabled></label></form>
+    <form style="display: none"><label for="go-to" class="disabled">Go to # <input type="text" id="go-to" name="go-to" pattern="[1-9][0-9]*" value="1" disabled></label></form>
     <label for="filter-components" class="disabled" title="Only show results of specific components. Note that when you download the output, filters are not taken into account: all results are downloaded">
       <input type="checkbox" id="filter-components" name="filter-components" hidden disabled>Filter components <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
     </label>
