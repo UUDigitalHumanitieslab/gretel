@@ -18,6 +18,8 @@ if ($continueConstraints) {
     $xpath = (isset($_POST['xpath'])) ? $_POST['xpath'] : $_SESSION['xpath'];
 }
 
+require "$root/basex-search-scripts/basex-client.php";
+require "$root/preparatory-scripts/treebank-availability.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 
@@ -39,23 +41,10 @@ if ($continueConstraints && !$isSpam) {
     $xpath = strtr($xpath, $trans);
     $xpath = preg_replace('/^\/*node/', '//node', $xpath);
     $_SESSION['xpath'] = $xpath;
-?>
-  <p>You can search an entire treebank (default), or select just one or more components. Due to pre-processing difficulties
-    some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
 
-    <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
-    on these treebanks, you can find their project websites in <a href='<?php echo "$home/documentation.php#faq-3"; ?>'>our FAQ</a>.</p>
-  <form action="xps/results.php" method="post">
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
+    require "$root/front-end-includes/tb-sel-shared-content.php";
 
-    <div class="cgn" style="display:none">
-      <?php require "$root/front-end-includes/tb-cgn.php"; ?>
-    </div>
-    <div class="lassy" style="display:none">
-      <?php require "$root/front-end-includes/tb-lassy.php"; ?>
-    </div>
-    <?php setContinueNavigation(); ?>
+    setContinueNavigation(); ?>
   </form>
 
 <?php } // $continueConstraints

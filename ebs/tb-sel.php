@@ -5,6 +5,7 @@ $step = 4;
 
 require '../config/config.php';
 require "$root/helpers.php";
+require "$root/functions.php";
 require "$root/preparatory-scripts/prep-functions.php";
 
 session_cache_limiter('private');
@@ -22,9 +23,11 @@ if ($continueConstraints) {
   $isSpam = isSpam($xpath);
 
   $id = session_id();
+
+  require "$root/basex-search-scripts/basex-client.php";
+  require "$root/preparatory-scripts/treebank-availability.php";
 }
 
-require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 ?>
 </head>
@@ -69,34 +72,10 @@ if ($continueConstraints && !$isSpam):
         It is also possible that you came to this page directly without first entering an input example.</p>
 <?php
     setPreviousPageMessage(3);
-else: ?>
-  <p>You can search an entire treebank (default), or select just one or more components.
-    For SoNaR it is currently only possible to select one component at a time. Due to pre-processing difficulties
-    some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.
-    Additionally, some SoNaR components cannot be queried using GrETEL (yet), as they lack some of the linguisitic annotations.
-    If this is fixed in an updated version of SoNaR, those components will be included as well.</p>
+else:
+  require "$root/front-end-includes/tb-sel-shared-content.php";
 
-  <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
-  on these treebanks, you can find their project websites in <a href="documentation.php#faq-3"
-  title="Where can I find more information about the corpora available in GrETEL?">our FAQ</a>.</p>
-  <form action="ebs/query.php" method="post">
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="cgn"> CGN</label></div>
-    <div class="label-wrapper"><label><input type="radio" name="treebank" value="lassy"> Lassy</label></div>
-    <?php if (!$xpChanged): ?>
-      <div class="label-wrapper"><label><input type="radio" name="treebank" value="sonar"> SoNaR</label></div>
-      <div class="sonar" style="display:none">
-        <?php require "$root/front-end-includes/tb-sonar.php"; ?>
-      </div>
-    <?php endif; ?>
-
-    <div class="cgn" style="display:none">
-      <?php require "$root/front-end-includes/tb-cgn.php"; ?>
-    </div>
-    <div class="lassy" style="display:none">
-      <?php require "$root/front-end-includes/tb-lassy.php"; ?>
-    </div>
-
-    <?php setContinueNavigation(); ?>
+  setContinueNavigation(); ?>
   </form>
 <?php endif; ?>
 
