@@ -32,14 +32,14 @@ require "$root/basex-search-scripts/treebank-search.php";
 
 try {
     if ($treebank == 'sonar') {
-      $serverInfo = getSonarServerInfo($treebank, $component[0]);
+      $serverInfo = getServerInfo($treebank, $component[0]);
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
         list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
     }
     else {
-      $serverInfo = getSonarServerInfo($treebank, false);
+      $serverInfo = getServerInfo($treebank, false);
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
