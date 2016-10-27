@@ -17,7 +17,7 @@ $(function(){
         controls = $(".controls"),
         resultsWrapper = $(".results-ajax-wrapper"),
         filterWrapper = $(".filter-wrapper"),
-        downloadWrapper = $("#download .content"),
+        downloadWrapper = $("#download-overview .flex-content"),
         messages = downloadWrapper.find(".messages"),
         notificationWrapper = $(".notification-wrapper");
 
@@ -459,8 +459,28 @@ $(function(){
         e.preventDefault();
 
         $("html, body").stop().animate({
-            scrollTop: $("#results").offset().top
+            scrollTop: $("#download-overview").offset().top
         }, 150);
         notificationWrapper.fadeOut("fast");
+    });
+
+    $(".btn-wrapper.collapse button").click(function() {
+      var $this = $(this),
+        isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
+
+      if (isCollapsed) {
+        $this.attr("data-collapse", 'visible');
+        $this.parent().nextAll("[data-target]").slideDown("fast");
+      } else {
+        $this.attr("data-collapse", 'hidden');
+        $this.parent().nextAll("[data-target]").slideUp("fast");
+      }
+    });
+
+    $("#results-menu a").off("click").click(function(e) {
+      $("html, body").stop().animate({
+          scrollTop: $($(this).attr("href")).offset().top
+      }, 150);
+      e.preventDefault();
     });
 });
