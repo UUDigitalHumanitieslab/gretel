@@ -29,8 +29,7 @@ function includeAlreadyExists($include) {
   if (isset($ALREADY{$include})) {
     session_write_close();
     return true;
-  }
-  else {
+  } else {
     $ALREADY{$include} = 1;
     $_SESSION['already'] = $ALREADY;
     session_write_close();
@@ -418,8 +417,8 @@ function highlightSentence($sentence, $beginlist, $tag)
         }
         $i++;
     }
-    $hlsentence= implode(' ', $words);
-    if (isset($prev)||isset($next)) {
+    $hlsentence = implode(' ', $words);
+    if (isset($prev) || isset($next)) {
       $hlsentence = $prev.' '.$hlsentence.' '.$next;
     }
     return $hlsentence;
