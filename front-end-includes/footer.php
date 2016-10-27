@@ -32,7 +32,10 @@
           </ul>
       </nav>
       <aside class="other">
-          <button name="to-top" title="Go to the top of the page"><i class="fa fa-fw fa-arrow-up"></i></button>
+          <button name="to-top" title="Go to the top of the page" type="button">
+            <i class="fa fa-fw fa-arrow-up"></i>
+            <span class="sr-only">Go to the top of the page</span>
+          </button>
           <div class="logo-wrapper">
             <?php include "$root/img/logo-image-gretel.svg"; ?>
           </div>
