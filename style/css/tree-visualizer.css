@@ -108,10 +108,8 @@
   box-shadow: -6px 6px 6px -2px rgba(0, 0, 0, 0.2);
   content: "";
   -webkit-transform: rotate(-45deg);
-      -ms-transform: rotate(-45deg);
           transform: rotate(-45deg);
   -webkit-transform-origin: 0 0;
-      -ms-transform-origin: 0 0;
           transform-origin: 0 0;
 }
 
@@ -133,7 +131,6 @@
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
   -webkit-transform: translate(50%, -50%);
-      -ms-transform: translate(50%, -50%);
           transform: translate(50%, -50%);
 }
 
@@ -141,7 +138,6 @@
 .tree-visualizer-fs .tree + .tooltip button:hover {
   background: #dc4e4e;
   -webkit-transform: translate(50%, -50%) scale(1.23);
-      -ms-transform: translate(50%, -50%) scale(1.23);
           transform: translate(50%, -50%) scale(1.23);
 }
 
@@ -301,7 +297,6 @@
   left: 0;
   top: 50%;
   -webkit-transform: translateY(-50%) scale(1);
-      -ms-transform: translateY(-50%) scale(1);
           transform: translateY(-50%) scale(1);
   color: #cd2b2b;
   font-size: 120%;
@@ -318,7 +313,6 @@
 .tree-visualizer .tree li.excluded a:hover::before,
 .tree-visualizer-fs .tree li.excluded a:hover::before {
   -webkit-transform: translateY(-50%) scale(0);
-      -ms-transform: translateY(-50%) scale(0);
           transform: translateY(-50%) scale(0);
   pointer-events: none;
 }
@@ -545,7 +539,6 @@
 
 .tree-visualizer-fs .tree.small a.hovered, .tree-visualizer-fs .tree.small a:hover {
   -webkit-transform: scale(2);
-      -ms-transform: scale(2);
           transform: scale(2);
   z-index: 3;
   background: #8e7f6b;
@@ -571,7 +564,6 @@
 
 .tree-visualizer-fs .tree.small a.only-child.hovered ~ span, .tree-visualizer-fs .tree.small a.only-child:hover ~ span {
   -webkit-transform: scale(2);
-      -ms-transform: scale(2);
           transform: scale(2);
   margin-top: 1.5em;
   z-index: 3;
@@ -579,7 +571,6 @@
 
 .tree-visualizer-fs .tree.x-small a.hovered, .tree-visualizer-fs .tree.x-small a:hover {
   -webkit-transform: scale(3);
-      -ms-transform: scale(3);
           transform: scale(3);
 }
 
@@ -589,7 +580,6 @@
 
 .tree-visualizer-fs .tree.x-small a.only-child.hovered ~ span, .tree-visualizer-fs .tree.x-small a.only-child:hover ~ span {
   -webkit-transform: scale(3);
-      -ms-transform: scale(3);
           transform: scale(3);
   margin-top: 3em;
 }
@@ -653,7 +643,6 @@
   background: #DF5F5F;
   color: white;
   -webkit-transform: scale(1.23);
-      -ms-transform: scale(1.23);
           transform: scale(1.23);
 }
 

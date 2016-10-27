@@ -44,6 +44,7 @@
 body {
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
     min-width: 576px;
     min-height: 100vh;
     background-color: #D6E69D;
@@ -157,6 +158,10 @@ svg[class^="logo-"] {
     pointer-events: none;
 }
 
+.flex-content {
+    display: flex;
+}
+
 .logo-gretel {
     circle {
         fill: rgba(168,205,40,0.78);
@@ -190,8 +195,7 @@ cite {
 
         &:hover {
             .fa-download {
-                background: white;
-                color: #7e6748;
+                transform: scale(1.25) translate(-24%,48%);
             }
         }
     }
@@ -352,7 +356,7 @@ table {
                 right: auto;
                 bottom: auto;
                 left: 50%;
-                z-index: 1;
+                z-index: 3;
                 display: block;
                 transform: translate(-50%, -100%);
             }
@@ -930,7 +934,8 @@ dd {
 
 .docs .project-web-wrapper,
 .home .project-web-wrapper,
-.matrix .xpath-wrapper {
+.matrix .xpath-wrapper,
+.xpath .open-beautifier-wrapper {
     a {
         display: inline-block;
         padding: 6px 8px;
@@ -969,7 +974,6 @@ dd {
 /* DOCUMENTATION */
 .docs {
     .flex-content {
-        display: flex;
         font-size: 88%;
         flex-wrap: wrap;
         justify-content: space-between;
@@ -1070,7 +1074,6 @@ dd {
         }
 
         .flex-content {
-            display: flex;
             margin: 0 -24px;
             flex-wrap: wrap;
         }
@@ -1180,151 +1183,88 @@ dd {
 
         li {
             display: inline-block;
+            margin: 0 4px;
 
             a {
-                border-bottom-style: dotted;
-            }
-
-            &:not(:last-child):after {
-                margin: 0 4px;
-                content: ' - ';
-            }
-        }
-    }
-}
-
-#download .content {
-    &.error,
-    &.no-results {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: 0 none;
-
-        h3 {
-            display: none;
-        }
-    }
-}
-
-#download .content,
-#query-overview .flex-content {
-    display: flex;
-    justify-content: space-between;
-}
-
-#query-overview {
-    .flex-content {
-        align-items: flex-start;
-    }
-
-    p {
-        margin: 0 0 0 36px;
-        padding: 12px;
-        border: 1px solid #dedede;
-        border-radius: 4px;
-        background: #FAFAFA;
-        font-size: 88%;
-    }
-}
-
-#download {
-    .content {
-        &:not(.active) {
-            position: relative;
-            min-height: 190px;
-            border: 1px solid #dedede;
-            border-radius: 4px;
-            background: #FAFAFA;
-
-            &::after {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                z-index: 0;
-                color: rgb(232, 232, 232);
-                content: "Searching";
-                text-shadow: 0 -1px rgba(0,0,0,.16), 0 1px rgb(255,255,255), 0 -1px 4px rgba(0,0,0,0.1);
-                font-weight: 700;
-                font-size: 36px;
-                transform: translate(-50%,-50%);
-            }
-        }
-
-        > div {
-            position: relative;
-            z-index: 1;
-            display: none;
-        }
-
-        h3 {
-            margin-top: 0;
-            text-align: left;
-        }
-
-        .distribution-wrapper {
-            margin-left: 36px;
-
-            .table-wrapper {
+                padding: 0.6em;
+                border: 1px solid;
+                border-bottom-style: 0 none;
+                border-radius: 4px;
                 font-size: 88%;
 
-                table {
-                    margin: 0 auto;
-                    font-size: 88%;
+                &:hover {
+                    border-bottom: 1px solid;
+                    background: #7e6748;
+                    color: white;
                 }
             }
         }
     }
+}
 
-    .messages {
-        margin: 0 auto;
-        padding: 12px;
-        font-size: 88%;
+.results,
+.treebanks {
+    .notice {
+        margin: 24px auto;
+        padding: 0.8em;
+        min-width: 300px;
+        width: 67%;
+        border: 1px solid #B2D241;
+        border-radius: 4px;
+        background-color: #EEF7CF;
+        text-align: center;
+    }
+}
 
-        &.active {
-            display: block;
+.treebanks {
+    .help-tooltip {
+        float: right;
+
+        &[data-title].hang-right:hover:before {
+            max-width: 200px;
         }
 
-        > div {
-            display: block;
-            padding: 0.8em;
-            border-radius: 4px;
-            text-align: center;
-
-            p {
-                margin: 0;
-                padding: 0;
-            }
+        .fa-exclamation-triangle {
+            margin-left: 8px;
+            opacity: 0.9;
         }
+    }
 
-        .error {
-            border: 1px solid #DF6B5F;
-            background-color: #FBDDD4;
+    .flex-content {
+        margin: 24px auto;
+    }
 
-            a {
-                border-bottom-color: #DF6B5F;
-                color: #DF6B5F;
-            }
-        }
-
-        .notice {
-            border: 1px solid #B2D241;
-            background-color: #EEF7CF;
-
-            small {
-                &::after {
-                    display: table;
-                    clear: both;
-                    content: "";
-                }
-            }
-        }
+    .notice {
+        margin: auto;
     }
 }
 
 .results {
-    .results-ajax-wrapper {
-        margin: 36px auto;
+    .btn-wrapper.collapse {
+        float: right;
 
+        button {
+            border-radius: 50%;
+
+            i {
+                transition: transform 250ms;
+            }
+
+            &[data-collapse="hidden"] {
+                i {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+    }
+
+    section {
+        &:not(:last-of-type) {
+            margin-bottom: 36px;
+        }
+    }
+
+    .results-ajax-wrapper {
         .table-wrapper {
             max-height: 70vh;
         }
@@ -1481,14 +1421,10 @@ dd {
         }
     }
 
-    #go-to {
-        width: 48px;
-    }
-
     .controls {
         position: relative;
         display: flex;
-        margin: auto auto 1.67em;
+        margin: 1.67em auto;
         padding: 0.67em 26px;
         max-width: 1024px;
         width: 100%;
@@ -1508,6 +1444,10 @@ dd {
             > span {
                 white-space: nowrap;
             }
+        }
+
+        #go-to {
+            width: 48px;
         }
     }
     @keyframes download-arrow {
@@ -1601,6 +1541,131 @@ dd {
     }
 }
 
+#download-overview {
+    .flex-content {
+        &:not(.active) {
+            position: relative;
+            min-height: 190px;
+            border: 1px solid #dedede;
+            border-radius: 4px;
+            background: #FAFAFA;
+
+            &::after {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                z-index: 0;
+                color: rgb(232, 232, 232);
+                content: "Searching";
+                text-shadow: 0 -1px rgba(0,0,0,.16), 0 1px rgb(255,255,255), 0 -1px 4px rgba(0,0,0,0.1);
+                font-weight: 700;
+                font-size: 36px;
+                transform: translate(-50%,-50%);
+            }
+        }
+
+        &.error,
+        &.no-results {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: 0 none;
+
+            h3 {
+                display: none;
+            }
+        }
+
+        > div {
+            position: relative;
+            z-index: 1;
+            display: none;
+        }
+
+        h3 {
+            margin-top: 0;
+            text-align: left;
+        }
+
+        .distribution-wrapper {
+            margin-left: 36px;
+
+            .table-wrapper {
+                font-size: 88%;
+
+                table {
+                    margin: 0 auto;
+                    font-size: 88%;
+                }
+            }
+        }
+    }
+
+    .messages {
+        margin: 0 auto;
+        font-size: 88%;
+
+        &.active {
+            display: block;
+        }
+
+        > div {
+            display: block;
+            padding: 0.8em;
+            border-radius: 4px;
+            text-align: center;
+
+            p {
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        .error {
+            border: 1px solid #DF6B5F;
+            background-color: #FBDDD4;
+
+            a {
+                border-bottom-color: #DF6B5F;
+                color: #DF6B5F;
+            }
+        }
+
+        .notice {
+            margin: auto;
+            border: 1px solid #B2D241;
+            background-color: #EEF7CF;
+
+            small {
+                &::after {
+                    display: table;
+                    clear: both;
+                    content: "";
+                }
+            }
+        }
+    }
+}
+
+#download-overview .flex-content,
+#query-overview .flex-content {
+    justify-content: space-between;
+}
+
+#query-overview {
+    .flex-content {
+        align-items: flex-start;
+    }
+
+    p {
+        margin: 0 0 0 36px;
+        padding: 12px;
+        border: 1px solid #dedede;
+        border-radius: 4px;
+        background: #FAFAFA;
+        font-size: 88%;
+    }
+}
+
 .xps {
     &.step-1 {
         .input-wrapper {
@@ -1627,17 +1692,27 @@ dd {
                     animation: reset-btn-rotate 300ms;
                 }
             }
+
+            .open-beautifier-wrapper {
+                margin-left: 12px;
+                white-space: nowrap;
+
+                a {
+                    height: 40px;
+                    white-space: nowrap;
+                    line-height: 28px;
+                }
+            }
         }
     }
 }
 @media all and (max-width: 768px) {
-    #download .content,
+    #download-overview .flex-content,
     #query-overview .flex-content {
         display: block;
     }
 
-    #query-overview p,
-    .results-download-wrapper {
+    #query-overview p {
         margin: 20px auto 0;
         padding: 12px;
     }
@@ -1647,7 +1722,7 @@ dd {
     }
 
     .results-download-wrapper {
-        padding: 0;
+        margin: 20px auto 0;
     }
 
     .distribution-wrapper {
@@ -1686,10 +1761,20 @@ dd {
         button {
             &:not([type="submit"]) {
                 margin-right: auto;
+                &:hover {
+                  i {
+                    transform: translateX(-16%) scale(1);
+                  }
+                }
             }
 
             &[type="submit"] {
                 margin-left: auto;
+                &:hover {
+                  i {
+                    transform: translateX(16%) scale(1);
+                  }
+                }
             }
         }
     }
