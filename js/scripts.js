@@ -10,7 +10,7 @@ $(function() {
         mobileMenu();
         helpTooltipPosition();
     })).resize();
-    $window.scroll($.throttle(500, helpTooltipPosition)).scroll();
+    $window.scroll($.throttle(250, helpTooltipPosition)).scroll();
 
 
     $("[name='to-top']").click(function() {
@@ -18,6 +18,35 @@ $(function() {
             scrollTop: 0
         });
     });
+
+    // Open in beautifier
+    $("body.matrix .xpath-wrapper a, body.xpath .open-beautifier-wrapper a").click(function(e) {
+        e.preventDefault();
+        var href = $(this).attr('href');
+        postXpath($("#xpath").serialize(), href);
+    });
+
+    function postXpath(xpath, href) {
+        $.ajax({
+            type: 'POST',
+            url: 'http://bramvanroy.be/projects/xpath-beautifier/php/receive-post.php',
+            crossDomain: true,
+            data: xpath,
+            headers: {
+                "cache-control": "no-cache"
+            },
+            xhrFields: {
+                withCredentials: true
+            }
+        }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
+            var newTab = window.open(href, '_blank');
+            if (newTab) {
+                newTab.focus();
+            } else {
+                alert('Your browser blocked opening a new window. Please allow pop-ups for this website. We will never show advertisements.');
+            }
+        });
+    }
 
     function mobileMenu() {
         if ($window.width() < 721) {
@@ -42,22 +71,22 @@ $(function() {
     });
 
     function helpTooltipPosition() {
-        $(".help-tooltip[data-title]").each(function(i, el) {
+        $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
             var $this = $(el),
                 rect = el.getBoundingClientRect(),
                 $w = $window.width(),
                 $h = $window.height();
             $this.addClass("hang-right hang-left hang-bottom hang-top");
-            if (($w - rect.right <= 320) || (rect.top <= 160) || ($h - rect.bottom <= 160)) {
+            if ((rect.right - rect.width <= 320) || (rect.top <= 160) || (rect.bottom - rect.height <= 160)) {
                 $this.removeClass("hang-right");
             }
-            if ((rect.left <= 320) || (rect.top <= 160) || ($h - rect.bottom <= 160)) {
+            if ((rect.left <= 320) || (rect.top <= 160) || (rect.bottom - rect.height <= 160)) {
                 $this.removeClass("hang-left");
             }
-            if (($h - rect.bottom <= 320) || ($w - rect.right <= 160) || (rect.left <= 160)) {
+            if ((rect.bottom - rect.height <= 320) || (rect.right - rect.width <= 160) || (rect.left <= 160)) {
                 $this.removeClass("hang-bottom");
             }
-            if ((rect.top <= 320) || ($w - rect.right <= 160) || (rect.left <= 160)) {
+            if ((rect.top <= 320) || (rect.right - rect.width <= 160) || (rect.left <= 160)) {
                 $this.removeClass("hang-top");
             }
         });
@@ -189,13 +218,6 @@ $(function() {
             advancedBtn.attr("title", str).children("span").text(str);
         });
 
-        // Open in beautifier
-        $(".xpath-wrapper a").click(function(e) {
-            e.preventDefault();
-            var href = $(this).attr('href');
-            postXpath($("#xpath").serialize(), href);
-        });
-
         $(".xpath-wrapper input[type='reset']").click(function(e) {
             e.preventDefault();
             $("#xpath").val($(".xpath-wrapper input[name='originalXp']").val()).change();
@@ -232,29 +254,6 @@ $(function() {
                 $(".xpath-wrapper textarea").off("mousedown");
             }
         }
-
-        function postXpath(xpath, href) {
-            $.ajax({
-                type: 'POST',
-                url: 'http://bramvanroy.be/projects/xpath-beautifier/php/receive-post.php',
-                crossDomain: true,
-                data: xpath,
-                headers: {
-                    "cache-control": "no-cache"
-                },
-                xhrFields: {
-                    withCredentials: true
-                }
-            }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
-                var newTab = window.open(href, '_blank');
-                if (newTab) {
-                    newTab.focus();
-                } else {
-                    alert('Your browser blocked opening a new window. Please allow pop-ups for this website. We will never show advertisements.');
-                }
-            });
-        }
-
     } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {
         // Main treebank selection (CGN, Lassy, SONAR)
         $("[type='radio']").change(function() {
@@ -462,5 +461,11 @@ $(function() {
             Cookies.set('popup-continue-' + popupId, 'true');
         }
         hidePopup(popup);
+    });
+
+    // Make anchors work, even though we've set a base-tag
+    $('a[href^="#"]').click(function(e) {
+      document.location.hash = $(this).attr("href").substring(1);
+      e.preventDefault();
     });
 });
