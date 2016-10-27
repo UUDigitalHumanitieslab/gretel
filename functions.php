@@ -206,10 +206,10 @@
       global $step, $currentPage, $ebsPages, $xpsPages;
       $navString = '<nav class="continue-btn-wrapper">';
       if (isBigStep()) {
-          $navString .= '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i> Go back</button>';
+          $navString .= '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-angle-left" aria-hidden="true"></i> Go back</button>';
       }
       if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {
-          $navString .= '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-fw fa-arrow-right" aria-hidden="true"></i></button>';
+          $navString .= '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-fw fa-angle-right" aria-hidden="true"></i></button>';
       }
       $navString .= '</nav>';
 
@@ -217,16 +217,16 @@
   }
 
   // Returns associative array containing at least the machine and the port
-  function getSonarServerInfo($corpus, $component) {
+  function getServerInfo($corpus, $component) {
     global $databaseGroups;
     // Lassy and CGN
     if (!$component && array_key_exists($corpus, $databaseGroups)) {
-      return $sonarComponentGroups{$corpus};
+      return $databaseGroups{$corpus};
     }
     // Sonar components
     elseif (array_key_exists($component, $databaseGroups{$corpus})) {
-      return $databaseGroups{$component};
-    } elseif (in_array($component, $sonarComponentGroups{'REST'}{'components'})) {
-      return $sonarComponentGroups{'REST'};
+      return $databaseGroups{$corpus}{$component};
+    } elseif (in_array($component, $databaseGroups{$corpus}{'REST'}{'components'})) {
+      return $databaseGroups{$corpus}{'REST'};
     }
   }
