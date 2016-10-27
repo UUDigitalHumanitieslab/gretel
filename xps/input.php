@@ -37,11 +37,24 @@ require "$root/front-end-includes/head.php";
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
-            <textarea name="xpath" wrap="soft" required spellcheck="false"><?php echo $xpath; ?></textarea>
+            <textarea name="xpath" id="xpath" wrap="soft" required spellcheck="false"><?php echo $xpath; ?></textarea>
             <button type="reset" name="clear" title="Empty the input field">
               <i class="fa fa-fw fa-times"></i>
               <span class="sr-only">Empty the input field</span>
             </button>
+            <div class="open-beautifier-wrapper">
+            <a href="http://bramvanroy.be/projects/xpath-beautifier/" title="Open and edit this XPath in the XPath Beautifier" aria-describedby="beautifier-tooltip" target="_blank">
+              Open in XPath Beautifier
+              <i class="fa fa-external-link" aria-hidden="true"></i>
+            </a>
+
+            <div class="help-tooltip" id="beautifier-tooltip" role="tooltip" data-title="The XPath Beautifier allows you to edit an expanded version of the XPath code given here.
+            This makes it easier to apply any adjustments. When you're done, copy the XPath code back in the field below.">
+              <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+              <span class="sr-only">The XPath Beautifier allows you to edit an expanded version of the XPath code given here.
+                This makes it easier to apply any adjustments. When you're done, copy the XPath code back in the text field above.</span>
+            </div>
+          </div>
         </div>
         <?php setContinueNavigation(); ?>
     </form>
