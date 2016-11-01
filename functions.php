@@ -172,7 +172,7 @@
         $i++;
           foreach ($thValArray as $th => $val) {
               $csClass = ($val == 'cs') ? 'case-sensitive' : '';
-              $advancedClass = ($th == 'detailed word class' || $th == 'not in search') ? 'advanced-option' : '';
+              $advancedClass = ($val == 'postag' || $val == 'not' ||  $val == 'cs') ? 'advanced-option' : '';
               $tableHTML .= "<tr class='row-group-$i $csClass $advancedClass'><th>$th</th>";
               foreach ($sentence as $key => $word) {
                   $isPunc = preg_match("/[\p{P}|^$=`´<>~]/u", $word);
