@@ -89,7 +89,7 @@ if ($continueConstraints):
             <span class="sr-only">In the results, show the sentence before and after the matching sentence to provide a broader context</span>
           </div>
         </div>
-        <div class="label-wrapper advanced-option">
+        <div class="label-wrapper">
           <label>
             <input type="checkbox" name="topcat" aria-describedby="topcat-tooltip"> Ignore properties of the dominating node
           </label>
