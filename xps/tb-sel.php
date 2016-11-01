@@ -18,8 +18,6 @@ if ($continueConstraints) {
     $xpath = (isset($_POST['xpath'])) ? $_POST['xpath'] : $_SESSION['xpath'];
 }
 
-require "$root/basex-search-scripts/basex-client.php";
-require "$root/preparatory-scripts/treebank-availability.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 

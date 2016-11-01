@@ -23,9 +23,6 @@ if ($continueConstraints) {
   $isSpam = isSpam($xpath);
 
   $id = session_id();
-
-  require "$root/basex-search-scripts/basex-client.php";
-  require "$root/preparatory-scripts/treebank-availability.php";
 }
 
 require "$root/front-end-includes/head.php";
