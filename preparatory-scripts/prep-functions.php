@@ -4,14 +4,19 @@ function xpathToBreadthFirst($xpath)
 {
     $bfresult;
     // Divide XPath in top-most level, and the rest (its "descendants")
-    if (preg_match("/^\/\/?node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
+    if (preg_match("/^\/*node\[([^\[]+?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
-
+        $topattrs = trim($topattrs);
+        $descendants = trim($descendants);
         $topcat;
          // Find category of top node
-         // CAVEAT: only takes one cat into account and not OR constructions
-         if ($topattrs && preg_match("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
-             $topcat = $toppattrsArray[1];
+         if ($topattrs && preg_match_all("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
+           // If we are dealing with more than one topcat, use ALL instead
+           if (count($toppattrsArray[1]) == 1) {
+             $topcat = $toppattrsArray[1][0];
+           } else {
+              $topcat = 'ALL';
+            }
          }
          // If the top node doesn't have any attributes
          // or if value is not specified, return ALL
@@ -22,7 +27,7 @@ function xpathToBreadthFirst($xpath)
          // Only continue if there is more than one level
          if ($descendants) {
              // Remove fixed-order nodes, not relevant
-             $descendants = preg_replace("/(?:and)?number\(\@begin\).*?\@begin\)/", '', $descendants);
+             $descendants = preg_replace("/(?:and )?number\(\@begin\).*?\@begin\)/", '', $descendants);
 
              $depth = 0;
              $children = '';
@@ -79,26 +84,36 @@ function xpathToBreadthFirst($xpath)
              preg_match_all("/node\[([^\]]*)/", $children, $childrenArray);
 
              foreach ($childrenArray[0] as $childNode) {
-                 preg_match("/\@rel=\"([^\"]+)\"/", $childNode, $rel);
-                 preg_match("/\@cat=\"([^\"]+)\"/", $childNode, $cat);
+               // Check if rel-attribute exists, and if there is only one
+               // If there isn't, or if thereis more than one we don't parse
+               // this one
+                preg_match_all("/\@rel=\"([^\"]+)\"/", $childNode, $relArray);
+                $relArray = array_filter($relArray);
 
-                 if (!$cat) {
-                     preg_match("/\@pt=\"([^\"]+)\"/", $childNode, $cat);
-                 }
+                if (count($relArray[1]) == 1) {
+                  $rel = $relArray[1][0];
 
-                 $dfpattern;
+                  preg_match_all("/\@cat=\"([^\"]+)\"/", $childNode, $catArray);
+                  $catArray = array_filter($catArray);
 
-                 // If rel exists, push value (and possibly also cat/pt) to array
-                 // CAVEAT: when no rel present, the node will be left out the
-                 // breadth-first pattern and therefore the pattern as a whole is
-                 // incomplete, and thus not usable
-                 if ($rel) {
-                     $dfpattern = "$rel[1]%";
-                     if ($cat[1]) {
-                         $dfpattern .= $cat[1];
-                     }
-                     array_push($dfpatterns, $dfpattern);
-                 }
+                  if (empty($catArray)) {
+                    preg_match_all("/\@pt=\"([^\"]+)\"/", $childNode, $catArray);
+                    $catArray = array_filter($catArray);
+                  }
+
+                  if (!empty($catArray)) {
+                    if (count($catArray[1]) == 1) {
+                      $cat = $catArray[1][0];
+                    } else {
+                      $cat = '';
+                    }
+                  } else {
+                    $cat = '';
+                  }
+
+                  $dfpattern = "$rel%$cat";
+                  array_push($dfpatterns, $dfpattern);
+                }
              }  // end foreach
 
              if ($dfpatterns) {

@@ -12,12 +12,12 @@ header('Content-Type:text/html; charset=utf-8');
 
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
-$firstDatabaseExists = true;
 
 $continueConstraints = sessionVariablesSet(array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
+    $databaseExists = false;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
     $xpath = $_SESSION['xpath'];
@@ -32,45 +32,58 @@ if ($continueConstraints) {
     $example = $_SESSION['example'];
 
     $context = $_SESSION['ct'];
-    $_SESSION['queryIteration'] = array(0, 0);
+    $_SESSION['endPosIteration'] = 0;
     $_SESSION['leftOvers'] = array();
-    $_SESSION['already'] = array();
 
-    if ($treebank == 'sonar') $_SESSION['includes'] = array();
+    if ($treebank == 'sonar') {
+      $_SESSION['includes'] = array();
+      $_SESSION['already'] = array();
+      $needRegularSonar = false;
+      $includes = array();
+    }
 }
 
 require "$root/basex-search-scripts/basex-client.php";
 require "$root/preparatory-scripts/prep-functions.php";
+require "$root/basex-search-scripts/treebank-search.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 
 if ($continueConstraints) {
   if ($treebank == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
-    if ($bf) {
-      $databaseName = $component . $bf;
-      $_SESSION['bf'] = $databaseName;
-      array_push($_SESSION['includes'], $databaseName);
-      $serverInfo = getServerInfo('sonar', $component);
+    if ($bf && $bf != 'ALL') {
+        // If is substring (eg. ALLnp%det)
+        if (strpos($bf, 'ALL') !== false) {
+            foreach ($cats as $cat) {
+              $bfcopy = $component . str_replace('ALL', $cat, $bf);
+              $includes[] = $bfcopy;
+            }
+        } else {
+          $includes[] = $component . $bf;
+        }
 
-      $dbhost = $serverInfo{'machine'};
-      $dbport = $serverInfo{'port'};
-      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        $serverInfo = getServerInfo('sonar', $component);
 
-      // db:exists returns a string 'false', still need to convert to bool
-      $firstDatabaseExists = $session->query("db:exists('$databaseName')")->execute();
+        $dbhost = $serverInfo{'machine'};
+        $dbport = $serverInfo{'port'};
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-      if ($firstDatabaseExists == 'false') {
-        $firstDatabaseExists = false;
-        $continueConstraints = false;
-      } else {
-        $firstDatabaseExists = true;
-      }
-      $session->close();
-    }
-    // Do not continue if $bf is empty/not set
-    else {
-      $continueConstraints = false;
+        foreach ($includes as $include) {
+          // db:exists returns a string 'false', still need to convert to bool
+          $databaseExists = $session->query("db:exists('$include')")->execute();
+
+          if ($databaseExists != 'false') {
+            $databaseExists = true;
+            $_SESSION['includes'][] = $include;
+          }
+        }
+
+        $continueConstraints = $databaseExists ? true : false;
+        $session->close();
+    } else {
+      $_SESSION['includes'] = getRegularSonar($component);
+      $needRegularSonar = true;
     }
   }
 }
@@ -86,7 +99,7 @@ if ($continueConstraints):
   require "$root/front-end-includes/results-shared-content.php";
   setContinueNavigation();
 else: // $continueConstraints
-  if (!$firstDatabaseExists):
+  if (isset($firstDatabaseExists) && !$firstDatabaseExists):
     setErrorHeading('No results found'); ?>
     <p>The query you constructed did not yield any results. Such a structure does not exist in the selected component.</p>
   <?php else:
@@ -101,7 +114,8 @@ endif;
 require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) : ?>
+if ($continueConstraints) :
+  ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>

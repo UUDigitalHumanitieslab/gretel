@@ -49,7 +49,7 @@ if ($continueConstraints) {
     // get context option
     $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
 
-    $_SESSION['queryIteration'] = array(0, 0);
+    $_SESSION['endPosIteration'] = 0;
     $_SESSION['leftOvers'] = array();
     $_SESSION['already'] = array();
 }
