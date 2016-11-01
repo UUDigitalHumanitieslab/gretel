@@ -10,8 +10,7 @@ $(function() {
         mobileMenu();
         helpTooltipPosition();
     })).resize();
-    $window.scroll($.throttle(250, helpTooltipPosition)).scroll();
-
+    $window.scroll($.throttle(700, helpTooltipPosition)).scroll();
 
     $("[name='to-top']").click(function() {
         $("html, body").animate({
@@ -71,22 +70,23 @@ $(function() {
     });
 
     function helpTooltipPosition() {
+      // Not for .treebanks, because we want to hang right on those
         $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
             var $this = $(el),
                 rect = el.getBoundingClientRect(),
-                $w = $window.width(),
-                $h = $window.height();
+                w = $window.width(),
+                h = $window.height();
             $this.addClass("hang-right hang-left hang-bottom hang-top");
-            if ((rect.right - rect.width <= 320) || (rect.top <= 160) || (rect.bottom - rect.height <= 160)) {
+            if ((w - rect.right <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
                 $this.removeClass("hang-right");
             }
-            if ((rect.left <= 320) || (rect.top <= 160) || (rect.bottom - rect.height <= 160)) {
+            if ((rect.left <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
                 $this.removeClass("hang-left");
             }
-            if ((rect.bottom - rect.height <= 320) || (rect.right - rect.width <= 160) || (rect.left <= 160)) {
+            if ((h - rect.bottom <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
                 $this.removeClass("hang-bottom");
             }
-            if ((rect.top <= 320) || (rect.right - rect.width <= 160) || (rect.left <= 160)) {
+            if ((rect.top <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
                 $this.removeClass("hang-top");
             }
         });

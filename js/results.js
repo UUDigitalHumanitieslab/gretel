@@ -42,13 +42,12 @@ $(function(){
                 .done(function(json) {
                     if (!done) {
                         var data = $.parseJSON(json);
-                        resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                         if (!data.error && data.data) {
                             loopResults(data.data, false);
+                            resultsWrapper.find("tbody.empty").hide();
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
-                            resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
-                            messages.children("div").removeClass("error notice").closest(".results-messages-wrapper").addClass("active");
+                            messages.closest(".results-messages-wrapper").addClass("active");
                             downloadWrapper.addClass("active");
                             if (data.error) {
                                 messageOnError(data.data)
@@ -91,7 +90,6 @@ $(function(){
         xhrAllSentences = $.ajax(phpVars.getAllResultsPath)
             .done(function(json) {
                 var data = $.parseJSON(json);
-                resultsWrapper.find("tbody:not(.empty) .added").removeClass("added");
                 if (!data.error && data.data) {
                     loopResults(data.data, true);
                 } else {
@@ -351,7 +349,7 @@ $(function(){
             // If none of the component checkboxes are checked
             if (!filterWrapper.find("[name='component']").is(":checked")) {
                 activeIndexResults = false;
-                resultsWrapper.find(".empty").css("display", "table-row-group");
+                resultsWrapper.find(".empty").css("display", "table-row-group").find("td").text("No results matching the specified filters");
                 filterWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
                 $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
             } else {
