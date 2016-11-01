@@ -8,7 +8,7 @@ set_time_limit(0);
 /********************/
 /* SET UP VARIABLES */
 /********************/
-$queryIteration = $_SESSION['queryIteration'];
+$queryIteration = $_SESSION['endPosIteration'];
 $leftOvers = $_SESSION['leftOvers'];
 
 $treebank = $_SESSION['treebank'];
@@ -16,7 +16,6 @@ $component = $_SESSION['subtreebank'];
 
 if ($treebank == 'sonar') {
     $includes = $_SESSION['includes'];
-    $bf = $_SESSION['bf'];
 }
 
 $databaseString = $treebank;
@@ -33,17 +32,17 @@ require "$root/basex-search-scripts/treebank-search.php";
 try {
     if ($treebank == 'sonar') {
       $serverInfo = getServerInfo($treebank, $component[0]);
-        $dbhost = $serverInfo{'machine'};
-        $dbport = $serverInfo{'port'};
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
+      $dbhost = $serverInfo{'machine'};
+      $dbport = $serverInfo{'port'};
+      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+      list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session);
     }
     else {
       $serverInfo = getServerInfo($treebank, false);
-        $dbhost = $serverInfo{'machine'};
-        $dbport = $serverInfo{'port'};
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
+      $dbhost = $serverInfo{'machine'};
+      $dbport = $serverInfo{'port'};
+      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+      list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, $queryIteration, $session);
     }
     $session->close();
 
@@ -58,7 +57,7 @@ try {
         if ($treebank == 'sonar') $databaseString = $tblist[$sid];
 
         // remove the added identifier (see getSentences) to use in the link
-        $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
+        $sidString = strstr($sid, '-endPos=', true) ?: $sid;
 
         // subtreebank where the sentence was found:
         if ($treebank == "lassy") {

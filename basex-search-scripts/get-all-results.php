@@ -11,7 +11,6 @@ $componentString = implode('-', $component);
 
 if ($treebank == 'sonar') {
     $includes = $_SESSION['includes'];
-    $bf = $_SESSION['bf'];
 }
 
 $databaseString = $treebank;
@@ -63,14 +62,14 @@ require "$root/basex-search-scripts/treebank-search.php";
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, array(0 , 'all'), $session);
+        list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, 'all', $session);
       }
       else {
         $serverInfo = getServerInfo($treebank, false);
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, array(0 , 'all'), $session);
+        list($sentences, $idlist, $beginlist) = getSentences($xpath, $treebank, $component, $context, 'all', $session);
       }
       $session->close();
 
@@ -101,7 +100,7 @@ require "$root/basex-search-scripts/treebank-search.php";
           if ($treebank == 'sonar') $databaseString = $tblist[$sid];
 
           // remove the added identifier (see GetSentences) to use in the link
-          $sidString = strstr($sid, '-dbIter=', true) ?: $sid;
+          $sidString = strstr($sid, '-endPos=', true) ?: $sid;
 
           // subtreebank where the sentence was found:
           if ($treebank == "lassy") {

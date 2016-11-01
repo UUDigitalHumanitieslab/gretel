@@ -17,7 +17,7 @@ function getMoreIncludes($database, &$databases, $session) {
         $file = $files[1];
 
         if (!includeAlreadyExists($file)) {
-          array_push($databases, $file);
+          $databases[] = $file;
         }
       }
     }
@@ -25,13 +25,13 @@ function getMoreIncludes($database, &$databases, $session) {
 
 function includeAlreadyExists($include) {
   session_start();
-  $ALREADY = $_SESSION['already'];
-  if (isset($ALREADY{$include})) {
+  $already = $_SESSION['already'];
+  if (isset($already{$include})) {
     session_write_close();
     return true;
   } else {
-    $ALREADY{$include} = 1;
-    $_SESSION['already'] = $ALREADY;
+    $already{$include} = 1;
+    $_SESSION['already'] = $already;
     session_write_close();
     return false;
   }
@@ -46,19 +46,16 @@ function corpusToDatabase($tblist, $treebank)
           $treebank = strtoupper($treebank);
           $tb = strtoupper($tb);
           $tb = $treebank.'_ID_'.$tb;
-          array_push($databases, $tb);
+          $databases[] = $tb;
       }
 
       return $databases;
 }
 
-function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration, $session)
+function getSentences($xpath, $treebank, $subtreebank, $context, $endPosIteration, $session)
 {
     global $flushLimit, $resultsLimit;
     $nrofmatches = 0;
-
-    $dbIteration = $queryIteration[0];
-    $endPosIteration = $queryIteration[1];
 
     if ($endPosIteration !== 'all') {
         session_start();
@@ -74,7 +71,7 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
             $m = trim($m);
             list($sentid, $sentence, $ids, $begins) = explode('||', $m);
             // Add unique identifier to avoid overlapping sentences w/ same ID
-            $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+leftover='.$nrofmatches;
+            $sentid .= '-endPos='.$endPosIteration.'+leftover='.$nrofmatches;
 
             $sentid = trim($sentid);
 
@@ -94,12 +91,9 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
 
     if ($nrofmatches < $flushLimit) {
       // rename corpora to database names
-      $database = corpusToDatabase($subtreebank, $treebank);
+      $databases = corpusToDatabase($subtreebank, $treebank);
 
-      $dbLength = count($database);
-
-      for ($dbIteration; $dbIteration < $dbLength; ++$dbIteration) {
-        $db = $database[$dbIteration];
+      while ($db = array_pop($databases)) {
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
@@ -147,7 +141,7 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
               ++$nrofmatches;
 
               // Add unique identifier to avoid overlapping sentences w/ same ID
-              $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+match='.$nrofmatches;
+              $sentid .= '-endPos='.$endPosIteration.'+match='.$nrofmatches;
 
               $sentid = trim($sentid);
               $sentences{$sentid} = $sentence;
@@ -170,7 +164,7 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
         if ($endPosIteration !== 'all') {
           session_start();
           $_SESSION['leftOvers'] = $leftOvers;
-          $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
+          $_SESSION['endPosIteration'] = $endPosIteration++;
           session_write_close();
         }
 
@@ -181,12 +175,9 @@ function getSentences($xpath, $treebank, $subtreebank, $context, $queryIteration
     }
 }
 
-function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $queryIteration, $session) {
-    global $flushLimit, $resultsLimit;
+function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $endPosIteration, $session) {
+    global $flushLimit, $resultsLimit, $needRegularSonar;
     $nrofmatches = 0;
-
-    $dbIteration = $queryIteration[0];
-    $endPosIteration = $queryIteration[1];
 
     if ($endPosIteration !== 'all') {
       session_start();
@@ -204,7 +195,7 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
             list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $m);
 
             // Add unique identifier to avoid overlapping sentences w/ same ID
-            $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+leftover='.$nrofmatches;
+            $sentid .= '-endPos='.$endPosIteration.'+leftover='.$nrofmatches;
 
             $sentid = trim($sentid);
 
@@ -224,9 +215,11 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
     }
 
     if ($nrofmatches < $flushLimit) {
-      for ($dbIteration; $dbIteration < count($includes); ++$dbIteration) {
-        $db = $includes[$dbIteration];
-        getMoreIncludes($db, $includes, $session);
+      while ($db = array_pop($includes)) {
+        if (!$needRegularSonar) {
+          getMoreIncludes($db, $includes, $session);
+        }
+
         while (1) {
           if ($endPosIteration !== 'all') ++$endPosIteration;
 
@@ -277,7 +270,7 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
               ++$nrofmatches;
 
               // Add unique identifier to avoid overlapping sentences w/ same ID
-              $sentid .= '-dbIter='.$dbIteration.'+endPos='.$endPosIteration.'+match='.$nrofmatches;
+              $sentid .= '-endPos='.$endPosIteration.'+match='.$nrofmatches;
 
               $sentid = trim($sentid);
               $sentences{$sentid} = $sentence;
@@ -301,8 +294,10 @@ function getSentencesSonar($xpath, $treebank, $component, $includes, $context, $
         if ($endPosIteration !== 'all') {
           session_start();
           $_SESSION['leftOvers'] = $leftOvers;
-          $_SESSION['queryIteration'] = array($dbIteration--, $endPosIteration++);
-          $_SESSION['includes'] = $includes;
+          $_SESSION['endPosIteration'] = $endPosIteration++;
+          if (!$needRegularSonar) {
+            $_SESSION['includes'] = $includes;
+          }
           session_write_close();
         }
 
@@ -422,4 +417,18 @@ function highlightSentence($sentence, $beginlist, $tag)
       $hlsentence = $prev.' '.$hlsentence.' '.$next;
     }
     return $hlsentence;
+}
+
+// Not required, yet
+function getRegularSonar($component) {
+  global $root;
+  $includes = file("$root/treebank-parts/$component.lst");
+  $includes = array_map("extractComponentTreebanks", $includes);
+
+  return $includes;
+}
+// Not required, yet
+function extractComponentTreebanks($line) {
+  preg_match("/>(\w+)</", $line, $matches);
+  return $matches[1];
 }

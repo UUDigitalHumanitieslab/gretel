@@ -8,26 +8,16 @@
  */
 function getCounts($xpath, $treebank, $subtreebank, $databases, $session)
 {
-    global $cats;
-    if ($treebank == 'sonar') {
-        $bf = $databases[0];
-        if (strpos($bf, 'ALL') !== false) {
-            array_shift($databases);
-            foreach ($cats as $cat) {
-                $dbcopy = str_replace('ALL', $cat, $bf);
-                array_push($databases, $dbcopy);
-            }
-        }
-    }
-    else {
-        $databases = corpusToDatabase($subtreebank, $treebank);
+    global $cats, $needRegularSonar;
+    if ($treebank != 'sonar') {
+      $databases = corpusToDatabase($subtreebank, $treebank);
     }
     $sum = 0;
     $counts = array();
     for ($i = 0; $i < count($databases); $i++) {
         $database = $databases[$i];
 
-        if ($treebank == 'sonar') {
+        if ($treebank == 'sonar' && !$needRegularSonar) {
             getMoreIncludes($database, $databases, $session);
         }
 
