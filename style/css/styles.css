@@ -502,6 +502,22 @@ table label {
   cursor: help;
 }
 
+.help-tooltip[data-title].hang-bottom:hover::after, .help-tooltip[data-title].hang-bottom:hover::before {
+  top: auto;
+  right: auto;
+  bottom: -10px;
+  left: 50%;
+  -webkit-transform: translate(-50%, 100%);
+          transform: translate(-50%, 100%);
+}
+
+.help-tooltip[data-title].hang-bottom:hover::after {
+  border-width: 0 5px 5px 5px;
+  border-color: #ad9f8e transparent;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+
 .help-tooltip[data-title].hang-right:hover::after, .help-tooltip[data-title].hang-right:hover::before {
   top: 50%;
   right: -10px;
@@ -532,22 +548,6 @@ table label {
   border-color: transparent #ad9f8e;
   -webkit-transform: translateY(-50%);
           transform: translateY(-50%);
-}
-
-.help-tooltip[data-title].hang-bottom:hover::after, .help-tooltip[data-title].hang-bottom:hover::before {
-  top: auto;
-  right: auto;
-  bottom: -10px;
-  left: 50%;
-  -webkit-transform: translate(-50%, 100%);
-          transform: translate(-50%, 100%);
-}
-
-.help-tooltip[data-title].hang-bottom:hover::after {
-  border-width: 0 5px 5px 5px;
-  border-color: #ad9f8e transparent;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
 }
 
 .help-tooltip[data-title]:hover::after, .help-tooltip[data-title]:hover::before, .help-tooltip[data-title].hang-top:hover::after, .help-tooltip[data-title].hang-top:hover::before {
@@ -1581,10 +1581,6 @@ dd p:last-child {
 .results .results-ajax-wrapper table thead th:last-child {
   min-width: 300px;
   width: calc(100% - 370px);
-}
-
-.results .results-ajax-wrapper .empty {
-  display: none;
 }
 
 .results .results-ajax-wrapper .empty tr {

@@ -289,6 +289,25 @@ table {
     display: inline;
     cursor: help;
 
+    &.hang-bottom {
+        &:hover {
+            &::after,
+            &::before {
+                top: auto;
+                right: auto;
+                bottom: -10px;
+                left: 50%;
+                transform: translate(-50%, 100%);
+            }
+
+            &::after {
+                border-width: 0 5px 5px 5px;
+                border-color: #ad9f8e transparent;
+                transform: translateX(-50%);
+            }
+        }
+    }
+
     &.hang-right {
         &:hover {
             &::after,
@@ -323,25 +342,6 @@ table {
                 border-width: 5px 0 5px 5px;
                 border-color: transparent #ad9f8e;
                 transform: translateY(-50%);
-            }
-        }
-    }
-
-    &.hang-bottom {
-        &:hover {
-            &::after,
-            &::before {
-                top: auto;
-                right: auto;
-                bottom: -10px;
-                left: 50%;
-                transform: translate(-50%, 100%);
-            }
-
-            &::after {
-                border-width: 0 5px 5px 5px;
-                border-color: #ad9f8e transparent;
-                transform: translateX(-50%);
             }
         }
     }
@@ -1298,8 +1298,6 @@ dd {
         }
 
         .empty {
-            display: none;
-
             tr {
                 background-color: #F7F7F7;
                 text-align: center;
