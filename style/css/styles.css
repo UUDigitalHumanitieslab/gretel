@@ -499,6 +499,7 @@ table label {
 .help-tooltip[data-title] {
   position: relative;
   display: inline;
+  white-space: normal !important;
   cursor: help;
 }
 
@@ -1334,6 +1335,17 @@ dd p:last-child {
           animation: reset-btn-rotate 300ms;
 }
 
+.ebs.step-3 .table-wrapper {
+  /* For tooltips */
+  overflow: visible;
+}
+
+.ebs.step-3 .table-wrapper .help-tooltip {
+  float: right;
+  margin-left: 4px;
+  font-weight: normal;
+}
+
 .ebs.step-3 thead td {
   background: #F0F0F0;
 }
@@ -1428,8 +1440,7 @@ dd p:last-child {
   pointer-events: none;
 }
 
-.ebs.step-3 #tree-output.advanced-mode-active,
-.ebs.step-3 .guidelines.advanced-mode-active {
+.ebs.step-3 #tree-output.advanced-mode-active {
   display: none;
 }
 
@@ -1499,19 +1510,6 @@ dd p:last-child {
   border-radius: 4px;
   background-color: #EEF7CF;
   text-align: center;
-}
-
-.treebanks .help-tooltip {
-  float: right;
-}
-
-.treebanks .help-tooltip[data-title].hang-right:hover:before {
-  max-width: 200px;
-}
-
-.treebanks .help-tooltip .fa-exclamation-triangle {
-  margin-left: 8px;
-  opacity: 0.9;
 }
 
 .treebanks .flex-content {

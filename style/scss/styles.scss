@@ -5,6 +5,7 @@
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
     font-size: inherit;
+
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -51,6 +52,7 @@ body {
     color: $textmain;
     font-family: $fontbody;
     line-height: 1.625;
+
     align-items: center;
 }
 @media all and (min-width: 1200px) {
@@ -147,6 +149,7 @@ body {
     .btn-wrapper {
         display: flex;
         margin-top: 16px;
+
         justify-content: space-around;
         align-items: center;
     }
@@ -183,6 +186,7 @@ cite {
     text-align: left;
     font-style: normal;
     font-size: 88%;
+
     align-items: center;
 
     p {
@@ -287,6 +291,7 @@ table {
 .help-tooltip[data-title] {
     position: relative;
     display: inline;
+    white-space: normal !important;
     cursor: help;
 
     &.hang-bottom {
@@ -464,6 +469,7 @@ dd {
     margin: 0 auto 0.34em;
     padding-bottom: 0.89em;
     border-bottom: 1px dotted #968A7A;
+
     justify-content: space-between;
     align-items: center;
 
@@ -471,6 +477,7 @@ dd {
         margin: 0;
         white-space: nowrap;
         font-size: 2em;
+
         flex: 1;
 
         sup {
@@ -508,10 +515,12 @@ dd {
         margin: 0;
         padding: 0;
         list-style: none;
+
         justify-content: space-around;
 
         li {
             text-align: center;
+
             flex: 1;
 
             &:not(:last-child) {
@@ -528,6 +537,7 @@ dd {
                 font-weight: 300;
                 font-size: 15px;
                 transition: transform 200ms;
+
                 will-change: transform;
 
                 &.active,
@@ -558,6 +568,7 @@ dd {
     button {
         display: none;
         width: 40px;
+
         align-self: flex-end;
 
         i {
@@ -634,11 +645,13 @@ dd {
     width: 100%;
     border-radius: 0 0 6px 6px;
     background: #fff;
+
     flex: 1;
 }
 /* Progress bar */
 .secondary-navigation {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
@@ -808,6 +821,7 @@ dd {
     display: flex;
     visibility: hidden;
     pointer-events: none;
+
     align-items: center;
     justify-content: center;
 
@@ -849,6 +863,7 @@ dd {
         background: white;
         transition: transform 400ms;
         transform: scale(0);
+
         align-items: center;
         justify-content: center;
         will-change: transform;
@@ -863,6 +878,7 @@ dd {
             border-top-color: #b9d655;
             border-radius: 50%;
             content: "";
+
             will-change: transform;
         }
 
@@ -927,6 +943,7 @@ dd {
 .home {
     main header {
         display: flex;
+
         align-items: center;
         justify-content: space-between;
     }
@@ -975,12 +992,14 @@ dd {
 .docs {
     .flex-content {
         font-size: 88%;
+
         flex-wrap: wrap;
         justify-content: space-between;
 
         article {
             padding: 0.67em;
             min-width: 240px;
+
             flex: 1;
         }
     }
@@ -999,6 +1018,7 @@ dd {
             margin-left: 5px;
             content: "\f104";
             animation: docs-target-arrow 600ms alternate infinite;
+
             @extend %fa;
         }
     }
@@ -1018,6 +1038,7 @@ dd {
     &.step-1 {
         .input-wrapper {
             display: flex;
+
             align-items: flex-start;
 
             button {
@@ -1044,6 +1065,17 @@ dd {
     }
 
     &.step-3 {
+        .table-wrapper {
+            /* For tooltips */
+            overflow: visible;
+
+            .help-tooltip {
+                float: right;
+                margin-left: 4px;
+                font-weight: normal;
+            }
+        }
+
         thead td {
             background: #F0F0F0;
         }
@@ -1075,6 +1107,7 @@ dd {
 
         .flex-content {
             margin: 0 -24px;
+
             flex-wrap: wrap;
         }
 
@@ -1082,6 +1115,7 @@ dd {
         .xpath-wrapper {
             margin: 0;
             padding: 24px;
+
             flex: 1;
         }
 
@@ -1133,11 +1167,8 @@ dd {
             }
         }
 
-        #tree-output,
-        .guidelines {
-            &.advanced-mode-active {
-                display: none;
-            }
+        #tree-output.advanced-mode-active {
+            display: none;
         }
 
         .open-beautifier-wrapper {
@@ -1217,19 +1248,6 @@ dd {
 }
 
 .treebanks {
-    .help-tooltip {
-        float: right;
-
-        &[data-title].hang-right:hover:before {
-            max-width: 200px;
-        }
-
-        .fa-exclamation-triangle {
-            margin-left: 8px;
-            opacity: 0.9;
-        }
-    }
-
     .flex-content {
         margin: 24px auto;
     }
@@ -1332,6 +1350,7 @@ dd {
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
         transform: translateY(100%) translateX(-50%);
+
         flex-wrap: wrap;
         justify-content: space-between;
 
@@ -1429,6 +1448,7 @@ dd {
         border-radius: 4px;
         background: #eee;
         font-size: 12px;
+
         align-items: center;
         justify-content: flex-end;
 
@@ -1668,6 +1688,7 @@ dd {
     &.step-1 {
         .input-wrapper {
             display: flex;
+
             align-items: flex-start;
 
             button {
@@ -1734,6 +1755,7 @@ dd {
         display: flex;
         margin-top: 1em;
         white-space: nowrap;
+
         justify-content: space-between;
         align-items: center;
 
@@ -1759,19 +1781,21 @@ dd {
         button {
             &:not([type="submit"]) {
                 margin-right: auto;
+
                 &:hover {
-                  i {
-                    transform: translateX(-16%) scale(1);
-                  }
+                    i {
+                        transform: translateX(-16%) scale(1);
+                    }
                 }
             }
 
             &[type="submit"] {
                 margin-left: auto;
+
                 &:hover {
-                  i {
-                    transform: translateX(16%) scale(1);
-                  }
+                    i {
+                        transform: translateX(16%) scale(1);
+                    }
                 }
             }
         }
@@ -1782,6 +1806,7 @@ dd {
     margin-top: 24px;
     width: 100%;
     background: #7E6748;
+
     flex: 0;
 
     .content {
@@ -1792,6 +1817,7 @@ dd {
         background: transparent;
         color: white;
         font-size: smaller;
+
         justify-content: space-between;
 
         a {
@@ -1817,6 +1843,7 @@ dd {
                     left: -12px;
                     line-height: 1.625;
                     transform: translateX(-100%);
+
                     @extend %fa;
                 }
             }
@@ -1864,6 +1891,7 @@ dd {
         flex-direction: column;
         padding-top: 20px;
         min-width: 100px;
+
         justify-content: space-between;
         align-items: center;
 
