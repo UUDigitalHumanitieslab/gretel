@@ -11,16 +11,16 @@
     <tbody>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEA" disabled> WR-P-E-A</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEA"> WR-P-E-A</label>
             </td>
             <td>Discussion lists</td>
             <td>4,395,094</td>
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEC" disabled> WR-P-E-C</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEC"> WR-P-E-C</label>
             </td>
             <td>E-magazines</td>
             <td>551,119</td>
@@ -35,16 +35,16 @@
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEF" disabled> WR-P-E-F</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEF"> WR-P-E-F</label>
             </td>
             <td>Press releases</td>
             <td>18,372</td>
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEG" disabled> WR-P-E-G</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEG"> WR-P-E-G</label>
             </td>
             <td>Subtitles</td>
             <td>3,925,824</td>
@@ -91,8 +91,8 @@
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPB" disabled> WR-P-P-B</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPB"> WR-P-P-B</label>
             </td>
             <td>Books</td>
             <td>1,709,808</td>
