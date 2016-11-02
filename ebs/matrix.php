@@ -126,29 +126,6 @@ if ($continueConstraints):
   </div>
 
   <aside id="tree-output"></aside>
-
-  <div class="guidelines">
-    <h3>Guidelines</h3>
-    <ul>
-      <li><strong>word</strong>: The exact word form. <strong>This is a case sensitive feature (cf. below).</strong></li>
-      <li><strong>lemma</strong>: Word form that generalizes over inflected forms.
-        For example: <em>zin</em> is the lemma of <em>zin, zinnen</em>, and <em>zinnetje</em>;
-        <em>gaan</em> is the lemma of <em>ga, gaat, gaan, ging, gingen</em>, and <em>gegaan</em>.</li>
-      <li><strong>word class</strong>: Short Dutch part-of-speech tag.
-      The different tags are: <code>n</code> (noun), <code>ww</code> (verb), <code>adj</code> (adjective),
-      <code>lid</code> (article), <code>vnw</code> (pronoun), <code>vg</code> (conjunction),
-      <code>bw</code> (adverb), <code>tw</code> (numeral), <code>vz</code> (preposition),
-      <code>tsw</code> (interjection), <code>spec</code> (special token), and <code>let</code> (punctuation).</li>
-      <li class="advanced-option"><strong>detailed word class</strong>: Long part-of-speech tag. For example: <code>N(soort,mv,basis)</code>, <code>WW(pv,tgw,ev)</code>, <code>VNW(pers,pron,nomin,vol,2v,ev)</code>.</li>
-      <li><strong>optional in search</strong>: The word will be ignored in the search instruction.
-          It may be included in the results, but it is not required that it is present.</li>
-      <li class="advanced-option"><strong>not in search</strong>: The word class and the dependency relation will be excluded from the results.</li>
-    </ul>
-    <p><strong>Note on case-sensitivity.</strong> As outlined above, the <code>word</code> feature can be made case-sensitive.
-      By default case-sensitivity is <em>disabled</em> (the search is case-insensitive). If you want to change the importance of case you can tick the checkbox for case-sensitivity.
-      Obviously, this option is only available for the <code>word</code> feature and not for punctuation.</p>
-    </p>
-  </div>
   <?php setContinueNavigation(); ?>
 </form>
 
