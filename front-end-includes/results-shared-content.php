@@ -10,7 +10,7 @@
 <section id="results-overview">
   <div class="btn-wrapper collapse">
     <button type="button" data-collapse="visible" title="Show or hide this section">
-      <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
+      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
     </button>
   </div>
@@ -34,7 +34,7 @@
 <section id="download-overview">
   <div class="btn-wrapper collapse">
     <button type="button" data-collapse="visible" title="Show or hide this section">
-      <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
+      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
     </button>
   </div>
@@ -74,7 +74,7 @@
 <section id="query-overview">
   <div class="btn-wrapper collapse">
     <button type="button" data-collapse="visible" title="Show or hide this section">
-      <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
+      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
     </button>
   </div>
