@@ -8,21 +8,21 @@
 </nav>
 
 <section id="results-overview">
-  <div class="btn-wrapper collapse">
-    <button type="button" data-collapse="visible" title="Show or hide this section">
+  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
+    <h2>Individual results</h2>
+    <span class="btn-wrapper collapse">
       <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
-    </button>
-  </div>
-  <h2>Individual results</h2>
+    </span>
+  </a>
   <div class="results-ajax-wrapper" data-target="true">
     <p>Click on a sentence ID to view the tree structure. The part of the sentence matching your input structure is set in bold.</p>
     <?php
-    if (isset($databaseGroups{$treebank}{$component}{'size'})):
-      $componentSize = $databaseGroups{$treebank}{$component}{'size'};
+    if (!$needRegularSonar && isset($databaseGroups{$treebank}{$component}{'sentences'})):
+      $componentSize = $databaseGroups{$treebank}{$component}{'sentences'};
       if ($componentSize > 1000000):
       ?>
-    <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize);?></strong> databases.
+    <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize);?></strong> sentences.
        <br>Searching through all of them can take a while!</small></p>
     <?php endif;
     endif;?>
@@ -32,13 +32,13 @@
 </section>
 
 <section id="download-overview">
-  <div class="btn-wrapper collapse">
-    <button type="button" data-collapse="visible" title="Show or hide this section">
+  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
+    <h2>Download results</h2>
+    <span class="btn-wrapper collapse">
       <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
-    </button>
-  </div>
-  <h2>Download results</h2>
+    </span>
+  </a>
   <div class="flex-content" data-target="true">
       <div class="results-messages-wrapper">
         <?php if ($treebank != 'sonar'): ?>
@@ -72,13 +72,13 @@
 </section>
 
 <section id="query-overview">
-  <div class="btn-wrapper collapse">
-    <button type="button" data-collapse="visible" title="Show or hide this section">
+  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
+    <h2>Query overview</h2>
+    <span class="btn-wrapper collapse">
       <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
       <span class="sr-only">Show or hide this section</span>
-    </button>
-  </div>
-  <h2>Query overview</h2>
+    </span>
+  </a>
   <div class="flex-content" data-target="true">
   <div>
     <div class="table-wrapper">

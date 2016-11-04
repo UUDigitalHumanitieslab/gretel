@@ -174,7 +174,7 @@
               $csClass = ($val == 'cs') ? 'case-sensitive' : '';
               $advancedClass = ($val == 'postag' || $val == 'not' ||  $val == 'cs') ? 'advanced-option' : '';
               $tableHTML .= "<tr class='row-group-$i $csClass $advancedClass'>";
-              $tableHTML .= "<th>$th " . addHelpersMatrix($val) ."</th>";
+              $tableHTML .= "<th><span>$th</span>" . addHelpersMatrix($val) ."</th>";
               foreach ($sentence as $key => $word) {
                   $isPunc = preg_match("/[\p{P}|^$=`´<>~]/u", $word);
                   $puncClass = $isPunc ? 'punctuation' : '';

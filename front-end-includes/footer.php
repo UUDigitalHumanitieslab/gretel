@@ -6,29 +6,25 @@
         <h3>Centre for Computational Linguistics</h3>
         <address>
           <ul>
-            <li class="address">University of Leuven<br>
+            <li class="address fa-before">University of Leuven<br>
           Blijde Inkomststraat 21 box 3315<br>
           3000 Leuven<br>
           Belgium<br></li>
-          <li class="web"><a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage"
+          <li class="web fa-before"><a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage"
               target="_blank">Centre for Computational Linguistics</a></li>
-          <li class="tel"  title="Phone number">+32-16-325088</li>
-          <li class="fax" title="Fax address">+32-16-325098</li>
-          <li class="email"><a href="mailto:gretel@ccl.kuleuven.be" title="Email us">gretel@ccl.kuleuven.be</a></li>
+          <li class="tel fa-before"  title="Phone number">+32-16-325088</li>
+          <li class="fax fa-before" title="Fax address">+32-16-325098</li>
+          <li class="email fa-before"><a href="mailto:gretel@ccl.kuleuven.be" title="Email us">gretel@ccl.kuleuven.be</a></li>
         </ul>
         </address>
       </aside>
       <nav class="footer-navigation">
         <h3>Navigation</h3>
           <ul>
-              <li><a href="index.php" title="Homepage Gretel" rel="home"
-              <?php if ($currentPage == "home") echo 'class="active"'; ?>>Home</a></li>
-              <li><a href="ebs/input.php" title="Example-based search"
-              <?php if ($currentPage == "ebs") echo 'class="active"'; ?>>Example-based search</a></li>
-              <li><a href="xps/input.php" title="XPath search"
-              <?php if ($currentPage == "xps") echo 'class="active"'; ?>>XPath search</a></li>
-              <li><a href="documentation.php" title="Documentation"
-              <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
+              <li class="fa-before"><a href="index.php" title="Homepage Gretel" rel="home">Home</a></li>
+              <li class="fa-before"><a href="ebs/input.php" title="Example-based search">Example-based search</a></li>
+              <li class="fa-before"><a href="xps/input.php" title="XPath search">XPath search</a></li>
+              <li class="fa-before"><a href="documentation.php" title="Documentation">Documentation</a></li>
           </ul>
       </nav>
       <aside class="other">

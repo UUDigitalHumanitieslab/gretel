@@ -1,4 +1,7 @@
 <?php
+session_cache_limiter('private');
+session_start();
+header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'ebs';
 $step = 5;
@@ -6,9 +9,7 @@ $step = 5;
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private');
-session_start();
-header('Content-Type:text/html; charset=utf-8');
+
 
 $noTbFlag = 0;
 
@@ -33,36 +34,41 @@ if (!$noTbFlag) {
     }
 }
 
-$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath',
-  'originalXp', 'manualMode', 'xpChanged'));
+$continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
+
+require "$root/functions.php";
 
 if ($continueConstraints) {
+
+    require "$root/preparatory-scripts/prep-functions.php";
     $id = session_id();
     $queryId = $_SESSION['queryid'];
     $treeVisualizer = true;
 
     $tokinput = $_SESSION['sentence'];
-    $manualMode = $_SESSION['manualMode'];
 
     $xpath = $_SESSION['xpath'];
     $originalXp = $_SESSION['originalXp'];
-    $xpChanged = $_SESSION['xpChanged'];
-    if ($treebank == 'sonar') {
-      $xpath = preg_replace('/^\/*/', '/', $xpath);
-      $originalXp = preg_replace('/^\/*/', '/', $originalXp);
-    }
-    else {
-      $xpath = preg_replace('/^\/*/', '//', $xpath);
-      $originalXp = preg_replace('/^\/*/', '//', $originalXp);
-    }
+
+    $xpath = cleanXpath($xpath);
+    $originalXp = cleanXpath($originalXp);
+
+    // Check if the XPath was edited by the user or not
+    $xpChanged = ($xpath == $originalXp) ? false : true;
 
     $_SESSION['xpath'] = $xpath;
     $_SESSION['originalXp'] = $originalXp;
+    $_SESSION['xpChanged'] = $xpChanged;
+
+    // Temporarily change XPath to show it to user
+    if ($treebank == 'sonar') {
+      $xpath = "/$xpath";
+    } else {
+      $xpath = "//$xpath";
+    }
 }
 
 session_write_close();
-
-require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 ?>
 
@@ -70,14 +76,13 @@ require "$root/front-end-includes/head.php";
 </head>
 <?php flush(); ?>
 <?php require "$root/front-end-includes/header.php"; ?>
-<?php if ($continueConstraints) :
+<?php if ($continueConstraints):
   $component = implode(', ', $component);
-  $xpath = rtrim($xpath);
 
   // Log query tree
   $qTree = file_get_contents("$tmp/$id-sub.xml");
   $treeLog = fopen("$log/gretel-querytrees.log", 'a');
-  fwrite($treeLog, "<alpino_ds id=\"$queryId\">$qTree\n</alpino_ds>\n");
+  fwrite($treeLog, "<alpino_ds id=\"$queryId\">\n$qTree\n</alpino_ds>\n");
   fclose($treeLog);
 ?>
 

@@ -39,25 +39,64 @@ if ($continueConstraints) {
 
     $xpath = $_SESSION['xpath'];
 
+    // Clean up XPath
+    $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
+
+    $xpath = strtr($xpath, $trans);
+    $xpath = trim($xpath);
+    $xpath = preg_replace('/^\/+/', '', $xpath);
+
     if (is_array($components)) {
         $component = implode(', ', $components);
     } else {
         $component = $components;
+        $_SESSION['subtreebank'] = $component;
     }
-
 
     // get context option
     $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
-
     $_SESSION['endPosIteration'] = 0;
     $_SESSION['leftOvers'] = array();
-    $_SESSION['already'] = array();
+
+    if ($treebank == 'sonar') {
+      $_SESSION['includes'] = array();
+      $_SESSION['already'] = array();
+      $needRegularSonar = false;
+      $databaseExists = false;
+      $includes = array();
+    }
 }
 
+session_write_close();
+
+require "$root/basex-search-scripts/basex-client.php";
+require "$root/preparatory-scripts/prep-functions.php";
+require "$root/basex-search-scripts/treebank-search.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
-?>
 
+if ($continueConstraints) {
+  if ($treebank == 'sonar') {
+    $bf = xpathToBreadthFirst($xpath);
+    checkBfPattern($bf);
+
+    // When looking in the regular version we need the double slash to go through
+    // all descendants
+    if ($needRegularSonar) {
+      $xpath = "//$xpath";
+    } else {
+      $xpath = "/$xpath";
+    }
+  } else {
+    $xpath = "//$xpath";
+  }
+
+  session_start();
+  $_SESSION['xpath'] = $xpath;
+  session_write_close();
+}
+
+?>
 </head>
 <?php flush(); ?>
 <?php
@@ -75,11 +114,11 @@ else: // $continueConstraints
     setPreviousPageMessage(2);
 
 endif;
-session_write_close();
 require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) : ?>
+if ($continueConstraints):
+  ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>

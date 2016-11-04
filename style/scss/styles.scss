@@ -5,7 +5,6 @@
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
     font-size: inherit;
-
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -27,11 +26,11 @@
     transition: transform 200ms;
     transform: scale(0);
 
-    &.loaded {
+    &.fa-loaded {
         transform: scale(1);
     }
 
-    &.failed {
+    &.fa-failed {
         display: none;
     }
 }
@@ -52,7 +51,6 @@ body {
     color: $textmain;
     font-family: $fontbody;
     line-height: 1.625;
-
     align-items: center;
 }
 @media all and (min-width: 1200px) {
@@ -149,7 +147,6 @@ body {
     .btn-wrapper {
         display: flex;
         margin-top: 16px;
-
         justify-content: space-around;
         align-items: center;
     }
@@ -186,7 +183,6 @@ cite {
     text-align: left;
     font-style: normal;
     font-size: 88%;
-
     align-items: center;
 
     p {
@@ -219,7 +215,7 @@ cite {
         color: white;
         transform: translate(-25%, 50%);
 
-        &.loaded {
+        &.fa-loaded {
             transform: scale(1) translate(-25%, 50%);
         }
     }
@@ -469,7 +465,6 @@ dd {
     margin: 0 auto 0.34em;
     padding-bottom: 0.89em;
     border-bottom: 1px dotted #968A7A;
-
     justify-content: space-between;
     align-items: center;
 
@@ -477,7 +472,6 @@ dd {
         margin: 0;
         white-space: nowrap;
         font-size: 2em;
-
         flex: 1;
 
         sup {
@@ -515,12 +509,10 @@ dd {
         margin: 0;
         padding: 0;
         list-style: none;
-
         justify-content: space-around;
 
         li {
             text-align: center;
-
             flex: 1;
 
             &:not(:last-child) {
@@ -537,7 +529,6 @@ dd {
                 font-weight: 300;
                 font-size: 15px;
                 transition: transform 200ms;
-
                 will-change: transform;
 
                 &.active,
@@ -568,7 +559,6 @@ dd {
     button {
         display: none;
         width: 40px;
-
         align-self: flex-end;
 
         i {
@@ -645,13 +635,11 @@ dd {
     width: 100%;
     border-radius: 0 0 6px 6px;
     background: #fff;
-
     flex: 1;
 }
 /* Progress bar */
 .secondary-navigation {
     display: flex;
-
     justify-content: space-between;
     align-items: center;
 
@@ -798,11 +786,43 @@ dd {
 #tree-output {
     position: relative;
     z-index: 2;
-    display: none;
     margin: 24px auto;
+    min-height: 240px;
+    background: #F5F5F5;
+
+    .tree-visualizer {
+        opacity: 0.48;
+        transition: opacity 200ms;
+    }
+
+    &::before {
+        position: absolute;
+        z-index: 1;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 90%;
+        background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
+        background-position: bottom center;
+        background-size: contain;
+        color: white;
+        content: "Loading tree";
+        text-align: center;
+        font-weight: bold;
+        font-size: 120%;
+        line-height: 180px;
+    }
 
     &.active {
-        display: block;
+        background: none;
+
+        .tree-visualizer {
+            opacity: 1;
+        }
+
+        &::before {
+            display: none;
+        }
     }
 }
 /* loading image */
@@ -821,7 +841,6 @@ dd {
     display: flex;
     visibility: hidden;
     pointer-events: none;
-
     align-items: center;
     justify-content: center;
 
@@ -863,7 +882,6 @@ dd {
         background: white;
         transition: transform 400ms;
         transform: scale(0);
-
         align-items: center;
         justify-content: center;
         will-change: transform;
@@ -878,7 +896,6 @@ dd {
             border-top-color: #b9d655;
             border-radius: 50%;
             content: "";
-
             will-change: transform;
         }
 
@@ -943,7 +960,6 @@ dd {
 .home {
     main header {
         display: flex;
-
         align-items: center;
         justify-content: space-between;
     }
@@ -992,14 +1008,12 @@ dd {
 .docs {
     .flex-content {
         font-size: 88%;
-
         flex-wrap: wrap;
         justify-content: space-between;
 
         article {
             padding: 0.67em;
             min-width: 240px;
-
             flex: 1;
         }
     }
@@ -1018,7 +1032,6 @@ dd {
             margin-left: 5px;
             content: "\f104";
             animation: docs-target-arrow 600ms alternate infinite;
-
             @extend %fa;
         }
     }
@@ -1038,7 +1051,6 @@ dd {
     &.step-1 {
         .input-wrapper {
             display: flex;
-
             align-items: flex-start;
 
             button {
@@ -1069,9 +1081,13 @@ dd {
             /* For tooltips */
             overflow: visible;
 
+            span {
+                float: left;
+            }
+
             .help-tooltip {
                 float: right;
-                margin-left: 4px;
+                margin-left: 6px;
                 font-weight: normal;
             }
         }
@@ -1107,7 +1123,6 @@ dd {
 
         .flex-content {
             margin: 0 -24px;
-
             flex-wrap: wrap;
         }
 
@@ -1115,8 +1130,12 @@ dd {
         .xpath-wrapper {
             margin: 0;
             padding: 24px;
-
             flex: 1;
+        }
+
+        .input-wrapper,
+        .xpath-wrapper > div:first-child {
+            transition: opacity 200ms;
         }
 
         .xpath-wrapper {
@@ -1152,8 +1171,7 @@ dd {
         }
 
         .advanced-mode-active {
-            opacity: 0.6;
-            filter: blur(1px);
+            opacity: 0.48;
             cursor: not-allowed;
             pointer-events: none;
 
@@ -1258,21 +1276,41 @@ dd {
 }
 
 .results {
-    .btn-wrapper.collapse {
-        float: right;
-
-        button {
+    a.collapse {
+        display: flex;
+        justify-content: space-between;
+        margin: 1.34em auto;
+        border: 0 none;
+        transition: all 250ms;
+        padding: 0.4em 0;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        h2 {
+          margin: 0;
+        }
+        > span {
             border-radius: 50%;
-
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            line-height: 30px;
+            border: 1px solid;
+            text-align: center;
             i {
                 transition: transform 250ms;
             }
+        }
 
-            &[data-collapse="hidden"] {
-                i {
-                    transform: rotate(180deg);
-                }
+        &:hover, &[data-collapse="hidden"] {
+          padding: 0.4em 0.6em;
+          background: #f7f7f7;
+          border: 1px solid #dcdcdc;
+          color: #565656;
+          > span {
+            i {
+                transform: rotate(180deg);
             }
+          }
         }
     }
 
@@ -1350,7 +1388,6 @@ dd {
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
         transform: translateY(100%) translateX(-50%);
-
         flex-wrap: wrap;
         justify-content: space-between;
 
@@ -1448,7 +1485,6 @@ dd {
         border-radius: 4px;
         background: #eee;
         font-size: 12px;
-
         align-items: center;
         justify-content: flex-end;
 
@@ -1688,7 +1724,6 @@ dd {
     &.step-1 {
         .input-wrapper {
             display: flex;
-
             align-items: flex-start;
 
             button {
@@ -1755,7 +1790,6 @@ dd {
         display: flex;
         margin-top: 1em;
         white-space: nowrap;
-
         justify-content: space-between;
         align-items: center;
 
@@ -1806,7 +1840,6 @@ dd {
     margin-top: 24px;
     width: 100%;
     background: #7E6748;
-
     flex: 0;
 
     .content {
@@ -1817,7 +1850,6 @@ dd {
         background: transparent;
         color: white;
         font-size: smaller;
-
         justify-content: space-between;
 
         a {
@@ -1835,16 +1867,28 @@ dd {
             padding-left: 26px;
             list-style: none;
 
-            li {
+            .fa-before {
                 position: relative;
 
                 &::before {
                     position: absolute;
                     left: -12px;
                     line-height: 1.625;
-                    transform: translateX(-100%);
-
+                    transition: transform 200ms;
+                    transform: scale(0) translateX(0);
                     @extend %fa;
+                }
+
+                &.fa-loaded {
+                    &::before {
+                        transform: scale(1) translateX(-100%);
+                    }
+                }
+
+                &.fa-failed {
+                    &::before {
+                        display: none;
+                    }
                 }
             }
         }
@@ -1891,7 +1935,6 @@ dd {
         flex-direction: column;
         padding-top: 20px;
         min-width: 100px;
-
         justify-content: space-between;
         align-items: center;
 

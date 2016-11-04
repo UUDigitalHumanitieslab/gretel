@@ -43,8 +43,8 @@ $(function(){
                     if (!done) {
                         var data = $.parseJSON(json);
                         if (!data.error && data.data) {
+                          resultsWrapper.find("tbody.empty").hide();
                             loopResults(data.data, false);
-                            resultsWrapper.find("tbody.empty").hide();
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
                             messages.closest(".results-messages-wrapper").addClass("active");
@@ -462,17 +462,19 @@ $(function(){
         notificationWrapper.fadeOut("fast");
     });
 
-    $(".btn-wrapper.collapse button").click(function() {
+    $("a.collapse").click(function(e) {
       var $this = $(this),
         isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
 
       if (isCollapsed) {
         $this.attr("data-collapse", 'visible');
-        $this.parent().nextAll("[data-target]").slideDown("fast");
+        $this.next("[data-target]").slideDown("fast");
       } else {
         $this.attr("data-collapse", 'hidden');
-        $this.parent().nextAll("[data-target]").slideUp("fast");
+        $this.next("[data-target]").slideUp("fast");
       }
+
+      e.preventDefault();
     });
 
     $("#results-menu a").off("click").click(function(e) {

@@ -161,8 +161,6 @@ $(function() {
             this.setCustomValidity("");
         });
 
-
-
         var getTreePathXHR;
         getTreePath();
 
@@ -331,7 +329,8 @@ $(function() {
 
     function getTreePath() {
         if (getTreePathXHR) getTreePathXHR.abort();
-
+        $("#tree-output").removeClass("active");
+        $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
         getTreePathXHR = $.ajax({
                 url: getTreePathScript,
                 method: "POST",
@@ -350,6 +349,8 @@ $(function() {
                     $("#xpath, .xpath-wrapper input[name='originalXp']").val(data.xpath);
                     adjustTextareaHeight($("#xpath"));
                 }
+
+                $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
             })
             .fail(function(jqXHR, textStatus, error) {
                 if (error != 'abort') {}

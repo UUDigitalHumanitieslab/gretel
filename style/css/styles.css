@@ -186,8 +186,8 @@ label.disabled {
   color: #d0d0d0;
 }
 
-.docs dt:target::after, .page-footer address ul li::before,
-.page-footer nav ul li::before {
+.docs dt:target::after, .page-footer address ul .fa-before::before,
+.page-footer nav ul .fa-before::before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
@@ -217,12 +217,12 @@ label.disabled {
           transform: scale(0);
 }
 
-.fa.loaded {
+.fa.fa-loaded {
   -webkit-transform: scale(1);
           transform: scale(1);
 }
 
-.fa.failed {
+.fa.fa-failed {
   display: none;
 }
 
@@ -421,7 +421,7 @@ cite .fa-download {
           transform: translate(-25%, 50%);
 }
 
-cite .fa-download.loaded {
+cite .fa-download.fa-loaded {
   -webkit-transform: scale(1) translate(-25%, 50%);
           transform: scale(1) translate(-25%, 50%);
 }
@@ -1009,12 +1009,44 @@ dd p:last-child {
 #tree-output {
   position: relative;
   z-index: 2;
-  display: none;
   margin: 24px auto;
+  min-height: 240px;
+  background: #F5F5F5;
+}
+
+#tree-output .tree-visualizer {
+  opacity: 0.48;
+  transition: opacity 200ms;
+}
+
+#tree-output::before {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 90%;
+  background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
+  background-position: bottom center;
+  background-size: contain;
+  color: white;
+  content: "Loading tree";
+  text-align: center;
+  font-weight: bold;
+  font-size: 120%;
+  line-height: 180px;
 }
 
 #tree-output.active {
-  display: block;
+  background: none;
+}
+
+#tree-output.active .tree-visualizer {
+  opacity: 1;
+}
+
+#tree-output.active::before {
+  display: none;
 }
 
 /* loading image */
@@ -1340,9 +1372,13 @@ dd p:last-child {
   overflow: visible;
 }
 
+.ebs.step-3 .table-wrapper span {
+  float: left;
+}
+
 .ebs.step-3 .table-wrapper .help-tooltip {
   float: right;
-  margin-left: 4px;
+  margin-left: 6px;
   font-weight: normal;
 }
 
@@ -1391,6 +1427,11 @@ dd p:last-child {
           flex: 1;
 }
 
+.ebs.step-3 .input-wrapper,
+.ebs.step-3 .xpath-wrapper > div:first-child {
+  transition: opacity 200ms;
+}
+
 .ebs.step-3 .xpath-wrapper {
   min-width: 380px;
 }
@@ -1424,9 +1465,7 @@ dd p:last-child {
 }
 
 .ebs.step-3 .advanced-mode-active {
-  opacity: 0.6;
-  -webkit-filter: blur(1px);
-          filter: blur(1px);
+  opacity: 0.48;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -1520,21 +1559,49 @@ dd p:last-child {
   margin: auto;
 }
 
-.results .btn-wrapper.collapse {
-  float: right;
+.results a.collapse {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  margin: 1.34em auto;
+  border: 0 none;
+  transition: all 250ms;
+  padding: 0.4em 0;
+  border-radius: 4px;
+  border: 1px solid transparent;
 }
 
-.results .btn-wrapper.collapse button {
+.results a.collapse h2 {
+  margin: 0;
+}
+
+.results a.collapse > span {
   border-radius: 50%;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  line-height: 30px;
+  border: 1px solid;
+  text-align: center;
 }
 
-.results .btn-wrapper.collapse button i {
+.results a.collapse > span i {
   transition: -webkit-transform 250ms;
   transition: transform 250ms;
   transition: transform 250ms, -webkit-transform 250ms;
 }
 
-.results .btn-wrapper.collapse button[data-collapse="hidden"] i {
+.results a.collapse:hover, .results a.collapse[data-collapse="hidden"] {
+  padding: 0.4em 0.6em;
+  background: #f7f7f7;
+  border: 1px solid #dcdcdc;
+  color: #565656;
+}
+
+.results a.collapse:hover > span i, .results a.collapse[data-collapse="hidden"] > span i {
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
 }
@@ -2166,18 +2233,32 @@ dd p:last-child {
   list-style: none;
 }
 
-.page-footer address ul li,
-.page-footer nav ul li {
+.page-footer address ul .fa-before,
+.page-footer nav ul .fa-before {
   position: relative;
 }
 
-.page-footer address ul li::before,
-.page-footer nav ul li::before {
+.page-footer address ul .fa-before::before,
+.page-footer nav ul .fa-before::before {
   position: absolute;
   left: -12px;
   line-height: 1.625;
-  -webkit-transform: translateX(-100%);
-          transform: translateX(-100%);
+  transition: -webkit-transform 200ms;
+  transition: transform 200ms;
+  transition: transform 200ms, -webkit-transform 200ms;
+  -webkit-transform: scale(0) translateX(0);
+          transform: scale(0) translateX(0);
+}
+
+.page-footer address ul .fa-before.fa-loaded::before,
+.page-footer nav ul .fa-before.fa-loaded::before {
+  -webkit-transform: scale(1) translateX(-100%);
+          transform: scale(1) translateX(-100%);
+}
+
+.page-footer address ul .fa-before.fa-failed::before,
+.page-footer nav ul .fa-before.fa-failed::before {
+  display: none;
 }
 
 .page-footer address {

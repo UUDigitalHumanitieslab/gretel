@@ -15,7 +15,12 @@ $xpath = $_SESSION['xpath'];
 $treebank  = $_SESSION['treebank'];
 $component = $_SESSION['subtreebank'];
 
-$includes = ($treebank == 'sonar') ? $_SESSION['includes'] : false;
+if ($treebank == 'sonar') {
+  $includes = $_SESSION['includes'];
+  $needRegularSonar = $_SESSION['needRegularSonar'];
+} else {
+  $includes = false;
+}
 
 session_write_close();
 

@@ -11,6 +11,7 @@ $componentString = implode('-', $component);
 
 if ($treebank == 'sonar') {
     $includes = $_SESSION['includes'];
+    $needRegularSonar = $_SESSION['needRegularSonar'];
 }
 
 $databaseString = $treebank;
@@ -19,10 +20,8 @@ $xpath = $_SESSION['xpath'];
 $ebsxps = $_SESSION['ebsxps'];
 if ($ebsxps == 'ebs') {
     $example = $_SESSION['example'];
-    if ($treebank != "sonar") {
-        $xpChanged = $_SESSION['xpChanged'];
-        $originalXp = $_SESSION['originalXp'];
-    }
+    $xpChanged = $_SESSION['xpChanged'];
+    $originalXp = $_SESSION['originalXp'];
 }
 
 // get context option
@@ -37,17 +36,10 @@ $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 if ($ebsxps == 'ebs') {
     $xplog = fopen("$log/gretel-ebq.log", 'a');
-    if ($treebank != "sonar") {
-      // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
-      fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
-    }
-    else {
-        // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.searched\n");
-        fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpath\n");
-    }
+    // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
+    fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$treebank\t$componentString\t$xpChanged\t$xpath\t$originalXp\n");
     fclose($xplog);
-}
-else {
+} else {
     $xplog = fopen("$log/gretel-xps.log", 'a');
     fwrite($xplog, "$date\t$user\t$id-$time\t$treebank\t$componentString\t$xpath\n");
     fclose($xplog);
@@ -63,8 +55,7 @@ require "$root/basex-search-scripts/treebank-search.php";
         $dbport = $serverInfo{'port'};
         $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
         list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $treebank, $component, $includes, $context, 'all', $session);
-      }
-      else {
+      } else {
         $serverInfo = getServerInfo($treebank, false);
         $dbhost = $serverInfo{'machine'};
         $dbport = $serverInfo{'port'};
@@ -94,7 +85,6 @@ require "$root/basex-search-scripts/treebank-search.php";
           // deal with quotes/apos
           $transformQuotes = array('"' => '&quot;', "'" => "&apos;");
           $hlsentence = strtr($hlsentence, $transformQuotes);
-
 
           // E.g. WRPEC0000019treebank
           if ($treebank == 'sonar') $databaseString = $tblist[$sid];

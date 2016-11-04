@@ -1,4 +1,7 @@
 <?php
+session_cache_limiter('private');
+session_start();
+header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'ebs';
 $step = 6;
@@ -6,21 +9,25 @@ $step = 6;
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private');
-session_start();
-header('Content-Type:text/html; charset=utf-8');
-
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
 
 $continueConstraints = sessionVariablesSet(array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
+  require "$root/preparatory-scripts/prep-functions.php";
+
     $treeVisualizer = true;
-    $databaseExists = false;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
     $xpath = $_SESSION['xpath'];
+    $originalXp = $_SESSION['originalXp'];
+
+    // Need to clean in case the user goes back in history, otherwise the
+    // prepended slashes below would keep stacking on each back-and-forward
+    // in history
+    $xpath = cleanXpath($xpath);
+    $originalXp = cleanXpath($originalXp);
 
     if (is_array($components)) {
         $component = implode(', ', $components);
@@ -39,57 +46,45 @@ if ($continueConstraints) {
       $_SESSION['includes'] = array();
       $_SESSION['already'] = array();
       $needRegularSonar = false;
+      $databaseExists = false;
       $includes = array();
     }
 }
 
-require "$root/basex-search-scripts/basex-client.php";
-require "$root/preparatory-scripts/prep-functions.php";
-require "$root/basex-search-scripts/treebank-search.php";
+session_write_close();
+
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 
 if ($continueConstraints) {
+  require "$root/basex-search-scripts/treebank-search.php";
+  require "$root/basex-search-scripts/basex-client.php";
+
   if ($treebank == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
-    if ($bf && $bf != 'ALL') {
-        // If is substring (eg. ALLnp%det)
-        if (strpos($bf, 'ALL') !== false) {
-            foreach ($cats as $cat) {
-              $bfcopy = $component . str_replace('ALL', $cat, $bf);
-              $includes[] = $bfcopy;
-            }
-        } else {
-          $includes[] = $component . $bf;
-        }
+    checkBfPattern($bf);
 
-        $serverInfo = getServerInfo('sonar', $component);
-
-        $dbhost = $serverInfo{'machine'};
-        $dbport = $serverInfo{'port'};
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-        foreach ($includes as $include) {
-          // db:exists returns a string 'false', still need to convert to bool
-          $databaseExists = $session->query("db:exists('$include')")->execute();
-
-          if ($databaseExists != 'false') {
-            $databaseExists = true;
-            $_SESSION['includes'][] = $include;
-          }
-        }
-
-        $continueConstraints = $databaseExists ? true : false;
-        $session->close();
+    // When looking in the regular version we need the double slash to go through
+    // all descendants
+    if ($needRegularSonar) {
+      $xpath = "//$xpath";
+      $originalXp = "//$originalXp";
     } else {
-      $_SESSION['includes'] = getRegularSonar($component);
-      $needRegularSonar = true;
+      $xpath = "/$xpath";
+      $originalXp = "/$originalXp";
     }
+  } else {
+    $xpath = "//$xpath";
+    $originalXp = "//$originalXp";
   }
-}
-session_write_close();
-?>
 
+  session_start();
+  $_SESSION['xpath'] = $xpath;
+  $_SESSION['originalXp'] = $originalXp;
+  $_SESSION['needRegularSonar'] = $needRegularSonar;
+  session_write_close();
+}
+?>
 </head>
 <?php flush(); ?>
 <?php
@@ -99,14 +94,13 @@ if ($continueConstraints):
   require "$root/front-end-includes/results-shared-content.php";
   setContinueNavigation();
 else: // $continueConstraints
-  if (isset($firstDatabaseExists) && !$firstDatabaseExists):
+  if (isset($databaseExists) && !$databaseExists):
     setErrorHeading('No results found'); ?>
     <p>The query you constructed did not yield any results. Such a structure does not exist in the selected component.</p>
   <?php else:
     setErrorHeading();
     ?>
-    <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
-        possible that you came to this page directly without first entering an input example.</p>
+    <p>Something went wrong. It is possible that you came to this page directly without entering the required fields in the previous steps.</p>
     <?php
     setPreviousPageMessage(4);
   endif;
@@ -114,7 +108,8 @@ endif;
 require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) :
+if ($continueConstraints):
+  var_dump($bf);
   ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>

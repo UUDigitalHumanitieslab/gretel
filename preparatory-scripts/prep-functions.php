@@ -4,10 +4,8 @@ function xpathToBreadthFirst($xpath)
 {
     $bfresult;
     // Divide XPath in top-most level, and the rest (its "descendants")
-    if (preg_match("/^\/*node\[([^\[]+?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
+    if (preg_match("/^\/*node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
-        $topattrs = trim($topattrs);
-        $descendants = trim($descendants);
         $topcat;
          // Find category of top node
          if ($topattrs && preg_match_all("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
@@ -24,6 +22,7 @@ function xpathToBreadthFirst($xpath)
              $topcat = 'ALL';
          }
 
+         $descendants = trim($descendants);
          // Only continue if there is more than one level
          if ($descendants) {
              // Remove fixed-order nodes, not relevant
@@ -62,15 +61,13 @@ function xpathToBreadthFirst($xpath)
                  }
              }
 
-             // At the end of the loop depth ought to be zero
-             /*
              if ($depth != 0) {
                  // warn("XPath not correct");
+                 return false;
              }
-             */
 
-            // Check if there is a count present
-            // and manipulate the string accordingly, i.e. multiply when necessary
+            // Check if there is a count present and manipulate the string
+            // accordingly, i.e. multiply when necessary
             // e.g. count(node[@pt="n"]) > 1 -> node[@pt="n"] and node[@pt="n"]
              $children = preg_replace_callback("/(count\((.*)\) *> *([1-9]+))/",
               function ($matches) {
@@ -85,7 +82,7 @@ function xpathToBreadthFirst($xpath)
 
              foreach ($childrenArray[0] as $childNode) {
                // Check if rel-attribute exists, and if there is only one
-               // If there isn't, or if thereis more than one we don't parse
+               // If there isn't, or if there is more than one we don't parse
                // this one
                 preg_match_all("/\@rel=\"([^\"]+)\"/", $childNode, $relArray);
                 $relArray = array_filter($relArray);
@@ -112,7 +109,7 @@ function xpathToBreadthFirst($xpath)
                   }
 
                   $dfpattern = "$rel%$cat";
-                  array_push($dfpatterns, $dfpattern);
+                  $dfpatterns[] = $dfpattern;
                 }
              }  // end foreach
 
@@ -133,6 +130,60 @@ function xpathToBreadthFirst($xpath)
     }
 
     return $bfresult;
+}
+
+function cleanXpath($xpath, $trimSlash = true) {
+  // Clean up XPath and original XPath
+  $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
+
+  $xpath = strtr($xpath, $trans);
+  $xpath = trim($xpath);
+
+  if ($trimSlash) $xpath = preg_replace('/^\/+/', '', $xpath);
+
+  return $xpath;
+}
+
+function checkBfPattern($bf) {
+  global $cats, $component, $includes, $dbuser, $dbpwd,
+    $continueConstraints, $databaseExists, $needRegularSonar;
+
+  session_start();
+  // If bf-pattern == ALL, we're faster searching through ragular version
+  if ($bf && $bf != 'ALL') {
+      // If is substring (eg. ALLnp%det)
+      if (strpos($bf, 'ALL') !== false) {
+          foreach ($cats as $cat) {
+            $bfcopy = $component . str_replace('ALL', $cat, $bf);
+            $includes[] = $bfcopy;
+          }
+      } else {
+        $includes[] = $component . $bf;
+      }
+
+      $serverInfo = getServerInfo('sonar', $component);
+
+      $dbhost = $serverInfo{'machine'};
+      $dbport = $serverInfo{'port'};
+      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+
+      foreach ($includes as $include) {
+        // db:exists returns a string 'false', still need to convert to bool
+        $databaseExists = $session->query("db:exists('$include')")->execute();
+
+        if ($databaseExists != 'false') {
+          $databaseExists = true;
+          $_SESSION['includes'][] = $include;
+        }
+      }
+
+      $continueConstraints = $databaseExists ? true : false;
+      $session->close();
+  } else {
+    $_SESSION['includes'] = getRegularSonar($component);
+    $needRegularSonar = true;
+  }
+  session_write_close();
 }
 
 function tokenize($sentence)

@@ -9,6 +9,9 @@
  *
  * @see /functions.php  buildEbsMatrix(), isSpam()
  */
+session_cache_limiter('private');
+session_start();
+header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'ebs';
 $step = 2;
@@ -17,9 +20,7 @@ require '../config/config.php';
 require "$root/helpers.php";
 require "$root/preparatory-scripts/prep-functions.php";
 
-session_cache_limiter('private');
-session_start();
-header('Content-Type:text/html; charset=utf-8');
+
 
 $continueConstraints = isset($_POST['input']);
 

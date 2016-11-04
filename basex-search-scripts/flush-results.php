@@ -1,13 +1,11 @@
 <?php
+
 require '../config/config.php';
 require "$root/functions.php";
 
 session_start();
 set_time_limit(0);
 
-/********************/
-/* SET UP VARIABLES */
-/********************/
 $queryIteration = $_SESSION['endPosIteration'];
 $leftOvers = $_SESSION['leftOvers'];
 
@@ -16,6 +14,7 @@ $component = $_SESSION['subtreebank'];
 
 if ($treebank == 'sonar') {
     $includes = $_SESSION['includes'];
+    $needRegularSonar = $_SESSION['needRegularSonar'];
 }
 
 $databaseString = $treebank;

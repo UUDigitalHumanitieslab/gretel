@@ -17,7 +17,7 @@ function getCounts($xpath, $treebank, $subtreebank, $databases, $session)
     for ($i = 0; $i < count($databases); $i++) {
         $database = $databases[$i];
 
-        if ($treebank == 'sonar' && !$needRegularSonar) {
+        if ($treebank == 'sonar') {
             getMoreIncludes($database, $databases, $session);
         }
 

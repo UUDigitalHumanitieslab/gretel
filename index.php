@@ -30,20 +30,18 @@ require "$root/front-end-includes/head.php";
 
             <p>In this search mode you can use a natural language example as a starting point for searching
                 a treebank with limited knowledge about tree representations and formal query languages.
-                The formal (XPath) query is automatically generated. In this type of search Three different
+                The formal (XPath) query is automatically generated. In this type of search three different
                 corpora can be queried: CGN, Lassy, and SoNaR.</p>
 
             <h3><a href="xps/input.php">XPath search</a></h3>
 
             <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
-                XPath search tool only when you are an experienced XPath user! Also note that because of the size of
-                the corpus, SoNaR is not accessible in this search mode because of the scale of the corpus and the
-                possible complexity of XPath code. Lassy and CGN are available.</p>
+                XPath search tool only when you are an experienced XPath user! Also here you can query CGN, Lassy, and SoNaR.</p>
 
                 <div class="citation-wrapper">
                 <p style="margin-top:0">Please cite the following paper if you are using GrETEL for your research. More documentation such as
                   tutorials, papers, and slides can be found on
-                  <a href="documentation.php" title="GrETEL documentation">the documentations page</a>.</p>
+                  <a href="documentation.php" title="GrETEL documentation">the documentation page</a>.</p>
                 <cite>
                   <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
                     title="Download Example-Based Treebank Querying" target="_blank">

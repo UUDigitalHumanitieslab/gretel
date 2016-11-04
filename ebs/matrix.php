@@ -16,6 +16,9 @@
  *
  * @see /functions.php  buildEbsMatrix(), isSpam()
  */
+ session_cache_limiter('private');
+ session_start();
+ header('Content-Type:text/html; charset=utf-8');
 
  $currentPage = 'ebs';
  $step = 3;
@@ -23,9 +26,7 @@
  require '../config/config.php';
  require "$root/helpers.php";
 
- session_cache_limiter('private');
- session_start();
- header('Content-Type:text/html; charset=utf-8');
+
 
 $continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 

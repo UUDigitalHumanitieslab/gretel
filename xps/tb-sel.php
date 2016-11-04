@@ -16,6 +16,7 @@ $id = session_id();
 
 if ($continueConstraints) {
     $xpath = (isset($_POST['xpath'])) ? $_POST['xpath'] : $_SESSION['xpath'];
+    $_SESSION['xpath'] = $xpath;
 }
 
 require "$root/functions.php";
@@ -31,15 +32,6 @@ $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
 require "$root/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam) {
-    // Clean up XPath
-    $xpath = rtrim($xpath);
-    $xpath = str_replace(array("\r", "\n", "\t"), ' ', $xpath);
-    // Deal with quotes/apos
-    $trans = array("='" => '="', "'\s" => '"\s', "']" => '"]');
-    $xpath = strtr($xpath, $trans);
-    $xpath = preg_replace('/^\/*node/', '//node', $xpath);
-    $_SESSION['xpath'] = $xpath;
-
     require "$root/front-end-includes/tb-sel-shared-content.php";
 
     setContinueNavigation(); ?>

@@ -176,10 +176,10 @@
                 var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times loaded"></i>' +
+                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times fa-loaded"></i>' +
                     '<span class="sr-only">Close this tooltip</span></button></aside>';
                 if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode" type="button"><i class="fa fa-fw fa-arrows-alt loaded"></i>' +
+                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode" type="button"><i class="fa fa-fw fa-arrows-alt fa-loaded"></i>' +
                         '<span class="sr-only">Open the tree in fullscreen mode</span></button>';
                 }
                 SS.append(SSHTML);
@@ -200,11 +200,11 @@
                 }
                 FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times loaded"></i>' +
+                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times fa-loaded"></i>' +
                     '<span class="sr-only">Close this tooltip</span></button></aside><div class="zoom-opts-wrapper"><a href="' + xml + '" target="_blank" title="Show XML">Show XML</a>' +
-                    '<div class="zoom-opts"><button class="zoom-out" type="button"><i class="fa fa-fw fa-search-minus loaded" aria-hidden="true"></i></button>' +
-                    '<button class="zoom-default" type="button">Default</button><button class="zoom-in" type="button"><i class="fa fa-fw fa-search-plus loaded" aria-hidden="true"></i></button>' +
-                    '<button title="Close fullscreen mode" type="button" class="close"><i class="fa fa-fw fa-times loaded"></i><span class="sr-only">Closen fullscreen mode</span></button></div></div>';
+                    '<div class="zoom-opts"><button class="zoom-out" type="button"><i class="fa fa-fw fa-search-minus fa-loaded" aria-hidden="true"></i></button>' +
+                    '<button class="zoom-default" type="button">Default</button><button class="zoom-in" type="button"><i class="fa fa-fw fa-search-plus fa-loaded" aria-hidden="true"></i></button>' +
+                    '<button title="Close fullscreen mode" type="button" class="close"><i class="fa fa-fw fa-times fa-loaded"></i><span class="sr-only">Closen fullscreen mode</span></button></div></div>';
 
                 FS.append(FSHTML);
 

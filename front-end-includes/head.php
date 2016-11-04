@@ -3,7 +3,7 @@
 <head>
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="GrETEL is an online tool that facilitates the exploitation of treebanks, large pieces of text that are syntactically annotated, by only requiring an input example instead of a formal query, or hard to understand computer code.">
-<meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, grind, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics">
+<meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics, search">
 
 <?php if (isBigStep()): ?>
   <meta name="robots" content="noindex">
@@ -23,7 +23,7 @@
 
 <?php
   // Prefetch links. Don't prefetch too much, only required pages such as
-  // the home page, or the next page in the process
+  // the next page in the process
 ?>
 <?php if (isSearch()): ?>
     <?php if (isset($step) && $step < count(${$currentPage.'Pages'})):
@@ -56,16 +56,16 @@
         classes: false,
         fontactive: function(familyName, fvd) {
           if (familyName == "FontAwesome") {
-            var faNodes = document.querySelectorAll(".fa");
+            var faNodes = document.querySelectorAll(".fa, .fa-before");
             for (var i = 0; i < faNodes.length; ++i) {
-              faNodes[i].classList.add("loaded");
+              faNodes[i].classList.add("fa-loaded");
             }
           }
         },
         fontinactive: function(familyName, fvd) {
           var faNodes = document.querySelectorAll(".fa");
           for (var i = 0; i < faNodes.length; ++i) {
-            faNodes[i].classList.add("failed");
+            faNodes[i].classList.add("fa-failed");
           }
         }
     };
