@@ -69,13 +69,15 @@ if ($continueConstraints) {
 
 session_write_close();
 
-require "$root/basex-search-scripts/basex-client.php";
 require "$root/preparatory-scripts/prep-functions.php";
-require "$root/basex-search-scripts/treebank-search.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
 
+
 if ($continueConstraints) {
+  require "$root/basex-search-scripts/treebank-search.php";
+  require "$root/basex-search-scripts/basex-client.php";
+
   if ($treebank == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
     checkBfPattern($bf);
@@ -84,18 +86,21 @@ if ($continueConstraints) {
     // all descendants
     if ($needRegularSonar) {
       $xpath = "//$xpath";
+      $originalXp = "//$originalXp";
     } else {
       $xpath = "/$xpath";
+      $originalXp = "/$originalXp";
     }
   } else {
     $xpath = "//$xpath";
+    $originalXp = "//$originalXp";
   }
 
   session_start();
   $_SESSION['xpath'] = $xpath;
+  $_SESSION['needRegularSonar'] = $needRegularSonar;
   session_write_close();
 }
-
 ?>
 </head>
 <?php flush(); ?>

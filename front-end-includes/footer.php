@@ -69,9 +69,6 @@ if (isIE) {
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js"></script>
-<?php if (isset($taalPortaal) && $taalPortaal): ?>
-    <script src="js/min/taalportaal.min.js"></script>
-<?php endif; ?>
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
     <script src="js/min/tree-visualizer.min.js"></script>
 <?php endif; ?>

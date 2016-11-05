@@ -23,8 +23,6 @@ header('Content-Type:text/html; charset=utf-8');
 session_regenerate_id(FALSE);
 session_unset();
 
-$taalPortaal = true;
-
 $id = session_id();
 $xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
 

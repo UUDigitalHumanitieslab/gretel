@@ -1282,35 +1282,57 @@ dd {
         margin: 1.34em auto;
         border: 0 none;
         transition: all 250ms;
-        padding: 0.4em 0;
         border-radius: 4px;
         border: 1px solid transparent;
+        color: #565656;
+        padding: 0.4em 0.6em;
+        background: transparent;
+        border: 1px solid #dcdcdc;
+
         h2 {
-          margin: 0;
+            margin: 0;
         }
+
         > span {
-            border-radius: 50%;
             border-radius: 50%;
             width: 32px;
             height: 32px;
-            line-height: 30px;
+            line-height: 28px;
             border: 1px solid;
             text-align: center;
+            background: transparent;
+            border: 1px solid #dcdcdc;
+            transition: line-height 200ms;
+
             i {
                 transition: transform 250ms;
+                color: #dcdcdc;
             }
         }
 
-        &:hover, &[data-collapse="hidden"] {
-          padding: 0.4em 0.6em;
-          background: #f7f7f7;
-          border: 1px solid #dcdcdc;
-          color: #565656;
-          > span {
-            i {
-                transform: rotate(180deg);
+        &:hover,
+        &[data-collapse="hidden"] {
+            color: #333;
+            background: #f7f7f7;
+            border-color: #c4c4c4;
+
+            > span {
+                background: #dcdcdc;
+                line-height: 32px;
+
+                i {
+                    color: #f7f7f7;
+                    transform: rotate(180deg);
+                }
             }
-          }
+        }
+
+        &[data-collapse="hidden"]:hover {
+            background: #f0f0f0;
+
+            i {
+                color: #f0f0f0;
+            }
         }
     }
 
@@ -1480,7 +1502,6 @@ dd {
         display: flex;
         margin: 1.67em auto;
         padding: 0.67em 26px;
-        max-width: 1024px;
         width: 100%;
         border-radius: 4px;
         background: #eee;

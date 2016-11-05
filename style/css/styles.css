@@ -1569,9 +1569,12 @@ dd p:last-child {
   margin: 1.34em auto;
   border: 0 none;
   transition: all 250ms;
-  padding: 0.4em 0;
   border-radius: 4px;
   border: 1px solid transparent;
+  color: #565656;
+  padding: 0.4em 0.6em;
+  background: transparent;
+  border: 1px solid #dcdcdc;
 }
 
 .results a.collapse h2 {
@@ -1580,30 +1583,46 @@ dd p:last-child {
 
 .results a.collapse > span {
   border-radius: 50%;
-  border-radius: 50%;
   width: 32px;
   height: 32px;
-  line-height: 30px;
+  line-height: 28px;
   border: 1px solid;
   text-align: center;
+  background: transparent;
+  border: 1px solid #dcdcdc;
+  transition: line-height 200ms;
 }
 
 .results a.collapse > span i {
   transition: -webkit-transform 250ms;
   transition: transform 250ms;
   transition: transform 250ms, -webkit-transform 250ms;
+  color: #dcdcdc;
 }
 
 .results a.collapse:hover, .results a.collapse[data-collapse="hidden"] {
-  padding: 0.4em 0.6em;
+  color: #333;
   background: #f7f7f7;
-  border: 1px solid #dcdcdc;
-  color: #565656;
+  border-color: #c4c4c4;
+}
+
+.results a.collapse:hover > span, .results a.collapse[data-collapse="hidden"] > span {
+  background: #dcdcdc;
+  line-height: 32px;
 }
 
 .results a.collapse:hover > span i, .results a.collapse[data-collapse="hidden"] > span i {
+  color: #f7f7f7;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
+}
+
+.results a.collapse[data-collapse="hidden"]:hover {
+  background: #f0f0f0;
+}
+
+.results a.collapse[data-collapse="hidden"]:hover i {
+  color: #f0f0f0;
 }
 
 .results section:not(:last-of-type) {
@@ -1793,7 +1812,6 @@ dd p:last-child {
   display: flex;
   margin: 1.67em auto;
   padding: 0.67em 26px;
-  max-width: 1024px;
   width: 100%;
   border-radius: 4px;
   background: #eee;

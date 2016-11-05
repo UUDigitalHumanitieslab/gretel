@@ -24,10 +24,6 @@ $step = 1;
 require '../config/config.php';
 require "$root/helpers.php";
 
-
-
-$taalPortaal = true;
-
 $id = session_id();
 $time = time();
 $_SESSION['queryid'] = "$id-$time";

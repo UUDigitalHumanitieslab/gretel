@@ -109,7 +109,6 @@ require "$root/front-end-includes/footer.php";
 include "$root/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints):
-  var_dump($bf);
   ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
