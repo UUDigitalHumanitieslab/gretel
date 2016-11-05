@@ -469,4 +469,29 @@ $(function() {
       document.location.hash = $(this).attr("href").substring(1);
       e.preventDefault();
     });
+
+    function taalPortaalFiller() {
+    	if (getUrlVars()["tpinput"]) {
+    		// Decode URI into readable string
+    		var tpinput = decodeURIComponent(getUrlVars()["tpinput"]);
+
+    		//Verschillende opties voor de verschillende pagina's:
+    		//(1) gretel voor lassy, gretel voor cgn: inputveld heeft id=example:
+    		$('#example').val(tpinput);
+    		//(4) XPath search: inputveld heeft name=xpinput
+    		$('textarea[name=xpinput]').val(tpinput);
+    	}
+    }
+
+    function getUrlVars() {
+    	var vars = [],
+    		hash;
+    	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    	for (var i = 0; i < hashes.length; i++) {
+    		hash = hashes[i].split('=');
+    		vars.push(hash[0]);
+    		vars[hash[0]] = hash[1];
+    	}
+    	return vars;
+    }
 });
