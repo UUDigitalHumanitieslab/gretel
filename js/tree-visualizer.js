@@ -58,7 +58,6 @@
         if (!args.initFSOnClick) {
             // Show tree-visualizer-fs tree
             instance.find(".tv-show-fs").click(function(e) {
-                var $this = $(this);
                 anyTooltip.css("top", "-100%").children("ul").empty();
                 if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
 
@@ -99,8 +98,8 @@
                 clearTimeout(tooltipTimeout);
                 fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
                 sizeTreeFS();
-                var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
 
+                var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
                 animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
                 animationSpeed += 50;
 
@@ -147,22 +146,18 @@
         });
 
         anyTree.on("mouseout", "a.hovered", function() {
-            var $this = $(this);
-            if ($this.closest(".tree").hasClass("small")) {
-                $this.on("transitionend", function() {
+            if ($(this).closest(".tree").hasClass("small")) {
+                $(this).on("transitionend", function() {
                     tooltipPosition(true);
                 });
             }
         });
 
         anyTooltip.find("button").click(function() {
-            var $this = $(this),
-                tooltip = $this.parent(".tooltip"),
-                tree = tooltip.prev(".tree"),
-                treeLeafs = tree.find("a");
+            var tooltip = $(this).parent(".tooltip");
 
             tooltip.fadeOut(250);
-            treeLeafs.removeClass("hovered");
+            tooltip.prev(".tree").find("a").removeClass("hovered");
         });
 
         function initVars() {
@@ -428,12 +423,10 @@
         function fontToFit() {
             sizeTreeFS();
             var currentFontSize = parseInt(treeFS.css("fontSize"), 10),
-                el = treeFS[0],
-                scrollw = el.scrollWidth,
-                scrollh = el.scrollHeight,
-                w = treeFS.outerWidth(),
-                h = treeFS.outerHeight();
-            if (((scrollh > h) || (scrollw > w)) && (currentFontSize > 4)) {
+                el = treeFS[0];
+
+            if (((el.scrollHeight > treeFS.outerHeight()) || (el.scrollWidth > treeFS.outerWidth()))
+                && (currentFontSize > 4)) {
                 if (fontFitSize == null) fontFitSize = "large";
                 treeFS.css("fontSize", currentFontSize - 1 + "px");
                 sizeTreeFS();
