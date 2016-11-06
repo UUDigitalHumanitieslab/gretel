@@ -812,19 +812,20 @@ dd {
         font-size: 120%;
         line-height: 180px;
     }
+}
 
-    &.active {
-        background: none;
+body.tv-active #tree-output {
+    background: none;
 
-        .tree-visualizer {
-            opacity: 1;
-        }
+    .tree-visualizer {
+        opacity: 1;
+    }
 
-        &::before {
-            display: none;
-        }
+    &::before {
+        display: none;
     }
 }
+
 /* loading image */
 @keyframes load-rotate {
     from {

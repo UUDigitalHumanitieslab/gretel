@@ -1037,15 +1037,15 @@ dd p:last-child {
   line-height: 180px;
 }
 
-#tree-output.active {
+body.tv-active #tree-output {
   background: none;
 }
 
-#tree-output.active .tree-visualizer {
+body.tv-active #tree-output .tree-visualizer {
   opacity: 1;
 }
 
-#tree-output.active::before {
+body.tv-active #tree-output::before {
   display: none;
 }
 

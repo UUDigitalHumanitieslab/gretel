@@ -15,8 +15,7 @@
     }
 }
 
-.tree-visualizer,
-.tree-visualizer-fs {
+.tv {
     box-sizing: border-box;
     color: #565656;
     text-align: center;
@@ -47,13 +46,13 @@
         }
     }
 
-    .tree {
+    .tv-tree {
         overflow: auto;
         display: flex;
         box-sizing: content-box;
         border-radius: 4px;
 
-        + .tooltip {
+        + .tv-tooltip {
             position: fixed;
             top: -100%;
             left: 0;
@@ -368,21 +367,21 @@
     }
 }
 
-.tree-visualizer {
+#tree-visualizer {
     position: relative;
 
-    .tree {
+    .tv-tree {
         padding: 24px;
         min-height: 240px;
         background: #F7F7F7;
         font-size: 12px;
 
-        + .tooltip {
+        + .tv-tooltip {
             z-index: 9;
         }
     }
 
-    > .tv-show-fs {
+    .tv-show-fs {
         display: block;
         position: absolute;
         top: 8px;
@@ -394,7 +393,8 @@
     }
 }
 
-.tree-visualizer-fs {
+#tree-visualizer-fs {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -402,12 +402,11 @@
     width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.6);
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
-    .sentence {
+    .tv-sentence {
         background: darken(#F5F5F5, 5%);
         border-bottom: 1px solid #ccc;
         padding: 12px;
@@ -415,7 +414,7 @@
         width: 100vw;
     }
 
-    .tree {
+    .tv-tree {
         position: relative;
         z-index: 11;
         min-width: 480px;
@@ -482,7 +481,7 @@
         }
     }
 
-    .zoom-opts-wrapper {
+    .tv-zoom-wrapper {
         position: absolute;
         top: 12px;
         right: 30px;
@@ -497,7 +496,7 @@
         }
     }
 
-    .zoom-opts {
+    .tv-zoom-opts {
         padding: 12px;
         background: #F5F5F5;
         border-radius: 4px;
@@ -516,7 +515,7 @@
             width: 36px;
             height: 36px;
 
-            &.close {
+            &.tv-close-fs {
                 margin-right: 0;
                 margin-left: 12px;
                 width: 34px;
@@ -542,19 +541,25 @@
                 }
             }
 
-            &.zoom-out {
+            &.tv-zoom-out {
                 border-radius: 4px 0 0 4px;
             }
 
-            &.zoom-in {
+            &.tv-zoom-in {
                 border-radius: 0 4px 4px 0;
             }
 
-            &.zoom-default {
+            &.tv-zoom-default {
                 padding: 0 8px;
                 width: auto;
                 border-radius: 0;
             }
         }
+    }
+}
+body {
+    &.tv-fs-open {
+        overflow-y: hidden;
+        #tree-visualizer-fs {display: flex;}
     }
 }

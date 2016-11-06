@@ -65,6 +65,7 @@ if ($continueConstraints && !$isSpam) {
   <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
   <div id="tree-output">
+      <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
   </div>
 
   <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">

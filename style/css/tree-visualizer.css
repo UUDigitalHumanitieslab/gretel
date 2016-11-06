@@ -1,5 +1,4 @@
-.tree-visualizer .tree li a.cs ~ .word em::before,
-.tree-visualizer-fs .tree li a.cs ~ .word em::before {
+.tv .tv-tree li a.cs ~ .word em::before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
   font-size: inherit;
@@ -8,34 +7,30 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.tree-visualizer-fs .zoom-opts:after {
+#tree-visualizer-fs .tv-zoom-opts:after {
   content: "";
   display: table;
   clear: both;
 }
 
-.tree-visualizer,
-.tree-visualizer-fs {
+.tv {
   box-sizing: border-box;
   color: #565656;
   text-align: center;
 }
 
-.tree-visualizer *,
-.tree-visualizer-fs * {
+.tv * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.tree-visualizer button,
-.tree-visualizer-fs button {
+.tv button {
   outline: 0;
   cursor: pointer;
 }
 
-.tree-visualizer .tv-error,
-.tree-visualizer-fs .tv-error {
+.tv .tv-error {
   margin-top: 24px;
   padding: 8px 16px;
   background: #DF5F5F;
@@ -46,13 +41,11 @@
   display: inline-block;
 }
 
-.tree-visualizer .tv-error p,
-.tree-visualizer-fs .tv-error p {
+.tv .tv-error p {
   margin: 0;
 }
 
-.tree-visualizer .tree,
-.tree-visualizer-fs .tree {
+.tv .tv-tree {
   overflow: auto;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -61,8 +54,7 @@
   border-radius: 4px;
 }
 
-.tree-visualizer .tree + .tooltip,
-.tree-visualizer-fs .tree + .tooltip {
+.tv .tv-tree + .tv-tooltip {
   position: fixed;
   top: -100%;
   left: 0;
@@ -75,8 +67,7 @@
   border-radius: 5px;
 }
 
-.tree-visualizer .tree + .tooltip > ul,
-.tree-visualizer-fs .tree + .tooltip > ul {
+.tv .tv-tree + .tv-tooltip > ul {
   padding: 0 8px;
   list-style: none;
   -webkit-columns: 2;
@@ -90,13 +81,11 @@
           column-rule: 1px solid #ccc;
 }
 
-.tree-visualizer .tree + .tooltip > ul li,
-.tree-visualizer-fs .tree + .tooltip > ul li {
+.tv .tv-tree + .tv-tooltip > ul li {
   white-space: nowrap;
 }
 
-.tree-visualizer .tree + .tooltip::after,
-.tree-visualizer-fs .tree + .tooltip::after {
+.tv .tv-tree + .tv-tooltip::after {
   position: absolute;
   bottom: -24px;
   left: 50%;
@@ -113,8 +102,7 @@
           transform-origin: 0 0;
 }
 
-.tree-visualizer .tree + .tooltip button,
-.tree-visualizer-fs .tree + .tooltip button {
+.tv .tv-tree + .tv-tooltip button {
   position: absolute;
   top: 0;
   right: 0;
@@ -134,27 +122,23 @@
           transform: translate(50%, -50%);
 }
 
-.tree-visualizer .tree + .tooltip button:hover,
-.tree-visualizer-fs .tree + .tooltip button:hover {
+.tv .tv-tree + .tv-tooltip button:hover {
   background: #dc4e4e;
   -webkit-transform: translate(50%, -50%) scale(1.23);
           transform: translate(50%, -50%) scale(1.23);
 }
 
-.tree-visualizer .tree + .tooltip button:active,
-.tree-visualizer-fs .tree + .tooltip button:active {
+.tv .tv-tree + .tv-tooltip button:active {
   background: #d83d3d;
 }
 
-.tree-visualizer .tree ol,
-.tree-visualizer-fs .tree ol {
+.tv .tv-tree ol {
   position: relative;
   display: table;
   padding-top: 1em;
 }
 
-.tree-visualizer .tree ol ol::before,
-.tree-visualizer-fs .tree ol ol::before {
+.tv .tv-tree ol ol::before {
   position: absolute;
   top: 0;
   left: 50%;
@@ -164,15 +148,13 @@
   content: "";
 }
 
-.tree-visualizer .tree > ol,
-.tree-visualizer-fs .tree > ol {
+.tv .tv-tree > ol {
   padding-top: 0;
   /* Center inside flexbox */
   margin: auto;
 }
 
-.tree-visualizer .tree li,
-.tree-visualizer-fs .tree li {
+.tv .tv-tree li {
   position: relative;
   display: table-cell;
   padding: 1em 0.5em 0;
@@ -181,9 +163,7 @@
   text-align: center;
 }
 
-.tree-visualizer .tree li::after, .tree-visualizer .tree li::before,
-.tree-visualizer-fs .tree li::after,
-.tree-visualizer-fs .tree li::before {
+.tv .tv-tree li::after, .tv .tv-tree li::before {
   position: absolute;
   top: 0;
   right: 50%;
@@ -193,102 +173,77 @@
   content: "";
 }
 
-.tree-visualizer .tree li::after,
-.tree-visualizer-fs .tree li::after {
+.tv .tv-tree li::after {
   right: auto;
   left: 50%;
   border-left: 1px solid #ccc;
 }
 
-.tree-visualizer .tree li.first-child::before,
-.tree-visualizer-fs .tree li.first-child::before {
+.tv .tv-tree li.first-child::before {
   border: 0 none;
 }
 
-.tree-visualizer .tree li.last-child::before,
-.tree-visualizer-fs .tree li.last-child::before {
+.tv .tv-tree li.last-child::before {
   border-right: 1px solid #ccc;
 }
 
-.tree-visualizer .tree li.last-child::after,
-.tree-visualizer-fs .tree li.last-child::after {
+.tv .tv-tree li.last-child::after {
   border: 0 none;
 }
 
-.tree-visualizer .tree li.only-child,
-.tree-visualizer-fs .tree li.only-child {
+.tv .tv-tree li.only-child {
   padding-top: 0;
 }
 
-.tree-visualizer .tree li.only-child::after, .tree-visualizer .tree li.only-child::before,
-.tree-visualizer-fs .tree li.only-child::after,
-.tree-visualizer-fs .tree li.only-child::before {
+.tv .tv-tree li.only-child::after, .tv .tv-tree li.only-child::before {
   display: none;
 }
 
-.tree-visualizer .tree li.highlight a,
-.tree-visualizer .tree li.highlight a.only-child,
-.tree-visualizer-fs .tree li.highlight a,
-.tree-visualizer-fs .tree li.highlight a.only-child {
+.tv .tv-tree li.highlight a,
+.tv .tv-tree li.highlight a.only-child {
   background: #C7BDB1;
   color: white;
   border-color: transparent;
 }
 
-.tree-visualizer .tree li.highlight a.hovered, .tree-visualizer .tree li.highlight a:hover,
-.tree-visualizer .tree li.highlight a.only-child.hovered,
-.tree-visualizer .tree li.highlight a.only-child:hover,
-.tree-visualizer-fs .tree li.highlight a.hovered,
-.tree-visualizer-fs .tree li.highlight a:hover,
-.tree-visualizer-fs .tree li.highlight a.only-child.hovered,
-.tree-visualizer-fs .tree li.highlight a.only-child:hover {
+.tv .tv-tree li.highlight a.hovered, .tv .tv-tree li.highlight a:hover,
+.tv .tv-tree li.highlight a.only-child.hovered,
+.tv .tv-tree li.highlight a.only-child:hover {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li.highlight a.hovered span:nth-child(2), .tree-visualizer .tree li.highlight a:hover span:nth-child(2),
-.tree-visualizer .tree li.highlight a.only-child.hovered span:nth-child(2),
-.tree-visualizer .tree li.highlight a.only-child:hover span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a:hover span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li.highlight a.only-child:hover span:nth-child(2) {
+.tv .tv-tree li.highlight a.hovered span:nth-child(2), .tv .tv-tree li.highlight a:hover span:nth-child(2),
+.tv .tv-tree li.highlight a.only-child.hovered span:nth-child(2),
+.tv .tv-tree li.highlight a.only-child:hover span:nth-child(2) {
   color: #3d3d3d;
 }
 
-.tree-visualizer .tree li.excluded::after, .tree-visualizer .tree li.excluded::before,
-.tree-visualizer-fs .tree li.excluded::after,
-.tree-visualizer-fs .tree li.excluded::before {
+.tv .tv-tree li.excluded::after, .tv .tv-tree li.excluded::before {
   border-top: 1px dotted red;
 }
 
-.tree-visualizer .tree li.excluded::after,
-.tree-visualizer-fs .tree li.excluded::after {
+.tv .tv-tree li.excluded::after {
   border-left: 1px dotted red;
 }
 
-.tree-visualizer .tree li.excluded.first-child::before,
-.tree-visualizer-fs .tree li.excluded.first-child::before {
+.tv .tv-tree li.excluded.first-child::before {
   border: 0 none;
 }
 
-.tree-visualizer .tree li.excluded.last-child::before,
-.tree-visualizer-fs .tree li.excluded.last-child::before {
+.tv .tv-tree li.excluded.last-child::before {
   border-right: 1px dotted red;
 }
 
-.tree-visualizer .tree li.excluded.last-child::after,
-.tree-visualizer-fs .tree li.excluded.last-child::after {
+.tv .tv-tree li.excluded.last-child::after {
   border: 0 none;
 }
 
-.tree-visualizer .tree li.excluded a span,
-.tree-visualizer-fs .tree li.excluded a span {
+.tv .tv-tree li.excluded a span {
   opacity: 0.36;
 }
 
-.tree-visualizer .tree li.excluded a::before,
-.tree-visualizer-fs .tree li.excluded a::before {
+.tv .tv-tree li.excluded a::before {
   content: "NOT";
   position: absolute;
   top: 0;
@@ -305,25 +260,21 @@
   transition: transform 200ms, -webkit-transform 200ms;
 }
 
-.tree-visualizer .tree li.excluded a:hover span,
-.tree-visualizer-fs .tree li.excluded a:hover span {
+.tv .tv-tree li.excluded a:hover span {
   opacity: 1;
 }
 
-.tree-visualizer .tree li.excluded a:hover::before,
-.tree-visualizer-fs .tree li.excluded a:hover::before {
+.tv .tv-tree li.excluded a:hover::before {
   -webkit-transform: translateY(-50%) scale(0);
           transform: translateY(-50%) scale(0);
   pointer-events: none;
 }
 
-.tree-visualizer .tree li.excluded a.hovered,
-.tree-visualizer-fs .tree li.excluded a.hovered {
+.tv .tv-tree li.excluded a.hovered {
   background-color: rgba(142, 127, 107, 0.36);
 }
 
-.tree-visualizer .tree li a,
-.tree-visualizer-fs .tree li a {
+.tv .tv-tree li a {
   display: inline-block;
   padding: 0.5em 1em;
   border-radius: 4em;
@@ -335,150 +286,115 @@
   z-index: 2;
 }
 
-.tree-visualizer .tree li a span:nth-child(2),
-.tree-visualizer-fs .tree li a span:nth-child(2) {
+.tv .tv-tree li a span:nth-child(2) {
   color: #565656;
   font-weight: normal;
 }
 
-.tree-visualizer .tree li a.hovered, .tree-visualizer .tree li a:hover,
-.tree-visualizer-fs .tree li a.hovered,
-.tree-visualizer-fs .tree li a:hover {
+.tv .tv-tree li a.hovered, .tv .tv-tree li a:hover {
   background: #ccc;
 }
 
-.tree-visualizer .tree li a.hovered + ol li a, .tree-visualizer .tree li a:hover + ol li a,
-.tree-visualizer-fs .tree li a.hovered + ol li a,
-.tree-visualizer-fs .tree li a:hover + ol li a {
+.tv .tv-tree li a.hovered + ol li a, .tv .tv-tree li a:hover + ol li a {
   background: #ccc;
 }
 
-.tree-visualizer .tree li a.hovered + ol li.highlight a,
-.tree-visualizer .tree li a.hovered + ol li.highlight a.only-child, .tree-visualizer .tree li a:hover + ol li.highlight a,
-.tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a,
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
+.tv .tv-tree li a.hovered + ol li.highlight a,
+.tv .tv-tree li a.hovered + ol li.highlight a.only-child, .tv .tv-tree li a:hover + ol li.highlight a,
+.tv .tv-tree li a:hover + ol li.highlight a.only-child {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer .tree li a.hovered span:nth-child(2), .tree-visualizer .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer .tree li a:hover span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover + ol li a span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover span:nth-child(2) {
+.tv .tv-tree li a.hovered + ol li a span:nth-child(2),
+.tv .tv-tree li a.hovered span:nth-child(2), .tv .tv-tree li a:hover + ol li a span:nth-child(2),
+.tv .tv-tree li a:hover span:nth-child(2) {
   color: white;
 }
 
-.tree-visualizer .tree li a.hovered,
-.tree-visualizer-fs .tree li a.hovered {
+.tv .tv-tree li a.hovered {
   background: #8E7F6B;
   color: #FFF !important;
   border-color: transparent;
 }
 
-.tree-visualizer .tree li a.hovered + ol li.highlight a span:nth-child(2),
-.tree-visualizer .tree li a:hover + ol li.highlight a span:nth-child(2),
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a span:nth-child(2),
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a span:nth-child(2) {
+.tv .tv-tree li a.hovered + ol li.highlight a span:nth-child(2),
+.tv .tv-tree li a:hover + ol li.highlight a span:nth-child(2) {
   color: #3d3d3d;
 }
 
-.tree-visualizer .tree li a.hovered + ol li a.only-child,
-.tree-visualizer .tree li a:hover + ol li a.only-child,
-.tree-visualizer-fs .tree li a.hovered + ol li a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li a.only-child {
+.tv .tv-tree li a.hovered + ol li a.only-child,
+.tv .tv-tree li a:hover + ol li a.only-child {
   background: #ccc;
   color: white;
 }
 
-.tree-visualizer .tree li a.hovered + ol li.highlight a.only-child,
-.tree-visualizer .tree li a:hover + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a.hovered + ol li.highlight a.only-child,
-.tree-visualizer-fs .tree li a:hover + ol li.highlight a.only-child {
+.tv .tv-tree li a.hovered + ol li.highlight a.only-child,
+.tv .tv-tree li a:hover + ol li.highlight a.only-child {
   background: #9C8A73;
   color: white;
 }
 
-.tree-visualizer .tree li a.hovered + ol::before,
-.tree-visualizer .tree li a.hovered + ol li::after,
-.tree-visualizer .tree li a.hovered + ol li::before,
-.tree-visualizer .tree li a.hovered + ol ol::before,
-.tree-visualizer .tree li a:hover + ol::before,
-.tree-visualizer .tree li a:hover + ol li::after,
-.tree-visualizer .tree li a:hover + ol li::before,
-.tree-visualizer .tree li a:hover + ol ol::before,
-.tree-visualizer-fs .tree li a.hovered + ol::before,
-.tree-visualizer-fs .tree li a.hovered + ol li::after,
-.tree-visualizer-fs .tree li a.hovered + ol li::before,
-.tree-visualizer-fs .tree li a.hovered + ol ol::before,
-.tree-visualizer-fs .tree li a:hover + ol::before,
-.tree-visualizer-fs .tree li a:hover + ol li::after,
-.tree-visualizer-fs .tree li a:hover + ol li::before,
-.tree-visualizer-fs .tree li a:hover + ol ol::before {
+.tv .tv-tree li a.hovered + ol::before,
+.tv .tv-tree li a.hovered + ol li::after,
+.tv .tv-tree li a.hovered + ol li::before,
+.tv .tv-tree li a.hovered + ol ol::before,
+.tv .tv-tree li a:hover + ol::before,
+.tv .tv-tree li a:hover + ol li::after,
+.tv .tv-tree li a:hover + ol li::before,
+.tv .tv-tree li a:hover + ol ol::before {
   border-color: #ddd;
 }
 
-.tree-visualizer .tree li a.only-child,
-.tree-visualizer-fs .tree li a.only-child {
+.tv .tv-tree li a.only-child {
   color: #9C8A73;
   font-weight: bold;
 }
 
-.tree-visualizer .tree li a.only-child:hover span:first-child,
-.tree-visualizer-fs .tree li a.only-child:hover span:first-child {
+.tv .tv-tree li a.only-child:hover span:first-child {
   color: #565656;
 }
 
-.tree-visualizer .tree li a.cs ~ .word em,
-.tree-visualizer-fs .tree li a.cs ~ .word em {
+.tv .tv-tree li a.cs ~ .word em {
   cursor: help;
 }
 
-.tree-visualizer .tree li a.cs ~ .word em::before,
-.tree-visualizer-fs .tree li a.cs ~ .word em::before {
+.tv .tv-tree li a.cs ~ .word em::before {
   content: "\f031";
   margin-right: 0.36em;
   color: #222;
 }
 
-.tree-visualizer .tree li a.ignored,
-.tree-visualizer-fs .tree li a.ignored {
+.tv .tv-tree li a.ignored {
   cursor: help;
   opacity: 0.67;
 }
 
-.tree-visualizer .tree li a.ignored + ol::before,
-.tree-visualizer-fs .tree li a.ignored + ol::before {
+.tv .tv-tree li a.ignored + ol::before {
   border-left: 1px dotted #ccc;
 }
 
-.tree-visualizer .tree li span,
-.tree-visualizer-fs .tree li span {
+.tv .tv-tree li span {
   display: block;
   margin: 2px auto;
 }
 
-.tree-visualizer {
+#tree-visualizer {
   position: relative;
 }
 
-.tree-visualizer .tree {
+#tree-visualizer .tv-tree {
   padding: 24px;
   min-height: 240px;
   background: #F7F7F7;
   font-size: 12px;
 }
 
-.tree-visualizer .tree + .tooltip {
+#tree-visualizer .tv-tree + .tv-tooltip {
   z-index: 9;
 }
 
-.tree-visualizer > .tv-show-fs {
+#tree-visualizer .tv-show-fs {
   display: block;
   position: absolute;
   top: 8px;
@@ -489,7 +405,8 @@
   text-align: center;
 }
 
-.tree-visualizer-fs {
+#tree-visualizer-fs {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -497,9 +414,6 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
   -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
@@ -511,7 +425,7 @@
           justify-content: center;
 }
 
-.tree-visualizer-fs .sentence {
+#tree-visualizer-fs .tv-sentence {
   background: #e8e8e8;
   border-bottom: 1px solid #ccc;
   padding: 12px;
@@ -519,7 +433,7 @@
   width: 100vw;
 }
 
-.tree-visualizer-fs .tree {
+#tree-visualizer-fs .tv-tree {
   position: relative;
   z-index: 11;
   min-width: 480px;
@@ -530,14 +444,14 @@
   overflow: scroll;
 }
 
-.tree-visualizer-fs .tree.small a {
+#tree-visualizer-fs .tv-tree.small a {
   transition: -webkit-transform 150ms;
   transition: transform 150ms;
   transition: transform 150ms, -webkit-transform 150ms;
   will-change: transform;
 }
 
-.tree-visualizer-fs .tree.small a.hovered, .tree-visualizer-fs .tree.small a:hover {
+#tree-visualizer-fs .tv-tree.small a.hovered, #tree-visualizer-fs .tv-tree.small a:hover {
   -webkit-transform: scale(2);
           transform: scale(2);
   z-index: 3;
@@ -546,45 +460,45 @@
   border-color: transparent !important;
 }
 
-.tree-visualizer-fs .tree.small a.only-child {
+#tree-visualizer-fs .tv-tree.small a.only-child {
   transition: margin-bottom 200ms, -webkit-transform 150ms;
   transition: transform 150ms, margin-bottom 200ms;
   transition: transform 150ms, margin-bottom 200ms, -webkit-transform 150ms;
 }
 
-.tree-visualizer-fs .tree.small a.only-child ~ span {
+#tree-visualizer-fs .tv-tree.small a.only-child ~ span {
   transition: margin-top 200ms, -webkit-transform 150ms;
   transition: transform 150ms, margin-top 200ms;
   transition: transform 150ms, margin-top 200ms, -webkit-transform 150ms;
 }
 
-.tree-visualizer-fs .tree.small a.only-child.hovered, .tree-visualizer-fs .tree.small a.only-child:hover {
+#tree-visualizer-fs .tv-tree.small a.only-child.hovered, #tree-visualizer-fs .tv-tree.small a.only-child:hover {
   margin-bottom: 2em;
 }
 
-.tree-visualizer-fs .tree.small a.only-child.hovered ~ span, .tree-visualizer-fs .tree.small a.only-child:hover ~ span {
+#tree-visualizer-fs .tv-tree.small a.only-child.hovered ~ span, #tree-visualizer-fs .tv-tree.small a.only-child:hover ~ span {
   -webkit-transform: scale(2);
           transform: scale(2);
   margin-top: 1.5em;
   z-index: 3;
 }
 
-.tree-visualizer-fs .tree.x-small a.hovered, .tree-visualizer-fs .tree.x-small a:hover {
+#tree-visualizer-fs .tv-tree.x-small a.hovered, #tree-visualizer-fs .tv-tree.x-small a:hover {
   -webkit-transform: scale(3);
           transform: scale(3);
 }
 
-.tree-visualizer-fs .tree.x-small a.only-child.hovered, .tree-visualizer-fs .tree.x-small a.only-child:hover {
+#tree-visualizer-fs .tv-tree.x-small a.only-child.hovered, #tree-visualizer-fs .tv-tree.x-small a.only-child:hover {
   margin-bottom: 5em;
 }
 
-.tree-visualizer-fs .tree.x-small a.only-child.hovered ~ span, .tree-visualizer-fs .tree.x-small a.only-child:hover ~ span {
+#tree-visualizer-fs .tv-tree.x-small a.only-child.hovered ~ span, #tree-visualizer-fs .tv-tree.x-small a.only-child:hover ~ span {
   -webkit-transform: scale(3);
           transform: scale(3);
   margin-top: 3em;
 }
 
-.tree-visualizer-fs .zoom-opts-wrapper {
+#tree-visualizer-fs .tv-zoom-wrapper {
   position: absolute;
   top: 12px;
   right: 30px;
@@ -597,24 +511,24 @@
           align-items: center;
 }
 
-.tree-visualizer-fs .zoom-opts-wrapper a {
+#tree-visualizer-fs .tv-zoom-wrapper a {
   font-weight: bold;
   color: white;
   margin-right: 16px;
 }
 
-.tree-visualizer-fs .zoom-opts {
+#tree-visualizer-fs .tv-zoom-opts {
   padding: 12px;
   background: #F5F5F5;
   border-radius: 4px;
 }
 
-.tree-visualizer-fs .zoom-opts:hover {
+#tree-visualizer-fs .tv-zoom-opts:hover {
   z-index: 12;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.tree-visualizer-fs .zoom-opts button {
+#tree-visualizer-fs .tv-zoom-opts button {
   position: relative;
   float: left;
   margin-right: 1px;
@@ -623,7 +537,7 @@
   height: 36px;
 }
 
-.tree-visualizer-fs .zoom-opts button.close {
+#tree-visualizer-fs .tv-zoom-opts button.tv-close-fs {
   margin-right: 0;
   margin-left: 12px;
   width: 34px;
@@ -639,29 +553,39 @@
   transition: transform 200ms, -webkit-transform 200ms;
 }
 
-.tree-visualizer-fs .zoom-opts button.close:hover {
+#tree-visualizer-fs .tv-zoom-opts button.tv-close-fs:hover {
   background: #DF5F5F;
   color: white;
   -webkit-transform: scale(1.23);
           transform: scale(1.23);
 }
 
-.tree-visualizer-fs .zoom-opts button.close:active {
+#tree-visualizer-fs .tv-zoom-opts button.tv-close-fs:active {
   top: auto;
   border: 2px solid #d83d3d;
   background: #d83d3d;
 }
 
-.tree-visualizer-fs .zoom-opts button.zoom-out {
+#tree-visualizer-fs .tv-zoom-opts button.tv-zoom-out {
   border-radius: 4px 0 0 4px;
 }
 
-.tree-visualizer-fs .zoom-opts button.zoom-in {
+#tree-visualizer-fs .tv-zoom-opts button.tv-zoom-in {
   border-radius: 0 4px 4px 0;
 }
 
-.tree-visualizer-fs .zoom-opts button.zoom-default {
+#tree-visualizer-fs .tv-zoom-opts button.tv-zoom-default {
   padding: 0 8px;
   width: auto;
   border-radius: 0;
+}
+
+body.tv-fs-open {
+  overflow-y: hidden;
+}
+
+body.tv-fs-open #tree-visualizer-fs {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }

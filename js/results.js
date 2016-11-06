@@ -12,6 +12,7 @@ $(function(){
 
     var hash = window.location.hash,
         $window = $(window),
+        $body = $("body"),
         $document = $(document),
         tvLink = $("a.tv-show-fs"),
         controls = $(".controls"),
@@ -230,8 +231,7 @@ $(function(){
     }
 
     function showTvFsOnLoad() {
-        var tvLink = $("a.tv-show-fs"),
-            hash = window.location.hash;
+        var hash = window.location.hash;
         if (!$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
             if (hash.indexOf("tv-") == 1) {
                 var index = hash.match(/\d+$/);
@@ -424,8 +424,7 @@ $(function(){
     resultsWrapper.find("tbody").on("click", "a.tv-show-fs", function(e) {
         var $this = $(this);
 
-        resultsWrapper.find("tbody a.tv-show-fs").removeClass("tv-fs-toggled");
-        $this.addClass("tv-fs-toggled");
+        $body.addClass("tv-fs-open");
 
         if (!this.hasAttribute("data-tv-fontsize")) {
             $this.attr("data-tv-fontsize", 0);

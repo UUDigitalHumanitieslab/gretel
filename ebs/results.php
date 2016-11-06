@@ -18,6 +18,7 @@ if ($continueConstraints) {
   require "$root/preparatory-scripts/prep-functions.php";
 
     $treeVisualizer = true;
+    $onlyFullscreenTv = true;
     $treebank = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
     $xpath = $_SESSION['xpath'];
@@ -110,9 +111,6 @@ include "$root/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints):
   ?>
-    <div class="loading-wrapper fullscreen tv">
-        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
-    </div>
     <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(

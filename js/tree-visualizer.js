@@ -14,16 +14,16 @@
         var defaults = {
             normalView: true,
             nvFontSize: 12,
-            fsView: true,
             fsFontSize: 14,
             sentence: "",
             initFSOnClick: false,
-            extendedPOS: false
+            extendedPOS: false,
+            pathToHTML: ''
         };
         var args = $.extend({}, defaults, options);
         var instance = this,
-            FS, SS,
-            treeFS, treeSS, tooltipFS, tooltipSS,
+            FS, NS,
+            treeFS, treeNS, tooltipFS, tooltipNS,
             anyTree,
             anyTooltip,
             zoomOpts,
@@ -32,35 +32,15 @@
         var $window = $(window),
           $body = $("body");
 
-        var FSPadding = {
-                top: 84,
-                right: 36,
-                bottom: 48,
-                left: 36
-            },
-            FSTreePadding = {
-                top: 12,
-                right: 12,
-                bottom: 12,
-                left: 12
-            };
-
-        if (args.normalView || args.fsView) {
-            instance.children(".tree-visualizer, .tree-visualizer-fs").remove();
-            initVars();
-            loadXML(xml);
-        } else {
-            console.error("Cannot initialize Tree Visualizer: either the container " +
-                "does not exist, or you have set both normal and fullscreen view to " +
-                "false, which does not make sense.");
-        }
+        initVars();
+        loadXML(xml);
 
         if (!args.initFSOnClick) {
             // Show tree-visualizer-fs tree
             instance.find(".tv-show-fs").click(function(e) {
                 anyTooltip.css("top", "-100%").children("ul").empty();
-                if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
-
+                if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
+                $body.addClass("tv-fs-open");
                 FS.fadeIn(250, function() {
                     fontFitSize = null;
                     fontToFit();
@@ -77,7 +57,8 @@
         // Close fullscreen if a user clicks on an empty area
         FS.click(function(e) {
             var target = $(e.target);
-            if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts-wrapper, .sentence").length) {
+            if (!target.tv-closest(".tv-error, .tv-tree, .tv-tooltip, .tv-zoom-wrapper, .tv-sentence").length) {
+                $body.removeClass("tv-fs-open");
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
@@ -88,7 +69,7 @@
         // Zooming
         zoomOpts.find("button").click(function() {
             var $this = $(this);
-            if ($this.is(".close")) {
+            if ($this.is(".tv-close")) {
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
@@ -110,26 +91,23 @@
         });
 
         // Make the tree-visualizer-fs tree responsive
-        if (args.fsView) {
-            $window.on("resize", $.debounce(250, function() {
-                if (treeFS.is(":visible")) {
-                    sizeTreeFS();
-                }
-            }));
-        }
+        $window.on("resize", $.debounce(250, function() {
+            if (treeFS.is(":visible")) {
+                sizeTreeFS();
+            }
+        }));
+
 
         anyTree.on("click", "a", function(e) {
             if (!$(this).hasClass("ignored")) {
                 var $this = $(this),
-                    listItem = $this.parent("li"),
-                    data = listItem.data(),
-                    tree = $this.closest(".tree"),
-                    treeLeafs = tree.find("a"),
-                    tooltipList = tree.next(".tooltip").children("ul"),
+                    data = $this.parent("li").data(),
+                    tree = $this.tv-closest(".tv-tree"),
+                    tooltipList = tree.next(".tv-tooltip").children("ul"),
                     i;
 
                 tooltipList.empty();
-                treeLeafs.removeClass("hovered");
+                tree.find("a").removeClass("hovered");
                 $this.addClass("hovered");
 
                 for (i in data) {
@@ -146,7 +124,7 @@
         });
 
         anyTree.on("mouseout", "a.hovered", function() {
-            if ($(this).closest(".tree").hasClass("small")) {
+            if ($(this).tv-closest(".tv-tree").hasClass("small")) {
                 $(this).on("transitionend", function() {
                     tooltipPosition(true);
                 });
@@ -154,10 +132,10 @@
         });
 
         anyTooltip.find("button").click(function() {
-            var tooltip = $(this).parent(".tooltip");
+            var tooltip = $(this).parent(".tv-tooltip");
 
             tooltip.fadeOut(250);
-            tooltip.prev(".tree").find("a").removeClass("hovered");
+            tooltip.prev(".tv-tree").find("a").removeClass("hovered");
         });
 
         function initVars() {
@@ -166,68 +144,34 @@
                 views = [];
 
             if (args.normalView) {
-                instance.append('<div class="tree-visualizer"></div>');
-                SS = instance.children(".tree-visualizer");
-                var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
-                    '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
-                    '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times fa-loaded"></i>' +
-                    '<span class="sr-only">Close this tooltip</span></button></aside>';
-                if (args.fsView) {
-                    SSHTML += '<button class="tv-show-fs" title="Open the tree in full screen mode" type="button"><i class="fa fa-fw fa-arrows-alt fa-loaded"></i>' +
-                        '<span class="sr-only">Open the tree in fullscreen mode</span></button>';
-                }
-                SS.append(SSHTML);
+                NS = instance.children("#tree-visualizer");
 
-                treeSS = SS.children(".tree");
-                tooltipSS = SS.children(".tooltip");
+                treeNS = NS.find(".tv-tree");
+                treeNS.css("fontSize", args.nvFontSize);
+                tooltipNS = treeNS.children(".tv-tooltip");
 
-                views.push(SS);
-                trees.push(treeSS);
-                tooltips.push(tooltipSS);
+                views.push(NS);
+                trees.push(treeNS);
+                tooltips.push(tooltipNS);
             }
-            if (args.fsView) {
-                instance.append('<div class="tree-visualizer-fs" style="display: none"></div>');
-                FS = instance.children(".tree-visualizer-fs");
-                var FSHTML = "";
-                if (!args.normalView) {
-                    FSHTML += '<div class="tv-error" style="display: none"><p></p></div>';
-                }
-                FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
-                    '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button title="Close this tooltip" type="button"><i class="fa fa-fw fa-times fa-loaded"></i>' +
-                    '<span class="sr-only">Close this tooltip</span></button></aside><div class="zoom-opts-wrapper"><a href="' + xml + '" target="_blank" title="Show XML">Show XML</a>' +
-                    '<div class="zoom-opts"><button class="zoom-out" type="button"><i class="fa fa-fw fa-search-minus fa-loaded" aria-hidden="true"></i></button>' +
-                    '<button class="zoom-default" type="button">Default</button><button class="zoom-in" type="button"><i class="fa fa-fw fa-search-plus fa-loaded" aria-hidden="true"></i></button>' +
-                    '<button title="Close fullscreen mode" type="button" class="close"><i class="fa fa-fw fa-times fa-loaded"></i><span class="sr-only">Closen fullscreen mode</span></button></div></div>';
 
-                FS.append(FSHTML);
+            FS = instance.children("#tree-visualizer-fs");
 
-                treeFS = FS.children(".tree");
-                tooltipFS = FS.children(".tooltip");
-                zoomOpts = FS.find(".zoom-opts");
+            treeFS = FS.find(".tv-tree");
+            treeFS.css("fontSize", args.fsFontSize);
+            treeFS.find(".tv-zoom-wrapper > a").attr('href', xml);
+            tooltipFS = treeFS.children(".tv-tooltip");
+            zoomOpts = FS.find(".tv-zoom-opts");
 
-                if (args.sentence != "") {
-                    treeFS.before('<div class="sentence">' + decodeURI(args.sentence) + '</div>');
-                    sentenceContainer = FS.children(".sentence");
-                }
+            views.push(FS);
+            trees.push(treeFS);
+            tooltips.push(tooltipFS);
 
-                views.push(FS);
-                trees.push(treeFS);
-                tooltips.push(tooltipFS);
-                FS.css({
-                    "padding-top": FSPadding.top,
-                    "padding-right": FSPadding.right,
-                    "padding-bottom": FSPadding.bottom,
-                    "padding-left": FSPadding.left
-                });
-                treeFS.css({
-                    "padding-top": FSTreePadding.top,
-                    "padding-right": FSTreePadding.right,
-                    "padding-bottom": FSTreePadding.bottom,
-                    "padding-left": FSTreePadding.left
-                });
+            if (args.sentence != "") {
+                treeFS.find(".tv-sentence-wrapper").addClass("has-sentence").children("span").text(decodeURI(args.sentence));
             }
+
+
             anyTree = jqArrayToJqObject(trees);
             anyTooltip = jqArrayToJqObject(tooltips);
             anyView = jqArrayToJqObject(views);
@@ -236,6 +180,7 @@
         }
 
         function loadXML(src) {
+            $body.removeClass("tv-active, tv-success, tv-fail");
             $.ajax({
                     type: "GET",
                     url: src,
@@ -243,6 +188,7 @@
                     cache: false
                 })
                 .done(function(data) {
+                    $body.addClass("tv-success");
                     if (data == null) {
                         errorHandle("Your XML appears to be empty or not in a compatible format.");
                     } else {
@@ -250,6 +196,7 @@
                     }
                 })
                 .fail(function(jqXHR, textStatus, errorThrown) {
+                    $body.addClass("tv-fail");
                     var msg = '';
                     if (jqXHR.status === 0) {
                         msg = 'Not connected to the Internet.<br>Verify your network connection.';
@@ -258,14 +205,14 @@
                     } else if (jqXHR.status == 500) {
                         msg = 'Internal Server Error.<br>If the problem persists, contact us.';
                     } else {
-                        msg = 'Uncaught Error.<br>Please try again at another time.<br>';
+                        msg = 'Something went wrong.<br>Please try again at another time.<br>';
                         msg += jqXHR.status + ' ' + textStatus + ' ' + errorThrown;
                     }
                     errorHandle(msg);
                 })
                 .always(function() {
                     if (args.normalView) {
-                        instance.addClass("active");
+                        $body.addClass("tv-active");
                     }
                     if (args.initFSOnClick) {
                         $(".loading-wrapper.tv").removeClass("active");
@@ -283,7 +230,7 @@
             removeError();
 
             // See the buildOutputList function below
-            anyTree.html(buildOutputList(xmlObject.find("node").first()));
+            anyTree.prepend(buildOutputList(xmlObject.find("node").first()));
 
             // Empty tooltips
             anyTooltip.children("ul").empty();
@@ -448,13 +395,13 @@
             var tree;
             if (typeof treeFS != "undefined" && treeFS.is(":visible")) {
                 tree = treeFS;
-            } else if (typeof treeSS != "undefined" && treeSS.is(":visible")) {
-                tree = treeSS;
+            } else if (typeof treeNS != "undefined" && treeNS.is(":visible")) {
+                tree = treeNS;
             }
             if (typeof tree != "undefined") {
                 var targetLink = tree.find("a.hovered");
                 if (targetLink.length) {
-                    var tooltip = tree.next(".tooltip"),
+                    var tooltip = tree.next(".tv-tooltip"),
                         targetRect = targetLink[0].getBoundingClientRect(),
                         treeRect = tree[0].getBoundingClientRect(),
                         linkV = {
@@ -508,7 +455,7 @@
                 "max-height": $window.height() - FSPadding.top - FSPadding.bottom
             });
 
-            if (args.sentence != "") {
+            if (args.tv-sentence != "") {
                 treeFS.css("max-height", $window.height() - FSPadding.top - FSPadding.bottom - (sentenceContainer[0].getBoundingClientRect().height * 2));
                 sentenceContainer.css("max-width", treeFS[0].getBoundingClientRect().width);
             }
@@ -517,17 +464,18 @@
         function errorHandle(message) {
             errorContainer.children("p").html(message).parent().fadeIn(250);
             if (args.normalView) {
-                treeSS.hide();
-                SS.children(".tv-show-fs").prop("disabled", true).hide();
+                treeNS.hide();
+                NS.children(".tv-show-fs").prop("disabled", true).hide();
             }
-            if (args.fsView) treeFS.hide();
+
+            treeFS.hide();
         }
 
         function removeError() {
             errorContainer.hide();
             treeFS.show();
             if (args.normalView) {
-                SS.children(".tv-show-fs").prop("disabled", false).show();
+                NS.children(".tv-show-fs").prop("disabled", false).show();
             }
         }
 
