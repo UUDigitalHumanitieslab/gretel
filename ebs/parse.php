@@ -20,8 +20,6 @@ require '../config/config.php';
 require "$root/helpers.php";
 require "$root/preparatory-scripts/prep-functions.php";
 
-
-
 $continueConstraints = isset($_POST['input']);
 
 if ($continueConstraints) {
@@ -93,7 +91,7 @@ require "$root/front-end-includes/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(function() {
-      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml"; ?>');
   });
   </script>
 <?php endif;

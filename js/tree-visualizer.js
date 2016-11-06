@@ -57,7 +57,7 @@
         // Close fullscreen if a user clicks on an empty area
         FS.click(function(e) {
             var target = $(e.target);
-            if (!target.tv-closest(".tv-error, .tv-tree, .tv-tooltip, .tv-zoom-wrapper, .tv-sentence").length) {
+            if (!target.closest(".tv-error, .tv-tree, .tv-tooltip, .tv-zoom-wrapper, .tv-sentence").length) {
                 $body.removeClass("tv-fs-open");
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
@@ -69,7 +69,7 @@
         // Zooming
         zoomOpts.find("button").click(function() {
             var $this = $(this);
-            if ($this.is(".tv-close")) {
+            if ($this.is(".tv-close-fs")) {
                 FS.fadeOut(250, function() {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
@@ -159,9 +159,10 @@
 
             treeFS = FS.find(".tv-tree");
             treeFS.css("fontSize", args.fsFontSize);
-            treeFS.find(".tv-zoom-wrapper > a").attr('href', xml);
             tooltipFS = treeFS.children(".tv-tooltip");
             zoomOpts = FS.find(".tv-zoom-opts");
+
+            zoomOpts.prev("a").attr('href', xml);
 
             views.push(FS);
             trees.push(treeFS);
