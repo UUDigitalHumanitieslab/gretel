@@ -1,7 +1,7 @@
 /**
  * Documentation loosely based on the JSDoc standard
  */
-$(function(){
+$(function() {
     // Customizable attributes!
     // Specify how long it should take for functions to start
     // * Before counting ALL hits, independent of current fetched results (ms)
@@ -44,7 +44,7 @@ $(function(){
                     if (!done) {
                         var data = $.parseJSON(json);
                         if (!data.error && data.data) {
-                          resultsWrapper.find("tbody.empty").hide();
+                            resultsWrapper.find("tbody.empty").hide();
                             loopResults(data.data, false);
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
@@ -92,6 +92,7 @@ $(function(){
             .done(function(json) {
                 var data = $.parseJSON(json);
                 if (!data.error && data.data) {
+                    resultsWrapper.find("tbody.empty").hide();
                     loopResults(data.data, true);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
@@ -139,8 +140,8 @@ $(function(){
                     // Length of associative array (Object in JS)
                     var size = Object.keys(totalArray).length;
                     if (typeof totalArray !== 'undefined' && size > 0) {
-                      var hitsSum = 0,
-                        totalSum = 0;
+                        var hitsSum = 0,
+                            totalSum = 0;
                         for (var database in totalArray) {
                             var databaseString = database.split("_")[2],
                                 componentHits = numericSeparator(parseInt(totalArray[database][0])),
@@ -213,8 +214,8 @@ $(function(){
 
     function messageNoResultsFound() {
         resultsWrapper.add(controls).remove();
-        $("#results .content").addClass("no-results");
-
+        $("#download-overview .flex-content").addClass("no-results");
+        $body.addClass("search-no-results");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
@@ -222,8 +223,8 @@ $(function(){
 
     function messageOnError(error) {
         resultsWrapper.add(controls).remove();
-        $("#results .content").addClass("error");
-
+        $("#download-overview .flex-content").addClass("error");
+        $body.addClass("search-error");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
@@ -232,7 +233,7 @@ $(function(){
 
     function showTvFsOnLoad() {
         var hash = window.location.hash;
-        if (!$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
+        if (!$body.hasClass("tv-fs-open")) {
             if (hash.indexOf("tv-") == 1) {
                 var index = hash.match(/\d+$/);
                 tvLink.eq(index[0] - 1).click();
@@ -246,7 +247,6 @@ $(function(){
             resultID = 0;
 
             resultsWrapper.find("tbody:not(.empty)").empty();
-            $(".loading-wrapper.searching").removeClass("active");
         }
         $.each(sentences, function(id, value) {
             if (returnAllResults || (!returnAllResults && !done)) {
@@ -270,8 +270,6 @@ $(function(){
             messageAllResultsFound();
         }
     }
-
-
 
     controls.find("[name='go-to']").keyup(function(e) {
             var keycode = e.keyCode,
@@ -422,22 +420,35 @@ $(function(){
 
     /* Tree visualizer */
     resultsWrapper.find("tbody").on("click", "a.tv-show-fs", function(e) {
-        var $this = $(this);
+        var $this = $(this),
+          treeSentence = $this.parent().nextAll("td:last-child").html(),
+          tvFs = $("#tree-visualizer-fs");
 
-        $body.addClass("tv-fs-open");
+        resultsWrapper.find("tbody a").removeClass("tv-toggled-link");
 
         if (!this.hasAttribute("data-tv-fontsize")) {
             $this.attr("data-tv-fontsize", 0);
         }
+        tvFs.attr("data-tv-active-index", $this.closest("tr").index());
+        $this.addClass("tv-toggled-link");
 
-        $(".loading-wrapper.tv").addClass("active");
-        $("body").treeVisualizer($this.data("tv-url"), {
+        $body.treeVisualizer($this.data("tv-url"), {
             normalView: false,
             initFSOnClick: true,
-            fsFontSize: 12
+            sentence: treeSentence,
+            hasNavigation: true
         });
         e.preventDefault();
     });
+
+    function htmlEscape(str) {
+      return str
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+  }
 
     if (hash) {
         if (hash.indexOf("tv-") == 1) {
@@ -462,24 +473,24 @@ $(function(){
     });
 
     $("a.collapse").click(function(e) {
-      var $this = $(this),
-        isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
+        var $this = $(this),
+            isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
 
-      if (isCollapsed) {
-        $this.attr("data-collapse", 'visible');
-        $this.next("[data-target]").slideDown("fast");
-      } else {
-        $this.attr("data-collapse", 'hidden');
-        $this.next("[data-target]").slideUp("fast");
-      }
+        if (isCollapsed) {
+            $this.attr("data-collapse", 'visible');
+            $this.next("[data-target]").slideDown("fast");
+        } else {
+            $this.attr("data-collapse", 'hidden');
+            $this.next("[data-target]").slideUp("fast");
+        }
 
-      e.preventDefault();
+        e.preventDefault();
     });
 
     $("#results-menu a").off("click").click(function(e) {
-      $("html, body").stop().animate({
-          scrollTop: $($(this).attr("href")).offset().top
-      }, 150);
-      e.preventDefault();
+        $("html, body").stop().animate({
+            scrollTop: $($(this).attr("href")).offset().top
+        }, 150);
+        e.preventDefault();
     });
 });

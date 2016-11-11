@@ -91,7 +91,9 @@ require "$root/front-end-includes/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(function() {
-      $("#tree-output").treeVisualizer('<?php echo "$home/tmp/$id-pt.xml"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>', {
+        sentence: '<?php echo "$input"; ?>'
+    });
   });
   </script>
 <?php endif;

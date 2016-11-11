@@ -26,8 +26,6 @@
  require '../config/config.php';
  require "$root/helpers.php";
 
-
-
 $continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
 if ($continueConstraints) {

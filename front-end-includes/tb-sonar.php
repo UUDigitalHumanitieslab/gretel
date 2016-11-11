@@ -83,8 +83,8 @@
         </tr>
         <tr>
             <td>
-                <label>
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEL"> WR-P-E-L</label>
+                <label class="disabled">
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEL" disabled> WR-P-E-L</label>
             </td>
             <td>Tweets</td>
             <td>2,636,859</td>
@@ -171,16 +171,16 @@
         </tr>
         <tr>
             <td>
-                <label>
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRUEA"> WR-U-E-A</label>
+                <label class="disabled">
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRUEA" disabled> WR-U-E-A</label>
             </td>
             <td>Chats</td>
             <td>2,387,131</td>
         </tr>
         <tr>
             <td>
-                <label>
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRUED"> WR-U-E-D</label>
+                <label class="disabled">
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRUED" disabled> WR-U-E-D</label>
             </td>
             <td>SMS</td>
             <td>101,116</td>

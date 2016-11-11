@@ -1007,21 +1007,17 @@ dd p:last-child {
 }
 
 #tree-output {
+  margin: 24px auto;
+}
+
+body.tv-is-loading #tree-output {
   position: relative;
   z-index: 2;
-  margin: 24px auto;
-  min-height: 240px;
-  background: #F5F5F5;
 }
 
-#tree-output .tree-visualizer {
-  opacity: 0.48;
-  transition: opacity 200ms;
-}
-
-#tree-output::before {
+body.tv-is-loading #tree-output::before {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -1035,18 +1031,6 @@ dd p:last-child {
   font-weight: bold;
   font-size: 120%;
   line-height: 180px;
-}
-
-body.tv-active #tree-output {
-  background: none;
-}
-
-body.tv-active #tree-output .tree-visualizer {
-  opacity: 1;
-}
-
-body.tv-active #tree-output::before {
-  display: none;
 }
 
 /* loading image */
@@ -1069,137 +1053,6 @@ body.tv-active #tree-output::before {
     -webkit-transform: rotate(360deg);
             transform: rotate(360deg);
   }
-}
-
-.loading-wrapper {
-  z-index: 11;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  visibility: hidden;
-  pointer-events: none;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-}
-
-.loading-wrapper.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  background: rgba(0, 0, 0, 0.34);
-}
-
-.loading-wrapper.fullscreen .loading {
-  width: 360px;
-  height: 360px;
-  border-width: 18px;
-  border-color: #F7F7F7;
-  background: #F0F0F0 url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
-  background-position: bottom center;
-  background-size: 74%;
-}
-
-.loading-wrapper.fullscreen .loading::after {
-  top: -18px;
-  right: -18px;
-  bottom: -18px;
-  left: -18px;
-  border-width: 18px;
-}
-
-.loading-wrapper .loading {
-  z-index: 100;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  width: 36px;
-  height: 36px;
-  border: 6px solid #F0F0F0;
-  border-radius: 50%;
-  background: white;
-  transition: -webkit-transform 400ms;
-  transition: transform 400ms;
-  transition: transform 400ms, -webkit-transform 400ms;
-  -webkit-transform: scale(0);
-          transform: scale(0);
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  will-change: transform;
-}
-
-.loading-wrapper .loading::after {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  bottom: -6px;
-  left: -6px;
-  border: 6px solid transparent;
-  border-top-color: #b9d655;
-  border-radius: 50%;
-  content: "";
-  will-change: transform;
-}
-
-.loading-wrapper .loading p {
-  width: 100%;
-  background: rgba(247, 247, 247, 0.88);
-  text-align: center;
-  font-weight: 700;
-  font-size: 24px;
-}
-
-.loading-wrapper .loading button {
-  position: relative;
-  z-index: 20;
-}
-
-.loading-wrapper.active {
-  visibility: visible;
-  height: 100%;
-  pointer-events: all;
-}
-
-.loading-wrapper.active .loading {
-  -webkit-transform: scale(1);
-          transform: scale(1);
-}
-
-.loading-wrapper.active .loading::after {
-  -webkit-animation: load-rotate 2.4s linear infinite;
-          animation: load-rotate 2.4s linear infinite;
-}
-
-.loading-wrapper.searching {
-  z-index: 10;
-  display: none;
-}
-
-.loading-wrapper.searching.active {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-#tree-output .loading-wrapper {
-  position: static;
-}
-
-#tree-output .loading-wrapper.active {
-  padding: 18px;
-  background: #F7F7F7;
 }
 
 .table-wrapper {
@@ -1951,8 +1804,8 @@ body.tv-active #tree-output::before {
   display: none;
   padding: 16px;
   border-radius: 4px;
-  background: #eeeeee;
-  box-shadow: inset 0 -1px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 12px rgba(0, 0, 0, 0.08);
+  background: #f7f7f7;
+  box-shadow: inset 0 -1px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.08), 0 0 6px rgba(0, 0, 0, 0.08);
   font-weight: 700;
   -webkit-animation: notification-blink 700ms alternate infinite;
           animation: notification-blink 700ms alternate infinite;
@@ -1968,6 +1821,10 @@ body.tv-active #tree-output::before {
 
 .results .notification-wrapper button {
   margin-left: 12px;
+}
+
+.search-error #results-overview, .search-no-results #results-overview {
+  display: none;
 }
 
 #download-overview .flex-content:not(.active) {

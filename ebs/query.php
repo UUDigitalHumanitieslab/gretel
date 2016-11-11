@@ -9,8 +9,6 @@ $step = 5;
 require '../config/config.php';
 require "$root/helpers.php";
 
-
-
 $noTbFlag = 0;
 
 if (isset($_POST['treebank'])) {
@@ -95,10 +93,12 @@ require "$root/front-end-includes/head.php";
 
 <?php if (!$xpChanged): ?>
   <h3>Query tree</h3>
-<div id="tree-output"></div>
+<div id="tree-output">
+    <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
+</div>
 <?php endif; ?>
 
-  <h3>XPath expression<?php if (!$xpChanged): ?>, generated from the query tree<?php endif; ?></h3>
+  <h3>XPath expression<?php if (!$xpChanged): ?> generated from the query tree<?php endif; ?></h3>
   <div class="generated-xpath"><code><?php echo $xpath; ?></code></div>
     <form action="ebs/results.php" method="post">
     <?php setContinueNavigation(); ?>

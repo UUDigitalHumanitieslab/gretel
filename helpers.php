@@ -55,7 +55,7 @@ function isDocs() {
   return false;
 }
 
-
+// For debugging: Pretty print variables
 function var_dump_pre($mixed = null) {
   echo '<pre>';
   var_dump($mixed);

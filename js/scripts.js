@@ -1,5 +1,5 @@
 $(function() {
-    var body = $("body"),
+    var $body = $("body"),
         nav1 = $(".primary-navigation"),
         $window = $(window),
         $document = $(document);
@@ -70,7 +70,7 @@ $(function() {
     });
 
     function helpTooltipPosition() {
-      // Not for .treebanks, because we want to hang right on those
+        // Not for .treebanks, because we want to hang right on those
         $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
             var $this = $(el),
                 rect = el.getBoundingClientRect(),
@@ -92,7 +92,7 @@ $(function() {
         });
     }
 
-    if (body.hasClass("step-1")) {
+    if ($body.hasClass("step-1")) {
         var clearBtn = $("[name='clear']");
         clearBtn.click(function(e) {
             var $this = $(this);
@@ -115,7 +115,7 @@ $(function() {
 
         taalPortaalFiller();
 
-        if (body.hasClass("xps")) {
+        if ($body.hasClass("xps")) {
             var input = $("[name='xpath']");
             // Check whether the XPath has the same amount of opening and closing tags
             // If not, throw custom validation error message
@@ -138,7 +138,7 @@ $(function() {
                 this.setCustomValidity("");
             });
         }
-    } else if (body.hasClass("matrix")) {
+    } else if ($body.hasClass("matrix")) {
         var input = $("[name='xpath']");
         // Check whether the XPath has the same amount of opening and closing tags
         // If not, throw custom validation error message
@@ -244,15 +244,19 @@ $(function() {
                 popup.find("button.continue").click(function() {
                     $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
                     $('[name="manualMode"]').val("true");
+
+                    $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
                     $(".xpath-wrapper textarea").off("mousedown");
                 });
             } else {
                 $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
                 $('[name="manualMode"]').val("true");
+
+                $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
                 $(".xpath-wrapper textarea").off("mousedown");
             }
         }
-    } else if ((body.hasClass("ebs") && body.hasClass("step-4")) || (body.hasClass("xps") && body.hasClass("step-2"))) {
+    } else if (($body.hasClass("ebs") && $body.hasClass("step-4")) || ($body.hasClass("xps") && $body.hasClass("step-2"))) {
         // Main treebank selection (CGN, Lassy, SONAR)
         $("[type='radio']").change(function() {
             var $this = $(this),
@@ -329,7 +333,7 @@ $(function() {
 
     function getTreePath() {
         if (getTreePathXHR) getTreePathXHR.abort();
-        $("#tree-output").removeClass("active");
+
         $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
         getTreePathXHR = $.ajax({
                 url: getTreePathScript,
@@ -351,11 +355,7 @@ $(function() {
                 }
 
                 $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
-            })
-            .fail(function(jqXHR, textStatus, error) {
-                if (error != 'abort') {}
-            })
-            .always(function() {});
+            });
     }
 
     function adjustTextareaHeight($el) {
@@ -466,32 +466,32 @@ $(function() {
 
     // Make anchors work, even though we've set a base-tag
     $('a[href^="#"]').click(function(e) {
-      document.location.hash = $(this).attr("href").substring(1);
-      e.preventDefault();
+        // Do an .is() test for dynamic urls
+        if ($(this).is('[href^="#"]')) {
+            document.location.hash = $(this).attr("href").substring(1);
+            e.preventDefault();
+        }
     });
 
     function taalPortaalFiller() {
-    	if (getUrlVars()["tpinput"]) {
-    		// Decode URI into readable string
-    		var tpinput = decodeURIComponent(getUrlVars()["tpinput"]);
+        if (getUrlVars()["tpinput"]) {
+            // Decode URI into readable string
+            var tpinput = decodeURIComponent(getUrlVars()["tpinput"]);
 
-    		//Verschillende opties voor de verschillende pagina's:
-    		//(1) gretel voor lassy, gretel voor cgn: inputveld heeft id=example:
-    		$('#example').val(tpinput);
-    		//(4) XPath search: inputveld heeft name=xpinput
-    		$('textarea[name=xpinput]').val(tpinput);
-    	}
+            $('.step-1 .input-wrapper input').val(tpinput);
+            $('.step-1 textarea[name=xpath]').val(tpinput);
+        }
     }
 
     function getUrlVars() {
-    	var vars = [],
-    		hash;
-    	var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    	for (var i = 0; i < hashes.length; i++) {
-    		hash = hashes[i].split('=');
-    		vars.push(hash[0]);
-    		vars[hash[0]] = hash[1];
-    	}
-    	return vars;
+        var vars = [],
+            hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
     }
 });
