@@ -96,6 +96,9 @@
             var index = FS.attr("data-tv-active-index"),
               resultsTable = $(".results-ajax-wrapper tbody:not(.empty)");
 
+             treeFS.find("a").removeClass("hovered");
+             tooltipFS.hide();
+
             if ($(this).is(".tv-prev-tree")) {
               if (index > 0) index--;
             } else {
@@ -364,7 +367,7 @@
             if (currentFontSize <= 4) {
                 zoomOpts.find("button.tv-zoom-out").prop("disabled", true);
                 treeFS.children("ol").css("fontSize", "4px");
-            } else if (currentFontSize >= 20) {
+            } else if (currentFontSize >= 16) {
                 zoomOpts.find("button.tv-zoom-in").prop("disabled", true);
             }
 
@@ -407,7 +410,7 @@
                 treeFS.children("ol").css("fontSize", fontFitSize + "px");
             }
 
-            while (fontFitSize < 20 && el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth) {
+            while (fontFitSize < 16 && el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth) {
                 fontFitSize++;
                 treeFS.children("ol").css("fontSize", fontFitSize + "px");
 

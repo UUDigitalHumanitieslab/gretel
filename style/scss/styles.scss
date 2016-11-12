@@ -788,28 +788,28 @@ dd {
 }
 
 body.tv-is-loading {
-  #tree-output {
-      position: relative;
-      z-index: 2;
+    #tree-output {
+        position: relative;
+        z-index: 2;
 
-      &::before {
-          position: absolute;
-          z-index: 3;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 90%;
-          background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
-          background-position: bottom center;
-          background-size: contain;
-          color: white;
-          content: "Loading tree";
-          text-align: center;
-          font-weight: bold;
-          font-size: 120%;
-          line-height: 180px;
-      }
-  }
+        &::before {
+            position: absolute;
+            z-index: 3;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90%;
+            background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
+            background-position: bottom center;
+            background-size: contain;
+            color: white;
+            content: "Loading tree";
+            text-align: center;
+            font-weight: bold;
+            font-size: 120%;
+            line-height: 180px;
+        }
+    }
 }
 /* loading image */
 @keyframes load-rotate {
@@ -1273,17 +1273,25 @@ body.tv-is-loading {
         }
     }
 
-    .filter-wrapper {
+    .filter-wrapper.active {
+        .filter-sel-wrapper {
+            display: flex;
+        }
+
+        [for="filter-components"] i {
+            transform: scale(1) rotate(180deg);
+        }
+    }
+
+    .filter-sel-wrapper {
         position: absolute;
-        bottom: -1em;
+        bottom: -8px;
         display: none;
-        margin-right: 0 !important;
-        margin-left: -56px !important;
         padding: 0.8em;
         max-width: 220px;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
-        transform: translateY(100%) translateX(-50%);
+        transform: translateY(100%);
         flex-wrap: wrap;
         justify-content: space-between;
 
@@ -1305,6 +1313,17 @@ body.tv-is-loading {
         label {
             display: block;
             margin: 2px;
+
+            &:last-child {
+                margin-right: auto;
+            }
+        }
+
+        [for="filter-components"] {
+            i {
+                transition: transform 150ms;
+                transform-origin: center center;
+            }
         }
         @keyframes check-comps-fadeout {
             from {
@@ -1350,23 +1369,6 @@ body.tv-is-loading {
                 i {
                     animation: check-comps-fadeout 2.25s forwards;
                 }
-            }
-        }
-    }
-
-    [for="filter-components"] {
-        i {
-            transition: transform 150ms;
-            transform-origin: center center;
-        }
-
-        &.active {
-            i {
-                transform: rotate(180deg);
-            }
-
-            + .filter-wrapper {
-                display: flex;
             }
         }
     }
@@ -1490,10 +1492,11 @@ body.tv-is-loading {
     }
 }
 
-.search-error, .search-no-results {
-  #results-overview {
-    display: none;
-  }
+.search-error,
+.search-no-results {
+    #results-overview {
+        display: none;
+    }
 }
 
 #download-overview {
