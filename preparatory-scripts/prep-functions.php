@@ -145,10 +145,12 @@ function cleanXpath($xpath, $trimSlash = true) {
 }
 
 function checkBfPattern($bf) {
-  global $cats, $component, $includes, $dbuser, $dbpwd,
+  global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
     $tempDatabases = array();
+
+    $component = $components[0];
 
   // If bf-pattern == ALL, we're faster searching through ragular version
   if ($bf && $bf != 'ALL') {

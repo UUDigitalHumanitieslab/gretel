@@ -64,7 +64,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentencesSonar($xpath, $corpus, $components, $databases, $context, 'all', $session);
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($xpath, $corpus, $components, $databases, $context, 'all', $session);
 
     $session->close();
 

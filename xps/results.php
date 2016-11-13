@@ -1,4 +1,7 @@
 <?php
+session_cache_limiter('private');
+session_start();
+header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'xps';
 $step = 3;
@@ -6,22 +9,18 @@ $step = 3;
 require '../config/config.php';
 require "$root/helpers.php";
 
-session_cache_limiter('private');
-session_start();
-header('Content-Type:text/html; charset=utf-8');
-
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
 $noTbFlag = 0;
 
 if (isset($_POST['treebank'])) {
-    $treebank = $_POST['treebank'];
-    $_SESSION['treebank'] = $treebank;
+    $corpus = $_POST['treebank'];
+    $_SESSION['treebank'] = $corpus;
 } elseif (isset($_SESSION['treebank'])) {
-    $treebank = $_SESSION['treebank'];
+    $corpus = $_SESSION['treebank'];
 } else {
     $noTbFlag = 1;
-    $treebank = '';
+    $corpus = '';
 }
 
 if (isset($_POST['subtreebank'])) {
@@ -35,50 +34,40 @@ if (isset($_POST['subtreebank'])) {
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('treebank', 'subtreebank', 'xpath'));
 if ($continueConstraints) {
+    require "$root/preparatory-scripts/prep-functions.php";
     $treeVisualizer = true;
+    $onlyFullscreenTv = true;
 
     $xpath = $_SESSION['xpath'];
-
-    // Clean up XPath
-    $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
-
-    $xpath = strtr($xpath, $trans);
-    $xpath = trim($xpath);
-    $xpath = preg_replace('/^\/+/', '', $xpath);
-
-    if (is_array($components)) {
-        $component = implode(', ', $components);
-    } else {
-        $component = $components;
-        $_SESSION['subtreebank'] = $component;
-    }
+    // Need to clean in case the user goes back in history, otherwise the
+    // prepended slashes below would keep stacking on each back-and-forward
+    // in history
+    $xpath = cleanXpath($xpath);
 
     // get context option
     $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
-    $_SESSION['endPosIteration'] = 0;
-    $_SESSION['leftOvers'] = array();
 
-    if ($treebank == 'sonar') {
-      $_SESSION['databases'] = array();
-      $_SESSION['already'] = array();
-      $needRegularSonar = false;
-      $databaseExists = false;
-      $includes = array();
+    $_SESSION['endPosIteration'] = 0;
+    $_SESSION['startDatabases'] = array();
+
+    if ($corpus == 'sonar') {
+        $_SESSION['flushAlready'] = array();
+        $databaseExists = false;
     }
+
+    $needRegularSonar = false;
 }
 
 session_write_close();
 
-require "$root/preparatory-scripts/prep-functions.php";
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";
-
 
 if ($continueConstraints) {
   require "$root/basex-search-scripts/treebank-search.php";
   require "$root/basex-search-scripts/basex-client.php";
-
-  if ($treebank == 'sonar') {
+  session_start();
+  if ($corpus == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
     checkBfPattern($bf);
 
@@ -86,17 +75,17 @@ if ($continueConstraints) {
     // all descendants
     if ($needRegularSonar) {
       $xpath = "//$xpath";
-      $originalXp = "//$originalXp";
     } else {
       $xpath = "/$xpath";
-      $originalXp = "/$originalXp";
     }
   } else {
     $xpath = "//$xpath";
-    $originalXp = "//$originalXp";
+    $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
   }
 
-  session_start();
+  // When flushing we update the databases on each iteration, not so in counting
+  // or when fetching all results
+  $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
   $_SESSION['xpath'] = $xpath;
   $_SESSION['needRegularSonar'] = $needRegularSonar;
   session_write_close();

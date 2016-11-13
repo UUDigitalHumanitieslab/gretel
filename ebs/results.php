@@ -29,14 +29,6 @@ if ($continueConstraints) {
     // in history
     $xpath = cleanXpath($xpath);
     $originalXp = cleanXpath($originalXp);
-
-    if (is_array($components)) {
-        $component = implode(', ', $components);
-    } else {
-        $component = $components;
-        $_SESSION['subtreebank'] = $component;
-    }
-
     $example = $_SESSION['example'];
 
     $context = $_SESSION['ct'];
@@ -44,7 +36,6 @@ if ($continueConstraints) {
     $_SESSION['startDatabases'] = array();
 
     if ($corpus == 'sonar') {
-      $_SESSION['flushAlready'] = array();
       $databaseExists = false;
     }
 

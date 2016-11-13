@@ -14,29 +14,8 @@ function getMoreIncludes($database, &$databases, $session)
     foreach ($newIncludes as $newInclude) {
         if (preg_match($pattern, $newInclude, $files)) {
             $file = $files[1];
-
-            if (!includeAlreadyExists($file)) {
-                $databases[] = $file;
-            }
+            $databases[] = $file;
         }
-    }
-}
-
-function includeAlreadyExists($include)
-{
-    session_start();
-    $already = $_SESSION['already'];
-    if (isset($already{$include})) {
-        session_write_close();
-
-        return true;
-    } else {
-        $already{$include}
-        = 1;
-        $_SESSION['already'] = $already;
-        session_write_close();
-
-        return false;
     }
 }
 

@@ -23,7 +23,7 @@ function getCounts($xpath, $corpus, $components, $databases, $session)
         $query->close();
     }
 
-    if ($corpus != 'sonar') {
+    if ($corpus !== 'sonar') {
         $sum = array_sum($counts);
     }
 

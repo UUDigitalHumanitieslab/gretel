@@ -18,13 +18,16 @@
   <div class="results-ajax-wrapper" data-target="true">
     <p>Click on a sentence ID to view the tree structure. The part of the sentence matching your input structure is set in bold.</p>
     <?php
-    if (!$needRegularSonar && isset($databaseGroups{$corpus}{$component}{'sentences'})):
-      $componentSize = $databaseGroups{$corpus}{$component}{'sentences'};
-      if ($componentSize > 1000000):
-      ?>
-    <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize);?></strong> sentences.
-       <br>Searching through all of them can take a while!</small></p>
-    <?php endif;
+    if ($corpus == 'sonar'):
+        $component = $components[0];
+        if (!$needRegularSonar && isset($databaseGroups{$corpus}{$component}{'sentences'})):
+          $componentSize = $databaseGroups{$corpus}{$component}{'sentences'};
+          if ($componentSize > 1000000):
+          ?>
+        <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize);?></strong> sentences.
+           <br>Searching through all of them can take a while!</small></p>
+        <?php endif;
+        endif;
     endif;?>
     <?php include "$root/front-end-includes/results-controls.php"; ?>
     <?php require "$root/front-end-includes/results-table-wrapper.php"; ?>
@@ -88,7 +91,8 @@
             <tr><th>Input example</th><td><em><?php echo $example; ?></em></td></tr>
           <?php endif; ?>
           <tr><th>XPath</th><td><code style="font-size: 88%"><?php echo $xpath; ?></code></td></tr>
-          <tr><th>Treebank</th><td><?php echo strtoupper($corpus)." [$component]"; ?></td></tr>
+          <?php $componentString = implode(', ', $components); ?>
+          <tr><th>Treebank</th><td><?php echo strtoupper($corpus)." [$componentString]"; ?></td></tr>
         </tbody>
       </table>
     </div>
