@@ -1830,7 +1830,7 @@ body.tv-is-loading #tree-output::before {
   display: none;
 }
 
-#download-overview .flex-content:not(.active) {
+#download-overview .flex-content:not(.active):not(.error) {
   position: relative;
   min-height: 190px;
   border: 1px solid #dedede;
@@ -1838,7 +1838,7 @@ body.tv-is-loading #tree-output::before {
   background: #FAFAFA;
 }
 
-#download-overview .flex-content:not(.active)::after {
+#download-overview .flex-content:not(.active):not(.error)::after {
   position: absolute;
   top: 50%;
   left: 50%;

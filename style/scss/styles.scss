@@ -1501,7 +1501,7 @@ body.tv-is-loading {
 
 #download-overview {
     .flex-content {
-        &:not(.active) {
+        &:not(.active):not(.error) {
             position: relative;
             min-height: 190px;
             border: 1px solid #dedede;
