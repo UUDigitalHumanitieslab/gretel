@@ -19,7 +19,7 @@ if ($continueConstraints) {
 
     $treeVisualizer = true;
     $onlyFullscreenTv = true;
-    $treebank = $_SESSION['treebank'];
+    $corpus = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
     $xpath = $_SESSION['xpath'];
     $originalXp = $_SESSION['originalXp'];
@@ -41,15 +41,14 @@ if ($continueConstraints) {
 
     $context = $_SESSION['ct'];
     $_SESSION['endPosIteration'] = 0;
-    $_SESSION['leftOvers'] = array();
+    $_SESSION['startDatabases'] = array();
 
-    if ($treebank == 'sonar') {
-      $_SESSION['includes'] = array();
-      $_SESSION['already'] = array();
-      $needRegularSonar = false;
+    if ($corpus == 'sonar') {
+      $_SESSION['flushAlready'] = array();
       $databaseExists = false;
-      $includes = array();
     }
+
+    $needRegularSonar = false;
 }
 
 session_write_close();
@@ -60,9 +59,10 @@ require "$root/front-end-includes/head.php";
 if ($continueConstraints) {
   require "$root/basex-search-scripts/treebank-search.php";
   require "$root/basex-search-scripts/basex-client.php";
-
-  if ($treebank == 'sonar') {
+  session_start();
+  if ($corpus == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
+     // Get correct databases to start search with
     checkBfPattern($bf);
 
     // When looking in the regular version we need the double slash to go through
@@ -77,9 +77,12 @@ if ($continueConstraints) {
   } else {
     $xpath = "//$xpath";
     $originalXp = "//$originalXp";
+    $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
   }
 
-  session_start();
+  // When flushing we update the databases on each iteration, not so in counting
+  // or when fetching all results
+  $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
   $_SESSION['xpath'] = $xpath;
   $_SESSION['originalXp'] = $originalXp;
   $_SESSION['needRegularSonar'] = $needRegularSonar;

@@ -12,9 +12,8 @@ $(function() {
 
     var hash = window.location.hash,
         $window = $(window),
-        $body = $("body"),
         $document = $(document),
-        tvLink = $("a.tv-show-fs"),
+        body = $("body"),
         controls = $(".controls"),
         resultsWrapper = $(".results-ajax-wrapper"),
         filterSelWrapper = $(".filter-sel-wrapper"),
@@ -24,14 +23,11 @@ $(function() {
 
     var xhrAllSentences,
         xhrFetchSentences,
+        xhrCount,
         resultID = 0,
         resultsCount = 0,
-        xhrCount,
         done = false,
-        doneCounting = false,
-        activeIndexResults = 0;
-
-    var windowsHasHash = window.location.hash;
+        doneCounting = false;
 
     getSentences();
 
@@ -212,8 +208,8 @@ $(function() {
 
     function messageNoResultsFound() {
         resultsWrapper.add(controls).remove();
-        $("#download-overview .flex-content").addClass("no-results");
-        $body.addClass("search-no-results");
+        downloadWrapper.addClass("no-results");
+        body.addClass("search-no-results");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
@@ -221,8 +217,8 @@ $(function() {
 
     function messageOnError(error) {
         resultsWrapper.add(controls).remove();
-        $("#download-overview .flex-content").addClass("error");
-        $body.addClass("search-error");
+        downloadWrapper.addClass("error");
+        body.addClass("search-error");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
@@ -230,12 +226,20 @@ $(function() {
     }
 
     function showTvFsOnLoad() {
-        var hash = window.location.hash;
-        if (!$body.hasClass("tv-fs-open")) {
+        if (!body.hasClass("tv-fs-open")) {
             if (hash.indexOf("tv-") == 1) {
                 var index = hash.match(/\d+$/);
-                tvLink.eq(index[0] - 1).click();
+                $("a.tv-show-fs").eq(index[0] - 1).click();
             }
+        }
+    }
+
+    if (hash) {
+        if (hash.indexOf("tv-") == 1) {
+            messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #looking-for-tree', function() {
+                messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
+                downloadWrapper.addClass("active");
+            });
         }
     }
 
@@ -256,7 +260,7 @@ $(function() {
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
                     value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
-            if (windowsHasHash) showTvFsOnLoad();
+            showTvFsOnLoad();
         });
 
         resultIDString = numericSeparator(parseInt(resultID));
@@ -296,7 +300,6 @@ $(function() {
 
             // If none of the component checkboxes are checked
             if (!filterSelWrapper.find("[name='component']").is(":checked")) {
-                activeIndexResults = false;
                 resultsWrapper.find(".empty").css("display", "table-row-group").find("td").text("No results matching the specified filters");
                 filterSelWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
             } else {
@@ -337,15 +340,24 @@ $(function() {
     });
 
     // Because we are actually going back in history, some browsers might not
-    // call the unload event
+    // call the beforeunload event
     $(".secondary-navigation a").click(function() {
         unLoadRequests();
     });
 
     function unLoadRequests() {
-        if (xhrAllSentences) xhrAllSentences.abort();
-        if (xhrCount) xhrCount.abort();
-        if (xhrFetchSentences) xhrFetchSentences.abort();
+        if (xhrAllSentences != null) {
+            xhrAllSentences.abort();
+            xhrAllSentences = null;
+        }
+        if (xhrCount != null) {
+            xhrCount.abort();
+            xhrCount = null;
+        }
+        if (xhrFetchSentences != null) {
+            xhrFetchSentences.abort();
+            xhrFetchSentences = null;
+        }
         done = true;
     }
 
@@ -363,7 +375,7 @@ $(function() {
         tvFs.attr("data-tv-active-index", $this.closest("tr").index());
         $this.addClass("tv-toggled-link");
 
-        $body.treeVisualizer($this.data("tv-url"), {
+        body.treeVisualizer($this.data("tv-url"), {
             normalView: false,
             initFSOnClick: true,
             sentence: treeSentence,
@@ -372,14 +384,6 @@ $(function() {
         e.preventDefault();
     });
 
-    if (hash) {
-        if (hash.indexOf("tv-") == 1) {
-            messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #looking-for-tree', function() {
-                messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
-                downloadWrapper.addClass("active");
-            });
-        }
-    }
 
     /* Notifications */
     notificationWrapper.find("button").click(function() {

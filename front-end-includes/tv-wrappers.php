@@ -1,4 +1,4 @@
-<?php if (!$onlyFullscreenTv): ?>
+<?php if (!isset($onlyFullscreenTv) || !$onlyFullscreenTv): ?>
     <div id="tree-visualizer" class="tv">
         <div class="tv-error">
             <p></p>

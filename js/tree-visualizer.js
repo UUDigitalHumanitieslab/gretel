@@ -27,136 +27,141 @@
             zoomOpts, tooltipTimeout;
         var $window = $(window),
             $body = $("body");
+        var initTrees = 0;
 
         initVars();
         loadXML(xml);
         navigationDisabler();
+        // Window event only need to be bound once
         $window.on("scroll", function() {
             tooltipPosition();
         });
 
         function bindInitEvents() {
-          if (!args.initFSOnClick) {
-              // Show tree-visualizer-fs tree
-              instance.find(".tv-show-fs").on("click", function(e) {
-                  anyTooltip.css("top", "-100%").children("ul").empty();
-                  if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
-                  $body.addClass("tv-fs-open");
-                  FS.fadeIn(250, function() {
-                      if (!FS.children("ol").is("[data-tv-fontsize]")) {
-                          fontToFit();
-                      }
-                  });
+            if (!args.initFSOnClick) {
+                // Show tree-visualizer-fs tree
+                instance.find(".tv-show-fs").on("click", function(e) {
+                    anyTooltip.css("top", "-100%").children("ul").empty();
+                    if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
+                    $body.addClass("tv-fs-open");
+                    FS.fadeIn(250, function() {
+                        if (!FS.children("ol").is("[data-tv-fontsize]")) {
+                            fontToFit();
+                        }
+                    });
 
-                  e.preventDefault();
-              });
-          }
-          // Adjust scroll position
-          anyTree.on("scroll", function() {
-              tooltipPosition();
-          });
-
-          // Close fullscreen if a user clicks on an empty area
-          FS.on("click", function(e) {
-              var target = $(e.target);
-              if (!target.closest(".tv-error, .tv-content-wrapper").length) {
-                  $body.removeClass("tv-fs-open");
-                  FS.fadeOut(250, function() {
-                      treeFS.find("a").removeClass("hovered");
-                      removeError();
-                  });
-                  if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
-              }
-          });
-          // Zooming
-          zoomOpts.find("button").on("click", function() {
-              var $this = $(this);
-              if ($this.is(".tv-close-fs")) {
-                  $body.removeClass("tv-fs-open");
-                  FS.fadeOut(250, function() {
-                      treeFS.find("a").removeClass("hovered");
-                      removeError();
-                  });
-                  if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
-              } else {
-                  clearTimeout(tooltipTimeout);
-                  fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
-
-                  var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
-                  animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
-                  animationSpeed += 50;
-
-                  tooltipTimeout = setTimeout(function() {
-                      tooltipPosition(true);
-                  }, animationSpeed);
-              }
-          });
-
-          FS.find(".tv-navigation-wrapper button").on("click", function() {
-            var index = FS.attr("data-tv-active-index"),
-              resultsTable = $(".results-ajax-wrapper tbody:not(.empty)");
-
-             treeFS.find("a").removeClass("hovered");
-             tooltipFS.hide();
-
-            if ($(this).is(".tv-prev-tree")) {
-              if (index > 0) index--;
-            } else {
-              if (index < resultsTable.find("tr").length - 1) index++;
+                    e.preventDefault();
+                });
             }
+            // Adjust scroll position
+            anyTree.on("scroll", function() {
+                tooltipPosition();
+            });
 
-            navigationDisabler();
-            FS.find(".tv-navigation-wrapper button").prop("disabled", false);
-            resultsTable.find("tr").eq(index).find("a").click();
-          });
+            // Close fullscreen if a user clicks on an empty area
+            FS.on("click", function(e) {
+                var target = $(e.target);
+                if (!target.closest(".tv-error, .tv-content-wrapper").length) {
+                    $body.removeClass("tv-fs-open");
+                    FS.fadeOut(250, function() {
+                        treeFS.find("a").removeClass("hovered");
+                        removeError();
+                    });
+                    if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
+                }
+            });
+            // Zooming
+            zoomOpts.find("button").on("click", function() {
+                var $this = $(this);
+                if ($this.is(".tv-close-fs")) {
+                    $body.removeClass("tv-fs-open");
+                    FS.fadeOut(250, function() {
+                        treeFS.find("a").removeClass("hovered");
+                        removeError();
+                    });
+                    if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
+                } else {
+                    clearTimeout(tooltipTimeout);
+                    fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
 
-          anyTree.on("click", "a", function(e) {
-              if (!$(this).hasClass("ignored")) {
-                  var $this = $(this),
-                      data = $this.parent("li").data(),
-                      tree = $this.closest(".tv-tree"),
-                      tooltipList = tree.next(".tv-tooltip").children("ul"),
-                      i;
+                    var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
+                    animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
+                    animationSpeed += 50;
 
-                  tooltipList.empty();
-                  tree.find("a").removeClass("hovered");
-                  $this.addClass("hovered");
+                    tooltipTimeout = setTimeout(function() {
+                        tooltipPosition(true);
+                    }, animationSpeed);
+                }
+            });
 
-                  for (i in data) {
-                      if (data.hasOwnProperty(i)) {
-                          $("<li>", {
-                              html: "<strong>" + i + "</strong>: " + data[i]
-                          }).prependTo(tooltipList);
-                      }
-                  }
-                  tooltipPosition();
-              }
+            FS.find(".tv-navigation-wrapper button").on("click", function() {
 
-              e.preventDefault();
-          });
+                var index = FS.attr("data-tv-active-index"),
+                    resultsTable = $(".results-ajax-wrapper tbody:not(.empty)");
 
-          anyTree.on("mouseout", "a.hovered", function() {
-              if ($(this).closest(".tv-tree").hasClass("small")) {
-                  $(this).on("transitionend", function() {
-                      tooltipPosition(true);
-                  });
-              }
-          });
+                treeFS.find("a").removeClass("hovered");
+                tooltipFS.hide();
 
-          anyTooltip.children("button").on("click", function() {
-              var tooltip = $(this).parent(".tv-tooltip");
-              tooltip.fadeOut(250);
-              tooltip.prev(".tv-tree").find("a").removeClass("hovered");
-          });
+                if ($(this).is(".tv-prev-tree")) {
+                    if (index > 0) index--;
+                } else {
+                    if (index < resultsTable.find("tr").length - 1) index++;
+                }
+
+
+                navigationDisabler();
+
+                resultsTable.find("tr").eq(index).find("a").click();
+            });
+
+            anyTree.on("click", "a", function(e) {
+                if (!$(this).hasClass("ignored")) {
+                    var $this = $(this),
+                        data = $this.parent("li").data(),
+                        tree = $this.closest(".tv-tree"),
+                        tooltipList = tree.next(".tv-tooltip").children("ul"),
+                        i;
+
+                    tooltipList.empty();
+                    tree.find("a").removeClass("hovered");
+                    $this.addClass("hovered");
+
+                    for (i in data) {
+                        if (data.hasOwnProperty(i)) {
+                            $("<li>", {
+                                html: "<strong>" + i + "</strong>: " + data[i]
+                            }).prependTo(tooltipList);
+                        }
+                    }
+                    tooltipPosition();
+                }
+
+                e.preventDefault();
+            });
+
+            anyTree.on("mouseout", "a.hovered", function() {
+                if ($(this).closest(".tv-tree").hasClass("small")) {
+                    $(this).on("transitionend", function() {
+                        tooltipPosition(true);
+                    });
+                }
+            });
+
+            anyTooltip.children("button").on("click", function() {
+                var tooltip = $(this).parent(".tv-tooltip");
+                tooltip.fadeOut(250);
+                tooltip.prev(".tv-tree").find("a").removeClass("hovered");
+            });
         }
 
         function navigationDisabler() {
-          var index = FS.attr("data-tv-active-index");
-          if (index <= 0) {
-            FS.find(".tv-navigation-wrapper .tv-prev-tree").prop("disabled", true);
-          } else if (index >= $(".results-ajax-wrapper tbody:not(.empty)").find("tr").length - 1) {
-            FS.find(".tv-navigation-wrapper .tv-next-tree").prop("disabled", true);
-          }
+            FS.find(".tv-navigation-wrapper button").prop("disabled", false);
+            var index = FS.attr("data-tv-active-index");
+            if (index <= 0) {
+                FS.find(".tv-navigation-wrapper .tv-prev-tree").prop("disabled", true);
+            } else if (index >= $(".results-ajax-wrapper tbody:not(.empty)").find("tr").length - 1) {
+                FS.find(".tv-navigation-wrapper .tv-next-tree").prop("disabled", true);
+            }
         }
 
         function initVars() {
@@ -198,7 +203,7 @@
             }
 
             if (!args.hasNavigation) {
-              FS.find(".tv-navigation-wrapper").hide();
+                FS.find(".tv-navigation-wrapper").hide();
             }
             anyView.find("*").off();
             bindInitEvents();
@@ -207,6 +212,7 @@
         function loadXML(src) {
             $body.addClass("tv-is-loading");
             if (args.initFSOnClick) $body.addClass("tv-fs-open");
+            var treeInitID = ++initTrees;
             $.ajax({
                     type: "GET",
                     url: src,
@@ -219,7 +225,8 @@
                         errorHandle("Your XML appears to be empty or not in a compatible format.");
                     } else {
                         $body.addClass("tv-success").removeClass("tv-fail");
-                        parseXMLObj(data);
+                        if (treeInitID == initTrees) parseXMLObj(data);
+
                     }
                 })
                 .fail(function(jqXHR, textStatus, errorThrown) {
@@ -238,7 +245,7 @@
                     errorHandle(msg);
                 })
                 .always(function() {
-                    $body.removeClass("tv-is-loading");
+                    if (treeInitID == initTrees) $body.removeClass("tv-is-loading");
                     if ($body.hasClass("tv-fail")) {
                         $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
                     } else {
@@ -442,13 +449,13 @@
                             bottom: $window.outerHeight() - targetRect.bottom,
                         },
                         treeV = {
-                          right: $window.outerWidth() - treeRect.right,
-                          bottom: $window.outerHeight() - treeRect.bottom,
+                            right: $window.outerWidth() - treeRect.right,
+                            bottom: $window.outerHeight() - treeRect.bottom,
                         };
 
                     var tooltipV = {
-                      left: parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8 , 10) + "px",
-                      top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
+                        left: parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10) + "px",
+                        top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
                     }
 
                     if (animate) {
@@ -458,7 +465,7 @@
                         }, 250);
                     } else {
                         tooltip.css({
-                            "left":  tooltipV.left,
+                            "left": tooltipV.left,
                             "top": tooltipV.top
                         });
                     }

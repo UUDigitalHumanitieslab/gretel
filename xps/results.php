@@ -59,7 +59,7 @@ if ($continueConstraints) {
     $_SESSION['leftOvers'] = array();
 
     if ($treebank == 'sonar') {
-      $_SESSION['includes'] = array();
+      $_SESSION['databases'] = array();
       $_SESSION['already'] = array();
       $needRegularSonar = false;
       $databaseExists = false;
