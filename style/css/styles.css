@@ -1010,12 +1010,12 @@ dd p:last-child {
   margin: 24px auto;
 }
 
-body.tv-is-loading #tree-output {
+body:not(.tv-success) #tree-output, body.tv-is-loading #tree-output {
   position: relative;
   z-index: 2;
 }
 
-body.tv-is-loading #tree-output::before {
+body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::before {
   position: absolute;
   z-index: 3;
   bottom: 0;
@@ -1080,7 +1080,7 @@ body.tv-is-loading #tree-output::before {
 .docs .project-web-wrapper a,
 .home .project-web-wrapper a,
 .matrix .xpath-wrapper a,
-.xpath .open-beautifier-wrapper a {
+.xps.input .open-beautifier-wrapper a {
   display: inline-block;
   padding: 6px 8px;
   border: 0 none;
@@ -1094,7 +1094,7 @@ body.tv-is-loading #tree-output::before {
 .docs .project-web-wrapper a i,
 .home .project-web-wrapper a i,
 .matrix .xpath-wrapper a i,
-.xpath .open-beautifier-wrapper a i {
+.xps.input .open-beautifier-wrapper a i {
   margin-left: 4px;
   font-weight: bold;
   font-size: 12px;
@@ -1103,7 +1103,7 @@ body.tv-is-loading #tree-output::before {
 .docs .project-web-wrapper a:hover,
 .home .project-web-wrapper a:hover,
 .matrix .xpath-wrapper a:hover,
-.xpath .open-beautifier-wrapper a:hover {
+.xps.input .open-beautifier-wrapper a:hover {
   background: #93816b;
   text-shadow: 0 1px rgba(0, 0, 0, 0.12);
 }
@@ -1111,7 +1111,7 @@ body.tv-is-loading #tree-output::before {
 .docs .project-web-wrapper a:active,
 .home .project-web-wrapper a:active,
 .matrix .xpath-wrapper a:active,
-.xpath .open-beautifier-wrapper a:active {
+.xps.input .open-beautifier-wrapper a:active {
   box-shadow: none;
   -webkit-transform: translateY(1px);
           transform: translateY(1px);

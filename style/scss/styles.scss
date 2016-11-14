@@ -787,7 +787,7 @@ dd {
     margin: 24px auto;
 }
 
-body.tv-is-loading {
+body:not(.tv-success), body.tv-is-loading {
     #tree-output {
         position: relative;
         z-index: 2;
@@ -842,7 +842,7 @@ body.tv-is-loading {
 .docs .project-web-wrapper,
 .home .project-web-wrapper,
 .matrix .xpath-wrapper,
-.xpath .open-beautifier-wrapper {
+.xps.input .open-beautifier-wrapper {
     a {
         display: inline-block;
         padding: 6px 8px;
