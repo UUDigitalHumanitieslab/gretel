@@ -19,12 +19,13 @@ require "$root/helpers.php";
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
+$xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
+$xpath = isset($_SESSION['xpath']) ? $_SESSION['xpath'] : $xpath;
 // Unset previous session ID, we don't want one session to span multiple queries
 session_regenerate_id(FALSE);
 session_unset();
 
 $id = session_id();
-$xpath = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and node[@rel="hd" and @pt="ww"] and node[@rel="predc" and @cat="np" and node[@rel="det" and @pt="lid"] and node[@rel="hd" and @pt="n"]]]';
 
 require "$root/functions.php";
 require "$root/front-end-includes/head.php";

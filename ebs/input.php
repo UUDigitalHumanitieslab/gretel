@@ -14,6 +14,7 @@
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
+$example = isset($_SESSION['example']) ? $_SESSION['example'] : 'Dit is een zin.';
 // Unset previous session ID, we don't want one session to span multiple queries
 session_regenerate_id(FALSE);
 session_unset();
@@ -37,7 +38,7 @@ require "$root/front-end-includes/head.php";
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a sentence, phrase, or constituent containing the (syntactic) characteristics you are looking for.</p>
         <div class="input-wrapper">
-          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="Dit is een zin." required>
+          <input type="text" name="input" placeholder="Dit is een voorbeeldzin." value="<?php echo $example; ?>" required>
           <button type="reset" name="clear" title="Empty the input field">
             <i class="fa fa-fw fa-times"></i>
             <span class="sr-only">Empty the input field</span>
