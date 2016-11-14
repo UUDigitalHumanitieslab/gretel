@@ -262,3 +262,10 @@
       return $databaseGroups{$corpus}{'REST'};
     }
   }
+
+  // Remove false-y items and spaces-only items from array
+  function array_cleaner($array) {
+      $array = array_map('trim', $array);
+      $array = array_filter($array);
+      return $array;
+  }

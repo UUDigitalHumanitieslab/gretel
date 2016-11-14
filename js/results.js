@@ -1,7 +1,7 @@
 /**
  * Documentation loosely based on the JSDoc standard
  */
-$(function(){
+$(function() {
     // Customizable attributes!
     // Specify how long it should take for functions to start
     // * Before counting ALL hits, independent of current fetched results (ms)
@@ -13,25 +13,21 @@ $(function(){
     var hash = window.location.hash,
         $window = $(window),
         $document = $(document),
-        tvLink = $("a.tv-show-fs"),
+        body = $("body"),
         controls = $(".controls"),
         resultsWrapper = $(".results-ajax-wrapper"),
-        filterWrapper = $(".filter-wrapper"),
+        filterSelWrapper = $(".filter-sel-wrapper"),
         downloadWrapper = $("#download-overview .flex-content"),
         messages = downloadWrapper.find(".messages"),
         notificationWrapper = $(".notification-wrapper");
 
     var xhrAllSentences,
         xhrFetchSentences,
+        xhrCount,
         resultID = 0,
         resultsCount = 0,
-        xhrCount,
         done = false,
-        doneCounting = false,
-        activeIndexResults = 0;
-
-    var windowsHasHash = window.location.hash,
-        visibleResultsIDArray = [];
+        doneCounting = false;
 
     getSentences();
 
@@ -43,7 +39,7 @@ $(function(){
                     if (!done) {
                         var data = $.parseJSON(json);
                         if (!data.error && data.data) {
-                          resultsWrapper.find("tbody.empty").hide();
+                            resultsWrapper.find("tbody.empty").hide();
                             loopResults(data.data, false);
                         } else {
                             $(".loading-wrapper.searching").removeClass("active");
@@ -91,6 +87,7 @@ $(function(){
             .done(function(json) {
                 var data = $.parseJSON(json);
                 if (!data.error && data.data) {
+                    resultsWrapper.find("tbody.empty").hide();
                     loopResults(data.data, true);
                 } else {
                     $(".loading-wrapper.searching").removeClass("active");
@@ -138,8 +135,8 @@ $(function(){
                     // Length of associative array (Object in JS)
                     var size = Object.keys(totalArray).length;
                     if (typeof totalArray !== 'undefined' && size > 0) {
-                      var hitsSum = 0,
-                        totalSum = 0;
+                        var hitsSum = 0,
+                            totalSum = 0;
                         for (var database in totalArray) {
                             var databaseString = database.split("_")[2],
                                 componentHits = numericSeparator(parseInt(totalArray[database][0])),
@@ -185,7 +182,6 @@ $(function(){
 
     function messageAllResultsFound() {
         disableAndEnableInputs();
-        refillVisibleResults();
 
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #results-found', function() {
             if (doneCounting) {
@@ -212,8 +208,8 @@ $(function(){
 
     function messageNoResultsFound() {
         resultsWrapper.add(controls).remove();
-        $("#results .content").addClass("no-results");
-
+        downloadWrapper.addClass("no-results");
+        body.addClass("search-no-results");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
@@ -221,8 +217,8 @@ $(function(){
 
     function messageOnError(error) {
         resultsWrapper.add(controls).remove();
-        $("#results .content").addClass("error");
-
+        downloadWrapper.addClass("error");
+        body.addClass("search-error");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
             messages.find(".error-msg").text(error);
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
@@ -230,13 +226,20 @@ $(function(){
     }
 
     function showTvFsOnLoad() {
-        var tvLink = $("a.tv-show-fs"),
-            hash = window.location.hash;
-        if (!$(".loading-wrapper.fullscreen").hasClass("active") && !$(".tree-visualizer-fs").is(":visible")) {
+        if (!body.hasClass("tv-fs-open")) {
             if (hash.indexOf("tv-") == 1) {
                 var index = hash.match(/\d+$/);
-                tvLink.eq(index[0] - 1).click();
+                $("a.tv-show-fs").eq(index[0] - 1).click();
             }
+        }
+    }
+
+    if (hash) {
+        if (hash.indexOf("tv-") == 1) {
+            messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #looking-for-tree', function() {
+                messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
+                downloadWrapper.addClass("active");
+            });
         }
     }
 
@@ -246,7 +249,6 @@ $(function(){
             resultID = 0;
 
             resultsWrapper.find("tbody:not(.empty)").empty();
-            $(".loading-wrapper.searching").removeClass("active");
         }
         $.each(sentences, function(id, value) {
             if (returnAllResults || (!returnAllResults && !done)) {
@@ -258,7 +260,7 @@ $(function(){
                     '<td>' + resultID + '</td><td>' + link + '</td><td>' +
                     value[2] + '</td><td>' + value[1] + '</td></tr>');
             }
-            if (windowsHasHash) showTvFsOnLoad();
+            showTvFsOnLoad();
         });
 
         resultIDString = numericSeparator(parseInt(resultID));
@@ -271,68 +273,18 @@ $(function(){
         }
     }
 
-
-
-    controls.find("[name='go-to']").keyup(function(e) {
-            var keycode = e.keyCode,
-                $this = $(this);
-            // Reset customValidity on backspace or delete keys, or up and down arrows
-            // Additionally allow a user to move throguh rows by using up and down arrows in
-            // the input field
-            if (keycode == 8 || keycode == 46 || keycode == 38 || keycode == 40) {
-                this.setCustomValidity("");
-                // UP arrow
-                if (keycode == 38 && $this.val() < visibleResultsIDArray[visibleResultsIDArray.length - 1]) {
-                    activeIndexResults++;
-                    $this.val(visibleResultsIDArray[activeIndexResults]).change();
-                    controls.find("form").submit();
-                }
-                // DOWN arrow
-                else if (keycode == 40 && $this.val() > visibleResultsIDArray[0]) {
-                    activeIndexResults--;
-                    $this.val(visibleResultsIDArray[activeIndexResults]).change();
-                    controls.find("form").submit();
-                }
-            }
-        })
-        .change(function() {
-            var val = $(this).val(),
-                row = resultsWrapper.find("tbody:not(.empty) tr[data-result-id='" + val + "']");
-
-
-            if (!row.is(":visible")) {
-                this.setCustomValidity("Please choose a row that is visible. Some rows are hidden depending on the filters you set.");
-            } else {
-                this.setCustomValidity("");
-                var offset = row.offset(),
-                    hControls = controls.outerHeight();
-
-                $("html, body").stop().animate({
-                    scrollTop: offset.top - hControls
-                }, 150);
-                activeIndexResults = activeIndexResults.indexOf(val);
-            }
-        });
-
-    controls.find("form").submit(function(e) {
-        e.preventDefault();
-        $("#go-to").change();
-    });
-
-    controls.find("[name='filter-components']").change(function() {
-        $(this).parent().toggleClass("active");
-    });
-
     $document.click(function(e) {
-        if ($(".controls [for='filter-components']").hasClass("active")) {
+        if (controls.find(".filter-wrapper").hasClass("active")) {
             var target = $(e.target);
-            if (!target.closest(".filter-wrapper, .controls [for='filter-components']").length) {
-                $(".controls [for='filter-components']").removeClass("active");
+            if (!target.closest(".filter-wrapper").length) {
+                controls.find(".filter-wrapper").removeClass("active");
             }
         }
     });
-
-    $(".filter-wrapper [type='checkbox']").change(function() {
+    controls.find("[for='filter-components']").click(function() {
+        $(this).parent().addClass("active");
+    }),
+    filterSelWrapper.find("[type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();
 
@@ -341,55 +293,40 @@ $(function(){
         if ($this.is("[name='component']")) {
             // Show/hide designated components in results
             if ($this.is(":checked")) {
-                resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").show();
+                resultsWrapper.find("tbody:not(.empty) tr[data-component^='" + component + "']").show();
             } else {
-                resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").hide();
+                resultsWrapper.find("tbody:not(.empty) tr[data-component^='" + component + "']").hide();
             }
 
             // If none of the component checkboxes are checked
-            if (!filterWrapper.find("[name='component']").is(":checked")) {
-                activeIndexResults = false;
+            if (!filterSelWrapper.find("[name='component']").is(":checked")) {
                 resultsWrapper.find(".empty").css("display", "table-row-group").find("td").text("No results matching the specified filters");
-                filterWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
-                $("[for='go-to']").addClass("disabled").children("input").prop("disabled", true);
+                filterSelWrapper.find("#all-components").prop("checked", false).parent().removeClass("active");
             } else {
-                if (filterWrapper.find("[name='component']:not(:disabled)").length == filterWrapper.find("[name='component']:not(:disabled):checked").length) {
-                    filterWrapper.find("#all-components").prop("checked", true).parent().addClass("active");
+                if (filterSelWrapper.find("[name='component']:not(:disabled)").length == filterSelWrapper.find("[name='component']:not(:disabled):checked").length) {
+                    filterSelWrapper.find("#all-components").prop("checked", true).parent().addClass("active");
                 } else {
-                    filterWrapper.find("#all-components").prop("checked", false).prop("indeterminate", true).parent().removeClass("active");
+                    filterSelWrapper.find("#all-components").prop("checked", false).prop("indeterminate", true).parent().removeClass("active");
                 }
                 resultsWrapper.find(".empty").hide();
-                $("[for='go-to']").removeClass("disabled").children("input").prop("disabled", false);
             }
         }
         // One checkbox to rule them all
         else if ($this.is("#all-components")) {
             $this.parent().toggleClass("active");
-            filterWrapper.find("[type='checkbox'][name='component']:not(:disabled)").prop("checked", $this.is(":checked")).change();
+            filterSelWrapper.find("[type='checkbox'][name='component']:not(:disabled)").prop("checked", $this.is(":checked")).change();
         }
-        refillVisibleResults();
     });
 
-    function refillVisibleResults() {
-        visibleResultsIDArray = [];
-        resultsWrapper.find("tbody:not(.empty) tr:visible").each(function(index, el) {
-            visibleResultsIDArray.push(parseInt($(el).data("result-id"), 10));
-        });
-        if (activeIndexResults != 0) {
-            activeIndexResults = 0;
-            $("#go-to").val(visibleResultsIDArray[0] || "--").change();
-        }
-    }
-
     function disableAndEnableInputs() {
-        $("[for='go-to'], [for='filter-components'], .filter-wrapper label").removeClass("disabled").children("input").prop("disabled", false);
+        $("[for='filter-components'], .filter-sel-wrapper label").removeClass("disabled").children("input").prop("disabled", false);
 
         // Disable the checkboxes which don't have any results
-        filterWrapper.find("[type='checkbox'][name='component']").each(function(i, el) {
+        filterSelWrapper.find("[type='checkbox'][name='component']").each(function(i, el) {
             var $this = $(el),
                 component = $this.val();
 
-            if (resultsWrapper.find("tbody:not(.empty) tr[data-component='" + component + "']").length == 0) {
+            if (resultsWrapper.find("tbody:not(.empty) tr[data-component^='" + component + "']").length == 0) {
                 $this.prop("disabled", true);
                 $this.prop("checked", false);
                 $this.parent("label").addClass("disabled");
@@ -398,56 +335,55 @@ $(function(){
     }
 
     // Abort searching request, so we can start a new request more quickly
-    // Use vanilla JS with beforeunload and jQuery unload to maximise effectiveness
-    window.addEventListener("beforeunload", function() {
-        unLoadRequests();
-    });
-
-    $window.unload(function() {
-        unLoadRequests();
+    window.addEventListener("beforeunload", function () {
+      unLoadRequests();
     });
 
     // Because we are actually going back in history, some browsers might not
-    // call the unload event
+    // call the beforeunload event
     $(".secondary-navigation a").click(function() {
         unLoadRequests();
     });
 
     function unLoadRequests() {
-        if (xhrAllSentences) xhrAllSentences.abort();
-        if (xhrCount) xhrCount.abort();
-        if (xhrFetchSentences) xhrFetchSentences.abort();
+        if (xhrAllSentences != null) {
+            xhrAllSentences.abort();
+            xhrAllSentences = null;
+        }
+        if (xhrCount != null) {
+            xhrCount.abort();
+            xhrCount = null;
+        }
+        if (xhrFetchSentences != null) {
+            xhrFetchSentences.abort();
+            xhrFetchSentences = null;
+        }
         done = true;
     }
 
     /* Tree visualizer */
     resultsWrapper.find("tbody").on("click", "a.tv-show-fs", function(e) {
-        var $this = $(this);
+        var $this = $(this),
+          treeSentence = $this.parent().nextAll("td:last-child").html(),
+          tvFs = $("#tree-visualizer-fs");
 
-        resultsWrapper.find("tbody a.tv-show-fs").removeClass("tv-fs-toggled");
-        $this.addClass("tv-fs-toggled");
+        resultsWrapper.find("tbody a").removeClass("tv-toggled-link");
 
         if (!this.hasAttribute("data-tv-fontsize")) {
             $this.attr("data-tv-fontsize", 0);
         }
+        tvFs.attr("data-tv-active-index", $this.closest("tr").index());
+        $this.addClass("tv-toggled-link");
 
-        $(".loading-wrapper.tv").addClass("active");
-        $("body").treeVisualizer($this.data("tv-url"), {
+        body.treeVisualizer($this.data("tv-url"), {
             normalView: false,
             initFSOnClick: true,
-            fsFontSize: 12
+            sentence: treeSentence,
+            hasNavigation: true
         });
         e.preventDefault();
     });
 
-    if (hash) {
-        if (hash.indexOf("tv-") == 1) {
-            messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #looking-for-tree', function() {
-                messages.children("div").removeClass("error").addClass("notice active").closest(".results-messages-wrapper").show();
-                downloadWrapper.addClass("active");
-            });
-        }
-    }
 
     /* Notifications */
     notificationWrapper.find("button").click(function() {
@@ -463,24 +399,24 @@ $(function(){
     });
 
     $("a.collapse").click(function(e) {
-      var $this = $(this),
-        isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
+        var $this = $(this),
+            isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
 
-      if (isCollapsed) {
-        $this.attr("data-collapse", 'visible');
-        $this.next("[data-target]").slideDown("fast");
-      } else {
-        $this.attr("data-collapse", 'hidden');
-        $this.next("[data-target]").slideUp("fast");
-      }
+        if (isCollapsed) {
+            $this.attr("data-collapse", 'visible');
+            $this.next("[data-target]").show();
+        } else {
+            $this.attr("data-collapse", 'hidden');
+            $this.next("[data-target]").hide();
+        }
 
-      e.preventDefault();
+        e.preventDefault();
     });
 
     $("#results-menu a").off("click").click(function(e) {
-      $("html, body").stop().animate({
-          scrollTop: $($(this).attr("href")).offset().top
-      }, 150);
-      e.preventDefault();
+        $("html, body").stop().animate({
+            scrollTop: $($(this).attr("href")).offset().top
+        }, 150);
+        e.preventDefault();
     });
 });

@@ -27,7 +27,6 @@ session_write_close();
 require "$root/front-end-includes/head.php";
 ?>
 </head>
-<?php flush(); ?>
 <?php
 require "$root/front-end-includes/header.php";
 

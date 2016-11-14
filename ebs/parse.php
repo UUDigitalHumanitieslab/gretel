@@ -20,8 +20,6 @@ require '../config/config.php';
 require "$root/helpers.php";
 require "$root/preparatory-scripts/prep-functions.php";
 
-
-
 $continueConstraints = isset($_POST['input']);
 
 if ($continueConstraints) {
@@ -65,6 +63,7 @@ if ($continueConstraints && !$isSpam) {
   <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
   <div id="tree-output">
+      <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
   </div>
 
   <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
@@ -92,7 +91,9 @@ require "$root/front-end-includes/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(function() {
-      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>', {
+        sentence: '<?php echo "$input"; ?>'
+    });
   });
   </script>
 <?php endif;

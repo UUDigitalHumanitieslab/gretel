@@ -145,20 +145,22 @@ function cleanXpath($xpath, $trimSlash = true) {
 }
 
 function checkBfPattern($bf) {
-  global $cats, $component, $includes, $dbuser, $dbpwd,
+  global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
-  session_start();
-  // If bf-pattern == ALL, we're faster searching through ragular version
+    $component = $components[0];
+
+  // If bf-pattern == ALL, we're faster searching through regular version
   if ($bf && $bf != 'ALL') {
+      $tempDatabases = array();
       // If is substring (eg. ALLnp%det)
       if (strpos($bf, 'ALL') !== false) {
           foreach ($cats as $cat) {
             $bfcopy = $component . str_replace('ALL', $cat, $bf);
-            $includes[] = $bfcopy;
+            $tempDatabases[] = $bfcopy;
           }
       } else {
-        $includes[] = $component . $bf;
+        $tempDatabases[] = $component . $bf;
       }
 
       $serverInfo = getServerInfo('sonar', $component);
@@ -167,23 +169,21 @@ function checkBfPattern($bf) {
       $dbport = $serverInfo{'port'};
       $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-      foreach ($includes as $include) {
+      foreach ($tempDatabases as $database) {
         // db:exists returns a string 'false', still need to convert to bool
-        $databaseExists = $session->query("db:exists('$include')")->execute();
+        $databaseExists = $session->query("db:exists('$database')")->execute();
 
         if ($databaseExists != 'false') {
           $databaseExists = true;
-          $_SESSION['includes'][] = $include;
+          $_SESSION['startDatabases'][] = $database;
         }
       }
-
       $continueConstraints = $databaseExists ? true : false;
       $session->close();
   } else {
-    $_SESSION['includes'] = getRegularSonar($component);
+    $_SESSION['startDatabases'] = getRegularSonar($component);
     $needRegularSonar = true;
   }
-  session_write_close();
 }
 
 function tokenize($sentence)

@@ -784,44 +784,30 @@ dd {
 }
 
 #tree-output {
-    position: relative;
-    z-index: 2;
     margin: 24px auto;
-    min-height: 240px;
-    background: #F5F5F5;
+}
 
-    .tree-visualizer {
-        opacity: 0.48;
-        transition: opacity 200ms;
-    }
-
-    &::before {
-        position: absolute;
-        z-index: 1;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 90%;
-        background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
-        background-position: bottom center;
-        background-size: contain;
-        color: white;
-        content: "Loading tree";
-        text-align: center;
-        font-weight: bold;
-        font-size: 120%;
-        line-height: 180px;
-    }
-
-    &.active {
-        background: none;
-
-        .tree-visualizer {
-            opacity: 1;
-        }
+body.tv-is-loading {
+    #tree-output {
+        position: relative;
+        z-index: 2;
 
         &::before {
-            display: none;
+            position: absolute;
+            z-index: 3;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90%;
+            background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
+            background-position: bottom center;
+            background-size: contain;
+            color: white;
+            content: "Loading tree";
+            text-align: center;
+            font-weight: bold;
+            font-size: 120%;
+            line-height: 180px;
         }
     }
 }
@@ -833,118 +819,6 @@ dd {
 
     to {
         transform: rotate(360deg);
-    }
-}
-
-.loading-wrapper {
-    z-index: 11;
-    display: flex;
-    visibility: hidden;
-    pointer-events: none;
-    align-items: center;
-    justify-content: center;
-
-    &.fullscreen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 0;
-        background: rgba(0,0,0,0.34);
-
-        .loading {
-            width: 360px;
-            height: 360px;
-            border-width: 18px;
-            border-color: #F7F7F7;
-            background: #F0F0F0 url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
-            background-position: bottom center;
-            background-size: 74%;
-
-            &::after {
-                top: -18px;
-                right: -18px;
-                bottom: -18px;
-                left: -18px;
-                border-width: 18px;
-            }
-        }
-    }
-
-    .loading {
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        width: 36px;
-        height: 36px;
-        border: 6px solid #F0F0F0;
-        border-radius: 50%;
-        background: white;
-        transition: transform 400ms;
-        transform: scale(0);
-        align-items: center;
-        justify-content: center;
-        will-change: transform;
-
-        &::after {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            bottom: -6px;
-            left: -6px;
-            border: 6px solid transparent;
-            border-top-color: #b9d655;
-            border-radius: 50%;
-            content: "";
-            will-change: transform;
-        }
-
-        p {
-            width: 100%;
-            background: rgba(247,247,247,0.88);
-            text-align: center;
-            font-weight: 700;
-            font-size: 24px;
-        }
-
-        button {
-            position: relative;
-            z-index: 20;
-        }
-    }
-
-    &.active {
-        visibility: visible;
-        height: 100%;
-        pointer-events: all;
-
-        .loading {
-            transform: scale(1);
-
-            &::after {
-                animation: load-rotate 2.4s linear infinite;
-            }
-        }
-    }
-
-    &.searching {
-        z-index: 10;
-        display: none;
-
-        &.active {
-            display: flex;
-        }
-    }
-}
-
-#tree-output {
-    .loading-wrapper {
-        position: static;
-
-        &.active {
-            padding: 18px;
-            background: #F7F7F7;
-        }
     }
 }
 
@@ -1399,17 +1273,25 @@ dd {
         }
     }
 
-    .filter-wrapper {
+    .filter-wrapper.active {
+        .filter-sel-wrapper {
+            display: flex;
+        }
+
+        [for="filter-components"] i {
+            transform: scale(1) rotate(180deg);
+        }
+    }
+
+    .filter-sel-wrapper {
         position: absolute;
-        bottom: -1em;
+        bottom: -8px;
         display: none;
-        margin-right: 0 !important;
-        margin-left: -56px !important;
         padding: 0.8em;
         max-width: 220px;
         background: white;
         box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 12px rgba(0,0,0,.12);
-        transform: translateY(100%) translateX(-50%);
+        transform: translateY(100%);
         flex-wrap: wrap;
         justify-content: space-between;
 
@@ -1431,6 +1313,17 @@ dd {
         label {
             display: block;
             margin: 2px;
+
+            &:last-child {
+                margin-right: auto;
+            }
+        }
+
+        [for="filter-components"] {
+            i {
+                transition: transform 150ms;
+                transform-origin: center center;
+            }
         }
         @keyframes check-comps-fadeout {
             from {
@@ -1476,23 +1369,6 @@ dd {
                 i {
                     animation: check-comps-fadeout 2.25s forwards;
                 }
-            }
-        }
-    }
-
-    [for="filter-components"] {
-        i {
-            transition: transform 150ms;
-            transform-origin: center center;
-        }
-
-        &.active {
-            i {
-                transform: rotate(180deg);
-            }
-
-            + .filter-wrapper {
-                display: flex;
             }
         }
     }
@@ -1597,8 +1473,8 @@ dd {
         display: none;
         padding: 16px;
         border-radius: 4px;
-        background: #eeeeee;
-        box-shadow: inset 0 -1px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0,0,0,.08), 0 0 12px rgba(0,0,0,.08);
+        background: #f7f7f7;
+        box-shadow: inset 0 -1px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.08);
         font-weight: 700;
         animation: notification-blink 700ms alternate infinite;
 
@@ -1616,9 +1492,16 @@ dd {
     }
 }
 
+.search-error,
+.search-no-results {
+    #results-overview {
+        display: none;
+    }
+}
+
 #download-overview {
     .flex-content {
-        &:not(.active) {
+        &:not(.active):not(.error) {
             position: relative;
             min-height: 190px;
             border: 1px solid #dedede;

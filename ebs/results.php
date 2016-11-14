@@ -18,7 +18,8 @@ if ($continueConstraints) {
   require "$root/preparatory-scripts/prep-functions.php";
 
     $treeVisualizer = true;
-    $treebank = $_SESSION['treebank'];
+    $onlyFullscreenTv = true;
+    $corpus = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
     $xpath = $_SESSION['xpath'];
     $originalXp = $_SESSION['originalXp'];
@@ -28,27 +29,16 @@ if ($continueConstraints) {
     // in history
     $xpath = cleanXpath($xpath);
     $originalXp = cleanXpath($originalXp);
-
-    if (is_array($components)) {
-        $component = implode(', ', $components);
-    } else {
-        $component = $components;
-        $_SESSION['subtreebank'] = $component;
-    }
-
     $example = $_SESSION['example'];
 
     $context = $_SESSION['ct'];
     $_SESSION['endPosIteration'] = 0;
-    $_SESSION['leftOvers'] = array();
-
-    if ($treebank == 'sonar') {
-      $_SESSION['includes'] = array();
-      $_SESSION['already'] = array();
-      $needRegularSonar = false;
+    $_SESSION['startDatabases'] = array();
+    if ($corpus == 'sonar') {
       $databaseExists = false;
-      $includes = array();
     }
+
+    $needRegularSonar = false;
 }
 
 session_write_close();
@@ -59,9 +49,11 @@ require "$root/front-end-includes/head.php";
 if ($continueConstraints) {
   require "$root/basex-search-scripts/treebank-search.php";
   require "$root/basex-search-scripts/basex-client.php";
-
-  if ($treebank == 'sonar') {
+  session_start();
+  if ($corpus == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
+     // Get correct databases to start search with, sets to
+     // $_SESSION['startDatabases']
     checkBfPattern($bf);
 
     // When looking in the regular version we need the double slash to go through
@@ -76,9 +68,12 @@ if ($continueConstraints) {
   } else {
     $xpath = "//$xpath";
     $originalXp = "//$originalXp";
+    $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
   }
 
-  session_start();
+  // When flushing we update the databases on each iteration, not so in counting
+  // or when fetching all results
+  $_SESSION['flushAlready'] = $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
   $_SESSION['xpath'] = $xpath;
   $_SESSION['originalXp'] = $originalXp;
   $_SESSION['needRegularSonar'] = $needRegularSonar;
@@ -110,9 +105,6 @@ include "$root/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints):
   ?>
-    <div class="loading-wrapper fullscreen tv">
-        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
-    </div>
     <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(

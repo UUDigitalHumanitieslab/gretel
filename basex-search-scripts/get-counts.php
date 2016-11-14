@@ -1,5 +1,6 @@
 <?php
-require "../config/config.php";
+
+require '../config/config.php';
 require "$root/functions.php";
 
 require "$root/basex-search-scripts/basex-client.php";
@@ -12,46 +13,41 @@ set_time_limit(0);
 $id = session_id();
 
 $xpath = $_SESSION['xpath'];
-$treebank  = $_SESSION['treebank'];
-$component = $_SESSION['subtreebank'];
+$corpus = $_SESSION['treebank'];
+$components = $_SESSION['subtreebank'];
+$already = $databases = $_SESSION['startDatabases'];
 
-if ($treebank == 'sonar') {
-  $includes = $_SESSION['includes'];
-  $needRegularSonar = $_SESSION['needRegularSonar'];
-} else {
-  $includes = false;
+if ($corpus == 'sonar') {
+    $needRegularSonar = $_SESSION['needRegularSonar'];
 }
 
 session_write_close();
 
-if ($treebank == 'sonar') {
-  $serverInfo = getServerInfo($treebank, $component[0]);
+if ($corpus == 'sonar') {
+    $serverInfo = getServerInfo($corpus, $components[0]);
 } else {
-  $serverInfo = getServerInfo($treebank, false);
+    $serverInfo = getServerInfo($corpus, false);
 }
 
 $dbhost = $serverInfo{'machine'};
 $dbport = $serverInfo{'port'};
 $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-list($sum, $counts) = getCounts($xpath, $treebank, $component, $includes, $session);
+list($sum, $counts) = getCounts($databases, $already, $session);
 
 $session->close();
 
-if ($treebank != 'sonar') {
-  // Add a distribution to the list:
-  // Instead of simply returning the amount of hits, return an array of
-  // each database with the amounts of hits per database, and the total
-  // # of sentences for that database
-  $total = getTotalSentences($treebank);
-  if (isset($total)) {
-    foreach ($counts as $database => $dbcount) {
-      $counts[$database] = array($dbcount, $total[$database]);
+if ($corpus != 'sonar') {
+    // Add a distribution to the list:
+    // Instead of simply returning the amount of hits, return an array of
+    // each database with the amounts of hits per database, and the total
+    // # of sentences for that database
+    $total = getTotalSentences($corpus);
+    foreach ($counts as $database => $dbCount) {
+        $counts{$database} = array($dbCount, $total[$database]);
     }
     createCsvCounts($sum, $counts);
-  }
 }
 
 header_remove('Set-Cookie');
-
 echo json_encode(array($sum, $counts));
