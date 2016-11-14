@@ -119,7 +119,7 @@ if ($continueConstraints):
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
-    <script src="js/results.js"></script>
+    <script src="js/min/results.min.js"></script>
 <?php endif; ?>
 </body>
 </html>
