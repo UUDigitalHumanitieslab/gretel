@@ -404,10 +404,10 @@ $(function() {
 
         if (isCollapsed) {
             $this.attr("data-collapse", 'visible');
-            $this.next("[data-target]").slideDown("fast");
+            $this.next("[data-target]").show();
         } else {
             $this.attr("data-collapse", 'hidden');
-            $this.next("[data-target]").slideUp("fast");
+            $this.next("[data-target]").hide();
         }
 
         e.preventDefault();

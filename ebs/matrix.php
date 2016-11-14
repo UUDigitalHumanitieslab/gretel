@@ -114,7 +114,8 @@ if ($continueConstraints):
           </a>
 
           <div class="help-tooltip" id="beautifier-tooltip" role="tooltip" data-title="The XPath Beautifier allows you to edit an expanded version of the XPath code given here.
-          This makes it easier to apply any adjustments. When you're done, copy the XPath code back in the field below.">
+          This makes it easier to apply any adjustments. When you're done, copy the XPath code back in the field above.
+          Note that you need to accept pop-ups for this website to open the beautifier in another tab!">
             <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
             <span class="sr-only">The XPath Beautifier allows you to edit an expanded version of the XPath code given here.
               This makes it easier to apply any adjustments. When you're done, copy the XPath code back in the text field above.</span>

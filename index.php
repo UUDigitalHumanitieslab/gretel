@@ -40,7 +40,7 @@ require "$root/front-end-includes/head.php";
 
                 <div class="citation-wrapper">
                 <p style="margin-top:0">Please cite the following paper if you are using GrETEL for your research. More documentation such as
-                  tutorials, papers, and slides can be found on
+                  tutorials, papers and slides can be found on
                   <a href="documentation.php" title="GrETEL documentation">the documentation page</a>.</p>
                 <cite>
                   <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
