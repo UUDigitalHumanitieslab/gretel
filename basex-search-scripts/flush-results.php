@@ -18,7 +18,7 @@ $queryIteration = $_SESSION['endPosIteration'];
 $corpus = $_SESSION['treebank'];
 $components = $_SESSION['subtreebank'];
 $databases = $_SESSION['flushDatabases'];
-
+$already = $_SESSION['flushAlready'];
 if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
 }
@@ -42,8 +42,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($xpath, $corpus, $components, $databases, $context, $queryIteration, $session);
-
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session);
     $session->close();
 
     if (isset($sentences)) {

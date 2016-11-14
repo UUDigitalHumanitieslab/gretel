@@ -17,7 +17,7 @@ $corpus = $_SESSION['treebank'];
 $components = $_SESSION['subtreebank'];
 $componentsString = implode('-', $components);
 $databaseString = $corpus;
-$databases = $_SESSION['startDatabases'];
+$already = $databases = $_SESSION['startDatabases'];
 
 if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
@@ -64,7 +64,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($xpath, $corpus, $components, $databases, $context, 'all', $session);
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, 'all', $session);
 
     $session->close();
 

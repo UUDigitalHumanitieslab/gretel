@@ -148,12 +148,11 @@ function checkBfPattern($bf) {
   global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
-    $tempDatabases = array();
-
     $component = $components[0];
 
-  // If bf-pattern == ALL, we're faster searching through ragular version
+  // If bf-pattern == ALL, we're faster searching through regular version
   if ($bf && $bf != 'ALL') {
+      $tempDatabases = array();
       // If is substring (eg. ALLnp%det)
       if (strpos($bf, 'ALL') !== false) {
           foreach ($cats as $cat) {
@@ -179,7 +178,6 @@ function checkBfPattern($bf) {
           $_SESSION['startDatabases'][] = $database;
         }
       }
-
       $continueConstraints = $databaseExists ? true : false;
       $session->close();
   } else {

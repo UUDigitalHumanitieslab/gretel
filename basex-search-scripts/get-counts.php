@@ -1,9 +1,5 @@
 <?php
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-
 require '../config/config.php';
 require "$root/functions.php";
 
@@ -19,8 +15,7 @@ $id = session_id();
 $xpath = $_SESSION['xpath'];
 $corpus = $_SESSION['treebank'];
 $components = $_SESSION['subtreebank'];
-
-$databases = $_SESSION['startDatabases'];
+$already = $databases = $_SESSION['startDatabases'];
 
 if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
@@ -38,7 +33,7 @@ $dbhost = $serverInfo{'machine'};
 $dbport = $serverInfo{'port'};
 $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-list($sum, $counts) = getCounts($xpath, $corpus, $components, $databases, $session);
+list($sum, $counts) = getCounts($databases, $already, $session);
 
 $session->close();
 

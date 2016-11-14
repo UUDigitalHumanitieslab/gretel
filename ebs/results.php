@@ -34,7 +34,6 @@ if ($continueConstraints) {
     $context = $_SESSION['ct'];
     $_SESSION['endPosIteration'] = 0;
     $_SESSION['startDatabases'] = array();
-
     if ($corpus == 'sonar') {
       $databaseExists = false;
     }
@@ -53,7 +52,8 @@ if ($continueConstraints) {
   session_start();
   if ($corpus == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
-     // Get correct databases to start search with
+     // Get correct databases to start search with, sets to
+     // $_SESSION['startDatabases']
     checkBfPattern($bf);
 
     // When looking in the regular version we need the double slash to go through
@@ -73,7 +73,7 @@ if ($continueConstraints) {
 
   // When flushing we update the databases on each iteration, not so in counting
   // or when fetching all results
-  $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
+  $_SESSION['flushAlready'] = $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
   $_SESSION['xpath'] = $xpath;
   $_SESSION['originalXp'] = $originalXp;
   $_SESSION['needRegularSonar'] = $needRegularSonar;

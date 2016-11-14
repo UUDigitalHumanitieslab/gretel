@@ -1,6 +1,6 @@
 <?php
 
-function getMoreIncludes($database, &$databases, $session)
+function getMoreIncludes($database, &$databases, &$already, $session)
 {
     $xquery = 'db:open("'.$database.'")/treebank/include';
     $query = $session->query($xquery);
@@ -14,8 +14,21 @@ function getMoreIncludes($database, &$databases, $session)
     foreach ($newIncludes as $newInclude) {
         if (preg_match($pattern, $newInclude, $files)) {
             $file = $files[1];
-            $databases[] = $file;
+            if (!includeAlreadyExists($file, $already)) {
+                $databases[] = $file;
+            }
         }
+    }
+}
+
+function includeAlreadyExists($include, &$already)
+{
+
+    if (isset($already{$include})) {
+        return true;
+    } else {
+        $already{$include} = 1;
+        return false;
     }
 }
 
@@ -33,22 +46,22 @@ function corpusToDatabase($components, $corpus)
     return $databases;
 }
 
-function getSentences($xpath, $corpus, $components, $databases, $context, $endPosIteration, $session)
+function getSentences($databases, $already, $endPosIteration, $session)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar;
+    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus;
 
     $matchesAmount = 0;
 
     while ($database = array_pop($databases)) {
         if ($corpus == 'sonar' && !$needRegularSonar) {
-            getMoreIncludes($database, $databases, $session);
+            getMoreIncludes($database, $databases, $already, $session);
         }
         while (1) {
             if ($endPosIteration !== 'all') {
                 ++$endPosIteration;
             }
 
-            $xquery = createXquery($xpath, $database, $corpus, $components, $context, $endPosIteration);
+            $xquery = createXquery($database, $endPosIteration);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -109,6 +122,7 @@ function getSentences($xpath, $corpus, $components, $databases, $context, $endPo
             session_start();
             $_SESSION['endPosIteration'] = $endPosIteration;
             $_SESSION['flushDatabases'] = $databases;
+            $_SESSION['flushAlready'] = $already;
             session_write_close();
         }
         if ($corpus !== 'sonar') {
@@ -121,9 +135,9 @@ function getSentences($xpath, $corpus, $components, $databases, $context, $endPo
     }
 }
 
-function createXquery($xpath, $database, $corpus, $components, $context, $endPosIteration)
+function createXquery($database, $endPosIteration)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar;
+    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
 
     $for = 'for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {

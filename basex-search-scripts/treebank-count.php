@@ -1,17 +1,17 @@
 <?php
 
-function getCounts($xpath, $corpus, $components, $databases, $session)
+function getCounts($databases, $already, $session)
 {
-    global $cats, $needRegularSonar;
+    global $corpus, $needRegularSonar;
 
     $sum = 0;
     $counts = array();
 
     while ($database = array_pop($databases)) {
         if ($corpus == 'sonar' && !$needRegularSonar) {
-            getMoreIncludes($database, $databases, $session);
+            getMoreIncludes($database, $databases, $already, $session);
         }
-        $xquery = createXqueryCount($xpath, $database, $corpus);
+        $xquery = createXqueryCount($database);
         $query = $session->query($xquery);
 
         if ($corpus == 'sonar') {
@@ -52,9 +52,9 @@ function createCsvCounts($sum, $counts)
     }
 }
 
-function createXqueryCount($xpath, $database, $corpus)
+function createXqueryCount($database)
 {
-    global $needRegularSonar;
+    global $needRegularSonar, $xpath, $corpus;
     $for = 'count(for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
         $for .= '/tree';
@@ -65,8 +65,9 @@ function createXqueryCount($xpath, $database, $corpus)
     return $xquery;
 }
 
-function getTotalSentences($corpus)
+function getTotalSentences()
 {
+    global $corpus;
     if ($corpus == 'lassy') {
         $total['LASSY_ID_DPC'] = '11716';
         $total['LASSY_ID_WIKI'] = '7341';
