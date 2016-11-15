@@ -18,15 +18,22 @@
         </ul>
         </address>
       </aside>
-      <nav class="footer-navigation">
-        <h3>Navigation</h3>
-          <ul>
-              <li class="fa-before"><a href="index.php" title="Homepage Gretel" rel="home">Home</a></li>
-              <li class="fa-before"><a href="ebs/input.php" title="Example-based search">Example-based search</a></li>
-              <li class="fa-before"><a href="xps/input.php" title="XPath search">XPath search</a></li>
-              <li class="fa-before"><a href="documentation.php" title="Documentation">Documentation</a></li>
-          </ul>
-      </nav>
+      <aside class="footer-nav-wrapper">
+        <nav class="footer-navigation">
+          <h3>Navigation</h3>
+            <ul>
+                <li class="fa-before fa-loaded"><a href="index.php" title="Homepage Gretel" rel="home">Home</a></li>
+                <li class="fa-before fa-loaded"><a href="ebs/input.php" title="Example-based search">Example-based search</a></li>
+                <li class="fa-before fa-loaded"><a href="xps/input.php" title="XPath search">XPath search</a></li>
+                <li class="fa-before fa-loaded"><a href="documentation.php" title="Documentation">Documentation</a></li>
+            </ul>
+        </nav>
+        <div class="authors">
+            <h3>Credits</h3>
+          <p>Concept and initial implementation by <a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author">Liesbeth Augustinus</a>,<br>
+            GrETEL 3 improvements and design by <a href="http://bramvanroy.be" title="Bram Vanroy homepage" target="_blank" rel="author">Bram Vanroy</a></p>
+        </div>
+      </aside>
       <aside class="other">
           <button name="to-top" title="Go to the top of the page" type="button">
             <i class="fa fa-fw fa-arrow-up"></i>
