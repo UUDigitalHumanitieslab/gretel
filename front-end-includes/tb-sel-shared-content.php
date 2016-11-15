@@ -27,8 +27,6 @@
         </label>
       </div>
     </div>
-    <p class="notice"><strong>Notice!</strong> We are currently improving the efficiency of our dataset. Therefore some components may not be available at the moment.
-  Please try again at a later time if you want to search through these temporarily unavailable components.</p>
   </div>
   <div class="corpora-wrapper">
       <div class="cgn" style="display:none">

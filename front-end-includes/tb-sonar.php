@@ -118,7 +118,7 @@
                 <label>
                     <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPE"> WR-P-P-E</label>
             </td>
-            <td>Guides & manuals</td>
+            <td>Guides &amp; manuals</td>
             <td>19,077</td>
         </tr>
         <tr>
@@ -139,10 +139,10 @@
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPH" disabled> WR-P-P-H</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPH"> WR-P-P-H</label>
             </td>
-            <td>Periodicals & magazines</td>
+            <td>Periodicals &amp; magazines</td>
             <td>5,475,556</td>
         </tr>
         <tr>
