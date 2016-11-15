@@ -30,6 +30,8 @@ $(function() {
         doneCounting = false;
 
     getSentences();
+    countAll();
+    body.addClass("results-loading counts-loading");
 
     function getSentences() {
         if (!done && (resultID <= phpVars.resultsLimit)) {
@@ -55,6 +57,7 @@ $(function() {
 
                             clearTimeout(findAllTimeout);
                             done = true;
+
                             if (xhrAllSentences) xhrAllSentences.abort();
                         }
                     }
@@ -76,6 +79,8 @@ $(function() {
                 });
         }
     }
+
+    // Short time-out to make sure at least a few results are already flushed
     var findAllTimeout = setTimeout(function() {
         findAll();
     }, timeoutBeforeMore);
@@ -130,6 +135,8 @@ $(function() {
                 messages.find(".amount-hits").text(sum);
                 messages.find(".is-still-counting").remove();
 
+                body.removeClass("counts-loading");
+                body.addClass("counts-done");
                 // Prepare distribution table. ONLY for lassy and cgn
                 if (resultsCount > 0) {
                     // Length of associative array (Object in JS)
@@ -182,6 +189,7 @@ $(function() {
 
     function messageAllResultsFound() {
         disableAndEnableInputs();
+        body.removeClass("results-loading").addClass("results-done");
 
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #results-found', function() {
             if (doneCounting) {
@@ -189,10 +197,12 @@ $(function() {
                 messages.find(".is-still-counting").remove();
             }
 
-            /* High likelihood of having more than the limit hits */
-            if (resultID == phpVars.resultsLimit) {
-                countAll();
-            } else {
+            // Stop counting if we already have the amount of hits
+            if (resultID < phpVars.resultsLimit) {
+                if (xhrCount != null) {
+                    xhrCount.abort();
+                    xhrCount = null;
+                }
                 countString = controls.find(".count strong").text();
 
                 controls.find(".count strong + span").text(countString);
@@ -207,6 +217,7 @@ $(function() {
     }
 
     function messageNoResultsFound() {
+        body.removeClass("results-loading").addClass("results-none");
         resultsWrapper.add(controls).remove();
         downloadWrapper.addClass("no-results");
         body.addClass("search-no-results");
@@ -216,6 +227,7 @@ $(function() {
     }
 
     function messageOnError(error) {
+        body.removeClass("results-loading").addClass("results-failed");
         resultsWrapper.add(controls).remove();
         downloadWrapper.addClass("error");
         body.addClass("search-error");
