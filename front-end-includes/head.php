@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="GrETEL is an online tool that facilitates the exploitation of treebanks, large pieces of text that are syntactically annotated, by only requiring an input example instead of a formal query, or hard to understand computer code.">
 <meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics, search">
@@ -56,19 +57,30 @@
         classes: false,
         fontactive: function(familyName, fvd) {
           if (familyName == "FontAwesome") {
-            var faNodes = document.querySelectorAll(".fa, .fa-before");
-            for (var i = 0; i < faNodes.length; ++i) {
-              faNodes[i].classList.add("fa-loaded");
-            }
+              document.addEventListener('DOMContentLoaded', appropriateFaClass("fa-loaded"));
           }
         },
         fontinactive: function(familyName, fvd) {
-          var faNodes = document.querySelectorAll(".fa");
-          for (var i = 0; i < faNodes.length; ++i) {
-            faNodes[i].classList.add("fa-failed");
-          }
+            if (familyName == "FontAwesome") {
+                <?php
+                    // Due to a bug in webfontloader, Edge wrongly returns fontinactive on a succesful font load
+                    // For that reason, we always use fa-loaded for Edge
+                ?>
+                if (/Edge\/\d./i.test(navigator.userAgent)) {
+                    document.addEventListener('DOMContentLoaded', appropriateFaClass("fa-loaded"));
+                } else {
+                    document.addEventListener('DOMContentLoaded', appropriateFaClass("fa-failed"));
+                }
+            }
         }
     };
+
+    function appropriateFaClass(classname) {
+        var faNodes = document.querySelectorAll(".fa, .fa-before");
+        for (var i = 0; i < faNodes.length; ++i) {
+          faNodes[i].classList.add(classname);
+        }
+    }
 
     (function(d) {
         var wf = d.createElement("script"),
