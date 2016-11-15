@@ -499,7 +499,6 @@ table label {
 .help-tooltip[data-title] {
   position: relative;
   display: inline;
-  white-space: normal !important;
   cursor: help;
 }
 
@@ -572,6 +571,7 @@ table label {
   background: #F0F0F0;
   content: attr(data-title);
   font-size: 12px;
+  white-space: normal !important;
 }
 
 .help-tooltip[data-title]:hover::after, .help-tooltip[data-title].hang-top:hover::after {
@@ -1227,12 +1227,11 @@ body:not(.tv-success) #tree-output::before {
   overflow: visible;
 }
 
-.ebs.step-3 .table-wrapper span {
-  float: left;
+.ebs.step-3 .table-wrapper th {
+  white-space: nowrap;
 }
 
 .ebs.step-3 .table-wrapper .help-tooltip {
-  float: right;
   margin-left: 6px;
   font-weight: normal;
 }
@@ -2126,6 +2125,7 @@ body:not(.tv-success) #tree-output::before {
 .ebs .label-wrapper,
 .xps .label-wrapper {
   margin: 4px auto;
+  white-space: nowrap;
 }
 
 .ebs .continue-btn-wrapper,

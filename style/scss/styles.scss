@@ -287,7 +287,6 @@ table {
 .help-tooltip[data-title] {
     position: relative;
     display: inline;
-    white-space: normal !important;
     cursor: help;
 
     &.hang-bottom {
@@ -371,6 +370,7 @@ table {
                 background: #F0F0F0;
                 content: attr(data-title);
                 font-size: 12px;
+                white-space: normal !important;
             }
 
             &::after {
@@ -955,13 +955,10 @@ body:not(.tv-success) {
         .table-wrapper {
             /* For tooltips */
             overflow: visible;
-
-            span {
-                float: left;
+            th {
+                white-space: nowrap;
             }
-
             .help-tooltip {
-                float: right;
                 margin-left: 6px;
                 font-weight: normal;
             }
@@ -1800,6 +1797,7 @@ body:not(.tv-success) {
 
     .label-wrapper {
         margin: 4px auto;
+        white-space: nowrap;
     }
 
     .continue-btn-wrapper {
