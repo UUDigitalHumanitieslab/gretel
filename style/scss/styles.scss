@@ -787,16 +787,17 @@ dd {
     margin: 24px auto;
 }
 
-body:not(.tv-success), body.tv-is-loading {
+body.tv-is-loading,
+body:not(.tv-success) {
     #tree-output {
         position: relative;
         z-index: 2;
 
         &::before {
             position: absolute;
-            z-index: 3;
             bottom: 0;
             left: 0;
+            z-index: 3;
             width: 100%;
             height: 90%;
             background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
@@ -1152,43 +1153,43 @@ body:not(.tv-success), body.tv-is-loading {
 .results {
     a.collapse {
         display: flex;
-        justify-content: space-between;
         margin: 1.34em auto;
-        border: 0 none;
-        transition: all 250ms;
-        border-radius: 4px;
-        border: 1px solid transparent;
-        color: #565656;
         padding: 0.4em 0.6em;
-        background: transparent;
+        border: 0 none;
+        border: 1px solid transparent;
         border: 1px solid #dcdcdc;
+        border-radius: 4px;
+        background: transparent;
+        color: #565656;
+        transition: all 250ms;
+        justify-content: space-between;
 
         h2 {
             margin: 0;
         }
 
         > span {
-            border-radius: 50%;
             width: 32px;
             height: 32px;
-            line-height: 28px;
             border: 1px solid;
-            text-align: center;
-            background: transparent;
             border: 1px solid #dcdcdc;
+            border-radius: 50%;
+            background: transparent;
+            text-align: center;
+            line-height: 28px;
             transition: line-height 200ms;
 
             i {
-                transition: transform 250ms;
                 color: #dcdcdc;
+                transition: transform 250ms;
             }
         }
 
         &:hover,
         &[data-collapse="hidden"] {
-            color: #333;
-            background: #f7f7f7;
             border-color: #c4c4c4;
+            background: #f7f7f7;
+            color: #333;
 
             > span {
                 background: #dcdcdc;
@@ -1372,18 +1373,27 @@ body:not(.tv-success), body.tv-is-loading {
             }
         }
     }
+    @keyframes load-rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
 
     .controls {
         position: relative;
         display: flex;
         margin: 1.67em auto;
-        padding: 0.67em 26px;
+        padding: 1.34em 16px;
         width: 100%;
         border-radius: 4px;
         background: #eee;
         font-size: 12px;
         align-items: center;
-        justify-content: flex-end;
+        justify-content: space-between;
 
         > *:not(:last-child) {
             margin-right: 1.34em;
@@ -1391,14 +1401,94 @@ body:not(.tv-success), body.tv-is-loading {
 
         .count {
             margin-right: auto;
+            white-space: nowrap;
+        }
+        @keyframes status-flicker {
+            from {
+                opacity: 0.4;
+            }
 
-            > span {
-                white-space: nowrap;
+            to {
+                opacity: 1;
             }
         }
 
-        #go-to {
-            width: 48px;
+        .status {
+            margin-right: auto;
+            white-space: nowrap;
+
+            span:first-child::after {
+                content: "&";
+                margin: 0 6px;
+            }
+
+            span {
+                display: none;
+            }
+        }
+
+        .searching-animation {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+
+            div {
+                top: -3px;
+                position: absolute;
+                right: -3px;
+                bottom: -3px;
+                left: -3px;
+                border: 4px solid rgba(0, 0, 0, 0);
+                border-top-color: #b2d241;
+                border-radius: 50%;
+                content: "";
+                animation: load-rotate 2.4s linear infinite;
+            }
+        }
+    }
+
+    &:not(.results-loading) {
+        .controls {
+            .searching-animation {
+                display: none;
+            }
+        }
+    }
+
+    &.counts-loading,
+    &.results-loading {
+        .controls .status {
+            animation: status-flicker 1s alternate infinite;
+        }
+    }
+
+    &.results-loading {
+        .controls {
+            .status span:first-child {
+                display: inline;
+
+                &::after {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &.counts-loading {
+        .controls {
+            .status span:last-child {
+                display: inline;
+            }
+        }
+    }
+
+    &.counts-loading.results-loading {
+        .controls {
+            .status span:first-child::after {
+                display: inline;
+            }
         }
     }
     @keyframes download-arrow {

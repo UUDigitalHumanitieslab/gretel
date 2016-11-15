@@ -1010,16 +1010,18 @@ dd p:last-child {
   margin: 24px auto;
 }
 
-body:not(.tv-success) #tree-output, body.tv-is-loading #tree-output {
+body.tv-is-loading #tree-output,
+body:not(.tv-success) #tree-output {
   position: relative;
   z-index: 2;
 }
 
-body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::before {
+body.tv-is-loading #tree-output::before,
+body:not(.tv-success) #tree-output::before {
   position: absolute;
-  z-index: 3;
   bottom: 0;
   left: 0;
+  z-index: 3;
   width: 100%;
   height: 90%;
   background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
@@ -1416,18 +1418,18 @@ body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::bef
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin: 1.34em auto;
+  padding: 0.4em 0.6em;
+  border: 0 none;
+  border: 1px solid transparent;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background: transparent;
+  color: #565656;
+  transition: all 250ms;
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  margin: 1.34em auto;
-  border: 0 none;
-  transition: all 250ms;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  color: #565656;
-  padding: 0.4em 0.6em;
-  background: transparent;
-  border: 1px solid #dcdcdc;
 }
 
 .results a.collapse h2 {
@@ -1435,28 +1437,28 @@ body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::bef
 }
 
 .results a.collapse > span {
-  border-radius: 50%;
   width: 32px;
   height: 32px;
-  line-height: 28px;
   border: 1px solid;
-  text-align: center;
-  background: transparent;
   border: 1px solid #dcdcdc;
+  border-radius: 50%;
+  background: transparent;
+  text-align: center;
+  line-height: 28px;
   transition: line-height 200ms;
 }
 
 .results a.collapse > span i {
+  color: #dcdcdc;
   transition: -webkit-transform 250ms;
   transition: transform 250ms;
   transition: transform 250ms, -webkit-transform 250ms;
-  color: #dcdcdc;
 }
 
 .results a.collapse:hover, .results a.collapse[data-collapse="hidden"] {
-  color: #333;
-  background: #f7f7f7;
   border-color: #c4c4c4;
+  background: #f7f7f7;
+  color: #333;
 }
 
 .results a.collapse:hover > span, .results a.collapse[data-collapse="hidden"] > span {
@@ -1660,13 +1662,24 @@ body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::bef
           animation: check-comps-fadeout 2.25s forwards;
 }
 
+@keyframes load-rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
 .results .controls {
   position: relative;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 1.67em auto;
-  padding: 0.67em 26px;
+  padding: 1.34em 16px;
   width: 100%;
   border-radius: 4px;
   background: #eee;
@@ -1674,9 +1687,9 @@ body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::bef
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
-  -webkit-justify-content: flex-end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 .results .controls > *:not(:last-child) {
@@ -1685,14 +1698,86 @@ body:not(.tv-success) #tree-output::before, body.tv-is-loading #tree-output::bef
 
 .results .controls .count {
   margin-right: auto;
-}
-
-.results .controls .count > span {
   white-space: nowrap;
 }
 
-.results .controls #go-to {
-  width: 48px;
+@-webkit-keyframes status-flicker {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes status-flicker {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.results .controls .status {
+  margin-right: auto;
+  white-space: nowrap;
+}
+
+.results .controls .status span:first-child::after {
+  content: "&";
+  margin: 0 6px;
+}
+
+.results .controls .status span {
+  display: none;
+}
+
+.results .controls .searching-animation {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+
+.results .controls .searching-animation div {
+  top: -3px;
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  left: -3px;
+  border: 4px solid transparent;
+  border-top-color: #b2d241;
+  border-radius: 50%;
+  content: "";
+  -webkit-animation: load-rotate 2.4s linear infinite;
+          animation: load-rotate 2.4s linear infinite;
+}
+
+.results:not(.results-loading) .controls .searching-animation {
+  display: none;
+}
+
+.results.counts-loading .controls .status, .results.results-loading .controls .status {
+  -webkit-animation: status-flicker 1s alternate infinite;
+          animation: status-flicker 1s alternate infinite;
+}
+
+.results.results-loading .controls .status span:first-child {
+  display: inline;
+}
+
+.results.results-loading .controls .status span:first-child::after {
+  display: none;
+}
+
+.results.counts-loading .controls .status span:last-child {
+  display: inline;
+}
+
+.results.counts-loading.results-loading .controls .status span:first-child::after {
+  display: inline;
 }
 
 @-webkit-keyframes download-arrow {

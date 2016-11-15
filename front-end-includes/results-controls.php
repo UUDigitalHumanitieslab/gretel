@@ -1,5 +1,7 @@
 <nav class="controls">
-    <p class="count"># of results: <strong>0</strong> / <span>--</span></p>
+    <span class="count"># of results: <strong>0</strong> / <span>--</span></span>
+
+    <span class="status"><span>Searching</span><span>Counting</span></span>
 
     <div class="filter-wrapper">
         <label for="filter-components" class="disabled" title="Only show results of specific components. Note that when you download the output, filters are not taken into account: all results are downloaded">
@@ -12,7 +14,7 @@
             } ?>
         </div>
     </div>
-    <div class="loading-wrapper searching active">
-        <div class="loading"></div>
+    <div class="searching-animation">
+        <div></div>
     </div>
 </nav>
