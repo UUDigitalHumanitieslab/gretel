@@ -410,7 +410,7 @@ $(function() {
         notificationWrapper.fadeOut("fast");
     });
 
-    $("a.collapse").click(function(e) {
+    $("a.collapse").off().click(function(e) {
         var $this = $(this),
             isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
 
