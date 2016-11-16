@@ -12,6 +12,26 @@ $(function() {
     })).resize();
     $window.scroll($.throttle(700, helpTooltipPosition)).scroll();
 
+    $("#popup-wrapper").on("click", "button.cancel, button.continue", function() {
+        var $this = $(this),
+            popup = $this.closest(".popup"),
+            popupId = popup.data("popup-id");
+
+        if ($this.hasClass("continue")) {
+            Cookies.set('popup-continue-' + popupId, 'true');
+        }
+        hidePopup(popup);
+    });
+
+    // Make anchors work, even though we've set a base-tag
+    $('a[href^="#"]').click(function(e) {
+        // Do an .is() test for dynamic urls
+        if ($(this).is('[href^="#"]')) {
+            document.location.hash = $(this).attr("href").substring(1);
+            e.preventDefault();
+        }
+    });
+
     $("[name='to-top']").click(function() {
         $("html, body").animate({
             scrollTop: 0
@@ -19,43 +39,11 @@ $(function() {
     });
 
     // Open in beautifier
-    $("body.matrix .xpath-wrapper a, body.xpath .open-beautifier-wrapper a").click(function(e) {
+    $("body.matrix .xpath-wrapper a, body.xps.input .open-beautifier-wrapper a").click(function(e) {
         e.preventDefault();
         var href = $(this).attr('href');
         postXpath($("#xpath").serialize(), href);
     });
-
-    function postXpath(xpath, href) {
-        $.ajax({
-            type: 'POST',
-            url: 'http://bramvanroy.be/projects/xpath-beautifier/php/receive-post.php',
-            crossDomain: true,
-            data: xpath,
-            headers: {
-                "cache-control": "no-cache"
-            },
-            xhrFields: {
-                withCredentials: true
-            }
-        }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
-            var newTab = window.open(href, '_blank');
-            if (newTab) {
-                newTab.focus();
-            } else {
-                alert('Your browser blocked opening a new window. Please allow pop-ups for this website. We will never show advertisements.');
-            }
-        });
-    }
-
-    function mobileMenu() {
-        if ($window.width() < 721) {
-            nav1.addClass("small");
-            nav1.find("button").addClass("active");
-        } else {
-            nav1.removeClass("active small");
-            nav1.find("button").removeClass("active");
-        }
-    }
 
     nav1.find("button").click(function() {
         nav1.toggleClass("active");
@@ -69,30 +57,7 @@ $(function() {
         }
     });
 
-    function helpTooltipPosition() {
-        // Not for .treebanks, because we want to hang right on those
-        $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
-            var $this = $(el),
-                rect = el.getBoundingClientRect(),
-                w = $window.width(),
-                h = $window.height();
-            $this.addClass("hang-right hang-left hang-bottom hang-top");
-            if ((w - rect.right <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
-                $this.removeClass("hang-right");
-            }
-            if ((rect.left <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
-                $this.removeClass("hang-left");
-            }
-            if ((h - rect.bottom <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
-                $this.removeClass("hang-bottom");
-            }
-            if ((rect.top <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
-                $this.removeClass("hang-top");
-            }
-        });
-    }
-
-    if ($body.hasClass("step-1")) {
+    if ($body.hasClass("input")) {
         var clearBtn = $("[name='clear']");
         clearBtn.click(function(e) {
             var $this = $(this);
@@ -256,24 +221,31 @@ $(function() {
                 $(".xpath-wrapper textarea").off("mousedown");
             }
         }
-    } else if (($body.hasClass("ebs") && $body.hasClass("step-4")) || ($body.hasClass("xps") && $body.hasClass("step-2"))) {
+    } else if ($body.hasClass("treebanks")) {
         // Main treebank selection (CGN, Lassy, SONAR)
         $("[type='radio']").change(function() {
             var $this = $(this),
                 value = $this.val();
             if ($this.is("[name='treebank']")) {
-                $(".cgn, .lassy, .sonar").hide();
+                $(".cgn, .lassy, .sonar").hide().removeClass("active");
                 $(".cgn, .lassy, .sonar").find("[type='checkbox'], [type='radio']").prop("disabled", true);
-                $("." + value).show().find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
+                $("." + value).show().addClass("active").find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
+
+                if (value != 'sonar' && $("." + value + " [type='checkbox']:checked").length == 0) {
+                    $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
+                } else {
+                    $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
+                }
             }
         });
         // Selecting subtreebanks
         $("[type='checkbox']").change(function() {
             var $this = $(this);
 
+            this.setCustomValidity('');
+
             // If this is not a check-all checkbox
             if (!$this.is("[data-check^='all']")) {
-
                 // For subtreebanks with checkboxes (Lassy and CGN only, they have checkboxes)
                 if ($this.is("[name='subtreebank[]']")) {
                     var checkboxAll,
@@ -312,6 +284,11 @@ $(function() {
             // If this is a check-all checkbox
             else {
                 var checked = $this.prop("checked");
+                if (!checked) {
+                    $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
+                } else {
+                    $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
+                }
 
                 if ($this.is("[data-check='all-cgn-vl']")) {
                     $(".cgn label:not(.disabled) [type='checkbox'][value^='v']").prop("checked", checked);
@@ -321,6 +298,12 @@ $(function() {
                     $(".lassy label:not(.disabled) [type='checkbox']").prop("checked", checked);
                 }
             }
+
+            if ($("div.active .table-wrapper [type='checkbox']:checked").length > 0) {
+                $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
+            } else {
+                $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
+            }
         });
 
         // On document ready, set active treebank (from cache or not)
@@ -328,6 +311,61 @@ $(function() {
             $("[type='radio'][name='treebank'][value='lassy']").click().change();
         } else {
             $("[type='radio'][name='treebank']:checked").click().change();
+        }
+    }
+
+    function helpTooltipPosition() {
+        // Not for .treebanks, because we want to hang right on those
+        $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
+            var $this = $(el),
+                rect = el.getBoundingClientRect(),
+                w = $window.width(),
+                h = $window.height();
+            $this.addClass("hang-right hang-left hang-bottom hang-top");
+            if ((w - rect.right <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
+                $this.removeClass("hang-right");
+            }
+            if ((rect.left <= 320) || (rect.top <= 160) || (h - rect.bottom <= 160)) {
+                $this.removeClass("hang-left");
+            }
+            if ((h - rect.bottom <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
+                $this.removeClass("hang-bottom");
+            }
+            if ((rect.top <= 320) || (w - rect.right <= 160) || (rect.left <= 160)) {
+                $this.removeClass("hang-top");
+            }
+        });
+    }
+
+    function postXpath(xpath, href) {
+        $.ajax({
+            type: 'POST',
+            url: 'http://bramvanroy.be/projects/xpath-beautifier/php/receive-post.php',
+            crossDomain: true,
+            data: xpath,
+            headers: {
+                "cache-control": "no-cache"
+            },
+            xhrFields: {
+                withCredentials: true
+            }
+        }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
+            var newTab = window.open(href, '_blank');
+            if (newTab) {
+                newTab.focus();
+            } else {
+                alert('Your browser blocked opening a new window. Please allow pop-ups for this website. We will never show advertisements.');
+            }
+        });
+    }
+
+    function mobileMenu() {
+        if ($window.width() < 721) {
+            nav1.addClass("small");
+            nav1.find("button").addClass("active");
+        } else {
+            nav1.removeClass("active small");
+            nav1.find("button").removeClass("active");
         }
     }
 
@@ -391,7 +429,6 @@ $(function() {
         }
     }
 
-
     /**
      * Mixed usage of offset and getBoundingClientRect
      * - offset: relative to document, does not take scrolling into account
@@ -452,26 +489,6 @@ $(function() {
         $popup.fadeOut("fast");
         $("#popup-overlay").hide();
     }
-
-    $("#popup-wrapper").on("click", "button.cancel, button.continue", function() {
-        var $this = $(this),
-            popup = $this.closest(".popup"),
-            popupId = popup.data("popup-id");
-
-        if ($this.hasClass("continue")) {
-            Cookies.set('popup-continue-' + popupId, 'true');
-        }
-        hidePopup(popup);
-    });
-
-    // Make anchors work, even though we've set a base-tag
-    $('a[href^="#"]').click(function(e) {
-        // Do an .is() test for dynamic urls
-        if ($(this).is('[href^="#"]')) {
-            document.location.hash = $(this).attr("href").substring(1);
-            e.preventDefault();
-        }
-    });
 
     function taalPortaalFiller() {
         if (getUrlVars()["tpinput"]) {
