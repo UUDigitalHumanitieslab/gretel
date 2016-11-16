@@ -1,0 +1,12 @@
+User-Agent: *
+Disallow: /img/
+
+User-Agent: Googlebot-Image
+Disallow: /*.png$
+Disallow: /*.ico$
+
+User-Agent: msnbot-media
+Disallow: /*.png$
+Disallow: /*.ico$
+
+Sitemap: http://gretel.ccl.kuleuven.be/gretel-bram/sitemap.xml

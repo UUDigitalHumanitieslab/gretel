@@ -36,7 +36,7 @@
         <tr>
             <td>
                 <label>
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEF" checked> WR-P-E-F</label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEF"> WR-P-E-F</label>
             </td>
             <td>Press releases</td>
             <td>18,372</td>
@@ -68,7 +68,7 @@
         <tr>
             <td>
                 <label>
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEJ"> WR-P-E-J</label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPEJ" checked> WR-P-E-J</label>
             </td>
             <td>Wikipedia</td>
             <td>1,354,245</td>
@@ -118,7 +118,7 @@
                 <label>
                     <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPE"> WR-P-P-E</label>
             </td>
-            <td>Guides & manuals</td>
+            <td>Guides &amp; manuals</td>
             <td>19,077</td>
         </tr>
         <tr>
@@ -131,8 +131,8 @@
         </tr>
         <tr>
             <td>
-                <label class="disabled">
-                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPG" disabled> WR-P-P-G</label>
+                <label>
+                    <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPG"> WR-P-P-G</label>
             </td>
             <td>Newspapers</td>
             <td>14,973,209</td>
@@ -142,7 +142,7 @@
                 <label>
                     <input type="radio" data-treebank="sonar" name="subtreebank[]" value="WRPPH"> WR-P-P-H</label>
             </td>
-            <td>Periodicals & magazines</td>
+            <td>Periodicals &amp; magazines</td>
             <td>5,475,556</td>
         </tr>
         <tr>

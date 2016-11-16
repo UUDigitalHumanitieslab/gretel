@@ -1,17 +1,18 @@
 <?php
-require "config/config.php";
+
 $currentPage="docs";
 
+require "config/config.php";
+require "$root/helpers.php";
 require "$root/functions.php";
-
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
 </head>
 
-        <?php require "$php/header.php"; ?>
+        <?php require "$root/front-end-includes/header.php"; ?>
             <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
                 frequently asked questions, and other information. If you have any more questions, you can always
-                <a href="#faq-4" title="FAQ how to contact us">contact us</a>.</p>
+                <a href="documentation.php#faq-4" title="FAQ how to contact us">contact us</a>.</p>
             <p>As stated on the home page, we would ask you to cite the following paper if you are using GrETEL for your research.</p>
             <cite>
               <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
@@ -20,7 +21,7 @@ require "$php/head.php";
                 <i class="fa fa-file-text-o"></i>
                 <i class="fa fa-download"></i>
               </span>
-                <span class="sr-only">Example-Based Treebank Querying</span>
+              <span class="sr-only">Example-Based Treebank Querying</span>
              </a>
               <p>
                 Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
@@ -66,19 +67,20 @@ require "$php/head.php";
 
                     <dt id="faq-2">For whom is GrETEL intended?</dt>
                     <dd><p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
-                    interested in searching through Lassy, CGN, or Sonar. However, the tool is especially dedicated to
+                    interested in searching through Lassy, CGN, or SoNaR. However, the tool is especially dedicated to
                     those looking for <em>specific linguistic patterns</em> in these corpora.</p></dd>
 
                     <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
-                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN (Corpus Gesproken Nederlands), and SoNaR.</p>
+                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN (Corpus Gesproken Nederlands), and SoNaR. More information on these corpora is provided on
+                      <a href="http://gretel.ccl.kuleuven.be/project/docs.php#treebanks" target="_blank" title="Go to the project page">GrETEL's project page</a>.</p>
                       <ul>
-                        <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blannk" title="The project page of Lassy Small">Lassy Small</a>
+                        <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank" title="The project page of Lassy Small">Lassy Small</a>
                           was the first corpus to be supported in GrETEL. It is a one-million words corpus
                           that consists of written data. All of its annotations have been manually checked and verified.</li>
-                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_Dutch/start.htm" target="_blannk" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
+                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm" target="_blank" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
                           or CGN for short, is a corpus of one million words that consists of transcribed Dutch speech.
                           All the provided annotations have been manually checked and verified.</li>
-                        <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blannk" title="The project page of SoNaR">SoNaR</a>,
+                        <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank" title="The project page of SoNaR">SoNaR</a>,
                           is different from Lassy and the CGN in that it is much larger. It is a corpus that consists of 25 components of written data,
                         amounting to 500 million words. Because of its size, the syntactic annotations have not been manually verified.</li>
                       </ul>
@@ -97,12 +99,12 @@ require "$php/head.php";
                          How that difference is relevant for SoNaR has been described in the paper cited below.</p>
                          <cite>
                            <a href="http://www.lrec-conf.org/proceedings/lrec2014/workshops/LREC2014Workshop-CMLC2%20Proceedings-rev2.pdf#page=20"
-                           title="Making Large Treebanks Searchable. The SoNaR case." target="_blank">
+                           title="Download 'Making Large Treebanks Searchable. The SoNaR case.'" target="_blank">
                            <span class="stack">
                              <i class="fa fa-file-text-o"></i>
                              <i class="fa fa-download"></i>
                            </span>
-                           <span class="sr-only">Making Large Treebanks Searchable. The SoNaR case.</span>
+                           <span class="sr-only">Download 'Making Large Treebanks Searchable. The SoNaR case.'</span>
                           </a>
 
                            <p>Vincent Vandeghinste and Liesbeth Augustinus. (2014). <strong>"Making Large Treebanks Searchable. The SoNaR case"</strong>.
@@ -117,8 +119,8 @@ require "$php/head.php";
     </div>
 
     <?php
-    require "$php/footer.php";
-    include "$root/scripts/AnalyticsTracking.php";
+    require "$root/front-end-includes/footer.php";
+    include "$root/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

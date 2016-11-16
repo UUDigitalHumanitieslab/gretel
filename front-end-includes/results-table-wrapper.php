@@ -11,7 +11,7 @@
     <tbody>
     </tbody>
     <tbody class="empty">
-        <tr><td colspan="4">No results for the filters you specified.</td></tr>
+        <tr><td colspan="4">No results found yet</td></tr>
     </tbody>
   </table>
 </div>

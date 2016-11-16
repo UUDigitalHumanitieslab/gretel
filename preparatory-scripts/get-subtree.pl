@@ -27,99 +27,29 @@
 
 #########################################################################
 
-use Getopt::Long;
 use XML::Twig;
-
-my $prog = "XML Subtree Generator";
-my $date = "July 31, 2013";
-my $author = "Liesbeth Augustinus";
-my $versionnr = "1.3";
 
 my $refpos=&initialize;
 
-# get command line options
-GetOptions("help", "h",
-           "version", "v",
-	   "xml=s",
-	   "m=s",
-	   "split", "s",
-	   "r=s",
-           );
+my ($inputxml, $options) = @ARGV;
 
-if (($opt_v) || ($opt_version)) {
-    print "$prog\n";
-    print "Version $versionnr\n";
-    print "(c) $author, $date\n";
-    exit(0);
-    }
 
-if (($opt_h) || ($opt_help)) {
-    print "$prog\n";
-    print "Version $versionnr\n";
-    print "(c) $author, $date\n";
-    print "\n";
-    print "Command-line options:\n";
-    print "\n";
-    print "--help | -h:\tdisplays this information\n";
-    print "--version | -v:\tdisplays version info\n";
-    print "\n";
-    print "--xml (path to) XML file\n";
-    print "-m:\tmode (alpino/lassy/cgn/sonar)\n";
-    print "-r:\tremove top node attribute\n";
-    print "--split || -s:\tsplit extended pos tags\n";
-    print "\n";
-    print "The script takes one argument, i.e. a path to an XML file\n";
-    print "\n";
-    exit(0);
-}
+my $twig=XML::Twig->new('pretty_print' => 'indented');
+$twig->parsefile($inputxml);
 
-if (!($opt_xml)) {
-    print "You need to specify an XML file with -xml.\n";
-    exit(-1);
-}
-
-if ($opt_m) {
-    $mode=$opt_m;
-}
-
-if (($opt_s) || ($opt_split)) {
-    $split=1;
-}
-
-if ($opt_r) {
-    $options=$opt_r;
-}
-
-# get XML
-#my $inputxml=shift(@ARGV);
-my $inputxml=$opt_xml;
-
-my $twig=XML::Twig->new(pretty_print => 'indented');    # create the twig
-$twig->parsefile("$inputxml");
 my $root=$twig->root->first_child; # start at 'top' node (leave out alpino_ds node)
 $tree=$twig->children;
 @children=$tree->children;
 $children[1]->cut;
-$subtree=&process_twig($root,$refpos,$mode,$split);
+$subtree=&process_twig($root,$refpos);
 $subtree=&cut_unary($subtree);
 
-# remove top node attributes
+# Remove top node attributes
 if ($options) {
     my $top=$subtree;
-    if ($options eq "relcat") {
-	$top->del_att(rel);
-	$top->set_att(cat=>" ");
-
-    }
-
-    elsif ($options eq "rel") {
-	$top->del_att(rel);
-    }
-    elsif ($options eq "cat") {
-	$top->del_att(cat);
-    }
-    else {
-	 $top->del_att($options);
+    $top->del_att(rel);
+    if ($options eq 'relcat') {
+    	$top->set_att('cat'=>' ');
     }
 }
 
@@ -140,132 +70,64 @@ sub cut_unary {
 }
 
 sub process_twig {
-	my ($twig,$refpos,$mode,$split) = @_;
+	my ($twig,$refpos) = @_;
 	my @children=$twig->children();
 	my %int;
 	foreach my $child(@children){
-		# print
-		my $result = process_twig($child,$refpos,$mode,$split);
+		my $result = process_twig($child,$refpos);
 		unless ($result) {
 			$child->cut;
 		}
 		else {
-			$twig->{att}->{interesting}='cat';
+			$twig->{'att'}->{'interesting'}='cat';
 		}
 	}
 
-	if ((defined($twig->{att}->{interesting})) &&
+	if ((defined($twig->{'att'}->{'interesting'})) &&
 		($twig->{'att'}->{'interesting'} ne 'na')) {
-			my $interesting=$twig->{'att'}->{'interesting'}; # value of @interesting attribute
-			my $hash=$twig->{att};
+			my $interesting=$twig->{'att'}->{'interesting'};
+			my $hash=$twig->{'att'};
 
-### define for each mode which attributes should be included ###
+		  $int{'rel'}++;
+		  $int{'begin'}++;
+      $int{'pt'}++;
 
-			if ($mode eq 'lassy') {
-			    $int{rel}++; # always include rel
-			    $int{pos}++; # always include pos
-			    $int{begin}++; # always include begin
-
-			    if ($interesting eq 'cat') {
-				$int{cat}++;
-			    }
-			    if ($interesting eq 'postag') {
-				$int{postag}++;
-			    }
-			    if ($interesting eq 'lemma') {
-				$int{root}++;
-			    }
-			    if ($interesting eq 'token') {
-				$int{root}++;
-				$int{word}++;
-        $int{casesensitive}++;
-			    }
-			}
-
-			elsif ($mode eq 'cgn') {
-			    $int{rel}++; # always include rel
-			    $int{pt}++; # always include pt
-			    $int{begin}++; # always include begin
-
-			    if ($interesting eq 'cat') {
-				$int{cat}++;
-			    }
-			    if ($interesting eq 'postag') {
-				$int{postag}++;
-			    }
-			    if ($interesting eq 'lemma') {
-				$int{lemma}++;
-			    }
-			    if ($interesting eq 'token') {
-				$int{lemma}++;
-				$int{word}++;
-        $int{casesensitive}++;
-			    }
-			}
-
-			elsif ($mode eq 'sonar') {
-			    $int{rel}++; # always include rel
-			    $int{pt}++; # always include pt
-			    $int{begin}++; # always include begin
-
-			    if ($interesting eq 'cat') {
-				$int{cat}++;
-			    }
-			    if ($interesting eq 'postag') {
-				$int{postag}++;
-			    }
-			    if ($interesting eq 'lemma') {
-				$int{lemma}++;
-			    }
-			    if ($interesting eq 'token') {
-				$int{lemma}++;
-				$int{word}++;
-        $int{casesensitive}++;
-			    }
-			    if ($interesting eq 'not') {
-				$twig->set_att("not")=>"relpt";
-				$int{not}++;
-
-			    }
-			}
-
-			else { # mode = alpino or undef (default)
-			    $int{rel}++; # always include rel
-			    $int{pos}++; # always include pos
-			    $int{begin}++; # always include begin
-
-			    if ($interesting eq 'cat') {
-				$int{cat}++;
-			    }
-			    if ($interesting eq 'lemma') {
-				$int{root}++;
-			    }
-			    if ($interesting eq 'token') {
-				$int{root}++;
-				$int{word}++;
-        $int{casesensitive}++;
-			    }
-			}
+	    if ($interesting eq 'cat') {
+        $int{'cat'}++;
+	    }
+	    elsif ($interesting eq 'postag') {
+        $int{'postag'}++;
+	    }
+	    elsif ($interesting eq 'lemma') {
+        $int{'lemma'}++;
+	    }
+	    elsif ($interesting eq 'token') {
+        $int{'lemma'}++;
+    		$int{'word'}++;
+        $int{'caseinsensitive'}++;
+		  }
+      elsif ($interesting eq 'not') {
+        $int{'not'}++;
+        $twig->set_att('not'=>'not');
+      }
 
 			foreach (keys %$hash) {
 					unless ($int{$_}) {
 						$twig->del_att($_);
 					}
 			}
+        if ($twig->{'att'}->{'postag'}) {
+				    my $cgntag=$twig->{'att'}->{'postag'}; # get CGN postag
+				        my @split=&split_one_tag($cgntag,$refpos); # split tag into separate attribute-value pairs
 
-			if ($split==1) { # split up postags
-			    if ($twig->{'att'}->{'postag'}) {
-				my $cgntag=$twig->{'att'}->{'postag'}; # get CGN postag
-				my @split=&split_one_tag($cgntag,$refpos); # split tag into separate attribute-value pairs
-
-				if (@split) {
+				            if (@split) {
 				    foreach $s(@split) {
 					my ($att,$val) = split(/\|/,$s);
-					$twig->set_att($att=>"$val");  # add new elements
+					$twig->set_att($att=>$val);  # add new elements
 				    }
 				}
 			    }
-			}
+
 
 
 			return $twig;
@@ -289,7 +151,7 @@ sub split_one_tag {
     my @parts;
     foreach $val(@pts) {
 
-	if ($pt ne "BW" || $pt ne "TSW"|| $pt ne "LET") {
+	if ($pt ne 'BW' || $pt ne 'TSW'|| $pt ne 'LET') {
 	    $feature=$refpos{$pt};
 	    $att=$$feature{$val};   # same as $att=$feature->{$val};
 	}
@@ -299,7 +161,7 @@ sub split_one_tag {
 	    return undef;
 	}
 
-	$attval=$att."|".$val; # combine attribute-value
+	$attval=$att.'|'.$val; # combine attribute-value
 	push(@parts, $attval);
     }
 
@@ -472,15 +334,15 @@ sub initialize {
 	);
 
     # hash of hash references
-    $refpos{"N"}={%n};
-    $refpos{"ADJ"}={%adj};
-    $refpos{"WW"}={%ww};
-    $refpos{"TW"}={%tw};
-    $refpos{"VNW"}={%vnw};
-    $refpos{"LID"}={%lid};
-    $refpos{"VZ"}={%vz};
-    $refpos{"VG"}={%vg};
-    $refpos{"SPEC"}={%spec};
+    $refpos{'N'}={%n};
+    $refpos{'ADJ'}={%adj};
+    $refpos{'WW'}={%ww};
+    $refpos{'TW'}={%tw};
+    $refpos{'VNW'}={%vnw};
+    $refpos{'LID'}={%lid};
+    $refpos{'VZ'}={%vz};
+    $refpos{'VG'}={%vg};
+    $refpos{'SPEC'}={%spec};
 
     return {%refpos}; # {} => reference van hash
 }

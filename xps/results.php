@@ -1,28 +1,26 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-require '../config/config.php';
-require "$root/helpers.php";
-
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = $_SESSION['ebsxps'];
+$currentPage = 'xps';
 $step = 3;
 
+require '../config/config.php';
+require "$root/helpers.php";
+
+$_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
 $noTbFlag = 0;
 
 if (isset($_POST['treebank'])) {
-    $treebank = $_POST['treebank'];
-    $_SESSION['treebank'] = $treebank;
+    $corpus = $_POST['treebank'];
+    $_SESSION['treebank'] = $corpus;
 } elseif (isset($_SESSION['treebank'])) {
-    $treebank = $_SESSION['treebank'];
+    $corpus = $_SESSION['treebank'];
 } else {
     $noTbFlag = 1;
-    $treebank = '';
+    $corpus = '';
 }
 
 if (isset($_POST['subtreebank'])) {
@@ -36,129 +34,69 @@ if (isset($_POST['subtreebank'])) {
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('treebank', 'subtreebank', 'xpath'));
 if ($continueConstraints) {
+    require "$root/preparatory-scripts/prep-functions.php";
     $treeVisualizer = true;
+    $onlyFullscreenTv = true;
 
     $xpath = $_SESSION['xpath'];
+    // Need to clean in case the user goes back in history, otherwise the
+    // prepended slashes below would keep stacking on each back-and-forward
+    // in history
+    $xpath = cleanXpath($xpath);
 
-    if (is_array($components)) {
-        $component = implode(', ', $components);
-    } else {
-        $component = $components;
+    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
+    $_SESSION['endPosIteration'] = 0;
+    $_SESSION['startDatabases'] = array();
+
+    if ($corpus == 'sonar') {
+        $databaseExists = false;
     }
 
-
-    // get context option
-    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
-
-    $_SESSION['queryIteration'] = array(0, 0);
-    $_SESSION['leftOvers'] = array();
-    $_SESSION['already'] = array();
+    $needRegularSonar = false;
 }
 
-require "$root/functions.php";
-require "$php/head.php";
-?>
+session_write_close();
 
+require "$root/functions.php";
+require "$root/front-end-includes/head.php";
+
+if ($continueConstraints) {
+  require "$root/basex-search-scripts/treebank-search.php";
+  require "$root/basex-search-scripts/basex-client.php";
+  session_start();
+  if ($corpus == 'sonar') {
+    $bf = xpathToBreadthFirst($xpath);
+    // Get correct databases to start search with, sets to
+    // $_SESSION['startDatabases']
+    checkBfPattern($bf);
+
+    // When looking in the regular version we need the double slash to go through
+    // all descendants
+    if ($needRegularSonar) {
+      $xpath = "//$xpath";
+    } else {
+      $xpath = "/$xpath";
+    }
+  } else {
+    $xpath = "//$xpath";
+    $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
+  }
+
+  // When flushing we update the databases on each iteration, not so in counting
+  // or when fetching all results
+  $_SESSION['flushAlready'] = $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
+  $_SESSION['xpath'] = $xpath;
+  $_SESSION['needRegularSonar'] = $needRegularSonar;
+  session_write_close();
+}
+?>
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints):
-  ?>
-
-  <section id="query-overview">
-      <h2>Query overview</h2>
-      <div class="flex-content">
-      <div>
-        <div class="table-wrapper">
-          <table>
-            <tbody>
-            <tr><th>XPath</th><td><code><?php echo $xpath; ?></code></td></tr>
-            <?php if ($treebank == 'sonar'): ?>
-            <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-            <?php else: ?>
-            <tr><th>Treebank</th><td><?php echo strtoupper($treebank)." [$component]"; ?></td></tr>
-            <?php endif; ?>
-            </tbody>
-          </table>
-        </div>
-        <a href='<?php echo "scripts/SaveXPath.php"; ?>' class="download-link" title="Download XPath query" target="_blank" download="gretel-xpath.txt">
-          <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download XPath</a>
-      </div>
-        <p>You can save the XPath query to use it as input for the XPath search mode by clicking the button below.
-          This allows you to use the same query for another (part of a) treebank or for a slightly modified search without having to start completely
-          from scratch.</p>
-      </div>
-    </section>
-  <section id="results">
-    <h2>Results overview</h2>
-    <div class="content">
-      <div class="results-explanation">
-        <p>When GrETEL has finished looking up your query, a message will apear
-          that the results have been found and are ready to be downloaded as a text file.</p>
-
-          <p>The document contains the first 500 results that match your query. Each sentence is preceded by the corpus that was used
-              (Lassy, CGN, or SoNaR), and the relevant component (e.g. WIKI, NA, WRPEC). At the top of the file you find the XPath code
-              that was used to find the results. This can be useful if you want to do a similar query later on. Each sentence also contains
-              <code>&lt;hit&gt;</code> tags surrounding the actual structure that you looked for, similar to how the web page shows these
-              parts in boldface in the table below.</p>
-              <p>Note that due to how the corpora are parsed, some oddities may occur. For instance, punctuation is left out
-              in the dependency structure (all punctuation is attached to the topmost node), which means that in a orthographic structure
-              the <code>&lt;hit&gt;</code> tags may show <em>punctuation gaps</em>.</p>
-
-        <?php if ($treebank != 'sonar'): ?>
-        <p>A distribution overview of the number of hits
-          per component is also provided. This may be useful for data analysis,
-          especially if you are interested in comparing different treebank components.
-          For example, if you want to know whether a syntactic construction in
-          spoken language is more frequent in Netherlandic Dutch or Belgian
-          Dutch, you can compare the <em>NL</em> and <em>VL</em> parts of that corpus.
-          You will be alerted when this list is generated so you can download it.
-        </p>
-        <?php endif; ?>
-      </div>
-      <div class="results-download-wrapper">
-        <div class="results-messages-wrapper">
-          <h3>Download results</h3>
-          <div class="messages">
-          </div>
-        </div>
-        <?php if ($treebank != 'sonar'): ?>
-        <div class="distribution-wrapper">
-        <h3>Distribution list</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                  <th>Treebank</th>
-                  <th>Hits</th>
-                  <th># sentences in treebank</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-        <a href='<?php echo "tmp/$id-gretel-distribution.csv"; ?>' class="download-link"
-          title="Download distribution" target="_blank" download="gretel-distribution.csv">
-          <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download distribution</a>
-      </div>
-    <?php endif; ?>
-    </div>
-    </div>
-      <div class="results-ajax-wrapper">
-        <h2>All results</h2>
-        <p><strong>Click on a sentence ID</strong> to view the tree structure. The
-          sentence ID refers to the treebank component in which the sentence occurs,
-          the text number, and the location within the text
-          (<em>p</em> page numbers, <em>s</em> sentence number).
-        </p>
-        <?php include "$php/results-controls.php"; ?>
-        <?php require "$php/results-table-wrapper.php"; ?>
-      </div>
-  </section>
-<?php
+    require "$root/front-end-includes/results-shared-content.php";
     setContinueNavigation();
 else: // $continueConstraints
     setErrorHeading();
@@ -169,20 +107,20 @@ else: // $continueConstraints
     setPreviousPageMessage(2);
 
 endif;
-session_write_close();
-require "$php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) : ?>
+if ($continueConstraints):
+  ?>
     <div class="loading-wrapper fullscreen tv">
         <div class="loading"><p>Loading tree...<br>Please wait</p></div>
     </div>
-    <?php include "$php/notifications.php"; ?>
+    <?php include "$root/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
-        'fetchResultsPath' => "$home/php/flush-results.php",
-        'getAllResultsPath' => "$home/php/get-all-results.php",
-        'fetchCountsPath' => "$home/php/get-counts.php",
+        'fetchResultsPath' => "$home/basex-search-scripts/flush-results.php",
+        'getAllResultsPath' => "$home/basex-search-scripts/get-all-results.php",
+        'fetchCountsPath' => "$home/basex-search-scripts/get-counts.php",
         'downloadPath' => "$home/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => $home,
@@ -191,7 +129,7 @@ if ($continueConstraints) : ?>
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
-    <script src="js/results.js"></script>
+    <script src="js/min/results.min.js"></script>
 <?php endif; ?>
 </body>
 </html>

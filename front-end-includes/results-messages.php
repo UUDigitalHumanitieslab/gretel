@@ -3,9 +3,8 @@
 
 <?php
 require '../config/config.php';
-session_start();
 
-$currentPage = $_SESSION['ebsxps'];
+session_start();
 $id = session_id();
 
 require "$root/functions.php";
@@ -18,9 +17,6 @@ require "$root/functions.php";
 
 <body>
   <?php
-  $fetchResultsPath = "$home/php/flush-results.php";
-  $getAllResultsPath = "$home/php/get-all-results.php";
-  $fetchCountsPath = "$home/php/get-counts.php";
   $downloadPath = "$home/tmp/$id-gretel-results.txt";
   ?>
 
@@ -33,7 +29,7 @@ require "$root/functions.php";
 
       <p>
         <a href="<?php echo $downloadPath; ?>" title="Download results" class="download-link" target="_blank" download="gretel-results.txt">
-        <i class="fa fa-fw fa-download" aria-hidden="true"></i> Download results</a>
+        <i class="fa fa-fw fa-loaded fa-download" aria-hidden="true"></i> Download results</a>
     </p>
   </div>
   <div id="no-results-found">

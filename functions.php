@@ -1,42 +1,7 @@
 <?php
-  // Returns true if we're on an ebs or xps page
-  $isSearch = (isset($currentPage) && ($currentPage == 'ebs' || $currentPage == 'xps')) ? 1 : 0;
-
-  // Returns true if we're on a page with step > 1
-  $isBigStep = (isset($step) && $step > 1) ? 1 : 0;
-
-  $isHome = (isset($currentPage) && $currentPage == 'home') ? 1 : 0;
-  $isDocs = (isset($currentPage) && $currentPage == 'docs') ? 1 : 0;
-
-  function setErrorHeading($string = '')
-  {
-      $message = 'Error';
-      if ($string != '') {
-          $message .= ": $string";
-      }
-      $message .= '!';
-      echo "<h3 class='error-heading'>$message</h3>";
-  }
-
-  function setPreviousPageMessage($goToStep)
-  {
-      global $currentPage, $ebsPages, $xpsPages;
-      $message = '<p>You can ';
-      if (isset($currentPage)) {
-          $keys = array_keys(${$currentPage.'Pages'});
-          $href = $currentPage.'/'.$keys[$goToStep - 1];
-
-          $message .= "go to <a href='$href' title='Go to a previous step'>step $goToStep</a> ";
-
-          if ($goToStep == 1) $message .= "and try a new example ";
-      }
-      $message .= "or go directly to <a href='index.php' title='Go to the homepage'>the homepage</a>.</p>";
-      echo $message;
-  }
-
   // Set page heading and subheading variables
   if (isset($currentPage)) {
-      if ($currentPage == 'home') {
+      if (isHome()) {
           $pageHeading = 'What is GrETEL?';
       } elseif ($currentPage == 'ebs') {
           $pageHeading = 'Example-based search';
@@ -59,36 +24,63 @@
                   'Results',
               );
           }
-      } elseif ($currentPage == 'docs') {
+      } elseif (isDocs()) {
           $pageHeading = 'Documentation';
       }
+  }
+
+  function setErrorHeading($string = '')
+  {
+      $message = 'Error';
+      if ($string != '') {
+          $message .= ": $string";
+      }
+      $message .= '!';
+      echo "<h3 class='error-heading'>$message</h3>";
+  }
+
+  function setPreviousPageMessage($goToStep)
+  {
+      global $currentPage, $ebsPages, $xpsPages;
+      $message = '<p>You can ';
+      if (isset($currentPage)) {
+          $keys = array_keys(${$currentPage.'Pages'});
+          $href = $currentPage.'/'.$keys[$goToStep - 1];
+
+          $message .= "go to <a href='$href' title='Go to a previous step'>step $goToStep</a> ";
+
+          if ($goToStep == 1) $message .= "and try a new example ";
+          $message .= "or ";
+      }
+      $message .= "go directly to <a href='index.php' title='Go to the homepage'>the homepage</a>.</p>";
+      echo $message;
   }
 
     // Set page heading variables
     function setPageTitle()
     {
         global $currentPage, $step;
-        $pageTitle = '';
         if (isset($currentPage)) {
-            if ($currentPage == 'home') {
-                $pageTitle .= 'GrETEL | An example based search engine for corpora';
+            if (isHome()) {
+                $pageTitle = 'GrETEL | An example based search engine for corpora';
             } else {
-                if ($currentPage == 'ebs' || $currentPage == 'xps') {
+              $pageTitle = '';
+                if (isSearch()) {
                     if (isset($step)) {
                         $pageTitle .= "Step $step | ";
                     }
                     if ($currentPage == 'ebs') {
-                        $pageTitle .= 'Example-based search | ';
+                        $pageTitle .= 'Example-based search';
                     } else {
-                        $pageTitle .= 'XPath search | ';
+                        $pageTitle .= 'XPath search';
                     }
-                } elseif ($currentPage == 'docs') {
+                } elseif (isDocs()) {
                     $pageTitle .= 'Documentation';
                 }
                 $pageTitle .= ' | GrETEL';
             }
         } else {
-            $pageTitle .= 'GrETEL | An example based search engine for corpora';
+            $pageTitle = 'GrETEL | An example based search engine for corpora';
         }
         echo $pageTitle;
     }
@@ -142,14 +134,16 @@
       $i = 0;
 
       $output = '<ul class="progressbar">';
-      if ($currentPage == 'ebs'):
+      if ($currentPage == 'ebs') {
           foreach ($ebsPages as $uri => $title) {
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
               $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
-          } else:
+          }
+        }
+      else {
           foreach ($xpsPages as $uri => $title) {
               ++$i;
               $class = setProgressClasses($i);
@@ -157,7 +151,7 @@
               $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
-      endif;
+        }
       $output .= '</ul>';
       echo $output;
   }
@@ -178,7 +172,9 @@
         $i++;
           foreach ($thValArray as $th => $val) {
               $csClass = ($val == 'cs') ? 'case-sensitive' : '';
-              $tableHTML .= "<tr class='row-group-$i $csClass'><th>$th</th>";
+              $advancedClass = ($val == 'postag' || $val == 'not' ||  $val == 'cs') ? 'advanced-option' : '';
+              $tableHTML .= "<tr class='row-group-$i $csClass $advancedClass'>";
+              $tableHTML .= "<th><span>$th</span>" . addHelpersMatrix($val) ."</th>";
               foreach ($sentence as $key => $word) {
                   $isPunc = preg_match("/[\p{P}|^$=`´<>~]/u", $word);
                   $puncClass = $isPunc ? 'punctuation' : '';
@@ -206,205 +202,70 @@
       echo $tableHTML;
   }
 
+  function addHelpersMatrix($wordValue) {
+
+      if ($wordValue == 'token') {
+          $description = 'The exact word form (also known as token)';
+      } elseif ($wordValue == 'cs') {
+          $description = 'If the word option is selected, you can choose to look for case-sensitive occurrences';
+      } elseif ($wordValue == 'lemma') {
+          $description = 'Word form that generalizes over inflected forms.'
+          . ' For example: gaan is the lemma of ga, gaat,'
+          . ' gaan, ging, gingen, and gegaan';
+      } elseif ($wordValue == 'pos') {
+          $description = 'Short Dutch part-of-speech tag. The different tags are:'
+          . ' n (noun), ww (verb), adj (adjective),'
+          . ' lid (article), vnw (pronoun), vg (conjunction),'
+          . ' bw (adverb), tw (numeral), vz (preposition),'
+          . ' tsw (interjection), spec (special token), and let (punctuation)';
+      } elseif ($wordValue == 'postag') {
+          $description = 'Long part-of-speech tag. For example: N(soort,mv,basis),'
+          . ' WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev)';
+      } elseif ($wordValue == 'na') {
+          $description = 'The word will be ignored in the search instruction.'
+          . ' It may be included in the results, but it is not required that it is present';
+      } elseif ($wordValue == 'not') {
+          $description = 'The word class and the dependency relation will be explicitly excluded from the results';
+      }
+
+      return '<div class="help-tooltip" role="tooltip" data-title="'.$description.'">'
+      . '<i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>'
+      . '<span class="sr-only">'.$description.'</span></div>';
+  }
+
   function setContinueNavigation()
   {
-      global $step, $currentPage, $ebsPages, $xpsPages, $isBigStep;
-      echo '<nav class="continue-btn-wrapper">';
-      if ($isBigStep) {
-          echo '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i> Go back</button>';
+      global $step, $currentPage, $ebsPages, $xpsPages;
+      $navString = '<nav class="continue-btn-wrapper">';
+      if (isBigStep()) {
+          $navString .= '<button onclick="history.go(-1); return false" title="Go back to the previous page"><i class="fa fa-fw fa-angle-left" aria-hidden="true"></i> Go back</button>';
       }
       if (isset($currentPage, $step) && $step < count(${$currentPage.'Pages'})) {
-          echo '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-fw fa-arrow-right" aria-hidden="true"></i></button>';
+          $navString .= '<button type="submit" title="Continue to the next page">Continue <i class="fa fa-fw fa-angle-right" aria-hidden="true"></i></button>';
       }
-      echo '</nav>';
+      $navString .= '</nav>';
+
+      echo $navString;
   }
 
-  function xpath2Bf($xpath)
-  {
-      $bfresult;
-      // Divide XPath in top-most level, and the rest (its "descendants")
-      if (preg_match("/^\/\/?node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
-          list(, $topattrs, $descendants) = $items;
-
-          $topcat;
-           // Find category of top node
-           // CAVEAT: only takes one cat into account and not OR constructions
-           if ($topattrs && preg_match("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
-               $topcat = $toppattrsArray[1];
-           }
-           // If the top node doesn't have any attributes
-           // or if value is not specified, return ALL
-           else {
-               $topcat = 'ALL';
-           }
-
-           // Only continue if there is more than one level
-           if ($descendants) {
-               // Remove fixed-order nodes, not relevant
-               $descendants = preg_replace("/(?:and)?number\(\@begin\).*?\@begin\)/", '', $descendants);
-
-               $depth = 0;
-               $children = '';
-               $charlength = strlen($descendants);
-
-               // Goes through each character of the string and keeps track of the
-               // depth we're in. If the depth is two or more, we don't take those
-               // characters into account. Output is $children that contains only
-               // nodes from the second level (i.e. "children" of top node)
-               for ($pos = 0; $pos < $charlength; ++$pos) {
-                   $char = substr($descendants, $pos, 1);
-
-                   if ($char == '[') {
-                       ++$depth;
-                   }
-
-                   // If we're less than 2 levels deep: keep characters in string
-                   if ($depth < 2) {
-                       $children .= $char;
-                   }
-
-                   // If we're deeper: don't include string, and possibly remove
-                   // trailing start node of a deeper level
-                   else {
-                       $children = preg_replace('/(and )?node$/', '', $children);
-                   }
-
-                 // Only decrement depth after operations to ensure closing brackets
-                 // of nodes that are too deep are excluded
-                   if ($char == ']') {
-                       --$depth;
-                   }
-               }
-
-               // At the end of the loop depth ought to be zero
-               /*
-               if ($depth != 0) {
-                   // warn("XPath not correct");
-               }
-               */
-
-              // Check if there is a count present
-              // and manipulate the string accordingly, i.e. multiply when necessary
-              // e.g. count(node[@pt="n"]) > 1 -> node[@pt="n"] and node[@pt="n"]
-               $children = preg_replace_callback("/(count\((.*)\) *> *([1-9]+))/",
-                function ($matches) {
-                    return $matches[2].str_repeat(' and '.$matches[2], $matches[3]);
-                }, $children);
-
-               $dfpatterns = array();
-
-               // Loop through all remaining node[...] matches and extract rel
-               // and cat values
-               preg_match_all("/node\[([^\]]*)/", $children, $childrenArray);
-
-               foreach ($childrenArray[0] as $childNode) {
-                   preg_match("/\@rel=\"([^\"]+)\"/", $childNode, $rel);
-                   preg_match("/\@cat=\"([^\"]+)\"/", $childNode, $cat);
-
-                   if (!$cat) {
-                       preg_match("/\@pt=\"([^\"]+)\"/", $childNode, $cat);
-                   }
-
-                   $dfpattern;
-
-                   // If rel exists, push value (and possibly also cat/pt) to array
-                   // CAVEAT: when no rel present, the node will be left out the
-                   // breadth-first pattern and therefore the pattern as a whole is
-                   // incomplete, and thus not usable
-                   if ($rel) {
-                       $dfpattern = "$rel[1]%";
-                       if ($cat[1]) {
-                           $dfpattern .= $cat[1];
-                       }
-                       array_push($dfpatterns, $dfpattern);
-                   }
-               }  // end foreach
-
-               if ($dfpatterns) {
-                   // Sort array alphabetically
-                   sort($dfpatterns);
-                   $dfpatternjoin = implode('_', $dfpatterns);
-                   $bfresult = $topcat.$dfpatternjoin;
-               } else {
-                   $bfresult = $topcat;
-               }
-           }    // end if ($descendants)
-           else {
-               $bfresult = $topcat;
-           }
-      } else {
-          $bfresult = false;
-      }
-
-      return $bfresult;
-  }
-
-  function isSpam($string)
-  {
-    // NOTE: backslash needs to be escaped twice
-    $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
-
-    if (preg_match($websiteRegex, $string) || filter_var($string, FILTER_VALIDATE_EMAIL)) {
-      return true;
+  // Returns associative array containing at least the machine and the port
+  function getServerInfo($corpus, $component) {
+    global $databaseGroups;
+    // Lassy and CGN
+    if (!$component && array_key_exists($corpus, $databaseGroups)) {
+      return $databaseGroups{$corpus};
     }
-    return false;
-  }
-
-  function Tokenize($sentence)
-  {
-    // Add space before and after punctuation marks
-    $sentence = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence);
-    // Deal wth ...
-    $sentence = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $sentence);
-    // Delete first and last space(s)
-    $sentence = preg_replace('/^\s*(.*?)\s*$/', '$1', $sentence);
-    // Change multiple spaces to single space
-    $sentence = preg_replace('/\s+/', ' ', $sentence);
-    return $sentence;
-  }
-
-  function ModifyLemma($parse, $id, $tmp)
-  {
-      $parseloc = "$tmp/$id-pt.xml";
-      $output = fopen($parseloc, 'w');
-      // Read alpino parse
-      $xml = simpledom_load_file($parse);
-      // Sort terminal nodes by 'begin' attribute
-      $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin');
-
-      foreach ($pts as $pt) {
-          if ($pt != 'let') {
-              $lemma = $pt->getAttribute('lemma');
-              // Remove _ from lemmas (for compounds) & remove _DIM from lemmas (for diminutives)
-              $lemma = preg_replace('/_(DIM)?/', '', $lemma);
-              // Add lemma
-              $pt->setAttribute('lemma', $lemma);
-          }
-      }
-
-      $tree = $xml->asXML();
-      fwrite($output, $tree);
-      fclose($output);
-
-      return $parseloc;
-  }
-
-  function applyCs($xpath) {
-    if (strpos($xpath, '@casesensitive="no"') !== false) {
-      preg_match_all("/(?<=node\[).*?(?=node\[|\])/", $xpath, $matches);
-      foreach ($matches[0] as $match) {
-        if (strpos($match, '@casesensitive="no"') !== false) {
-          $dummyMatch = preg_replace('/(?: and )?@casesensitive="no"/', '', $match);
-            if (strpos($dummyMatch, '@word') !== false || strpos($dummyMatch, '@lemma') !== false) {
-              // Wrap attribute in lower-case(), and lower-case the value
-              $dummyMatch = preg_replace_callback('/@(word|lemma)="([^"]+)"/', function($matches) {
-                 return 'lower-case(@'. $matches[1]. ')="'.strtolower($matches[2]).'"';
-               }, $dummyMatch);
-            }
-
-            $xpath = preg_replace('/'.preg_quote($match, '/').'/', $dummyMatch, $xpath, 1);
-        }
-      }
+    // Sonar components
+    elseif (array_key_exists($component, $databaseGroups{$corpus})) {
+      return $databaseGroups{$corpus}{$component};
+    } elseif (in_array($component, $databaseGroups{$corpus}{'REST'}{'components'})) {
+      return $databaseGroups{$corpus}{'REST'};
     }
-    return $xpath;
+  }
+
+  // Remove false-y items and spaces-only items from array
+  function array_cleaner($array) {
+      $array = array_map('trim', $array);
+      $array = array_filter($array);
+      return $array;
   }

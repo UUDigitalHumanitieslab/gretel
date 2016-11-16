@@ -25,8 +25,8 @@ THE SOFTWARE.
 
 /**
 * @package SimpleDOM
-* @version $Id: SimpleDOM.php 60 2010-04-01 06:34:58Z simpledom.dev $
-* @link    $URL: https://simpledom.googlecode.com/svn/trunk/SimpleDOM.php $
+* @version $Id: simple-dom.php 60 2010-04-01 06:34:58Z simpledom.dev $
+* @link    $URL: https://simpledom.googlecode.com/svn/trunk/simple-dom.php $
 */
 
 /**

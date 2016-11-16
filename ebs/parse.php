@@ -9,14 +9,17 @@
  *
  * @see /functions.php  buildEbsMatrix(), isSpam()
  */
-require '../config/config.php';
-require "$root/helpers.php";
 session_cache_limiter('private');
 
 session_start();
+header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = $_SESSION['ebsxps'];
+$currentPage = 'ebs';
 $step = 2;
+
+require '../config/config.php';
+require "$root/helpers.php";
+require "$root/preparatory-scripts/prep-functions.php";
 
 $continueConstraints = isset($_POST['input']);
 
@@ -28,7 +31,7 @@ if ($continueConstraints) {
 }
 
 require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 
 // Check if $input contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($input) : false;
@@ -36,19 +39,19 @@ $isSpam = ($continueConstraints) ? isSpam($input) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$php/header.php";
+require "$root/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam) {
-    require "$scripts/AlpinoParser.php";
-    require "$scripts/SimpleDOM.php";
+    require "$root/preparatory-scripts/alpino-parser.php";
+    require "$root/preparatory-scripts/simple-dom.php";
 
     $_SESSION['example'] = $input;
 
     // Prepare/clean up input to be tokenized in next step
-    $tokinput = Tokenize($input);
+    $tokinput = tokenize($input);
     $_SESSION['sentence'] = $tokinput;
-    $parse = Alpino($tokinput, $id);
-    $parseloc = ModifyLemma($parse, $id, $tmp);
+    $parse = alpino($tokinput, $id);
+    $parseloc = modifyLemma($parse, $id, $tmp);
 ?>
 
   <p>You find the structure of the tagged and parsed sentence below.
@@ -61,6 +64,7 @@ if ($continueConstraints && !$isSpam) {
   <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
 
   <div id="tree-output">
+      <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
   </div>
 
   <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
@@ -84,15 +88,17 @@ if ($continueConstraints && !$isSpam) {
 
 session_write_close();
 
-require "$php/footer.php";
+require "$root/front-end-includes/footer.php";
 if ($continueConstraints) : ?>
   <script>
   $(function() {
-      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>');
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>', {
+        sentence: '<?php echo "$input"; ?>'
+    });
   });
   </script>
 <?php endif;
-include "$root/scripts/AnalyticsTracking.php";
+include "$root/front-end-includes/analytics-tracking.php";
 ?>
 
 </div>

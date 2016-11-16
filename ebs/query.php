@@ -1,13 +1,13 @@
 <?php
-require '../config/config.php';
-require "$root/helpers.php";
-
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-$currentPage = $_SESSION['ebsxps'];
+$currentPage = 'ebs';
 $step = 5;
+
+require '../config/config.php';
+require "$root/helpers.php";
 
 $noTbFlag = 0;
 
@@ -34,7 +34,11 @@ if (!$noTbFlag) {
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
 
+require "$root/functions.php";
+
 if ($continueConstraints) {
+
+    require "$root/preparatory-scripts/prep-functions.php";
     $id = session_id();
     $queryId = $_SESSION['queryid'];
     $treeVisualizer = true;
@@ -42,64 +46,63 @@ if ($continueConstraints) {
     $tokinput = $_SESSION['sentence'];
 
     $xpath = $_SESSION['xpath'];
+    $originalXp = $_SESSION['originalXp'];
 
-    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
+    $xpath = cleanXpath($xpath);
+    $originalXp = cleanXpath($originalXp);
+
+    // Check if the XPath was edited by the user or not
+    $xpChanged = ($xpath == $originalXp) ? false : true;
+
+    $_SESSION['xpath'] = $xpath;
+    $_SESSION['originalXp'] = $originalXp;
+    $_SESSION['xpChanged'] = $xpChanged;
+
+    // Temporarily change XPath to show it to user
+    if ($treebank == 'sonar') {
+      $xpath = "/$xpath";
+    } else {
+      $xpath = "//$xpath";
+    }
 }
 
 session_write_close();
-
-require "$root/functions.php";
-require "$php/head.php";
+require "$root/front-end-includes/head.php";
 ?>
+
+<link rel="prefetch" href="js/min/results.min.js">
 </head>
 <?php flush(); ?>
-<?php require "$php/header.php"; ?>
-
-<?php if ($continueConstraints) :
+<?php require "$root/front-end-includes/header.php"; ?>
+<?php if ($continueConstraints):
   $component = implode(', ', $component);
-  $xpath = rtrim($xpath);
 
-  //log query tree
+  // Log query tree
   $qTree = file_get_contents("$tmp/$id-sub.xml");
   $treeLog = fopen("$log/gretel-querytrees.log", 'a');
-  fwrite($treeLog, "<alpino_ds id=\"$queryId\">$qTree\n</alpino_ds>\n");
+  fwrite($treeLog, "<alpino_ds id=\"$queryId\">\n$qTree\n</alpino_ds>\n");
   fclose($treeLog);
 ?>
 
+<h3>Input</h3>
 <ul>
 <li>Input example: <em><?php echo $tokinput; ?></em></li>
 <li>Treebank: <?php echo strtoupper($treebank); ?></li>
 <li>Components: <?php echo strtoupper($component); ?></li>
 </ul>
 
-<div id="tree-output"></div>
+<?php if (!$xpChanged): ?>
+  <h3>Query tree</h3>
+<div id="tree-output">
+    <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
+</div>
+<?php endif; ?>
 
-<?php
-    if ($treebank == 'sonar') : ?>
-      <p>XPath expression, generated from the query tree. It is not possible to use custom XPath when querying SONAR; the code
-        below is provided to show you the structure that is assigned to your input example.</p>
-
-    <?php else : ?>
-      <p>XPath expression, generated from the query tree. You can adapt it if necessary. Only do so if you know what you are doing!
-      If you are dealing with a long query, the
-      <a href="http://bramvanroy.be/projects/xpath-beautifier" target="_blank" title="XPath beautifier">XPath beautifier</a> might come in handy.</p>
-    <?php endif; ?>
-
+  <h3>XPath expression<?php if (!$xpChanged): ?> generated from the query tree<?php endif; ?></h3>
+  <div class="generated-xpath"><code><?php echo $xpath; ?></code></div>
     <form action="ebs/results.php" method="post">
-    <?php
-    if ($treebank == 'sonar') {
-        $readonly = 'readonly';
-    } else {
-        $readonly = '';
-        $htmlXpath = htmlentities($xpath, ENT_QUOTES);
-        echo '<input type="hidden" name="originalXp" value="'.$htmlXpath.'">';
-    }
-    ?>
-    <textarea name="xp" wrap="soft" <?php echo $readonly;?> spellcheck="false"><?php echo $xpath; ?></textarea>
-
-    <?php if ($treebank != 'sonar') : ?><input type="reset" value="Reset XPath"><?php endif; ?>
     <?php setContinueNavigation(); ?>
-  </form>
+    </form>
 <?php else: // $continueConstraints
     setErrorHeading();
 ?>
@@ -109,10 +112,10 @@ require "$php/head.php";
 <?php
     setPreviousPageMessage(4);
 endif;  // $continueConstraints
-require "$php/footer.php";
-include "$root/scripts/AnalyticsTracking.php";
+require "$root/front-end-includes/footer.php";
+include "$root/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints) : ?>
+if ($continueConstraints && !$xpChanged) : ?>
     <script src="js/tree-visualizer.js"></script>
     <script>
     $(function(){
