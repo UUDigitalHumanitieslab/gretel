@@ -5,7 +5,7 @@ function goBack() {
 
 $(document).ready(function() {
     function navResize(){
-       if($(window).width() < 1100 && $(window).width() >= 700 )
+       if($(window).width() < 1450 && $(window).width() >= 700 )
       {
 	$("nav ul").addClass('ellipse').removeClass('circular breadcrumb'); //add or unhide image.
       } 

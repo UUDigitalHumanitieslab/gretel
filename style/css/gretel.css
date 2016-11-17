@@ -211,7 +211,7 @@ nav {
     float: left;
     background: #C0C0C0; //grey;
     width: 120px;
-    height: 50px;
+    height: 40px;
     border-radius: 25px; // a complete circle requires the border radius to be half of your width/height // rectangular if no border-radius
     -webkit-border-radius: 25px;
     -moz-border-radius: 25px;
@@ -219,7 +219,8 @@ nav {
 .ellipse li p {
     color: white;
     text-decoration: none; 
-    padding: 0px 0px 0px 20px;
+    margin: 12px 0px 0px 20px;
+    //padding: 0px 0px 0px 20px;
     background: transparent ;// grey;                   /* fallback color */
     position: relative; 
     display: block;
@@ -239,16 +240,16 @@ nav {
 .circular li { 
     float: left;
     background: #C0C0C0; //grey;
-    width: 50px;
-    height: 50px;
-    border-radius: 25px; // a complete circle requires the border radius to be half of your width/height
-    -webkit-border-radius: 25px;
-    -moz-border-radius: 25px;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px; // a complete circle requires the border radius to be half of your width/height
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
 }
 .circular li p {
     color: white;
     text-decoration: none; 
-    padding: 0px 0px 0px 20px;
+    margin: 12px 0px 0px 15px;
     background: transparent ;// grey;                   /* fallback color */
     position: relative; 
     display: block;
