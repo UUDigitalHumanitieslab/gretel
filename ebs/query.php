@@ -6,8 +6,8 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = 'ebs';
 $step = 5;
 
-require '../config/config.php';
-require "$root/helpers.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
 
 $noTbFlag = 0;
 
@@ -34,11 +34,11 @@ if (!$noTbFlag) {
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('sentence', 'treebank', 'subtreebank', 'xpath'));
 
-require "$root/functions.php";
+require ROOT_PATH."/functions.php";
 
 if ($continueConstraints) {
 
-    require "$root/preparatory-scripts/prep-functions.php";
+    require ROOT_PATH."/preparatory-scripts/prep-functions.php";
     $id = session_id();
     $queryId = $_SESSION['queryid'];
     $treeVisualizer = true;
@@ -67,13 +67,13 @@ if ($continueConstraints) {
 }
 
 session_write_close();
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/front-end-includes/head.php";
 ?>
 
 <link rel="prefetch" href="js/min/results.min.js">
 </head>
 <?php flush(); ?>
-<?php require "$root/front-end-includes/header.php"; ?>
+<?php require ROOT_PATH."/front-end-includes/header.php"; ?>
 <?php if ($continueConstraints):
   $component = implode(', ', $component);
 
@@ -94,7 +94,7 @@ require "$root/front-end-includes/head.php";
 <?php if (!$xpChanged): ?>
   <h3>Query tree</h3>
 <div id="tree-output">
-    <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
+    <?php include ROOT_PATH."/front-end-includes/tv-wrappers.php"; ?>
 </div>
 <?php endif; ?>
 
@@ -112,8 +112,8 @@ require "$root/front-end-includes/head.php";
 <?php
     setPreviousPageMessage(4);
 endif;  // $continueConstraints
-require "$root/front-end-includes/footer.php";
-include "$root/front-end-includes/analytics-tracking.php";
+require ROOT_PATH."/front-end-includes/footer.php";
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints && !$xpChanged) : ?>
     <script src="js/tree-visualizer.js"></script>

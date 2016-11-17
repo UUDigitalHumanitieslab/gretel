@@ -2,12 +2,12 @@
 <html lang="en">
 
 <?php
-require '../config/config.php';
+require "../config.php";
 
 session_start();
 $id = session_id();
 
-require "$root/functions.php";
+require ROOT_PATH."/functions.php";
 ?>
 
 <head>
@@ -17,14 +17,14 @@ require "$root/functions.php";
 
 <body>
   <?php
-  $downloadPath = "$home/tmp/$id-gretel-results.txt";
+  $downloadPath = HOME_PATH."/tmp/$id-gretel-results.txt";
   ?>
 
   <div id="results-found">
       <p><strong class="amount-hits">--</strong> result(s) have/has been found!</p>
       <small class="is-still-counting">Still counting the total amount of hits. This can take a while but you can already download the first 500 results by clicking the button below.</small>
       <p class="is-restricted" style="display: none;">We have restricted the output to 500 hits. You can find the reason for this
-        <a href='<?php echo "$home/documentation.php#faq-1"; ?>' title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.<br>
+        <a href='<?php echo HOME_PATH."/documentation.php#faq-1"; ?>' title="Why is the output limited to 500 sentences?" target="_blank">in our FAQ</a>.<br>
       </p>
 
       <p>

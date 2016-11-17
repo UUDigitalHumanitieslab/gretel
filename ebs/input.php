@@ -22,19 +22,19 @@ session_unset();
 $currentPage = 'ebs';
 $step = 1;
 
-require '../config/config.php';
-require "$root/helpers.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
 
 $id = session_id();
 $time = time();
 $_SESSION['queryid'] = "$id-$time";
 
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$root/front-end-includes/header.php"; ?>
+<?php require ROOT_PATH."/front-end-includes/header.php"; ?>
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">
         <p>Enter a sentence, phrase, or constituent containing the (syntactic) characteristics you are looking for.</p>
         <div class="input-wrapper">
@@ -48,8 +48,8 @@ require "$root/front-end-includes/head.php";
     </form>
 
     <?php
-    require "$root/front-end-includes/footer.php";
-    include "$root/front-end-includes/analytics-tracking.php";
+    require ROOT_PATH."/front-end-includes/footer.php";
+    include ROOT_PATH."/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

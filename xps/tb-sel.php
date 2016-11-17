@@ -3,9 +3,9 @@
 $currentPage = 'xps';
 $step = 2;
 
-require '../config/config.php';
-require "$root/helpers.php";
-require "$root/preparatory-scripts/prep-functions.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/preparatory-scripts/prep-functions.php";
 
 session_cache_limiter('private');
 session_start();
@@ -19,8 +19,8 @@ if ($continueConstraints) {
     $_SESSION['xpath'] = $xpath;
 }
 
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 
 // Check if $xpath contains email addresses or website URLs
 $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
@@ -29,10 +29,10 @@ $isSpam = ($continueConstraints) ? isSpam($xpath) : false;
 </head>
 <?php flush(); ?>
 <?php
-require "$root/front-end-includes/header.php";
+require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam) {
-    require "$root/front-end-includes/tb-sel-shared-content.php";
+    require ROOT_PATH."/front-end-includes/tb-sel-shared-content.php";
 
     setContinueNavigation(); ?>
   </form>
@@ -53,8 +53,8 @@ else {
 ?>
 
 <?php
-require "$root/front-end-includes/footer.php";
-include "$root/front-end-includes/analytics-tracking.php";
+require ROOT_PATH."/front-end-includes/footer.php";
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

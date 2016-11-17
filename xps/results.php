@@ -6,8 +6,8 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = 'xps';
 $step = 3;
 
-require '../config/config.php';
-require "$root/helpers.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
 
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
@@ -34,7 +34,7 @@ if (isset($_POST['subtreebank'])) {
 
 $continueConstraints = !$noTbFlag && sessionVariablesSet(array('treebank', 'subtreebank', 'xpath'));
 if ($continueConstraints) {
-    require "$root/preparatory-scripts/prep-functions.php";
+    require ROOT_PATH."/preparatory-scripts/prep-functions.php";
     $treeVisualizer = true;
     $onlyFullscreenTv = true;
 
@@ -57,12 +57,12 @@ if ($continueConstraints) {
 
 session_write_close();
 
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 
 if ($continueConstraints) {
-  require "$root/basex-search-scripts/treebank-search.php";
-  require "$root/basex-search-scripts/basex-client.php";
+  require ROOT_PATH."/basex-search-scripts/treebank-search.php";
+  require ROOT_PATH."/basex-search-scripts/basex-client.php";
   session_start();
   if ($corpus == 'sonar') {
     $bf = xpathToBreadthFirst($xpath);
@@ -93,10 +93,10 @@ if ($continueConstraints) {
 </head>
 <?php flush(); ?>
 <?php
-require "$root/front-end-includes/header.php";
+require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints):
-    require "$root/front-end-includes/results-shared-content.php";
+    require ROOT_PATH."/front-end-includes/results-shared-content.php";
     setContinueNavigation();
 else: // $continueConstraints
     setErrorHeading();
@@ -107,23 +107,20 @@ else: // $continueConstraints
     setPreviousPageMessage(2);
 
 endif;
-require "$root/front-end-includes/footer.php";
-include "$root/front-end-includes/analytics-tracking.php";
+require ROOT_PATH."/front-end-includes/footer.php";
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints):
   ?>
-    <div class="loading-wrapper fullscreen tv">
-        <div class="loading"><p>Loading tree...<br>Please wait</p></div>
-    </div>
-    <?php include "$root/front-end-includes/notifications.php"; ?>
+    <?php include ROOT_PATH."/front-end-includes/notifications.php"; ?>
     <?php // Variables for JS
     $jsVars = array(
-        'fetchResultsPath' => "$home/basex-search-scripts/flush-results.php",
-        'getAllResultsPath' => "$home/basex-search-scripts/get-all-results.php",
-        'fetchCountsPath' => "$home/basex-search-scripts/get-counts.php",
-        'downloadPath' => "$home/tmp/$id-gretel-results.txt",
+        'fetchResultsPath' => HOME_PATH."/basex-search-scripts/flush-results.php",
+        'getAllResultsPath' => HOME_PATH."/basex-search-scripts/get-all-results.php",
+        'fetchCountsPath' => HOME_PATH."/basex-search-scripts/get-counts.php",
+        'downloadPath' => HOME_PATH."/tmp/$id-gretel-results.txt",
         'resultsLimit' => $resultsLimit,
-        'fetchHomePath' => $home,
+        'fetchHomePath' => HOME_PATH,
     );
     ?>
     <script>

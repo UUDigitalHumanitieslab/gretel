@@ -34,10 +34,10 @@ if (isset($_GET['db'])) {
     $db = $_GET['db'];
 }
 
-require '../config/config.php';
-require "$root/helpers.php";
-require "$root/functions.php";
-require "$root/basex-search-scripts/basex-client.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/basex-search-scripts/basex-client.php";
 
 try {
   $serverInfo;

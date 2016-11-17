@@ -13,8 +13,8 @@
 $currentPage = 'xps';
 $step = 1;
 
-require '../config/config.php';
-require "$root/helpers.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
 
 session_start();
 header('Content-Type:text/html; charset=utf-8');
@@ -27,12 +27,12 @@ session_unset();
 
 $id = session_id();
 
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php require "$root/front-end-includes/header.php"; ?>
+<?php require ROOT_PATH."/front-end-includes/header.php"; ?>
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
         <div class="input-wrapper">
@@ -61,8 +61,8 @@ require "$root/front-end-includes/head.php";
     </form>
 
     <?php
-    require "$root/front-end-includes/footer.php";
-    include "$root/front-end-includes/analytics-tracking.php";
+    require ROOT_PATH."/front-end-includes/footer.php";
+    include ROOT_PATH."/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

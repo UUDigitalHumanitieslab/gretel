@@ -1,9 +1,9 @@
 .gitignore*
 
-config/
 log/
 tmp/
 parsers/
 killall/
 
 prepros.cfg
+config.php

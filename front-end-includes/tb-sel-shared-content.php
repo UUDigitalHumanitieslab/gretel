@@ -30,12 +30,12 @@
   </div>
   <div class="corpora-wrapper">
       <div class="cgn" style="display:none">
-        <?php require "$root/front-end-includes/tb-cgn.php"; ?>
+        <?php require ROOT_PATH."/front-end-includes/tb-cgn.php"; ?>
       </div>
       <div class="lassy" style="display:none">
-        <?php require "$root/front-end-includes/tb-lassy.php"; ?>
+        <?php require ROOT_PATH."/front-end-includes/tb-lassy.php"; ?>
       </div>
       <div class="sonar" style="display:none">
-        <?php require "$root/front-end-includes/tb-sonar.php"; ?>
+        <?php require ROOT_PATH."/front-end-includes/tb-sonar.php"; ?>
       </div>
   </div>
