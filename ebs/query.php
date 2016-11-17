@@ -78,8 +78,8 @@ require ROOT_PATH."/front-end-includes/head.php";
   $component = implode(', ', $component);
 
   // Log query tree
-  $qTree = file_get_contents("$tmp/$id-sub.xml");
-  $treeLog = fopen("$log/gretel-querytrees.log", 'a');
+  $qTree = file_get_contents(ROOT_PATH."/tmp/$id-sub.xml");
+  $treeLog = fopen(ROOT_PATH."/log//gretel-querytrees.log", 'a');
   fwrite($treeLog, "<alpino_ds id=\"$queryId\">\n$qTree\n</alpino_ds>\n");
   fclose($treeLog);
 ?>

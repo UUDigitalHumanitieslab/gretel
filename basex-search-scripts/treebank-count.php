@@ -33,9 +33,9 @@ function getCounts($databases, $already, $session)
 function createCsvCounts($sum, $counts)
 {
     if (isset($counts) && count($counts) > 0 && $sum > 0) {
-        global $tmp, $id;
+        global $id;
 
-        $fileName = "$tmp/$id-gretel-distribution.csv";
+        $fileName = ROOT_PATH."/tmp/$id-gretel-distribution.csv";
         if (file_exists($fileName)) {
             unlink($fileName);
         }
