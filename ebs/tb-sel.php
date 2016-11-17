@@ -2,6 +2,7 @@
 <!-- tb-sel.php -->
 <!-- script for treebank selection; generates query tree and XPath in the background -->
 
+<!-- version 0.9 date: 17.11.2019  disable SoNaR search -->
 <!-- version 0.8 date: 19.03.2015  bug fix (add -CS for utf8 output) -->
 <!-- version 0.7 date: 12.12.2014  bug fix -->
 <!-- version 0.6 date: 15.10.2014  RELEASED WITH GrETEL2.0 -->
@@ -14,6 +15,7 @@
 /* Display errors*/
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
+
 require 'header.php';?>
 
 <style type="text/css">
@@ -27,58 +29,7 @@ require 'header.php';?>
 }
 </style>
 
-<script>
-// checkall LASSY function
-$(function () { // this line makes sure this code runs on page load
-	$('.checkall').click(function () {
-		$(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
-	});
-});
-// checkall CGN function
-$(function () { // this line makes sure this code runs on page load
-       $('.checknlfunction').click(function () {
-	       $(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
-        });
-});
-$(function () { // this line makes sure this code runs on page load
-    $('.checkvlfunction').click(function () {
-	    $(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
-	  });
-  });
-// show/hide subtreebanks
-$(document).ready(function(){
 
-    $('input[type="radio"]').click(function(){
-	if($(this).attr("value")=="cgn"){
-	  $(".box").hide();
-	  $(".cgn").show();
-	}
-	if($(this).attr("value")=="lassy"){
-	  $(".box").hide();
-	  $(".lassy").show();
-	}
-	if($(this).attr("value")=="sonar"){
-	  $(".box").hide();
-	  $(".sonar").show();
-	}
-      });
-  });
-
-$(document).ready(function(){
-    if (document.getElementById('cgn').checked) {
-      $(".box").hide();
-      $(".cgn").show();
-    }
-    if (document.getElementById('lassy').checked) {
-      $(".box").hide();
-      $(".lassy").show();
-    }
-    if (document.getElementById('sonar').checked) {
-      $(".box").hide();
-      $(".sonar").show();
-    }
-  });
-</script>
 </head>
 
 <body>
@@ -120,12 +71,13 @@ $step="step_four"; // for progress bar
 $title="<h1>Step 4: Select a treebank</h1><hr/>";
 
 $info='<p>
-You can search an entire treebank (default), or select just one or more components. For SoNaR it is currently only possible to select one component at a time.</p>';
+You can search an entire treebank (default), or select just one or more components. <!--  For SoNaR it is currently only possible to select one component at a time.--></p>';
 
 $info2='<p>
 Due to pre-processing difficulties some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts. </p>';
 
 $warning='<p>
+The SoNaR treebank is no longer available in GrETEL 2.0. An updated version is available via <a href="http://gretel.ccl.kuleuven.be/gretel3">GrETEL3</a>.
 Some SoNaR components cannot be queried using GrETEL (yet), as they lack some of the linguisitic annotations. If this is fixed in an updated version of SoNaR, those components will be included as well.</p>';
 
 /***********************************************************/
@@ -202,9 +154,9 @@ else {
   echo 'Which <b>treebank</b> do you want to query? Click on the treebank name to see its different <b>components</b>.<br/><br/>';
   echo '<form action="'.$next.'" method="post" >';
   echo '<div>
-        <label><input type="radio" name="treebank" value="cgn" id="cgn" >CGN</label><br/>
-        <label><input type="radio" name="treebank" value="lassy" id="lassy"  checked>LASSY</label><br/>
-        <label><input type="radio" name="treebank" value="sonar" id="sonar" >SoNaR</label><br/>
+        <b><label><input type="radio" name="treebank" value="cgn" id="cgn">CGN</label> treebank</b>: spoken Dutch -- version 2.0.1 <br/>
+        <b><label><input type="radio" name="treebank" value="lassy" id="lassy"  checked>LASSY</label> Small</b>: written Dutch -- version 1.1<br/>
+        <!-- b> <label><input type="radio" name="treebank" value="sonar" id="sonar" >SoNaR</label> treebank</b>: written Dutch -- version 1.0<br/ -->
         </div>';
 
   echo "$info";
@@ -241,4 +193,57 @@ else {
 </div>
 </div>
 </body>
+<script>
+// checkall LASSY function
+$(function () { // this line makes sure this code runs on page load
+	$('.checkall').click(function () {
+		$(this).parents('fieldset:eq(0)').find(':checkbox').attr('checked', this.checked);
+	});
+});
+// checkall CGN function
+$(function () { // this line makes sure this code runs on page load
+       $('.checknlfunction').click(function () {
+	       $(this).parents('fieldset:eq(0)').find(':checkbox.checknl').attr('checked', this.checked);
+        });
+});
+$(function () { // this line makes sure this code runs on page load
+    $('.checkvlfunction').click(function () {
+	    $(this).parents('fieldset:eq(0)').find(':checkbox.checkvl').attr('checked', this.checked);
+	  });
+  });
+// show/hide subtreebanks
+$(document).ready(function(){
+
+    $('input[type="radio"]').click(function(){
+	if($(this).attr("value")=="cgn"){
+	  $(".box").hide();
+	  $(".cgn").show();
+	}
+	if($(this).attr("value")=="lassy"){
+	  $(".box").hide();
+	  $(".lassy").show();
+	}
+	if($(this).attr("value")=="sonar"){
+	  $(".box").hide();
+	  $(".sonar").show();
+	}
+      });
+  });
+
+$(document).ready(function(){
+    if (document.getElementById('cgn').checked) {
+      $(".box").hide();
+      $(".cgn").show();
+    }
+    if (document.getElementById('lassy').checked) {
+      $(".box").hide();
+      $(".lassy").show();
+    }
+    if (document.getElementById('sonar').checked) {
+      $(".box").hide();
+      $(".sonar").show();
+    }
+  });
+</script>
+
 </html>

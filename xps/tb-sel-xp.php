@@ -183,8 +183,8 @@ else {
 echo 'Which <b>treebank</b> do you want to query? Click on the treebank name to see its different <b>components</b>.<br/><br/>';
 echo '<form action="'.$next.'" method="post" >';
 echo '<div>
-        <label><input type="radio" name="treebank" value="cgn" id="cgn" >CGN</label><br/>
-        <label><input type="radio" name="treebank" value="lassy" id="lassy"  checked>LASSY</label><br/>
+        <b><label><input type="radio" name="treebank" value="cgn" id="cgn">CGN</label> treebank</b>: spoken Dutch -- version 2.0.1 <br/>
+        <b><label><input type="radio" name="treebank" value="lassy" id="lassy"  checked>LASSY</label> Small</b>: written Dutch -- version 1.1<br/>
         </div>';
 
 echo "$info";

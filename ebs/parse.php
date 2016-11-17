@@ -59,7 +59,7 @@ $title="<h1>Step 2: Input Parse</h1>
 $captcha="This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
 $info='The structure of the <strong>tagged</strong><a href="#" class="clickMe" tooltip="indicating <em>word classes</em>, like <strong>n</strong> (noun)"> <sup>[?]</sup></a> and <strong>parsed</strong><a href="#" class="clickMe" tooltip="indicating <em>dependencies</em> (or relations), like <strong>su</strong> (subject) and <em>constituents</em>, like <strong>np</strong> (noun phrase)"> <sup>[?]</sup></a> sentence: ';
 
-$info2='<p>If the analysis is different from what you expected, you can enter <a href="#" class="clickMe" tooltip="Use the <strong>New</strong> button (top right hand side)"> another input example</a>.</p>';
+$info2='<p>If the analysis is different from what you expected, you can try another input example.</p>';
 
 
 // set search mode
