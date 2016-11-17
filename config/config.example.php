@@ -5,6 +5,7 @@ $home="http://localhost/gretel-2.0";
 // GrETEL 2.0 home directory
 $root="/path/to/gretel/gretel-2.0";
 
+$version="2.0.2";
 
 // paths to other directories
 $tmp="$root/tmp"; // tmp dir

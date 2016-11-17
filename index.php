@@ -18,12 +18,19 @@
 <script type="text/javascript" src="js/tooltip.js" ></script>
 <script type="text/javascript" src="js/browserDetection.js" ></script>
 <?php include_once("scripts/AnalyticsTracking.php") ?>
+
+<style>
+td {
+   vertical-align: top;
+   padding: 10px 30px;
+}
+</style>
 </head>
 
 <body>
 <div id="container">
 <div id="ccl-logo">
-<a href="http://ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60"></img></a>
+<a href="http://www.ccl.kuleuven.be" target="_blank"><img src="img/ccl-logo-square.png" height="60"></img></a>
 </div>
 
 <h1>GrETEL 2.0</h1>
@@ -45,7 +52,28 @@
 <p>Please <b>cite</b> the following paper if you are using GrETEL for your research:<br/><br/>
 Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a> In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012). Istanbul, Turkey. pp. 3161-3167</p>
 
+GrETEL is developed at the <a href="http://www.ccl.kuleuven.be" target="_blank">Centre for Computational Linguistics (CCL)</a>. For questions or comments on the content of this website, or if you want to become a member of our user group, you can contact us at <a href="mailto:gretel@ccl.kuleuven.be">gretel@ccl.kuleuven.be</a>.
+
+<br/>
 <h2>Documentation</h2>
+<table>
+<tr>
+<td>
+<h4>Information</h4>
+<ul>
+<li><a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and documentation</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications and Talks</a></li>
+</ul>
+</td>
+<td>
+<h4>Related tools</h4>
+<ul>
+<li><a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a></li>
+</ul>
+</td>
+<td>
 <h4>Tutorials</h4>
 <ul>
 <li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf" target="_blank">Slides</a></li>
@@ -53,19 +81,18 @@ Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="
 <li><a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf" target="_blank">CLARIN Educational Module</a></li>
 <li><a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html" target="_blank">Combined Case Study MIMORE - GrETEL</a></li>
 </ul>
+</td>
+<td>
 
-<h4>Information</h4>
-<ul>
-<li><a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and documentation</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications and Talks</a></li>
-</ul>
+</td>
+</tr>
+</table>
 
-<h4>Related tools</h4>
-<ul>
-<li><a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans</a></li>
-<li><a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a></li>
-</ul>
+<hr>
+
+<div id="footer">
+<p>version 2.0.2  &copy; 2016 Liesbeth Augustinus</p>
+</div>
 
 </div>
 </body>

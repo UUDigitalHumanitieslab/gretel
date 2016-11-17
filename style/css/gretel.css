@@ -32,6 +32,16 @@ padding: 2%;
 #ccl-logo {
     float: right;
 }
+
+#footer {
+text-align: center;
+background:#fff;
+//border: 1px solid #ccc;
+clear: both;
+//height:150%;
+}
+
+
 nav #ccl-logo {
     float:none;
 }
@@ -48,7 +58,7 @@ a {
 /* mouse over */
 a:hover {
     color:  grey;
-    font-weight:bold;
+    //font-weight:bold;
 }
 
 a {

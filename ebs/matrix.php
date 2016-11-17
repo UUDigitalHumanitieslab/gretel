@@ -209,6 +209,11 @@ echo "<br/>";
 echo $new.$back.$continue;
 echo "</form>";
 ?>
+<br/><br/><br/>
+<hr>
+<div id="footer">
+<p>version <?php echo "$version";?>  &copy; 2016 Liesbeth Augustinus</p>
+</div>
 </div>
 </body>
 </html>

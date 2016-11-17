@@ -5,6 +5,7 @@ $home="http://gretel.ccl.kuleuven.be/gretel-lies";
 // GrETEL 2.0 home directory
 $root="/home/paco/web/gretel/gretel-lies";
 
+$version="2.0.2";
 
 // paths to other directories
 $tmp="$root/tmp"; // tmp dir
