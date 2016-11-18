@@ -77,7 +77,7 @@ $info2='<p>
 Due to pre-processing difficulties some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts. </p>';
 
 $warning='<p>
-The SoNaR treebank is no longer available in GrETEL 2.0. An updated version is available via <a href="http://gretel.ccl.kuleuven.be/gretel3">GrETEL3</a>.
+The SoNaR treebank is no longer available in GrETEL 2.0. An updated version is available via <a href="http://gretel.ccl.kuleuven.be/gretel3">GrETEL 3</a>.
 Some SoNaR components cannot be queried using GrETEL (yet), as they lack some of the linguisitic annotations. If this is fixed in an updated version of SoNaR, those components will be included as well.</p>';
 
 /***********************************************************/

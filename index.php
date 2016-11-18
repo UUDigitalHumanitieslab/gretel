@@ -78,7 +78,7 @@ GrETEL is developed at the <a href="http://www.ccl.kuleuven.be" target="_blank">
 <ul>
 <li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf" target="_blank">Slides</a></li>
 <li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial-handson.pdf" target="_blank">Exercises</a></li>
-<li><a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf" target="_blank">CLARIN Educational Module</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/docs/GrETEL-EducationalModule.pdf" target="_blank">CLARIN Educational Module</a></li>
 <li><a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html" target="_blank">Combined Case Study MIMORE - GrETEL</a></li>
 </ul>
 </td>
