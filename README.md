@@ -5,8 +5,9 @@ GrETEL 2.0
 ----------
 
 --- INFO ---
+v2.0.2 November 2016: minor bug fixes + SoNaR disabled 
 v2.0.1 March 2016: minor bug fixes
-v2.0 November 2014: delivered to the TST-Centrale
+v2.0   November 2014: delivered to the TST-Centrale
 
 URL: http://gretel.ccl.kuleuven.be/gretel-2.0
 
