@@ -29,8 +29,8 @@
         <?php endif;
         endif;
     endif;?>
-    <?php include "$root/front-end-includes/results-controls.php"; ?>
-    <?php require "$root/front-end-includes/results-table-wrapper.php"; ?>
+    <?php include ROOT_PATH."/front-end-includes/results-controls.php"; ?>
+    <?php require ROOT_PATH."/front-end-includes/results-table-wrapper.php"; ?>
   </div>
 </section>
 

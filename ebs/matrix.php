@@ -23,8 +23,8 @@
  $currentPage = 'ebs';
  $step = 3;
 
- require '../config/config.php';
- require "$root/helpers.php";
+ require "../config.php";
+ require ROOT_PATH."/helpers.php";
 
 $continueConstraints = sessionVariablesSet(array('example', 'sentence'));
 
@@ -35,14 +35,14 @@ if ($continueConstraints) {
     $input = $_SESSION['example'];
 }
 
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require "$root/front-end-includes/header.php";
+require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints):
   // Set tokenized input sentence to variable
@@ -126,7 +126,7 @@ if ($continueConstraints):
   </div>
 
   <div id="tree-output">
-      <?php include "$root/front-end-includes/tv-wrappers.php"; ?>
+      <?php include ROOT_PATH."/front-end-includes/tv-wrappers.php"; ?>
   </div>
   <?php setContinueNavigation(); ?>
 </form>
@@ -141,12 +141,12 @@ endif;
 
 session_write_close();
 
-require "$root/front-end-includes/footer.php";
-include "$root/front-end-includes/analytics-tracking.php";
+require ROOT_PATH."/front-end-includes/footer.php";
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 
 <script>
-    var getTreePathScript = <?php echo json_encode("$home/preparatory-scripts/process-input-example.php"); ?>;
+    var getTreePathScript = <?php echo json_encode(HOME_PATH."/preparatory-scripts/process-input-example.php"); ?>;
 </script>
 </body>
 </html>

@@ -40,7 +40,7 @@
             <span class="sr-only">Go to the top of the page</span>
           </button>
           <div class="logo-wrapper">
-            <?php include "$root/img/logo-image-gretel.svg"; ?>
+            <?php include ROOT_PATH."/img/logo-image-gretel.svg"; ?>
           </div>
       </aside>
     </div>
@@ -78,7 +78,7 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js"></script>
 <?php if (isset($treeVisualizer) && $treeVisualizer):
     if (isset($onlyFullscreenTv) && $onlyFullscreenTv) {
-        include "$root/front-end-includes/tv-wrappers.php";
+        include ROOT_PATH."/front-end-includes/tv-wrappers.php";
     } ?>
     <script src="js/tree-visualizer.js"></script>
 <?php endif; ?>

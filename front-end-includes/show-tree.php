@@ -34,10 +34,10 @@ if (isset($_GET['db'])) {
     $db = $_GET['db'];
 }
 
-require '../config/config.php';
-require "$root/helpers.php";
-require "$root/functions.php";
-require "$root/basex-search-scripts/basex-client.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/basex-search-scripts/basex-client.php";
 
 try {
   $serverInfo;
@@ -98,7 +98,7 @@ function treeHighlighter($xmlString, $xpath) {
     }
   }
   else {
-      $errorLog = fopen("$log/xml2tree.log", 'a');
+      $errorLog = fopen(ROOT_PATH."/log//xml2tree.log", 'a');
       fwrite($errorLog, "Can't find $xpath\n");
       fclose($errorLog);
 

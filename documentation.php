@@ -2,14 +2,14 @@
 
 $currentPage="docs";
 
-require "config/config.php";
-require "$root/helpers.php";
-require "$root/functions.php";
-require "$root/front-end-includes/head.php";
+require "config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 
-        <?php require "$root/front-end-includes/header.php"; ?>
+        <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
             <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
                 frequently asked questions, and other information. If you have any more questions, you can always
                 <a href="documentation.php#faq-4" title="FAQ how to contact us">contact us</a>.</p>
@@ -119,8 +119,8 @@ require "$root/front-end-includes/head.php";
     </div>
 
     <?php
-    require "$root/front-end-includes/footer.php";
-    include "$root/front-end-includes/analytics-tracking.php";
+    require ROOT_PATH."/front-end-includes/footer.php";
+    include ROOT_PATH."/front-end-includes/analytics-tracking.php";
     ?>
 </body>
 </html>

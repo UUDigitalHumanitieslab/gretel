@@ -6,22 +6,22 @@
  */
 
 function alpino($sentence,$id) {
-  require("../config/config.php"); // load configuration file to get Alpino variables ($alpinoHome and $tmp)
-
+    global $alpinoDirectory;
   $descriptorspec = array(
 			  0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 			  1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-			  2 => array("file", "/tmp/alpino.log", "a") // stderr is a file to write to
+			  2 => array("file", ROOT_PATH."/log/alpino.log", "a") // stderr is a file to write to
 			  );
 
   $cwd = '/';
-  $env = array('ALPINO_HOME' => "$alpinoHome");
-  $alpino = "$alpinoHome/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
+  $env = array('ALPINO_HOME' => $alpinoDirectory);
+  $tmp = ROOT_PATH . '/tmp';
+  $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
 
   $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
   if (!is_resource($process)) {
-   die('error');
+   die('Error when parsing input with Alpino');
   }
   if (is_resource($process)) {
     // $pipes now looks like this:
@@ -46,6 +46,6 @@ function alpino($sentence,$id) {
     //    echo "command returned $return_value\n";
   }
 
-  return "$tmp/$id.xml"; //return parse location
+  return ROOT_PATH."/tmp/$id.xml"; //return parse location
 
 }

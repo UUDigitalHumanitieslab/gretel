@@ -199,10 +199,10 @@ function tokenize($sentence)
   return $sentence;
 }
 
-function modifyLemma($parse, $id, $tmp)
+function modifyLemma($parse, $id)
 {
-    $parseloc = "$tmp/$id-pt.xml";
-    $output = fopen($parseloc, 'w');
+    $parseLocation = ROOT_PATH."/tmp/$id-pt.xml";
+    $output = fopen($parseLocation, 'w');
     // Read alpino parse
     $xml = simpledom_load_file($parse);
     // Sort terminal nodes by 'begin' attribute
@@ -221,8 +221,6 @@ function modifyLemma($parse, $id, $tmp)
     $tree = $xml->asXML();
     fwrite($output, $tree);
     fclose($output);
-
-    return $parseloc;
 }
 
 function applyCs($xpath) {

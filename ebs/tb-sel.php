@@ -6,10 +6,10 @@ header('Content-Type:text/html; charset=utf-8');
 $currentPage = 'ebs';
 $step = 4;
 
-require '../config/config.php';
-require "$root/helpers.php";
-require "$root/functions.php";
-require "$root/preparatory-scripts/prep-functions.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/preparatory-scripts/prep-functions.php";
 
 $continueConstraints = sessionVariablesSet(array('example', 'sentence')) && postVariablesSet(array('manualMode', 'originalXp'));
 $continueConstraints = $continueConstraints && (isset($_POST['xpath']) || isset($_SESSION['xpath']));
@@ -24,11 +24,11 @@ if ($continueConstraints) {
   $id = session_id();
 }
 session_write_close();
-require "$root/front-end-includes/head.php";
+require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 <?php
-require "$root/front-end-includes/header.php";
+require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam):
   session_start();
@@ -38,7 +38,7 @@ if ($continueConstraints && !$isSpam):
   $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
   session_write_close();
 
-  if (!file_exists("$tmp/$id-sub.xml") || filesize("$tmp/$id-sub.xml") == 0 || !$continueConstraints):
+  if (!file_exists(ROOT_PATH."//tmp/$id-sub.xml") || filesize(ROOT_PATH."//tmp/$id-sub.xml") == 0 || !$continueConstraints):
     setErrorHeading();
   ?>
 
@@ -47,7 +47,7 @@ if ($continueConstraints && !$isSpam):
 
   <?php setPreviousPageMessage(3);
   else:
-    require "$root/front-end-includes/tb-sel-shared-content.php";
+    require ROOT_PATH."/front-end-includes/tb-sel-shared-content.php";
     setContinueNavigation(); ?>
     </form>
   <?php endif;
@@ -63,8 +63,8 @@ else:
     setPreviousPageMessage($step - 1);
 endif;
 
-require "$root/front-end-includes/footer.php";
-include "$root/front-end-includes/analytics-tracking.php";
+require ROOT_PATH."/front-end-includes/footer.php";
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 </body>
 </html>

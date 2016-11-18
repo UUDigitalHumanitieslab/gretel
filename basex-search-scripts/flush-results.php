@@ -4,11 +4,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-require '../config/config.php';
-require "$root/functions.php";
+require "../config.php";
+require ROOT_PATH."/functions.php";
 
-require "$root/basex-search-scripts/basex-client.php";
-require "$root/basex-search-scripts/treebank-search.php";
+require ROOT_PATH."/basex-search-scripts/basex-client.php";
+require ROOT_PATH."/basex-search-scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);

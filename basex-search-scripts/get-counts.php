@@ -1,11 +1,11 @@
 <?php
 
-require '../config/config.php';
-require "$root/functions.php";
+require "../config.php";
+require ROOT_PATH."/functions.php";
 
-require "$root/basex-search-scripts/basex-client.php";
-require "$root/basex-search-scripts/treebank-count.php";
-require "$root/basex-search-scripts/treebank-search.php";
+require ROOT_PATH."/basex-search-scripts/basex-client.php";
+require ROOT_PATH."/basex-search-scripts/treebank-count.php";
+require ROOT_PATH."/basex-search-scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);

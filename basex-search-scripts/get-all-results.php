@@ -4,11 +4,11 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-require '../config/config.php';
-require "$root/functions.php";
+require "../config.php";
+require ROOT_PATH."/functions.php";
 
-require "$root/basex-search-scripts/basex-client.php";
-require "$root/basex-search-scripts/treebank-search.php";
+require ROOT_PATH."/basex-search-scripts/basex-client.php";
+require ROOT_PATH."/basex-search-scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);
@@ -43,12 +43,12 @@ $time = time();
 $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 if ($ebsxps == 'ebs') {
-    $xplog = fopen("$log/gretel-ebq.log", 'a');
+    $xplog = fopen(ROOT_PATH."/log//gretel-ebq.log", 'a');
     // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
     fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$corpus\t$componentsString\t$xpChanged\t$xpath\t$originalXp\n");
     fclose($xplog);
 } else {
-    $xplog = fopen("$log/gretel-xps.log", 'a');
+    $xplog = fopen(ROOT_PATH."/log//gretel-xps.log", 'a');
     fwrite($xplog, "$date\t$user\t$id-$time\t$corpus\t$componentsString\t$xpath\n");
     fclose($xplog);
 }
@@ -71,7 +71,7 @@ try {
     if (isset($sentences)) {
         // Write results to file so that they can be downloaded later on
         // If the file already exists, remove it and re-create it (just to be sure)
-        $fileName = "$tmp/$id-gretel-results.txt";
+        $fileName = ROOT_PATH."/tmp/$id-gretel-results.txt";
         if (file_exists($fileName)) {
             unlink($fileName);
         }

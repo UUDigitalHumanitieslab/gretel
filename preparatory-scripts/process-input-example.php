@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-require '../config/config.php';
-require "$root/helpers.php";
-require "$root/functions.php";
-require "$root/preparatory-scripts/prep-functions.php";
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/preparatory-scripts/prep-functions.php";
 
 $id = session_id();
 
-$lpxml = simplexml_load_file("$tmp/$id-pt.xml");
+$lpxml = simplexml_load_file(ROOT_PATH."/tmp/$id-pt.xml");
 
 // Set tokenized input sentence to variable
 $tokinput = $_SESSION['sentence'];
@@ -34,7 +34,7 @@ foreach ($sentence as $begin => $word) {
     }
 }
 // save parse with @interesting annotations
-$treefileName = "$tmp/$id-int.xml";
+$treefileName = ROOT_PATH."/tmp/$id-int.xml";
 if (file_exists($treefileName)) {
     unlink($treefileName);
 }
@@ -51,7 +51,9 @@ if (isset($_POST['topcat'])) {
     $remove = 'rel';
 }
 
-`perl -CS $root/preparatory-scripts/get-subtree.pl $tmp/$id-int.xml $remove > $tmp/$id-sub.xml`;
+$subTreefileName = ROOT_PATH."/tmp/$id-sub.xml";
+$pathToRoot = ROOT_PATH;
+`perl -CS $pathToRoot/preparatory-scripts/get-subtree.pl $treefileName $remove > $subTreefileName`;
 
 if (isset($_POST['order'])) {
     $order = 'true';
@@ -61,7 +63,7 @@ if (isset($_POST['order'])) {
 }
 
 // generate XPath from sentence
-$xpath = `perl -CS $root/preparatory-scripts/xpath-generator.pl $tmp/$id-sub.xml $order`;
+$xpath = `perl -CS $pathToRoot/preparatory-scripts/xpath-generator.pl $subTreefileName $order`;
 $xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath);
 
 // Apply case (in)sensitivity where necessary

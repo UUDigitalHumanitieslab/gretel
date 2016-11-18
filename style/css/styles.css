@@ -1011,13 +1011,13 @@ dd p:last-child {
 }
 
 body.tv-is-loading #tree-output,
-body:not(.tv-success) #tree-output {
+body:not(.tv-success):not(.tv-fail) #tree-output {
   position: relative;
   z-index: 2;
 }
 
 body.tv-is-loading #tree-output::before,
-body:not(.tv-success) #tree-output::before {
+body:not(.tv-success):not(.tv-fail) #tree-output::before {
   position: absolute;
   bottom: 0;
   left: 0;
