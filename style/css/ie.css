@@ -4,7 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png");
+  background-image: url("../../../img/ie8-bg-fix-black.png");
 }
 
 .is-ie {
