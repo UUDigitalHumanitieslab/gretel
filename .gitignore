@@ -1,7 +1,14 @@
 .gitignore*
+*.png
+*.ico
+*~
 
-config/
 log/
 tmp/
 parsers/
 
+prepros.cfg
+config.php
+sitemap.xml
+robots.txt
+.htaccess

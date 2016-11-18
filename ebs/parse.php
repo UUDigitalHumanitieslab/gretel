@@ -1,144 +1,104 @@
-<html>
-<!-- parse.php -->
-<!-- show Alpino input parse -->
+<?php
+/**
+ * EBS STEP 2: Displays a parse of the input sentence.
+ *
+ *
+ *
+ * @author Liesbeth Augustinus
+ * @author Bram Vanroy
+ *
+ * @see /functions.php  buildEbsMatrix(), isSpam()
+ */
+session_cache_limiter('private');
 
-<!-- version 0.4 date: 14.10.2014  RELEASED WITH GrETEL2.0 -->
-<!-- written by Liesbeth Augustinus (c) 2014 -->
-<!-- for the GrETEL2.0 project -->
-
-<head>
-
-<?php 
-require 'header.php';
-/* Display errors*/
-//error_reporting(E_ALL);
-//ini_set('display_errors', 1); 
-?>
-</head>
-
-<body>
-<div id="container">
-<?php session_cache_limiter('private'); //  avoids page reload when going back
 session_start();
 header('Content-Type:text/html; charset=utf-8');
 
-/***********************************************************/
-/* VARIABLES */
-$id= session_id();
-$input = $_POST['input'];
-$date=date('d-m-Y');
-$time=time(); // time stamp
+$currentPage = 'ebs';
+$step = 2;
 
-if (getenv('REMOTE_ADDR')){
-$user = getenv('REMOTE_ADDR');
-}
-else {
-$user="anonymous";
-}
+require "../config.php";
+require ROOT_PATH."/helpers.php";
+require ROOT_PATH."/preparatory-scripts/prep-functions.php";
+require ROOT_PATH."/functions.php";
+require ROOT_PATH."/preparatory-scripts/alpino-parser.php";
+require ROOT_PATH."/preparatory-scripts/simple-dom.php";
 
-// dir to includes
-$alpino="$scripts/AlpinoParser.php";
-$tokenizer="$scripts/Tokenizer.php";
-$simpledom="$scripts/SimpleDOM.php";
-$modlem="$scripts/ModifyLemma.php";
+$continueConstraints = isset($_POST['input']);
 
-// log files
-$grtllog="$log/gretel-ebq.log";
+if ($continueConstraints) {
+    $treeVisualizer = true;
+    $id = session_id();
 
-// navigation
-$start="input.php";
-$next="matrix.php";
-$new='<button type="button" onclick="window.location.href=\''.$start.'?'.$time.'\'">New Input Example</button>';
-$back='<button type="button" value="Back" onclick="goBack()">Back</button>';
-$continue='<div style="float:right"><button type="Submit" value="Continue" class="colour">Continue</button></div>';
-$step="step_two"; // for progress bar
-$title="<h1>Step 2: Input Parse</h1>
-<hr/>";
-
-// messages
-$captcha="This is a suspicious input example. GrETEL does not accept URL's or HTML as input.";
-$info='The structure of the <strong>tagged</strong><a href="#" class="clickMe" tooltip="indicating <em>word classes</em>, like <strong>n</strong> (noun)"> <sup>[?]</sup></a> and <strong>parsed</strong><a href="#" class="clickMe" tooltip="indicating <em>dependencies</em> (or relations), like <strong>su</strong> (subject) and <em>constituents</em>, like <strong>np</strong> (noun phrase)"> <sup>[?]</sup></a> sentence: ';
-
-$info2='<p>If the analysis is different from what you expected, you can try another input example.</p>';
-
-
-// set search mode
-if ($_POST['search']=="basic") {
-  $_SESSION['search']="basic";
-}
-else {
-  $_SESSION['search']="advanced";
+    $input = $_POST['input'];
 }
 
-$sm=$_SESSION['search'];
+// Check if $input contains email addresses or website URLs
+$isSpam = ($continueConstraints) ? isSpam($input) : false;
 
-/***********************************************************/
-/* INCLUDES */
-require("$navigation");
-require("$tokenizer");
-require("$simpledom");
-require("$alpino");
-require("$modlem");
-/***********************************************************/
+require ROOT_PATH."/front-end-includes/head.php";
+?>
+</head>
+<?php flush(); ?>
+<?php
+require ROOT_PATH."/front-end-includes/header.php";
 
-if (preg_match('/(http:\/\/.*)|(<.*)|(.*>)/', $input)==1) { // check for spam
-  echo "<h3>Error</h3>";
-  echo $captcha."\n<br/><br/>";
-  echo $back;
-  exit;
+if ($continueConstraints && !$isSpam) {
+
+    $_SESSION['example'] = $input;
+
+    // Prepare/clean up input to be tokenized in next step
+    $tokinput = tokenize($input);
+    $_SESSION['sentence'] = $tokinput;
+    $parse = alpino($tokinput, $id);
+    modifyLemma($parse, $id);
+?>
+
+  <p>You find the structure of the tagged and parsed sentence below.
+    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun),
+    and parsing shows <em>dependencies</em> (or relations),
+     such as <code>su</code> (subject) and <em>constituents</em>,
+     such as <code>np</code> (noun phrase).
+  </p>
+
+  <p>Your input sentence was: <em><?php echo $tokinput; ?></em></p>
+
+  <div id="tree-output">
+      <?php include ROOT_PATH."/front-end-includes/tv-wrappers.php"; ?>
+  </div>
+
+  <form action="ebs/matrix.php" method="post" enctype="multipart/form-data">
+    <p>If the analysis is different from what you expected, you can enter
+      <a href="ebs/input.php" title="Example-based search">a new input example</a>.
+    </p>
+    <?php setContinueNavigation(); ?>
+  </form>
+<?php
+} else {
+    if ($isSpam):
+        setErrorHeading("spam detected"); ?>
+        <p>Your input example contained a hyperlink or email address and is seen as spam. Therefore we will not allow you to continue. </p>
+    <?php else:
+        setErrorHeading('variables undefined'); ?>
+        <p>It seems that you did not enter an input sentence. It is also
+        possible that you came to this page directly without first entering an input example.</p>
+    <?php endif;
+    setPreviousPageMessage($step-1);
 }
 
-elseif(!$input || empty($input)) {
-  echo "<h3>Error</h3>";
-  echo "Please provide an <b>input example</b>. \n<br/><br/>";
-  echo $back;
-  exit;
-}
+session_write_close();
 
-else { // LOG INPUT
-  $log = fopen($grtllog, "a");  //concatenate sentences
-  fwrite($log, "\n$date\t$user\t$id-$time\t$sm\t$input\n");
-  fclose($log);
-  $_SESSION['sentid']="$id-$time";
-  $_SESSION['example']="$input";  // for retrieving input example on other pages
-}
-
-//ALPINO
-$tokinput = Tokenize($input);
-$_SESSION['sentence']="$tokinput";
-
-$parse = Alpino($tokinput,$id); // $parse = parse location
-
-//MODIFY LEMMA
-$parseloc=ModifyLemma($parse,$id,$tmp); // returns parse location
-
-//ADD STYLE
-`perl  $scripts/xml2tree.pl $tmp/$id-pt.xml '//node[@rel]' 'psonar' > $tmp/$id-style.xml`; //add stylesheet to input parse
-`perl  $scripts/xml2tree.pl $tmp/$id-pt.xml '//node[@rel ]' 'zsonar'> $tmp/$id-style-zoom.xml`; //add stylesheet (zoom function) to input parse
-
-// INFO
-echo "$title";
-echo "$info";
-echo "<i>$tokinput</i></p><br/>";
-
-// DRAW INPUT PARSE
-$inputparse=$home."/tmp/$id-style.xml?$time";
-$inputzoom=$home."/tmp/$id-style-zoom.xml?$time";
-
-echo '<table border=1 class="hd" width="100%"><tr><th>Alpino parse of the input example [<a href="'.$inputzoom.'" target="_blank">full screen</a>]</th></tr>';
-echo "<td><iframe name=\"treeimg\" src=\"".$inputparse."\">Sorry, your browser does not support iframes.</iframe></td>
-</tr></table>";
-
-echo '
-<form action="'.$next.'" method="post" enctype="multipart/form-data" >
-';
-echo "<br/>";
-echo $info2;
-echo $new;
-echo $back;
-echo $continue;
-
-echo "</form>";
+require ROOT_PATH."/front-end-includes/footer.php";
+if ($continueConstraints) : ?>
+  <script>
+  $(function() {
+      $("#tree-output").treeVisualizer('<?php echo "tmp/$id-pt.xml"; ?>', {
+        sentence: '<?php echo $input; ?>'
+    });
+  });
+  </script>
+<?php endif;
+include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 <br/><br/><br/>
 <hr>
@@ -146,5 +106,12 @@ echo "</form>";
 <p>version <?php echo "$version";?>  &copy; 2016 Liesbeth Augustinus</p>
 </div>
 </div>
+<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
+<script>
+$.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml', {
+    container: "#tree-output"
+});
+</script>
+
 </body>
 </html>
