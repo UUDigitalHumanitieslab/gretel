@@ -41,4 +41,4 @@ Available at http://gretel.ccl.kuleuven.be/gretel3
 
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design
-* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [mhkuu](https://github.com/mhkuu) for beta testing.
+* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis) for beta testing.
