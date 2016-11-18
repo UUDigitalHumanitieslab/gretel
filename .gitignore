@@ -1,6 +1,7 @@
 .gitignore*
 *.png
 *.ico
+*~
 
 log/
 tmp/
