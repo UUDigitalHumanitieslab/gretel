@@ -6,7 +6,6 @@
 log/
 tmp/
 parsers/
-img/
 
 prepros.cfg
 config.php
