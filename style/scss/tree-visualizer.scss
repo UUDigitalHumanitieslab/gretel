@@ -92,9 +92,8 @@
     .tv-tree {
         display: flex;
         overflow: scroll;
-        justify-content: center;
         align-items: center;
-        flex: 1;
+        flex: 1 0 0%;
 
         ol {
             position: relative;
@@ -113,9 +112,8 @@
         }
 
         > ol {
-            /* Center inside flexbox */
             margin: auto;
-            padding-top: 0;
+            padding: 6em 1.26em 1.26em 1.26em;
         }
 
         li {
@@ -614,7 +612,7 @@
         width: 360px;
         height: 360px;
         border-radius: 50%;
-        background: url("http://gretel.ccl.kuleuven.be/gretel-bram/img/logo-image-gretel.svg") no-repeat;
+        background: url("../../../img/logo-image-gretel.svg") no-repeat;
         background-position: center bottom;
         background-size: contain;
         transform: translate(-50%, -67%);
