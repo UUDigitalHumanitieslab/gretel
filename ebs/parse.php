@@ -101,12 +101,5 @@ if ($continueConstraints) : ?>
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 </div>
-<script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
-<script>
-$.treeVisualizer('<?php echo "$home/tmp/$id"; ?>-pt.xml', {
-    container: "#tree-output"
-});
-</script>
-
 </body>
 </html>
