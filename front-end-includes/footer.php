@@ -32,6 +32,7 @@
             <h3>Credits</h3>
           <p>Concept and initial implementation by <a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author">Liesbeth Augustinus</a>,<br>
             GrETEL 3 improvements and design by <a href="http://bramvanroy.be" title="Bram Vanroy homepage" target="_blank" rel="author">Bram Vanroy</a></p>
+      <p><?php echo "version $version $date";?></p>
         </div>
       </aside>
       <aside class="other">

@@ -100,11 +100,6 @@ if ($continueConstraints) : ?>
 <?php endif;
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
-<br/><br/><br/>
-<hr>
-<div id="footer">
-<p>version <?php echo "$version";?>  &copy; 2016 Liesbeth Augustinus</p>
-</div>
 </div>
 <script src="<?php echo $home; ?>/js/min/tree-visualizer.min.js"></script>
 <script>
