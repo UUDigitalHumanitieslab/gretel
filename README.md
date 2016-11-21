@@ -1,17 +1,14 @@
-# gretel
+# GrETEL 2.0
 
-----------
-GrETEL 2.0
-----------
-
---- INFO ---
+## INFO
+v2.0.3 November 2016: bug fix footer
 v2.0.2 November 2016: minor bug fixes + SoNaR disabled 
 v2.0.1 March 2016: minor bug fixes
 v2.0   November 2014: delivered to the TST-Centrale
 
-URL: http://gretel.ccl.kuleuven.be/gretel-2.0
+Available at http://gretel.ccl.kuleuven.be/gretel-2.0
 
---- INSTALLATION ---
+## INSTALLATION
 
 1. Download GrETEL
 2. Create directories log, tmp, and parsers (make sure tmp and log are writable)
@@ -24,6 +21,11 @@ URL: http://gretel.ccl.kuleuven.be/gretel-2.0
    - Set paths to BaseX database locations (@basexpaths)
    - Set BaseX database servers (@dbname_server)
 
---- KNOWN BUGS ---
+## KNOWN BUGS
 
 - Tree visualisation is no longer supported in Google Chrome
+
+## Credits
+
+* [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/)
+* Centre for Computational Linguistics, KU Leuven (http://www.ccl.kuleuven.be)
