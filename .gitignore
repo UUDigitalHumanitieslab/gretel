@@ -1,6 +1,9 @@
 .gitignore*
 
-config/
+*~
+config.php
+config/config.php
+config/config.pm
 log/
 tmp/
 parsers/

@@ -62,14 +62,9 @@ if (isset($_SESSION['xpath'])) { // find previous input example
 <textarea rows="5" cols="100" name="xpinput" wrap="soft" id="xpath">'.$inputxp.'</textarea><button type="button" onClick="copyText();" id="clear" title="This button clears the input box above, allowing you to enter a new query without having to delete the current input character by character">Clear</button><br/><p><b>OR</b> upload a file containing an XPath expression</p><input type="file" name="xpfile"/><br/><br/>';
 
 echo $continue;
+echo '<br/>';
+require 'footer.php';
 ?>
-<br/><br/><br/>
-<hr>
-
-<div id="footer">
-<p>version <?php echo "$version";?>  &copy; 2016 Liesbeth Augustinus</p>
-</div>
-
 </div>
 </body>
 </html>

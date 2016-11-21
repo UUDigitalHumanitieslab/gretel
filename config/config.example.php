@@ -1,9 +1,13 @@
 <?php
+$version="2.0.x";
+
+$date="year"
+
 // GrETEL 2.0 home URL
-$home="http://localhost/gretel-2.0";
+$home="http://localhost/gretel-version";
 
 // GrETEL 2.0 home directory
-$root="/path/to/gretel/gretel-2.0";
+$root="/path/to/gretel/gretel-version";
 
 $version="2.0.2";
 

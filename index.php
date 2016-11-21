@@ -87,13 +87,6 @@ GrETEL is developed at the <a href="http://www.ccl.kuleuven.be" target="_blank">
 </td>
 </tr>
 </table>
-
-<hr>
-
-<div id="footer">
-<p>version 2.0.2  &copy; 2016 Liesbeth Augustinus</p>
-</div>
-
 </div>
 </body>
 </html>

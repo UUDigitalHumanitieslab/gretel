@@ -204,15 +204,9 @@ echo '<br/><br/>';
 echo $new.$continue;
 
 echo '</form>';
-
+echo '<br/>';
+require 'footer.php';
 ?>
-<br/><br/><br/>
-<hr>
-
-<div id="footer">
-<p>version <?php echo "$version";?>  &copy; 2016 Liesbeth Augustinus</p>
-</div>
-
 </div>
 </body>
 </html>
