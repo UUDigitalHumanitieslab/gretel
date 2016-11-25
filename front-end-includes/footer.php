@@ -30,7 +30,7 @@
         </nav>
         <div class="authors">
             <h3>Credits</h3>
-          <p>Concept and initial implementation by <a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author">Liesbeth Augustinus</a>,<br>
+      <p>Concept and initial implementation by <a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author">Liesbeth Augustinus</a> &amp; <a href="http://www.ccl.kuleuven.be/~vincent/ccl/" title="Vincent Vandeghinste homepage" target="_blank" rel="author">Vincent Vandeghinste</a><br>
             GrETEL 3 improvements and design by <a href="http://bramvanroy.be" title="Bram Vanroy homepage" target="_blank" rel="author">Bram Vanroy</a></p>
       <p><?php echo "version $version $date";?></p>
         </div>
