@@ -1,4 +1,3 @@
-<h3>CGN core corpus</h3>
 <div class="table-wrapper">
 <table>
     <thead>
@@ -286,7 +285,7 @@
         </tr>
         <tfoot>
             <tr>
-                <td colspan=2>CGN core</td>
+                <td colspan=2>CGN treebank</td>
                 <td>Complete treebank</td>
                 <td>87,342</td>
                 <td>671,088</td>

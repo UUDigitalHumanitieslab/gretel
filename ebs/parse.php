@@ -54,10 +54,10 @@ if ($continueConstraints && !$isSpam) {
     modifyLemma($parse, $id);
 ?>
 
-  <p>You find the structure of the tagged and parsed sentence below.
-    Tagging indicates <em>word classes</em>, such as <code>n</code> (noun),
-    and parsing shows <em>dependencies</em> (or relations),
-     such as <code>su</code> (subject) and <em>constituents</em>,
+  <p>You find the structure of the POS-tagged and parsed sentence below.
+    POS-tagging refers to the annotation of <em>word classes</em>, such as <code>n</code> (noun),
+    and parsing refers to the annotation of <em>dependency relations</em>,
+     such as <code>su</code> (subject), and <em>constituents</em>,
      such as <code>np</code> (noun phrase).
   </p>
 

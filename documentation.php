@@ -10,12 +10,11 @@ require ROOT_PATH."/front-end-includes/head.php";
 </head>
 
         <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
-            <p>This page gathers all sorts of documentation on and information about GrETEL. Below, you can find tutorials, related tools,
-                frequently asked questions, and other information. If you have any more questions, you can always
+<p>This page gathers all sorts of documentation on GrETEL, such as tutorials, related tools, and frequently asked questions. If you have any more questions, you can always consult the GrETEL <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">project website</a> or you can
                 <a href="documentation.php#faq-4" title="FAQ how to contact us">contact us</a>.</p>
-            <p>As stated on the home page, we would ask you to cite the following paper if you are using GrETEL for your research.</p>
+            <p>Please cite the following paper if you are using GrETEL for your research.</p>
             <cite>
-              <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
+              <a href="http://gretel.ccl.kuleuven.be/docs/Augustinus2012-ebq-LREC.pdf"
               title="Example-Based Treebank Querying" target="_blank">
               <span class="stack">
                 <i class="fa fa-file-text-o"></i>
@@ -52,6 +51,7 @@ require ROOT_PATH."/front-end-includes/head.php";
                     <ul>
                     <li><a href="http://gretel.ccl.kuleuven.be/afribooms" title="GrETEL 4 Afrikaans" target="_blank">GrETEL 4 Afrikaans</a></li>
                     <li><a href="http://gretel.ccl.kuleuven.be/poly-gretel" title="Poly-GrETEL" target="_blank">Poly-GrETEL</a></li>
+                    <li><a href="http://gretel.ccl.kuleuven.be/gretel-2.0" title="GrETEL 2.0" target="_blank">GrETEL 2..0</a></li>
                     </ul>
                 </article>
             </div>
@@ -59,30 +59,24 @@ require ROOT_PATH."/front-end-includes/head.php";
                 <h2>Frequently Asked Questions</h2>
                 <dl>
                     <dt id="faq-1">Why is the output limited to 500 sentences?</dt>
-                    <dd><p>The reason is two-fold. For one, it might take very long for a query with
-                    more than 500 results to finish. More importantly, though, the corpora provided by us are
+  <dd><p>GrETEL is free for students and academic research, but the corpora that are accessible via GrETEL are
                     <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus
                     as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
-                    literally download the whole corpus - which is not the intention of this project.</p></dd>
+  literally download the whole corpus - which is not the intention of this project. If you would like to obtain the raw corpus data (for academic or commercial use), you should contact the <a href="http://ivdnt.org" target="_blank" title="Go to the project page">INT</a></p></dd>
 
                     <dt id="faq-2">For whom is GrETEL intended?</dt>
                     <dd><p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
-                    interested in searching through Lassy, CGN, or SoNaR. However, the tool is especially dedicated to
-                    those looking for <em>specific linguistic patterns</em> in these corpora.</p></dd>
+                    interested in searching through the Lassy Small, CGN, or SoNaR treebanks. The tool is especially useful if you want to look for <em>specific linguistic patterns</em> in those corpora.</p></dd>
 
                     <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
-                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN (Corpus Gesproken Nederlands), and SoNaR. More information on these corpora is provided on
+                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN treebank, and SoNaR treebank. More information on these corpora is provided on
                       <a href="http://gretel.ccl.kuleuven.be/project/docs.php#treebanks" target="_blank" title="Go to the project page">GrETEL's project page</a>.</p>
                       <ul>
                         <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank" title="The project page of Lassy Small">Lassy Small</a>
-                          was the first corpus to be supported in GrETEL. It is a one-million words corpus
+                          was the first corpus to be supported in GrETEL. It is a one-million words treebank
                           that consists of written data. All of its annotations have been manually checked and verified.</li>
-                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm" target="_blank" title="The project page of Corpus Gesproken Nederlands">Corpus Gesproken Nederlands</a>,
-                          or CGN for short, is a corpus of one million words that consists of transcribed Dutch speech.
-                          All the provided annotations have been manually checked and verified.</li>
-                        <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank" title="The project page of SoNaR">SoNaR</a>,
-                          is different from Lassy and the CGN in that it is much larger. It is a corpus that consists of 25 components of written data,
-                        amounting to 500 million words. Because of its size, the syntactic annotations have not been manually verified.</li>
+                        <li><a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm" target="_blank" title="The project page of Corpus Gesproken Nederlands">CGN treebank</a> is a treebank of one million words that consists of transcribed Dutch speech. All the provided annotations have been manually checked and verified. CGN stands for "Corpus Gesproken Nederlands" (Spoken Dutch Corpus). The CGN treebank is a syntactically enriched part of the 10-million word CGN corpus.</li>
+                        <li><a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank" title="The project page of SoNaR">SoNaR treebank</a> is the parsed version of the 500-million word SoNaR-500 corpus. It is a corpus that consists of 25 components of written data. Because of its size, the syntactic annotations have not been manually verified.</li>
                       </ul>
                     </dd>
 
@@ -92,13 +86,11 @@ require ROOT_PATH."/front-end-includes/head.php";
                       <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage" target="_blank">CCL's website</a> or
                       in the footer of this website.</p></dd>
 
-                     <dt id="faq-5">Why does XPath generated for SoNaR only have one leading slash, when the code for Lassy and CGN has two?</dt>
-                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other. The
-                         first question is rather easy to understand: a double slash makes sure that the following pattern is searched for in all
-                         descendants of the current node (or implied root), whereas the single slash restricts the search to its direct children.
+                     <dt id="faq-5">Why does XPath generated for SoNaR only have one leading slash, when the code for LASSY and CGN has two?</dt>
+                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other. An XPath pattern that begins with a double slash makes sure that the pattern is searched for in all descendants of the current node (or implied root), whereas a single slash restricts the search to its direct children.
                          How that difference is relevant for SoNaR has been described in the paper cited below.</p>
                          <cite>
-                           <a href="http://www.lrec-conf.org/proceedings/lrec2014/workshops/LREC2014Workshop-CMLC2%20Proceedings-rev2.pdf#page=20"
+                           <a href="http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf"
                            title="Download 'Making Large Treebanks Searchable. The SoNaR case.'" target="_blank">
                            <span class="stack">
                              <i class="fa fa-file-text-o"></i>
@@ -113,6 +105,12 @@ require ROOT_PATH."/front-end-includes/head.php";
                            </p>
                          </cite>
                      </dd>
+ <dt id="faq-6">What is new in version 3?</dt>
+                     <dd><p>In addition to an overall design update, major changes include a more intuitive query builder in the example-based search mode and a visualizer for syntax trees that is compatible with all modern browsers. Moreover, the results are presented as soon as they are found, so you can browse the matching sentences before the treebank search is completed.
+Furthermore it is possible to query the 500-million word SoNaR treebank in a similar fashion as the two one-million word treebanks CGN and LASSY Small.
+</p>
+</dd>
+
                 </dl>
             </section>
         </main>

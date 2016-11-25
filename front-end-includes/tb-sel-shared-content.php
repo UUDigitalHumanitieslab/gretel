@@ -1,8 +1,8 @@
-<p>You can search an entire treebank (default), or select just one or more components. Due to pre-processing difficulties
-  some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
-
 <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
-  on these treebanks, you can find their project websites in <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.</p>
+  on these treebanks, you can find the project websites in <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.</p>
+
+<p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties
+  some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
 
 <?php
   $nextPage = ($currentPage == 'ebs') ? 'ebs/query.php' : 'xps/results.php';
@@ -13,17 +13,17 @@
     <div class="labels-wrapper">
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="cgn"> CGN
+          <input type="radio" name="treebank" value="cgn"> <b>CGN treebank</b>: spoken Dutch - version 2.0.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="lassy"> Lassy
+          <input type="radio" name="treebank" value="lassy"> <b>LASSY Small</b>: written Dutch - version 1.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="sonar"> SoNaR
+          <input type="radio" name="treebank" value="sonar"> <b>SoNaR treebank</b>: written Dutch - version 1.0
         </label>
       </div>
     </div>

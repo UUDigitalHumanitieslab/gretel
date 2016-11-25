@@ -11,38 +11,20 @@ require ROOT_PATH."/front-end-includes/head.php";
         <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
             <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
-                the exploitation of treebanks, text corpora with syntactic annotations. If you are new to this
-                search engine we highly recommend that you first take a look at
-                <a href="documentation.php" title="Documentation">the documentation on the topic</a>.
-                Tutorials as well as scientific papers are available.
-                On that page you can also find a section called
-                <a href="documentation.php#faq" title="Frequently Asked Questions">Frequently Asked Questions</a>.</p>
-            <p> The tool allows to search in treebanks without knowledge about the tree representations, treebank
-                query languages, nor the specific linguistic theories in the treebank. The user provides the query
-                engine with an example sentence, marking which parts of the sentence are the focus of the query.
-                Through automated parsing of the example sentence and subtree extraction of the sentence part
-                under focus the treebank is queried for the extracted subtree. GrETEL then returns sentences similar
-                to the input example.</p>
+                the exploitation of syntactically annotated coropra or <i>treebanks</i>. If you are new to GrETEL
+                we recommend you to take a look at the <a href="documentation.php" title="Documentation">documentation</a>.
+            </p>
 
-            <p><strong style="font-size: 88%">GrETEL provides two search approaches, introduced below.</strong></p>
-            <h3><a href="ebs/input.php">Example-based search</a></h3>
+            <p>GrETEL has two search modes:</p>
+            <p><b><a href="ebs/input.php">Example-based search</a></b> enables you to use a natural language example as a starting point for searching
+  a treebank. The query procedure consists of several steps, which allows you to define how similar the search results and the input example should be. In this way you can query a treebank without knowledge of the XPath query language, the tree representations, nor the exact grammar implementation used for the annotation of the trees.</p>            
 
-            <p>In this search mode you can use a natural language example as a starting point for searching
-                a treebank with limited knowledge about tree representations and formal query languages.
-                The formal (XPath) query is automatically generated. In this type of search three different
-                corpora can be queried: CGN, Lassy, and SoNaR.</p>
-
-            <h3><a href="xps/input.php">XPath search</a></h3>
-
-            <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the
-                XPath search tool only when you are an experienced XPath user! You can query CGN, Lassy, and SoNaR here as well.</p>
+  <p><b><a href="xps/input.php">XPath search</a></b> enables you to query a treebank by means of an XPath query. This search mode is intended for experienced XPath users, as you need to build the XPath query yourself.</p>
 
                 <div class="citation-wrapper">
-                <p style="margin-top:0">Please cite the following paper if you are using GrETEL for your research. More documentation such as
-                  tutorials, papers and slides can be found on
-                  <a href="documentation.php" title="GrETEL documentation">the documentation page</a>.</p>
+  <p style="margin-top:0">Please cite the following paper if you have used GrETEL for your research:</p>
                 <cite>
-                  <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf"
+                  <a href="http://gretel.ccl.kuleuven.be/docs/Augustinus2012-ebq-LREC.pdf"
                     title="Download Example-Based Treebank Querying" target="_blank">
                     <span class="stack">
                       <i class="fa fa-file-text-o"></i>

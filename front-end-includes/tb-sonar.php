@@ -1,4 +1,3 @@
-<h3>SoNaR</h3>
 <div class="table-wrapper">
 <table>
     <thead>
@@ -211,7 +210,7 @@
         </tr>
         <tfoot>
             <tr>
-                <td>SoNaR</td>
+                <td>SoNaR treebank</td>
                 <td>Complete treebank</td>
                 <td>41,258,769</td>
             </tr>
