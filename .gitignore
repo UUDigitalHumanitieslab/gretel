@@ -4,6 +4,7 @@
 config.php
 config/config.php
 config/config.pm
+favicon*
 log/
 tmp/
 parsers/
