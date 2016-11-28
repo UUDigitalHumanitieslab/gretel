@@ -1,4 +1,3 @@
-<h3>LASSY Small</h3>
 <div class="table-wrapper">
 <table>
     <thead>

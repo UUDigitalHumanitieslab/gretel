@@ -1,3 +1,4 @@
+<html>
 <?php
 session_cache_limiter('private');
 session_start();
@@ -11,6 +12,7 @@ require ROOT_PATH."/helpers.php";
 require ROOT_PATH."/functions.php";
 require ROOT_PATH."/preparatory-scripts/prep-functions.php";
 
+
 $continueConstraints = sessionVariablesSet(array('example', 'sentence')) && postVariablesSet(array('manualMode', 'originalXp'));
 $continueConstraints = $continueConstraints && (isset($_POST['xpath']) || isset($_SESSION['xpath']));
 
@@ -23,6 +25,7 @@ if ($continueConstraints) {
 
   $id = session_id();
 }
+
 session_write_close();
 require ROOT_PATH."/front-end-includes/head.php";
 ?>
@@ -65,6 +68,9 @@ endif;
 
 require ROOT_PATH."/front-end-includes/footer.php";
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+
 ?>
+</div>
 </body>
+
 </html>

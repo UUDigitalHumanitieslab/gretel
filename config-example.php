@@ -1,5 +1,8 @@
 <?php
 
+$version = "3.0.x";
+$date = "month year";
+
 function buildHomeURL()
 {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";

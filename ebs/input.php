@@ -32,7 +32,7 @@ $_SESSION['queryid'] = "$id-$time";
 require ROOT_PATH."/functions.php";
 require ROOT_PATH."/front-end-includes/head.php";
 ?>
-</head>
+
 <?php flush(); ?>
 <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
     <form action="ebs/parse.php" method="post" enctype="multipart/form-data">

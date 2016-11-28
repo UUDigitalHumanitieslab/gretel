@@ -50,9 +50,9 @@ if ($continueConstraints):
   $sentence = explode(' ', $tokinput);
 ?>
 <form action="ebs/tb-sel.php" method="post">
-  <p>In the matrix below, the sentence you entered has been tokenized, i.e. divided into elements that are separated by spaces.
-    Indicate the relevant parts of the sentence, i.e. the parts you are interested in. A detailed description of each option is
-    given at the bottom of this page.
+  <p>
+    In the matrix below, you can indicate the relevant parts of the construction, i.e. the lexical items that should be included in the query, as well as their level of abstraction. Your selection is visualized by means of the <em>query tree</em> at the bottom of this page. The syntactic information provided by the parse in the previous step is automatically included.<br/>
+    The advanced options offer more possibilities to modify your search instruction. You can also modify the generated <em>XPath query</em>, which will be used to do the actual treebank search. 
   </p>
   <div class="flex-content">
     <div class="input-wrapper">
@@ -148,5 +148,6 @@ include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 <script>
     var getTreePathScript = <?php echo json_encode(HOME_PATH."/preparatory-scripts/process-input-example.php"); ?>;
 </script>
+
 </body>
 </html>

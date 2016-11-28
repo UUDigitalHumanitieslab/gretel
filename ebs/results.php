@@ -80,7 +80,7 @@ if ($continueConstraints) {
   session_write_close();
 }
 ?>
-</head>
+
 <?php flush(); ?>
 <?php
 require ROOT_PATH."/front-end-includes/header.php";

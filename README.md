@@ -20,7 +20,7 @@ Available at http://gretel.ccl.kuleuven.be/gretel3
 
 ## Notes for developers
 
-### Frontend
+### Front-end
 * We used [SCSS](http://sass-lang.com/documentation/file.SCSS_FOR_SASS_USERS.html) as our stylesheet markdown of preference. All styles are available as `.scss` files (`styles/scss/`). For users who do not want to work with SCSS/SASS we also included the expanded CSS output of the SCSS files (`styles/css/`). In production, however, we use the minfied files (`styles/css/min/`) to decrease load times.
 * We do not support Internet Explorer because we highly rely on the power of the flexbox specification. Internet Explorer does not provide (good) support for flex properties. Microsoft's newer, and better, browser Edge is supported.
 * JavaScript files are also provided as expanded (`js/`) as well as minified files (`js/min/`). We use jQuery as the library of choice.
@@ -28,7 +28,7 @@ Available at http://gretel.ccl.kuleuven.be/gretel3
 * Opening XPath code directly in the [XPath Beautifier](http://bramvanroy.be/projects/xpath-beautifier/) will only work on our own URL. This is due to cross-origin restrictions. This is a deliberate security measure as to not flood that tool with possibly malicious requests.
 
 
-### Backend
+### Back-end
 * The results that are flushed to the user at a time as well as the maximum results that will be fetched is stored in variables in `config.php`. Change `$flushLimit` and `$resultsLimit` to the values that you want.
 * Scripts are organised according to their function:
   * `basex-search-scripts/`: scripts that are required to do the actual searching for results. However, the `basex-client.php` is sometimes needed in other cases as well to open up a BaseX session.
@@ -41,4 +41,4 @@ Available at http://gretel.ccl.kuleuven.be/gretel3
 
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design
-* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [mhkuu](https://github.com/mhkuu) for beta testing.
+* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis) for beta testing.
