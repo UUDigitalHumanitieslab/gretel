@@ -100,6 +100,5 @@ if ($continueConstraints) : ?>
 <?php endif;
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
-</div>
 </body>
 </html>

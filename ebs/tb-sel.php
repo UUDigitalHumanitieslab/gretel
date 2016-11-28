@@ -1,4 +1,3 @@
-<html>
 <?php
 session_cache_limiter('private');
 session_start();
@@ -70,7 +69,5 @@ require ROOT_PATH."/front-end-includes/footer.php";
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 
 ?>
-</div>
 </body>
-
 </html>

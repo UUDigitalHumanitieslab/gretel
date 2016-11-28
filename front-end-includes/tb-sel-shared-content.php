@@ -13,17 +13,17 @@
     <div class="labels-wrapper">
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="cgn"> <b>CGN treebank</b>: spoken Dutch - version 2.0.1
+          <input type="radio" name="treebank" value="cgn"> <strong>CGN treebank</strong>: spoken Dutch - version 2.0.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="lassy"> <b>LASSY Small</b>: written Dutch - version 1.1
+          <input type="radio" name="treebank" value="lassy"> <strong>LASSY Small</strong>: written Dutch - version 1.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="sonar"> <b>SoNaR treebank</b>: written Dutch - version 1.0
+          <input type="radio" name="treebank" value="sonar"> <strong>SoNaR treebank</strong>: written Dutch - version 1.0
         </label>
       </div>
     </div>
