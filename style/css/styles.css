@@ -1062,6 +1062,72 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
   max-width: 100%;
 }
 
+a.collapse {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 1.34em auto;
+  padding: 0.4em 0.6em;
+  border: 0 none;
+  border: 1px solid transparent;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background: transparent;
+  color: #565656;
+  transition: all 250ms;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+a.collapse > * {
+  margin: 0;
+}
+
+a.collapse > span {
+  width: 32px;
+  height: 32px;
+  border: 1px solid;
+  border: 1px solid #dcdcdc;
+  border-radius: 50%;
+  background: transparent;
+  text-align: center;
+  line-height: 28px;
+  transition: line-height 200ms;
+}
+
+a.collapse > span i {
+  color: #dcdcdc;
+  transition: -webkit-transform 250ms;
+  transition: transform 250ms;
+  transition: transform 250ms, -webkit-transform 250ms;
+}
+
+a.collapse:hover, a.collapse[data-collapse="hidden"] {
+  border-color: #c4c4c4;
+  background: #f7f7f7;
+  color: #333;
+}
+
+a.collapse:hover > span, a.collapse[data-collapse="hidden"] > span {
+  background: #dcdcdc;
+  line-height: 32px;
+}
+
+a.collapse:hover > span i, a.collapse[data-collapse="hidden"] > span i {
+  color: #f7f7f7;
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
+a.collapse[data-collapse="hidden"]:hover {
+  background: #f0f0f0;
+}
+
+a.collapse[data-collapse="hidden"]:hover i {
+  color: #f0f0f0;
+}
+
 /* ============= */
 /* PAGE SPECIFIC */
 /* ============= */
@@ -1082,7 +1148,7 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 .docs .project-web-wrapper a,
 .home .project-web-wrapper a,
 .matrix .xpath-wrapper a,
-.xps.input .open-beautifier-wrapper a {
+.xps.xpath .open-beautifier-wrapper a {
   display: inline-block;
   padding: 6px 8px;
   border: 0 none;
@@ -1096,7 +1162,7 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 .docs .project-web-wrapper a i,
 .home .project-web-wrapper a i,
 .matrix .xpath-wrapper a i,
-.xps.input .open-beautifier-wrapper a i {
+.xps.xpath .open-beautifier-wrapper a i {
   margin-left: 4px;
   font-weight: bold;
   font-size: 12px;
@@ -1105,7 +1171,7 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 .docs .project-web-wrapper a:hover,
 .home .project-web-wrapper a:hover,
 .matrix .xpath-wrapper a:hover,
-.xps.input .open-beautifier-wrapper a:hover {
+.xps.xpath .open-beautifier-wrapper a:hover {
   background: #93816b;
   text-shadow: 0 1px rgba(0, 0, 0, 0.12);
 }
@@ -1113,7 +1179,7 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 .docs .project-web-wrapper a:active,
 .home .project-web-wrapper a:active,
 .matrix .xpath-wrapper a:active,
-.xps.input .open-beautifier-wrapper a:active {
+.xps.xpath .open-beautifier-wrapper a:active {
   box-shadow: none;
   -webkit-transform: translateY(1px);
           transform: translateY(1px);
@@ -1411,72 +1477,6 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 
 .treebanks .notice {
   margin: auto;
-}
-
-.results a.collapse {
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  margin: 1.34em auto;
-  padding: 0.4em 0.6em;
-  border: 0 none;
-  border: 1px solid transparent;
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  background: transparent;
-  color: #565656;
-  transition: all 250ms;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-}
-
-.results a.collapse h2 {
-  margin: 0;
-}
-
-.results a.collapse > span {
-  width: 32px;
-  height: 32px;
-  border: 1px solid;
-  border: 1px solid #dcdcdc;
-  border-radius: 50%;
-  background: transparent;
-  text-align: center;
-  line-height: 28px;
-  transition: line-height 200ms;
-}
-
-.results a.collapse > span i {
-  color: #dcdcdc;
-  transition: -webkit-transform 250ms;
-  transition: transform 250ms;
-  transition: transform 250ms, -webkit-transform 250ms;
-}
-
-.results a.collapse:hover, .results a.collapse[data-collapse="hidden"] {
-  border-color: #c4c4c4;
-  background: #f7f7f7;
-  color: #333;
-}
-
-.results a.collapse:hover > span, .results a.collapse[data-collapse="hidden"] > span {
-  background: #dcdcdc;
-  line-height: 32px;
-}
-
-.results a.collapse:hover > span i, .results a.collapse[data-collapse="hidden"] > span i {
-  color: #f7f7f7;
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
-}
-
-.results a.collapse[data-collapse="hidden"]:hover {
-  background: #f0f0f0;
-}
-
-.results a.collapse[data-collapse="hidden"]:hover i {
-  color: #f0f0f0;
 }
 
 .results section:not(:last-of-type) {

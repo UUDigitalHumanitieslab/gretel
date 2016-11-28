@@ -58,18 +58,18 @@ require ROOT_PATH."/front-end-includes/head.php";
             <section id="faq">
                 <h2>Frequently Asked Questions</h2>
                 <dl>
-                    <dt id="faq-1">Why is the output limited to 500 sentences?</dt>
-  <dd><p>GrETEL is free for students and academic research, but the corpora that are accessible via GrETEL are
+                    <dt id="faq-1" data-collapse-btn="true">Why is the output limited to 500 sentences?</dt>
+  <dd data-collapse-target="true"><p>GrETEL is free for students and academic research, but the corpora that are accessible via GrETEL are
                     <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus
                     as a whole. If a user would search for a structure with only a <code>cat="top"</code> node, they could
   literally download the whole corpus - which is not the intention of this project. If you would like to obtain the raw corpus data (for academic or commercial use), you should contact the <a href="http://ivdnt.org" target="_blank" title="Go to the project page">INT</a></p></dd>
 
-                    <dt id="faq-2">For whom is GrETEL intended?</dt>
-                    <dd><p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
+                    <dt id="faq-2" data-collapse-btn="true" data-collapse-btn="true">For whom is GrETEL intended?</dt>
+                    <dd data-collapse-target="true"><p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
                     interested in searching through the Lassy Small, CGN, or SoNaR treebanks. The tool is especially useful if you want to look for <em>specific linguistic patterns</em> in those corpora.</p></dd>
 
-                    <dt id="faq-3">Where can I find more information about the corpora available in GrETEL?</dt>
-                    <dd><p>GrETEL currently provides access to three corpora: Lassy Small, CGN treebank, and SoNaR treebank. More information on these corpora is provided on
+                    <dt id="faq-3" data-collapse-btn="true">Where can I find more information about the corpora available in GrETEL?</dt>
+                    <dd data-collapse-target="true"><p>GrETEL currently provides access to three corpora: Lassy Small, CGN treebank, and SoNaR treebank. More information on these corpora is provided on
                       <a href="http://gretel.ccl.kuleuven.be/project/docs.php#treebanks" target="_blank" title="Go to the project page">GrETEL's project page</a>.</p>
                       <ul>
                         <li><a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank" title="The project page of Lassy Small">Lassy Small</a>
@@ -80,14 +80,14 @@ require ROOT_PATH."/front-end-includes/head.php";
                       </ul>
                     </dd>
 
-                    <dt id="faq-4">How can I contact you?</dt>
-                    <dd><p>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
+                    <dt id="faq-4" data-collapse-btn="true">How can I contact you?</dt>
+                    <dd data-collapse-target="true"><p>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
                       questions, or general feedback you are welcome to give us a ring, or send us an email. You can find contact information on
                       <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage" target="_blank">CCL's website</a> or
                       in the footer of this website.</p></dd>
 
-                     <dt id="faq-5">Why does XPath generated for SoNaR only have one leading slash, when the code for LASSY and CGN has two?</dt>
-                     <dd><p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other. An XPath pattern that begins with a double slash makes sure that the pattern is searched for in all descendants of the current node (or implied root), whereas a single slash restricts the search to its direct children.
+                     <dt id="faq-5" data-collapse-btn="true">Why does XPath generated for SoNaR only have one leading slash, when the code for LASSY and CGN has two?</dt>
+                     <dd data-collapse-target="true"><p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other. An XPath pattern that begins with a double slash makes sure that the pattern is searched for in all descendants of the current node (or implied root), whereas a single slash restricts the search to its direct children.
                          How that difference is relevant for SoNaR has been described in the paper cited below.</p>
                          <cite>
                            <a href="http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf"
@@ -105,8 +105,8 @@ require ROOT_PATH."/front-end-includes/head.php";
                            </p>
                          </cite>
                      </dd>
- <dt id="faq-6">What is new in version 3?</dt>
-                     <dd><p>In addition to an overall design update, major changes include a more intuitive query builder in the example-based search mode and a visualizer for syntax trees that is compatible with all modern browsers. Moreover, the results are presented as soon as they are found, so you can browse the matching sentences before the treebank search is completed.
+ <dt id="faq-6" data-collapse-btn="true">What is new in version 3?</dt>
+                     <dd data-collapse-target="true"><p>In addition to an overall design update, major changes include a more intuitive query builder in the example-based search mode and a visualizer for syntax trees that is compatible with all modern browsers. Moreover, the results are presented as soon as they are found, so you can browse the matching sentences before the treebank search is completed.
 Furthermore it is possible to query the 500-million word SoNaR treebank in a similar fashion as the two one-million word treebanks CGN and LASSY Small.
 </p>
 </dd>

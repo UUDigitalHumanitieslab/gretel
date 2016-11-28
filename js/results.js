@@ -410,21 +410,6 @@ $(function() {
         notificationWrapper.fadeOut("fast");
     });
 
-    $("a.collapse").off().click(function(e) {
-        var $this = $(this),
-            isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
-
-        if (isCollapsed) {
-            $this.attr("data-collapse", 'visible');
-            $this.next("[data-target]").show();
-        } else {
-            $this.attr("data-collapse", 'hidden');
-            $this.next("[data-target]").hide();
-        }
-
-        e.preventDefault();
-    });
-
     $("#results-menu a").off("click").click(function(e) {
         $("html, body").stop().animate({
             scrollTop: $($(this).attr("href")).offset().top

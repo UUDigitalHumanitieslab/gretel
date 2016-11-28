@@ -8,14 +8,8 @@
 </nav>
 
 <section id="results-overview">
-  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
-    <h2>Individual results</h2>
-    <span class="btn-wrapper collapse">
-      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
-      <span class="sr-only">Show or hide this section</span>
-    </span>
-  </a>
-  <div class="results-ajax-wrapper" data-target="true">
+  <h2 data-collapse-btn="true">Individual results</h2>
+  <div class="results-ajax-wrapper" data-collapse-target="true">
     <p>Click on a sentence ID to view the tree structure. The part of the sentence matching your input structure is set in bold.</p>
     <?php
     if ($corpus == 'sonar'):
@@ -35,14 +29,8 @@
 </section>
 
 <section id="download-overview">
-  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
-    <h2>Download results</h2>
-    <span class="btn-wrapper collapse">
-      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
-      <span class="sr-only">Show or hide this section</span>
-    </span>
-  </a>
-  <div class="flex-content" data-target="true">
+  <h2 data-collapse-btn="true">Download results</h2>
+  <div class="flex-content" data-collapse-target="true">
       <div class="results-messages-wrapper">
         <?php if ($corpus != 'sonar'): ?>
         <h3>Download results</h3>
@@ -75,14 +63,8 @@
 </section>
 
 <section id="query-overview">
-  <a href="#" class="collapse" data-collapse="visible" title="Show or hide this section">
-    <h2>Query overview</h2>
-    <span class="btn-wrapper collapse">
-      <i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>
-      <span class="sr-only">Show or hide this section</span>
-    </span>
-  </a>
-  <div class="flex-content" data-target="true">
+  <h2 data-collapse-btn="true">Query overview</h2>
+  <div class="flex-content" data-collapse-target="true">
   <div>
     <div class="table-wrapper">
       <table>

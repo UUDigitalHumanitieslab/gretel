@@ -23,6 +23,18 @@ $(function() {
         hidePopup(popup);
     });
 
+    $("[data-collapse-btn]").wrap('<a href="#" class="collapse" data-collapse="visible" title="Show or hide this section" />').after(
+    '<span class="btn-wrapper">'
+        + '<i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>'
+        + '<span class="sr-only">Show or hide this section</span>'
+    + '</span>');
+
+    $("[name='to-top']").click(function() {
+        $("html, body").animate({
+            scrollTop: 0
+        });
+    });
+
     // Make anchors work, even though we've set a base-tag
     $('a[href^="#"]').click(function(e) {
         // Do an .is() test for dynamic urls
@@ -32,11 +44,24 @@ $(function() {
         }
     });
 
-    $("[name='to-top']").click(function() {
-        $("html, body").animate({
-            scrollTop: 0
-        });
+    // Unset previous handler first, then attach new
+    $("a.collapse").off().click(function(e) {
+        var $this = $(this),
+            isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
+
+        if (isCollapsed) {
+            $this.attr("data-collapse", 'visible');
+            $this.next("[data-collapse-target]").show();
+        } else {
+            $this.attr("data-collapse", 'hidden');
+            $this.next("[data-collapse-target]").hide();
+        }
+
+        e.preventDefault();
     });
+
+    // Immediately hide FAQ sections
+    $("body.docs a.collapse").click();
 
     // Open in beautifier
     $("body.matrix .xpath-wrapper a, body.xps.input .open-beautifier-wrapper a").click(function(e) {
