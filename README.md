@@ -6,17 +6,25 @@ v3.0. November 2016: GrETEL 3 initial release
 
 Available at http://gretel.ccl.kuleuven.be/gretel3
 
-
 ## Installation
 
-1. Download GrETEL from GitHub
-2. Create directories in the root directory log, tmp, and parsers (make sure tmp and log are writable)
-3. Put Alpino parser in the `parsers/` directory. Current version in GrETEL: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (Available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary).)
-4. Create BaseX databases containing the treebanks you want to make available 
-5. Adapt config.example.php file and change name to config.php
-  * Set path to Alpino parser
-  * Set BaseX variables (machine names, port numbers, password and username)
+### Prerequisites
 
+Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the following packages to be installed on your machine:
+
+* BaseX (https://packages.debian.org/jessie/database/basex)
+* Perl (https://packages.debian.org/jessie/perl/perl) with:
+  * XML::Twig (https://packages.debian.org/jessie/libxml-twig-perl)
+  * XML::XPath (https://packages.debian.org/jessie/libxml-xpath-perl)
+
+### Next steps
+
+1. Download (or clone) GrETEL from GitHub.
+2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary).
+3. Create BaseX databases containing the treebanks you want to make available.
+4. Adapt `config.example.php` file and change name to `config.php`, and then:
+  * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
+  * Set BaseX variables (machine names, port numbers, password and username)
 
 ## Notes for developers
 
