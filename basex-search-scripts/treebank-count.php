@@ -68,7 +68,17 @@ function createXqueryCount($database)
 function getTotalSentences()
 {
     global $corpus;
-    if ($corpus == 'lassy') {
+    if (API_URL) {
+        $components = json_decode(file_get_contents(API_URL . '/treebank/show/' . $corpus));
+        $sum = 0;
+        foreach ($components as $c) {
+            $basex_db = strtoupper($corpus . '_ID_' . $c->slug);
+            $sum += intval($c->nr_sentences);
+            $total[$basex_db] = $c->nr_sentences;
+        }
+        $total['TOTAL'] = $sum;
+    }
+    else if ($corpus == 'lassy') {
         $total['LASSY_ID_DPC'] = '11716';
         $total['LASSY_ID_WIKI'] = '7341';
         $total['LASSY_ID_WRPE'] = '14420';

@@ -84,3 +84,8 @@ if (isIE) {
     <script src="js/tree-visualizer.js"></script>
 <?php endif; ?>
 <script src="js/min/scripts.min.js"></script>
+
+<?php if (API_URL): ?>
+  <script>var API = '<?=API_URL; ?>';</script>
+  <script src="js/api-scripts.js"></script>
+<?php endif; ?>

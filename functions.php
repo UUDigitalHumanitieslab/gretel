@@ -251,8 +251,13 @@
   // Returns associative array containing at least the machine and the port
   function getServerInfo($corpus, $component) {
     global $databaseGroups;
+
+    // Retrieval from API: one servername/port
+    if (API_URL) {
+      return $databaseGroups{'api'};
+    }
     // Lassy and CGN
-    if (!$component && array_key_exists($corpus, $databaseGroups)) {
+    else if (!$component && array_key_exists($corpus, $databaseGroups)) {
       return $databaseGroups{$corpus};
     }
     // Sonar components

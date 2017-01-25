@@ -21,6 +21,10 @@ require ROOT_PATH."/front-end-includes/head.php";
 
   <p><b><a href="xps/input.php">XPath search</a></b> enables you to query a treebank by means of an XPath query. This search mode is intended for experienced XPath users, as you need to build the XPath query yourself.</p>
 
+  <?php if (API_URL): ?>
+    <p><b><a href="../gretel-upload">Treebank upload</a></b> allows you to upload your own treebank to GrETEL.</p>
+  <?php endif; ?>
+
                 <div class="citation-wrapper">
   <p style="margin-top:0">Please cite the following paper if you have used GrETEL for your research:</p>
                 <cite>

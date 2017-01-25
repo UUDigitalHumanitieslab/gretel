@@ -9,8 +9,11 @@ function buildHomeURL()
     return $protocol.$_SERVER['HTTP_HOST'].'/'.basename(__DIR__).'/';
 }
 
-define('ROOT_PATH', __DIR__);
-define('HOME_PATH', buildHomeURL());
+defined('ROOT_PATH') or define('ROOT_PATH', __DIR__);
+defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
+
+// Whether or not to use an API to retrieve uploaded corpora. If empty, the corpora will need to be defined in the code.
+defined('API_URL')   or define('API_URL',   '');
 
 // === CHANGE PATH TO ALPINO DIRECTORY === //
 $alpinoDirectory = ROOT_PATH."/parsers/Alpino";
@@ -111,7 +114,11 @@ $databaseGroups = array(
     ),
     'machine' => 'machinename',
     'port' => 0000
-  )
+  ),
+  'api' => array(
+    'machine' => 'machinename',
+    'port' => 0000
+  ),
 );
 
 $dbuser = 'youruser';

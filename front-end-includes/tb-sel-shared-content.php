@@ -11,6 +11,7 @@
 <form action="<?php echo $nextPage; ?>" method="post">
   <div class="flex-content">
     <div class="labels-wrapper">
+      <?php if (!API_URL) { ?>
       <div class="label-wrapper">
         <label>
           <input type="radio" name="treebank" value="cgn"> <strong>CGN treebank</strong>: spoken Dutch - version 2.0.1
@@ -26,9 +27,11 @@
           <input type="radio" name="treebank" value="sonar"> <strong>SoNaR treebank</strong>: written Dutch - version 1.0
         </label>
       </div>
+      <?php } ?>
     </div>
   </div>
   <div class="corpora-wrapper">
+      <?php if (!API_URL) { ?>
       <div class="cgn" style="display:none">
         <?php require ROOT_PATH."/front-end-includes/tb-cgn.php"; ?>
       </div>
@@ -38,4 +41,5 @@
       <div class="sonar" style="display:none">
         <?php require ROOT_PATH."/front-end-includes/tb-sonar.php"; ?>
       </div>
+      <?php } ?>
   </div>
