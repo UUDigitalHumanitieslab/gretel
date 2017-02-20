@@ -16,7 +16,6 @@ $(function() {
     $('.labels-wrapper').on('click', 'input[name="treebank"]', function() {
         var treebank = $(this).val();
         $.getJSON(API + '/treebank/show/' + treebank, function(data) {
-            console.log('here');
             $('.corpora-wrapper').empty();
 
             var tbl = $('<table>');
@@ -44,10 +43,10 @@ $(function() {
                 tbl_row.append($('<td>').append(input));
                 // Add cell values
                 $.each(e, function(j, v) {
-                    if (j == 'slug' || j == 'title') {
+                    if (j === 'slug' || j === 'title') {
                         tbl_row.append($('<td>').text(v));
                     }
-                    else if (j == 'nr_sentences' || j == 'nr_words') {
+                    else if (j === 'nr_sentences' || j === 'nr_words') {
                         tbl_row.append($('<td>').text(parseInt(v).toLocaleString()));
                     }
                 });
