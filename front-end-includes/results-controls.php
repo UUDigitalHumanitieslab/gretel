@@ -2,6 +2,15 @@
     <span class="count"># of results: <strong>0</strong> / <span>--</span></span>
 
     <span class="status"><span>Searching</span><span>Counting</span></span>
+    
+    <div class="filter-wrapper">
+        <label for="filter-metadata" title="Only show results for specific metadata. Note that when you download the output, filters are not taken into account: all results are downloaded">
+          <input type="checkbox" id="filter-metadata" name="filter-metadata" hidden disabled>Filter metadata <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
+        </label>
+        <div class="filter-sel-wrapper">
+            <?php show_metadata_facets(); ?>
+        </div>
+    </div>
 
     <div class="filter-wrapper">
         <label for="filter-components" class="disabled" title="Only show results of specific components. Note that when you download the output, filters are not taken into account: all results are downloaded">

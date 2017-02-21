@@ -139,6 +139,8 @@ function createXquery($database, $endPosIteration)
 {
     global $flushLimit, $resultsLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
 
+    $m_filter = get_metadata_filter();
+
     $for = 'for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
         $for .= '/tree';
@@ -186,11 +188,11 @@ function createXquery($database, $endPosIteration)
         $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
 
-        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
+        $xquery = $for.$xpath.$m_filter.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
             .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
-        $xquery = $for.$xpath.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$return;
+        $xquery = $for.$xpath.$m_filter.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$return;
     }
 
     // Adds positioning values:; limits possible output
@@ -254,4 +256,62 @@ function getRegularSonar($component)
     $databases = file("treebank-parts/$component.lst", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     return $databases;
+}
+
+/**
+ * Retrieves the metadata fields of the current corpus
+ * @global string $corpus The current corpus
+ * @return array All metadata fields
+ */
+function get_metadata_fields()
+{
+    global $corpus;
+
+    $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $corpus));
+    return array_map(function($m)
+    {
+        return $m->field;
+    }, $metadata);
+}
+
+/**
+ * Builds the xQuery metadata filter
+ * @return string The metadata filter
+ */
+function get_metadata_filter()
+{
+    $metadata_fields = get_metadata_fields();
+
+    // Compile the filter
+    $m_filter = '';
+    foreach ($_SESSION as $key => $value)
+    {
+        if (substr($key, 0, 2) != 'm-')
+        {
+            continue;
+        }
+
+        $key = substr($key, 2);
+        if (in_array($key, $metadata_fields))
+        {
+            $values = explode('*', $value);
+
+            // Single values
+            if (count($values) == 1)
+            {
+                $m_filter .= 'where $node/ancestor::alpino_ds/metadata/meta'
+                        . '[@name="' . $key . '" and '
+                        . '@value="' . $values[0] . '"] ';
+            }
+            // Ranged values
+            else if (count($values) == 2)
+            {
+                $m_filter .= 'where $node/ancestor::alpino_ds/metadata/meta'
+                        . '[@name="' . $key . '" and '
+                        . '@value>="' . $values[0] . '" and '
+                        . '@value<="' . $values[1] . '"] ';
+            }
+        }
+    }
+    return $m_filter;
 }

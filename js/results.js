@@ -297,7 +297,10 @@ $(function() {
     });
     controls.find("[for='filter-components']").click(function() {
         $(this).parent().addClass("active");
-    }),
+    });
+    controls.find("[for='filter-metadata']").click(function() {
+        $(this).parent().addClass("active");
+    });
     filterSelWrapper.find("[type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();

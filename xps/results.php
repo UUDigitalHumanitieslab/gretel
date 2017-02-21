@@ -2,12 +2,18 @@
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 $currentPage = 'xps';
 $step = 3;
 
 require "../config.php";
 require ROOT_PATH."/helpers.php";
+
+require ROOT_PATH."/front-end-includes/metadata.php";
+retrieve_metadata();
 
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
@@ -126,7 +132,8 @@ if ($continueConstraints):
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
-    <script src="js/min/results.min.js"></script>
+    <script src="js/results.js"></script>
+    <script src="js/facets.js"></script>
 <?php endif; ?>
 </body>
 </html>

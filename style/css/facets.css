@@ -1,0 +1,12 @@
+.facet-daterange {
+	max-width: 100px;
+}
+
+.results .filter-sel-wrapper {
+	z-index: 100;
+	justify-content: flex-start !important;
+}
+
+.results .filter-wrapper.active [for="filter-metadata"] i {
+	transform: scale(1) rotate(180deg);
+}
