@@ -3,11 +3,6 @@
 *.ico
 *~
 
-log/
-tmp/
-parsers/
-config/
-
 prepros.cfg
 config.php
 sitemap.xml
