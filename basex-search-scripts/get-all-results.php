@@ -98,7 +98,10 @@ try {
             $sidString = strstr($sid, '-endPos=', true) ?: $sid;
 
             // subtreebank where the sentence was found:
-            if ($corpus == 'lassy') {
+            if (API_URL) {
+                $componentsString = substr($sidString, 0, strrpos($sidString, '-'));
+            }
+            else if ($corpus == 'lassy') {
                 preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentsFromRegex);
                 $componentsFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentsFromRegex[1]);
 
