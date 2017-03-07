@@ -272,6 +272,28 @@
 
             // Empty tooltips
             anyTooltip.children("ul").empty();
+			
+			// Add metadata
+			var metadata = $("<table>");
+			xmlObject.find("metadata").children("meta").sort(function(a, b) {
+				return a.getAttribute("name").localeCompare(b.getAttribute("name"));
+			}).each(function(i, e) {
+				var meta = $("<tr>");
+				
+				var th = $("<th>");
+				th.append(e.getAttribute("name"));
+				meta.append(th);
+				
+				var td = $("<td>");
+				td.append(e.getAttribute("value"));
+				meta.append(td);
+				
+				metadata.append(meta);
+			})
+			$(document).tooltip({
+				items: ".fa-commenting", 
+				content: metadata
+			});
 
             // Do some small tree modifications
             treeModifier();
