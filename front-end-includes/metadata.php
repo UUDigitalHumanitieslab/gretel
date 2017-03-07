@@ -78,7 +78,7 @@ function get_metadata_filter()
 }
 
 /**
- * Retrieves the metadata for the current corpus and xPath query.
+ * Retrieves the metadata counts for the current corpus and xPath query.
  * @global string $corpus
  * @global array $components
  * @global string $xpath
@@ -86,7 +86,7 @@ function get_metadata_filter()
  * @global string $dbpwd
  * @return array Metadata per subcorpus
  */
-function get_metadata()
+function get_metadata_counts()
 {
     global $corpus, $components, $xpath, $dbuser, $dbpwd;
 
@@ -110,9 +110,8 @@ function get_metadata()
 		  for $n
 		  in (
 			for $node
-			in db:open("' . $database . '")' . 
-                $xpath . '/ancestor::alpino_ds/metadata/meta
-			return $node)
+			in db:open("' . $database . '")' . $xpath . '
+			return $node/ancestor::alpino_ds/metadata/meta)
 		  let $k := $n/@name
 		  let $t := $n/@type
 		  group by $k, $t
@@ -145,7 +144,7 @@ function show_metadata_facets()
     $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $_SESSION['treebank']));
     // First, combine the XMLs into an array with total counts over all databases
     $totals = array();
-    foreach (get_metadata() as $db => $m)
+    foreach (get_metadata_counts() as $db => $m)
     {
         $xml = new SimpleXMLElement($m);
         foreach ($xml as $group => $counts)
