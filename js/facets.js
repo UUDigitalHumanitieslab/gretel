@@ -72,6 +72,9 @@ $(function() {
             max: max,
             values: [current_min, current_max],
             slide: function(event, ui) {
+				$(this).prev().val(ui.values[0] + " - " + ui.values[1]);
+			},
+            stop: function(event, ui) {
                 var value = ui.values[0] + '*' + ui.values[1];
                 window.location = updateQueryStringParameter(key, value);
             }
