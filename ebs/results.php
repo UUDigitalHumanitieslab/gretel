@@ -27,7 +27,7 @@ if ($continueConstraints) {
     $onlyFullscreenTv = true;
     $corpus = $_SESSION['treebank'];
     $components = $_SESSION['subtreebank'];
-    $xpath = $_SESSION['xpath'];
+    $xpath = $_SESSION['originalXp'] . get_metadata_filter();
     $originalXp = $_SESSION['originalXp'];
 
     // Need to clean in case the user goes back in history, otherwise the

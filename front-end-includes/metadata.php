@@ -20,6 +20,64 @@ function retrieve_metadata()
 }
 
 /**
+ * Retrieves the metadata fields of the current corpus
+ * @global string $corpus The current corpus
+ * @return array All metadata fields
+ */
+function get_metadata_fields()
+{
+    global $corpus;
+
+    $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $corpus));
+    return array_map(function($m)
+    {
+        return $m->field;
+    }, $metadata);
+}
+
+/**
+ * Builds the xQuery metadata filter
+ * @return string The metadata filter
+ */
+function get_metadata_filter()
+{
+    $metadata_fields = get_metadata_fields();
+
+    // Compile the filter
+    $m_filter = '';
+    foreach ($_SESSION as $key => $value)
+    {
+        if (substr($key, 0, 2) != 'm-')
+        {
+            continue;
+        }
+
+        $key = substr($key, 2);
+        if (in_array($key, $metadata_fields))
+        {
+            $values = explode('*', $value);
+
+            // Single values
+            if (count($values) == 1)
+            {
+                $m_filter .= '[ancestor::alpino_ds/metadata/meta'
+                        . '[@name="' . $key . '" and '
+                        . '@value="' . $values[0] . '"]] ';
+            }
+            // Ranged values
+            else if (count($values) == 2)
+            {
+                $m_filter .= '[ancestor::alpino_ds/metadata/meta'
+                        . '[@name="' . $key . '" and '
+                        . '@value>="' . $values[0] . '" and '
+                        . '@value<="' . $values[1] . '"]] ';
+            }
+        }
+    }
+    return $m_filter;
+}
+
+/**
  * Retrieves the metadata for the current corpus and xPath query.
  * @global string $corpus
  * @global array $components
@@ -45,8 +103,6 @@ function get_metadata()
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    $m_filter = get_metadata_filter();
-
     $result = array();
     foreach ($_SESSION['startDatabases'] as $database)
     {
@@ -55,7 +111,7 @@ function get_metadata()
 		  in (
 			for $node
 			in db:open("' . $database . '")' . 
-                $xpath . '/ancestor::alpino_ds/metadata/meta ' . $m_filter . '
+                $xpath . '/ancestor::alpino_ds/metadata/meta
 			return $node)
 		  let $k := $n/@name
 		  let $t := $n/@type
