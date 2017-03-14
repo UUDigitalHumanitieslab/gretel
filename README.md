@@ -20,7 +20,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 ### Next steps
 
 1. Download (or clone) GrETEL from GitHub.
-2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary).
+2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)).
 3. Create BaseX databases containing the treebanks you want to make available.
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
@@ -49,13 +49,13 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 * We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and auto-minify CSS and JavaSript.
 * Commands to install Grunt, local dependencies and then to watch for changes:
 
-    sudo apt-get install npm
-    sudo apt-get install nodejs-legacy
-    sudo npm install -g grunt-cli
+      sudo apt-get install npm
+      sudo apt-get install nodejs-legacy
+      sudo npm install -g grunt-cli
 
-    npm install
+      npm install
 
-    grunt watch
+      grunt watch
 
 ## Credits
 
