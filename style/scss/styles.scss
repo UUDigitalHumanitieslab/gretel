@@ -1277,9 +1277,9 @@ a.collapse {
             display: flex;
         }
 
-        [for="filter-components"] i {
+        [for="filter-components"] i, [for="filter-metadata"] i {
             transform: scale(1) rotate(180deg);
-        }
+		}
     }
 
     .filter-sel-wrapper {
@@ -1293,6 +1293,7 @@ a.collapse {
         transform: translateY(100%);
         flex-wrap: wrap;
         justify-content: space-between;
+		z-index: 10;
 
         &::before {
             position: absolute;
@@ -1318,7 +1319,7 @@ a.collapse {
             }
         }
 
-        [for="filter-components"] {
+        [for="filter-components"], [for="filter-metadata"] {
             i {
                 transition: transform 150ms;
                 transform-origin: center center;
