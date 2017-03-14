@@ -45,6 +45,18 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
   * `functions.php`: contains general functions that are often required but that are not specific to any part of the process
   * `helpers.php`: basic helper functions that return booleans.
 
+### During development
+* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and auto-minify CSS and JavaSript.
+* Commands to install Grunt, local dependencies and then to watch for changes:
+
+    sudo apt-get install npm
+    sudo apt-get install nodejs-legacy
+    sudo npm install -g grunt-cli
+
+    npm install
+
+    grunt watch
+
 ## Credits
 
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;

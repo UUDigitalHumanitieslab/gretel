@@ -1,0 +1,16 @@
+{
+  "name": "gretel",
+  "version": "3.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CCL-KULeuven/gretel.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-uglify": "^0.5.1",
+	"grunt-contrib-sass": "^1.0.0",
+	"grunt-contrib-cssmin": "~1.0.2",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

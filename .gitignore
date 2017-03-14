@@ -13,3 +13,7 @@ config/
 
 # Sass
 *.css.map
+.sass-cache/
+
+# NPM
+node_modules/

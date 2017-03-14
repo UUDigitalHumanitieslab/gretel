@@ -88,5 +88,5 @@ if (isIE) {
 
 <?php if (API_URL): ?>
   <script>var API = '<?=API_URL; ?>';</script>
-  <script src="js/api-scripts.js"></script>
+  <script src="js/min/api.min.js"></script>
 <?php endif; ?>
