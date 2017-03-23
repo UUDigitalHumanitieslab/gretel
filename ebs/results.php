@@ -93,7 +93,9 @@ require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints):
   require ROOT_PATH."/front-end-includes/results-shared-content.php";
+  echo '<form action="ebs/analysis.php" method="post">';
   setContinueNavigation();
+  echo '</form>';
 else: // $continueConstraints
   if (isset($databaseExists) && !$databaseExists):
     setErrorHeading('No results found'); ?>

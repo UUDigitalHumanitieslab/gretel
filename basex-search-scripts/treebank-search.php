@@ -85,7 +85,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
                 if ($corpus == 'sonar') {
                     list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
                 } else {
-                    list($sentid, $sentence, $ids, $begins) = explode('||', $match);
+                    list($sentid, $sentence, $ids, $begins, $meta) = explode('||', $match);
                 }
 
                 if (isset($sentid, $sentence, $ids, $begins)) {
@@ -99,6 +99,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
                     $sentences{$sentid} = $sentence;
                     $idlist{$sentid} = $ids;
                     $beginlist{$sentid} = $begins;
+                    $metalist{$sentid} = $meta;
                     if ($corpus == 'sonar') {
                         $tblist{$sentid} = $tb;
                     }
@@ -128,7 +129,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
         if ($corpus !== 'sonar') {
             $tblist = false;
         }
-        return array($sentences, $tblist, $idlist, $beginlist);
+        return array($sentences, $tblist, $idlist, $beginlist, $metalist);
     } else {
         // in case there are no results to be found
         return false;
@@ -154,6 +155,8 @@ function createXquery($database, $endPosIteration)
 
     $regulartb = $needRegularSonar ? "let \$tb := '$database'" : '';
     $returnTb = ($corpus == 'sonar') ? '||{data($tb)}' : '';
+    
+    $meta = 'let $meta := ($node//ancestor::alpino_ds/metadata/meta)';
 
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
@@ -189,8 +192,8 @@ function createXquery($database, $endPosIteration)
         $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
-            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
-        $xquery = $for.$xpath.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$return;
+            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$meta}</match>';
+        $xquery = $for.$xpath.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$return;
     }
 
     // Adds positioning values:; limits possible output

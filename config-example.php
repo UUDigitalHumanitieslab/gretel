@@ -33,11 +33,13 @@ $ebsPages = array(
     'tb-sel.php' => 'Treebanks',
     'query.php' => 'Query',
     'results.php' => 'Results',
+    'analysis.php' => 'Analysis',
 );
 $xpsPages = array(
     'input.php' => 'XPath',
     'tb-sel.php' => 'Treebanks',
-    'results.php' => 'Results'
+    'results.php' => 'Results',
+    'analysis.php' => 'Analysis',
 );
 
 $matrixOptions = array(

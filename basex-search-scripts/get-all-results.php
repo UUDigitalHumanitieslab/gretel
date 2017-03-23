@@ -64,7 +64,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, 'all', $session);
+    list($sentences, $tblist, $idlist, $beginlist, $metalist) = getSentences($databases, $already, 'all', $session);
 
     $session->close();
 
@@ -128,7 +128,7 @@ try {
             . '&id='.$idlist[$sid]
             . '" target="_blank">'.$sidString.'</a>';
 
-            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentsString);
+            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentsString, $metalist[$sid]);
             fwrite($fh, "$corpus\t$componentsString\t$hlsentenceDownload\n");
         }
         fclose($fh);
