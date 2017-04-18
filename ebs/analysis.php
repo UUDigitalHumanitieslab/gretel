@@ -116,23 +116,23 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 </script>
 
 <script>
-	$(function () {
+	$(function() {
 		var utils = $.pivotUtilities;
 		var heatmap = utils.renderers["Heatmap"];
         
         var metadata_fields = [];
-        $.get( API + '/treebank/metadata/' + CORPUS, function(data) {
+        $.get(API + '/treebank/metadata/' + CORPUS, function(data) {
             $.each(data, function(i, value) {
                metadata_fields.push(value.field); 
             });
         }).done(function() {
-            console.log(metadata_fields);
             $.ajax('basex-search-scripts/get-all-results.php')
-                .done(function (json) {
+                .done(function(json) {
                     var data = $.parseJSON(json);
                     if (!data.error && data.data) {
-                        var pivotData = [metadata_fields];
-                        
+                        var m_list = [];
+                        var pos_list = [];
+                        var lemmata_list = [];
                         $.each(data.data, function(i, value) {
                             var metadata = $($.parseXML("<metadata>" + value[3] + "</metadata>"));
                             var mv = [];
@@ -143,11 +143,60 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
                             $.each(metadata_fields, function(j, v) {
                                 mv.push(m[v]);
                             });
+                            m_list.push(mv);
                             
-                            pivotData.push(mv);
+                            var nodes = $($.parseXML(value[4]));
+                            var lemmata = [];
+                            var pos = [];
+                            $.each(nodes.find('node'), function(j, v) {
+                                var attr = $(v).attr('pos');
+                                if (attr) {
+                                    pos.push(attr);
+                                }
+                                
+                                var attr = $(v).attr('lemma');
+                                if (attr) {
+                                    lemmata.push(attr);
+                                }
+                            });
+                            pos_list.push(pos);
+                            lemmata_list.push(lemmata);
                         });
-
-                        console.log(pivotData);
+                        
+                        console.log(pos_list);
+                        
+                        
+                        var longest = pos_list.sort(function (a, b) {
+                            return b.length - a.length;
+                        })[0].length;
+                        
+                        for (var i = 1; i <= longest; i++) {
+                            metadata_fields.push('pos' + i);
+                        }
+                        for (var i = 1; i <= longest; i++) {
+                            metadata_fields.push('lem' + i);
+                        }
+                        
+                        var pivotData = [metadata_fields];
+                        
+                        $.each(m_list, function(i, m) {
+                            var line = [];
+                            
+                            line.push.apply(line, m_list[i]);
+                            var p = pos_list[i];
+                            while (p.length < longest) {
+                                p.push('(none)');
+                            }
+                            line.push.apply(line, pos_list[i]);
+                            var l = lemmata_list[i];
+                            while (l.length < longest) {
+                                l.push('(none)');
+                            }
+                            line.push.apply(line, lemmata_list[i]);
+                            
+                            pivotData.push(line);
+                        });                   
+                        
 
                         $("#output").pivotUI(
                             pivotData, {
@@ -166,7 +215,7 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
                         }*/
                     }
                 })
-                .fail(function (jqXHR, textStatus, error) {
+                .fail(function(jqXHR, textStatus, error) {
                     // Edge triggers a fail when an XHR request is aborted
                     // We don't want that, so if the error message is abort, ignore
                     if (error != 'abort') {
@@ -180,9 +229,6 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
                         //xhrFetchSentences.abort();
                 });
         });
-        
-        
-		
 	});
 </script>
 
