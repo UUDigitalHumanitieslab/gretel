@@ -13,6 +13,7 @@
                   'Select a treebank',
                   'Query overview',
                   'Results',
+                  'Analysis',
               );
           }
       } elseif ($currentPage == 'xps') {
@@ -22,6 +23,7 @@
                   'Give an XPath expression',
                   'Select a treebank',
                   'Results',
+                  'Analysis',
               );
           }
       } elseif (isDocs()) {
