@@ -23,23 +23,22 @@ if ($continueConstraints) {
   $isSpam = isSpam($xpath);
 
   $id = session_id();
-}
 
+  if (!$isSpam) {
+    $_SESSION['originalXp'] = $originalXp;
+    $_SESSION['xpath'] = $xpath;
+    $_SESSION['manualMode'] = ($_POST['manualMode'] == 'false') ? false : true;
+    $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
+  }
+}
 session_write_close();
 require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
-<?php
-require ROOT_PATH."/front-end-includes/header.php";
+<?php flush(); ?>
+<?php require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints && !$isSpam):
-  session_start();
-  $_SESSION['originalXp'] = $originalXp;
-  $_SESSION['xpath'] = $xpath;
-  $_SESSION['manualMode'] = ($_POST['manualMode'] == 'false') ? false : true;
-  $_SESSION['ct'] = isset($_POST['ct']) ? true : false;
-  session_write_close();
-
   if (!file_exists(ROOT_PATH."//tmp/$id-sub.xml") || filesize(ROOT_PATH."//tmp/$id-sub.xml") == 0 || !$continueConstraints):
     setErrorHeading();
   ?>
