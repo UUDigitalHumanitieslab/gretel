@@ -27,7 +27,8 @@ $(function() {
         resultID = 0,
         resultsCount = 0,
         done = false,
-        doneCounting = false;
+        doneCounting = false,
+        hasError = false;
 
     getSentences();
     countAll();
@@ -38,7 +39,7 @@ $(function() {
             $(".loading-wrapper.searching").addClass("active");
             xhrFetchSentences = $.ajax(phpVars.fetchResultsPath)
                 .done(function(json) {
-                    if (!done) {
+                    if (!done && !hasError) {
                         var data = $.parseJSON(json);
                         if (!data.error && data.data) {
                             resultsWrapper.find("tbody.empty").hide();
@@ -57,8 +58,10 @@ $(function() {
 
                             clearTimeout(findAllTimeout);
                             done = true;
+                            hasError = true;
 
                             if (xhrAllSentences) xhrAllSentences.abort();
+                            if (xhrCount) xhrCount.abort();
                         }
                     }
                 })
@@ -73,7 +76,7 @@ $(function() {
                     }
                 })
                 .always(function() {
-                    if ((resultID == xResultsBeforeMore) && !done) {
+                    if ((resultID == xResultsBeforeMore) && !done && !hasError) {
                         findAll();
                     }
                 });
@@ -127,38 +130,40 @@ $(function() {
                     sum = data[0],
                     totalArray = data[1];
 
-                resultsCount = sum;
+                if (!data.error && data.sum && data.counts) {
+                  resultsCount = sum;
 
-                sum = numericSeparator(parseInt(sum));
+                  sum = numericSeparator(parseInt(sum));
 
-                controls.find(".count strong + span").text(sum);
-                messages.find(".amount-hits").text(sum);
-                messages.find(".is-still-counting").remove();
+                  controls.find(".count strong + span").text(sum);
+                  messages.find(".amount-hits").text(sum);
+                  messages.find(".is-still-counting").remove();
 
-                body.removeClass("counts-loading");
-                body.addClass("counts-done");
-                // Prepare distribution table. ONLY for lassy and cgn
-                if (resultsCount > 0) {
-                    // Length of associative array (Object in JS)
-                    var size = Object.keys(totalArray).length;
-                    if (typeof totalArray !== 'undefined' && size > 0) {
-                        var hitsSum = 0,
-                            totalSum = 0;
-                        for (var database in totalArray) {
-                            var databaseString = database.split("_")[2],
-                                componentHits = numericSeparator(parseInt(totalArray[database][0])),
-                                componentTotal = numericSeparator(parseInt(totalArray[database][1]));
+                  body.removeClass("counts-loading");
+                  body.addClass("counts-done");
+                  // Prepare distribution table. ONLY for lassy and cgn
+                  if (resultsCount > 0) {
+                      // Length of associative array (Object in JS)
+                      var size = Object.keys(totalArray).length;
+                      if (typeof totalArray !== 'undefined' && size > 0) {
+                          var hitsSum = 0,
+                              totalSum = 0;
+                          for (var database in totalArray) {
+                              var databaseString = database.split("_")[2],
+                                  componentHits = numericSeparator(parseInt(totalArray[database][0])),
+                                  componentTotal = numericSeparator(parseInt(totalArray[database][1]));
 
-                            hitsSum += parseInt(totalArray[database][0]);
-                            totalSum += parseInt(totalArray[database][1]);
-                            downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
-                        }
-                        downloadWrapper.find(".distribution-wrapper tbody").append('<tr><th>Total</th><th>' + numericSeparator(hitsSum) + '</th><th>' + numericSeparator(totalSum) + '</th></tr>');
-                        downloadWrapper.find(".distribution-wrapper").show();
-                    }
-                    if (resultsCount > phpVars.resultsLimit) {
-                        messages.find(".is-restricted").show();
-                    }
+                              hitsSum += parseInt(totalArray[database][0]);
+                              totalSum += parseInt(totalArray[database][1]);
+                              downloadWrapper.find(".distribution-wrapper tbody").append('<tr><td>' + databaseString + '</td><td>' + componentHits + '</td><td>' + componentTotal + '</td></tr>');
+                          }
+                          downloadWrapper.find(".distribution-wrapper tbody").append('<tr><th>Total</th><th>' + numericSeparator(hitsSum) + '</th><th>' + numericSeparator(totalSum) + '</th></tr>');
+                          downloadWrapper.find(".distribution-wrapper").show();
+                      }
+                      if (resultsCount > phpVars.resultsLimit) {
+                          messages.find(".is-restricted").show();
+                      }
+                  }
                 }
             })
             .fail(function(jqXHR, textStatus, error) {
@@ -174,11 +179,6 @@ $(function() {
 
     /**
      * Converts an integer with four or more digits to a comma-separated string
-     * @param {number} integer - Any (positive) integer
-     * @example
-     * // returns 1,234,567
-     * numericSeparator(1234567);
-     * @returns {string} Returns thhe string representation of the number.
      */
     function numericSeparator(integer) {
         if (Number.isInteger(integer) && integer > 999) {
