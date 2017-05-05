@@ -232,7 +232,9 @@ $(function() {
         downloadWrapper.addClass("error");
         body.addClass("search-error");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #error', function() {
-            messages.find(".error-msg").text(error);
+          var link = '<p>If this error persists, please do not hesitate to <a href="documentation.php#faq-4" title="How can you contact us?">contact us</a>!</p>';
+            messages.find(".error-msg").text(error).after(link);
+
             messages.children("div").removeClass("notice").addClass("error active").closest(".results-messages-wrapper").show();
         });
     }
