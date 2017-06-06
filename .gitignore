@@ -6,7 +6,6 @@
 prepros.cfg
 prepros-6.config
 config.php
-config/*
 sitemap.xml
 robots.txt
 .htaccess
