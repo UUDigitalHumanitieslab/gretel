@@ -31,28 +31,26 @@ if ($continueConstraints) {
     $id = session_id();
 
     $input = $_POST['input'];
-}
+    // Check if $input contains email addresses or website URLs
+    $isSpam = isSpam($input);
 
-// Check if $input contains email addresses or website URLs
-$isSpam = ($continueConstraints) ? isSpam($input) : false;
+    if (!$isSpam) {
+      $_SESSION['example'] = $input;
+
+      // Prepare/clean up input to be tokenized in next step
+      $tokinput = tokenize($input);
+      $_SESSION['sentence'] = $tokinput;
+      $parse = alpino($tokinput, $id);
+      modifyLemma($parse, $id);
+    }
+}
 
 require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
-<?php
-require ROOT_PATH."/front-end-includes/header.php";
-
-if ($continueConstraints && !$isSpam) {
-
-    $_SESSION['example'] = $input;
-
-    // Prepare/clean up input to be tokenized in next step
-    $tokinput = tokenize($input);
-    $_SESSION['sentence'] = $tokinput;
-    $parse = alpino($tokinput, $id);
-    modifyLemma($parse, $id);
-?>
+<?php require ROOT_PATH."/front-end-includes/header.php"; ?>
+<?php if ($continueConstraints && !$isSpam) { ?>
 
   <p>You find the structure of the POS-tagged and parsed sentence below.
     POS-tagging refers to the annotation of <em>word classes</em>, such as <code>n</code> (noun),
@@ -85,8 +83,6 @@ if ($continueConstraints && !$isSpam) {
     <?php endif;
     setPreviousPageMessage($step-1);
 }
-
-session_write_close();
 
 require ROOT_PATH."/front-end-includes/footer.php";
 if ($continueConstraints) : ?>

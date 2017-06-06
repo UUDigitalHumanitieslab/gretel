@@ -163,23 +163,27 @@ function checkBfPattern($bf) {
         $tempDatabases[] = $component . $bf;
       }
 
-      $serverInfo = getServerInfo('sonar', $component);
+      try {
+        $serverInfo = getServerInfo('sonar', $component);
 
-      $dbhost = $serverInfo{'machine'};
-      $dbport = $serverInfo{'port'};
-      $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+        $dbhost = $serverInfo{'machine'};
+        $dbport = $serverInfo{'port'};
+        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-      foreach ($tempDatabases as $database) {
-        // db:exists returns a string 'false', still need to convert to bool
-        $databaseExists = $session->query("db:exists('$database')")->execute();
+        foreach ($tempDatabases as $database) {
+          // db:exists returns a string 'false', still need to convert to bool
+          $databaseExists = $session->query("db:exists('$database')")->execute();
 
-        if ($databaseExists != 'false') {
-          $databaseExists = true;
-          $_SESSION['startDatabases'][] = $database;
+          if ($databaseExists != 'false') {
+            $databaseExists = true;
+            $_SESSION['startDatabases'][] = $database;
+          }
         }
+        $continueConstraints = $databaseExists ? true : false;
+        $session->close();
+      } catch (Exception $e) {
+        error_log($e);
       }
-      $continueConstraints = $databaseExists ? true : false;
-      $session->close();
   } else {
     $_SESSION['startDatabases'] = getRegularSonar($component);
     $needRegularSonar = true;

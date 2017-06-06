@@ -63,6 +63,11 @@ $(function() {
     // Immediately hide FAQ sections
     $("body.docs a.collapse").click();
 
+    // Unless it's in the hash
+    if ($body.hasClass("docs") && window.location.hash) {
+      $(window.location.hash).parent("a").click();
+    }
+
     // Open in beautifier
     $("body.matrix .xpath-wrapper a, body.xps.input .open-beautifier-wrapper a").click(function(e) {
         e.preventDefault();
