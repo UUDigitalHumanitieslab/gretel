@@ -46,8 +46,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
   border-radius: 4px;
   overflow: hidden;
   font-size: 12px;
@@ -59,16 +59,16 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   padding: 12px;
 }
 
 .tv .tv-sentence-wrapper {
   display: none;
   -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+  flex: 1;
   text-align: left;
   margin-right: 24px;
   border-bottom: 3px solid #ddd;
@@ -101,11 +101,11 @@
   display: flex;
   overflow: scroll;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-flex: 1 0 0%;
-      -ms-flex: 1 0 0%;
-          flex: 1 0 0%;
+  -ms-flex: 1 0 0%;
+  flex: 1 0 0%;
 }
 
 .tv .tv-tree ol {
@@ -232,7 +232,8 @@
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
   -webkit-transform: translateY(-50%) scale(1);
-          transform: translateY(-50%) scale(1);
+  -ms-transform: translateY(-50%) scale(1);
+  transform: translateY(-50%) scale(1);
 }
 
 .tv .tv-tree li.excluded a:hover span {
@@ -241,7 +242,8 @@
 
 .tv .tv-tree li.excluded a:hover::before {
   -webkit-transform: translateY(-50%) scale(0);
-          transform: translateY(-50%) scale(0);
+  -ms-transform: translateY(-50%) scale(0);
+  transform: translateY(-50%) scale(0);
   pointer-events: none;
 }
 
@@ -371,14 +373,14 @@
   padding: 0 8px;
   list-style: none;
   -webkit-columns: 2;
-     -moz-columns: 2;
-          columns: 2;
+  -moz-columns: 2;
+  columns: 2;
   -webkit-column-gap: 24px;
-     -moz-column-gap: 24px;
-          column-gap: 24px;
+  -moz-column-gap: 24px;
+  column-gap: 24px;
   -webkit-column-rule: 1px solid #ccc;
-     -moz-column-rule: 1px solid #ccc;
-          column-rule: 1px solid #ccc;
+  -moz-column-rule: 1px solid #ccc;
+  column-rule: 1px solid #ccc;
 }
 
 .tv .tv-tooltip > ul li {
@@ -397,9 +399,11 @@
   box-shadow: -6px 6px 6px -2px rgba(0, 0, 0, 0.2);
   content: "";
   -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
   -webkit-transform-origin: 0 0;
-          transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+  transform-origin: 0 0;
 }
 
 .tv .tv-tooltip button {
@@ -419,13 +423,15 @@
   transition: transform 200ms;
   transition: transform 200ms, -webkit-transform 200ms;
   -webkit-transform: translate(50%, -50%);
-          transform: translate(50%, -50%);
+  -ms-transform: translate(50%, -50%);
+  transform: translate(50%, -50%);
 }
 
 .tv .tv-tooltip button:hover {
   background: #dc4e4e;
   -webkit-transform: translate(50%, -50%) scale(1.23);
-          transform: translate(50%, -50%) scale(1.23);
+  -ms-transform: translate(50%, -50%) scale(1.23);
+  transform: translate(50%, -50%) scale(1.23);
 }
 
 .tv .tv-tooltip button:active {
@@ -476,8 +482,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 #tree-visualizer-fs .tv-navigation-wrapper button:first-child {
@@ -497,8 +503,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   margin-left: auto;
 }
 
@@ -512,8 +518,8 @@
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 #tree-visualizer-fs .tv-zoom-opts button {
@@ -541,7 +547,8 @@
   background: #DF5F5F;
   color: white;
   -webkit-transform: scale(1.23);
-          transform: scale(1.23);
+  -ms-transform: scale(1.23);
+  transform: scale(1.23);
 }
 
 #tree-visualizer-fs .tv-zoom-opts button.tv-close-fs:active {
@@ -585,7 +592,8 @@
   background: #8e7f6b;
   color: #FFF !important;
   -webkit-transform: scale(2);
-          transform: scale(2);
+  -ms-transform: scale(2);
+  transform: scale(2);
 }
 
 #tree-visualizer-fs .tv-tree.tv-small a.only-child {
@@ -608,12 +616,14 @@
   z-index: 3;
   margin-top: 1.5em;
   -webkit-transform: scale(2);
-          transform: scale(2);
+  -ms-transform: scale(2);
+  transform: scale(2);
 }
 
 #tree-visualizer-fs .tv-tree.tv-x-small a.hovered, #tree-visualizer-fs .tv-tree.tv-x-small a:hover {
   -webkit-transform: scale(3);
-          transform: scale(3);
+  -ms-transform: scale(3);
+  transform: scale(3);
 }
 
 #tree-visualizer-fs .tv-tree.tv-x-small a.only-child.hovered, #tree-visualizer-fs .tv-tree.tv-x-small a.only-child:hover {
@@ -623,7 +633,8 @@
 #tree-visualizer-fs .tv-tree.tv-x-small a.only-child.hovered ~ span, #tree-visualizer-fs .tv-tree.tv-x-small a.only-child:hover ~ span {
   margin-top: 3em;
   -webkit-transform: scale(3);
-          transform: scale(3);
+  -ms-transform: scale(3);
+  transform: scale(3);
 }
 
 #tree-visualizer-fs .tv-loading-wrapper {
@@ -639,7 +650,8 @@
   background-position: center bottom;
   background-size: contain;
   -webkit-transform: translate(-50%, -67%);
-          transform: translate(-50%, -67%);
+  -ms-transform: translate(-50%, -67%);
+  transform: translate(-50%, -67%);
 }
 
 #tree-visualizer-fs .tv-loading-wrapper p {
@@ -651,7 +663,8 @@
   font-weight: 700;
   font-size: 24px;
   -webkit-transform: translateY(-67%);
-          transform: translateY(-67%);
+  -ms-transform: translateY(-67%);
+  transform: translateY(-67%);
 }
 
 body.tv-fs-open {

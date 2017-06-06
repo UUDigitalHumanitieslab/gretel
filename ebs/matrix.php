@@ -33,6 +33,10 @@ if ($continueConstraints) {
     $id = session_id();
 
     $input = $_SESSION['example'];
+
+    // Set tokenized input sentence to variable
+    $tokinput = $_SESSION['sentence'];
+    $sentence = explode(' ', $tokinput);
 }
 
 require ROOT_PATH."/functions.php";
@@ -45,14 +49,11 @@ require ROOT_PATH."/front-end-includes/head.php";
 require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints):
-  // Set tokenized input sentence to variable
-  $tokinput = $_SESSION['sentence'];
-  $sentence = explode(' ', $tokinput);
 ?>
 <form action="ebs/tb-sel.php" method="post">
   <p>
     In the matrix below, you can indicate the relevant parts of the construction, i.e. the lexical items that should be included in the query, as well as their level of abstraction. Your selection is visualized by means of the <em>query tree</em> at the bottom of this page. The syntactic information provided by the parse in the previous step is automatically included.<br/>
-    The advanced options offer more possibilities to modify your search instruction. You can also modify the generated <em>XPath query</em>, which will be used to do the actual treebank search. 
+    The advanced options offer more possibilities to modify your search instruction. You can also modify the generated <em>XPath query</em>, which will be used to do the actual treebank search.
   </p>
   <div class="flex-content">
     <div class="input-wrapper">
@@ -138,8 +139,6 @@ else:
     It is also possible that you came to this page directly without first entering a query.</p>
   <?php setPreviousPageMessage($step-1);
 endif;
-
-session_write_close();
 
 require ROOT_PATH."/front-end-includes/footer.php";
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
