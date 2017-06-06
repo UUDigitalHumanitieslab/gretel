@@ -8,3 +8,4 @@ config.php
 sitemap.xml
 robots.txt
 .htaccess
+config/
