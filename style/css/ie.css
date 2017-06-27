@@ -4,12 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-<<<<<<< HEAD
-  background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png");
-}
-=======
   background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png"); }
->>>>>>> bcb630f... Starting to use Grunt for auto-compiling SCSS and auto-minifying CSS and JavaScript
 
 .is-ie {
   position: fixed;
