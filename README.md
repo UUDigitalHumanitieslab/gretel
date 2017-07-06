@@ -7,7 +7,7 @@ v3.0. November 2016: GrETEL 3 initial release
 
 Available at http://gretel.ccl.kuleuven.be/gretel3
 
-## Branches
+### Branches
 
 master: official version of GrETEL 3, available at http://gretel.ccl.kuleuven.be/gretel3  
 dev: development version  
