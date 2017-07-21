@@ -128,10 +128,15 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 					.done(function (json) {
 						var data = $.parseJSON(json);
 						if (!data.error && data.data) {
+							// for each match: the metadata, the POS-tags and lemmata
 							var m_list = [];
-							var pos_list = [];
+							var pos_list = []; 
 							var lemmata_list = [];
+
+							// iterate through the found matches
 							$.each(data.data, function (i, value) {
+								// TODO: instead of parsing XML (metadata + nodes), this could probably be done
+								// more efficiently with a simple regex. We're not interested in this structure anyway.
 								var metadata = $($.parseXML("<metadata>" + value[3] + "</metadata>"));
 								var mv = [];
 								var m = {};
@@ -161,9 +166,8 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 								lemmata_list.push(lemmata);
 							});
 
-							console.log(pos_list);
-
-
+							// TODO: this could be done more efficient, either just max (O(n)) instead of sort
+							// or integrate this in the existing loop above.
 							var longest = pos_list.sort(function (a, b) {
 								return b.length - a.length;
 							})[0].length;
@@ -181,6 +185,8 @@ include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 								var line = [];
 
 								line.push.apply(line, m_list[i]);
+								// TODO: instead of first expanding the pos_list and then appending
+								// that list to the result list. Directly expand the result list.
 								var p = pos_list[i];
 								while (p.length < longest) {
 									p.push('(none)');
