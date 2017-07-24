@@ -190,11 +190,11 @@ function createXquery($database, $endPosIteration)
         $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
 
-        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
             .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}</match>';
-        $xquery = $for.$xpath.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$return;
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$return;
     }
 
     // Adds positioning values:; limits possible output
