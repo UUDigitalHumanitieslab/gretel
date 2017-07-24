@@ -37,7 +37,7 @@ my ($inputxml, $options) = @ARGV;
 my $twig=XML::Twig->new('pretty_print' => 'indented');
 $twig->parsefile($inputxml);
 
-my $root=$twig->root->first_child; # start at 'top' node (leave out alpino_ds node)
+my $root=$twig->root->first_child('node'); # start at 'top' node (leave out alpino_ds node, skip 'parser' tag)
 $tree=$twig->children;
 @children=$tree->children;
 $children[1]->cut;
