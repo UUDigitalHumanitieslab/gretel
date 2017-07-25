@@ -7,10 +7,28 @@
     "url": "git+https://github.com/CCL-KULeuven/gretel.git"
   },
   "devDependencies": {
+    "@types/es6-shim": "^0.31.34",
+    "@types/jasmine": "^2.5.53",
+    "@types/karma": "^0.13.36",
     "grunt": "~0.4.0",
+    "grunt-contrib-cssmin": "~1.0.2",
+    "grunt-contrib-jasmine": "^1.1.0",
+    "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify": "^0.5.1",
-	"grunt-contrib-sass": "^1.0.0",
-	"grunt-contrib-cssmin": "~1.0.2",
-    "grunt-contrib-watch": "^1.0.0"
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-karma": "^2.0.0",
+    "grunt-template-jasmine-requirejs": "^0.2.3",
+    "grunt-ts": "^6.0.0-beta.16",
+    "jasmine": "^2.6.0",
+    "jasmine-core": "^2.6.4",
+    "jasmine-ts": "^0.2.0",
+    "karma": "^1.7.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-requirejs": "^1.1.0",
+    "phantomjs": "^2.1.7",
+    "requirejs": "^2.3.4",
+    "typescript": "^2.4.2",
+    "typings": "^2.1.1"
   }
 }

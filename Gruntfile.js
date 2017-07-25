@@ -2,6 +2,19 @@ module.exports = function (grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		ts: {
+			default: {
+				src: ['node_modules/@types/**/*.d.ts', 'ts/**/*.ts'],
+				outDir: 'js',
+				options: {
+					keepDirectoryHierarchy: true,
+					module: 'amd',
+					fast: 'never',
+					target: 'ES5',
+					inlineSourceMap: true
+				}
+			}
+		},
 		uglify: {
 			build: {
 				files: {
@@ -30,7 +43,22 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+
+		// use karma to run tests
+		karma: {
+			options: {
+				configFile: 'karma.conf.js'
+			},
+			default: {
+				logLevel: 'INFO',
+			}
+		},
+
 		watch: {
+			ts: {
+				files: ['ts/**/*.ts'],
+				tasks: ['ts', 'karma']
+			},
 			js: {
 				files: ['js/*.js'],
 				tasks: ['uglify']
@@ -39,7 +67,7 @@ module.exports = function (grunt) {
 				files: ['style/scss/*.scss'],
 				tasks: ['sass', 'cssmin']
 			}
-		}
+		},
 	});
 
 	// Load the plugins
@@ -47,7 +75,10 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-jasmine');
+	grunt.loadNpmTasks('grunt-karma');
+	grunt.loadNpmTasks('grunt-ts');
 
 	// Default task(s).
-	grunt.registerTask('default', ['uglify', 'sass', 'cssmin']);
+	grunt.registerTask('default', ['ts', 'uglify', 'sass', 'cssmin', 'karma']);
 };
