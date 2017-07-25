@@ -164,7 +164,7 @@
 
       $tableHTML = '<table><thead><tr><th>sentence</th>';
 
-      foreach ($sentence as $key => $word) {
+      foreach ($sentence as $word) {
           $tableHTML .= "<td>$word</td>";
       }
       $tableHTML .= '</tr></thead><tbody>';
