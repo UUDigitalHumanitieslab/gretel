@@ -4,7 +4,7 @@ module.exports = function (config) {
 
         files: [
             // The tests should be included manually (using AMD)
-            { pattern: 'js/**/*.spec.js', included: false },
+            { pattern: 'js/**/*.js', included: false },
 
             'test-main.js'
         ],

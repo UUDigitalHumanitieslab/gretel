@@ -3,7 +3,9 @@ import { XPathExtractinator } from './xpath-extractinator';
 describe("XPath Extractinator",
     () => {
         it("Works", () => {
-            // TODO: implement
-            expect(42).toEqual(42, 'huh?');
+            let extractinator = new XPathExtractinator();
+            let result = extractinator.extract('//node');
+            console.log(result);
+            expect(result).toBeTruthy();
         });
     });
