@@ -52,7 +52,7 @@ $xpath = ProcessTree($subtree);
 
 my $orderString =
   $order
-  ? ' and not(.//node[position() < last()][number(@begin) > following-sibling::node/number(@begin)])'
+  ? ' and not(.//node[position() < last()][number(@begin) > number(following-sibling::node/@begin)])'
   : '';
 
 if ( $xpath && $topxpath ) {    # if more than one node is selected
