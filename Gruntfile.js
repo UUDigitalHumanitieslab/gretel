@@ -11,7 +11,12 @@ module.exports = function (grunt) {
 					module: 'amd',
 					fast: 'never',
 					target: 'ES5',
-					inlineSourceMap: true
+					inlineSourceMap: true,
+					noFallthroughCasesInSwitch: true,
+					noImplicitAny: true,
+					noImplicitUseStrict: true,
+					noImplicitReturns: true,
+					strictNullChecks: true
 				}
 			}
 		},

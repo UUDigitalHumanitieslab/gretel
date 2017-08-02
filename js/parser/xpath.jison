@@ -99,19 +99,19 @@ arg_list:   arg_list COMMA expr     { var args = $1;
 
 path_expr:  loc_path
         |   filter_expr SLASH rel_loc_path          { $$ = new yy.xpathModels.XPathPathExpr({
-                                                                    initial_context: yy.xpathModels.XPathInitialContextEnum.EXPR,
+                                                                    initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: $1, steps: $3}); }
         |   filter_expr DBL_SLASH rel_loc_path      { var steps = $3;
                                                       steps.splice(0, 0, new yy.xpathModels.XPathStep({
                                                                                 axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
                                                                                 test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
                                                       $$ = new yy.xpathModels.XPathPathExpr({
-                                                                    initial_context: yy.xpathModels.XPathInitialContextEnum.EXPR,
+                                                                    initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: $1, steps: steps}); }
         |   base_expr SLASH rel_loc_path            { // could eliminate filterExpr wrapper, but this makes tests pass as-is
                                                       var filterExpr = new yy.xpathModels.XPathFilterExpr({expr: $1});
                                                       $$ = new yy.xpathModels.XPathPathExpr({
-                                                                    initial_context: yy.xpathModels.XPathInitialContextEnum.EXPR,
+                                                                    initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: filterExpr, steps: $3}); }
         |   base_expr DBL_SLASH rel_loc_path        { var steps = $3;
                                                       // could eliminate filterExpr wrapper, but this makes tests pass as-is
@@ -120,7 +120,7 @@ path_expr:  loc_path
                                                                                 axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
                                                                                 test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
                                                       $$ = new yy.xpathModels.XPathPathExpr({
-                                                                    initial_context: yy.xpathModels.XPathInitialContextEnum.EXPR,
+                                                                    initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: filterExpr, steps: steps}); }
         ;
 
@@ -130,10 +130,10 @@ filter_expr:  base_expr predicate     { $$ = new yy.xpathModels.XPathFilterExpr(
                                         $$ = filterExpr; }
         ;
 
-hashtag_expr:  HASH QNAME SLASH hashtag_path              { $$ = new yy.xpathModels.HashtagExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.HASHTAG,
+hashtag_expr:  HASH QNAME SLASH hashtag_path              { $$ = new yy.xpathModels.HashtagExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.HASHTAG,
                                                                       namespace: $2,
                                                                       steps: $4}); }
-        |  HASH QNAME                                     { $$ = new yy.xpathModels.HashtagExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.HASHTAG,
+        |  HASH QNAME                                     { $$ = new yy.xpathModels.HashtagExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.HASHTAG,
                                                                       namespace: $2,
                                                                       steps: []}); }
         ;
@@ -147,17 +147,17 @@ predicate:   LBRACK expr RBRACK            { $$ = $2; }
         ;
 
 
-loc_path:   rel_loc_path                    { $$ = new yy.xpathModels.XPathPathExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.RELATIVE,
+loc_path:   rel_loc_path                    { $$ = new yy.xpathModels.XPathPathExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.RELATIVE,
                                                                       steps: $1}); }
-        |   SLASH rel_loc_path              { $$ = new yy.xpathModels.XPathPathExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.ROOT,
+        |   SLASH rel_loc_path              { $$ = new yy.xpathModels.XPathPathExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.ROOT,
                                                                       steps: $2}); }
         |   DBL_SLASH rel_loc_path          { var steps = $2;
                                               // insert descendant step into beginning
                                               steps.splice(0, 0, new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
                                                                                 test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
-                                              $$ = new yy.xpathModels.XPathPathExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.ROOT,
+                                              $$ = new yy.xpathModels.XPathPathExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.ROOT,
                                                                       steps: steps}); }
-        |   SLASH                   { $$ = new yy.xpathModels.XPathPathExpr({initial_context: yy.xpathModels.XPathInitialContextEnum.ROOT,
+        |   SLASH                   { $$ = new yy.xpathModels.XPathPathExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.ROOT,
                                                               steps: []});}
         ;
 
