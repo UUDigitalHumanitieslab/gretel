@@ -14,17 +14,17 @@
       <?php if (!API_URL) { ?>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="cgn"> <strong>CGN treebank</strong>: spoken Dutch - version 2.0.1
+          <input type="radio" name="treebank" value="cgn" required> <strong>CGN treebank</strong>: spoken Dutch - version 2.0.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="lassy"> <strong>LASSY Small</strong>: written Dutch - version 1.1
+          <input type="radio" name="treebank" value="lassy" required> <strong>LASSY Small</strong>: written Dutch - version 1.1
         </label>
       </div>
       <div class="label-wrapper">
         <label>
-          <input type="radio" name="treebank" value="sonar"> <strong>SoNaR treebank</strong>: written Dutch - version 1.0
+          <input type="radio" name="treebank" value="sonar" required> <strong>SoNaR treebank</strong>: written Dutch - version 1.0
         </label>
       </div>
       <?php } ?>

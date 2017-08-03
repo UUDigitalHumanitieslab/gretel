@@ -2,7 +2,7 @@ $(function() {
     // Add radio buttons for each treebank   
     $.getJSON(API + '/treebank', function(data) {
         $.each(data, function(i, e) {
-            var radio = $('<input type="radio" name="treebank" />')
+            var radio = $('<input type="radio" name="treebank" required />')
                 .attr('id', e.title)
                 .attr('value', e.title)
                 .appendTo('.labels-wrapper');
