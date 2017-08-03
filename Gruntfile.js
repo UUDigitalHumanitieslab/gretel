@@ -2,21 +2,46 @@ module.exports = function (grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		copy: {
+			js: {
+				files: [
+					{
+						expand: true,
+						cwd: 'node_modules/requirejs',
+						src: 'require.js',
+						dest: 'js/packages/'
+					},
+					{
+						expand: true,
+						cwd: 'node_modules/rxjs/bundles/',
+						src: '*',
+						dest: 'js/packages/'
+					}
+				]
+			}
+		},
+		jison: {
+			default: {
+				options: { moduleType: 'amd' },
+				files: { 'js/ts/parser/xpath.js': ['ts/parser/xpath.jison', 'ts/parser/xpath.jisonlex'] }
+			}
+		},
 		ts: {
 			default: {
-				src: ['node_modules/@types/**/*.d.ts', 'ts/**/*.ts'],
-				outDir: 'js',
+				src: ['!node_modules/**', 'ts/**/*.ts'],
+				outDir: 'js/ts',
 				options: {
 					keepDirectoryHierarchy: true,
 					module: 'amd',
+					moduleResolution: 'node',
 					fast: 'never',
 					target: 'ES5',
 					inlineSourceMap: true,
 					noFallthroughCasesInSwitch: true,
-					noImplicitAny: true,
+					// noImplicitAny: true, // not compatible with JQuery
 					noImplicitUseStrict: true,
 					noImplicitReturns: true,
-					strictNullChecks: true
+					// strictNullChecks: true // not compatible with JQuery
 				}
 			}
 		},
@@ -76,6 +101,7 @@ module.exports = function (grunt) {
 	});
 
 	// Load the plugins
+	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
@@ -83,7 +109,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jasmine');
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-ts');
+	grunt.loadNpmTasks('grunt-jison');
 
 	// Default task(s).
-	grunt.registerTask('default', ['ts', 'uglify', 'sass', 'cssmin', 'karma']);
+	grunt.registerTask('default', ['copy', 'jison', 'ts', 'uglify', 'sass', 'cssmin', 'karma']);
 };

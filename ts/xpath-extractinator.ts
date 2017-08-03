@@ -1,7 +1,6 @@
 import * as parser from './parser/xpath';
 import { XPathModels } from './parser/xpath-models';
 
-
 export class XPathExtractinator {
     constructor() {
         // assign the shared scope
@@ -16,9 +15,11 @@ export class XPathExtractinator {
     /**
      * Extract a variable for each node matched by the query.
      * @param xPath Query to analyse.
+     * @throws {XPathModels.ParseError} The provided query is malformed.
      * @throws {FormatError} The provided query is in an unexpected format.
      */
     extract(xPath: string): PathVariable[] {
+        if (!xPath || !xPath.trim()) { return []; }
         let parsed = parser.parse(xPath);
         // expect any query to at least start with //node
         if (parsed.type == 'path') {
@@ -68,13 +69,16 @@ export class XPathExtractinator {
     }
 }
 
-export class FormatError extends Error {
+export class FormatError {
     constructor(public type: 'path_start' | 'operation_type' | 'axis_type', public details: string[] = []) {
-        super({
+    }
+
+    public get message() {
+        return {
             'path_start': 'Unexpected path format! Expected it should start with //node.',
-            'operation_type': `Unexpected operation type ${details[0]}.`,
-            'axis_type': `Unknown axis type (${details[0]}).`
-        }[type]);
+            'operation_type': `Unexpected operation type ${this.details[0]}.`,
+            'axis_type': `Unknown axis type (${this.details[0]}).`
+        }[this.type]
     }
 }
 

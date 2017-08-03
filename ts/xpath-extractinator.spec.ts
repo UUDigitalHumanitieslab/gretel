@@ -1,4 +1,5 @@
 import { XPathExtractinator, PathVariable } from './xpath-extractinator';
+import { XPathModels } from './parser/xpath-models';
 
 describe("XPath Extractinator",
     () => {
@@ -7,6 +8,26 @@ describe("XPath Extractinator",
         beforeEach(() => {
             extractinator = new XPathExtractinator();
         })
+
+        it("Ignores empty input", () => {
+            expectExtract('', [], false);
+        });
+
+        it("Ignores malformed input", () => {
+            let parseError: XPathModels.ParseError | null = null;
+            let result: PathVariable[] | null = null;
+            try {
+                result = extractinator.extract('//node[');
+            }
+            catch (error) {
+                if (error instanceof XPathModels.ParseError) {
+                    parseError = error;
+                }
+            }
+
+            expect(result).toBeFalsy('No results should be returned if the input is malformed!');
+            expect(parseError).toBeTruthy('No ParseError was thrown!');
+        });
 
         it("Extracts root", () => {
             // the root is implicit and called $node; it shouldn't be returned as extracted

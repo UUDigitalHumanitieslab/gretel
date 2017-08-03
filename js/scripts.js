@@ -418,7 +418,7 @@ $(function() {
                 }
 
                 if (data.xpath) {
-                    $("#xpath, .xpath-wrapper input[name='originalXp']").val(data.xpath);
+                    $("#xpath, .xpath-wrapper input[name='originalXp']").val(data.xpath).change();
                     adjustTextareaHeight($("#xpath"));
                 }
 

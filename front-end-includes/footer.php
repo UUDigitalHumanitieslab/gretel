@@ -90,3 +90,18 @@ if (isIE) {
   <script>var API = '<?=API_URL; ?>';</script>
   <script src="js/min/api.min.js"></script>
 <?php endif; ?>
+<script type="text/javascript">
+$('body').ready(function() {
+  window.setTimeout(function() {
+    // TODO: everything through requirejs, so we don't need to wait anymore...
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src ='js/packages/require.js';
+    var $script = $(script);
+    $script.attr('data-main', 'js/app-config');
+
+    $('#requirejs').append(script);    
+  }, 0);
+});
+</script>
+<div id="requirejs"></div>
