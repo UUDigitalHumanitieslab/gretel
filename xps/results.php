@@ -13,6 +13,7 @@ require "../config.php";
 require ROOT_PATH."/helpers.php";
 
 require ROOT_PATH."/front-end-includes/metadata.php";
+require ROOT_PATH."/front-end-includes/xpath-variables-hidden.php";
 retrieve_metadata();
 
 $_SESSION['ebsxps'] = $currentPage;
@@ -103,7 +104,10 @@ require ROOT_PATH."/front-end-includes/header.php";
 
 if ($continueConstraints):
     require ROOT_PATH."/front-end-includes/results-shared-content.php";
+    echo '<form action="xps/analysis.php" method="post">';
     setContinueNavigation();
+    render_xpath_variables_hidden("xpath-variables");
+    echo '</form>';
 else: // $continueConstraints
     setErrorHeading();
     ?>

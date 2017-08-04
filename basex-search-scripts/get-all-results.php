@@ -18,6 +18,7 @@ $components = $_SESSION['subtreebank'];
 $componentsString = implode('-', $components);
 $databaseString = $corpus;
 $already = $databases = $_SESSION['startDatabases'];
+$variables = isset($_POST['variables']) ? $_POST['variables'] : null;
 
 if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
@@ -64,7 +65,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist) = getSentences($databases, $already, 'all', $session);
+    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList) = getSentences($databases, $already, 'all', $session, $variables);
 
     $session->close();
 
@@ -128,7 +129,7 @@ try {
             . '&id='.$idlist[$sid]
             . '" target="_blank">'.$sidString.'</a>';
 
-            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentsString, $metalist[$sid], $xmllist[$sid]);
+            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentsString, $metalist[$sid], $xmllist[$sid], $varList[$sid]);
             fwrite($fh, "$corpus\t$componentsString\t$hlsentenceDownload\n");
         }
         fclose($fh);

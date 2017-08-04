@@ -46,7 +46,11 @@ function corpusToDatabase($components, $corpus)
     return $databases;
 }
 
-function getSentences($databases, $already, $endPosIteration, $session)
+/**
+ *
+ * @param $variables An array with variables to return. Each element should contain name and path.
+ */
+function getSentences($databases, $already, $endPosIteration, $session, $variables = null)
 {
     global $flushLimit, $resultsLimit, $needRegularSonar, $corpus;
 
@@ -61,7 +65,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
                 ++$endPosIteration;
             }
 
-            $xquery = createXquery($database, $endPosIteration);
+            $xquery = createXquery($database, $endPosIteration, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -101,6 +105,8 @@ function getSentences($databases, $already, $endPosIteration, $session)
                     $beginlist{$sentid} = $begins;
                     $xmllist{$sentid} = $xml_sentences;
                     $metalist{$sentid} = $meta;
+                    preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
+                    $varList{$sentid} = $varMatches[0];
                     if ($corpus == 'sonar') {
                         $tblist{$sentid} = $tb;
                     }
@@ -108,7 +114,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
             }
             if ($endPosIteration === 'all') {
                 break;
-            } else if ($matchesAmount >= $flushLimit) {
+            } elseif ($matchesAmount >= $flushLimit) {
                 // Re-add pop'd database because it is very likely we aren't finished with it
                 // More results are still in that database but because of the flushlimit we
                 // have to bail out
@@ -130,16 +136,28 @@ function getSentences($databases, $already, $endPosIteration, $session)
         if ($corpus !== 'sonar') {
             $tblist = false;
         }
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist);
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList);
     } else {
         // in case there are no results to be found
         return false;
     }
 }
 
-function createXquery($database, $endPosIteration)
+function createXquery($database, $endPosIteration, $variables)
 {
     global $flushLimit, $resultsLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
+
+    $variable_declarations = '';
+    $variable_results = '';
+
+    if (isset($variables) && $variables != null) {
+        foreach ($variables as $index => $value) {
+            $name = $value['name'];
+            $variable_declarations .= 'let ' . $name . ' := (' . $value['path'] . ')';
+            $variable_results .= '<var name="' . $name . '">{' . $name . '/@lemma}{' . $name . '/@pos}</var>';
+        }
+        $variable_results = '<vars>' . $variable_results . '</vars>';
+    }
 
     $for = 'for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
@@ -188,13 +206,13 @@ function createXquery($database, $endPosIteration)
         }
 
         $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
-            .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
+            .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||'.$variable_results.'</match>';
 
-        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$variable_declarations.$return;
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
-            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}</match>';
-        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$return;
+            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}||'.$variable_results.'</match>';
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
     }
 
     // Adds positioning values:; limits possible output
@@ -203,8 +221,8 @@ function createXquery($database, $endPosIteration)
     if ($endPosIteration == 'all') {
         $closePosition = ')[position() = 1 to '.$resultsLimit.']';
     }
-    // Only fetch the given flushLimit, and increment on each iteration
     else {
+        // Only fetch the given flushLimit, and increment on each iteration
         $endPosition = $endPosIteration * $flushLimit;
         $startPosition = $endPosition - $flushLimit + 1;
         $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';

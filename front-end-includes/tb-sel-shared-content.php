@@ -1,3 +1,6 @@
+<?php 
+require "xpath-variables-hidden.php";
+?>
 <p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
   on these treebanks, you can find the project websites in <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.</p>
 
@@ -9,6 +12,7 @@
 ?>
 
 <form action="<?php echo $nextPage; ?>" method="post">
+  <?php render_xpath_variables_hidden("xpath-variables"); ?>
   <div class="flex-content">
     <div class="labels-wrapper">
       <?php if (!API_URL) { ?>

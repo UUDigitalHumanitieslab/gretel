@@ -51,8 +51,8 @@ class View {
     private paths: JQuery[] = [];
 
     private renderItem = (index: number) => {
-        let nameInput = $(`<input type="hidden" name="${this.formName}[${index}].name" />`);
-        let pathInput = $(`<input type="hidden" name="${this.formName}[${index}].path" />`);
+        let nameInput = $(`<input type="hidden" name="${this.formName}[${index}][name]" />`);
+        let pathInput = $(`<input type="hidden" name="${this.formName}[${index}][path]" />`);
 
         this.target.append(nameInput);
         this.target.append(pathInput);
