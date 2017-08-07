@@ -57,6 +57,7 @@ require ROOT_PATH."/front-end-includes/head.php";
             </div>
           </div>
         </div>
+        <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
         <?php setContinueNavigation(); ?>
     </form>
 

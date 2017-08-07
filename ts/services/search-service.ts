@@ -17,7 +17,7 @@ export class SearchService {
 
                     return resolve(this.parseData(data.data));
                 } else {
-                    return reject(data.error);
+                    return reject(data.data);
                 }
             });
         });
