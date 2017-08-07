@@ -112,8 +112,8 @@ if ($continueConstraints) {
     setPreviousPageMessage(4);
     }
 }
-require ROOT_PATH."/front-end-includes/footer.php";
-include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+require ROOT_PATH . "/front-end-includes/footer.php";
+include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 
 if ($continueConstraints) {
     include ROOT_PATH."/front-end-includes/notifications.php";
