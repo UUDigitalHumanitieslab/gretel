@@ -80,15 +80,19 @@ if ($continueConstraints) {
     session_write_close();
 }
 ?>
-
 <?php flush(); ?>
 <?php
 require ROOT_PATH . "/front-end-includes/header.php";
-?>
-<analysis data-api-url="<?=htmlspecialchars(API_URL) ?>" data-corpus="<?=htmlspecialchars($corpus) ?>"></analysis>
-<?php
+
 if ($continueConstraints) {
+    ?>
+    <analysis data-api-url="<?=htmlspecialchars(API_URL) ?>" data-corpus="<?=htmlspecialchars($corpus) ?>"></analysis>
+    <?php
     setContinueNavigation();
+} else {
+    ?>
+    <p>Something went wrong. It is possible that you came to this page directly without entering the required fields in the previous steps.</p>
+    <?php
 }
 require ROOT_PATH . "/front-end-includes/footer.php";
 include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
