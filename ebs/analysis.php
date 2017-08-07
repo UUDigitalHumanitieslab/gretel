@@ -93,10 +93,7 @@ if ($continueConstraints) {
 require ROOT_PATH . "/front-end-includes/footer.php";
 include ROOT_PATH . "/front-end-includes/analytics-tracking.php";
 ?>
-
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pivottable/2.11.0/pivot.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/pivottable/2.11.0/pivot.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/pivottable/2.6.0/tips_data.min.js"></script>
+<link rel="stylesheet" href="js/packages/pivottable/pivot.min.css">
 <div id="xpath-variables">
 <?php
 if (isset($_POST["xpath-variables"])) {

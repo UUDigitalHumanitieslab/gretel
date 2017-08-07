@@ -1,3 +1,5 @@
+import * as $ from 'jquery';
+
 export class TreebankService {
     // TODO: have a configuration available for getting this kind of URLs from
     constructor(private api: string){

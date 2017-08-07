@@ -1,4 +1,6 @@
 import { PathVariable } from '../xpath-extractinator';
+import * as $ from 'jquery';
+
 export class SearchService {
     public getAllResults(variables: PathVariable[]) {
         // TODO: read URL from config

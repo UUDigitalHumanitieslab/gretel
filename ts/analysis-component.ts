@@ -2,9 +2,8 @@ import { NotificationService } from './services/notification-service';
 import { TreebankService } from './services/treebank-service';
 import { SearchService, SearchResult } from './services/search-service';
 import { PathVariable } from './xpath-extractinator';
-//import * as $ from 'jquery'; TODO: also load jquery using require;
-// currently this breaks the tree-visualizer plugin which isn't loaded this way
-import { } from 'pivottable';
+import * as $ from 'jquery';
+import 'pivottable/pivot';
 
 export class AnalysisComponent {
     variables: PathVariable[];

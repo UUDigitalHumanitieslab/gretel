@@ -1,6 +1,8 @@
 import { AnalysisComponent } from './analysis-component';
 import { XPathVariablesComponent } from './xpath-variables-component';
 
+import * as $ from 'jquery';
+
 export class ComponentsRenderer {
     private componentMap = {
         'analysis': AnalysisComponent,
