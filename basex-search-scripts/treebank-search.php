@@ -153,7 +153,7 @@ function createXquery($database, $endPosIteration, $variables)
     if (isset($variables) && $variables != null) {
         foreach ($variables as $index => $value) {
             $name = $value['name'];
-            $variable_declarations .= 'let ' . $name . ' := (' . $value['path'] . ')';
+            $variable_declarations .= 'let ' . $name . ' := (' . $value['path'] . ')[1]';
             $variable_results .= '<var name="' . $name . '">{' . $name . '/@lemma}{' . $name . '/@pos}</var>';
         }
         $variable_results = '<vars>' . $variable_results . '</vars>';
