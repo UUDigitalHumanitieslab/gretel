@@ -16,6 +16,12 @@ module.exports = function (grunt) {
 						cwd: 'node_modules/rxjs/bundles/',
 						src: '*',
 						dest: 'js/packages/'
+					},
+					{
+						expand: true,
+						cwd: 'node_modules/pivottable/dist/',
+						src: '*',
+						dest: 'js/packages/pivottable/'
 					}
 				]
 			}

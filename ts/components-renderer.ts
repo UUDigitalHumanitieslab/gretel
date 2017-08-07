@@ -1,8 +1,10 @@
+import { AnalysisComponent } from './analysis-component';
 import { XPathVariablesComponent } from './xpath-variables-component';
 
 export class ComponentsRenderer {
     private componentMap = {
-        '.xpath-variables': XPathVariablesComponent
+        'analysis': AnalysisComponent,
+        'xpath-variables': XPathVariablesComponent
     }
 
     public render() {

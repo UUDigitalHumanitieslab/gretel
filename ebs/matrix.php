@@ -106,7 +106,7 @@ if ($continueConstraints):
         <input type="hidden" name="manualMode" value="false">
 
         <textarea id="xpath" class="advanced-option" name="xpath" spellcheck="false" wrap="soft" required></textarea>
-        <div class="xpath-variables" data-name="xpath-variables" data-source="#xpath"></div>
+        <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
         <div class="open-beautifier-wrapper advanced-option">
           <input type="reset" value="Reset XPath" style="font-size: 88%">
 

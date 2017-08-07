@@ -1,6 +1,7 @@
 require.config({
     paths: {
-        "rxjs": "packages/Rx"
+        "rxjs": "packages/Rx",
+        "pivottable": "packages/pivottable"
     }
 });
 define(["require", "exports", "./ts/components-renderer"], function (require, exports, components_renderer) {

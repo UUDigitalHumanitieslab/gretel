@@ -4,11 +4,10 @@ module.exports = function (config) {
 
         files: [
             // The tests should be included manually (using AMD)
-            { pattern: 'js/**/*.js', included: false },
+            { pattern: 'js/!(packages)/**/*.js', included: false },
 
             'test-main.js'
         ],
-
         reporters: ['progress'],
         browsers: ['PhantomJS'],
         autoWatch: false,
