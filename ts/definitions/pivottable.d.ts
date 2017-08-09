@@ -43,6 +43,12 @@ interface PivotOptions {
     localeStrings?: any;
 }
 
+declare type PivotAggregator<T> = (data: any, rowKey: any, colKey: any) => {
+    push: (record) => void,
+    value: () => T,
+    format: (x: T) => string
+}
+
 interface PivotUiOptions {
     /**
      * dictionary of rendering functions, defaulting with various table renderers 
@@ -52,7 +58,7 @@ interface PivotUiOptions {
     /**
      * dictionary of generators for aggregation functions in dropdown, defaulting to common aggregators
      */
-    aggregators?: any;
+    aggregators?: { [name: string]: PivotAggregator<any> };
 
     /**
      * array of strings, attribute names to prepopulate in row area, default is []
@@ -134,8 +140,51 @@ interface PivotUiOptions {
 }
 
 interface PivotUtilities {
-    aggregatorTemplates: any,
-    aggregators: any,
+    aggregatorTemplates: {
+        average: PivotAggregator<any>,
+        count: PivotAggregator<any>,
+        countUnique: PivotAggregator<any>,
+        extremes: PivotAggregator<any>,
+        first: PivotAggregator<any>,
+        fractionOf: PivotAggregator<any>,
+        last: PivotAggregator<any>,
+        listUnique: PivotAggregator<any>,
+        max: PivotAggregator<any>,
+        median: PivotAggregator<any>,
+        min: PivotAggregator<any>,
+        quantile: PivotAggregator<any>,
+        runningStat: PivotAggregator<any>,
+        stdev: PivotAggregator<any>,
+        sum: PivotAggregator<any>,
+        sumOverSum: PivotAggregator<any>,
+        sumOverSumBound80: PivotAggregator<any>,
+        uniques: PivotAggregator<any>,
+        'var': PivotAggregator<any>
+    }
+    aggregators: {
+        '80% Lower Bound': PivotAggregator<any>,
+        '80% Upper Bound': PivotAggregator<any>,
+        'Average': PivotAggregator<any>,
+        'Count': PivotAggregator<any>,
+        'Count Unique Values': PivotAggregator<any>,
+        'Count as Fraction of Columns': PivotAggregator<any>,
+        'Count as Fraction of Rows': PivotAggregator<any>,
+        'Count as Fraction of Total': PivotAggregator<any>,
+        'First': PivotAggregator<any>,
+        'Integer Sum': PivotAggregator<any>,
+        'Last': PivotAggregator<any>,
+        'List Unique Values': PivotAggregator<any>,
+        'Maximum': PivotAggregator<any>,
+        'Median': PivotAggregator<any>,
+        'Minimum': PivotAggregator<any>,
+        'Sample Standard Deviation': PivotAggregator<any>,
+        'Sample Variance': PivotAggregator<any>,
+        'Sum': PivotAggregator<any>,
+        'Sum as Fraction of Columns': PivotAggregator<any>,
+        'Sum as Fraction of Rows': PivotAggregator<any>,
+        'Sum as Fraction of Total': PivotAggregator<any>,
+        'Sum over Sum': PivotAggregator<any>
+    },
     renderers: {
         [name: string]: any
     },
@@ -166,8 +215,8 @@ interface JQueryPivot {
 
     pivotUtilities: PivotUtilities;
 }
-interface JQuery extends JQueryPivot {}
-interface JQueryStatic extends JQueryPivot {}
+interface JQuery extends JQueryPivot { }
+interface JQueryStatic extends JQueryPivot { }
 
 // require js module support
 

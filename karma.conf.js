@@ -1,6 +1,6 @@
 module.exports = function (config) {
     config.set({
-        frameworks: ['jasmine', 'requirejs'],
+        frameworks: ['jasmine-jquery','jasmine', 'requirejs'],
 
         files: [
             // The tests should be included manually (using AMD)

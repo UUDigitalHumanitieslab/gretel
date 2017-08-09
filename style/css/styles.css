@@ -1450,4 +1450,9 @@ a.collapse {
       .page-footer .other .logo-wrapper path {
         fill: #655745; }
 
+analysis {
+  display: block;
+  max-width: 100%;
+  overflow: auto; }
+
 /*# sourceMappingURL=styles.css.map */
