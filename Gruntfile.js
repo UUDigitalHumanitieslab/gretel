@@ -2,6 +2,7 @@ module.exports = function (grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		clean: ['js/packages', 'js/ts', 'log', 'tmp'],
 		copy: {
 			js: {
 				files: [
@@ -108,6 +109,7 @@ module.exports = function (grunt) {
 
 	// Load the plugins
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-sass');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
@@ -118,5 +120,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-jison');
 
 	// Default task(s).
-	grunt.registerTask('default', ['copy', 'jison', 'ts', 'uglify', 'sass', 'cssmin', 'karma']);
+	grunt.registerTask('default', ['clean', 'copy', 'jison', 'ts', 'uglify', 'sass', 'cssmin', 'karma']);
 };
