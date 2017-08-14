@@ -13,9 +13,10 @@ export class AnalysisComponent {
     corpus: string;
     treebankService: TreebankService;
 
-    constructor(element: JQuery, private analysisService = new AnalysisService(), private notificationService = new NotificationService(), private searchService = new SearchService()) {
-        this.initialize(element);
-        this.show(element);
+    constructor(element: HTMLElement, private analysisService = new AnalysisService(), private notificationService = new NotificationService(), private searchService = new SearchService()) {
+        let $element = $(element);
+        this.initialize($element);
+        this.show($element);
     }
 
     private initialize(element: JQuery) {

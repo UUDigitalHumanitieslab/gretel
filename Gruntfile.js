@@ -2,10 +2,18 @@ module.exports = function (grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		clean: ['js/packages', 'js/ts', 'log', 'tmp'],
+		clean: {
+			default: ['js/packages', 'js/ts', 'log/*', 'tmp/*']
+		},
 		copy: {
 			js: {
 				files: [
+					{
+						expand: true,
+						cwd: 'node_modules/ace-builds/src-min/',
+						src: ['ace.js', 'theme-dawn.js', 'mode-xquery.js', 'worker-xquery.js'],
+						dest: 'js/packages/ace'
+					},
 					{
 						expand: true,
 						cwd: 'node_modules/requirejs',

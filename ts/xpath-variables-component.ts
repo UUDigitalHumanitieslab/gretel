@@ -10,11 +10,12 @@ export class XPathVariablesComponent {
     private subject: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private variables = this.subject.debounceTime(50).map(xpath => this.extract(xpath)).filter(variables => variables != null);
 
-    constructor(element: JQuery) {
-        let data = $(element).data();
+    constructor(element: HTMLElement) {
+        let $element = $(element);
+        let data = $element.data();
         this.source = $(data.source);
 
-        this.view = new View(data.name, element);
+        this.view = new View(data.name, $element);
 
         this.variables.subscribe(variables => {
             this.view.render(variables);

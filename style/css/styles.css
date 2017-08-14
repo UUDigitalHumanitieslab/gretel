@@ -1455,4 +1455,7 @@ analysis {
   max-width: 100%;
   overflow: auto; }
 
+xpath-editor textarea.hidden {
+  display: none; }
+
 /*# sourceMappingURL=styles.css.map */

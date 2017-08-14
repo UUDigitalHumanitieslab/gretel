@@ -7,6 +7,7 @@
     "url": "git+https://github.com/CCL-KULeuven/gretel.git"
   },
   "devDependencies": {
+    "@types/ace": "0.0.35",
     "@types/es6-shim": "^0.31.34",
     "@types/jasmine": "^2.5.53",
     "@types/jquery": "^3.2.10",
@@ -37,6 +38,7 @@
     "typings": "^2.1.1"
   },
   "dependencies": {
+    "ace-builds": "^1.2.8",
     "jquery": "^3.2.1",
     "pivottable": "^2.14.0",
     "rxjs": "^5.4.2"
