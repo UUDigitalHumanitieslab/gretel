@@ -1,6 +1,7 @@
 require.config({
     paths: {
         "ace": "packages/ace",
+        "ace/range": "packages/ace/ace",
         "rxjs": "packages/Rx",
         "pivottable": "packages/pivottable"
     }

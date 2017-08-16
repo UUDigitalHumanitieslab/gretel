@@ -1457,5 +1457,11 @@ analysis {
 
 xpath-editor textarea.hidden {
   display: none; }
+xpath-editor .pathError {
+  background: url(http://i.imgur.com/HlfA2is.gif) bottom repeat-x; }
+xpath-editor .errorMessage {
+  color: #d54a4a;
+  display: inline-block;
+  min-height: 1.5em; }
 
 /*# sourceMappingURL=styles.css.map */
