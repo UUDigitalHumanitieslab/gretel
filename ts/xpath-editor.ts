@@ -75,17 +75,20 @@ export class XPathEditor {
                 $('.pathError').removeClass('pathError');
                 if (parsed.error) {
                     let $line = $(`.ace_text-layer .ace_line:nth(${parsed.error.line})`);
-                    if (parsed.error.offset != undefined && parsed.error.length != undefined) {
-                        let position = 0;
-                        $line.children().each((index, child) => {
+                    let rangeKnown = parsed.error.offset != undefined && parsed.error.length != undefined;
+                    let position = 0;
+                    let $children = $line.children();
+                    if (!$children.length) {
+                        // the line could not be parsed
+                        $line.addClass('pathError');
+                    } else {
+                        $children.each((index, child) => {
                             let length = child.innerText.length;
-                            if (parsed.error.offset >= position && parsed.error.length <= position + length) {
+                            if (!rangeKnown || (parsed.error.offset >= position && parsed.error.length <= position + length)) {
                                 $(child).addClass('pathError');
                             }
                             position += length;
                         });
-                    } else {
-                        $line.addClass('pathError');
                     }
                     this.$errorElement.text(parsed.error.message);
                 } else {
