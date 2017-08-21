@@ -1,6 +1,7 @@
 ///<reference path="definitions/ace.d.ts"/>
 import { BehaviorSubject } from 'rxjs';
 import * as ace from 'ace/ace';
+import { Range } from 'ace/range';
 import XPathParserService from './services/xpath-parser.service';
 
 export const Selector = 'xpath-editor';
@@ -15,6 +16,7 @@ export class XPathEditor {
     private $errorElement: JQuery;
     private $hiddenInput: JQuery;
 
+    private existingMarkerId: number | undefined = undefined;
     private valueSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private parsedObservable = this.valueSubject.debounceTime(50).map(xpath => this.xpathParserService.parse(xpath));
 
@@ -54,13 +56,15 @@ export class XPathEditor {
         }
         editor.setTheme('ace/theme/dawn');
 
-        editor.setOption('highlightActiveLine', false);
-        editor.setOption('showGutter', false);
-        editor.setOption('showPrintMargin', false);
-        editor.setOption('fontSize', 16);
-        editor.setOption('minLines', 2);
-        editor.setOption('maxLines', 30);
-        editor.setOption('useWorker', false);
+        editor.setOptions({
+            'highlightActiveLine': false,
+            'showGutter': false,
+            'showPrintMargin': false,
+            'fontSize': 16,
+            'minLines': 2,
+            'maxLines': 30,
+            'useWorker': false
+        });
 
         this.session = editor.getSession();
         this.session.setMode('ace/mode/xquery');
@@ -72,24 +76,25 @@ export class XPathEditor {
     private showErrors() {
         this.parsedObservable
             .subscribe(parsed => {
-                $('.pathError').removeClass('pathError');
+                if (this.existingMarkerId != undefined) {
+                    this.session.removeMarker(this.existingMarkerId);
+                }
+
+                // TODO: prevent removal if the same
                 if (parsed.error) {
-                    let $line = $(`.ace_text-layer .ace_line:nth(${parsed.error.line})`);
-                    let rangeKnown = parsed.error.offset != undefined && parsed.error.length != undefined;
-                    let position = 0;
-                    let $children = $line.children();
-                    if (!$children.length) {
-                        // the line could not be parsed
-                        $line.addClass('pathError');
+                    // TODO: support multi-line (and multiple) errors.
+                    let pathRange: Range;
+                    if (parsed.error.offset == undefined) {
+                        // select the entire line if the offset is unknown
+                        pathRange = new Range(parsed.error.line, 0, parsed.error.line + 1, 0);
+
                     } else {
-                        $children.each((index, child) => {
-                            let length = child.innerText.length;
-                            if (!rangeKnown || (parsed.error.offset >= position && parsed.error.length <= position + length)) {
-                                $(child).addClass('pathError');
-                            }
-                            position += length;
-                        });
+                        pathRange = new Range(parsed.error.line,
+                            parsed.error.offset,
+                            parsed.error.line,
+                            parsed.error.offset + parsed.error.length);
                     }
+                    this.existingMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
                     this.$errorElement.text(parsed.error.message);
                 } else {
                     this.$errorElement.text('');

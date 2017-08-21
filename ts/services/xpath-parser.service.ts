@@ -47,8 +47,14 @@ export interface ParsedXPath {
 }
 
 export interface ParseError {
+    /**
+     * Zero-based character offset
+     */
     offset: number,
     length: number | undefined,
+    /**
+     * Zero-based line number
+     */
     line: number,
     message: string
 }
