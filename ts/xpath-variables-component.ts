@@ -1,4 +1,5 @@
 import { PathVariable, XPathExtractinator, FormatError } from './xpath-extractinator';
+import * as $ from 'jquery';
 import { BehaviorSubject } from 'rxjs'
 import { XPathModels } from './parser/xpath-models';
 

@@ -44,7 +44,7 @@ interface PivotOptions {
 }
 
 declare type PivotAggregator<T> = (data: any, rowKey: any, colKey: any) => {
-    push: (record) => void,
+    push: (record: any) => void,
     value: () => T,
     format: (x: T) => string
 }
