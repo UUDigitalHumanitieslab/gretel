@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 					{
 						expand: true,
 						cwd: 'node_modules/pivottable/dist/',
-						src: '*',
+						src: '*.css',
 						dest: 'js/packages/pivottable/'
 					}
 				]
@@ -39,6 +39,9 @@ module.exports = function (grunt) {
 		},
 		sass: {
 			build: {
+				options: {
+					loadPath: ['./node_modules']
+				},
 				files: {
 					'style/css/ie.css': 'style/scss/ie.scss',
 					'style/css/styles.css': 'style/scss/styles.scss',
