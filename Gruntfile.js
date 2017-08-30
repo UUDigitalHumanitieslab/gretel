@@ -1,35 +1,18 @@
+var webpackConfig = require('./webpack.config');
 module.exports = function (grunt) {
 	// Project configuration.
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		clean: {
-			default: ['js/packages', 'js/ts', 'log/*', 'tmp/*']
+			default: ['ts/parser/xpath.js', 'js/packages', 'js/ts', 'log/*', 'tmp/*']
 		},
 		copy: {
 			js: {
 				files: [
 					{
 						expand: true,
-						cwd: 'node_modules/ace-builds/src-min/',
-						src: ['ace.js', 'theme-dawn.js', 'mode-xquery.js', 'worker-xquery.js'],
-						dest: 'js/packages/ace'
-					},
-					{
-						expand: true,
-						cwd: 'node_modules/requirejs',
-						src: 'require.js',
-						dest: 'js/packages/'
-					},
-					{
-						expand: true,
-						cwd: 'node_modules/rxjs/bundles/',
-						src: '*',
-						dest: 'js/packages/'
-					},
-					{
-						expand: true,
 						cwd: 'node_modules/pivottable/dist/',
-						src: '*',
+						src: '*.css',
 						dest: 'js/packages/pivottable/'
 					}
 				]
@@ -37,28 +20,12 @@ module.exports = function (grunt) {
 		},
 		jison: {
 			default: {
-				options: { moduleType: 'amd' },
-				files: { 'js/ts/parser/xpath.js': ['ts/parser/xpath.jison', 'ts/parser/xpath.jisonlex'] }
+				options: { moduleType: 'commonjs' },
+				files: { 'ts/parser/xpath.js': ['ts/parser/xpath.jison', 'ts/parser/xpath.jisonlex'] }
 			}
 		},
-		ts: {
-			default: {
-				src: ['!node_modules/**', 'ts/**/*.ts'],
-				outDir: 'js/ts',
-				options: {
-					keepDirectoryHierarchy: true,
-					module: 'amd',
-					moduleResolution: 'node',
-					fast: 'never',
-					target: 'ES5',
-					inlineSourceMap: true,
-					noFallthroughCasesInSwitch: true,
-					// noImplicitAny: true, // not compatible with JQuery
-					noImplicitUseStrict: true,
-					noImplicitReturns: true,
-					// strictNullChecks: true // not compatible with JQuery
-				}
-			}
+		webpack: {
+			main: webpackConfig
 		},
 		uglify: {
 			build: {
@@ -72,6 +39,9 @@ module.exports = function (grunt) {
 		},
 		sass: {
 			build: {
+				options: {
+					loadPath: ['./node_modules']
+				},
 				files: {
 					'style/css/ie.css': 'style/scss/ie.scss',
 					'style/css/styles.css': 'style/scss/styles.scss',
@@ -100,9 +70,13 @@ module.exports = function (grunt) {
 		},
 
 		watch: {
+			jison: {
+				files: ['ts/**/*.jison', 'ts/**/*.jisonlex'],
+				tasks: ['jison', 'webpack', 'karma']
+			},
 			ts: {
 				files: ['ts/**/*.ts'],
-				tasks: ['ts', 'karma']
+				tasks: ['webpack', 'karma']
 			},
 			js: {
 				files: ['js/*.js'],
@@ -124,9 +98,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jasmine');
 	grunt.loadNpmTasks('grunt-karma');
-	grunt.loadNpmTasks('grunt-ts');
+	grunt.loadNpmTasks('grunt-webpack');
 	grunt.loadNpmTasks('grunt-jison');
 
 	// Default task(s).
-	grunt.registerTask('default', ['clean', 'copy', 'jison', 'ts', 'uglify', 'sass', 'cssmin', 'karma']);
+	grunt.registerTask('default', ['clean', 'copy', 'jison', 'webpack', 'uglify', 'sass', 'cssmin', 'karma']);
 };

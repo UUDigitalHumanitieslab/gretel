@@ -1,15 +1,19 @@
-///<reference path="definitions/ace.d.ts"/>
 import { BehaviorSubject } from 'rxjs';
-import * as ace from 'ace/ace';
-import { Range } from 'ace/range';
+import * as $ from 'jquery';
+import * as ace from 'brace';
+import { modeName as xpathModeName, Completer } from './xpath-mode';
+import 'brace/ext/language_tools';
+import 'brace/theme/dawn';
 import XPathParserService from './services/xpath-parser.service';
+
+let AceRange = ace.acequire('ace/range').Range;
 
 export const Selector = 'xpath-editor';
 export class XPathEditor {
     public autofocus: boolean;
     public value: string;
 
-    private session: AceAjax.IEditSession;
+    private session: ace.IEditSession;
     private xpathParserService: XPathParserService;
 
     private $element: JQuery;
@@ -49,7 +53,11 @@ export class XPathEditor {
         let $container = $('<div>');
         this.$errorElement = $('<p class="errorMessage"></p>');
         this.$element.append(...[$container, this.$errorElement]);
+        let languageTools = ace.acequire("ace/ext/language_tools");
+        languageTools.setCompleters([new Completer()]);
+
         let editor = ace.edit($container[0]);
+        editor.$blockScrolling = Infinity; // disable annoying 'this will be disabled in the next version' message
         editor.setValue(this.value, -1);
         if (this.autofocus) {
             editor.focus();
@@ -57,6 +65,8 @@ export class XPathEditor {
         editor.setTheme('ace/theme/dawn');
 
         editor.setOptions({
+            'behavioursEnabled': true,
+            'enableBasicAutocompletion': true,
             'highlightActiveLine': false,
             'showGutter': false,
             'showPrintMargin': false,
@@ -67,7 +77,7 @@ export class XPathEditor {
         });
 
         this.session = editor.getSession();
-        this.session.setMode('ace/mode/xquery');
+        this.session.setMode(xpathModeName);
 
         editor.on('change', () => this.updateValue());
         this.showErrors();
@@ -83,13 +93,12 @@ export class XPathEditor {
                 // TODO: prevent removal if the same
                 if (parsed.error) {
                     // TODO: support multi-line (and multiple) errors.
-                    let pathRange: Range;
+                    let pathRange: ace.Range;
                     if (parsed.error.offset == undefined) {
                         // select the entire line if the offset is unknown
-                        pathRange = new Range(parsed.error.line, 0, parsed.error.line + 1, 0);
-
+                        pathRange = new AceRange(parsed.error.line, 0, parsed.error.line + 1, 0);
                     } else {
-                        pathRange = new Range(parsed.error.line,
+                        pathRange = new AceRange(parsed.error.line,
                             parsed.error.offset,
                             parsed.error.line,
                             parsed.error.offset + parsed.error.length);

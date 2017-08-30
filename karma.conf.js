@@ -1,13 +1,18 @@
+var webpackConfig = require('./webpack.config');
+
 module.exports = function (config) {
     config.set({
-        frameworks: ['jasmine-jquery','jasmine', 'requirejs'],
-
-        files: [
-            // The tests should be included manually (using AMD)
-            { pattern: 'js/!(packages)/**/*.js', included: false },
-
-            'test-main.js'
-        ],
+        basePath: '',
+        frameworks: ['jasmine-jquery', 'jasmine'],
+        files: ['ts/**/*.spec.ts'],
+        preprocessors: {
+            'ts/**/*.spec.ts': ['webpack']
+        },
+        webpack: {
+            module: webpackConfig.module,
+            resolve: webpackConfig.resolve,
+            node: webpackConfig.node
+        },
         reporters: ['progress'],
         browsers: ['PhantomJS'],
         autoWatch: false,
