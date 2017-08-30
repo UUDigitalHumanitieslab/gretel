@@ -47,6 +47,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 
 ### During development
 * We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and auto-minify CSS and JavaScript.
+* Note that some client-side code is in Typescript `ts/`, this code is automatically compiled using Grunt.
 * Commands to install Grunt, local dependencies and then to watch for changes:
 
 

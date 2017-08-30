@@ -1455,4 +1455,17 @@ analysis {
   max-width: 100%;
   overflow: auto; }
 
+xpath-editor textarea.hidden {
+  display: none; }
+xpath-editor .ace_editor {
+  min-height: 100px; }
+xpath-editor .pathError {
+  background: #ff0 url("data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=") bottom repeat-x;
+  position: absolute;
+  width: fit-content; }
+xpath-editor .errorMessage {
+  color: #d54a4a;
+  display: inline-block;
+  min-height: 1.5em; }
+
 /*# sourceMappingURL=styles.css.map */

@@ -1,0 +1,21 @@
+xpath-editor {
+    textarea.hidden {
+        display: none;
+    }
+
+    .ace_editor {
+        min-height: 100px;
+    }
+    
+    .pathError {
+        background: #ff0 url('data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=') bottom repeat-x;
+        position: absolute;
+        width: fit-content;
+    }
+
+    .errorMessage {
+        color: #d54a4a;
+        display: inline-block;
+        min-height: 1.5em;
+    }
+}

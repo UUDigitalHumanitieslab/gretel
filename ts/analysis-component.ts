@@ -5,7 +5,9 @@ import { TreebankService } from './services/treebank-service';
 import { SearchService, SearchResult } from './services/search-service';
 import { PathVariable } from './xpath-extractinator';
 import * as $ from 'jquery';
-import 'pivottable/pivot';
+import 'jquery-ui';
+import 'jquery-ui/ui/widgets/sortable';
+import 'pivottable';
 
 export class AnalysisComponent {
     variables: PathVariable[];
@@ -13,9 +15,10 @@ export class AnalysisComponent {
     corpus: string;
     treebankService: TreebankService;
 
-    constructor(element: JQuery, private analysisService = new AnalysisService(), private notificationService = new NotificationService(), private searchService = new SearchService()) {
-        this.initialize(element);
-        this.show(element);
+    constructor(element: HTMLElement, private analysisService = new AnalysisService(), private notificationService = new NotificationService(), private searchService = new SearchService()) {
+        let $element = $(element);
+        this.initialize($element);
+        this.show($element);
     }
 
     private initialize(element: JQuery) {
@@ -34,7 +37,7 @@ export class AnalysisComponent {
                 });
     }
 
-    private show(element) {
+    private show(element: JQuery<HTMLElement>) {
         Promise.all([
             this.treebankService.getMetadata(this.corpus) as any,
             this.searchService.getAllResults(this.variables) as any])

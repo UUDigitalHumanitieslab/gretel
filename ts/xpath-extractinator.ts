@@ -4,7 +4,7 @@ import { XPathModels } from './parser/xpath-models';
 export class XPathExtractinator {
     constructor() {
         // assign the shared scope
-        (parser as any).yy = {
+        parser.parser.yy = {
             xpathModels: XPathModels,
             parseError: XPathModels.parseError
         };

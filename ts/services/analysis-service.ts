@@ -71,10 +71,10 @@ export class AnalysisService {
         columnNames.push(...metadataKeys);
 
         // show 1-based positions, because they are a bit more human-friendly
-        let nodePositions = Array.apply(null, { length: maxNodeCount }).map((_, index) => index + 1);
+        let nodePositions: number[] = Array.apply(null, { length: maxNodeCount }).map((_: number, index: number) => index + 1);
 
-        columnNames.push(...nodePositions.map(i => `pos${i}`));
-        columnNames.push(...nodePositions.map(i => `lem${i}`));
+        columnNames.push(...nodePositions.map((i: number) => `pos${i}`));
+        columnNames.push(...nodePositions.map((i: number) => `lem${i}`));
 
         // remove the starting $ variable identifier
         columnNames.push(...variables.map(name => `pos_${name.slice(1)}`));
