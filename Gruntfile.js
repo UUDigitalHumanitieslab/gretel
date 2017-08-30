@@ -12,8 +12,8 @@ module.exports = function (grunt) {
 					{
 						expand: true,
 						cwd: 'node_modules/pivottable/dist/',
-						src: '*.css',
-						dest: 'js/packages/pivottable/'
+						src: 'pivot.min.css',
+						dest: 'style/css/min'
 					}
 				]
 			}

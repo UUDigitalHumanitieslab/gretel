@@ -20,4 +20,3 @@ config/
 
 # NPM
 node_modules/
-js/packages/
