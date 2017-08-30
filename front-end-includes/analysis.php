@@ -10,7 +10,6 @@ class Analysis
         if ($this->continueConstraints) {
             ?>
             <analysis data-api-url="<?=htmlspecialchars(API_URL) ?>" data-corpus="<?=htmlspecialchars($this->corpus) ?>"></analysis>
-            <link rel="stylesheet" href="js/packages/pivottable/pivot.min.css">
             <div id="xpath-variables">
             <?php
             if (isset($this->variables)) {

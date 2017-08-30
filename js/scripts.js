@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
     var $body = $("body"),
         nav1 = $(".primary-navigation"),
         $window = $(window),
@@ -6,13 +6,13 @@ $(function() {
 
     $("#old-ie-script").remove();
 
-    $window.resize($.throttle(500, function() {
+    $window.resize($.throttle(500, function () {
         mobileMenu();
         helpTooltipPosition();
     })).resize();
     $window.scroll($.throttle(700, helpTooltipPosition)).scroll();
 
-    $("#popup-wrapper").on("click", "button.cancel, button.continue", function() {
+    $("#popup-wrapper").on("click", "button.cancel, button.continue", function () {
         var $this = $(this),
             popup = $this.closest(".popup"),
             popupId = popup.data("popup-id");
@@ -24,19 +24,19 @@ $(function() {
     });
 
     $("[data-collapse-btn]").wrap('<a href="#" class="collapse" data-collapse="visible" title="Show or hide this section" />').after(
-    '<span class="btn-wrapper">'
+        '<span class="btn-wrapper">'
         + '<i class="fa fa-fw fa-angle-up" aria-hidden="true"></i>'
         + '<span class="sr-only">Show or hide this section</span>'
-    + '</span>');
+        + '</span>');
 
-    $("[name='to-top']").click(function() {
+    $("[name='to-top']").click(function () {
         $("html, body").animate({
             scrollTop: 0
         });
     });
 
     // Make anchors work, even though we've set a base-tag
-    $('a[href^="#"]').click(function(e) {
+    $('a[href^="#"]').click(function (e) {
         // Do an .is() test for dynamic urls
         if ($(this).is('[href^="#"]')) {
             document.location.hash = $(this).attr("href").substring(1);
@@ -45,7 +45,7 @@ $(function() {
     });
 
     // Unset previous handler first, then attach new
-    $("a.collapse").off().click(function(e) {
+    $("a.collapse").off().click(function (e) {
         var $this = $(this),
             isCollapsed = ($this.attr("data-collapse") == 'hidden') ? true : false;
 
@@ -65,21 +65,21 @@ $(function() {
 
     // Unless it's in the hash
     if ($body.hasClass("docs") && window.location.hash) {
-      $(window.location.hash).parent("a").click();
+        $(window.location.hash).parent("a").click();
     }
 
     // Open in beautifier
-    $("body.matrix .xpath-wrapper a, body.xps.input .open-beautifier-wrapper a").click(function(e) {
+    $("body.matrix .xpath-wrapper a, body.xps.input .open-beautifier-wrapper a").click(function (e) {
         e.preventDefault();
         var href = $(this).attr('href');
         postXpath($("#xpath").serialize(), href);
     });
 
-    nav1.find("button").click(function() {
+    nav1.find("button").click(function () {
         nav1.toggleClass("active");
     });
 
-    $document.click(function(e) {
+    $document.click(function (e) {
         if (nav1.hasClass("active")) {
             if (!$(e.target).closest(nav1.find("button"), nav1.find("ul")).length) {
                 nav1.removeClass("active");
@@ -89,7 +89,7 @@ $(function() {
 
     if ($body.hasClass("input")) {
         var clearBtn = $("[name='clear']");
-        clearBtn.click(function(e) {
+        clearBtn.click(function (e) {
             var $this = $(this);
             $this.prev("[name='input'], textarea").val("").addClass("no-content").focus();
             $this.prop("disabled", true);
@@ -97,7 +97,7 @@ $(function() {
             e.preventDefault();
         });
 
-        $("[name='input'], textarea").keyup(function() {
+        $("[name='input'], textarea").keyup(function () {
             var $this = $(this);
             if ($this.val()) {
                 $this.removeClass("no-content");
@@ -114,7 +114,7 @@ $(function() {
             var input = $("[name='xpath']");
             // Check whether the XPath has the same amount of opening and closing tags
             // If not, throw custom validation error message
-            $("[type='submit']").click(function() {
+            $("[type='submit']").click(function () {
                 var openBrackets = (input.val().match(/\[/g) || "").length,
                     closeBrackets = (input.val().match(/\]/g) || "").length;
                 if (openBrackets == closeBrackets) {
@@ -129,7 +129,7 @@ $(function() {
                 }
             });
 
-            input.keyup(function() {
+            input.keyup(function () {
                 this.setCustomValidity("");
             });
         }
@@ -137,7 +137,7 @@ $(function() {
         var input = $("[name='xpath']");
         // Check whether the XPath has the same amount of opening and closing tags
         // If not, throw custom validation error message
-        $("[type='submit']").click(function() {
+        $("[type='submit']").click(function () {
             var openBrackets = (input.val().match(/\[/g) || "").length,
                 closeBrackets = (input.val().match(/\]/g) || "").length;
             if (openBrackets == closeBrackets) {
@@ -152,27 +152,27 @@ $(function() {
             }
         });
 
-        input.keyup(function() {
+        input.keyup(function () {
             this.setCustomValidity("");
         });
 
         var getTreePathXHR;
         getTreePath();
 
-        $("main form input[type='radio'], main form input[type='checkbox']:not([name='ct'])").change(function() {
+        $("main form input[type='radio'], main form input[type='checkbox']:not([name='ct'])").change(function () {
             getTreePath();
         });
         $("form").submit(getTreePath());
 
         // Allow cell clicks to go down to the inputs, but prevent clicks on the input
         // going up. Otherwise, we'll get stuck in an infinite loop
-        $("tbody td").click(function() {
+        $("tbody td").click(function () {
             $(this).find("input").click();
-        }).find("input").click(function(e) {
+        }).find("input").click(function (e) {
             e.stopPropagation();
         });
 
-        $(".table-wrapper .case-sensitive input[type='checkbox']").each(function(i, el) {
+        $(".table-wrapper .case-sensitive input[type='checkbox']").each(function (i, el) {
             var $el = $(el);
             if ($el.is(":checked")) {
                 $el.prop("disabled", false).parent("td:not(.punctuation)").removeClass("disabled");
@@ -180,7 +180,7 @@ $(function() {
         });
 
         // Enable disable the option for case-sensitivity
-        $(".table-wrapper input[type='radio']").click(function() {
+        $(".table-wrapper input[type='radio']").click(function () {
             var $this = $(this),
                 mother = $this.parent("td:not(.punctuation)"),
                 checkCell = $(".table-wrapper .case-sensitive td:nth-child(" + (mother.index() + 1) + ")")
@@ -197,7 +197,7 @@ $(function() {
         var advancedBtn = $(".advanced-btn-wrapper button"),
             advancedRow = $(".table-wrapper tr.advanced-option");
 
-        advancedBtn.click(function() {
+        advancedBtn.click(function () {
             $(".advanced-option:not(tr)").toggle();
             advancedRow.toggleClass("visible-row");
             var str;
@@ -211,7 +211,7 @@ $(function() {
             advancedBtn.attr("title", str).children("span").text(str);
         });
 
-        $(".xpath-wrapper input[type='reset']").click(function(e) {
+        $(".xpath-wrapper input[type='reset']").click(function (e) {
             e.preventDefault();
             $("#xpath").val($(".xpath-wrapper input[name='originalXp']").val()).change();
             $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").removeClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", false);
@@ -236,7 +236,7 @@ $(function() {
 
             if (!Cookies.get('popup-continue-' + popupId)) {
                 showPopup(popup, $("#xpath"));
-                popup.find("button.continue").click(function() {
+                popup.find("button.continue").click(function () {
                     $(".input-wrapper, .xpath-wrapper > div:first-child, #tree-output, .guidelines").addClass("advanced-mode-active").find(":not(.disabled) > input, :not(.disabled) > button").prop("disabled", true);
                     $('[name="manualMode"]').val("true");
 
@@ -253,7 +253,7 @@ $(function() {
         }
     } else if ($body.hasClass("treebanks")) {
         // Main treebank selection (CGN, Lassy, SONAR)
-        $("[type='radio']").change(function() {
+        $("[type='radio']").change(function () {
             var $this = $(this),
                 value = $this.val();
             if ($this.is("[name='treebank']")) {
@@ -269,7 +269,7 @@ $(function() {
             }
         });
         // Selecting subtreebanks
-        $("[type='checkbox']").change(function() {
+        $("[type='checkbox']").change(function () {
             var $this = $(this);
 
             this.setCustomValidity('');
@@ -346,7 +346,7 @@ $(function() {
 
     function helpTooltipPosition() {
         // Not for .treebanks, because we want to hang right on those
-        $("body:not(.treebanks) .help-tooltip[data-title]").each(function(i, el) {
+        $("body:not(.treebanks) .help-tooltip[data-title]").each(function (i, el) {
             var $this = $(el),
                 rect = el.getBoundingClientRect(),
                 w = $window.width(),
@@ -379,7 +379,7 @@ $(function() {
             xhrFields: {
                 withCredentials: true
             }
-        }).done(function(data) {}).fail(function(a, b, c) {}).always(function() {
+        }).done(function (data) { }).fail(function (a, b, c) { }).always(function () {
             var newTab = window.open(href, '_blank');
             if (newTab) {
                 newTab.focus();
@@ -404,11 +404,11 @@ $(function() {
 
         $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
         getTreePathXHR = $.ajax({
-                url: getTreePathScript,
-                method: "POST",
-                data: $("main form").serialize()
-            })
-            .done(function(json) {
+            url: getTreePathScript,
+            method: "POST",
+            data: $("main form").serialize()
+        })
+            .done(function (json) {
                 var data = $.parseJSON(json);
 
                 if (data.location) {
@@ -419,6 +419,18 @@ $(function() {
 
                 if (data.xpath) {
                     $("#xpath, .xpath-wrapper input[name='originalXp']").val(data.xpath).change();
+                    var element = document.getElementById('xpath');
+
+                    // trigger change event for those not listening using (this instance of) jquery
+                    if ("createEvent" in document) {
+                        var evt = document.createEvent("HTMLEvents");
+                        evt.initEvent("change", false, true);
+                        element.dispatchEvent(evt);
+                    }
+                    else {
+                        element.fireEvent("onchange");
+                    }
+
                     adjustTextareaHeight($("#xpath"));
                 }
 
