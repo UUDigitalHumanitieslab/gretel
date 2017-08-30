@@ -144,7 +144,7 @@ function cleanXpath($xpath, $trimSlash = true) {
   return $xpath;
 }
 
-function checkBfPattern($bf) {
+function checkBfPattern($bf, $sid) {
   global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
@@ -176,7 +176,7 @@ function checkBfPattern($bf) {
 
           if ($databaseExists != 'false') {
             $databaseExists = true;
-            $_SESSION['startDatabases'][] = $database;
+            $_SESSION[$sid]['startDatabases'][] = $database;
           }
         }
         $continueConstraints = $databaseExists ? true : false;
@@ -185,7 +185,7 @@ function checkBfPattern($bf) {
         error_log($e);
       }
   } else {
-    $_SESSION['startDatabases'] = getRegularSonar($component);
+    $_SESSION[$sid]['startDatabases'] = getRegularSonar($component);
     $needRegularSonar = true;
   }
 }
@@ -222,7 +222,12 @@ function modifyLemma($parse, $id)
         }
     }
 
-    $tree = $xml->asXML();
+    if ($xml->xpath('/treebank')) {
+      $tree = $xml->alpino_ds->asXML();
+    } else {
+      $tree = $xml->asXML();
+    }
+
     fwrite($output, $tree);
     fclose($output);
 }
