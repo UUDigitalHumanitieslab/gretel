@@ -4,6 +4,7 @@ import * as ace from 'brace';
 import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
+import { MacroService } from './services/macro-service';
 import XPathParserService from './services/xpath-parser.service';
 
 let AceRange = ace.acequire('ace/range').Range;
@@ -14,6 +15,7 @@ export class XPathEditor {
     public value: string;
 
     private session: ace.IEditSession;
+    private macroService: MacroService;
     private xpathParserService: XPathParserService;
 
     private $element: JQuery;
@@ -22,11 +24,42 @@ export class XPathEditor {
 
     private existingMarkerId: number | undefined = undefined;
     private valueSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    private parsedObservable = this.valueSubject.debounceTime(50).map(xpath => this.xpathParserService.parse(xpath));
+    private macroServiceLoaded = false;
+
+    private beforeEnrich: string = null;
+
+    private parsedObservable = this.valueSubject.debounceTime(50).map(xpath => {
+        if (this.macroServiceLoaded &&
+            (xpath != this.beforeEnrich ||
+                !this.session.getUndoManager().hasRedo())) {
+            // don't redo enrichment if the value is the same as before the enrichment: undo was probably used
+            this.beforeEnrich = xpath;
+            let enrichment = this.macroService.enrich(xpath);
+            if (enrichment.result) {
+                for (let replacement of enrichment.replacements) {
+                    let range = new AceRange(replacement.line,
+                        replacement.offset,
+                        replacement.line,
+                        replacement.offset + replacement.length);
+                    this.session.replace(range, replacement.value);
+                }
+                xpath = enrichment.result;
+            }
+        }
+
+        return this.xpathParserService.parse(xpath);
+    });
 
     constructor(element: HTMLElement) {
         this.$element = $(element);
         this.$element.data('xpath-editor', this);
+        this.macroService = new MacroService();
+        this.macroService.loadFromUrl(this.$element.data('root-url')).then(() => {
+            this.macroServiceLoaded = true;
+            // parse again, just to be sure
+            this.valueSubject.next(this.value);
+        });
+
         this.$hiddenInput = this.$element.children('textarea');
         this.$hiddenInput.addClass('hidden');
 

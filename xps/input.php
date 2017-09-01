@@ -40,7 +40,7 @@ require ROOT_PATH."/front-end-includes/head.php";
 <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
-        <xpath-editor autofocus>
+        <xpath-editor autofocus data-root-url="/<?= basename($_SERVER['CONTEXT_DOCUMENT_ROOT']) ?>/macros.txt">
           <textarea name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
         </xpath-editor>
         <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>

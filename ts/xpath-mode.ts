@@ -1,11 +1,14 @@
 import 'brace/mode/xquery';
 import * as ace from 'brace';
 import { XpathAttributes } from './xpath-attributes';
+import { MacroService } from './services/macro-service';
 
 let TokenIterator: { new(session: ace.IEditSession, initialRow: number, initialColumn: number): ace.TokenIterator } = ace.acequire("ace/token_iterator").TokenIterator;
 let XQueryMode: { new(): any } = ace.acequire('ace/mode/xquery').Mode;
 let CstyleBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/cstyle').CstyleBehaviour;
 let XQueryBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/xquery').XQueryBehaviour;
+
+let macroService = new MacroService();
 
 export const modeName = 'xpath';
 export default class XPathMode extends XQueryMode {
@@ -58,7 +61,9 @@ export class Completer {
             }
         })));
 
+    // TODO: look into using ACE states for this instead
     static onlyAttributes = false;
+    static onlyMacros = false;
     public getCompletions(editor: ace.Editor,
         session: ace.IEditSession,
         position: { column: number, row: number },
@@ -66,31 +71,49 @@ export class Completer {
         callback: (error: string | null, data: { value: string, score: number, meta: string }[]) => void) {
         let iterator = new TokenIterator(session, position.row, position.column);
         let token = iterator.getCurrentToken() as TokenInfoWithType;
-        if (token && token.type && token.type == "string") {
-            iterator.stepBackward();
-            iterator.stepBackward();
-            token = iterator.getCurrentToken() as TokenInfoWithType;
-            if (token && token.value && token.value.startsWith('@')) {
-                let name = token.value.substring(1);
-                let attribute = XpathAttributes[name];
-                let values = attribute ? attribute.values : [];
-                if (values) {
-                    callback(null, values.map(value => { return { value: value[0], meta: value[1], score: 500 } }));
-                    return;
+        if (token) {
+            if (token.type && token.type == "string") {
+                iterator.stepBackward();
+                iterator.stepBackward();
+                token = iterator.getCurrentToken() as TokenInfoWithType;
+                if (token && token.value && token.value.startsWith('@')) {
+                    let name = token.value.substring(1);
+                    let attribute = XpathAttributes[name];
+                    let values = attribute ? attribute.values : [];
+                    if (values) {
+                        callback(null, values.map(value => { return { value: value[0], meta: value[1], score: 500 } }));
+                        return;
+                    }
                 }
+            }
+
+            if (token.value && token.value.startsWith('@')) {
+                // reopened attribute autocomplete
+                Completer.onlyAttributes = true;
             }
         }
 
-        if (token.value && token.value.startsWith('@')) {
-            // reopened attribute autocomplete
-            Completer.onlyAttributes = true;
+        let macroCompletions: { value: string, meta: string, score: number }[];
+        if (Completer.onlyMacros || !Completer.onlyAttributes) {
+            let macroLookup = macroService.getMacros();
+            macroCompletions = Object.keys(macroLookup).map(macro => {
+                return {
+                    value: `${!Completer.onlyMacros ? '%' : ''}${macro}%`,
+                    meta: macroLookup[macro].trim().replace(/\s\s+/g, ' '),
+                    score: 500
+                }
+            });
         }
 
+        if (Completer.onlyMacros) {
+            callback(null, macroCompletions);
+            Completer.onlyMacros = false;
+        }
         if (Completer.onlyAttributes) {
             callback(null, this.attributesCompletions.concat([]));
             Completer.onlyAttributes = false;
         } else {
-            callback(null, this.allCompletions.concat([]));
+            callback(null, this.allCompletions.concat(macroCompletions));
         }
     }
 }
@@ -118,6 +141,10 @@ class XPathBehaviour extends XQueryBehaviour {
             }
 
             switch (text) {
+                case "%":
+                    Completer.onlyMacros = true;
+                    this.startAutocomplete(editor);
+                    break;
                 case "=":
                     let position = editor.getCursorPosition();
                     let iterator = new TokenIterator(session, position.row, position.column);
