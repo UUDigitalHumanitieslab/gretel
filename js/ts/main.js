@@ -14995,6 +14995,16 @@ var XPathModels;
         return XPathNumericLiteral;
     }());
     XPathModels.XPathNumericLiteral = XPathNumericLiteral;
+    var ParseLocation = (function () {
+        function ParseLocation(properties) {
+            this.firstColumn = properties.first_column;
+            this.firstLine = properties.first_line;
+            this.lastColumn = properties.last_column;
+            this.lastLine = properties.last_line;
+        }
+        return ParseLocation;
+    }());
+    XPathModels.ParseLocation = ParseLocation;
 })(XPathModels = exports.XPathModels || (exports.XPathModels = {}));
 
 
@@ -37360,7 +37370,8 @@ case 32:
  var steps = $$[$0];
                                                       steps.splice(0, 0, new yy.xpathModels.XPathStep({
                                                                                 axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
-                                                                                test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
+                                                                                test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                                                location: new yy.xpathModels.ParseLocation(_$)}));
                                                       this.$ = new yy.xpathModels.XPathPathExpr({
                                                                     initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: $$[$0-2], steps: steps}); 
@@ -37378,7 +37389,8 @@ case 34:
                                                       var filterExpr = new yy.xpathModels.XPathFilterExpr({expr: $$[$0-2]});
                                                       steps.splice(0, 0, new yy.xpathModels.XPathStep({
                                                                                 axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
-                                                                                test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
+                                                                                test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                                                location: new yy.xpathModels.ParseLocation(_$)}));
                                                       this.$ = new yy.xpathModels.XPathPathExpr({
                                                                     initialContext: yy.xpathModels.XPathInitialContextEnum.EXPR,
                                                                     filter: filterExpr, steps: steps}); 
@@ -37421,8 +37433,9 @@ break;
 case 44:
  var steps = $$[$0];
                                               // insert descendant step into beginning
-                                              steps.splice(0, 0, new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
-                                                                                test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
+                                              steps.splice(0, 0, new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF,
+                                                      test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                      location: new yy.xpathModels.ParseLocation(_$)}));
                                               this.$ = new yy.xpathModels.XPathPathExpr({initialContext: yy.xpathModels.XPathInitialContextEnum.ROOT,
                                                                       steps: steps}); 
 break;
@@ -37440,8 +37453,9 @@ case 47:
 break;
 case 48:
  var path = $$[$0-2];
-                                            path.push(new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF, 
-                                                                     test: yy.xpathModels.XPathTestEnum.TYPE_NODE}));
+                                            path.push(new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.DESCENDANT_OR_SELF,
+                                                    test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                    location: new yy.xpathModels.ParseLocation(_$)}));
                                             path.push($$[$0]);
                                             this.$ = path; 
 break;
@@ -37450,11 +37464,13 @@ case 49: case 53:
 break;
 case 50:
  this.$ = new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.SELF, 
-                                                          test: yy.xpathModels.XPathTestEnum.TYPE_NODE}); 
+                                                          test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                          location: new yy.xpathModels.ParseLocation(_$)}); 
 break;
 case 51:
  this.$ = new yy.xpathModels.XPathStep({axis: yy.xpathModels.XPathAxisEnum.PARENT, 
-                                                          test: yy.xpathModels.XPathTestEnum.TYPE_NODE}); 
+                                                          test: yy.xpathModels.XPathTestEnum.TYPE_NODE,
+                                                          location: new yy.xpathModels.ParseLocation(_$)}); 
 break;
 case 52:
  var step = $$[$0-1];
@@ -37464,11 +37480,13 @@ break;
 case 54:
  var nodeTest = $$[$0]; // temporary dict with appropriate args
                                           nodeTest.axis = yy.xpathModels.XPathAxisEnum.CHILD;
+                                          nodeTest.location = new yy.xpathModels.ParseLocation(_$);
                                           this.$ = new yy.xpathModels.XPathStep(nodeTest); 
 break;
 case 55:
  var nodeTest = $$[$0];  // temporary dict with appropriate args
                                           nodeTest.axis = $$[$0-1]; // add axis
+                                          nodeTest.location = new yy.xpathModels.ParseLocation(_$);
                                           this.$ = new yy.xpathModels.XPathStep(nodeTest); 
 break;
 case 56:
@@ -42157,7 +42175,8 @@ exports.Selector = 'xpath-editor';
 var XPathEditor = (function () {
     function XPathEditor(element) {
         var _this = this;
-        this.existingMarkerId = undefined;
+        this.existingErrorMarkerId = undefined;
+        this.existingWarningMarkerIds = [];
         this.valueSubject = new rxjs_1.BehaviorSubject('');
         this.macroServiceLoaded = false;
         this.beforeEnrich = null;
@@ -42211,7 +42230,7 @@ var XPathEditor = (function () {
         (_a = this.$element).append.apply(_a, [$container, this.$errorElement]);
         var languageTools = ace.acequire("ace/ext/language_tools");
         languageTools.setCompleters([new xpath_mode_1.Completer()]);
-        var editor = ace.edit($container[0]);
+        var editor = this.editor = ace.edit($container[0]);
         editor.$blockScrolling = Infinity; // disable annoying 'this will be disabled in the next version' message
         editor.setValue(this.value, -1);
         if (this.autofocus) {
@@ -42239,11 +42258,11 @@ var XPathEditor = (function () {
         var _this = this;
         this.parsedObservable
             .subscribe(function (parsed) {
-            if (_this.existingMarkerId != undefined) {
-                _this.session.removeMarker(_this.existingMarkerId);
-            }
-            // TODO: prevent removal if the same
             if (parsed.error) {
+                if (_this.existingErrorMarkerId != undefined) {
+                    _this.session.removeMarker(_this.existingErrorMarkerId);
+                }
+                // TODO: prevent removal if the same
                 // TODO: support multi-line (and multiple) errors.
                 var pathRange = void 0;
                 if (parsed.error.offset == undefined) {
@@ -42253,11 +42272,36 @@ var XPathEditor = (function () {
                 else {
                     pathRange = new AceRange(parsed.error.line, parsed.error.offset, parsed.error.line, parsed.error.offset + parsed.error.length);
                 }
-                _this.existingMarkerId = _this.session.addMarker(pathRange, 'pathError', 'text', undefined);
+                _this.existingErrorMarkerId = _this.session.addMarker(pathRange, 'pathError', 'text', undefined);
                 _this.$errorElement.text(parsed.error.message);
             }
             else {
+                if (_this.existingErrorMarkerId != undefined) {
+                    _this.session.removeMarker(_this.existingErrorMarkerId);
+                }
+                // TODO: prevent removal if the same
                 _this.$errorElement.text('');
+            }
+            // TODO: prevent removal if the same
+            if (_this.existingWarningMarkerIds.length) {
+                _this.session.clearAnnotations();
+                _this.existingWarningMarkerIds.forEach(function (id) {
+                    _this.session.removeMarker(id);
+                });
+                _this.existingWarningMarkerIds = [];
+            }
+            if (parsed.warnings.length) {
+                _this.editor.renderer.setShowGutter(true);
+                _this.existingWarningMarkerIds = parsed.warnings.map(function (message) {
+                    var warningRange = new AceRange(message.line, message.offset, message.line, message.offset + message.length);
+                    _this.session.setAnnotations([{
+                            row: message.line,
+                            column: message.offset,
+                            text: message.message,
+                            type: 'warning'
+                        }]);
+                    return _this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
+                });
             }
         });
     };
@@ -61307,7 +61351,7 @@ var XPathParserService = (function () {
         var expression;
         var error;
         if (!xpath) {
-            return { expression: null, error: null };
+            return { expression: null, warnings: [], error: null };
         }
         try {
             expression = parser.parse(xpath);
@@ -61328,8 +61372,13 @@ var XPathParserService = (function () {
             }
         }
         return {
-            expression: expression, error: error
+            expression: expression,
+            // TODO: actually give warnings!
+            warnings: [],
+            error: error
         };
+    };
+    XPathParserService.prototype.getWarnings = function (expression) {
     };
     return XPathParserService;
 }());

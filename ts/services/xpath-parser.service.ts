@@ -12,11 +12,11 @@ export default class XPathParserService {
         // XPathModels.isDebugging = true;
     }
 
-    public parse(xpath: string) {
+    public parse(xpath: string): ParsedXPath {
         let expression: XPathModels.XPathExpression | null;
-        let error: ParseError | null;
+        let error: ParseMessage | null;
         if (!xpath) {
-            return { expression: null, error: null };
+            return { expression: null, warnings: [], error: null };
         }
         try {
             expression = parser.parse(xpath);
@@ -36,17 +36,24 @@ export default class XPathParserService {
         }
 
         return {
-            expression, error
+            expression,
+            // TODO: actually give warnings!
+            warnings: [],
+            error
         }
+    }
+
+    private getWarnings(expression: XPathModels.XPathExpression) {
     }
 }
 
 export interface ParsedXPath {
     expression: XPathModels.XPathExpression | null,
-    error: ParseError | null
+    error: ParseMessage | null,
+    warnings: ParseMessage[]
 }
 
-export interface ParseError {
+export interface ParseMessage {
     /**
      * Zero-based character offset
      */
