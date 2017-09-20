@@ -102,6 +102,18 @@ if ($continueConstraints):
       </div>
 
       <div>
+        <div class="label-wrapper">
+          <label>
+            <input type="checkbox" name="sentids" aria-describedby="sentids-tooltip" checked> Include sentence IDs in downloadable results
+          </label>
+          <div class="help-tooltip" id="sentids-tooltip" role="tooltip" data-title="Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+            <span class="sr-only">Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
         <h3 class="advanced-option">Modify XPath</h3>
         <input type="hidden" name="originalXp" value="">
         <input type="hidden" name="manualMode" value="false">
