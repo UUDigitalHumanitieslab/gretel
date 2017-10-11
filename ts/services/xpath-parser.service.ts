@@ -1,7 +1,9 @@
 import * as parser from '../parser/xpath';
+import { XpathAttributes } from '../xpath-attributes';
 import { XPathModels } from '../parser/xpath-models';
 
-export default class XPathParserService {
+const elementNames = ['item', 'meta', 'metadata', 'node', 'parser', 'sentence'];
+export class XPathParserService {
     constructor() {
         // assign the shared scope
         (parser as any).yy = {
@@ -24,11 +26,13 @@ export default class XPathParserService {
         } catch (exception) {
             if (exception instanceof XPathModels.ParseError) {
                 expression = null;
+                let startColumn = exception.hash.loc ? exception.hash.loc.first_column : undefined
                 error = {
-                    length: exception.hash.token ? exception.hash.token.length : undefined,
-                    line: exception.hash.line,
+                    lastLine: exception.hash.line,
+                    lastColumn: startColumn && exception.hash.token ? startColumn + exception.hash.token.length : undefined,
+                    startLine: exception.hash.line,
+                    startColumn: startColumn,
                     message: exception.message,
-                    offset: exception.hash.loc ? exception.hash.loc.first_column : undefined
                 };
             } else {
                 throw error;
@@ -37,13 +41,66 @@ export default class XPathParserService {
 
         return {
             expression,
-            // TODO: actually give warnings!
-            warnings: [],
+            warnings: expression ? this.getWarnings([expression]) : [],
             error
         }
     }
 
-    private getWarnings(expression: XPathModels.XPathExpression) {
+    private createWarning(message: string, location: XPathModels.ParseLocation, offset = -1): ParseMessage {
+        return {
+            startLine: location.firstLine - 1,
+            startColumn: location.firstColumn + offset,
+            lastColumn: location.lastColumn,
+            lastLine: location.lastLine - 1,
+            message
+        };
+    }
+
+    private getWarnings(expressions: XPathModels.XPathExpression[]): ParseMessage[] {
+        let warnings: ParseMessage[] = [];
+        for (let expression of expressions) {
+            if (expression.type == 'path') {
+                for (let step of expression.steps) {
+                    if (step.properties.axis == 'attribute') {
+                        // check the attribute's name
+                        if (!XpathAttributes[step.properties.name]) {
+                            warnings.push(this.createWarning(`Unknown attribute @${step.properties.name}`, step.properties.location));
+                        }
+                    } else if (step.properties.test == 'name') {
+                        // check the element name
+                        if (elementNames.indexOf(step.properties.name) == -1) {
+                            let warning = this.createWarning(`Unknown element ${step.properties.name}`, step.properties.location, 0);
+                            warnings.push(warning);
+                        }
+                    }
+                    warnings.push(...this.getWarnings(step.getChildren()));
+                }
+            } else if (expression.type == 'operation') {
+                let children = expression.getChildren();
+                if (expression.operationType == '!=' || expression.operationType == '==') {
+                    // check the value of an attribute expression (e.g. @rel="hd"")
+                    let left = children[0];
+                    let right = children[1];
+                    if (left.type == 'path' &&
+                        left.steps.length &&
+                        left.steps[0].properties.axis == 'attribute' &&
+                        right.type == 'string') {
+                        let attributeName = left.steps[0].properties.name;
+                        let attribute = XpathAttributes[attributeName];
+                        let attributeValue = right.value;
+                        if (attribute && attribute.values.length && attribute.values.findIndex((val) => val[0] == attributeValue) == -1) {
+                            warnings.push(this.createWarning(`Unknown attribute value "${attributeValue}"`, right.location, 0));
+                        }
+                    }
+                }
+                warnings.push(...this.getWarnings(children));
+            } else if (expression.type == 'function') {
+                // check the arguments of a function
+                warnings.push(...this.getWarnings(expression.getChildren()));
+            }
+        }
+
+        return warnings;
     }
 }
 
@@ -57,11 +114,18 @@ export interface ParseMessage {
     /**
      * Zero-based character offset
      */
-    offset: number,
-    length: number | undefined,
+    startColumn: number,
+    /**
+     * Zero-based last column, exclusive.
+     */
+    lastColumn: number,
     /**
      * Zero-based line number
      */
-    line: number,
+    startLine: number,
+    /**
+     * Zero-based last line number, inclusive.
+     */
+    lastLine: number,
     message: string
 }

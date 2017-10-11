@@ -5,7 +5,7 @@ import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
 import { MacroService } from './services/macro-service';
-import XPathParserService from './services/xpath-parser.service';
+import { XPathParserService } from './services/xpath-parser.service';
 
 let AceRange = ace.acequire('ace/range').Range;
 
@@ -129,14 +129,14 @@ export class XPathEditor {
                     // TODO: prevent removal if the same
                     // TODO: support multi-line (and multiple) errors.
                     let pathRange: ace.Range;
-                    if (parsed.error.offset == undefined) {
+                    if (parsed.error.startColumn == undefined) {
                         // select the entire line if the offset is unknown
-                        pathRange = new AceRange(parsed.error.line, 0, parsed.error.line + 1, 0);
+                        pathRange = new AceRange(parsed.error.startLine, 0, parsed.error.startLine + 1, 0);
                     } else {
-                        pathRange = new AceRange(parsed.error.line,
-                            parsed.error.offset,
-                            parsed.error.line,
-                            parsed.error.offset + parsed.error.length);
+                        pathRange = new AceRange(parsed.error.startLine,
+                            parsed.error.startColumn,
+                            parsed.error.lastColumn,
+                            parsed.error.lastColumn);
                     }
                     this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
                     this.$errorElement.text(parsed.error.message);
@@ -161,13 +161,13 @@ export class XPathEditor {
                 if (parsed.warnings.length) {
                     this.editor.renderer.setShowGutter(true);
                     this.existingWarningMarkerIds = parsed.warnings.map((message) => {
-                        let warningRange = new AceRange(message.line,
-                            message.offset,
-                            message.line,
-                            message.offset + message.length);
+                        let warningRange = new AceRange(message.startLine,
+                            message.startColumn,
+                            message.lastLine,
+                            message.lastColumn);
                         this.session.setAnnotations([{
-                            row: message.line,
-                            column: message.offset,
+                            row: message.startLine,
+                            column: message.startColumn,
                             text: message.message,
                             type: 'warning'
                         }]);
