@@ -120,36 +120,40 @@ export class XPathEditor {
 
     private showErrors() {
         this.parsedObservable
+            .map(parsed => {
+                return {
+                    value: parsed,
+                    key: (parsed.error ? parsed.error.startLine + parsed.error.message : '')
+                    + (parsed.warnings ? parsed.warnings.map(w => w.startLine + w.message).join('') : '')
+                }
+            })
+            .distinctUntilKeyChanged('key')
             .subscribe(parsed => {
-                if (parsed.error) {
+                if (parsed.value.error) {
                     if (this.existingErrorMarkerId != undefined) {
                         this.session.removeMarker(this.existingErrorMarkerId);
                     }
 
-                    // TODO: prevent removal if the same
-                    // TODO: support multi-line (and multiple) errors.
                     let pathRange: ace.Range;
-                    if (parsed.error.startColumn == undefined) {
+                    if (parsed.value.error.startColumn == undefined) {
                         // select the entire line if the offset is unknown
-                        pathRange = new AceRange(parsed.error.startLine, 0, parsed.error.startLine + 1, 0);
+                        pathRange = new AceRange(parsed.value.error.startLine, 0, parsed.value.error.startLine + 1, 0);
                     } else {
-                        pathRange = new AceRange(parsed.error.startLine,
-                            parsed.error.startColumn,
-                            parsed.error.lastColumn,
-                            parsed.error.lastColumn);
+                        pathRange = new AceRange(parsed.value.error.startLine,
+                            parsed.value.error.startColumn,
+                            parsed.value.error.lastColumn,
+                            parsed.value.error.lastColumn);
                     }
                     this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-                    this.$errorElement.text(parsed.error.message);
+                    this.$errorElement.text(parsed.value.error.message);
                 } else {
                     if (this.existingErrorMarkerId != undefined) {
                         this.session.removeMarker(this.existingErrorMarkerId);
                     }
 
-                    // TODO: prevent removal if the same
                     this.$errorElement.text('');
                 }
 
-                // TODO: prevent removal if the same
                 if (this.existingWarningMarkerIds.length) {
                     this.session.clearAnnotations();
                     this.existingWarningMarkerIds.forEach((id) => {
@@ -158,9 +162,9 @@ export class XPathEditor {
                     this.existingWarningMarkerIds = [];
                 }
 
-                if (parsed.warnings.length) {
+                if (parsed.value.warnings.length) {
                     this.editor.renderer.setShowGutter(true);
-                    this.existingWarningMarkerIds = parsed.warnings.map((message) => {
+                    this.existingWarningMarkerIds = parsed.value.warnings.map((message) => {
                         let warningRange = new AceRange(message.startLine,
                             message.startColumn,
                             message.lastLine,

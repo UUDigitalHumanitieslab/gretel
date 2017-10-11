@@ -42512,32 +42512,36 @@ var XPathEditor = (function () {
     XPathEditor.prototype.showErrors = function () {
         var _this = this;
         this.parsedObservable
+            .map(function (parsed) {
+            return {
+                value: parsed,
+                key: (parsed.error ? parsed.error.startLine + parsed.error.message : '')
+                    + (parsed.warnings ? parsed.warnings.map(function (w) { return w.startLine + w.message; }).join('') : '')
+            };
+        })
+            .distinctUntilKeyChanged('key')
             .subscribe(function (parsed) {
-            if (parsed.error) {
+            if (parsed.value.error) {
                 if (_this.existingErrorMarkerId != undefined) {
                     _this.session.removeMarker(_this.existingErrorMarkerId);
                 }
-                // TODO: prevent removal if the same
-                // TODO: support multi-line (and multiple) errors.
                 var pathRange = void 0;
-                if (parsed.error.startColumn == undefined) {
+                if (parsed.value.error.startColumn == undefined) {
                     // select the entire line if the offset is unknown
-                    pathRange = new AceRange(parsed.error.startLine, 0, parsed.error.startLine + 1, 0);
+                    pathRange = new AceRange(parsed.value.error.startLine, 0, parsed.value.error.startLine + 1, 0);
                 }
                 else {
-                    pathRange = new AceRange(parsed.error.startLine, parsed.error.startColumn, parsed.error.lastColumn, parsed.error.lastColumn);
+                    pathRange = new AceRange(parsed.value.error.startLine, parsed.value.error.startColumn, parsed.value.error.lastColumn, parsed.value.error.lastColumn);
                 }
                 _this.existingErrorMarkerId = _this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-                _this.$errorElement.text(parsed.error.message);
+                _this.$errorElement.text(parsed.value.error.message);
             }
             else {
                 if (_this.existingErrorMarkerId != undefined) {
                     _this.session.removeMarker(_this.existingErrorMarkerId);
                 }
-                // TODO: prevent removal if the same
                 _this.$errorElement.text('');
             }
-            // TODO: prevent removal if the same
             if (_this.existingWarningMarkerIds.length) {
                 _this.session.clearAnnotations();
                 _this.existingWarningMarkerIds.forEach(function (id) {
@@ -42545,9 +42549,9 @@ var XPathEditor = (function () {
                 });
                 _this.existingWarningMarkerIds = [];
             }
-            if (parsed.warnings.length) {
+            if (parsed.value.warnings.length) {
                 _this.editor.renderer.setShowGutter(true);
-                _this.existingWarningMarkerIds = parsed.warnings.map(function (message) {
+                _this.existingWarningMarkerIds = parsed.value.warnings.map(function (message) {
                     var warningRange = new AceRange(message.startLine, message.startColumn, message.lastLine, message.lastColumn);
                     _this.session.setAnnotations([{
                             row: message.startLine,
