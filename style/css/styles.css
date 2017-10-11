@@ -1460,10 +1460,17 @@ xpath-editor textarea.hidden {
   display: none; }
 xpath-editor .ace_editor {
   min-height: 100px; }
-xpath-editor .pathError {
-  background: #ff0 url("data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=") bottom repeat-x;
+xpath-editor .pathError, xpath-editor .pathWarning {
+  background-position: bottom;
+  background-repeat: repeat-x;
   position: absolute;
   width: fit-content; }
+xpath-editor .pathError {
+  background-color: #FFCCCC;
+  background-image: url("data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs="); }
+xpath-editor .pathWarning {
+  background-color: #FFFFAB;
+  background-image: url("data:image/gif;base64,R0lGODlhBAADAKEBAP/SAP///////////yH5BAEKAAIALAAAAAAEAAMAAAIEDGKJVgA7"); }
 xpath-editor .errorMessage {
   color: #d54a4a;
   display: inline-block;

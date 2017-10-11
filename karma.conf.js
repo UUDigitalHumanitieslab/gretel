@@ -3,7 +3,7 @@ var webpackConfig = require('./webpack.config');
 module.exports = function (config) {
     config.set({
         basePath: '',
-        frameworks: ['jasmine-jquery', 'jasmine'],
+        frameworks: ['jasmine-jquery', 'jasmine', 'es6-shim'],
         files: ['ts/**/*.spec.ts'],
         preprocessors: {
             'ts/**/*.spec.ts': ['webpack']

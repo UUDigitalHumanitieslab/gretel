@@ -95,6 +95,7 @@ export module XPathModels {
         type: 'operation' = 'operation';
         operationType: T;
 
+        abstract getChildren(): XPathExpression[];
         abstract toXPath(): string;
     }
 
@@ -165,6 +166,10 @@ export module XPathModels {
         constructor(public properties: { type: 'num-neg', value: XPathExpression }) {
             super();
             this.operationType = properties.type;
+        }
+
+        getChildren() {
+            return [this.properties.value];
         }
 
         toXPath() {
@@ -245,7 +250,8 @@ export module XPathModels {
             name: string,
             namespace: string,
             literal: string | null,
-            predicates: XPathExpression[] | null
+            predicates: XPathExpression[] | null,
+            location: ParseLocation
         }) {
             this.predicates = properties.predicates || [];
         }
@@ -349,7 +355,7 @@ export module XPathModels {
         value: string;
         private stringDelimiter: string;
 
-        constructor(value: string) {
+        constructor(value: string, public location: ParseLocation) {
             this.stringDelimiter = value[0];
             this.value = value.substr(1, value.length - 2);
         }
@@ -361,7 +367,7 @@ export module XPathModels {
 
     export class XPathNumericLiteral implements IXPathExpression {
         type: 'numeric' = 'numeric';
-        constructor(public value: number) {
+        constructor(public value: number, public location: ParseLocation) {
         }
 
         public toXPath() {
@@ -369,5 +375,24 @@ export module XPathModels {
             return `${this.value}`;
         }
     }
-}
 
+    export class ParseLocation {
+        public firstColumn: number;
+        public firstLine: number;
+        public lastColumn: number;
+        public lastLine: number;
+
+        constructor(properties: {
+            first_column: number,
+            first_line: number,
+            last_column: number,
+            last_line: number
+        }[]) {
+            let current = properties[properties.length - 1];
+            this.firstColumn = current.first_column;
+            this.firstLine = current.first_line;
+            this.lastColumn = current.last_column;
+            this.lastLine = current.last_line;
+        }
+    }
+}

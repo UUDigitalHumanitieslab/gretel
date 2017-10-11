@@ -7,10 +7,24 @@ xpath-editor {
         min-height: 100px;
     }
     
-    .pathError {
-        background: #ff0 url('data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=') bottom repeat-x;
+    %pathMessage {
+        background-position: bottom;
+        background-repeat: repeat-x;
         position: absolute;
         width: fit-content;
+
+    }
+
+    .pathError {
+        @extend %pathMessage;
+        background-color: #FFCCCC;
+        background-image: url('data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=');
+    }
+
+    .pathWarning {
+        @extend %pathMessage;
+        background-color: #FFFFAB;
+        background-image: url('data:image/gif;base64,R0lGODlhBAADAKEBAP/SAP///////////yH5BAEKAAIALAAAAAAEAAMAAAIEDGKJVgA7')
     }
 
     .errorMessage {

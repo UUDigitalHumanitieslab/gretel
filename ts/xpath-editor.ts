@@ -5,7 +5,7 @@ import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
 import { MacroService } from './services/macro-service';
-import XPathParserService from './services/xpath-parser.service';
+import { XPathParserService } from './services/xpath-parser.service';
 
 let AceRange = ace.acequire('ace/range').Range;
 
@@ -14,6 +14,7 @@ export class XPathEditor {
     public autofocus: boolean;
     public value: string;
 
+    private editor: ace.Editor;
     private session: ace.IEditSession;
     private macroService: MacroService;
     private xpathParserService: XPathParserService;
@@ -22,7 +23,8 @@ export class XPathEditor {
     private $errorElement: JQuery;
     private $hiddenInput: JQuery;
 
-    private existingMarkerId: number | undefined = undefined;
+    private existingErrorMarkerId: number | undefined = undefined;
+    private existingWarningMarkerIds: number[] = [];
     private valueSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private macroServiceLoaded = false;
 
@@ -89,7 +91,7 @@ export class XPathEditor {
         let languageTools = ace.acequire("ace/ext/language_tools");
         languageTools.setCompleters([new Completer()]);
 
-        let editor = ace.edit($container[0]);
+        let editor = this.editor = ace.edit($container[0]);
         editor.$blockScrolling = Infinity; // disable annoying 'this will be disabled in the next version' message
         editor.setValue(this.value, -1);
         if (this.autofocus) {
@@ -118,28 +120,63 @@ export class XPathEditor {
 
     private showErrors() {
         this.parsedObservable
+            .map(parsed => {
+                return {
+                    value: parsed,
+                    key: (parsed.error ? parsed.error.startLine + parsed.error.message : '')
+                    + (parsed.warnings ? parsed.warnings.map(w => w.startLine + w.message).join('') : '')
+                }
+            })
+            .distinctUntilKeyChanged('key')
             .subscribe(parsed => {
-                if (this.existingMarkerId != undefined) {
-                    this.session.removeMarker(this.existingMarkerId);
+                if (parsed.value.error) {
+                    if (this.existingErrorMarkerId != undefined) {
+                        this.session.removeMarker(this.existingErrorMarkerId);
+                    }
+
+                    let pathRange: ace.Range;
+                    if (parsed.value.error.startColumn == undefined) {
+                        // select the entire line if the offset is unknown
+                        pathRange = new AceRange(parsed.value.error.startLine, 0, parsed.value.error.startLine + 1, 0);
+                    } else {
+                        pathRange = new AceRange(parsed.value.error.startLine,
+                            parsed.value.error.startColumn,
+                            parsed.value.error.lastColumn,
+                            parsed.value.error.lastColumn);
+                    }
+                    this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
+                    this.$errorElement.text(parsed.value.error.message);
+                } else {
+                    if (this.existingErrorMarkerId != undefined) {
+                        this.session.removeMarker(this.existingErrorMarkerId);
+                    }
+
+                    this.$errorElement.text('');
                 }
 
-                // TODO: prevent removal if the same
-                if (parsed.error) {
-                    // TODO: support multi-line (and multiple) errors.
-                    let pathRange: ace.Range;
-                    if (parsed.error.offset == undefined) {
-                        // select the entire line if the offset is unknown
-                        pathRange = new AceRange(parsed.error.line, 0, parsed.error.line + 1, 0);
-                    } else {
-                        pathRange = new AceRange(parsed.error.line,
-                            parsed.error.offset,
-                            parsed.error.line,
-                            parsed.error.offset + parsed.error.length);
-                    }
-                    this.existingMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-                    this.$errorElement.text(parsed.error.message);
-                } else {
-                    this.$errorElement.text('');
+                if (this.existingWarningMarkerIds.length) {
+                    this.session.clearAnnotations();
+                    this.existingWarningMarkerIds.forEach((id) => {
+                        this.session.removeMarker(id);
+                    });
+                    this.existingWarningMarkerIds = [];
+                }
+
+                if (parsed.value.warnings.length) {
+                    this.editor.renderer.setShowGutter(true);
+                    this.existingWarningMarkerIds = parsed.value.warnings.map((message) => {
+                        let warningRange = new AceRange(message.startLine,
+                            message.startColumn,
+                            message.lastLine,
+                            message.lastColumn);
+                        this.session.setAnnotations([{
+                            row: message.startLine,
+                            column: message.startColumn,
+                            text: message.message,
+                            type: 'warning'
+                        }]);
+                        return this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
+                    })
                 }
             });
     }
