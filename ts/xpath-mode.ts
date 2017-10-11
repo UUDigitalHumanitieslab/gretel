@@ -62,37 +62,40 @@ export class Completer {
         })));
 
     // TODO: look into using ACE states for this instead
+    /**
+     * Only show attribute auto-completions.
+     */
     static onlyAttributes = false;
+    /**
+     * Only show macro auto-completions.
+     */
     static onlyMacros = false;
-    public getCompletions(editor: ace.Editor,
-        session: ace.IEditSession,
-        position: { column: number, row: number },
-        prefix: string,
-        callback: (error: string | null, data: { value: string, score: number, meta: string }[]) => void) {
-        let iterator = new TokenIterator(session, position.row, position.column);
-        let token = iterator.getCurrentToken() as TokenInfoWithType;
-        if (token) {
-            if (token.type && token.type == "string") {
-                iterator.stepBackward();
-                iterator.stepBackward();
-                token = iterator.getCurrentToken() as TokenInfoWithType;
-                if (token && token.value && token.value.startsWith('@')) {
-                    let name = token.value.substring(1);
-                    let attribute = XpathAttributes[name];
-                    let values = attribute ? attribute.values : [];
-                    if (values) {
-                        callback(null, values.map(value => { return { value: value[0], meta: value[1], score: 500 } }));
-                        return;
-                    }
-                }
-            }
 
-            if (token.value && token.value.startsWith('@')) {
-                // reopened attribute autocomplete
-                Completer.onlyAttributes = true;
+    private getAttributeCompletions(iterator: ace.TokenIterator) {
+        let token = iterator.getCurrentToken() as TokenInfoWithType;
+        if (token.type && token.type == "string") {
+            iterator.stepBackward();
+            iterator.stepBackward();
+            token = iterator.getCurrentToken() as TokenInfoWithType;
+            if (token && token.value && token.value.startsWith('@')) {
+                let name = token.value.substring(1);
+                let attribute = XpathAttributes[name];
+                let values = attribute ? attribute.values : [];
+                if (values) {
+                    return values.map(value => { return { value: value[0], meta: value[1], score: 500 } });
+                }
             }
         }
 
+        if (token.value && token.value.startsWith('@')) {
+            // reopened attribute autocomplete
+            Completer.onlyAttributes = true;
+        }
+
+        return false;
+    }
+
+    private getMacroCompletions() {
         let macroCompletions: { value: string, meta: string, score: number }[];
         if (Completer.onlyMacros || !Completer.onlyAttributes) {
             let macroLookup = macroService.getMacros();
@@ -104,6 +107,23 @@ export class Completer {
                 }
             });
         }
+
+        return macroCompletions;
+    }
+
+    public getCompletions(editor: ace.Editor,
+        session: ace.IEditSession,
+        position: { column: number, row: number },
+        prefix: string,
+        callback: (error: string | null, data: { value: string, score: number, meta: string }[]) => void) {
+        let iterator = new TokenIterator(session, position.row, position.column);
+        let attributeCompletions = this.getAttributeCompletions(iterator);
+        if (attributeCompletions) {
+            callback(null, attributeCompletions);
+            return;
+        }
+
+        let macroCompletions = this.getMacroCompletions();
 
         if (Completer.onlyMacros) {
             callback(null, macroCompletions);
@@ -118,6 +138,9 @@ export class Completer {
     }
 }
 
+/**
+ * Add additional XPATH behavior to autocomplete macros, functions and attributes.
+ */
 class XPathBehaviour extends XQueryBehaviour {
     constructor() {
         super();

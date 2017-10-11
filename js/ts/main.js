@@ -37383,9 +37383,17 @@ exports.XpathAttributes = {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(7);
+/**
+ * The macro service is used to replace macro variables in the XPATH with the macro value.
+ * This is done using the same syntax as used by PaQU e.g. `%PQ_example%`.
+ */
 var MacroService = (function () {
     function MacroService() {
     }
+    /**
+     * Loads the macro definitions from a URL.
+     * @param url The URL of the macro definitions
+     */
     MacroService.prototype.loadFromUrl = function (url) {
         var _this = this;
         return new Promise(function (resolve, reject) {
@@ -37394,6 +37402,10 @@ var MacroService = (function () {
             });
         });
     };
+    /**
+     * Loads the macro definitions from the passed text data.
+     * @param data The definitions to load.
+     */
     MacroService.prototype.loadFromText = function (data) {
         MacroService.macroLookup = this.parseValues(data);
     };
@@ -37403,6 +37415,12 @@ var MacroService = (function () {
         }
         return MacroService.macroLookup;
     };
+    /**
+     * Find all the macro references in the specified XPATH and returns their replacements.
+     * @param value
+     * @returns The replacements which were performed (should be repeated sequentially) and the replacement results,
+     * if no replacements were performed the result is false.
+     */
     MacroService.prototype.enrich = function (value) {
         var macroCalls = /%([^\%\s]+)%/g;
         var macroCall;
@@ -37442,6 +37460,12 @@ var MacroService = (function () {
             result: macroReplacements.length ? result.join('\n') + value.substring(lastIndex) : false
         };
     };
+    /**
+     * Parses the macro definition text and returns all the macro names and their replacement values.
+     * The macro definition should contain macro names (e.g. PQ_example) followed by the value to
+     * place in the XPATH instead of this macro call, which is surrounded by """.
+     * @param data The macro definition text
+     */
     MacroService.prototype.parseValues = function (data) {
         var macroLookup = {};
         var macroPattern = /\b(.*)\b\s*=\s*"""([\s\S]*?)"""/g;
@@ -56544,29 +56568,28 @@ var Completer = (function () {
             };
         })));
     }
-    Completer.prototype.getCompletions = function (editor, session, position, prefix, callback) {
-        var iterator = new TokenIterator(session, position.row, position.column);
+    Completer.prototype.getAttributeCompletions = function (iterator) {
         var token = iterator.getCurrentToken();
-        if (token) {
-            if (token.type && token.type == "string") {
-                iterator.stepBackward();
-                iterator.stepBackward();
-                token = iterator.getCurrentToken();
-                if (token && token.value && token.value.startsWith('@')) {
-                    var name_1 = token.value.substring(1);
-                    var attribute = xpath_attributes_1.XpathAttributes[name_1];
-                    var values = attribute ? attribute.values : [];
-                    if (values) {
-                        callback(null, values.map(function (value) { return { value: value[0], meta: value[1], score: 500 }; }));
-                        return;
-                    }
+        if (token.type && token.type == "string") {
+            iterator.stepBackward();
+            iterator.stepBackward();
+            token = iterator.getCurrentToken();
+            if (token && token.value && token.value.startsWith('@')) {
+                var name_1 = token.value.substring(1);
+                var attribute = xpath_attributes_1.XpathAttributes[name_1];
+                var values = attribute ? attribute.values : [];
+                if (values) {
+                    return values.map(function (value) { return { value: value[0], meta: value[1], score: 500 }; });
                 }
             }
-            if (token.value && token.value.startsWith('@')) {
-                // reopened attribute autocomplete
-                Completer.onlyAttributes = true;
-            }
         }
+        if (token.value && token.value.startsWith('@')) {
+            // reopened attribute autocomplete
+            Completer.onlyAttributes = true;
+        }
+        return false;
+    };
+    Completer.prototype.getMacroCompletions = function () {
         var macroCompletions;
         if (Completer.onlyMacros || !Completer.onlyAttributes) {
             var macroLookup_1 = macroService.getMacros();
@@ -56578,6 +56601,16 @@ var Completer = (function () {
                 };
             });
         }
+        return macroCompletions;
+    };
+    Completer.prototype.getCompletions = function (editor, session, position, prefix, callback) {
+        var iterator = new TokenIterator(session, position.row, position.column);
+        var attributeCompletions = this.getAttributeCompletions(iterator);
+        if (attributeCompletions) {
+            callback(null, attributeCompletions);
+            return;
+        }
+        var macroCompletions = this.getMacroCompletions();
         if (Completer.onlyMacros) {
             callback(null, macroCompletions);
             Completer.onlyMacros = false;
@@ -56598,11 +56631,20 @@ var Completer = (function () {
         'number()': { meta: 'Parse number', hasArguments: true },
     };
     // TODO: look into using ACE states for this instead
+    /**
+     * Only show attribute auto-completions.
+     */
     Completer.onlyAttributes = false;
+    /**
+     * Only show macro auto-completions.
+     */
     Completer.onlyMacros = false;
     return Completer;
 }());
 exports.Completer = Completer;
+/**
+ * Add additional XPATH behavior to autocomplete macros, functions and attributes.
+ */
 var XPathBehaviour = (function (_super) {
     __extends(XPathBehaviour, _super);
     function XPathBehaviour() {
