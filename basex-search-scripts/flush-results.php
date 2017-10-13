@@ -24,8 +24,7 @@ if ($corpus == 'sonar') {
 }
 
 $databaseString = $corpus;
-$xpath = $_SESSION['xpath'];
-
+$xpath = $_SESSION['xpath'] . $_SESSION['metadataFilter'];
 // get context option
 $context = $_SESSION['ct'];
 

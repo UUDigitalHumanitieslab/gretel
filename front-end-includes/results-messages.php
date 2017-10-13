@@ -34,7 +34,15 @@ require ROOT_PATH."/functions.php";
   </div>
   <div id="no-results-found">
       <strong>No results were found!</strong>
-      <?php setPreviousPageMessage(1); ?>
+      <?php 
+      if (!$_SESSION['metadataFilter']) {
+        setPreviousPageMessage(1);
+      } else {
+        ?>
+        <br /><a role="button" class="resetFiltersButton">Reset the filters</a>
+        <?php
+      }
+      ?>
   </div>
   <div id="error">
       <strong>Error! <span class="error-msg"></span></strong>

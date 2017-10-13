@@ -24,7 +24,7 @@ if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
 }
 
-$xpath = $_SESSION['xpath'];
+$xpath = $_SESSION['xpath'] . $_SESSION['metadataFilter'];
 $ebsxps = $_SESSION['ebsxps'];
 
 if ($ebsxps == 'ebs') {

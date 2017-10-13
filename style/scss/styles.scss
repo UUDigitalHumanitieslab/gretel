@@ -67,6 +67,10 @@ body {
     }
 }
 
+[role="button"] {
+    cursor: pointer;
+}
+
 #popup-overlay {
     position: fixed;
     top: 0;

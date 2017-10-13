@@ -1,8 +1,8 @@
-$(function() {
+$(function () {
     // Update date range facet with currently selected value and redirect on change in date selection
-    $('.facet input.facet-daterange').each(function() {
-		$(this).css('max-width', '100px');
-		
+    $('.facet input.facet-daterange').each(function () {
+        $(this).css('max-width', '100px');
+
         var key = $(this).attr('name').split('_')[0];
         var type = $(this).attr('name').split('_')[1];
         var val = getParameterByName(key);
@@ -24,7 +24,7 @@ $(function() {
             changeMonth: true,
             changeYear: true,
             dateFormat: 'yy-mm-dd'
-        }).on('change', function() {
+        }).on('change', function () {
             var value = '';
             if (type === 'from') {
                 value = $(this).val() + '*' + $(this).next().val();
@@ -51,7 +51,7 @@ $(function() {
     });
 
     // Update range facet with currently selected value and redirect on slide
-    $('.facet input.facet-range').each(function() {
+    $('.facet input.facet-range').each(function () {
         var key = $(this).attr('name');
         var val = getParameterByName(key);
         var min = +$(this).attr('data-min');
@@ -73,10 +73,10 @@ $(function() {
             min: min,
             max: max,
             values: [current_min, current_max],
-            slide: function(event, ui) {
-				$(this).prev().val(ui.values[0] + " - " + ui.values[1]);
-			},
-            stop: function(event, ui) {
+            slide: function (event, ui) {
+                $(this).prev().val(ui.values[0] + " - " + ui.values[1]);
+            },
+            stop: function (event, ui) {
                 var value = ui.values[0] + '*' + ui.values[1];
                 window.location = updateQueryStringParameter(key, value);
             }
@@ -84,13 +84,13 @@ $(function() {
     });
 
     // Update dropdown facet with currently selected value
-    $('.facet select').each(function() {
+    $('.facet select').each(function () {
         var key = $(this).attr('name');
         $(this).val(getParameterByName(key));
     });
 
     // Redirect on selection
-    $('.facet select').on('change', function() {
+    $('.facet select').on('change', function () {
         var key = $(this).attr('name');
         var value = $(this).val();
 
@@ -105,7 +105,7 @@ $(function() {
     });
 
     // Update checkbox facet with currently selected value
-    $('.facet input.facet-value').each(function() {
+    $('.facet input.facet-value').each(function () {
         var key = $(this).parents('div.facet').attr('id');
         var value = $(this).attr('name');
 
@@ -114,7 +114,7 @@ $(function() {
     });
 
     // Redirect on click
-    $('.facet input.facet-value').click(function() {
+    $('.facet input.facet-value').click(function () {
         var key = $(this).parents('div.facet').attr('id');
         var value = $(this).attr('name');
 
@@ -131,10 +131,24 @@ $(function() {
     // After click on buttons with the "export" class,
     // save the results using the current URL parameters,
     // adding the print parameter.
-    $('.export').click(function() {
+    $('.export').click(function () {
         var url = window.location.href.replace('ebs/results.php', 'scripts/SaveResults.php');
         url = updateQueryStringParameter('print', $(this).attr('data-format'), url);
         window.open(url);
+    });
+        
+    $('body').on('click', '.resetFiltersButton', function () {
+        var url = window.location.href;
+        $('.facet-value:checked').each(function(index, checkbox) {
+            var key = $(checkbox).parents('div.facet').attr('id');
+            url = updateQueryStringParameter(key, undefined, url);
+        })
+        $('.facet select').each(function(index, element) {
+            var key = $(element).attr('name');
+            url = updateQueryStringParameter(key, undefined, url);
+        });
+
+        window.location = url;
     });
 });
 

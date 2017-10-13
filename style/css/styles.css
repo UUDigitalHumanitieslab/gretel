@@ -206,6 +206,9 @@ body {
     width: 374px;
     height: 450px;
     content: url("../../../img/logo-image-gretel-curve.svg"); } }
+[role="button"] {
+  cursor: pointer; }
+
 #popup-overlay {
   position: fixed;
   top: 0;
