@@ -3,7 +3,7 @@ import 'brace/mode/xquery';
 import * as ace from 'brace';
 import { XpathAttributes } from './xpath-attributes';
 import { MacroService } from './services/macro-service';
-import { XPathHighlighter } from './xpath-highlighter';
+import { AlpinoXPathHighlighter } from './alpino-xpath-highlighter-rules';
 let TokenIterator: { new(session: ace.IEditSession, initialRow: number, initialColumn: number): ace.TokenIterator } = ace.acequire("ace/token_iterator").TokenIterator;
 let TextMode: { new(): any } = ace.acequire('ace/mode/text').Mode;
 // defined in the javascript mode!
@@ -18,7 +18,7 @@ export const modeName = 'xpath';
 export default class XPathMode extends TextMode {
     constructor() {
         super();
-        this.HighlightRules = XPathHighlighter;
+        this.HighlightRules = AlpinoXPathHighlighter;
         this.$outdent = new MatchingBraceOutdent();
     }
 
@@ -96,6 +96,11 @@ export class Completer {
         return false;
     }
 
+    private getFunctionCompletions(currentToken: TokenInfoWithType, iterator: ace.TokenIterator) {
+        // TODO: implement!
+        return [] as { value: string, meta: string, score: number }[];
+    }
+
     private getMacroCompletions() {
         let macroCompletions: { value: string, meta: string, score: number }[];
         if (Completer.onlyMacros || !Completer.onlyAttributes) {
@@ -117,7 +122,8 @@ export class Completer {
         position: { column: number, row: number },
         prefix: string,
         callback: (error: string | null, data: { value: string, score: number, meta: string }[]) => void) {
-        let iterator = new TokenIterator(session, position.row, position.column);
+        let createIterator = () => new TokenIterator(session, position.row, position.column);
+        let iterator = createIterator();
         let currentToken = iterator.getCurrentToken() as TokenInfoWithType;
         let attributeCompletions = this.getAttributeCompletions(currentToken, iterator);
         if (attributeCompletions) {
@@ -128,6 +134,8 @@ export class Completer {
         if (currentToken.value.startsWith("@")) {
             callback(null, this.attributesCompletions.concat([]));
             Completer.onlyAttributes = false;
+        } else if (currentToken.type && currentToken.type.startsWith("function")) {
+            callback(null, this.getFunctionCompletions(currentToken, createIterator()));
         } else {
             let macroCompletions = this.getMacroCompletions();
             if (Completer.onlyMacros) {

@@ -1,15 +1,15 @@
 import * as ace from 'brace';
-import { Highlighter } from './xpath-interfaces';
-let TextHighlightRules: Highlighter = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
+import { HighlighterRules } from './xpath-interfaces';
+let TextHighlightRules: HighlighterRules = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
 
-const identifierRe = "[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\\d\\$_\u00a1-\uffff]*";
+export const identifierRe = "[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\\d\\$_\u00a1-\uffff]*";
+export const equalityRe = "(=|!=|<=|<|>=|>)";
 const numericRe = "[+-]?\\d[\\d_]*(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b";
-const equalityRe = "(=|!=|<=|<|>=|>)";
 
 /**
  * Highlighter to use by ACE text editor for highlighting the different tokens in an XPATH string.
  */
-export class XPathHighlighter extends TextHighlightRules {
+export class XPathHighlighterRules extends TextHighlightRules {
     constructor() {
         super();
         this.$rules = {
