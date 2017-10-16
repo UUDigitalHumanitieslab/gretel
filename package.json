@@ -41,7 +41,6 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
-    "ace-builds": "^1.2.8",
     "brace": "^0.10.0",
     "jquery-ui": "^1.12.1",
     "pivottable": "^2.14.0",
