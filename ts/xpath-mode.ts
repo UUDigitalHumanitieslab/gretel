@@ -1,19 +1,25 @@
+import 'brace/mode/javascript';
 import 'brace/mode/xquery';
 import * as ace from 'brace';
 import { XpathAttributes } from './xpath-attributes';
 import { MacroService } from './services/macro-service';
-
+import { AlpinoXPathHighlighter } from './alpino-xpath-highlighter-rules';
 let TokenIterator: { new(session: ace.IEditSession, initialRow: number, initialColumn: number): ace.TokenIterator } = ace.acequire("ace/token_iterator").TokenIterator;
-let XQueryMode: { new(): any } = ace.acequire('ace/mode/xquery').Mode;
+let TextMode: { new(): any } = ace.acequire('ace/mode/text').Mode;
+// defined in the javascript mode!
+let MatchingBraceOutdent = ace.acequire("ace/mode/matching_brace_outdent").MatchingBraceOutdent;
 let CstyleBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/cstyle').CstyleBehaviour;
 let XQueryBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/xquery').XQueryBehaviour;
+let TextHighlightRules: any = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
 
 let macroService = new MacroService();
 
 export const modeName = 'xpath';
-export default class XPathMode extends XQueryMode {
+export default class XPathMode extends TextMode {
     constructor() {
         super();
+        this.HighlightRules = AlpinoXPathHighlighter;
+        this.$outdent = new MatchingBraceOutdent();
     }
 
     public completer = new Completer();
@@ -71,9 +77,9 @@ export class Completer {
      */
     static onlyMacros = false;
 
-    private getAttributeCompletions(iterator: ace.TokenIterator) {
-        let token = iterator.getCurrentToken() as TokenInfoWithType;
-        if (token.type && token.type == "string") {
+    private getAttributeCompletions(currentToken: TokenInfoWithType, iterator: ace.TokenIterator) {
+        let token = currentToken;
+        if (token.type && token.type == "attribute.string") {
             iterator.stepBackward();
             iterator.stepBackward();
             token = iterator.getCurrentToken() as TokenInfoWithType;
@@ -87,12 +93,12 @@ export class Completer {
             }
         }
 
-        if (token.value && token.value.startsWith('@')) {
-            // reopened attribute autocomplete
-            Completer.onlyAttributes = true;
-        }
-
         return false;
+    }
+
+    private getFunctionCompletions(currentToken: TokenInfoWithType, iterator: ace.TokenIterator) {
+        // TODO: implement!
+        return [] as { value: string, meta: string, score: number }[];
     }
 
     private getMacroCompletions() {
@@ -116,24 +122,28 @@ export class Completer {
         position: { column: number, row: number },
         prefix: string,
         callback: (error: string | null, data: { value: string, score: number, meta: string }[]) => void) {
-        let iterator = new TokenIterator(session, position.row, position.column);
-        let attributeCompletions = this.getAttributeCompletions(iterator);
+        let createIterator = () => new TokenIterator(session, position.row, position.column);
+        let iterator = createIterator();
+        let currentToken = iterator.getCurrentToken() as TokenInfoWithType;
+        let attributeCompletions = this.getAttributeCompletions(currentToken, iterator);
         if (attributeCompletions) {
             callback(null, attributeCompletions);
             return;
         }
 
-        let macroCompletions = this.getMacroCompletions();
-
-        if (Completer.onlyMacros) {
-            callback(null, macroCompletions);
-            Completer.onlyMacros = false;
-        }
-        if (Completer.onlyAttributes) {
+        if (currentToken.value.startsWith("@")) {
             callback(null, this.attributesCompletions.concat([]));
             Completer.onlyAttributes = false;
+        } else if (currentToken.type && currentToken.type.startsWith("function")) {
+            callback(null, this.getFunctionCompletions(currentToken, createIterator()));
         } else {
-            callback(null, this.allCompletions.concat(macroCompletions));
+            let macroCompletions = this.getMacroCompletions();
+            if (Completer.onlyMacros) {
+                callback(null, macroCompletions);
+                Completer.onlyMacros = false;
+            } else {
+                callback(null, this.allCompletions.concat(macroCompletions));
+            }
         }
     }
 }
