@@ -190,31 +190,31 @@ function show_metadata_facets()
             continue;
         }
         // Build the facet
-        echo '<div class="facet" id="' . $group . '">';
-        echo '<p><strong>' . $group . '</strong></p>';
+        echo '<div class="facet" id="' . htmlspecialchars($group) . '">';
+        echo '<p><strong>' . htmlspecialchars($group) . '</strong></p>';
         // Date range
         if ($group_details->facet === 'date_range')
         {
-            echo '<input class="facet-daterange" type="text" name="' . $group . '_from" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
-            echo '<input class="facet-daterange" type="text" name="' . $group . '_to" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
+            echo '<input class="facet-daterange" type="text" name="' . htmlspecialchars($group) . '_from" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
+            echo '<input class="facet-daterange" type="text" name="' . htmlspecialchars($group) . '_to" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
         }
         // Slider
         else if ($group_details->facet === 'slider')
         {
-            echo '<input class="facet-range" type="text" name="' . $group . '" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
+            echo '<input class="facet-range" type="text" name="' . htmlspecialchars($group) . '" data-min="' . $group_details->min_value . '" data-max="' . $group_details->max_value . '" readonly>';
             echo '<div class="slider-range"></div>';
         }
         // Dropdown
         else if ($group_details->facet === 'dropdown')
         {
-            echo '<select name="' . $group . '">';
+            echo '<select name="' . htmlspecialchars($group) . '">';
             echo '<option value="">';
             echo '--- show all ---';
             echo '</option>';
             foreach ($counts as $k => $v)
             {
-                echo '<option value="' . $k . '">';
-                echo $k . ' (' . $v . ')';
+                echo '<option value="' . htmlspecialchars($k) . '">';
+                echo htmlspecialchars($k . ' (' . $v . ')');
                 echo '</option>';
             }
             echo '</select>';
@@ -224,8 +224,8 @@ function show_metadata_facets()
         {
             foreach ($counts as $k => $v)
             {
-                echo '<input class="facet-value" type="checkbox" name="' . $k . '">';
-                echo $k . ' (' . $v . ')';
+                echo '<input class="facet-value" type="checkbox" name="' . htmlspecialchars($k) . '">';
+                echo htmlspecialchars($k . ' (' . $v . ')');
                 echo '</input>';
                 echo '<br/>';
             }
