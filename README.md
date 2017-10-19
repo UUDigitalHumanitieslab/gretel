@@ -20,20 +20,39 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 ### Next steps
 
 1. Download (or clone) GrETEL from GitHub.
-2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)).
+2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)). 
+
+> It is recommended to use the same version used for creating the treebanks. This way an example based search will result in the same search structure as stored in the database.
+
 3. Create BaseX databases containing the treebanks you want to make available.
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
 
+## Notes for users
+
+Only the properties of the first node matched by an XPATH variable is returned for analysis. For example:
+
+A user searches for `//node[node]`. Two variables are found in this query: `$node1 = //node` and `$node2 = $node1[node]`.
+
+The following sentence would match this query: 
+
+`node[np] (node[det] node[noun])`
+
+The node found for `$node1` will then be `node[np]`. 
+The node found for `$node2` will then be `node[det]`. The properties of `node[noun]` will not be available for analysis using this query.
+
+When searching for a more specific structure, this is unlikely to occur.
+
 ## Notes for developers
+
 
 ### Front-end
 * We used [SCSS](http://sass-lang.com/documentation/file.SCSS_FOR_SASS_USERS.html) as our stylesheet markdown of preference. All styles are available as `.scss` files (`styles/scss/`). For users who do not want to work with SCSS/SASS we also included the expanded CSS output of the SCSS files (`styles/css/`). In production, however, we use the minfied files (`styles/css/min/`) to decrease load times.
 * We do not support Internet Explorer because we highly rely on the power of the flexbox specification. Internet Explorer does not provide (good) support for flex properties. Microsoft's newer, and better, browser Edge is supported.
 * JavaScript files are also provided as expanded (`js/`) as well as minified files (`js/min/`). We use jQuery as the library of choice.
 * Results are 'flushed' to the user by use of subsequent ajax requests. Therefore, JavaScript _has_ to be enabled by users.
-* Opening XPath code directly in the [XPath Beautifier](http://bramvanroy.be/projects/xpath-beautifier/) will only work on our own URL. This is due to cross-origin restrictions. This is a deliberate security measure as to not flood that tool with possibly malicious requests.
+* Newer functionality is built in TypeScript and can be found under `ts/`. This code is transpiled to JavaScript and placed under `js/ts`.
 
 
 ### Back-end
@@ -46,7 +65,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
   * `helpers.php`: basic helper functions that return booleans.
 
 ### During development
-* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and auto-minify CSS and JavaScript.
+* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and TypeScript, and auto-minify CSS and JavaScript.
 * Note that some client-side code is in Typescript `ts/`, this code is automatically compiled using Grunt.
 * Commands to install Grunt, local dependencies and then to watch for changes:
 
@@ -63,5 +82,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
 * [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
-* [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design
-* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis) for beta testing.
+* [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
+* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 3.1 functionality and improvements;
+* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 3.1 functionality and improvements;
+* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback.
