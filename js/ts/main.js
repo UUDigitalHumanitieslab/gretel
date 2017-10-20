@@ -62897,7 +62897,11 @@ var XPathExtractinator = (function () {
                 throw new FormatError('path_start');
             }
             var nameGenerator_1 = new NameGenerator();
-            var result = this.extractRecursively("$node", children[1].getChildren(), function () { return nameGenerator_1.get(); });
+            var result = [{
+                    name: '$node',
+                    path: '*',
+                    location: getLocation(children[1].properties.location)
+                }].concat(this.extractRecursively("$node", children[1].getChildren(), function () { return nameGenerator_1.get(); }));
             return result;
         }
         return [];
@@ -62910,10 +62914,10 @@ var XPathExtractinator = (function () {
                 case "path":
                     // this is a level below the parent e.g. $parent/*
                     var name_1 = nameGenerator();
-                    result.push({ name: name_1, path: parentName + "/" + child.toXPath() });
                     for (var _a = 0, _b = child.steps; _a < _b.length; _a++) {
                         var step = _b[_a];
                         if (step.properties.axis == 'child') {
+                            result.push({ name: name_1, path: parentName + "/" + child.toXPath(), location: getLocation(step.properties.location) });
                             result.push.apply(result, this.extractRecursively(name_1, step.predicates, nameGenerator));
                         }
                         else {
@@ -62954,6 +62958,13 @@ var FormatError = (function () {
     return FormatError;
 }());
 exports.FormatError = FormatError;
+function getLocation(location) {
+    return {
+        line: location.firstLine,
+        firstColumn: location.firstColumn,
+        lastColumn: location.lastColumn
+    };
+}
 var NameGenerator = (function () {
     function NameGenerator() {
         this.index = 1;

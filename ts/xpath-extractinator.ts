@@ -29,7 +29,14 @@ export class XPathExtractinator {
             }
 
             let nameGenerator = new NameGenerator();
-            let result = this.extractRecursively("$node", children[1].getChildren(), () => nameGenerator.get());
+            let result = [{
+                name: '$node',
+                path: '*',
+                location: getLocation(children[1].properties.location)
+            }].concat(this.extractRecursively(
+                "$node",
+                children[1].getChildren(),
+                () => nameGenerator.get()));
             return result;
         }
 
@@ -44,10 +51,10 @@ export class XPathExtractinator {
                 case "path":
                     // this is a level below the parent e.g. $parent/*
                     let name = nameGenerator();
-                    result.push({ name, path: `${parentName}/${child.toXPath()}` });
 
                     for (let step of child.steps) {
                         if (step.properties.axis == 'child') {
+                            result.push({ name, path: `${parentName}/${child.toXPath()}`, location: getLocation(step.properties.location) });
                             result.push(...this.extractRecursively(name, step.predicates, nameGenerator));
                         } else {
                             throw new FormatError('axis_type', [step.properties.axis]);
@@ -84,7 +91,22 @@ export class FormatError {
 
 export interface PathVariable {
     name: string,
-    path: string
+    path: string,
+    location: Location
+}
+
+function getLocation(location: XPathModels.ParseLocation): Location {
+    return {
+        line: location.firstLine,
+        firstColumn: location.firstColumn,
+        lastColumn: location.lastColumn
+    };
+}
+
+interface Location {
+    line: number,
+    firstColumn: number,
+    lastColumn: number
 }
 
 class NameGenerator {
