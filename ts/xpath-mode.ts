@@ -1,6 +1,7 @@
 import 'brace/mode/javascript';
 import 'brace/mode/xquery';
 import * as ace from 'brace';
+import { functionCompletions, pathCompletions } from './alpino-xpath-completions';
 import { XpathAttributes } from './xpath-attributes';
 import { MacroService } from './services/macro-service';
 import { AlpinoXPathHighlighter } from './alpino-xpath-highlighter-rules';
@@ -34,38 +35,15 @@ export class Completer {
         return { value: key, meta: XpathAttributes[key].description, score: 500 }
     });
 
-    static functionCompletions: { [name: string]: { meta: string, hasArguments: boolean } } = {
-        'fn:replace()': { meta: 'Replace', hasArguments: true },
-        'not()': { meta: 'Negation', hasArguments: true },
-        'position()': { meta: 'Position of node', hasArguments: false },
-        'last()': { meta: 'Last node position', hasArguments: false },
-        'number()': { meta: 'Parse number', hasArguments: true },
-    };
-
-    private allCompletions = Object.keys(Completer.functionCompletions).map(func => {
-        return { value: func, meta: Completer.functionCompletions[func].meta, score: 500 };
-    }).concat([
-        { value: 'node', meta: '', score: 500 },
-        { value: 'and', meta: '', score: 500 },
-        { value: 'or', meta: '', score: 500 },
-        { value: "ancestor-or-self::", meta: '', score: 500 },
-        { value: "ancestor::", meta: '', score: 500 },
-        { value: "child::", meta: '', score: 500 },
-        { value: "descendant-or-self::", meta: '', score: 500 },
-        { value: "descendant::", meta: '', score: 500 },
-        { value: "following-sibling::", meta: '', score: 500 },
-        { value: "following::", meta: '', score: 500 },
-        { value: "parent::", meta: '', score: 500 },
-        { value: "preceding-sibling::", meta: '', score: 500 },
-        { value: "preceding::", meta: '', score: 500 },
-        { value: "self::", meta: '', score: 500 },
-        { value: 'following-sibling::', meta: '', score: 500 }].concat(this.attributesCompletions.map(completion => {
-            return {
-                value: '@' + completion.value,
-                meta: completion.meta,
-                score: completion.score
-            }
-        })));
+    private allCompletions = Object.keys(functionCompletions).map(func => {
+        return { value: func, meta: functionCompletions[func].meta, score: 500 };
+    }).concat(pathCompletions.concat(this.attributesCompletions.map(completion => {
+        return {
+            value: '@' + completion.value,
+            meta: completion.meta,
+            score: completion.score
+        }
+    })));
 
     // TODO: look into using ACE states for this instead
     /**
@@ -101,11 +79,10 @@ export class Completer {
         return [] as { value: string, meta: string, score: number }[];
     }
 
-    private getMacroCompletions() {
-        let macroCompletions: { value: string, meta: string, score: number }[];
+    private getMacroCompletions(): { value: string, meta: string, score: number }[] {
         if (Completer.onlyMacros || !Completer.onlyAttributes) {
             let macroLookup = macroService.getMacros();
-            macroCompletions = Object.keys(macroLookup).map(macro => {
+            return Object.keys(macroLookup).map(macro => {
                 return {
                     value: `${!Completer.onlyMacros ? '%' : ''}${macro}%`,
                     meta: macroLookup[macro].trim().replace(/\s\s+/g, ' '),
@@ -114,7 +91,7 @@ export class Completer {
             });
         }
 
-        return macroCompletions;
+        return [];
     }
 
     public getCompletions(editor: ace.Editor,
@@ -162,7 +139,7 @@ class XPathBehaviour extends XQueryBehaviour {
             session: ace.IEditSession,
             text: string): AceHandlerResult => {
             if (text.endsWith('()')) {
-                let func = Completer.functionCompletions[text];
+                let func = functionCompletions[text];
                 if (func && func.hasArguments) {
                     // place the cursor within the parentheses
                     return {

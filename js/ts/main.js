@@ -37410,9 +37410,6 @@ var MacroService = (function () {
         MacroService.macroLookup = this.parseValues(data);
     };
     MacroService.prototype.getMacros = function () {
-        if (!MacroService.macroLookup) {
-            return {};
-        }
         return MacroService.macroLookup;
     };
     /**
@@ -37475,6 +37472,10 @@ var MacroService = (function () {
         }
         return macroLookup;
     };
+    /**
+     * defined statically, to make it available in the XPATH mode
+     */
+    MacroService.macroLookup = {};
     return MacroService;
 }());
 exports.MacroService = MacroService;
@@ -38415,14 +38416,14 @@ exports.main = function commonjsMain(args) {
         console.log('Usage: '+args[0]+' FILE');
         process.exit(1);
     }
-    var source = __webpack_require__(387).readFileSync(__webpack_require__(388).normalize(args[1]), "utf8");
+    var source = __webpack_require__(388).readFileSync(__webpack_require__(389).normalize(args[1]), "utf8");
     return exports.parser.parse(source);
 };
 if (typeof module !== 'undefined' && __webpack_require__.c[__webpack_require__.s] === module) {
   exports.main(process.argv.slice(1));
 }
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(42), __webpack_require__(386)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(42), __webpack_require__(387)(module)))
 
 /***/ }),
 /* 81 */
@@ -38441,7 +38442,7 @@ renderer.render();
 Object.defineProperty(exports, "__esModule", { value: true });
 var analysis_component_1 = __webpack_require__(83);
 var xpath_editor_1 = __webpack_require__(93);
-var xpath_variables_component_1 = __webpack_require__(389);
+var xpath_variables_component_1 = __webpack_require__(390);
 var $ = __webpack_require__(7);
 /**
  * Renders the components which have been drawn in the HTML. Similar to how this is done in Angular 2+.
@@ -42445,10 +42446,10 @@ var rxjs_1 = __webpack_require__(45);
 var $ = __webpack_require__(7);
 var ace = __webpack_require__(22);
 var xpath_mode_1 = __webpack_require__(376);
-__webpack_require__(383);
 __webpack_require__(384);
+__webpack_require__(385);
 var macro_service_1 = __webpack_require__(79);
-var xpath_parser_service_1 = __webpack_require__(385);
+var xpath_parser_service_1 = __webpack_require__(386);
 var AceRange = ace.acequire('ace/range').Range;
 exports.Selector = 'xpath-editor';
 var XPathEditor = (function () {
@@ -56517,9 +56518,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __webpack_require__(377);
 __webpack_require__(379);
 var ace = __webpack_require__(22);
+var alpino_xpath_completions_1 = __webpack_require__(380);
 var xpath_attributes_1 = __webpack_require__(78);
 var macro_service_1 = __webpack_require__(79);
-var alpino_xpath_highlighter_rules_1 = __webpack_require__(380);
+var alpino_xpath_highlighter_rules_1 = __webpack_require__(381);
 var TokenIterator = ace.acequire("ace/token_iterator").TokenIterator;
 var TextMode = ace.acequire('ace/mode/text').Mode;
 // defined in the javascript mode!
@@ -56549,25 +56551,9 @@ var Completer = (function () {
         this.attributesCompletions = Object.keys(xpath_attributes_1.XpathAttributes).map(function (key) {
             return { value: key, meta: xpath_attributes_1.XpathAttributes[key].description, score: 500 };
         });
-        this.allCompletions = Object.keys(Completer.functionCompletions).map(function (func) {
-            return { value: func, meta: Completer.functionCompletions[func].meta, score: 500 };
-        }).concat([
-            { value: 'node', meta: '', score: 500 },
-            { value: 'and', meta: '', score: 500 },
-            { value: 'or', meta: '', score: 500 },
-            { value: "ancestor-or-self::", meta: '', score: 500 },
-            { value: "ancestor::", meta: '', score: 500 },
-            { value: "child::", meta: '', score: 500 },
-            { value: "descendant-or-self::", meta: '', score: 500 },
-            { value: "descendant::", meta: '', score: 500 },
-            { value: "following-sibling::", meta: '', score: 500 },
-            { value: "following::", meta: '', score: 500 },
-            { value: "parent::", meta: '', score: 500 },
-            { value: "preceding-sibling::", meta: '', score: 500 },
-            { value: "preceding::", meta: '', score: 500 },
-            { value: "self::", meta: '', score: 500 },
-            { value: 'following-sibling::', meta: '', score: 500 }
-        ].concat(this.attributesCompletions.map(function (completion) {
+        this.allCompletions = Object.keys(alpino_xpath_completions_1.functionCompletions).map(function (func) {
+            return { value: func, meta: alpino_xpath_completions_1.functionCompletions[func].meta, score: 500 };
+        }).concat(alpino_xpath_completions_1.pathCompletions.concat(this.attributesCompletions.map(function (completion) {
             return {
                 value: '@' + completion.value,
                 meta: completion.meta,
@@ -56597,10 +56583,9 @@ var Completer = (function () {
         return [];
     };
     Completer.prototype.getMacroCompletions = function () {
-        var macroCompletions;
         if (Completer.onlyMacros || !Completer.onlyAttributes) {
             var macroLookup_1 = macroService.getMacros();
-            macroCompletions = Object.keys(macroLookup_1).map(function (macro) {
+            return Object.keys(macroLookup_1).map(function (macro) {
                 return {
                     value: "" + (!Completer.onlyMacros ? '%' : '') + macro + "%",
                     meta: macroLookup_1[macro].trim().replace(/\s\s+/g, ' '),
@@ -56608,7 +56593,7 @@ var Completer = (function () {
                 };
             });
         }
-        return macroCompletions;
+        return [];
     };
     Completer.prototype.getCompletions = function (editor, session, position, prefix, callback) {
         var createIterator = function () { return new TokenIterator(session, position.row, position.column); };
@@ -56637,13 +56622,6 @@ var Completer = (function () {
             }
         }
     };
-    Completer.functionCompletions = {
-        'fn:replace()': { meta: 'Replace', hasArguments: true },
-        'not()': { meta: 'Negation', hasArguments: true },
-        'position()': { meta: 'Position of node', hasArguments: false },
-        'last()': { meta: 'Last node position', hasArguments: false },
-        'number()': { meta: 'Parse number', hasArguments: true },
-    };
     // TODO: look into using ACE states for this instead
     /**
      * Only show attribute auto-completions.
@@ -56666,7 +56644,7 @@ var XPathBehaviour = (function (_super) {
         _this.inherit(CstyleBehaviour, ["brackets", "string_dquotes"]);
         _this.add("autoclosing", "insertion", function (state, action, editor, session, text) {
             if (text.endsWith('()')) {
-                var func = Completer.functionCompletions[text];
+                var func = alpino_xpath_completions_1.functionCompletions[text];
                 if (func && func.hasArguments) {
                     // place the cursor within the parentheses
                     return {
@@ -60128,6 +60106,37 @@ exports.Mode = Mode;
 
 /***/ }),
 /* 380 */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.functionCompletions = {
+    'fn:replace()': { meta: 'Replace', hasArguments: true },
+    'not()': { meta: 'Negation', hasArguments: true },
+    'position()': { meta: 'Position of node', hasArguments: false },
+    'last()': { meta: 'Last node position', hasArguments: false },
+    'number()': { meta: 'Parse number', hasArguments: true },
+};
+exports.pathCompletions = [
+    { value: 'node', meta: '', score: 500 },
+    { value: 'and', meta: '', score: 500 },
+    { value: 'or', meta: '', score: 500 },
+    { value: "ancestor-or-self::", meta: '', score: 500 },
+    { value: "ancestor::", meta: '', score: 500 },
+    { value: "child::", meta: '', score: 500 },
+    { value: "descendant-or-self::", meta: '', score: 500 },
+    { value: "descendant::", meta: '', score: 500 },
+    { value: "following-sibling::", meta: '', score: 500 },
+    { value: "following::", meta: '', score: 500 },
+    { value: "parent::", meta: '', score: 500 },
+    { value: "preceding-sibling::", meta: '', score: 500 },
+    { value: "preceding::", meta: '', score: 500 },
+    { value: "self::", meta: '', score: 500 },
+    { value: 'following-sibling::', meta: '', score: 500 }
+];
+
+
+/***/ }),
+/* 381 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __extends = (this && this.__extends) || (function () {
@@ -60142,8 +60151,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var ace = __webpack_require__(22);
-var alpino_function_highlighter_rules_1 = __webpack_require__(381);
-var xpath_highlighter_rules_1 = __webpack_require__(382);
+var alpino_function_highlighter_rules_1 = __webpack_require__(382);
+var xpath_highlighter_rules_1 = __webpack_require__(383);
 var TextHighlightRules = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
 var AlpinoXPathHighlighter = (function (_super) {
     __extends(AlpinoXPathHighlighter, _super);
@@ -60174,7 +60183,7 @@ exports.AlpinoXPathHighlighter = AlpinoXPathHighlighter;
 
 
 /***/ }),
-/* 381 */
+/* 382 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __extends = (this && this.__extends) || (function () {
@@ -60228,7 +60237,7 @@ exports.AlpinoFunctionHighlighterRules = AlpinoFunctionHighlighterRules;
 
 
 /***/ }),
-/* 382 */
+/* 383 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __extends = (this && this.__extends) || (function () {
@@ -60335,7 +60344,7 @@ exports.XPathHighlighterRules = XPathHighlighterRules;
 
 
 /***/ }),
-/* 383 */
+/* 384 */
 /***/ (function(module, exports) {
 
 ace.define("ace/snippets",["require","exports","module","ace/lib/oop","ace/lib/event_emitter","ace/lib/lang","ace/range","ace/anchor","ace/keyboard/hash_handler","ace/tokenizer","ace/lib/dom","ace/editor"], function(acequire, exports, module) {
@@ -62286,7 +62295,7 @@ acequire("../config").defineOptions(Editor.prototype, "editor", {
             
 
 /***/ }),
-/* 384 */
+/* 385 */
 /***/ (function(module, exports) {
 
 ace.define("ace/theme/dawn",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
@@ -62400,7 +62409,7 @@ dom.importCssString(exports.cssText, exports.cssClass);
 
 
 /***/ }),
-/* 385 */
+/* 386 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -62520,7 +62529,7 @@ exports.XPathParserService = XPathParserService;
 
 
 /***/ }),
-/* 386 */
+/* 387 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -62548,13 +62557,13 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 387 */
+/* 388 */
 /***/ (function(module, exports) {
 
 
 
 /***/ }),
-/* 388 */
+/* 389 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -62785,11 +62794,11 @@ var substr = 'ab'.substr(-1) === 'b'
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(42)))
 
 /***/ }),
-/* 389 */
+/* 390 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var xpath_extractinator_1 = __webpack_require__(390);
+var xpath_extractinator_1 = __webpack_require__(391);
 var $ = __webpack_require__(7);
 var rxjs_1 = __webpack_require__(45);
 var xpath_models_1 = __webpack_require__(43);
@@ -62863,7 +62872,7 @@ var View = (function () {
 
 
 /***/ }),
-/* 390 */
+/* 391 */
 /***/ (function(module, exports, __webpack_require__) {
 
 Object.defineProperty(exports, "__esModule", { value: true });

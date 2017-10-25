@@ -8,7 +8,7 @@ export class MacroService {
     /**
      * defined statically, to make it available in the XPATH mode
      */
-    private static macroLookup: MacroLookup;
+    private static macroLookup: MacroLookup = {};
 
     constructor() {
     }
@@ -34,10 +34,6 @@ export class MacroService {
     }
 
     public getMacros(): MacroLookup {
-        if (!MacroService.macroLookup) {
-            return {};
-        }
-
         return MacroService.macroLookup;
     }
 
