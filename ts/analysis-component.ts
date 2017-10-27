@@ -3,6 +3,7 @@ import { AnalysisService } from './services/analysis-service';
 import { NotificationService } from './services/notification-service';
 import { TreebankService } from './services/treebank-service';
 import { SearchService, SearchResult } from './services/search-service';
+import { FileExportRenderer } from './file-export-renderer';
 import { PathVariable } from './xpath-extractinator';
 import * as $ from 'jquery';
 import 'jquery-ui';
@@ -50,8 +51,10 @@ export class AnalysisComponent {
     }
 
     private pivot(element: JQuery, metadataKeys: string[], searchResults: SearchResult[]) {
-        var utils = $.pivotUtilities;
-        var heatmap = utils.renderers["Heatmap"];
+        let utils = $.pivotUtilities;
+        let heatmap = utils.renderers["Heatmap"];
+        let renderers = $.extend($.pivotUtilities.renderers,
+            { 'File export': (new FileExportRenderer()).render });
         let pivotData = this.analysisService.getFlatTable(searchResults, this.variables.map(x => x.name), metadataKeys);
         element.pivotUI(
             pivotData, {
@@ -65,7 +68,8 @@ export class AnalysisComponent {
                 },
                 rows: ['lem1'],
                 cols: ['pos1'],
-                renderer: heatmap
+                renderer: heatmap,
+                renderers
             });
     }
 }
