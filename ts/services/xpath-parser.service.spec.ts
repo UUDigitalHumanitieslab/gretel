@@ -1,12 +1,8 @@
-import * as parser from '../parser/xpath';
-import { XPathModels } from '../parser/xpath-models';
 import { ParseMessage, XPathParserService } from './xpath-parser.service';
 
 describe("XPath Parser Service", () => {
     let parserService: XPathParserService;
     beforeEach(() => {
-        // assign the shared scope
-        parser.parser.yy = { xpathModels: XPathModels };
         parserService = new XPathParserService();
     });
 
@@ -24,7 +20,7 @@ describe("XPath Parser Service", () => {
         expectWarnings('//node[foo and bar]', [
             { startLine: 0, lastLine: 0, startColumn: 7, lastColumn: 10, message: 'Unknown element foo' },
             { startLine: 0, lastLine: 0, startColumn: 15, lastColumn: 18, message: 'Unknown element bar' }]);
-            expectWarnings('//node[fn:replace(node)]', []);
+        expectWarnings('//node[fn:replace(node)]', []);
         expectWarnings('//node[fn:replace(foo)]', [{ startLine: 0, lastLine: 0, startColumn: 18, lastColumn: 21, message: 'Unknown element foo' }]);
     });
 

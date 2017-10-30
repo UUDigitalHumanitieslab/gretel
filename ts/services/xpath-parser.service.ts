@@ -1,17 +1,11 @@
-import * as parser from '../parser/xpath';
 import { XpathAttributes } from '../xpath-attributes';
-import { XPathModels } from '../parser/xpath-models';
+import { XPathModels, XPathParser } from 'ts-xpath';
 
 const elementNames = ['item', 'meta', 'metadata', 'node', 'parser', 'sentence'];
 export class XPathParserService {
+    private parser: XPathParser;
     constructor() {
-        // assign the shared scope
-        (parser as any).yy = {
-            xpathModels: XPathModels,
-            parseError: XPathModels.parseError
-        };
-        // this can be useful to figure out what's wrong
-        // XPathModels.isDebugging = true;
+        this.parser = new XPathParser();
     }
 
     public parse(xpath: string): ParsedXPath {
@@ -21,7 +15,7 @@ export class XPathParserService {
             return { expression: null, warnings: [], error: null };
         }
         try {
-            expression = parser.parse(xpath);
+            expression = this.parser.parse(xpath);
             error = null;
         } catch (exception) {
             if (exception instanceof XPathModels.ParseError) {
