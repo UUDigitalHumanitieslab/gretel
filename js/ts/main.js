@@ -41782,13 +41782,15 @@ var AnalysisComponent = (function () {
     };
     AnalysisComponent.prototype.show = function (element) {
         var _this = this;
+        element.addClass('is-loading');
         Promise.all([
             this.treebankService.getMetadata(this.corpus),
-            this.searchService.getAllResults(this.variables)
+            this.searchService.getAllResults(this.variables, true)
         ])
             .then(function (values) {
             var metadataKeys = values[0], searchResults = values[1];
-            _this.pivot(element, metadataKeys, searchResults);
+            _this.pivot(element, metadataKeys, searchResults)
+                .removeClass('is-loading');
         }).catch(function (error) {
             _this.notificationService.messageOnError("An error occurred: " + error + ".");
         });
@@ -41797,7 +41799,7 @@ var AnalysisComponent = (function () {
         var utils = $.pivotUtilities;
         var heatmap = utils.renderers["Heatmap"];
         var pivotData = this.analysisService.getFlatTable(searchResults, this.variables.map(function (x) { return x.name; }), metadataKeys);
-        element.pivotUI(pivotData, {
+        return element.pivotUI(pivotData, {
             aggregators: {
                 'Count': utils.aggregators['Count'],
                 'Count Unique Values': utils.aggregators['Count Unique Values'],
@@ -41955,12 +41957,16 @@ var $ = __webpack_require__(7);
 var SearchService = (function () {
     function SearchService() {
     }
-    SearchService.prototype.getAllResults = function (variables) {
+    /**
+     * @param isAnalysis Whether these results are retrieved for analysis: a higher limit can be set for this in the configuration.
+     */
+    SearchService.prototype.getAllResults = function (variables, isAnalysis) {
         var _this = this;
+        if (isAnalysis === void 0) { isAnalysis = false; }
         // TODO: read URL from config
         return new Promise(function (resolve, reject) {
             $.ajax('basex-search-scripts/get-all-results.php', {
-                data: { variables: variables },
+                data: { variables: variables, isAnalysis: isAnalysis },
                 method: 'post'
             }).done(function (json) {
                 var data = $.parseJSON(json);

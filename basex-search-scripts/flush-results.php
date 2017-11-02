@@ -41,7 +41,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session);
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session, $resultsLimit);
     $session->close();
 
     if (isset($sentences)) {

@@ -12,6 +12,7 @@ require ROOT_PATH."/basex-search-scripts/treebank-search.php";
 
 session_start();
 set_time_limit(0);
+ini_set('memory_limit', '3G');
 
 $corpus = $_SESSION['treebank'];
 $components = $_SESSION['subtreebank'];
@@ -19,7 +20,10 @@ $componentsString = implode('-', $components);
 $databaseString = $corpus;
 $already = $databases = $_SESSION['startDatabases'];
 $variables = isset($_POST['variables']) ? $_POST['variables'] : null;
-
+if (!isset($analysisLimit)) {
+    $analysisLimit = $resultsLimit;
+}
+$searchLimit = isset($_POST['isAnalysis']) && $_POST['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
 if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION['needRegularSonar'];
 }
@@ -65,7 +69,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList) = getSentences($databases, $already, 'all', $session, $variables);
+    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList) = getSentences($databases, $already, 'all', $session, $searchLimit, $variables);
 
     $session->close();
 
@@ -101,8 +105,7 @@ try {
             // subtreebank where the sentence was found:
             if (API_URL) {
                 $componentsString = substr($sidString, 0, strrpos($sidString, '-'));
-            }
-            else if ($corpus == 'lassy') {
+            } elseif ($corpus == 'lassy') {
                 preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentsFromRegex);
                 $componentsFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentsFromRegex[1]);
 

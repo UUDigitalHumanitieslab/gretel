@@ -50,9 +50,9 @@ function corpusToDatabase($components, $corpus)
  *
  * @param $variables An array with variables to return. Each element should contain name and path.
  */
-function getSentences($databases, $already, $endPosIteration, $session, $variables = null)
+function getSentences($databases, $already, $endPosIteration, $session, $searchLimit, $variables = null)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus;
+    global $flushLimit, $needRegularSonar, $corpus;
 
     $matchesAmount = 0;
 
@@ -65,7 +65,7 @@ function getSentences($databases, $already, $endPosIteration, $session, $variabl
                 ++$endPosIteration;
             }
 
-            $xquery = createXquery($database, $endPosIteration, $variables);
+            $xquery = createXquery($database, $endPosIteration, $searchLimit, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -81,7 +81,7 @@ function getSentences($databases, $already, $endPosIteration, $session, $variabl
             $matches = array_cleaner($matches);
 
             while ($match = array_shift($matches)) {
-                if ($endPosIteration === 'all' && $matchesAmount >= $resultsLimit) {
+                if ($endPosIteration === 'all' && $matchesAmount >= $searchLimit) {
                     break 3;
                 }
                 $match = str_replace('<match>', '', $match);
@@ -143,9 +143,9 @@ function getSentences($databases, $already, $endPosIteration, $session, $variabl
     }
 }
 
-function createXquery($database, $endPosIteration, $variables)
+function createXquery($database, $endPosIteration, $searchLimit, $variables)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
+    global $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
 
     $variable_declarations = '';
     $variable_results = '';
@@ -217,9 +217,9 @@ function createXquery($database, $endPosIteration, $variables)
 
     // Adds positioning values:; limits possible output
     $openPosition = '(';
-    // Never fetch more than the resultsLimit, not even with all
+    // Never fetch more than the search limit, not even with all
     if ($endPosIteration == 'all') {
-        $closePosition = ')[position() = 1 to '.$resultsLimit.']';
+        $closePosition = ')[position() = 1 to '.$searchLimit.']';
     }
     else {
         // Only fetch the given flushLimit, and increment on each iteration
