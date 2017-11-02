@@ -4,7 +4,7 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		clean: {
-			default: ['ts/parser/xpath.js', 'js/packages', 'js/ts', 'log/*', 'tmp/*']
+			default: ['js/packages', 'js/ts', 'log/*', 'tmp/*']
 		},
 		copy: {
 			js: {
@@ -16,12 +16,6 @@ module.exports = function (grunt) {
 						dest: 'style/css/min'
 					}
 				]
-			}
-		},
-		jison: {
-			default: {
-				options: { moduleType: 'commonjs' },
-				files: { 'ts/parser/xpath.js': ['ts/parser/xpath.jison', 'ts/parser/xpath.jisonlex'] }
 			}
 		},
 		webpack: {
@@ -70,10 +64,6 @@ module.exports = function (grunt) {
 		},
 
 		watch: {
-			jison: {
-				files: ['ts/**/*.jison', 'ts/**/*.jisonlex'],
-				tasks: ['jison', 'webpack', 'karma']
-			},
 			ts: {
 				files: ['ts/**/*.ts'],
 				tasks: ['webpack', 'karma']
@@ -99,8 +89,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jasmine');
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-webpack');
-	grunt.loadNpmTasks('grunt-jison');
 
 	// Default task(s).
-	grunt.registerTask('default', ['clean', 'copy', 'jison', 'webpack', 'uglify', 'sass', 'cssmin', 'karma']);
+	grunt.registerTask('default', ['clean', 'copy', 'webpack', 'uglify', 'sass', 'cssmin', 'karma']);
 };

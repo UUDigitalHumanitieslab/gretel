@@ -38,12 +38,14 @@ export class AnalysisComponent {
     }
 
     private show(element: JQuery<HTMLElement>) {
+        element.addClass('is-loading');
         Promise.all([
             this.treebankService.getMetadata(this.corpus) as any,
-            this.searchService.getAllResults(this.variables) as any])
+            this.searchService.getAllResults(this.variables, true) as any])
             .then((values: any) => {
                 let [metadataKeys, searchResults] = values;
-                this.pivot(element, metadataKeys, searchResults);
+                this.pivot(element, metadataKeys, searchResults)
+                    .removeClass('is-loading');
             }).catch(error => {
                 this.notificationService.messageOnError(`An error occurred: ${error}.`);
             });
@@ -53,7 +55,7 @@ export class AnalysisComponent {
         var utils = $.pivotUtilities;
         var heatmap = utils.renderers["Heatmap"];
         let pivotData = this.analysisService.getFlatTable(searchResults, this.variables.map(x => x.name), metadataKeys);
-        element.pivotUI(
+        return element.pivotUI(
             pivotData, {
                 aggregators: {
                     'Count': utils.aggregators['Count'],
