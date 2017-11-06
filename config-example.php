@@ -1,7 +1,7 @@
 <?php
 
-$version = "3.0.x";
-$date = "month year";
+$version = "3.9.99";
+$date = "November 2017";
 
 function buildHomeURL()
 {
