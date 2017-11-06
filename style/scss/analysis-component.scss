@@ -1,0 +1,36 @@
+@import '../css/min/pivot.min.css';
+/*! from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
+@keyframes spinAround {
+    from {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(359deg);
+              transform: rotate(359deg);
+    }
+}
+analysis {
+    display: block;
+    max-width: 100%;
+    overflow: auto;
+}
+.is-loading {
+    min-height: 100px;
+
+    /*! from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
+    &:after {
+        animation: spinAround 500ms infinite linear;
+        border: 2px solid #96846c;
+        border-radius: 290486px;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        content: "";
+        display: block;
+        height: 1em;
+        position: relative;
+        width: 1em;
+        left: calc(50% - (1em / 2));
+        top: calc(50px - (1em / 2));
+    }
+}

@@ -218,7 +218,6 @@ $(function() {
 
     function messageNoResultsFound() {
         body.removeClass("results-loading").addClass("results-none");
-        resultsWrapper.add(controls).remove();
         downloadWrapper.addClass("no-results");
         body.addClass("search-no-results");
         messages.load(phpVars.fetchHomePath + '/front-end-includes/results-messages.php #no-results-found', function() {
@@ -297,7 +296,10 @@ $(function() {
     });
     controls.find("[for='filter-components']").click(function() {
         $(this).parent().addClass("active");
-    }),
+    });
+    controls.find("[for='filter-metadata']").click(function() {
+        $(this).parent().addClass("active");
+    });
     filterSelWrapper.find("[type='checkbox']").change(function() {
         var $this = $(this),
             component = $this.val();

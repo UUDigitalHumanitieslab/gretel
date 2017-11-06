@@ -48,9 +48,12 @@ else {
 
 # generate XPath expression
 my $topxpath = GetXPath($subtree);
-$xpath = ProcessTree( $subtree );
+$xpath = ProcessTree($subtree);
 
-my $orderString = $order ? ' and not(.//node[position() < last()][number(@begin) > following-sibling::node/number(@begin)])' : '';
+my $orderString =
+  $order
+  ? ' and not(.//node[position() < last()][number(@begin) > number(following-sibling::node/@begin)])'
+  : '';
 
 if ( $xpath && $topxpath ) {    # if more than one node is selected
     $xpath = '//' . $topxpath . $orderString . ' and ' . $xpath . ']';
@@ -75,7 +78,7 @@ if ( $xpath =~ /not/ ) {                # exclude nodes using not-function
 print $xpath;
 
 sub ProcessTree {
-    my ( $tree ) = @_;
+    my ($tree) = @_;
     my ( $xpath, $nextpath, $childxpath );
     my @children = $tree->children;
     my ( @childxpaths, %COUNTS, %ALREADY );
@@ -84,7 +87,7 @@ sub ProcessTree {
             $childxpath = GetXPath($_);
 
             if ($childxpath) {
-                $lower = &ProcessTree( $_ );
+                $lower = &ProcessTree($_);
                 if ($lower) {
                     $childxpath .= ' and ' . $lower . ']';
                 }
@@ -195,11 +198,14 @@ sub GetXPath {
 
     my $xstring;
 
-    if ( !@atts ) {                      # no matching attributes found
+    if ( !@atts ) {
+
+        # no matching attributes found
         return undef;
     }
 
-    else {                               # one or more attributes found
+    else {
+        # one or more attributes found
         my $string = join( " and ", @atts );
         $xstring = "node[" . $string;
 

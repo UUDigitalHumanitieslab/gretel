@@ -8,7 +8,7 @@ require ROOT_PATH."/preparatory-scripts/prep-functions.php";
 
 $id = session_id();
 
-$lpxml = simplexml_load_file(ROOT_PATH."/tmp/$id-pt.xml");
+$lpxml = simplexml_load_string(file_get_contents(ROOT_PATH."/tmp/$id-pt.xml"));
 
 // Set tokenized input sentence to variable
 $tokinput = $_SESSION['sentence'];

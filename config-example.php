@@ -1,7 +1,7 @@
 <?php
 
-$version = "3.0.x";
-$date = "month year";
+$version = "3.9.99";
+$date = "November 2017";
 
 function buildHomeURL()
 {
@@ -9,8 +9,11 @@ function buildHomeURL()
     return $protocol.$_SERVER['HTTP_HOST'].'/'.basename(__DIR__).'/';
 }
 
-define('ROOT_PATH', __DIR__);
-define('HOME_PATH', buildHomeURL());
+defined('ROOT_PATH') or define('ROOT_PATH', __DIR__);
+defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
+
+// Whether or not to use an API to retrieve uploaded corpora. If empty, the corpora will need to be defined in the code.
+defined('API_URL')   or define('API_URL',   '');
 
 // === CHANGE PATH TO ALPINO DIRECTORY === //
 $alpinoDirectory = ROOT_PATH."/parsers/Alpino";
@@ -19,6 +22,8 @@ $alpinoDirectory = ROOT_PATH."/parsers/Alpino";
 $flushLimit = 1;
 // Global limit on the max amount of sentences returned
 $resultsLimit = 500;
+// Global limit on the max amount of sentences returned for analysis
+$analysisLimit = 50000;
 
 $cats = array("advp", "ahi", "ap", "conj", "cp", "detp", "du", "inf", "list", "mwu",
     "np", "oti", "pp", "ppart", "ppres", "rel", "smain", "ssub", "sv1", "svan", "ti", "top", "whq", "whrel", "whsub");
@@ -30,11 +35,13 @@ $ebsPages = array(
     'tb-sel.php' => 'Treebanks',
     'query.php' => 'Query',
     'results.php' => 'Results',
+    'analysis.php' => 'Analysis',
 );
 $xpsPages = array(
     'input.php' => 'XPath',
     'tb-sel.php' => 'Treebanks',
-    'results.php' => 'Results'
+    'results.php' => 'Results',
+    'analysis.php' => 'Analysis',
 );
 
 $matrixOptions = array(
@@ -111,7 +118,11 @@ $databaseGroups = array(
     ),
     'machine' => 'machinename',
     'port' => 0000
-  )
+  ),
+  'api' => array(
+    'machine' => 'machinename',
+    'port' => 0000
+  ),
 );
 
 $dbuser = 'youruser';

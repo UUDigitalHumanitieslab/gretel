@@ -4,8 +4,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png");
-}
+  background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png"); }
 
 .is-ie {
   position: fixed;
@@ -15,12 +14,11 @@
   margin-left: -288px;
   width: 576px;
   background: white;
-  padding: 24px;
-}
+  padding: 24px; }
+  .is-ie i {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    font-size: 36px; }
 
-.is-ie i {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  font-size: 36px;
-}
+/*# sourceMappingURL=ie.css.map */

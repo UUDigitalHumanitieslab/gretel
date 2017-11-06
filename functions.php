@@ -13,6 +13,7 @@
                   'Select a treebank',
                   'Query overview',
                   'Results',
+                  'Analysis',
               );
           }
       } elseif ($currentPage == 'xps') {
@@ -22,6 +23,7 @@
                   'Give an XPath expression',
                   'Select a treebank',
                   'Results',
+                  'Analysis',
               );
           }
       } elseif (isDocs()) {
@@ -162,7 +164,7 @@
 
       $tableHTML = '<table><thead><tr><th>sentence</th>';
 
-      foreach ($sentence as $key => $word) {
+      foreach ($sentence as $word) {
           $tableHTML .= "<td>$word</td>";
       }
       $tableHTML .= '</tr></thead><tbody>';
@@ -251,8 +253,13 @@
   // Returns associative array containing at least the machine and the port
   function getServerInfo($corpus, $component) {
     global $databaseGroups;
+
+    // Retrieval from API: one servername/port
+    if (API_URL) {
+      return $databaseGroups{'api'};
+    }
     // Lassy and CGN
-    if (!$component && array_key_exists($corpus, $databaseGroups)) {
+    else if (!$component && array_key_exists($corpus, $databaseGroups)) {
       return $databaseGroups{$corpus};
     }
     // Sonar components

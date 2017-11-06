@@ -52,7 +52,7 @@
 <?php
   // Check if we're on IE, if so display a warning message
   // WE DO NOT SUPPORT IE (but we do support the newer Edge)
- ?>
+    ?>
 <script id="old-ie-script">
 var ua = window.navigator.userAgent,
   msie = ua.indexOf('MSIE '),
@@ -75,12 +75,19 @@ if (isIE) {
 </script>
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.min.js"></script>
-<?php if (isset($treeVisualizer) && $treeVisualizer):
+<?php if (isset($treeVisualizer) && $treeVisualizer) :
     if (isset($onlyFullscreenTv) && $onlyFullscreenTv) {
         include ROOT_PATH."/front-end-includes/tv-wrappers.php";
     } ?>
     <script src="js/tree-visualizer.js"></script>
 <?php endif; ?>
 <script src="js/min/scripts.min.js"></script>
+
+<?php if (API_URL) : ?>
+  <script>var API = '<?=API_URL; ?>';</script>
+  <script src="js/min/api.min.js"></script>
+<?php endif; ?>
+<script type="text/javascript" src="js/ts/main.js"></script>

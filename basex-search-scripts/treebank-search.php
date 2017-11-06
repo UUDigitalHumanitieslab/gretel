@@ -46,9 +46,13 @@ function corpusToDatabase($components, $corpus)
     return $databases;
 }
 
-function getSentences($databases, $already, $endPosIteration, $session)
+/**
+ *
+ * @param $variables An array with variables to return. Each element should contain name and path.
+ */
+function getSentences($databases, $already, $endPosIteration, $session, $searchLimit, $variables = null)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus;
+    global $flushLimit, $needRegularSonar, $corpus;
 
     $matchesAmount = 0;
 
@@ -61,7 +65,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
                 ++$endPosIteration;
             }
 
-            $xquery = createXquery($database, $endPosIteration);
+            $xquery = createXquery($database, $endPosIteration, $searchLimit, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -77,7 +81,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
             $matches = array_cleaner($matches);
 
             while ($match = array_shift($matches)) {
-                if ($endPosIteration === 'all' && $matchesAmount >= $resultsLimit) {
+                if ($endPosIteration === 'all' && $matchesAmount >= $searchLimit) {
                     break 3;
                 }
                 $match = str_replace('<match>', '', $match);
@@ -85,7 +89,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
                 if ($corpus == 'sonar') {
                     list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
                 } else {
-                    list($sentid, $sentence, $ids, $begins) = explode('||', $match);
+                    list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
                 }
 
                 if (isset($sentid, $sentence, $ids, $begins)) {
@@ -99,6 +103,10 @@ function getSentences($databases, $already, $endPosIteration, $session)
                     $sentences{$sentid} = $sentence;
                     $idlist{$sentid} = $ids;
                     $beginlist{$sentid} = $begins;
+                    $xmllist{$sentid} = $xml_sentences;
+                    $metalist{$sentid} = $meta;
+                    preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
+                    $varList{$sentid} = $varMatches[0];
                     if ($corpus == 'sonar') {
                         $tblist{$sentid} = $tb;
                     }
@@ -106,7 +114,7 @@ function getSentences($databases, $already, $endPosIteration, $session)
             }
             if ($endPosIteration === 'all') {
                 break;
-            } else if ($matchesAmount >= $flushLimit) {
+            } elseif ($matchesAmount >= $flushLimit) {
                 // Re-add pop'd database because it is very likely we aren't finished with it
                 // More results are still in that database but because of the flushlimit we
                 // have to bail out
@@ -128,16 +136,28 @@ function getSentences($databases, $already, $endPosIteration, $session)
         if ($corpus !== 'sonar') {
             $tblist = false;
         }
-        return array($sentences, $tblist, $idlist, $beginlist);
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList);
     } else {
         // in case there are no results to be found
         return false;
     }
 }
 
-function createXquery($database, $endPosIteration)
+function createXquery($database, $endPosIteration, $searchLimit, $variables)
 {
-    global $flushLimit, $resultsLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
+    global $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
+
+    $variable_declarations = '';
+    $variable_results = '';
+
+    if (isset($variables) && $variables != null) {
+        foreach ($variables as $index => $value) {
+            $name = $value['name'];
+            $variable_declarations .= 'let ' . $name . ' := (' . $value['path'] . ')[1]';
+            $variable_results .= '<var name="' . $name . '">{' . $name . '/@lemma}{' . $name . '/@pos}</var>';
+        }
+        $variable_results = '<vars>' . $variable_results . '</vars>';
+    }
 
     $for = 'for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
@@ -154,6 +174,8 @@ function createXquery($database, $endPosIteration)
 
     $regulartb = $needRegularSonar ? "let \$tb := '$database'" : '';
     $returnTb = ($corpus == 'sonar') ? '||{data($tb)}' : '';
+    
+    $meta = 'let $meta := ($node/ancestor::alpino_ds/metadata/meta)';
 
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
@@ -184,23 +206,23 @@ function createXquery($database, $endPosIteration)
         }
 
         $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
-            .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
+            .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||'.$variable_results.'</match>';
 
-        $xquery = $for.$xpath.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$return;
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$variable_declarations.$return;
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
-            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}</match>';
-        $xquery = $for.$xpath.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$return;
+            .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}||'.$variable_results.'</match>';
+        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
     }
 
     // Adds positioning values:; limits possible output
     $openPosition = '(';
-    // Never fetch more than the resultsLimit, not even with all
+    // Never fetch more than the search limit, not even with all
     if ($endPosIteration == 'all') {
-        $closePosition = ')[position() = 1 to '.$resultsLimit.']';
+        $closePosition = ')[position() = 1 to '.$searchLimit.']';
     }
-    // Only fetch the given flushLimit, and increment on each iteration
     else {
+        // Only fetch the given flushLimit, and increment on each iteration
         $endPosition = $endPosIteration * $flushLimit;
         $startPosition = $endPosition - $flushLimit + 1;
         $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';

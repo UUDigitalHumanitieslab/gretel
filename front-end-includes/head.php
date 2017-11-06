@@ -16,6 +16,7 @@
 
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400:latin|Roboto+Condensed:400:latin" rel="stylesheet">
 <link rel="stylesheet" href="style/css/min/styles.min.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
   <link rel="stylesheet" href="style/css/min/tree-visualizer.min.css">

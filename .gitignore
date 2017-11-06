@@ -1,7 +1,10 @@
+.tscache
 .gitignore*
 *.png
 *.ico
 *~
+tmp/*
+log/*
 
 prepros.cfg
 prepros-6.config
@@ -10,3 +13,12 @@ sitemap.xml
 robots.txt
 .htaccess
 config/
+
+# Sass
+*.css.map
+.sass-cache/
+
+# NPM
+node_modules/
+
+.idea

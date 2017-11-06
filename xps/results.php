@@ -2,12 +2,19 @@
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 $currentPage = 'xps';
 $step = 3;
 
 require "../config.php";
-require ROOT_PATH."/helpers.php";
+require ROOT_PATH . "/helpers.php";
+
+require ROOT_PATH . "/front-end-includes/metadata.php";
+require ROOT_PATH . "/front-end-includes/xpath-variables-hidden.php";
+retrieve_metadata();
 
 $_SESSION['ebsxps'] = $currentPage;
 $id = session_id();
@@ -39,6 +46,7 @@ if ($continueConstraints) {
     $onlyFullscreenTv = true;
 
     $xpath = $_SESSION['xpath'];
+    $_SESSION['metadataFilter'] = get_metadata_filter();
     // Need to clean in case the user goes back in history, otherwise the
     // prepended slashes below would keep stacking on each back-and-forward
     // in history
@@ -57,63 +65,65 @@ if ($continueConstraints) {
 
 session_write_close();
 
-require ROOT_PATH."/functions.php";
-require ROOT_PATH."/front-end-includes/head.php";
+require ROOT_PATH . "/functions.php";
+require ROOT_PATH . "/front-end-includes/head.php";
 
 if ($continueConstraints) {
-  require ROOT_PATH."/basex-search-scripts/treebank-search.php";
-  require ROOT_PATH."/basex-search-scripts/basex-client.php";
-  session_start();
-  if ($corpus == 'sonar') {
-    $bf = xpathToBreadthFirst($xpath);
-    // Get correct databases to start search with, sets to
-    // $_SESSION['startDatabases']
-    checkBfPattern($bf);
+    require ROOT_PATH . "/basex-search-scripts/treebank-search.php";
+    require ROOT_PATH . "/basex-search-scripts/basex-client.php";
+    session_start();
+    if ($corpus == 'sonar') {
+        $bf = xpathToBreadthFirst($xpath);
+        // Get correct databases to start search with, sets to
+        // $_SESSION['startDatabases']
+        checkBfPattern($bf);
 
-    // When looking in the regular version we need the double slash to go through
-    // all descendants
-    if ($needRegularSonar) {
-      $xpath = "//$xpath";
+        // When looking in the regular version we need the double slash to go through
+        // all descendants
+        if ($needRegularSonar) {
+            $xpath = "//$xpath";
+        } else {
+            $xpath = "/$xpath";
+        }
     } else {
-      $xpath = "/$xpath";
+        $xpath = "//$xpath";
+        $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
     }
-  } else {
-    $xpath = "//$xpath";
-    $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
-  }
 
   // When flushing we update the databases on each iteration, not so in counting
   // or when fetching all results
-  $_SESSION['flushAlready'] = $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
-  $_SESSION['xpath'] = $xpath;
-  $_SESSION['needRegularSonar'] = $needRegularSonar;
-  session_write_close();
+    $_SESSION['flushAlready'] = $_SESSION['flushDatabases'] = $_SESSION['startDatabases'];
+    $_SESSION['xpath'] = $xpath;
+    $_SESSION['needRegularSonar'] = $needRegularSonar;
+    session_write_close();
 }
 ?>
 </head>
-<?php flush(); ?>
-<?php
-require ROOT_PATH."/front-end-includes/header.php";
+<?php 
+flush();
 
-if ($continueConstraints):
+require ROOT_PATH . "/front-end-includes/header.php";
+
+if ($continueConstraints) {
     require ROOT_PATH."/front-end-includes/results-shared-content.php";
+    echo '<form action="xps/analysis.php" method="post">';
     setContinueNavigation();
-else: // $continueConstraints
+    render_xpath_variables_hidden("xpath-variables");
+    echo '</form>';
+} else {
     setErrorHeading();
     ?>
     <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
         possible that you came to this page directly without first entering an input example.</p>
     <?php
     setPreviousPageMessage(2);
-
-endif;
+}
 require ROOT_PATH."/front-end-includes/footer.php";
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 
-if ($continueConstraints):
-  ?>
-    <?php include ROOT_PATH."/front-end-includes/notifications.php"; ?>
-    <?php // Variables for JS
+if ($continueConstraints) {
+    include ROOT_PATH."/front-end-includes/notifications.php";
+    // Variables for JS
     $jsVars = array(
         'fetchResultsPath' => HOME_PATH."/basex-search-scripts/flush-results.php",
         'getAllResultsPath' => HOME_PATH."/basex-search-scripts/get-all-results.php",
@@ -127,6 +137,8 @@ if ($continueConstraints):
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>
     <script src="js/min/results.min.js"></script>
-<?php endif; ?>
+<?php 
+}
+?>
 </body>
 </html>

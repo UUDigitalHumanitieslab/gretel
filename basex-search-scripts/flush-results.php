@@ -24,8 +24,7 @@ if ($corpus == 'sonar') {
 }
 
 $databaseString = $corpus;
-$xpath = $_SESSION['xpath'];
-
+$xpath = $_SESSION['xpath'] . $_SESSION['metadataFilter'];
 // get context option
 $context = $_SESSION['ct'];
 
@@ -42,7 +41,7 @@ try {
     $dbport = $serverInfo{'port'};
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session);
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session, $resultsLimit);
     $session->close();
 
     if (isset($sentences)) {
@@ -61,7 +60,10 @@ try {
             $sidString = strstr($sid, '-endPos=', true) ?: $sid;
 
             // subtreebank where the sentence was found:
-            if ($corpus == 'lassy') {
+            if (API_URL) {
+                $componentString = substr($sidString, 0, strrpos($sidString, '-'));
+            }
+            else if ($corpus == 'lassy') {
                 preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentFromRegex);
                 $componentFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentFromRegex[1]);
 

@@ -7,6 +7,7 @@ $currentPage = 'ebs';
 $step = 5;
 
 require "../config.php";
+require  ROOT_PATH."/front-end-includes/xpath-variables-hidden.php";
 require ROOT_PATH."/helpers.php";
 
 $noTbFlag = 0;
@@ -101,6 +102,7 @@ require ROOT_PATH."/front-end-includes/head.php";
   <h3>XPath expression<?php if (!$xpChanged): ?> generated from the query tree<?php endif; ?></h3>
   <div class="generated-xpath"><code><?php echo $xpath; ?></code></div>
     <form action="ebs/results.php" method="post">
+    <?php render_xpath_variables_hidden("xpath-variables"); ?>
     <?php setContinueNavigation(); ?>
     </form>
 <?php else: // $continueConstraints
