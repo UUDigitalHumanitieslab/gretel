@@ -1,10 +1,11 @@
-# GrETEL 3
+# GrETEL 4
+
+This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3.
 
 ## Info
 
-v3.0. November 2016: GrETEL 3 initial release
-
-Available at http://gretel.ccl.kuleuven.be/gretel3
+* v4.0. November 2017: GrETEL 4 currently under development!
+* v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
 
 ## Installation
 
@@ -83,6 +84,6 @@ When searching for a more specific structure, this is unlikely to occur.
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
 * [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
-* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 3.1 functionality and improvements;
-* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 3.1 functionality and improvements;
-* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback.
+* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
+* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 4 functionality and improvements;
+* Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.
