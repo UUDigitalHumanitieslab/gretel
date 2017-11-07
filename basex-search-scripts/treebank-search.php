@@ -50,7 +50,7 @@ function corpusToDatabase($components, $corpus)
  *
  * @param $variables An array with variables to return. Each element should contain name and path.
  */
-function getSentences($databases, $already, $endPosIteration, $session, $searchLimit, $variables = null)
+function getSentences($databases, $already, $endPosIteration, $session, $sid, $searchLimit, $variables = null)
 {
     global $flushLimit, $needRegularSonar, $corpus;
 
@@ -128,9 +128,9 @@ function getSentences($databases, $already, $endPosIteration, $session, $searchL
     if (isset($sentences)) {
         if ($endPosIteration !== 'all') {
             session_start();
-            $_SESSION['endPosIteration'] = $endPosIteration;
-            $_SESSION['flushDatabases'] = $databases;
-            $_SESSION['flushAlready'] = $already;
+            $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
+            $_SESSION[$sid]['flushDatabases'] = $databases;
+            $_SESSION[$sid]['flushAlready'] = $already;
             session_write_close();
         }
         if ($corpus !== 'sonar') {

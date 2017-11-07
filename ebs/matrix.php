@@ -26,16 +26,17 @@
  require "../config.php";
  require ROOT_PATH."/helpers.php";
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
+$continueConstraints = isset($_POST['sid']) && sessionVariablesSet($_POST['sid'], array('example', 'sentence'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
-    $id = session_id();
 
-    $input = $_SESSION['example'];
+    define('SID', $_POST['sid']);
+
+    $input = $_SESSION[SID]['example'];
 
     // Set tokenized input sentence to variable
-    $tokinput = $_SESSION['sentence'];
+    $tokinput = $_SESSION[SID]['sentence'];
     $sentence = explode(' ', $tokinput);
 }
 
@@ -101,6 +102,18 @@ if ($continueConstraints):
       </div>
 
       <div>
+        <div class="label-wrapper">
+          <label>
+            <input type="checkbox" name="sentids" aria-describedby="sentids-tooltip" checked> Include sentence IDs in downloadable results
+          </label>
+          <div class="help-tooltip" id="sentids-tooltip" role="tooltip" data-title="Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+            <span class="sr-only">Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
         <h3 class="advanced-option">Modify XPath</h3>
         <input type="hidden" name="originalXp" value="">
         <input type="hidden" name="manualMode" value="false">
@@ -130,6 +143,7 @@ if ($continueConstraints):
   <div id="tree-output">
       <?php include ROOT_PATH."/front-end-includes/tv-wrappers.php"; ?>
   </div>
+  <input type="hidden" name="sid" value="<?php echo SID; ?>">
   <?php setContinueNavigation(); ?>
 </form>
 
@@ -146,7 +160,7 @@ include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
 
 <script>
-    var getTreePathScript = <?php echo json_encode(HOME_PATH."/preparatory-scripts/process-input-example.php"); ?>;
+    var getTreePathScript = <?php echo json_encode(HOME_PATH."/preparatory-scripts/process-input-example.php?sid=".SID); ?>;
 </script>
 
 </body>

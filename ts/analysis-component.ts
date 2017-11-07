@@ -25,6 +25,7 @@ export class AnalysisComponent {
         let data = element.data();
         this.apiUrl = data.apiUrl;
         this.treebankService = new TreebankService(this.apiUrl);
+        this.searchService.resultsUrl = data.resultsUrl;
         this.corpus = data.corpus;
         this.variables =
             $.makeArray($('#xpath-variables .path-variable'))

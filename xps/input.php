@@ -10,14 +10,14 @@
  * @author Bram Vanroy
  */
 
+ session_start();
+ header('Content-Type:text/html; charset=utf-8');
+
 $currentPage = 'xps';
 $step = 1;
 
 require "../config.php";
 require ROOT_PATH."/helpers.php";
-
-session_start();
-header('Content-Type:text/html; charset=utf-8');
 
 $xpath = '//node[@cat="smain"
 	and node[@rel="su" and @pt="vnw"]
@@ -25,12 +25,10 @@ $xpath = '//node[@cat="smain"
 	and node[@rel="predc" and @cat="np"
 		and node[@rel="det" and @pt="lid"]
 		and node[@rel="hd" and @pt="n"]]]';
-$xpath = isset($_SESSION['xpath']) ? $_SESSION['xpath'] : $xpath;
-// Unset previous session ID, we don't want one session to span multiple queries
-session_regenerate_id(false);
-session_unset();
 
-$id = session_id();
+define('SID', session_id() . '-' . time());
+$_SESSION[SID] = array();
+$_SESSION[SID]['queryid'] = SID;
 
 require ROOT_PATH."/functions.php";
 require ROOT_PATH."/front-end-includes/head.php";
@@ -44,6 +42,7 @@ require ROOT_PATH."/front-end-includes/head.php";
           <textarea name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
         </xpath-editor>
         <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
+        <input type="hidden" name="sid" value="<?php echo SID; ?>">
         <?php setContinueNavigation(); ?>
     </form>
 
