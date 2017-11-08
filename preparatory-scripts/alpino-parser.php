@@ -22,7 +22,7 @@ function alpino($sentence, $id)
     $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
     if (!is_resource($process)) {
-        die('Error when parsing input with Alpino' . $tmp);
+        die('Error when parsing input with Alpino');
     }
     if (is_resource($process)) {
         // $pipes now looks like this:
