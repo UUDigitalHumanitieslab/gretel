@@ -4,12 +4,13 @@ class Analysis
     public $continueConstraints = array();
     public $variables;
     public $corpus;
+    public $SID;
 
     public function render()
     {
         if ($this->continueConstraints) {
             ?>
-            <analysis data-api-url="<?=htmlspecialchars(API_URL) ?>" data-corpus="<?=htmlspecialchars($this->corpus) ?>"></analysis>
+            <analysis data-api-url="<?=htmlspecialchars(API_URL) ?>" data-results-url="<?=htmlspecialchars(HOME_PATH."/basex-search-scripts/get-all-results.php?sid=".$this->SID) ?>" data-corpus="<?=htmlspecialchars($this->corpus) ?>"></analysis>
             <div id="xpath-variables">
             <?php
             if (isset($this->variables)) {

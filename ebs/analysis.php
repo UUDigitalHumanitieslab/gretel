@@ -15,31 +15,30 @@ require ROOT_PATH . "/helpers.php";
 require ROOT_PATH . "/front-end-includes/metadata.php";
 retrieve_metadata();
 
-$_SESSION['ebsxps'] = $currentPage;
-$id = session_id();
-
-$continueConstraints = sessionVariablesSet(array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
+$continueConstraints = sessionVariablesSet($_POST['sid'], array('treebank', 'queryid', 'example', 'subtreebank', 'xpath'));
 
 if ($continueConstraints) {
+    define('SID', $_POST['sid']);    
+    $_SESSION[SID]['ebsxps'] = $currentPage;
     require ROOT_PATH . "/preparatory-scripts/prep-functions.php";
 
     $treeVisualizer = true;
     $onlyFullscreenTv = true;
-    $corpus = $_SESSION['treebank'];
-    $components = $_SESSION['subtreebank'];
-    $xpath = $_SESSION['originalXp'] . get_metadata_filter();
-    $originalXp = $_SESSION['originalXp'];
+    $corpus = $_SESSION[SID]['treebank'];
+    $components = $_SESSION[SID]['subtreebank'];
+    $xpath = $_SESSION[SID]['originalXp'] . get_metadata_filter(SID);
+    $originalXp = $_SESSION[SID]['originalXp'];
 
     // Need to clean in case the user goes back in history, otherwise the
     // prepended slashes below would keep stacking on each back-and-forward
     // in history
     $xpath = cleanXpath($xpath);
     $originalXp = cleanXpath($originalXp);
-    $example = $_SESSION['example'];
+    $example = $_SESSION[SID]['example'];
 
-    $context = $_SESSION['ct'];
-    $_SESSION['endPosIteration'] = 0;
-    $_SESSION['startDatabases'] = array();
+    $context = $_SESSION[SID]['ct'];
+    $_SESSION[SID]['endPosIteration'] = 0;
+    $_SESSION[SID]['startDatabases'] = array();
     if ($corpus == 'sonar') {
         $databaseExists = false;
     }
@@ -47,15 +46,13 @@ if ($continueConstraints) {
     $needRegularSonar = false;
 }
 
-session_write_close();
-
 require ROOT_PATH . "/functions.php";
 require ROOT_PATH . "/front-end-includes/head.php";
 
 if ($continueConstraints) {
     require ROOT_PATH . "/basex-search-scripts/treebank-search.php";
     require ROOT_PATH . "/basex-search-scripts/basex-client.php";
-    session_start();
+    
     if ($corpus == 'sonar') {
         $bf = xpathToBreadthFirst($xpath);
         // Get correct databases to start search with, sets to
@@ -74,11 +71,11 @@ if ($continueConstraints) {
     } else {
         $xpath = "//$xpath";
         $originalXp = "//$originalXp";
-        $_SESSION['startDatabases'] = corpusToDatabase($components, $corpus);
+        $_SESSION[SID]['startDatabases'] = corpusToDatabase($components, $corpus);
     }
-
-    session_write_close();
 }
+
+session_write_close();
 ?>
 <?php flush(); ?>
 <?php
@@ -87,6 +84,7 @@ require ROOT_PATH . "/front-end-includes/analysis.php";
 $analysis = new Analysis();
 $analysis->continueConstraints = $continueConstraints;
 $analysis->corpus = $corpus;
+$analysis->SID = SID;
 if (isset($_POST["xpath-variables"])) {
     $analysis->variables = $_POST["xpath-variables"];
 }

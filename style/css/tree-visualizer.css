@@ -52,7 +52,7 @@
     .tv .tv-sentence-wrapper.has-sentence {
       display: flex; }
     .tv .tv-sentence-wrapper i::after {
-      content: "";
+      content: '';
       display: inline-block;
       height: 100%;
       vertical-align: middle; }
@@ -64,7 +64,8 @@
     display: flex;
     overflow: scroll;
     align-items: center;
-    flex: 1 0 0%; }
+    /* If we use 0% a minifer will cut off %, which leads to another effect */
+    flex: 1 0 0.00000001%; }
     .tv .tv-tree ol {
       position: relative;
       display: table;
@@ -76,10 +77,10 @@
         width: 0;
         height: 1em;
         border-left: 1px solid #ccc;
-        content: ""; }
+        content: ''; }
     .tv .tv-tree > ol {
       margin: auto;
-      padding: 6em 1.26em 1.26em 1.26em; }
+      padding: 6em 1.26em 1.26em; }
     .tv .tv-tree li {
       position: relative;
       display: table-cell;
@@ -94,7 +95,7 @@
         width: 50%;
         height: 1em;
         border-top: 1px solid #ccc;
-        content: ""; }
+        content: ''; }
       .tv .tv-tree li::after {
         right: auto;
         left: 50%;
@@ -142,7 +143,7 @@
         left: 0;
         width: 100%;
         color: #cd2b2b;
-        content: "NOT";
+        content: 'NOT';
         text-align: center;
         font-size: 120%;
         transition: transform 200ms;
@@ -210,7 +211,7 @@
           .tv .tv-tree li a.cs ~ .word em::before {
             margin-right: 0.36em;
             color: #222;
-            content: "\f031"; }
+            content: '\f031'; }
         .tv .tv-tree li a.ignored {
           opacity: 0.67;
           cursor: help; }
@@ -248,7 +249,7 @@
       border: 12px solid;
       border-color: transparent transparent white white;
       box-shadow: -6px 6px 6px -2px rgba(0, 0, 0, 0.2);
-      content: "";
+      content: '';
       transform: rotate(-45deg);
       transform-origin: 0 0; }
     .tv .tv-tooltip button {
@@ -257,7 +258,7 @@
       right: 0;
       width: 30px;
       height: 30px;
-      border: 0;
+      border: 0 none;
       border-radius: 50%;
       background: #DF5F5F;
       color: white;
@@ -411,7 +412,8 @@ body.tv-fs-open {
     display: block; }
   body.tv-fs-open.tv-is-loading #tree-visualizer-fs .tv-loading-wrapper {
     display: block; }
-  body.tv-fs-open.tv-is-loading #tree-visualizer-fs .tv-tree, body.tv-fs-open.tv-is-loading #tree-visualizer-fs .tv-tooltip {
+  body.tv-fs-open.tv-is-loading #tree-visualizer-fs .tv-tooltip,
+  body.tv-fs-open.tv-is-loading #tree-visualizer-fs .tv-tree {
     display: none; }
 body.tv-ns-open.tv-is-loading #tree-visualizer {
   pointer-events: none;

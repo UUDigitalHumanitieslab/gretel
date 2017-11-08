@@ -20,3 +20,5 @@ config/
 
 # NPM
 node_modules/
+
+.idea

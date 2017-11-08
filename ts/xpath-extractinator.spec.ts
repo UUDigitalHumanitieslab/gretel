@@ -1,5 +1,5 @@
 import { XPathExtractinator, PathVariable } from './xpath-extractinator';
-import { XPathModels } from './parser/xpath-models';
+import { XPathModels } from 'ts-xpath';
 
 describe("XPath Extractinator",
     () => {

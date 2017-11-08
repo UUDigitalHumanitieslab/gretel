@@ -39,13 +39,13 @@ function get_metadata_fields()
  * Builds the xQuery metadata filter
  * @return string The metadata filter
  */
-function get_metadata_filter()
+function get_metadata_filter($sid)
 {
     $metadata_fields = get_metadata_fields();
 
     // Compile the filter
     $m_filter = '';
-    foreach ($_SESSION as $key => $value)
+    foreach ($_SESSION[$sid] as $key => $value)
     {
         if (substr($key, 0, 2) != 'm-')
         {
@@ -139,9 +139,9 @@ function get_metadata_counts()
 /**
  * Shows all metadata facets
  */
-function show_metadata_facets()
+function show_metadata_facets($corpus)
 {
-    $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $_SESSION['treebank']));
+    $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $corpus));
     // First, combine the XMLs into an array with total counts over all databases
     $totals = array();
     foreach (get_metadata_counts() as $db => $m)

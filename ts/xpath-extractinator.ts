@@ -1,15 +1,10 @@
-import * as parser from './parser/xpath';
-import { XPathModels } from './parser/xpath-models';
+import { XPathModels, XPathParser } from 'ts-xpath';
 
 export class XPathExtractinator {
+    private parser: XPathParser;
+
     constructor() {
-        // assign the shared scope
-        parser.parser.yy = {
-            xpathModels: XPathModels,
-            parseError: XPathModels.parseError
-        };
-        // this can be useful to figure out what's wrong
-        // XPathModels.isDebugging = true;
+        this.parser = new XPathParser();
     }
 
     /**
@@ -20,7 +15,7 @@ export class XPathExtractinator {
      */
     extract(xPath: string): PathVariable[] {
         if (!xPath || !xPath.trim()) { return []; }
-        let parsed = parser.parse(xPath);
+        let parsed = this.parser.parse(xPath);
         // expect any query to at least start with //node
         if (parsed.type == 'path') {
             let children = parsed.getChildren();
