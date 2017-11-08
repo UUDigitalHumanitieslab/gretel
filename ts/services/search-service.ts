@@ -2,13 +2,15 @@ import { PathVariable } from '../xpath-extractinator';
 import * as $ from 'jquery';
 
 export class SearchService {
+    public resultsUrl: string;
+
     /**
      * @param isAnalysis Whether these results are retrieved for analysis: a higher limit can be set for this in the configuration.
      */
     public getAllResults(variables: PathVariable[], isAnalysis = false) {
         // TODO: read URL from config
         return new Promise<SearchResult[]>((resolve, reject) => {
-            $.ajax('basex-search-scripts/get-all-results.php', {
+            $.ajax(this.resultsUrl, {
                 data: { variables, isAnalysis },
                 method: 'post'
             }).done((json) => {

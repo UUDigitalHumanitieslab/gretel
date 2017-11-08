@@ -41769,6 +41769,7 @@ var AnalysisComponent = (function () {
         var data = element.data();
         this.apiUrl = data.apiUrl;
         this.treebankService = new treebank_service_1.TreebankService(this.apiUrl);
+        this.searchService.resultsUrl = data.resultsUrl;
         this.corpus = data.corpus;
         this.variables =
             $.makeArray($('#xpath-variables .path-variable'))
@@ -41965,7 +41966,7 @@ var SearchService = (function () {
         if (isAnalysis === void 0) { isAnalysis = false; }
         // TODO: read URL from config
         return new Promise(function (resolve, reject) {
-            $.ajax('basex-search-scripts/get-all-results.php', {
+            $.ajax(_this.resultsUrl, {
                 data: { variables: variables, isAnalysis: isAnalysis },
                 method: 'post'
             }).done(function (json) {

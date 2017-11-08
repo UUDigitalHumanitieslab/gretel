@@ -3,8 +3,7 @@
   height: 100%;
   position: fixed;
   top: 0;
-  left: 0;
-  background-image: url("http://gretel.ccl.kuleuven.be/gretel3/img/ie8-bg-fix-black.png"); }
+  left: 0; }
 
 .is-ie {
   position: fixed;
