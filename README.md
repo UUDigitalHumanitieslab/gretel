@@ -3,7 +3,7 @@
 This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
 
 ## Info
-* v4.0. November 2017: GrETEL 4 currently under development!
+* v3.9.99 November 2017: GrETEL 4 currently under development!
 * v3.0.2 July 2017: Show error message if the BaseX server is down  
 * v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
 
