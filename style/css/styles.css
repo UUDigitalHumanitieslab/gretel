@@ -1463,6 +1463,8 @@ analysis {
   display: block;
   max-width: 100%;
   overflow: auto; }
+  analysis .btn-wrapper button:not(:first-child) {
+    margin-left: 10px; }
 
 .is-loading {
   min-height: 100px;

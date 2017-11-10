@@ -20,7 +20,7 @@ interface PivotOptions {
     /**
      * function to generate output from pivot data structure (defaults to simple table)
      */
-    renderer?: any;
+    renderer?: PivotRenderer;
 
     /**
      * object to define derived attributes, defaults to {}
@@ -53,7 +53,7 @@ interface PivotUiOptions {
     /**
      * dictionary of rendering functions, defaulting with various table renderers 
      */
-    renderers?: any;
+    renderers?: { [name: string]: PivotRenderer };
 
     /**
      * dictionary of generators for aggregation functions in dropdown, defaulting to common aggregators
@@ -80,7 +80,7 @@ interface PivotUiOptions {
      */
     aggregatorName?: string;
 
-    renderer: any,
+    renderer: PivotRenderer,
 
     /**
      * string, renderer to prepopulate in radio button (key to renderers object), default is first key in renderers
@@ -186,7 +186,13 @@ interface PivotUtilities {
         'Sum over Sum': PivotAggregator<any>
     },
     renderers: {
-        [name: string]: any
+        [name: string]: PivotRenderer
+    },
+    /**
+     * import pivottable/dist/export_renderers for this
+     */
+    export_renderers: {
+        [name: string]: PivotRenderer
     },
     derivers: any,
     locales: any,
@@ -215,6 +221,8 @@ interface JQueryPivot {
 
     pivotUtilities: PivotUtilities;
 }
+
+type PivotRenderer = (pivotData: any, opts: any) => JQuery;
 interface JQuery extends JQueryPivot { }
 interface JQueryStatic extends JQueryPivot { }
 
