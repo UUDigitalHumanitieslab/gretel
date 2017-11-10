@@ -145,7 +145,7 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
+              $output .= '<li '.$class.'><a '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
         }
@@ -154,7 +154,7 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
+              $output .= '<li '.$class.'><a '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
         }

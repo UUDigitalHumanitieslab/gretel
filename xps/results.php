@@ -51,7 +51,7 @@ if ($continueConstraints) {
     $onlyFullscreenTv = true;
 
     $xpath = $_SESSION[SID]['xpath'];
-    $_SESSION[SID]['metadataFilter'] = get_metadata_filter();
+    $_SESSION[SID]['metadataFilter'] = get_metadata_filter(SID);
     // Need to clean in case the user goes back in history, otherwise the
     // prepended slashes below would keep stacking on each back-and-forward
     // in history

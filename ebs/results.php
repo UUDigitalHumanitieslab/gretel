@@ -28,7 +28,7 @@ if ($continueConstraints) {
     $corpus = $_SESSION[SID]['treebank'];
     $components = $_SESSION[SID]['subtreebank'];
     $xpath = $_SESSION[SID]['xpath'];
-    $_SESSION['metadataFilter'] = get_metadata_filter();
+    $_SESSION[SID]['metadataFilter'] = get_metadata_filter(SID);
     $originalXp = $_SESSION[SID]['originalXp'];
 
   // Need to clean in case the user goes back in history, otherwise the

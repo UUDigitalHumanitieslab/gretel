@@ -44,7 +44,7 @@ require ROOT_PATH."/functions.php";
   <div id="no-results-found">
       <strong>No results were found!</strong>
       <?php 
-      if (!$_SESSION['metadataFilter']) {
+      if (!$_SESSION[SID]['metadataFilter']) {
         setPreviousPageMessage(1);
       } else {
         ?>

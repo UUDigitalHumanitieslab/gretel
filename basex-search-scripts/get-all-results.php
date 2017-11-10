@@ -47,6 +47,8 @@ if ($ebsxps == 'ebs') {
     $xpChanged = $_SESSION[SID]['xpChanged'];
     $originalXp = $_SESSION[SID]['originalXp'];
     $addSentIds = $_SESSION[SID]['sentids'];
+} else {
+    $addSentIds = false;
 }
 
 // get context option

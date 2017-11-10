@@ -106,7 +106,7 @@ function getSentences($databases, $already, $endPosIteration, $session, $sid, $s
                     $xmllist{$sentid} = $xml_sentences;
                     $metalist{$sentid} = $meta;
                     preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
-                    $varList{$sentid} = $varMatches[0];
+                    $varList{$sentid} = count($varMatches) == 0 ? '' : $varMatches[0];
                     if ($corpus == 'sonar') {
                         $tblist{$sentid} = $tb;
                     }

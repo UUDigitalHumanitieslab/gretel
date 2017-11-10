@@ -19,10 +19,11 @@ gretel2.0: official version of GrETEL 2.0, available at http://gretel.ccl.kuleuv
 
 Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the following packages to be installed on your machine:
 
-* BaseX (https://packages.debian.org/jessie/database/basex)
-* Perl (https://packages.debian.org/jessie/perl/perl) with:
-  * XML::Twig (https://packages.debian.org/jessie/libxml-twig-perl)
-  * XML::XPath (https://packages.debian.org/jessie/libxml-xpath-perl)
+* [BaseX](https://packages.debian.org/jessie/database/basex)
+* [SimpleXML](http://php.net/manual/en/book.simplexml.php)
+* [Perl](https://packages.debian.org/jessie/perl/perl) with:
+  * [XML::Twig](https://packages.debian.org/jessie/libxml-twig-perl)
+  * [XML::XPath](https://packages.debian.org/jessie/libxml-xpath-perl)
 
 ### Next steps
 

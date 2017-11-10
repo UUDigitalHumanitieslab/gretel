@@ -8,7 +8,7 @@
           <input type="checkbox" id="filter-metadata" name="filter-metadata" hidden disabled>Filter metadata <i class="fa fa-fw fa-angle-down" aria-hidden="true"></i>
         </label>
         <div class="filter-sel-wrapper">
-            <?php show_metadata_facets($_SESSION[SID]['treebank']); ?>
+            <?php show_metadata_facets($_SESSION[SID]['treebank'], SID); ?>
         </div>
     </div>
 

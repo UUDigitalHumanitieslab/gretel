@@ -86,7 +86,7 @@ function get_metadata_filter($sid)
  * @global string $dbpwd
  * @return array Metadata per subcorpus
  */
-function get_metadata_counts()
+function get_metadata_counts($sid)
 {
     global $corpus, $components, $xpath, $dbuser, $dbpwd;
 
@@ -104,7 +104,7 @@ function get_metadata_counts()
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
     $result = array();
-    foreach ($_SESSION['startDatabases'] as $database)
+    foreach ($_SESSION[$sid]['startDatabases'] as $database)
     {
         $xquery = '{
 		  for $n
@@ -139,12 +139,12 @@ function get_metadata_counts()
 /**
  * Shows all metadata facets
  */
-function show_metadata_facets($corpus)
+function show_metadata_facets($corpus, $sid)
 {
     $metadata = json_decode(file_get_contents(API_URL . '/treebank/metadata/' . $corpus));
     // First, combine the XMLs into an array with total counts over all databases
     $totals = array();
-    foreach (get_metadata_counts() as $db => $m)
+    foreach (get_metadata_counts($sid) as $db => $m)
     {
         $xml = new SimpleXMLElement($m);
         foreach ($xml as $group => $counts)

@@ -76,15 +76,16 @@ flush();
 
 require ROOT_PATH . "/front-end-includes/header.php";
 require ROOT_PATH . "/front-end-includes/analysis.php";
-$analysis = new Analysis();
-$analysis->continueConstraints = $continueConstraints;
-$analysis->corpus = $corpus;
-$analysis->SID = SID;
-if (isset($_POST["xpath-variables"])) {
-    $analysis->variables = $_POST["xpath-variables"];
+if ($continueConstraints) {
+    $analysis = new Analysis();
+    $analysis->continueConstraints = $continueConstraints;
+    $analysis->corpus = $corpus;
+    $analysis->SID = SID;
+    if (isset($_POST["xpath-variables"])) {
+        $analysis->variables = $_POST["xpath-variables"];
+    }
+    $analysis->render();
 }
-$analysis->render();
-
 require ROOT_PATH."/front-end-includes/footer.php";
 include ROOT_PATH."/front-end-includes/analytics-tracking.php";
 ?>
