@@ -77729,6 +77729,9 @@ var XPathEditor = (function () {
         this.showErrors();
         var _a;
     };
+    /**
+     * Listen for parse errors and warnings and show them.
+     */
     XPathEditor.prototype.showErrors = function () {
         var _this = this;
         this.parsedObservable
@@ -77742,46 +77745,59 @@ var XPathEditor = (function () {
             .distinctUntilKeyChanged('key')
             .subscribe(function (parsed) {
             if (parsed.value.error) {
-                if (_this.existingErrorMarkerId != undefined) {
-                    _this.session.removeMarker(_this.existingErrorMarkerId);
-                }
-                var pathRange = void 0;
-                if (parsed.value.error.startColumn == undefined) {
-                    // select the entire line if the offset is unknown
-                    pathRange = new AceRange(parsed.value.error.startLine, 0, parsed.value.error.startLine + 1, 0);
-                }
-                else {
-                    pathRange = new AceRange(parsed.value.error.startLine, parsed.value.error.startColumn, parsed.value.error.lastColumn, parsed.value.error.lastColumn);
-                }
-                _this.existingErrorMarkerId = _this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-                _this.$errorElement.text(parsed.value.error.message);
+                _this.showErrorMessage(parsed.value.error);
             }
             else {
-                if (_this.existingErrorMarkerId != undefined) {
-                    _this.session.removeMarker(_this.existingErrorMarkerId);
-                }
-                _this.$errorElement.text('');
+                _this.hideErrorMessage();
             }
-            if (_this.existingWarningMarkerIds.length) {
-                _this.session.clearAnnotations();
-                _this.existingWarningMarkerIds.forEach(function (id) {
-                    _this.session.removeMarker(id);
-                });
-                _this.existingWarningMarkerIds = [];
-            }
+            _this.hideWarningMessages();
             if (parsed.value.warnings.length) {
+                // warning markers are rendered in the gutter
                 _this.editor.renderer.setShowGutter(true);
-                _this.existingWarningMarkerIds = parsed.value.warnings.map(function (message) {
-                    var warningRange = new AceRange(message.startLine, message.startColumn, message.lastLine, message.lastColumn);
-                    _this.session.setAnnotations([{
-                            row: message.startLine,
-                            column: message.startColumn,
-                            text: message.message,
-                            type: 'warning'
-                        }]);
-                    return _this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
-                });
+                _this.showWarningMessages(parsed.value.warnings);
             }
+        });
+    };
+    XPathEditor.prototype.hideErrorMessage = function () {
+        if (this.existingErrorMarkerId != undefined) {
+            this.session.removeMarker(this.existingErrorMarkerId);
+            this.$errorElement.text('');
+        }
+    };
+    XPathEditor.prototype.hideWarningMessages = function () {
+        var _this = this;
+        if (this.existingWarningMarkerIds.length) {
+            this.session.clearAnnotations();
+            this.existingWarningMarkerIds.forEach(function (id) {
+                _this.session.removeMarker(id);
+            });
+            this.existingWarningMarkerIds = [];
+        }
+    };
+    XPathEditor.prototype.showErrorMessage = function (errorMessage) {
+        this.hideErrorMessage();
+        var pathRange;
+        if (errorMessage.startColumn == undefined) {
+            // select the entire line if the offset is unknown
+            pathRange = new AceRange(errorMessage.startLine, 0, errorMessage.startLine + 1, 0);
+        }
+        else {
+            pathRange = new AceRange(errorMessage.startLine, errorMessage.startColumn, errorMessage.lastColumn, errorMessage.lastColumn);
+        }
+        this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
+        this.$errorElement.text(errorMessage.message);
+    };
+    XPathEditor.prototype.showWarningMessages = function (warningMessages) {
+        var _this = this;
+        this.existingWarningMarkerIds = warningMessages.map(function (message) {
+            var warningRange = new AceRange(message.startLine, message.startColumn, message.lastLine, message.lastColumn);
+            _this.session.setAnnotations([{
+                    row: message.startLine,
+                    column: message.startColumn,
+                    text: message.message,
+                    type: 'warning'
+                }]);
+            return _this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
         });
     };
     return XPathEditor;
@@ -97659,55 +97675,59 @@ var XPathParserService = (function () {
     };
     XPathParserService.prototype.getWarnings = function (expressions) {
         var warnings = [];
-        var _loop_1 = function (expression) {
+        for (var _i = 0, expressions_1 = expressions; _i < expressions_1.length; _i++) {
+            var expression = expressions_1[_i];
             if (expression.type == 'path') {
-                for (var _i = 0, _a = expression.steps; _i < _a.length; _i++) {
-                    var step = _a[_i];
-                    if (step.properties.axis == 'attribute') {
-                        // check the attribute's name
-                        if (!xpath_attributes_1.XpathAttributes[step.properties.name]) {
-                            warnings.push(this_1.createWarning("Unknown attribute @" + step.properties.name, step.properties.location));
-                        }
-                    }
-                    else if (step.properties.test == 'name') {
-                        // check the element name
-                        if (elementNames.indexOf(step.properties.name) == -1) {
-                            var warning = this_1.createWarning("Unknown element " + step.properties.name, step.properties.location, 0);
-                            warnings.push(warning);
-                        }
-                    }
-                    warnings.push.apply(warnings, this_1.getWarnings(step.getChildren()));
-                }
+                warnings.push.apply(warnings, this.getPathWarnings(expression));
             }
             else if (expression.type == 'operation') {
-                var children = expression.getChildren();
-                if (expression.operationType == '!=' || expression.operationType == '==') {
-                    // check the value of an attribute expression (e.g. @rel="hd"")
-                    var left = children[0];
-                    var right = children[1];
-                    if (left.type == 'path' &&
-                        left.steps.length &&
-                        left.steps[0].properties.axis == 'attribute' &&
-                        right.type == 'string') {
-                        var attributeName = left.steps[0].properties.name;
-                        var attribute = xpath_attributes_1.XpathAttributes[attributeName];
-                        var attributeValue_1 = right.value;
-                        if (attribute && attribute.values.length && attribute.values.findIndex(function (val) { return val[0] == attributeValue_1; }) == -1) {
-                            warnings.push(this_1.createWarning("Unknown attribute value \"" + attributeValue_1 + "\"", right.location, 0));
-                        }
-                    }
-                }
-                warnings.push.apply(warnings, this_1.getWarnings(children));
+                warnings.push.apply(warnings, this.getOperationWarnings(expression));
             }
             else if (expression.type == 'function') {
                 // check the arguments of a function
-                warnings.push.apply(warnings, this_1.getWarnings(expression.getChildren()));
+                warnings.push.apply(warnings, this.getWarnings(expression.getChildren()));
             }
-        };
-        var this_1 = this;
-        for (var _i = 0, expressions_1 = expressions; _i < expressions_1.length; _i++) {
-            var expression = expressions_1[_i];
-            _loop_1(expression);
+        }
+        return warnings;
+    };
+    XPathParserService.prototype.getOperationWarnings = function (expression) {
+        var children = expression.getChildren();
+        if (expression.operationType == '!=' || expression.operationType == '==') {
+            // check the value of an attribute expression (e.g. @rel="hd"")
+            var left = children[0], right = children[1];
+            if (left.type == 'path' &&
+                left.steps.length &&
+                left.steps[0].properties.axis == 'attribute' &&
+                right.type == 'string') {
+                // to the left is an attribute path, to the right a string value expression
+                var attributeName = left.steps[0].properties.name;
+                var attribute = xpath_attributes_1.XpathAttributes[attributeName];
+                var attributeValue_1 = right.value;
+                if (attribute && attribute.values.length && attribute.values.findIndex(function (val) { return val[0] == attributeValue_1; }) == -1) {
+                    return [this.createWarning("Unknown attribute value \"" + attributeValue_1 + "\"", right.location, 0)];
+                }
+            }
+        }
+        return this.getWarnings(children);
+    };
+    XPathParserService.prototype.getPathWarnings = function (expression) {
+        var warnings = [];
+        for (var _i = 0, _a = expression.steps; _i < _a.length; _i++) {
+            var step = _a[_i];
+            if (step.properties.axis == 'attribute') {
+                // check the attribute's name
+                if (!xpath_attributes_1.XpathAttributes[step.properties.name]) {
+                    warnings.push(this.createWarning("Unknown attribute @" + step.properties.name, step.properties.location));
+                }
+            }
+            else if (step.properties.test == 'name') {
+                // check the element name
+                if (elementNames.indexOf(step.properties.name) == -1) {
+                    var warning = this.createWarning("Unknown element " + step.properties.name, step.properties.location, 0);
+                    warnings.push(warning);
+                }
+            }
+            warnings.push.apply(warnings, this.getWarnings(step.getChildren()));
         }
         return warnings;
     };

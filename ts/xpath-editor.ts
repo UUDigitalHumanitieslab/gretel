@@ -5,7 +5,7 @@ import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
 import { MacroService } from './services/macro-service';
-import { XPathParserService } from './services/xpath-parser.service';
+import { ParseMessage, XPathParserService } from './services/xpath-parser.service';
 
 let AceRange = ace.acequire('ace/range').Range;
 
@@ -118,6 +118,9 @@ export class XPathEditor {
         this.showErrors();
     }
 
+    /**
+     * Listen for parse errors and warnings and show them.
+     */
     private showErrors() {
         this.parsedObservable
             .map(parsed => {
@@ -130,54 +133,69 @@ export class XPathEditor {
             .distinctUntilKeyChanged('key')
             .subscribe(parsed => {
                 if (parsed.value.error) {
-                    if (this.existingErrorMarkerId != undefined) {
-                        this.session.removeMarker(this.existingErrorMarkerId);
-                    }
-
-                    let pathRange: ace.Range;
-                    if (parsed.value.error.startColumn == undefined) {
-                        // select the entire line if the offset is unknown
-                        pathRange = new AceRange(parsed.value.error.startLine, 0, parsed.value.error.startLine + 1, 0);
-                    } else {
-                        pathRange = new AceRange(parsed.value.error.startLine,
-                            parsed.value.error.startColumn,
-                            parsed.value.error.lastColumn,
-                            parsed.value.error.lastColumn);
-                    }
-                    this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-                    this.$errorElement.text(parsed.value.error.message);
+                    this.showErrorMessage(parsed.value.error);
                 } else {
-                    if (this.existingErrorMarkerId != undefined) {
-                        this.session.removeMarker(this.existingErrorMarkerId);
-                    }
-
-                    this.$errorElement.text('');
+                    this.hideErrorMessage();
                 }
 
-                if (this.existingWarningMarkerIds.length) {
-                    this.session.clearAnnotations();
-                    this.existingWarningMarkerIds.forEach((id) => {
-                        this.session.removeMarker(id);
-                    });
-                    this.existingWarningMarkerIds = [];
-                }
+                this.hideWarningMessages();
 
                 if (parsed.value.warnings.length) {
+                    // warning markers are rendered in the gutter
                     this.editor.renderer.setShowGutter(true);
-                    this.existingWarningMarkerIds = parsed.value.warnings.map((message) => {
-                        let warningRange = new AceRange(message.startLine,
-                            message.startColumn,
-                            message.lastLine,
-                            message.lastColumn);
-                        this.session.setAnnotations([{
-                            row: message.startLine,
-                            column: message.startColumn,
-                            text: message.message,
-                            type: 'warning'
-                        }]);
-                        return this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
-                    })
+                    this.showWarningMessages(parsed.value.warnings);
                 }
             });
+    }
+
+    private hideErrorMessage() {
+        if (this.existingErrorMarkerId != undefined) {
+            this.session.removeMarker(this.existingErrorMarkerId);
+            this.$errorElement.text('');
+        }
+    }
+
+    private hideWarningMessages() {
+        if (this.existingWarningMarkerIds.length) {
+            this.session.clearAnnotations();
+            this.existingWarningMarkerIds.forEach((id) => {
+                this.session.removeMarker(id);
+            });
+            this.existingWarningMarkerIds = [];
+        }
+    }
+
+    private showErrorMessage(errorMessage: ParseMessage) {
+        this.hideErrorMessage();
+
+        let pathRange: ace.Range;
+        if (errorMessage.startColumn == undefined) {
+            // select the entire line if the offset is unknown
+            pathRange = new AceRange(errorMessage.startLine, 0, errorMessage.startLine + 1, 0);
+        } else {
+            pathRange = new AceRange(errorMessage.startLine,
+                errorMessage.startColumn,
+                errorMessage.lastColumn,
+                errorMessage.lastColumn);
+        }
+
+        this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
+        this.$errorElement.text(errorMessage.message);
+    }
+
+    private showWarningMessages(warningMessages: ParseMessage[]) {
+        this.existingWarningMarkerIds = warningMessages.map((message) => {
+            let warningRange = new AceRange(message.startLine,
+                message.startColumn,
+                message.lastLine,
+                message.lastColumn);
+            this.session.setAnnotations([{
+                row: message.startLine,
+                column: message.startColumn,
+                text: message.message,
+                type: 'warning'
+            }]);
+            return this.session.addMarker(warningRange, 'pathWarning', 'text', undefined);
+        });
     }
 }

@@ -54,44 +54,58 @@ export class XPathParserService {
         let warnings: ParseMessage[] = [];
         for (let expression of expressions) {
             if (expression.type == 'path') {
-                for (let step of expression.steps) {
-                    if (step.properties.axis == 'attribute') {
-                        // check the attribute's name
-                        if (!XpathAttributes[step.properties.name]) {
-                            warnings.push(this.createWarning(`Unknown attribute @${step.properties.name}`, step.properties.location));
-                        }
-                    } else if (step.properties.test == 'name') {
-                        // check the element name
-                        if (elementNames.indexOf(step.properties.name) == -1) {
-                            let warning = this.createWarning(`Unknown element ${step.properties.name}`, step.properties.location, 0);
-                            warnings.push(warning);
-                        }
-                    }
-                    warnings.push(...this.getWarnings(step.getChildren()));
-                }
+                warnings.push(...this.getPathWarnings(expression));
             } else if (expression.type == 'operation') {
-                let children = expression.getChildren();
-                if (expression.operationType == '!=' || expression.operationType == '==') {
-                    // check the value of an attribute expression (e.g. @rel="hd"")
-                    let left = children[0];
-                    let right = children[1];
-                    if (left.type == 'path' &&
-                        left.steps.length &&
-                        left.steps[0].properties.axis == 'attribute' &&
-                        right.type == 'string') {
-                        let attributeName = left.steps[0].properties.name;
-                        let attribute = XpathAttributes[attributeName];
-                        let attributeValue = right.value;
-                        if (attribute && attribute.values.length && attribute.values.findIndex((val) => val[0] == attributeValue) == -1) {
-                            warnings.push(this.createWarning(`Unknown attribute value "${attributeValue}"`, right.location, 0));
-                        }
-                    }
-                }
-                warnings.push(...this.getWarnings(children));
+                warnings.push(...this.getOperationWarnings(expression));
             } else if (expression.type == 'function') {
                 // check the arguments of a function
                 warnings.push(...this.getWarnings(expression.getChildren()));
             }
+        }
+
+        return warnings;
+    }
+
+    private getOperationWarnings(expression: XPathModels.XPathOperation) {
+        let children = expression.getChildren();
+        if (expression.operationType == '!=' || expression.operationType == '==') {
+            // check the value of an attribute expression (e.g. @rel="hd"")
+            let left = children[0],
+                right = children[1];
+
+            if (left.type == 'path' &&
+                left.steps.length &&
+                left.steps[0].properties.axis == 'attribute' &&
+                right.type == 'string') {
+                // to the left is an attribute path, to the right a string value expression
+                let attributeName = left.steps[0].properties.name;
+                let attribute = XpathAttributes[attributeName];
+                let attributeValue = right.value;
+                if (attribute && attribute.values.length && attribute.values.findIndex((val) => val[0] == attributeValue) == -1) {
+                    return [this.createWarning(`Unknown attribute value "${attributeValue}"`, right.location, 0)];
+                }
+            }
+        }
+
+        return this.getWarnings(children);
+    }
+
+    private getPathWarnings(expression: XPathModels.XPathPathExpr) {
+        let warnings: ParseMessage[] = [];
+        for (let step of expression.steps) {
+            if (step.properties.axis == 'attribute') {
+                // check the attribute's name
+                if (!XpathAttributes[step.properties.name]) {
+                    warnings.push(this.createWarning(`Unknown attribute @${step.properties.name}`, step.properties.location));
+                }
+            } else if (step.properties.test == 'name') {
+                // check the element name
+                if (elementNames.indexOf(step.properties.name) == -1) {
+                    let warning = this.createWarning(`Unknown element ${step.properties.name}`, step.properties.location, 0);
+                    warnings.push(warning);
+                }
+            }
+            warnings.push(...this.getWarnings(step.getChildren()));
         }
 
         return warnings;
