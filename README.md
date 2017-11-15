@@ -73,7 +73,7 @@ When searching for a more specific structure, this is unlikely to occur.
   * `helpers.php`: basic helper functions that return booleans.
 
 ### During development
-* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and TypeScript, and auto-minify CSS and JavaScript.
+* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS (Ruby and Sass have to be installed in the PATH: https://github.com/gruntjs/grunt-contrib-sass) and auto-minify CSS and JavaScript.
 * Note that some client-side code is in Typescript `ts/`, this code is automatically compiled using Grunt.
 * Commands to install Grunt, local dependencies and then to watch for changes:
 
