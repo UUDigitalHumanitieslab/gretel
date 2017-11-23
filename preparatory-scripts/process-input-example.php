@@ -17,7 +17,7 @@ if (!isset($_GET['sid'])) {
 
 define('SID', $_GET['sid']);
 
-$lpxml = simplexml_load_file(ROOT_PATH."/tmp/".SID."-pt.xml");
+$lpxml = simplexml_load_string(file_get_contents(ROOT_PATH."/tmp/".SID."-pt.xml"));
 
 // Set tokenized input sentence to variable
 $tokinput = $_SESSION[SID]['sentence'];
