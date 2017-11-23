@@ -1,7 +1,7 @@
 <body <?php setBodyClasses(); ?>>
     <div id="container">
         <header class="page-header">
-            <h1>GrETEL <sup>3</<sup></h1>
+            <h1>GrETEL <sup class="version">4</sup> <sup>alpha!</sup></h1>
             <p>Greedy Extraction of Trees for Empirical Linguistics</p>
             <nav class="primary-navigation">
                 <ul>

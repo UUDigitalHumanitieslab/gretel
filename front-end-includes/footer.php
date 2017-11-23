@@ -1,20 +1,22 @@
   </main>
 </div>
+<?php
+require_once ROOT_PATH."/package.php";
+?>
 <footer class="page-footer">
     <div class="content">
       <aside class="contact">
-        <h3>Centre for Computational Linguistics</h3>
+        <h3>Digital Humanities Lab</h3>
         <address>
           <ul>
-            <li class="address fa-before">University of Leuven<br>
-          Blijde Inkomststraat 21 box 3315<br>
-          3000 Leuven<br>
-          Belgium<br></li>
-          <li class="web fa-before"><a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage"
-              target="_blank">Centre for Computational Linguistics</a></li>
-          <li class="tel fa-before"  title="Phone number">+32-16-325088</li>
-          <li class="fax fa-before" title="Fax address">+32-16-325098</li>
-          <li class="email fa-before"><a href="mailto:gretel@ccl.kuleuven.be" title="Email us">gretel@ccl.kuleuven.be</a></li>
+            <li class="address fa-before">Utrecht University<br>
+          Drift 10, room 3.07<br>
+          3512 BS Utrecht<br>
+          Netherlands<br></li>
+          <li class="web fa-before"><a href="https://dig.hum.uu.nl" title="Digital Humanities Lab"
+              target="_blank">Digital Humanities Lab</a></li>
+          <li class="tel fa-before"  title="Phone number">+31 30 253 7867</li>
+          <li class="email fa-before"><a href="mailto:s.j.j.spoel@uu.nl" title="Email us">s.j.j.spoel@uu.nl</a></li>
         </ul>
         </address>
       </aside>
@@ -30,9 +32,25 @@
         </nav>
         <div class="authors">
             <h3>Credits</h3>
-      <p>Concept and initial implementation <br><a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author">Liesbeth Augustinus</a> &amp; <a href="http://www.ccl.kuleuven.be/~vincent/ccl/" title="Vincent Vandeghinste homepage" target="_blank" rel="author">Vincent Vandeghinste</a><br>
-            GrETEL 3 improvements and design <br><a href="http://bramvanroy.be" title="Bram Vanroy homepage" target="_blank" rel="author">Bram Vanroy</a></p>
-      <p><?php echo "version $version $date";?></p>
+            <p>
+              Concept and initial implementation at <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage"
+              target="_blank">Centre for Computational Linguistics</a> (University of Leuven).
+            </p>
+            <p>
+                <li><a href="http://www.ccl.kuleuven.be/~liesbeth/" title="Liesbeth Augustinus homepage" target="_blank" rel="author" lang="nl-BE">Liesbeth Augustinus</a></li>
+                <li><a href="http://www.ccl.kuleuven.be/~vincent/ccl/" title="Vincent Vandeghinste homepage" target="_blank" rel="author" lang="nl-BE">Vincent Vandeghinste</a></li>
+                <li><a href="http://bramvanroy.be" title="Bram Vanroy homepage" target="_blank" rel="author" lang="nl-BE">Bram Vanroy</a></li>
+            </p>
+            <p>
+              GrETEL 4 at <a href="https://dig.hum.uu.nl/" target="_blank">Digital Humanties Lab</a> (Utrecht University).
+            </p>
+            <p>
+                <li><a href="https://www.uu.nl/staff/JEJMOdijk" title="Jan Odijk homepage" target="_blank" rel="author" lang="nl-NL">Jan Odijk</a> (project lead)</li>
+                <li><a href="https://www.uu.nl/staff/MHvanderKlis" title="Martijn van der Klis homepage" target="_blank" rel="author" lang="nl-NL">Martijn van der Klis</a></li>
+                <li><a href="https://www.uu.nl/staff/SJJSpoel" title="Sheean Spoel homepage" target="_blank" rel="author" lang="nl-NL">Sheean Spoel</a></li>
+                <li><a href="https://www.uu.nl/staff/GFoks" title="Gerson Foks homepage" target="_blank" rel="author" lang="nl-NL">Gerson Foks</a></li>
+            </p>
+      <p><?php echo "version ".VERSION." ".DATE;?></p>
         </div>
       </aside>
       <aside class="other">

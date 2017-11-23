@@ -407,19 +407,23 @@ dd {
     font-size: 2em;
 
     flex: 1;
-    sup {
+    sup {    
       position: static;
       display: inline-block;
-      width: 28px;
+      color: $heading_sup_bgc;
       height: 28px;
-      border-radius: 50%;
-      background: $heading_sup_bgc;
-      color: #FFFFFF;
       vertical-align: super;
       text-align: center;
       font-weight: bolder;
       font-size: 16px;
       line-height: 28px;
+
+      &.version {
+        width: 28px;
+        border-radius: 50%;
+        background: $heading_sup_bgc;
+        color: #FFFFFF;
+      }    
     }
   }
   > p {

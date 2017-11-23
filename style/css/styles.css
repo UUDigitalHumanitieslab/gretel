@@ -483,16 +483,18 @@ dd {
     .page-header h1 sup {
       position: static;
       display: inline-block;
-      width: 28px;
+      color: #d54b4b;
       height: 28px;
-      border-radius: 50%;
-      background: #B6D54B;
-      color: #FFFFFF;
       vertical-align: super;
       text-align: center;
       font-weight: bolder;
       font-size: 16px;
       line-height: 28px; }
+      .page-header h1 sup.version {
+        width: 28px;
+        border-radius: 50%;
+        background: #d54b4b;
+        color: #FFFFFF; }
   .page-header > p {
     position: absolute;
     bottom: 0;

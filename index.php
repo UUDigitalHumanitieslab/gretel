@@ -11,11 +11,17 @@ require ROOT_PATH."/front-end-includes/head.php";
 
 
         <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
-            <p style="text-align: center; padding: 10px; margin-bottom: 10px; background-color: #F2DEDE; border: 1px solid red;">
-              <em>
-              This is a development version for GrETEL which includes functionality to upload your own corpus and faceted search. All features are experimental and might break unexpectedly. <br> Please <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official version</a> if you want to use GrETEL for research purposes.
-              </em>
-            </p>
+            <div style="padding: 10px; margin-bottom: 10px; background-color: #F2DEDE; border: 1px solid red;">
+              <p>
+                This is a preview of the next version of GrETEL, developed by the Digital Humanities Lab at Utrecht University. <strong>This is currently under active development!</strong> It includes additional functionality to <a href="/gretel-upload">upload your own corpus</a>, faceted search, analysis and improved usability.
+              </p>
+              <p>
+                <em>All features are experimental and might break or change unexpectedly!</em>
+              </p>
+              <p>
+                Please <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official stable version</a> (developed by University of Leuven) if you want to use GrETEL for research purposes.
+              </p>
+            </div>
             <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of syntactically annotated coropra or <i>treebanks</i>. If you are new to GrETEL

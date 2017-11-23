@@ -52,7 +52,17 @@ module.exports = function (grunt) {
 				}
 			}
 		},
-
+		php_config: {
+			build: {
+				dest: 'package.php',
+				options: {
+					constants: {
+						version: '<%= pkg.version %>',
+						date: (new Date()).toDateString()
+					}
+				}
+			}
+		},
 		// use karma to run tests
 		karma: {
 			options: {
@@ -87,6 +97,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jasmine');
+	grunt.loadNpmTasks('grunt-php-config');
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-webpack');
 
