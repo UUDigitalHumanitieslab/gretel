@@ -7,33 +7,16 @@ type NodeProperties = {
 
 type Row = {
     metadataValues: { [name: string]: string },
-    nodeCount: number,
-    /**
-     * Get the node properties, using their 1-based position.
-     */
-    nodeProperties: { [position: number]: NodeProperties },
     nodeVariableValues: { [name: string]: NodeProperties }
 };
 
 export class AnalysisService {
     private getRow(variables: string[], metadataKeys: string[], result: SearchResult, placeholder: string): Row {
-        let nodes = $($.parseXML(result.nodeXml)).find('node[lemma]');
         let metadataValues: { [name: string]: string } = {};
         for (let key of metadataKeys) {
             metadataValues[key] = result.metadata[key];
         }
-
-        let nodeProperties: { [position: number]: NodeProperties } = {};
-        nodes.each((index, node) => {
-            let $node = $(node);
-            let pos = $node.attr('pos');
-            let lemma = $node.attr('lemma');
-            nodeProperties[index + 1] = {
-                pos: pos ? pos : placeholder,
-                lemma: lemma ? lemma : placeholder
-            };
-        });
-
+        
         let nodeVariableValues: { [name: string]: NodeProperties } = {};
         for (let variable of variables) {
             let value = result.variables[variable];
@@ -43,7 +26,7 @@ export class AnalysisService {
             };
         }
 
-        return { metadataValues, nodeCount: nodes.length, nodeProperties, nodeVariableValues };
+        return { metadataValues, nodeVariableValues };
     }
 
     /**
@@ -56,25 +39,14 @@ export class AnalysisService {
      */
     public getFlatTable(searchResults: SearchResult[], variables: string[], metadataKeys: string[], placeholder = '(none)'): string[][] {
         let rows: Row[] = [];
-        let maxNodeCount = 0;
 
         for (let result of searchResults) {
             let row = this.getRow(variables, metadataKeys, result, placeholder);
             rows.push(row);
-
-            if (row.nodeCount > maxNodeCount) {
-                maxNodeCount = row.nodeCount;
-            }
         }
 
         let columnNames: string[] = [];
         columnNames.push(...metadataKeys);
-
-        // show 1-based positions, because they are a bit more human-friendly
-        let nodePositions: number[] = Array.apply(null, { length: maxNodeCount }).map((_: number, index: number) => index + 1);
-
-        columnNames.push(...nodePositions.map((i: number) => `pos${i}`));
-        columnNames.push(...nodePositions.map((i: number) => `lem${i}`));
 
         // remove the starting $ variable identifier
         columnNames.push(...variables.map(name => `pos_${name.slice(1)}`));
@@ -87,8 +59,6 @@ export class AnalysisService {
             let line: string[] = [];
 
             line.push(...metadataKeys.map(key => row.metadataValues[key] ? row.metadataValues[key] : placeholder));
-            line.push(...nodePositions.map(i => row.nodeProperties[i] ? row.nodeProperties[i].pos : placeholder));
-            line.push(...nodePositions.map(i => row.nodeProperties[i] ? row.nodeProperties[i].lemma : placeholder));
             line.push(...variables.map(name => row.nodeVariableValues[name] ? row.nodeVariableValues[name].pos : placeholder));
             line.push(...variables.map(name => row.nodeVariableValues[name] ? row.nodeVariableValues[name].lemma : placeholder));
 
