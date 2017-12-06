@@ -59,6 +59,9 @@ export class AnalysisComponent {
         let renderers = $.extend($.pivotUtilities.renderers,
             { 'File export': (new FileExportRenderer()).render });
         let pivotData = this.analysisService.getFlatTable(searchResults, this.variables.map(x => x.name), metadataKeys);
+        // Show a default pivot using the first node variable's lemma property against the POS property.
+        // This way the user will get to see some useable values to help clarify the interface.
+        let defaultVariable = this.variables.length > 0 ? [this.variables[0].name.substr(1)] : [];
         return element.pivotUI(
             pivotData, {
                 aggregators: {
@@ -69,8 +72,8 @@ export class AnalysisComponent {
                     'First': utils.aggregators['First'],
                     'Last': utils.aggregators['Last']
                 },
-                rows: ['lem1'],
-                cols: ['pos1'],
+                rows: defaultVariable.map(v => `lem_${v}`),
+                cols: defaultVariable.map(v => `pos_${v}`),
                 renderer: heatmap,
                 renderers
             });
