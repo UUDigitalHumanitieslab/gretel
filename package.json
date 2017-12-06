@@ -2,10 +2,9 @@
   "name": "gretel",
   "version": "3.9.99",
   "license": "CC-BY-NC-SA-4.0",
-  "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CCL-KULeuven/gretel.git"
+    "url": "git+https://github.com/UUDigitalHumanitieslab/gretel.git"
   },
   "devDependencies": {
     "@types/es6-shim": "^0.31.34",
