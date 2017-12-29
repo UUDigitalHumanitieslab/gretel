@@ -36,6 +36,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
+5. Run `npm install` and `grunt` to compile all the JavaScript and stylesheet files.
 
 ## Notes for users
 

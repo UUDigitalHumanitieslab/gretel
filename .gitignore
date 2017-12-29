@@ -22,3 +22,8 @@ config/
 node_modules/
 
 .idea
+
+# Grunt output
+style/css/**
+js/min/**
+js/ts/**
