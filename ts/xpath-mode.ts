@@ -57,7 +57,7 @@ export class Completer {
 
     private getAttributeCompletions(currentToken: TokenInfoWithType, iterator: ace.TokenIterator) {
         let token = currentToken;
-        if (token.type && token.type == "attribute.string") {
+        if (token.type && (token.type == "attribute.string" || token.type == "function.attribute.string")) {
             iterator.stepBackward();
             iterator.stepBackward();
             token = iterator.getCurrentToken() as TokenInfoWithType;
