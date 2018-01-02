@@ -74,7 +74,7 @@ export class XPathHighlighterRules extends TextHighlightRules {
             "attribute": [
                 {
                     token: ["text", "keyword.operator", "text", "attribute.string"],
-                    regex: `(\\s*)${equalityRe}(\\s*)(\"[^\"]*\")`,
+                    regex: `(\\s*)${equalityRe}(\\s*)(\"[^\"]*\"|\'[^\']*\')`,
                     next: "start"
                 }, {
                     token: ["text", "keyword.operator", "text", "constant.numeric"],
