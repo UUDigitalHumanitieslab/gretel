@@ -592,6 +592,7 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['ld', ''],
             ['me', ''],
             ['mod', ''],
+            ['mwp', ''],
             ['nucl', ''],
             ['obcomp', ''],
             ['obj1', ''],
