@@ -47,8 +47,12 @@ td {
 <h4><a href="xps/input-xp.php">XPath search</a></h4>
 
 <p>In this search mode you have to build the XPath query yourself. We strongly recommend to use the XPath search tool only when you are an experienced XPath user!</p>
-<br/>
 
+<h4><a href="res/input-re.php">RegEx search</a></h4>
+
+<p>In this search mode you can query the treebanks using a text string or a regular expression.</p>
+<br/>
+<br/>
 <p>Please <b>cite</b> the following paper if you are using GrETEL for your research:<br/><br/>
 Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="http://nederbooms.ccl.kuleuven.be/documentation/LREC2012-ebq.pdf" target="_blank">"Example-Based Treebank Querying"</a> In: Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012). Istanbul, Turkey. pp. 3161-3167</p>
 

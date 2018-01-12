@@ -24,7 +24,7 @@ require("../config/config.php");
 
 // dir to external scripts
 $basexclient="$scripts/BaseXClient.php";
-$treebanksearch="$scripts/TreebankSearch.php";
+$treebanksearch="$scripts/RegExSearch.php";
 $formatresults="$scripts/FormatResults.php";
 
 /* GET VARIABLES */
@@ -35,8 +35,7 @@ if (getenv('limit')){
 $print=$_GET["print"]; // get print mode
 
 $treebank=$_SESSION['treebank']; // get treebank
-$xpath=$_SESSION['xpath']; // get xpath
-$example=$_SESSION['example']; // get input example
+$regex=$_SESSION['regex']; // get regex
 $context=$_SESSION['ct'];
 
  if ($_SESSION["ct"]=="on") {
@@ -55,29 +54,23 @@ require("$formatresults");
 /***********************************************************/
 
 //create session
-$session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+  $pgname=$treebank;
+  $conn_string="dbname=$pgname host=$pghost port=$pgport user=$pguser password=$pgpwd";
+  $session=pg_connect($conn_string) or die('connection failed');
 
 $subtreebanks=explode('-', $subtb);
 
 try {
-   // get results
- 
-  if (isset($limit)) {
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
-    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,$limit,$context);
-  }
-   
-  else {
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);
-    list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
-  }
+   // get counts and sentences
+    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($regex,$case,$treebank,$subtreebanks,$session); 
+
   
   // print results
   
   if ($print == "txt") {
     header("Content-Disposition: attachment; filename=DBresults.txt");
     header("Content-type:text/plain; charset=utf-8");
-    echo "XPATH: $xpath\n\n";
+    echo "REGEX: $regex\n\n";
     printMatchesTxt($sentences,$counthits);
   }
   
@@ -103,13 +96,7 @@ try {
     echo "$htmlopen\n";
     echo "$printbuttons\n";
 
-    echo "<h1>GrETEL Search Results</h1><hr/>\n<b>XPath: </b>$xpath<br/>\n";
-    if ($_SESSION['search']!=="xpsearch" && isset($example)){
-      echo "<b>Based on input example: </b>$example<br/><br/>\n";
-    }
-    else {
-      echo "<br/><br/>\n";
-    }
+    echo "<h1>GrETEL Search Results</h1><hr/>\n<b>RegEx: </b>$regex<br/><br/><br/>\n";
   
   
     // format counts
@@ -120,7 +107,7 @@ try {
 
     printCountsPF($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS); // print counts
 
-    printMatchesPF($sentences,$counthits,$idlist,$beginlist); // print matching sentences
+    printMatchesRegexPF($sentences,$counthits,$regex); // print matching sentences
     
     echo "$printbuttons\n";
     echo $htmlclose;
@@ -139,8 +126,5 @@ catch (Exception $e) {
   $error=$e->getMessage();
   echo $error;
 }
-
-// close session
-$session->close();
 
 ?>

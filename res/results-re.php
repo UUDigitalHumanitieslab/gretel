@@ -9,7 +9,7 @@
 /* Display errors*/
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1); 
-require'header-re.php';
+require 'header-re.php';
 
 echo '
 <link rel="stylesheet" type="text/css" href="'.$home.'/style/css/datatable.css"></link>
@@ -69,6 +69,7 @@ header('Content-Type:text/html; charset=utf-8');
 $id=session_id();
 $date=date('d-m-Y');
 $time=time(); // time stamp
+$limit=1000;
 
 if (getenv('REMOTE_ADDR')){
 $user = getenv('REMOTE_ADDR');
@@ -94,7 +95,7 @@ $step="step_three";
 $title="<h1>Step 3: Results</h1><hr/>";
 
 // messages and documentation
-$export="$home/scripts/SaveResults.php?"; // script for downloading the results
+$export="$home/scripts/SaveResultsRegex.php?"; // script for downloading the results
 $showtree="$home/scripts/ShowTree.php"; // script for displaying syntax trees
 $tip="<b>Click on a sentence ID</b> to view the tree structure. The
 sentence ID refers to the treebank component in which the sentence occurs, the text number, and the location within the text (page + sentence number).";
@@ -108,10 +109,7 @@ require("$formatresults"); // functions to format the treebank results
 
 /***********************************************************/
 
-try {
-  $start = microtime(true); // start timing
-
-  // get XPath
+  // get input
   if (empty($_SESSION['string'])) {
     echo "<h1>Input Error</h1><hr/>";
     echo "Please enter a query\n<br/><br/>";
@@ -120,11 +118,11 @@ try {
   }
   
   else {
-    $input=$_SESSION['string'];
+    $string=$_SESSION['string'];
   }
   
   echo "$title";
-  chop($input);
+  chop($string);
 
   // get treebank
   if ($_POST['treebank']) {
@@ -140,7 +138,7 @@ try {
  
   // log input
   $log=fopen($grtllog, "a"); //concatenate
-  fwrite($log, "$date\t$user\t$id-$time\t$treebank\t$input\n");
+  fwrite($log, "$date\t$user\t$id-$time\t$treebank\t$string\n");
   fclose($log);
 
   // get subtreebanks
@@ -162,12 +160,16 @@ try {
   }
 
   // get word boundary option
-  if ($_SESSION["wb"]="on") {
+  if ($_SESSION["wb"]=="on") {
      $wb=1;
+     $string='\\b'.$string.'\\b'; // add word boundary symbol
+     $_SESSION['regex']=$string;
   }
 
   else {
     $wb=0;
+    $_SESSION["wb"]="off";
+    $_SESSION['regex']=$string;
   }
   
   // get case option
@@ -190,37 +192,17 @@ try {
 
   // create session
 
-  /* MOVE TO CONFIG FILE!!! */
   $pgname=$treebank;
-  $pghost='asterix';
-  $pgport='5432';
-  $pguser='vincent';
-  $pgpwd='vincent';
-  
-  $conn_string="dbname=$dbname host=$dbhost port=$dbport user=$dbuser password=$dbpwd";
+  $conn_string="dbname=$pgname host=$pghost port=$pgport user=$pguser password=$pgpwd";
   $session=pg_connect($conn_string) or die('connection failed');
 
-  
   // get results
   try {
-    // get counts
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS)=GetCounts($xpath,$treebank,$subtreebanks,$session);   
-    
-    // get sentences
-    if ($TOTALCOUNTS['hits'] > 20000 || $TOTALCOUNTS['ms'] > 5000 ) { // display subset if too many hits
-      $limit=500;
-      
-      list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,$limit,$context);
-    }
-   
-     elseif ($TOTALCOUNTS['hits'] !=0 ) {
-      list($sentences,$counthits,$idlist,$beginlist)=GetSentences($xpath,$treebank,$subtreebanks,$session,"none",$context);
-    }
-
-    else {
-      // do nothing
-    }
-    // print query
+    // get counts and sentences
+    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($string,$case,$treebank,$subtreebanks,$session); 
+ 
+ 
+  // print query
 
     echo 
 '<div align="right"><button type="button" value="Printer-friendly version" onclick="window.open(\''.$export.'&print=html\')">Printer-friendly version</button></div>';
@@ -231,7 +213,7 @@ try {
 <th colspan="2" align="left">QUERY</th>
 </tr>
 <tr>
-<th  align="left">XPath</th><td>'.$input.'</td>
+<th  align="left">RegEx</th><td>'.$string.'</td>
 </tr>
 <tr>
 <th  align="left">Treebank</th><td>'.strtoupper($treebank).' ['.$components.']</td>
@@ -275,20 +257,14 @@ try {
     echo '<button onclick="window.open(\''.$export.'&print=csv\')" title="Comma-separated file of detailed search results (counts per treebank)">Download table</button><br/><br/>';
       
     print "</div>"; // show/hide div pt 2
-    
-    if (isset($limit)) {
-      print "Since there are too many results to display, a sample of $limit hits per treebank component is presented.<br/><br/>\n";
-      $export.="&limit=".$limit;
-    }
-    
+
+   
     echo $tip;
     
-    printMatches($sentences,$counthits,$idlist,$beginlist,$treebank,$showtree); // print matching sentence and hits per sentence
+    printMatchesRegex($sentences,$counthits,$wordlist,$treebank,$showtree,$string,$limit); // print matching sentence and hits per sentence
     }
     
     echo $new.$back;
-    // close session
-    $session->close();
   }
   
   catch (Exception $e) {
@@ -306,7 +282,7 @@ try {
       echo $back;
 
       $oom = fopen($oomlog, "a");
-      fwrite($oom, "$date\t$user\t$id-$time\t$input\t$error\n");
+      fwrite($oom, "$date\t$user\t$id-$time\t$string\t$error\n");
       fclose($oom);
     }
     
@@ -316,14 +292,6 @@ try {
       echo $back;
     }
   }
-
-}
-
-
-catch (Exception $e) {
-  // print exception
-  print $e->getMessage();
-}
 
 echo '<br/>';
 require 'footer.php';

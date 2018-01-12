@@ -11,7 +11,7 @@ function printCounts($treebank,$HITS,$MS,$TOTALS,$TOTALCOUNTS) { // print table 
   $CORPUS=SetDB2CorpusDetailed($treebank);
    print "<table id=\"results\" border=\"1\">\n
              <thead>\n
-              <tr><th>TREEBANK</th><th>HITS</th><th>MATCHING SENTENCE</th><th>SENTENCES IN TREEBANK</th></tr>
+              <tr><th>TREEBANK</th><th>HITS</th><th>MATCHING SENTENCES</th><th>SENTENCES IN TREEBANK</th></tr>
              </thead>
              </tbody>
              ";
@@ -80,7 +80,77 @@ function printMatches($sentences,$counthits,$idlist,$beginlist,$treebank,$showtr
       
 }
 
-function printMatchesTxt($sentences,$counthits,$idlist,$beginlist) { // NOTE: sentence IDs are the keys of all hashes
+function printMatchesRegex($sentences,$counthits,$wordlist,$treebank,$showtree,$regex,$limit) { // NOTE: sentence IDs are the keys of all hashes
+     print '<div class="tableWrapper"><table id="example" class="sortable" border="1">
+             <thead>
+<tr><th class="pointer">SENTENCE ID</th><th class="pointer">MATCHING SENTENCES</th><th class="pointer">HITS</th></tr>
+             </thead>
+             <tfoot>
+             <tr><th colspan="3"></th></tr>
+             </tfoot>
+             ';
+      
+      print '           
+             <tbody>
+             ';
+
+ if (count($sentences) > 2000 ) { // display message if there are too many results
+      echo "<br/>"."Since there are too many results to display, a random sample of $limit hits is presented.<br/>\n";
+    }
+
+$i=0; // set counter
+
+$sentences=shuffle_assoc($sentences); // randomize array
+ 
+      foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
+	if ($i < $limit) {
+		$sid=trim($id);
+		$hlsentence=HighlightSentenceRegex($sentence,$regex); // highlight sentence
+		$trans = array('"' => '&quot;', "'" => "&apos;"); // deal with quotes/apos
+		$hls=strtr("$hlsentence", $trans);
+
+		$sentenceidlink='<a class="match" href="'.$showtree.'?sid='.$sid.'&wd='.$wordlist[$id].'&tb='.$treebank.'&db='.$treebank.'&opt=zoom" target="_blank" >'.$sid.'</a>';
+
+		print '<tr><td width="150px">'.$sentenceidlink.'</td><td>'.$hlsentence.'</td><td width="100px" >'.$counthits[$id].'</td></tr>'."\n";
+
+	$i++;
+	}
+
+	else {
+	  break;}
+
+    }
+
+      print "</tbody></table></div>\n<br/><br/>\n";
+      
+}
+
+
+function shuffle_assoc($array)
+{
+    // Initialize
+        $shuffled_array = array();
+
+
+    // Get array's keys and shuffle them.
+        $shuffled_keys = array_keys($array);
+        shuffle($shuffled_keys);
+
+
+    // Create same array, but in shuffled order.
+        foreach ( $shuffled_keys AS $shuffled_key ) {
+
+            $shuffled_array[  $shuffled_key  ] = $array[  $shuffled_key  ];
+
+        } // foreach
+
+
+    // Return
+        return $shuffled_array;
+}
+
+
+function printMatchesTxt($sentences,$counthits) { // NOTE: sentence IDs are the keys of all hashes
       
       foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
 	print "$id\t$sentence\t[$counthits[$id]]\n";
@@ -111,6 +181,29 @@ function printMatchesPF($sentences,$counthits,$idlist,$beginlist) { // NOTE: sen
 
 }
 
+function printMatchesRegexPF($sentences,$counthits,$regex) { // NOTE: sentence IDs are the keys of all hashes
+      print '<table id="matches" border="1">
+             <thead>
+              <tr><th>SENTENCE ID</th><th>MATCHING SENTENCE</th><th>HITS</th></tr>
+             </thead>
+             <tfoot>
+              <tr><th>SENTENCE ID</th><th>MATCHING SENTENCE</th><th>HITS</th></tr>
+             </tfoot>
+             <tbody>
+             ';
+      
+      foreach ($sentences as $id => $sentence) { // print matching sentence and hits per sentence
+	$hlsentence=HighlightSentenceRegex($sentence,$regex); // highlight sentence
+
+	$trans = array('"' => '&quot;', "'" => "&apos;"); // deal with quotes/apos
+	$hls=strtr("$hlsentence", $trans);
+
+	print '<tr><td>'.$id.'</td><td>'.$hlsentence.'</td><td>'.$counthits[$id].'</td></tr>';
+      }
+      print "</tbody></table>\n<br/><br/>\n";
+
+}
+
 
 function HighlightSentence($sentence,$beginlist) {
   if (preg_match('/<i>/', $sentence)) {
@@ -131,5 +224,10 @@ function HighlightSentence($sentence,$beginlist) {
     $hlsentence=$prev.' '.$hlsentence.' '.$next;
   }
   return $hlsentence;
+}
+
+function HighlightSentenceRegex($sentence,$regex) {
+$hlsentence=preg_replace("/($regex)/i", "<b>$1</b>", $sentence); // put string in boldface
+return $hlsentence;
 }
 ?>
