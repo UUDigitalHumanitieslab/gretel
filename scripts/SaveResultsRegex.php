@@ -44,6 +44,8 @@ $context=$_SESSION['ct'];
   else {
     $context=0;
   }
+
+$case=$_SESSION["case"];
 /***********************************************************/
 /* INCLUDES */
 
@@ -62,7 +64,7 @@ $subtreebanks=explode('-', $subtb);
 
 try {
    // get counts and sentences
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($regex,$case,$treebank,$subtreebanks,$session); 
+    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($regex,$case,$treebank,$subtreebanks,$session,$context); 
 
   
   // print results

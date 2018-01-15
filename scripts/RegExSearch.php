@@ -1,6 +1,6 @@
 <?php
 
-function GetResults($string,$case,$treebank,$subtreebanks,$session) {
+function GetResults($string,$case,$treebank,$subtreebanks,$session,$contextflag) {
 
   $database=Corpus2DB($subtreebanks,$treebank); // rename corpora to database names
 
@@ -64,18 +64,24 @@ while ($row = pg_fetch_row($results)) {
       $sentid=$row[0];
       $sentence=$row[1];
 
-    // $context=GetContextLASSY($sentid);
-    // $prev=array_shift($context);
-    // $next=array_shift($context);
-
       $convertedstring=preg_replace('/\\\\\\\\y/i','\\b',$string); //change word boundary symbol
 
-      if (preg_match("/($convertedstring)/i", $sentence)) {
+    if (preg_match("/($convertedstring)/i", $sentence)) {
       preg_match_all("/($convertedstring)/i", $sentence, $hits);
 
-$chits=count($hits[0]); // count hits in sentence
+    $chits=count($hits[0]); // count hits in sentence
 
-$sentences{$sentid}=$sentence; // put sentences in a hash
+    if ($contextflag == "1") {
+      $context=GetContext($sentid,$db,$session);
+      $prev=array_shift($context);
+      $next=array_shift($context);
+      $sentences{$sentid}=$prev.'<i>'.$sentence.'</i>'.$next; // put sentences + context in a hash
+    }
+
+  else {
+    $sentences{$sentid}=$sentence; // put sentences in a hash
+  }
+
 $counthits{$sentid}=$chits; // put hits per sentence in a hash
 
 $i=$i+$chits; // add hit count to total
@@ -93,8 +99,8 @@ $i=$i+$chits; // add hit count to total
   $words=preg_replace('/[\\?\\*\\!\\+\\.]/i','',$words); //remove .?*+
   $words=preg_replace('/ /i','-',$words);
 
-$wordlist{$sentid}=$words;
-      }
+  $wordlist{$sentid}=$words;
+  }
 }     
 
 } // end while
@@ -225,58 +231,23 @@ function SetDB2CorpusDetailed($corpus) {
   return ($CORPUS);
 }
 
-// COPIED FROM s-results-lassy.php
+function GetContext($sentid,$subtb,$session) {
 
-function GetContextLASSY($id) {
-  $dbname="lassy";
-  $dbmachine="asterix";
-  $dbport=5432;
-  $dbuser='vincent';
-  $dbpwd='vincent';
-  
-  $conn_string="dbname=$dbname host=$dbmachine port=$dbport user=$dbuser password=$dbpwd";
-  $db=pg_connect($conn_string) or die('connection failed');
-
-  preg_match('/(.*?s\.)(\d+)/',$id, $match);
+  preg_match('/(.*?s\.)(\d+)/',$sentid, $match);
   $text=$match[1];
-
-  // $corpus=$match[2];
-  if ( preg_match('/^wiki/',$text)) {
-    $corpus="wiki";
-  }
-  
-  if ( preg_match('/^dpc/',$text)) {
-    $corpus="dpc";
-  }  
-  if ( preg_match('/^WR-P-E/',$text)) {
-    $corpus="wrpe";
-  }
-  if ( preg_match('/^WR-P-P/',$text)) {
-    $corpus="wrpp";
-  }
-  if ( preg_match('/^WS-U/',$text)) {
-    $corpus="wsu";
-  }
-  
   $snr=$match[2];
   
-  // echo "C $corpus\tT $text\tS $snr\n";
   $prev=$snr-1;
   $next=$snr+1;
   $previd=$text.$prev;
   $nextid=$text.$next;
-  $prevsql = "select sentence from $corpus where file = '$previd';";
-  $nextsql = "select sentence from $corpus where file = '$nextid';";
+  $prevsql = "select sentence from $subtb where file = '$previd';";
+  $nextsql = "select sentence from $subtb where file = '$nextid';";
   $prevresult = pg_query($session, $prevsql);
   $nextresult = pg_query($session, $nextsql);
 
   $nextcontext = pg_fetch_row($nextresult);
   $prevcontext = pg_fetch_row($prevresult);
-
-    // if (!$result) {
-  // echo "An error occured.\n";
-  // exit;
-  //}
 
   $context=array();
   array_push($context, "$prevcontext[0]");

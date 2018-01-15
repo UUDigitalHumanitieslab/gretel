@@ -199,7 +199,7 @@ require("$formatresults"); // functions to format the treebank results
   // get results
   try {
     // get counts and sentences
-    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($string,$case,$treebank,$subtreebanks,$session); 
+    list($HITS,$MS,$TOTALS,$TOTALCOUNTS,$sentences,$counthits,$wordlist) = GetResults($string,$case,$treebank,$subtreebanks,$session,$context); 
  
  
   // print query
