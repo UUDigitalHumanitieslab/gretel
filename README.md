@@ -1,6 +1,7 @@
 # GrETEL 2.0
 
 ## INFO
+v2.0.4 January 2018: regular expression search mode included
 v2.0.3 November 2016: bug fix footer
 v2.0.2 November 2016: minor bug fixes + SoNaR disabled 
 v2.0.1 March 2016: minor bug fixes

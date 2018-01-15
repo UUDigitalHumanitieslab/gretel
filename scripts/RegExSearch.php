@@ -72,7 +72,7 @@ while ($row = pg_fetch_row($results)) {
     $chits=count($hits[0]); // count hits in sentence
 
     if ($contextflag == "1") {
-      $context=GetContext($sentid,$db,$session);
+      $context=GetContext($sentid,$db,$treebank,$session);
       $prev=array_shift($context);
       $next=array_shift($context);
       $sentences{$sentid}=$prev.'<i>'.$sentence.'</i>'.$next; // put sentences + context in a hash
@@ -231,16 +231,31 @@ function SetDB2CorpusDetailed($corpus) {
   return ($CORPUS);
 }
 
-function GetContext($sentid,$subtb,$session) {
+function GetContext($sentid,$subtb,$treebank,$session) {
 
+
+  if ($treebank=='cgn') {
+  preg_match('/(f..\d+)\_\_(\d+)/',$sentid, $match); 
+  }
+  
+  else {
   preg_match('/(.*?s\.)(\d+)/',$sentid, $match);
+  }
+
   $text=$match[1];
   $snr=$match[2];
-  
   $prev=$snr-1;
   $next=$snr+1;
+
+  if ($treebank == 'cgn') {
+  $previd=$text.'__'.$prev;
+  $nextid=$text.'__'.$next;
+  }
+
+  else {
   $previd=$text.$prev;
-  $nextid=$text.$next;
+  $nextid=$text.$next; 
+  }
   $prevsql = "select sentence from $subtb where file = '$previd';";
   $nextsql = "select sentence from $subtb where file = '$nextid';";
   $prevresult = pg_query($session, $prevsql);

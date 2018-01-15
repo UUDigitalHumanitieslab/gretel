@@ -68,6 +68,8 @@ GrETEL is developed at the <a href="http://www.ccl.kuleuven.be" target="_blank">
 <li><a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a></li>
 <li><a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and documentation</a></li>
 <li><a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications and Talks</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/project/php/TreebankFreqsLASSY.html"  target="_blank">Linguistic annotations in Lassy Small</a></li>
+<li><a href="http://gretel.ccl.kuleuven.be/project/php/TreebankFreqsCGN.html"  target="_blank">Linguistic annotations in CGN</a></li>
 </ul>
 </td>
 <td>
