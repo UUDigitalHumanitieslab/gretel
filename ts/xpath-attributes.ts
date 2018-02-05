@@ -1,4 +1,5 @@
-// based on https://www.let.rug.nl/vannoord/Lassy/sa-man_lassy.pdf and https://github.com/rug-compling/paqu/blob/master/src/pqserve/attributes.txt
+// based on https://www.let.rug.nl/vannoord/Lassy/sa-man_lassy.pdf,
+// https://www.let.rug.nl/vannoord/Lassy/alpino_ds.dtd and https://github.com/rug-compling/paqu/blob/master/src/pqserve/attributes.txt
 type XPathAttribute = {
     description: string,
     /**
@@ -10,7 +11,14 @@ type XPathAttribute = {
 export let XpathAttributes: { [name: string]: XPathAttribute } = {
     'aform': { description: '', values: [] },
     'begin': { description: 'Begin position', values: [] },
-    'buiging': { description: '', values: [] },
+    'buiging': {
+        description: '',
+        values: [
+            ['zonder', ''],
+            ['met-e', ''],
+            ['met-s', '']
+        ]
+    },
     'case': {
         description: 'Finite verb case',
         values: [
@@ -66,7 +74,13 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['e_als', '"zoveel"']
         ]
     },
-    'conjtype': { description: '', values: [] },
+    'conjtype': {
+        description: 'Conjunction',
+        values: [
+            ['neven', 'Correlative'],
+            ['onder', 'Subordinating']
+        ]
+    },
     'def': {
         description: 'Article definiteness',
         values: [
@@ -74,7 +88,12 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['indef', ''],
             ['both', '']]
     },
-    'dial': { description: '', values: [] },
+    'dial': {
+        description: '',
+        values: [
+            ['dial', '']
+        ]
+    },
     'end': { description: 'End position', values: [] },
     'frame': { description: 'Full lexical category', values: [] },
     'gen': {
@@ -84,10 +103,40 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['both', '']
         ]
     },
-    'genus': { description: '', values: [] },
-    'getal': { description: '', values: [] },
-    'getal-n': { description: '', values: [] },
-    'graad': { description: '', values: [] },
+    'genus': {
+        description: '',
+        values: [
+            ['genus', ''],
+            ['zijd', ''],
+            ['masc', ''],
+            ['fem', ''],
+            ['onz', '']
+        ]
+    },
+    'getal': {
+        description: '',
+        values: [
+            ['getal', ''],
+            ['ev', ''],
+            ['mv', '']
+        ]
+    },
+    'getal-n': {
+        description: '',
+        values: [
+            ['zonder-n', ''],
+            ['mv-n', '']
+        ]
+    },
+    'graad': {
+        description: '',
+        values: [
+            ['basis', ''],
+            ['comp', ''],
+            ['sup', ''],
+            ['dim', '']
+        ]
+    },
     'his': { description: '', values: [] },
     'his_1': { description: '', values: [] },
     'his_2': { description: '', values: [] },
@@ -170,10 +219,26 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
     },
     'lcat': { description: 'Complementized category', values: [] },
     'lemma': { description: 'Word lemma', values: [] },
-    'lwtype': { description: '', values: [] },
+    'lwtype': {
+        description: '',
+        values: [
+            ['bep', ''],
+            ['onbep', '']
+        ]
+    },
     'mwu_root': { description: '', values: [] },
     'mwu_sense': { description: '', values: [] },
-    'naamval': { description: '', values: [] },
+    'naamval': {
+        description: '',
+        values: [
+            ['stan', ''],
+            ['nomin', ''],
+            ['obl', ''],
+            ['bijz', ''],
+            ['gen', ''],
+            ['dat', '']
+        ]
+    },
     'neclass': {
         description: 'Named entity class',
         values: [
@@ -184,8 +249,27 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['year', 'Year']
         ]
     },
-    'npagr': { description: '', values: [] },
-    'ntype': { description: '', values: [] },
+    'npagr': {
+        description: '',
+        values: [
+            ['agr', ''],
+            ['evon', ''],
+            ['rest', ''],
+            ['evz', ''],
+            ['mv', ''],
+            ['agr3', ''],
+            ['evmo', ''],
+            ['rest3', ''],
+            ['evf', '']
+        ]
+    },
+    'ntype': {
+        description: '',
+        values: [
+            ['soort', ''],
+            ['eigen', '']
+        ]
+    },
     'num': {
         description: 'Number',
         values: [
@@ -198,10 +282,24 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['sg_num', '']
         ]
     },
-    'numtype': { description: '', values: [] },
+    'numtype': {
+        description: '',
+        values: [
+            ['hoofd', ''],
+            ['rang', '']
+        ]
+    },
     'other_id': { description: '', values: [] },
     'pb': { description: '', values: [] },
-    'pdtype': { description: '', values: [] },
+    'pdtype': {
+        description: '',
+        values: [
+            ['pron', ''],
+            ['adv-pron', ''],
+            ['det', ''],
+            ['grad', '']
+        ]
+    },
     'per': {
         description: 'Person',
         values: [
@@ -215,7 +313,20 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
         ]
     },
     'personalized': { description: '', values: [] },
-    'persoon': { description: '', values: [] },
+    'persoon': {
+        description: '',
+        values: [
+            ['1', ''],
+            ['2', ''],
+            ['2v', ''],
+            ['2b', ''],
+            ['3', ''],
+            ['3p', ''],
+            ['3m', ''],
+            ['3v', ''],
+            ['3o', '']
+        ]
+    },
     'pos': {
         description: 'Simplified POS-tag',
         values: [
@@ -243,9 +354,17 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
             ['UNKNOWN', 'Parse problem']
         ]
     },
-    'positie': { description: '', values: [] },
-    'postag': {
+    'positie': {
         description: '',
+        values: [
+            ['prenom', ''],
+            ['nom', ''],
+            ['postnom', ''],
+            ['vrij', '']
+        ]
+    },
+    'postag': {
+        description: 'POS-tag CGN/DCOI/LASSY style',
         values: [
             ['N(soort,ev,basis,zijd,stan)', 'die stoel, deze muziek, de filter'],
             ['N(soort,ev,basis,onz,stan)', 'het kind, ons huis, het filter'],
@@ -572,9 +691,39 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
         ]
     },
     'pron': { description: '', values: [] },
-    'pt': { description: '', values: [] },
-    'pvagr': { description: '', values: [] },
-    'pvtijd': { description: '', values: [] },
+    'pt': {
+        description: '',
+        values: [
+            ['let', ''],
+            ['spec', ''],
+            ['bw', ''],
+            ['vg', ''],
+            ['lid', ''],
+            ['vnw', ''],
+            ['tw', ''],
+            ['ww', ''],
+            ['adj', ''],
+            ['n', ''],
+            ['tsw', ''],
+            ['vz', '']
+        ]
+    },
+    'pvagr': {
+        description: '',
+        values: [
+            ['ev', ''],
+            ['mv', ''],
+            ['met-t', '']
+        ]
+    },
+    'pvtijd': {
+        description: '',
+        values: [
+            ['tgw', ''],
+            ['verl', ''],
+            ['conj', '']
+        ]
+    },
     'refl': { description: '', values: [] },
     'rel': {
         description: 'Dependency relation',
@@ -617,13 +766,56 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
     'sc': { description: 'Sub-categorization frame', values: [] },
     'sense': { description: 'Word sense', values: [] },
     'special': { description: '', values: [] },
-    'spectype': { description: '', values: [] },
-    'status': { description: '', values: [] },
+    'spectype': {
+        description: '',
+        values: [
+            ['afgebr', ''],
+            ['onverst', ''],
+            ['vreemd', ''],
+            ['deeleigen', ''],
+            ['meta', ''],
+            ['comment', ''],
+            ['achter', ''],
+            ['afk', ''],
+            ['symb', ''],
+            ['enof', '']
+        ]
+    },
+    'status': {
+        description: '',
+        values: [
+            ['vol', ''],
+            ['red', ''],
+            ['nadr', '']
+        ]
+    },
     'stype': { description: '', values: [] },
     'tense': { description: 'Word tense', values: [['past', '']] },
     'vform': { description: '', values: [] },
-    'vwtype': { description: '', values: [] },
-    'vztype': { description: '', values: [] },
+    'vwtype': {
+        description: '',
+        values: [
+            ['pr', ''],
+            ['pers', ''],
+            ['refl', ''],
+            ['recip', ''],
+            ['bez', ''],
+            ['vb', ''],
+            ['vrag', ''],
+            ['betr', ''],
+            ['excl', ''],
+            ['aanw', ''],
+            ['onbep', '']
+        ]
+    },
+    'vztype': {
+        description: '',
+        values: [
+            ['init', ''],
+            ['versm', ''],
+            ['fin', '']
+        ]
+    },
     'wh': {
         description: 'Question word',
         values: [
@@ -637,5 +829,13 @@ export let XpathAttributes: { [name: string]: XPathAttribute } = {
     'wk': { description: '', values: [] },
     'word': { description: 'Surface form', values: [] },
     'word_is_': { description: '', values: [] },
-    'wvorm': { description: '', values: [] },
+    'wvorm': {
+        description: '',
+        values: [
+            ['pv', ''],
+            ['inf', ''],
+            ['od', ''],
+            ['vd', '']
+        ]
+    },
 }
