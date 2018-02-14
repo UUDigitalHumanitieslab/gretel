@@ -152,6 +152,13 @@ else {
   $_SESSION["wb"]="off";
 }
 
+// get context option
+if (isset($_POST["ct"])) {
+  $_SESSION["ct"]="on";
+}
+else {
+  $_SESSION["ct"]="off";
+}
 
 $_SESSION['search']="research"; // set search mode
 chop($input);
@@ -188,11 +195,6 @@ echo '</div>';
 echo '<div class="lassy box">';
 require("$lassytable");
 echo '</div>';
-
-// include context
-echo '<p><b>OPTION</b></p>
-  <input type="checkbox" name="ct" value="on" />Include context (one sentence before and after the matching sentence)';
-echo '<br/><br/>';
 
 echo $new.$continue;
 

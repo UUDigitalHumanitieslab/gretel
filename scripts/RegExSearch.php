@@ -17,7 +17,7 @@ function GetResults($string,$case,$treebank,$subtreebanks,$session,$contextflag)
 // count matching sentences
   foreach ($database as $db) {
 
-  if ($case == "IS") {
+  if ($case == "CI") {
     $sqlcnt = "select count(*) from $db where sentence ~* '$string';";
   }
   else {
@@ -42,7 +42,7 @@ foreach ($database as $db) {
 
 
   foreach ($database as $db) {
-if ($case == "IS") {
+if ($case == "CI") {
     $sqlmatch = "select file, sentence from $db where sentence ~* '$string';";
   }
   else {
@@ -75,7 +75,7 @@ while ($row = pg_fetch_row($results)) {
       $context=GetContext($sentid,$db,$treebank,$session);
       $prev=array_shift($context);
       $next=array_shift($context);
-      $sentences{$sentid}=$prev.'<i>'.$sentence.'</i>'.$next; // put sentences + context in a hash
+      $sentences{$sentid}=$prev.' <i>'.$sentence.'</i> '.$next; // put sentences + context in a hash
     }
 
   else {

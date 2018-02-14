@@ -58,13 +58,17 @@ if (isset($_SESSION['string'])) { // find previous input example
 
 echo '
 <input type="text" name="string" size=50 value="'.$input.'" id="string" />
-<button type="button" onClick="copyText();" id="clear">Clear</button><br/><br/>
+<button type="button" onClick="copyText();" id="clear">Clear</button><br/><br/><br/>
 ';
 
 echo '
-<input type="radio" name="case" value="CI" checked />Case insensitive search [CI]<br/>
-<input type="radio" name="case" value="CS" />Case sensitive search [CS]<br/>
+<b>OPTIONS</b><br/><br/>
 <input type="checkbox" name="wb" value="on" checked/>Word boundaries<br/><br/>
+
+<input type="radio" name="case" value="CI" checked />Case insensitive search [CI]<br/>
+<input type="radio" name="case" value="CS" />Case sensitive search [CS]<br/><br/>
+
+<input type="checkbox" name="ct" value="on" />Include context (one sentence before and after the matching sentence)<br/><br/>
 ';
 
 echo $continue;

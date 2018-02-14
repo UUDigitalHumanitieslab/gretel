@@ -173,21 +173,23 @@ require("$formatresults"); // functions to format the treebank results
   }
   
   // get case option
-  if (isset($_SESSION["case"])) {
-    $case=$_SESSION["case"];
+  if ($_SESSION["case"]=="CS") {
+    $case="CS";
+    $caseinfo="case sensitive";
   }
   else {
     $case="CI";
+    $caseinfo="case insensitive";
   }
   
 // get context option
-  if (isset($_POST["ct"])) {
+  if ($_SESSION["ct"]=="on") {
     $context=1;
-    $_SESSION["ct"]="on";
+    $contextinfo="on";
   }
   else {
     $context=0;
-    $_SESSION["ct"]="off";
+    $contextinfo="off";
   }
 
   // create session
@@ -218,6 +220,13 @@ require("$formatresults"); // functions to format the treebank results
 <tr>
 <th  align="left">Treebank</th><td>'.strtoupper($treebank).' ['.$components.']</td>
 </tr>
+<tr>
+<th  align="left">Options</th><td>Case: '.$caseinfo.'</td>
+</tr>
+<tr>
+<th></th><td>Context: '.$contextinfo.'</td>
+</tr>
+
 </table><br/>
 '; 
 
