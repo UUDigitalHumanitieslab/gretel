@@ -1,5 +1,4 @@
 <?php
-
 $currentPage = 'home';
 require "config.php";
 require ROOT_PATH."/helpers.php";
