@@ -9,7 +9,9 @@ $router = new AltoRouter();
 $router->setBasePath("/gretel/api/src/router.php");
 $alpinoDirectory = "/opt/Alpino";
 define('ROOT_PATH', "/vagrant/vagrant_data/gretel");
-// map test
+
+
+// Test route to show as an example (remove before merging with develop)
 $router->map( 'GET', '/test_route', function() {
     $data = [
             'payload' => 'test'
@@ -19,9 +21,8 @@ $router->map( 'GET', '/test_route', function() {
 });
 
 
-// map to get
+//
 $router->map('POST', '/parse_sentence', function() {
-
     $sentence = $_POST['sentence'];
     //TODO: make the id random.
     $location = alpino($sentence, 1233);

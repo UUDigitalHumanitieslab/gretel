@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Observable, from} from "rxjs/Observable";
-import * as rxjs from 'rxjs'
+import {Observable} from "rxjs/Observable";
+import * as rxjs from 'rxjs';
 import {HttpClient} from "@angular/common/http";
 import { HttpHeaders } from '@angular/common/http';
 @Injectable()
@@ -17,7 +17,7 @@ export class AlpinoService {
 
       })
     };
-    let url = "http://localhost:8080/gretel/api/src/router.php/parse_sentence";
+    const url = 'http://localhost:8080/gretel/api/src/router.php/parse_sentence';
     return this.http.post(url, sentence);
 
   }

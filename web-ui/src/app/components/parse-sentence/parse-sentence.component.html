@@ -1,3 +1,7 @@
 <input type="text" #sentence>
 <button (click)="parseSentence(sentence)">parse!</button>
-{{link}}
+<div>
+  Reference:
+  <p  *ngIf="link">{{link | json}}</p>
+</div>
+
