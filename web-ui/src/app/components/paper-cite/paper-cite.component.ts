@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-paper-cite',
@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PaperCiteComponent implements OnInit {
 
+    @Input() href: string;
   constructor() { }
 
   ngOnInit() {

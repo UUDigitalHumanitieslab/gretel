@@ -1,13 +1,8 @@
 <nav class="primary-navigation">
   <ul>
-    <li><a  title="Home"
-            class="active">Home</a></li>
-    <li><a  title="Example-based search"
-    >Example-based search</a></li>
-    <li><a  title="XPath search"
-    >XPath search</a></li>
-    <li><a routerLink="/documentation" routerLinkActive="active" title="Documentation"
-    >Documentation</a></li>
+    <li *ngFor="let link of links">
+      <a title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="active">{{link.name}}</a>
+    </li>
   </ul>
   <button name="show-menu">
     <i class="fa fa-fw fa-bars" aria-hidden="true"></i>

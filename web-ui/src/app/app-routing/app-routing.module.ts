@@ -6,13 +6,26 @@ import {DocumentationComponent} from "../pages/documentation/documentation.compo
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     component: HomePageComponent
   },
   {
     path: 'documentation',
     component: DocumentationComponent
   },
+  {
+    path: 'example-based-search',
+    component: HomePageComponent
+  },
+  {
+    path: 'xpath-search',
+    component: HomePageComponent
+  },
+  {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({

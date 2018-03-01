@@ -18,6 +18,8 @@ import {AdressComponent} from './components/adress/adress.component';
 import {PaperCiteComponent} from './components/paper-cite/paper-cite.component';
 import {AppRoutingModule} from "./app-routing/app-routing.module";
 import {DocumentationComponent} from './pages/documentation/documentation.component';
+import { GretelWebsiteLinkComponent } from './components/gretel-website-link/gretel-website-link.component';
+import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 
 
 @NgModule({
@@ -35,6 +37,8 @@ import {DocumentationComponent} from './pages/documentation/documentation.compon
     AdressComponent,
     PaperCiteComponent,
     DocumentationComponent,
+    GretelWebsiteLinkComponent,
+    DocumentationContentComponent,
 
   ],
   imports: [
