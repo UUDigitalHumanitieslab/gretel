@@ -12,7 +12,7 @@ interface RouteWrapper {
 
 const wrappedRoutes: RouteWrapper[] = [
     {
-      name: 'home',
+      name: 'Home',
       link: '/home',
       proxy: false,
       route: {
@@ -23,7 +23,7 @@ const wrappedRoutes: RouteWrapper[] = [
     },
 
   {
-    name: 'example-based-search',
+    name: 'Example-based search',
     link: '/gretel/ebs/input.php',
     proxy: true,
     route: {
@@ -32,7 +32,7 @@ const wrappedRoutes: RouteWrapper[] = [
     },
   },
   {
-    name: 'x-path-search',
+    name: 'XPath search',
     link: '/gretel/xps/input.php',
     proxy: true,
     route: {
@@ -42,7 +42,7 @@ const wrappedRoutes: RouteWrapper[] = [
 
 },
   {
-    name: 'documentation',
+    name: 'Documentation',
     link: '/documentation',
     proxy: false,
     route: {
@@ -59,10 +59,10 @@ const wrappedRoutes: RouteWrapper[] = [
 const routes: Routes = wrappedRoutes.map(route => route.route);
 
 const mainRoutesNames = [
-  "home",
-  "example-based-search",
-  "x-path-search",
-  "documentation"
+  "Home",
+  "Example-based Search",
+  "X-path Search",
+  "Documentation"
 ];
 
 const mainRoutes : RouteWrapper[] =  wrappedRoutes.filter(route => mainRoutesNames.includes(route.name));
