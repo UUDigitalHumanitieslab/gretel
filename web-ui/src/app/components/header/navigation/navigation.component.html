@@ -1,0 +1,14 @@
+<nav class="primary-navigation">
+  <ul>
+    <li *ngFor="let link of links">
+
+      <a *ngIf="! link.proxy; else phplink" title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="active">{{link.name}}</a>
+
+      <ng-template #phplink><a href="{{link.link}}">{{link.name}}</a></ng-template>
+    </li>
+  </ul>
+  <button name="show-menu">
+    <i class="fa fa-fw fa-bars" aria-hidden="true"></i>
+    <span class="sr-only">Open the mobile menu</span>
+  </button>
+</nav>
