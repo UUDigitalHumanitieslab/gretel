@@ -13,13 +13,13 @@ import {NavigationComponent} from './components/header/navigation/navigation.com
 import {BodyHeaderComponent} from './components/body-header/body-header.component';
 import {FooterComponent} from './components/footer/footer.component';
 import {HomeContentComponent} from './pages/home-page/home-content/home-content.component';
-import {FaListComponent} from './components/fa-list/fa-list.component';
 import {AdressComponent} from './components/adress/adress.component';
 import {PaperCiteComponent} from './components/paper-cite/paper-cite.component';
 import {AppRoutingModule} from "./app-routing/app-routing.module";
 import {DocumentationComponent} from './pages/documentation/documentation.component';
 import { GretelWebsiteLinkComponent } from './components/gretel-website-link/gretel-website-link.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
+import { FooterNavigationComponent } from './components/footer/footer-navigation/footer-navigation.component';
 
 
 @NgModule({
@@ -33,12 +33,12 @@ import { DocumentationContentComponent } from './pages/documentation/documentati
     BodyHeaderComponent,
     FooterComponent,
     HomeContentComponent,
-    FaListComponent,
     AdressComponent,
     PaperCiteComponent,
     DocumentationComponent,
     GretelWebsiteLinkComponent,
     DocumentationContentComponent,
+    FooterNavigationComponent,
 
   ],
   imports: [

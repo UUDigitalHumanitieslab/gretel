@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FaListComponent } from './fa-list.component';
+import { FooterNavigationComponent } from './footer-navigation.component';
 
-describe('FaListComponent', () => {
-  let component: FaListComponent;
-  let fixture: ComponentFixture<FaListComponent>;
+describe('FooterNavigationComponent', () => {
+  let component: FooterNavigationComponent;
+  let fixture: ComponentFixture<FooterNavigationComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FaListComponent ]
+      declarations: [ FooterNavigationComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FaListComponent);
+    fixture = TestBed.createComponent(FooterNavigationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

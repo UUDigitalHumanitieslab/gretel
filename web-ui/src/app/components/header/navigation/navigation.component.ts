@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Link} from "./link";
+import {mainRoutes, RouteWrapper} from "../../../routes";
 
 @Component({
   selector: 'app-navigation',
@@ -8,30 +8,11 @@ import {Link} from "./link";
 })
 
 
-export class NavigationComponent implements OnInit {
 
-  links: Link[] = [
-    {
-      title: "home",
-      name: "Home",
-      link: "/home"
-    },
-    {
-      title: "example-based-search",
-      name: "Example-based search",
-      link: "/example-based-search"
-    },
-    {
-      title: "XPath-search",
-      name: "XPath search",
-      link: "/xpath-search"
-    },
-    {
-      title: "documentation",
-      name: "Documentation",
-      link: "/documentation"
-    }
-  ]
+export class NavigationComponent implements OnInit {
+  links: RouteWrapper[] = mainRoutes;
+
+
   constructor() { }
 
   ngOnInit() {

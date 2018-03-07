@@ -1,7 +1,10 @@
 <nav class="primary-navigation">
   <ul>
     <li *ngFor="let link of links">
-      <a title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="active">{{link.name}}</a>
+
+      <a *ngIf="! link.proxy; else phplink" title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="active">{{link.name}}</a>
+
+      <ng-template #phplink><a href="{{link.link}}">{{link.name}}</a></ng-template>
     </li>
   </ul>
   <button name="show-menu">
