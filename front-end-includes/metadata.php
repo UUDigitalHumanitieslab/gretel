@@ -101,23 +101,27 @@ function get_metadata_counts($sid)
     $result = array();
     foreach ($_SESSION[$sid]['startDatabases'] as $database) {
         $xquery = '{
-		  for $n
-		  in (
-			for $node
-			in db:open("'.$database.'")'.$xpath.'
-			return $node/ancestor::alpino_ds/metadata/meta)
-		  let $k := $n/@name
-		  let $t := $n/@type
-		  group by $k, $t
-		  order by $k, $t
-		  return element {$k} {
-			attribute type {$t},
-			for $m in $n
-			let $v := $m/@value
-			group by $v
-			return element value { attribute type {$v}, count($m) }
-		  }
-		}';
+            for $n
+            in (
+                for $node
+                in db:open("'.$database.'")'.$xpath.'
+                return $node/ancestor::alpino_ds/metadata/meta)
+            let $k := $n/@name
+            let $t := $n/@type
+            group by $k, $t
+            order by $k, $t
+
+            return element meta {
+                attribute name {$k},
+                attribute type {$t},
+                for $m in $n
+                let $v := $m/@value
+                group by $v
+                return element count { 
+                    attribute value {$v}, count($m)
+                }
+            }
+        }';
 
         $m_query = '<metadata>'.$xquery.'</metadata>';
 
@@ -141,19 +145,20 @@ function show_metadata_facets($corpus, $sid)
     foreach (get_metadata_counts($sid) as $db => $m) {
         $xml = new SimpleXMLElement($m);
         foreach ($xml as $group => $counts) {
+            $name = (string) $counts['name'];
             $a2 = array();
             foreach ($counts as $k => $v) {
-                $a2[(string) $v['type']] = (int) $v;
+                $a2[(string) $v['value']] = (int) $v;
             }
-            if (isset($totals[$group])) {
-                $a1 = $totals[$group];
+            if (isset($totals[$name])) {
+                $a1 = $totals[$name];
                 $sums = array();
                 foreach (array_keys($a1 + $a2) as $key) {
                     $sums[$key] = (isset($a1[$key]) ? $a1[$key] : 0) + (isset($a2[$key]) ? $a2[$key] : 0);
                 }
-                $totals[$group] = $sums;
+                $totals[$name] = $sums;
             } else {
-                $totals[$group] = $a2;
+                $totals[$name] = $a2;
             }
         }
     }
