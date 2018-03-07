@@ -56,16 +56,16 @@ const wrappedRoutes: RouteWrapper[] = [
 ];
 
 
-const routes: Routes = wrappedRoutes.map(route => route.route);
+var routes: Routes = wrappedRoutes.map(route => route.route);
 
 const mainRoutesNames = [
   "Home",
-  "Example-based Search",
-  "X-path Search",
+  "Example-based search",
+  "XPath search",
   "Documentation"
 ];
 
-const mainRoutes : RouteWrapper[] =  wrappedRoutes.filter(route => mainRoutesNames.includes(route.name));
+var mainRoutes : RouteWrapper[] =  wrappedRoutes.filter(route => mainRoutesNames.includes(route.name));
 
 
 export {RouteWrapper, routes, wrappedRoutes, mainRoutes}
