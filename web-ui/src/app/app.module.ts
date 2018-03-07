@@ -8,7 +8,7 @@ import {AlpinoService} from "./services/alpino.service";
 import {HttpClientModule} from "@angular/common/http";
 import {HomePageComponent} from './pages/home-page/home-page.component';
 import {HeaderComponent} from './components/header/header.component';
-import {LogoComponent} from './components/logo/logo.component';
+import {LogoComponent} from './components/header/logo/logo.component';
 import {NavigationComponent} from './components/header/navigation/navigation.component';
 import {BodyHeaderComponent} from './components/body-header/body-header.component';
 import {FooterComponent} from './components/footer/footer.component';

@@ -12,24 +12,28 @@ export class FooterComponent implements OnInit {
 
   navigationItems: FaListItem[] = [
     {
-      'htmlClass': 'fa-caret-right',
-      'href': 'https://www.google.com',
-      'content': 'Homepage Gretel',
+      htmlClass: 'fa-caret-right',
+      title: "home",
+      name: "Home",
+      link: "/home"
     },
     {
-      'htmlClass': 'fa-caret-right',
-      'href': 'https://www.google.com',
-      'content': 'Example-based search',
+      htmlClass: 'fa-caret-right',
+      title: "example-based-search",
+      name: "Example-based search",
+      link: "/example-based-search"
     },
     {
-      'htmlClass': 'fa-caret-right',
-      'href': 'https://www.google.com',
-      'content': 'XPath search',
+      htmlClass: 'fa-caret-right',
+      title: "XPath-search",
+      name: "XPath search",
+      link: "/xpath-search"
     },
     {
-      'htmlClass': 'fa-caret-right',
-      'href': 'https://www.google.com',
-      'content': 'Documentation',
+      htmlClass: 'fa-caret-right',
+      title: "documentation",
+      name: "Documentation",
+      link: "/documentation"
     }
   ];
 

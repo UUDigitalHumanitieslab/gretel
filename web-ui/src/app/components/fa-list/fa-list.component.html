@@ -1,6 +1,6 @@
 <ul class="fa-ul">
   <li *ngFor="let item of items">
-  <span class="fa-li"><i class="fas {{item.htmlClass}}"></i></span>
-    <a href="{{item.href}}">{{item.content}}</a>
+  <span class="fa-li"><i class="fas {{item.htmlClass}}" ></i></span>
+    <a routerLink="{{item.link}}">{{item.title}}</a>
   </li>
 </ul>

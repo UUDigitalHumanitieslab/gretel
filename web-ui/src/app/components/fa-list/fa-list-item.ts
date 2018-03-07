@@ -1,5 +1,4 @@
-export interface FaListItem {
+import {Link} from "../header/navigation/link";
+export interface FaListItem extends Link{
   htmlClass: string;
-  href: string;
-  content: string;
 }
