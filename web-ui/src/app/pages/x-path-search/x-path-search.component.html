@@ -1,0 +1,9 @@
+<app-body-header>XPath Search</app-body-header>
+<app-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="currentStep"></app-breadcrumb-bar>
+
+<div class="container" [ngSwitch]="this.currentStep">
+  <app-xpath-input *ngSwitchCase="1" (isValid)="setValidState($event)" #xpathInput></app-xpath-input>
+</div>
+
+<button (click)="prev()">prev</button>
+<button (click)="next()">next</button>

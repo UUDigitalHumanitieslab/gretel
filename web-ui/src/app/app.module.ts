@@ -19,7 +19,15 @@ import {DocumentationComponent} from './pages/documentation/documentation.compon
 import { GretelWebsiteLinkComponent } from './components/gretel-website-link/gretel-website-link.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { FooterNavigationComponent } from './components/footer/footer-navigation/footer-navigation.component';
-
+import { XPathSearchComponent } from './pages/x-path-search/x-path-search.component';
+import { Header3Component } from './components/header-3/header-3.component';
+import { XpathEditorComponent } from './components/xpath-editor/xpath-editor.component';
+import { StepsNavigatorComponent } from './components/steps-navigator/steps-navigator.component';
+import {XPathSearchService} from "./x-path-search.service";
+import {LinkService} from "./services/link.service";
+import { StepComponent } from './components/step/step.component';
+import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
+import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 
 @NgModule({
   declarations: [
@@ -37,15 +45,24 @@ import { FooterNavigationComponent } from './components/footer/footer-navigation
     GretelWebsiteLinkComponent,
     DocumentationContentComponent,
     FooterNavigationComponent,
-
+    XPathSearchComponent,
+    Header3Component,
+    XpathEditorComponent,
+    StepsNavigatorComponent,
+    StepComponent,
+    XpathInputComponent,
+    BreadcrumbBarComponent,
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+
   ],
   providers: [
-    AlpinoService
+    AlpinoService,
+    XPathSearchService,
+    LinkService,
   ],
   bootstrap: [AppComponent]
 })

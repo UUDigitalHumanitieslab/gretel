@@ -1,72 +1,37 @@
 import {HomePageComponent} from "./pages/home-page/home-page.component";
 import {Route, Routes} from "@angular/router";
 import {DocumentationComponent} from "./pages/documentation/documentation.component";
-
-interface RouteWrapper {
-  name: string,
-  link: string,
-  proxy: boolean
-  route: Route,
-}
+import {XPathSearchComponent} from "./pages/x-path-search/x-path-search.component";
 
 
-const wrappedRoutes: RouteWrapper[] = [
-    {
-      name: 'Home',
-      link: '/home',
-      proxy: false,
-      route: {
-        path: 'home',
-        component: HomePageComponent
-      }
 
-    },
 
+
+const routes: Routes = [
   {
-    name: 'Example-based search',
-    link: '/gretel/ebs/input.php',
-    proxy: true,
-    route: {
-      path: 'example-based-search',
-      component: DocumentationComponent
-    },
+    path: 'home',
+    component: HomePageComponent,
   },
   {
-    name: 'XPath search',
-    link: '/gretel/xps/input.php',
-    proxy: true,
-    route: {
-      path: 'x-path-search',
-      component: DocumentationComponent
-    }
-
-},
+    path: 'home',
+    component: HomePageComponent,
+  },
   {
-    name: 'Documentation',
-    link: '/documentation',
-    proxy: false,
-    route: {
-      path: 'documentation',
-      component: DocumentationComponent
-    },
-
+    path: 'example-based-search',
+    component: DocumentationComponent,
+  },
+  {
+    path: 'x-path-search',
+    component: XPathSearchComponent,
+  },
+  {
+    path: 'documentation',
+    component: DocumentationComponent,
   },
 
 
 ];
 
 
-var routes: Routes = wrappedRoutes.map(route => route.route);
-
-const mainRoutesNames = [
-  "Home",
-  "Example-based search",
-  "XPath search",
-  "Documentation"
-];
-
-var mainRoutes : RouteWrapper[] =  wrappedRoutes.filter(route => mainRoutesNames.includes(route.name));
-
-
-export {RouteWrapper, routes, wrappedRoutes, mainRoutes}
+export {routes}
 

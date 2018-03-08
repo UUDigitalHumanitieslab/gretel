@@ -4,11 +4,9 @@ import {HomePageComponent} from "../pages/home-page/home-page.component";
 import {DocumentationComponent} from "../pages/documentation/documentation.component";
 import {routes} from "../routes";
 
-
-
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, {enableTracing: true})
+    RouterModule.forRoot(routes)
   ],
   exports: [
     RouterModule
