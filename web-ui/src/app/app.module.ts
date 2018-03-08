@@ -19,11 +19,11 @@ import {DocumentationComponent} from './pages/documentation/documentation.compon
 import { GretelWebsiteLinkComponent } from './components/gretel-website-link/gretel-website-link.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { FooterNavigationComponent } from './components/footer/footer-navigation/footer-navigation.component';
-import { XPathSearchComponent } from './pages/x-path-search/x-path-search.component';
+import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { Header3Component } from './components/header-3/header-3.component';
 import { XpathEditorComponent } from './components/xpath-editor/xpath-editor.component';
 import { StepsNavigatorComponent } from './components/steps-navigator/steps-navigator.component';
-import {XPathSearchService} from "./x-path-search.service";
+import {XpathSearchService} from "./xpath-search.service";
 import {LinkService} from "./services/link.service";
 import { StepComponent } from './components/step/step.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
@@ -45,7 +45,7 @@ import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-b
     GretelWebsiteLinkComponent,
     DocumentationContentComponent,
     FooterNavigationComponent,
-    XPathSearchComponent,
+    XpathSearchComponent,
     Header3Component,
     XpathEditorComponent,
     StepsNavigatorComponent,
@@ -61,7 +61,7 @@ import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-b
   ],
   providers: [
     AlpinoService,
-    XPathSearchService,
+    XpathSearchService,
     LinkService,
   ],
   bootstrap: [AppComponent]

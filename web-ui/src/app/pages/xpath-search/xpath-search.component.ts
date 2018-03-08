@@ -10,10 +10,10 @@ interface Step{
 
 @Component({
   selector: 'app-x-path-search',
-  templateUrl: './x-path-search.component.html',
-  styleUrls: ['./x-path-search.component.scss']
+  templateUrl: './xpath-search.component.html',
+  styleUrls: ['./xpath-search.component.scss']
 })
-export class XPathSearchComponent implements OnInit {
+export class XpathSearchComponent implements OnInit {
 
   constructor() { }
 

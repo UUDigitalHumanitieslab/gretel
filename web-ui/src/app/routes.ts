@@ -1,7 +1,7 @@
 import {HomePageComponent} from "./pages/home-page/home-page.component";
 import {Route, Routes} from "@angular/router";
 import {DocumentationComponent} from "./pages/documentation/documentation.component";
-import {XPathSearchComponent} from "./pages/x-path-search/x-path-search.component";
+import {XpathSearchComponent} from "./pages/xpath-search/xpath-search.component";
 
 
 
@@ -21,8 +21,8 @@ const routes: Routes = [
     component: DocumentationComponent,
   },
   {
-    path: 'x-path-search',
-    component: XPathSearchComponent,
+    path: 'xpath-search',
+    component: XpathSearchComponent,
   },
   {
     path: 'documentation',

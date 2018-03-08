@@ -7,7 +7,7 @@ interface Link{
 const links: Link[] = [
   {
     name: 'xpath input',
-    link: '/x-path-search',
+    link: '/xpath-search',
     proxy: false,
   },
   {
@@ -27,7 +27,7 @@ const links: Link[] = [
   },
   {
     name: 'XPath search',
-    link: '/x-path-search',
+    link: '/xpath-search',
     proxy: false,
   },
   {

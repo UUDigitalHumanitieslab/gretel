@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { XPathSearchComponent } from './x-path-search.component';
+import { XpathSearchComponent } from './xpath-search.component';
 
-describe('XPathSearchComponent', () => {
-  let component: XPathSearchComponent;
-  let fixture: ComponentFixture<XPathSearchComponent>;
+describe('XpathSearchComponent', () => {
+  let component: XpathSearchComponent;
+  let fixture: ComponentFixture<XpathSearchComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ XPathSearchComponent ]
+      declarations: [ XpathSearchComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(XPathSearchComponent);
+    fixture = TestBed.createComponent(XpathSearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
