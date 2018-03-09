@@ -58,3 +58,8 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 * [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design
 * Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback, as well as [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis) for beta testing.
+
+## License
+
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [license.txt](license.txt) file for license rights and limitations.
+
