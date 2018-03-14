@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {mainRoutes, RouteWrapper} from "../../../routes";
+import {Link, mainLinks} from "../../../links";
+import {LinkService} from "../../../services/link.service";
 
 @Component({
   selector: 'app-navigation',
@@ -10,12 +11,14 @@ import {mainRoutes, RouteWrapper} from "../../../routes";
 
 
 export class NavigationComponent implements OnInit {
-  links: RouteWrapper[] = mainRoutes;
 
 
-  constructor() { }
+  constructor(private linkService: LinkService) { }
+
+  links: Link[] = [];
 
   ngOnInit() {
+    this.links = this.linkService.getMainLinks()
   }
 
 }

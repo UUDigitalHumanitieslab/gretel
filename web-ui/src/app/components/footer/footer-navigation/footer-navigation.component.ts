@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {mainRoutes, RouteWrapper} from "../../../routes";
+import {Link, mainLinks} from "../../../links";
+import {LinkService} from "../../../services/link.service";
 
 @Component({
   selector: 'app-footer-navigation',
@@ -8,11 +9,12 @@ import {mainRoutes, RouteWrapper} from "../../../routes";
 })
 export class FooterNavigationComponent implements OnInit {
 
-  constructor() { }
+  constructor(private linkService: LinkService) { }
 
-  links: RouteWrapper[] = mainRoutes;
+  links: Link[] = [];
 
   ngOnInit() {
+    this.links = this.linkService.getMainLinks()
   }
 
 }

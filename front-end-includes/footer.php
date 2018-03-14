@@ -24,10 +24,10 @@ require_once ROOT_PATH."/package.php";
         <nav class="footer-navigation">
           <h3>Navigation</h3>
             <ul>
-                <li class="fa-before fa-loaded"><a href="index.php" title="Homepage Gretel" rel="home">Home</a></li>
+                <li class="fa-before fa-loaded"><a href="../home" title="Homepage Gretel" rel="home">Home</a></li>
                 <li class="fa-before fa-loaded"><a href="ebs/input.php" title="Example-based search">Example-based search</a></li>
                 <li class="fa-before fa-loaded"><a href="xps/input.php" title="XPath search">XPath search</a></li>
-                <li class="fa-before fa-loaded"><a href="documentation.php" title="Documentation">Documentation</a></li>
+                <li class="fa-before fa-loaded"><a href="../documentation" title="Documentation">Documentation</a></li>
             </ul>
         </nav>
         <div class="authors">
