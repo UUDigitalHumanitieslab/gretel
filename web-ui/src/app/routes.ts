@@ -29,6 +29,12 @@ const routes: Routes = [
     component: DocumentationComponent,
   },
 
+  {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full'
+  }
+
 
 ];
 
