@@ -27,3 +27,5 @@ node_modules/
 style/css/**
 js/min/**
 js/ts/**
+
+vendor
