@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {StepComponent} from "../step.component";
 import {TreebankService} from "../../../services/treebank.service";
-import {TreebankInfo} from "../../../treebank";
+import {Treebank, TreebankInfo} from "../../../treebank";
 import {TableColumn} from "../../scrollable-table/TableColumn";
 
 
@@ -52,22 +52,32 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     })
   }
 
-  getTreebankInfo(item: any) {
+  /**
+   * Gets the detailed info of a given treebank
+   * @param treebank
+   */
+  getTreebankInfo(treebank: Treebank) {
     let results = [];
-    this.treebankService.getTreebankInfo(item).subscribe((info: info[]) => {
+    this.treebankService.getTreebankInfo(treebank).subscribe((info: info[]) => {
       //To keep track if we selected the given subpart of the treebank.
-      this.info[item.title] = info;
-      this.info[item.title].forEach(entry => entry.selected = true);
+      this.info[treebank.title] = info;
+      this.info[treebank.title].forEach(entry => entry.selected = true);
       }
     )
   }
 
+  /**
+   * Checks if there are treebanks selected
+   */
   checkIfValid() {
-    this.valid = !this.valid;
+    //TODO: make correct
     this.isValid.emit(this.valid);
   }
 
-
+  /**
+   * Shows a warning.
+   * This warning should give info why the options that the user selected is not valid.
+   */
   showWarning() {
     console.log("Warning")
   }

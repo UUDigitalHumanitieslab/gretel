@@ -18,7 +18,6 @@ export class XpathInputComponent extends StepComponent implements OnInit {
   }
 
   checkIfValid(){
-    this.valid = ! this.valid;
     this.isValid.emit(this.valid);
   }
 

@@ -17,9 +17,16 @@ export class StepComponent implements OnInit {
   ngOnInit() {
   }
 
+  /**
+   * Check if the input of the user is valid
+   */
   public checkIfValid(){
     throw new Error("checkIfValid not implemented");
   }
+
+  /**
+   * Gives an warning that helps the user to understand why the current input is not valid
+   */
   public showWarning(){
     throw new Error("showWarning not implemented");
   }

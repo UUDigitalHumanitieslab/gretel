@@ -17,6 +17,7 @@ export class XpathSearchComponent implements OnInit {
   constructor(private  http: HttpClient, private sessionService: SessionService) {
   }
 
+  //All the components. used to call functions on.
   @ViewChild('xpathInput') xpathInput;
   @ViewChild('selectTreebanks') selectTreebanks;
   @ViewChild('hiddenForm') form;
@@ -76,6 +77,12 @@ export class XpathSearchComponent implements OnInit {
 
   }
 
+
+  /**
+   * Adds a variable to the form. Is used add information to the post request when the form is submitted
+   * @param name: name for the variable
+   * @param value: value of the variable
+   * */
   addFormVariable(name: string, value: string) {
     let element = document.createElement('input');
     element.value = value;
@@ -103,11 +110,15 @@ export class XpathSearchComponent implements OnInit {
 
     this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "document"}).subscribe((res) => {
       console.log(res.body);
-    })
+    });
+
     this.currentStep += 1;
 
   }
 
+  /**
+   * Goes to the resultsphp page with the selected treebank and subtreebanks
+   */
   goToResultsPhp() {
     //TODO: get info from the child component.
     this.addFormVariable("treebank", "test");
@@ -118,6 +129,9 @@ export class XpathSearchComponent implements OnInit {
   }
 
 
+  /**
+   * Go back one step
+   */
   prev() {
     if (this.currentStep > 1) {
       this.currentStep -= 1;
@@ -125,8 +139,12 @@ export class XpathSearchComponent implements OnInit {
 
   }
 
-  setValidState(e) {
-    this.valid = e;
+  /**
+   * Sets
+   * @param boolean
+   */
+  setValid(valid: boolean) {
+    this.valid = valid;
   }
 
   /**

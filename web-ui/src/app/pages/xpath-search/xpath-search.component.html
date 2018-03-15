@@ -2,8 +2,8 @@
 <app-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="currentStep"></app-breadcrumb-bar>
 
 <div class="container" [ngSwitch]="this.currentStep">
-  <app-xpath-input *ngSwitchCase="1" (isValid)="setValidState($event)" #xpathInput></app-xpath-input>
-  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValidState($event)" #selectTreebanks></app-select-treebanks>
+  <app-xpath-input *ngSwitchCase="1" (isValid)="setValid($event)" #xpathInput></app-xpath-input>
+  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValid($event)" #selectTreebanks></app-select-treebanks>
 </div>
 
 <button (click)="prev()">prev</button>
