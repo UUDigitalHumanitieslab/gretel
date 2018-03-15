@@ -2,12 +2,13 @@ import {Injectable} from '@angular/core';
 import {Observable} from "rxjs/Observable";
 import * as Rx from "rxjs/Rx"
 import {Treebank, TreebankInfo} from "../treebank";
+import {HttpClient} from "@angular/common/http";
 
 
 @Injectable()
 export class TreebankService {
 
-  constructor() {
+  constructor(private http: HttpClient) {
   }
 
   treebanks: Treebank[] = [
@@ -50,10 +51,13 @@ export class TreebankService {
 
 
   getTreebanks(): Observable<Treebank> {
-    return Rx.Observable.from(this.treebanks);
+    //TODO: make a link service
+    return this.http.get("http://localhost:8080/gretel-upload/index.php/api/treebank");
+
   }
 
   getTreebankInfo(treebank: Treebank) {
+    return this.http.get(`http://localhost:8080/gretel-upload/index.php/api/treebank/show/${treebank.title}`)
     return Rx.Observable.from(
       this.treebanksInfo.filter((info: TreebankInfo) => info.slug == treebank.title)
     );

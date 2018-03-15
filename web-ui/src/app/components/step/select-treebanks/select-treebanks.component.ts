@@ -29,22 +29,22 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     header: "Component"
     },
     {
-      field: "name",
+      field: "title",
       header: "Contents"
     },
     {
-      field: "nrSentences",
+      field: "nr_sentences",
       header: "Sentences"
     },
     {
-      field: "nrWords",
+      field: "nr_words",
       header: "Words"
     },
   ];
 
   ngOnInit() {
     this.treebankService.getTreebanks().subscribe((treebank: any) => {
-      this.items.push(treebank);
+      this.items = treebank;
     })
   }
 
@@ -52,16 +52,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     let results = [];
     this.treebankService.getTreebankInfo(item).subscribe((info: TreebankInfo) => {
       //To keep track if we selected the given subpart of the treebank.
-      info["selected"] = false;
-      results.push(info);
-
-      },
-      () => {
-      },
-      () => {
-        this.info[item.title] = results;
-        console.log(this.info);
-
+      this.info[item.title] = info;
+      this.info[item.title].forEach(entry => entry.selected = true);
       }
     )
   }
