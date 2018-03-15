@@ -28,6 +28,10 @@ import {LinkService} from "./services/link.service";
 import { StepComponent } from './components/step/step.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import {SelectTreebanksComponent} from "./components/step/select-treebanks/select-treebanks.component";
+import {TreebankService} from "./services/treebank.service";
+import {ScrollableTableComponent} from "./components/scrollable-table/scrollable-table.component";
+import {TableModule} from "primeng/table";
 
 @NgModule({
   declarations: [
@@ -52,17 +56,22 @@ import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-b
     StepComponent,
     XpathInputComponent,
     BreadcrumbBarComponent,
+    SelectTreebanksComponent,
+    ScrollableTableComponent,
+
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
+    TableModule
 
   ],
   providers: [
     AlpinoService,
     XpathSearchService,
     LinkService,
+    TreebankService
   ],
   bootstrap: [AppComponent]
 })

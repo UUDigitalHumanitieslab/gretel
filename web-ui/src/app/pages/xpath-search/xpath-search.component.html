@@ -3,7 +3,10 @@
 
 <div class="container" [ngSwitch]="this.currentStep">
   <app-xpath-input *ngSwitchCase="1" (isValid)="setValidState($event)" #xpathInput></app-xpath-input>
+  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValidState($event)" #selectTreebanks></app-select-treebanks>
 </div>
 
 <button (click)="prev()">prev</button>
 <button (click)="next()">next</button>
+<form  action="/gretel/xps/tb-sel.php" method="post" name="xpath" hidden #hiddenForm>
+</form>

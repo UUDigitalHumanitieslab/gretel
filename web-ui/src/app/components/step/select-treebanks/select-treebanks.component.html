@@ -1,0 +1,15 @@
+<h2><span>Step 2:</span> Select a treebank</h2><p>Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get more information
+  on these treebanks, you can find the project websites in <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.</p>
+
+<p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties
+  some sentences could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
+<ul>
+
+  <li *ngFor="let item of items" >
+    <input type="checkbox" name="{{item.id}}" value="{{item.title}}"  (change)="getTreebankInfo(item)" #checkbox> {{item.title}}
+      <p *ngIf="checkbox.checked">
+        <app-scrollable-table [columns]="columns" [data]="info[item.title]"></app-scrollable-table>
+      </p>
+  </li>
+</ul>
+
