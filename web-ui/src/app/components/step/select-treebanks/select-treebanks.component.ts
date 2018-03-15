@@ -4,6 +4,10 @@ import {TreebankService} from "../../../services/treebank.service";
 import {TreebankInfo} from "../../../treebank";
 import {TableColumn} from "../../scrollable-table/TableColumn";
 
+
+interface info extends TreebankInfo{
+  selected: boolean;
+}
 @Component({
   selector: 'app-select-treebanks',
   templateUrl: './select-treebanks.component.html',
@@ -12,7 +16,7 @@ import {TableColumn} from "../../scrollable-table/TableColumn";
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
   items: any[];
-  info: { [title: string]: TreebankInfo[] } = {};
+  info: { [title: string]: info[] } = {};
 
 
   constructor(private treebankService: TreebankService) {
@@ -50,7 +54,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
   getTreebankInfo(item: any) {
     let results = [];
-    this.treebankService.getTreebankInfo(item).subscribe((info: TreebankInfo) => {
+    this.treebankService.getTreebankInfo(item).subscribe((info: info[]) => {
       //To keep track if we selected the given subpart of the treebank.
       this.info[item.title] = info;
       this.info[item.title].forEach(entry => entry.selected = true);

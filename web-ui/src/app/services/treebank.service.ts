@@ -35,6 +35,7 @@ export class TreebankService {
       nrSentences: 100,
       nrWords: 101,
     },
+
     {
       slug: "test_treebank",
       name: "third name",
@@ -50,16 +51,14 @@ export class TreebankService {
   ];
 
 
-  getTreebanks(): Observable<Treebank> {
+  getTreebanks(): Observable<any> {
     //TODO: make a link service
     return this.http.get("http://localhost:8080/gretel-upload/index.php/api/treebank");
 
   }
 
-  getTreebankInfo(treebank: Treebank) {
+  getTreebankInfo(treebank: any) {
     return this.http.get(`http://localhost:8080/gretel-upload/index.php/api/treebank/show/${treebank.title}`)
-    return Rx.Observable.from(
-      this.treebanksInfo.filter((info: TreebankInfo) => info.slug == treebank.title)
-    );
+
   }
 }

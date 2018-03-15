@@ -37,6 +37,9 @@ export class ScrollableTableComponent implements OnInit {
   }
 
   isAllChecked(){
+    if(!this.data){
+      return false;
+    }
     for(let entry of this.data){
       if(! entry.selected){
         return false;

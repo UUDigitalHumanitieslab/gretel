@@ -32,6 +32,8 @@ import {SelectTreebanksComponent} from "./components/step/select-treebanks/selec
 import {TreebankService} from "./services/treebank.service";
 import {ScrollableTableComponent} from "./components/scrollable-table/scrollable-table.component";
 import {TableModule} from "primeng/table";
+import {CookieService} from "angular2-cookie/core";
+import {SessionService} from "./services/session.service";
 
 @NgModule({
   declarations: [
@@ -71,7 +73,9 @@ import {TableModule} from "primeng/table";
     AlpinoService,
     XpathSearchService,
     LinkService,
-    TreebankService
+    TreebankService,
+    CookieService,
+    SessionService
   ],
   bootstrap: [AppComponent]
 })

@@ -4,9 +4,7 @@ import {XpathInputComponent} from "../../components/step/xpath-input/xpath-input
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {FormGroup} from "@angular/forms";
-interface Step {
-  componentName: string
-}
+import {SessionService} from "../../services/session.service";
 
 
 @Component({
@@ -16,17 +14,16 @@ interface Step {
 })
 export class XpathSearchComponent implements OnInit {
 
-  constructor(private  http: HttpClient) {
+  constructor(private  http: HttpClient, private sessionService: SessionService) {
   }
 
   @ViewChild('xpathInput') xpathInput;
+  @ViewChild('selectTreebanks') selectTreebanks;
   @ViewChild('hiddenForm') form;
 
-  stepToProxy = 2;
-  proxyLink = "/gretel/xps/tb-sel.php";
-
   currentStep = 1;
-  valid = false;
+  // Should be false: now true for debugging.
+  valid = true;
 
   crumbs: Crumb[] = [
     {
@@ -48,53 +45,78 @@ export class XpathSearchComponent implements OnInit {
   ];
 
   ngOnInit() {
-
   }
 
-
+  /**
+   *  go to next step. Only can continue of the current step is validated.
+   */
   next() {
-    if (true) {
 
-      this.valid = false;
-      this.currentStep += 1;
-      /*
-      let xpathElement = document.createElement('input');
-      xpathElement.value = `//node`;
-      xpathElement.name = "xpath";
+    if (this.valid) {
+      // Should be false, for debugging only
+      this.valid = true;
+      switch (this.currentStep) {
+        case 1: {
+          this.goToSelectTreebank();
+          break;
+        }
+        case 2: {
+          this.goToResultsPhp();
+          break;
+        }
 
 
+      }
 
 
-
-      let sidElement = document.createElement('input');
-      sidElement.name = "sid";
-      sidElement.value = "halloe123";
-      this.form.nativeElement.append(
-        sidElement
-      );
-      this.form.nativeElement.append(
-        xpathElement
-      );
-      this.form.nativeElement.submit()
-      */
+    } else {
+      this.showWarning()
     }
-    /*
-     else {
-     this.showWarning();
-     }
-     */
+
 
   }
 
-  addXpathVariables(){
+  addFormVariable(name: string, value: string) {
+    let element = document.createElement('input');
+    element.value = value;
+    element.name = name;
+    this.form.nativeElement.append(element)
 
   }
 
-  proxyIfNeeded() {
-    if (this.currentStep == this.stepToProxy) {
-      window.location.href = this.proxyLink;
-    }
+  /**
+   * Goes to the selection of the treebank.
+   * The status of this session must be updated to the server. (php *zucht*)
+   * Creates an PID and posts the PID with nodeinformation to the php server
+   */
+  goToSelectTreebank() {
+    let id = this.sessionService.getSessionId();
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'responseType': 'text/html'
+      })
+    };
+    const formData = new FormData();
+    formData.append("sid", id);
+    formData.append("xpath", this.getXPath());
+
+    this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "document"}).subscribe((res) => {
+      console.log(res.body);
+    })
+    this.currentStep += 1;
+
   }
+
+  goToResultsPhp() {
+    //TODO: get info from the child component.
+    this.addFormVariable("treebank", "test");
+    this.addFormVariable("sid", this.sessionService.getSessionId());
+    this.addFormVariable("subtreebank[]", "test");
+    this.form.nativeElement.submit();
+
+  }
+
 
   prev() {
     if (this.currentStep > 1) {
@@ -105,31 +127,33 @@ export class XpathSearchComponent implements OnInit {
 
   setValidState(e) {
     this.valid = e;
-
   }
 
+  /**
+   * Show the warning of the appropiate component.
+   */
   showWarning() {
-    if (this.currentStep == 1) {
-      this.xpathInput.showWarning();
+    switch (this.currentStep) {
+      case 1: {
+        this.xpathInput.showWarning();
+        break;
+      }
+      case 2: {
+        this.selectTreebanks.showWarning();
+        break;
+      }
+
+
     }
 
   }
 
-  /*
-   goToTreebanks(){
-   const httpOptions = {
-   headers: new HttpHeaders({
-   'responseType': 'text/html'
-   })
-   };
-   const formData = new FormData();
-   formData.append("sid", "1");
-   this.http.post("/gretel/xps/tb-sel.php?sid=1", formData, {responseType: "document"}).subscribe((res)=>{
-   console.log(res.body);
-   })
-
-   }
+  //Sheean deze invullen a.u.b.
+  /**
+   * Function that gets the xpath from the xpath input component
    */
-
+  getXPath() {
+    return "//node"
+  }
 
 }
