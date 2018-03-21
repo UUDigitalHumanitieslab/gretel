@@ -1,6 +1,6 @@
-import { PathVariable, XPathExtractinator, FormatError } from './xpath-extractinator';
+import { PathVariable, XPathExtractinator, FormatError } from '../../services/xpath-extractinator.service';
 import * as $ from 'jquery';
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 import { XPathModels } from 'ts-xpath';
 
 export class XPathVariablesComponent {
@@ -66,7 +66,11 @@ class View {
     constructor(private formName: string, private target: JQuery) {
     }
 
-    public render(items: PathVariable[]) {
+    public render(items: PathVariable[] | null) {
+        if (!items) {
+            return;
+        }
+        
         if (this.renderedLength != items.length) {
             this.target.empty();
             this.names = [];

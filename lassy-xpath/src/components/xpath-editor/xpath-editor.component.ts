@@ -4,13 +4,13 @@ import * as ace from 'brace';
 import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
-import { MacroService } from './services/macro-service';
-import { ParseMessage, XPathParserService } from './services/xpath-parser.service';
+import { MacroService } from '../../services/macro.service';
+import { ParseMessage, XPathParserService } from '../../services/xpath-parser.service';
 
 let AceRange = ace.acequire('ace/range').Range;
 
 export const Selector = 'xpath-editor';
-export class XPathEditor {
+export class XPathEditorComponent {
     public autofocus: boolean;
     public value: string;
 
