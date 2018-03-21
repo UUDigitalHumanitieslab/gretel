@@ -2,6 +2,9 @@
   <p-table [columns]="columns" [value]="data">
     <ng-template pTemplate="header" let-columns>
       <tr>
+        <th>
+          <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)">
+        </th>
         <th *ngFor="let col of columns">
           {{col.header}}
         </th>
@@ -9,6 +12,9 @@
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
       <tr>
+        <td>
+          <input type="checkbox" (change)="changeSelected(rowData)" [checked]="rowData['selected']">
+        </td>
         <td *ngFor="let col of columns">
           <div *ngIf="col.field == 'number'; else field">{{i}}</div>
           <ng-template #field>{{rowData[col.field]}}</ng-template>

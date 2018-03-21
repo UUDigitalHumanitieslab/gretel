@@ -5,6 +5,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {FormGroup} from "@angular/forms";
 import {SessionService} from "../../services/session.service";
+import {DataService} from "../../services/data.service";
 
 
 @Component({
@@ -13,8 +14,11 @@ import {SessionService} from "../../services/session.service";
   styleUrls: ['./xpath-search.component.scss']
 })
 export class XpathSearchComponent implements OnInit {
+  // TODO refactor
+  done = false;
+  results = [];
 
-  constructor(private  http: HttpClient, private sessionService: SessionService) {
+  constructor(private  http: HttpClient, private sessionService: SessionService, private dataService: DataService) {
   }
 
   //All the components. used to call functions on.
@@ -62,7 +66,7 @@ export class XpathSearchComponent implements OnInit {
           break;
         }
         case 2: {
-          this.goToResultsPhp();
+          this.goToResults();
           break;
         }
 
@@ -101,19 +105,32 @@ export class XpathSearchComponent implements OnInit {
 
     const httpOptions = {
       headers: new HttpHeaders({
-        'responseType': 'text/html'
+        'responseType': ''
       })
     };
     const formData = new FormData();
     formData.append("sid", id);
     formData.append("xpath", this.getXPath());
 
-    this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "document"}).subscribe((res) => {
-      console.log(res.body);
+    this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "json"}).subscribe((res) => {
+      //console.log(res.body);
     });
 
     this.currentStep += 1;
 
+  }
+
+  goToResults() {
+    this.done = false;
+    this.dataService.getData().subscribe((data) => {
+        this.results = data;
+      },
+      e => console.log(e),
+      () => this.done = true
+    );
+
+
+    this.currentStep += 1;
   }
 
   /**

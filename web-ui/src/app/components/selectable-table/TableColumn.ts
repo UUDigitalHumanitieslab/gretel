@@ -1,4 +1,4 @@
-/** Columns to be used in scrollable-table component */
+/** Columns to be used in selectable-table component */
 interface TableColumn {
 
   field: String;

@@ -1,7 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
-
 import {AppComponent} from './app.component';
 import {ParseSentenceComponent} from './components/parse-sentence/parse-sentence.component';
 import {AlpinoService} from "./services/alpino.service";
@@ -30,10 +29,15 @@ import { XpathInputComponent } from './components/step/xpath-input/xpath-input.c
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import {SelectTreebanksComponent} from "./components/step/select-treebanks/select-treebanks.component";
 import {TreebankService} from "./services/treebank.service";
-import {ScrollableTableComponent} from "./components/scrollable-table/scrollable-table.component";
+import {ScrollableTableComponent} from "./components/selectable-table/scrollable-table.component";
 import {TableModule} from "primeng/table";
 import {CookieService} from "angular2-cookie/core";
 import {SessionService} from "./services/session.service";
+import { ResultsComponent } from './components/step/results/results.component';
+import {DataService} from "./services/data.service";
+import {DropdownWithFilterComponent} from "./components/dropdown-with-filter/dropdown-with-filter.component";
+import {FilterComponent} from "./components/filter/filter.component";
+
 
 @NgModule({
   declarations: [
@@ -60,6 +64,9 @@ import {SessionService} from "./services/session.service";
     BreadcrumbBarComponent,
     SelectTreebanksComponent,
     ScrollableTableComponent,
+    ResultsComponent,
+    DropdownWithFilterComponent,
+    FilterComponent
 
   ],
   imports: [
@@ -75,7 +82,8 @@ import {SessionService} from "./services/session.service";
     LinkService,
     TreebankService,
     CookieService,
-    SessionService
+    SessionService,
+    DataService
   ],
   bootstrap: [AppComponent]
 })

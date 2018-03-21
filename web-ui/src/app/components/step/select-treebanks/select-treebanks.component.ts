@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {StepComponent} from "../step.component";
 import {TreebankService} from "../../../services/treebank.service";
 import {Treebank, TreebankInfo} from "../../../treebank";
-import {TableColumn} from "../../scrollable-table/TableColumn";
+import {TableColumn} from "../../selectable-table/TableColumn";
 
 
 interface info extends TreebankInfo{
