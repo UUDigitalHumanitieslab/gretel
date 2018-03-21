@@ -1,6 +1,5 @@
 import { AnalysisComponent } from './analysis-component';
-import { XPathEditor } from './xpath-editor';
-import { XPathVariablesComponent } from './xpath-variables-component';
+import { XPathEditorComponent, XPathVariablesComponent } from 'lassy-xpath';
 
 import * as $ from 'jquery';
 
@@ -10,7 +9,7 @@ import * as $ from 'jquery';
 export class ComponentsRenderer {
     private componentMap: { [name: string]: Component } = {
         'analysis': AnalysisComponent,
-        'xpath-editor': XPathEditor,
+        'xpath-editor': XPathEditorComponent,
         'xpath-variables': XPathVariablesComponent
     }
 

@@ -2,15 +2,15 @@ import 'brace/mode/javascript';
 import 'brace/mode/xquery';
 import * as ace from 'brace';
 import { functionCompletions, pathCompletions } from './alpino-xpath-completions';
-import { XpathAttributes } from './xpath-attributes';
-import { MacroService } from './services/macro-service';
+import { XpathAttributes } from '../../common/xpath-attributes';
+import { MacroService } from '../../services/macro.service';
 import { AlpinoXPathHighlighter } from './alpino-xpath-highlighter-rules';
 let TokenIterator: { new(session: ace.IEditSession, initialRow: number, initialColumn: number): ace.TokenIterator } = ace.acequire("ace/token_iterator").TokenIterator;
-let TextMode: { new(): any } = ace.acequire('ace/mode/text').Mode;
+export let TextMode: { new(): any } = ace.acequire('ace/mode/text').Mode;
 // defined in the javascript mode!
 let MatchingBraceOutdent = ace.acequire("ace/mode/matching_brace_outdent").MatchingBraceOutdent;
 let CstyleBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/cstyle').CstyleBehaviour;
-let XQueryBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/xquery').XQueryBehaviour;
+export let XQueryBehaviour: AceBehaviour = ace.acequire('ace/mode/behaviour/xquery').XQueryBehaviour;
 let TextHighlightRules: any = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
 
 let macroService = new MacroService();
@@ -128,7 +128,7 @@ export class Completer {
 /**
  * Add additional XPATH behavior to autocomplete macros, functions and attributes.
  */
-class XPathBehaviour extends XQueryBehaviour {
+export class XPathBehaviour extends XQueryBehaviour {
     constructor() {
         super();
         this.inherit(CstyleBehaviour, ["brackets", "string_dquotes"]);
@@ -182,7 +182,7 @@ class XPathBehaviour extends XQueryBehaviour {
     }
 }
 
-interface AceBehaviour {
+export interface AceBehaviour {
     new(): {
         add(name: string, action: string, callback: (state: string[],
             action: string,
@@ -195,7 +195,7 @@ interface AceBehaviour {
     }
 }
 
-type AceHandlerResult = { text: string, selection: number[] | void } | void;
+export type AceHandlerResult = { text: string, selection: number[] | void } | void;
 type TokenInfoWithType = {
     type: string | void
 } & ace.TokenInfo;

@@ -1,4 +1,4 @@
-import { XpathAttributes } from '../xpath-attributes';
+import { XpathAttributes } from '../common/xpath-attributes';
 import { XPathModels, XPathParser } from 'ts-xpath';
 
 const elementNames = ['item', 'meta', 'metadata', 'node', 'parser', 'sentence'];
@@ -10,7 +10,7 @@ export class XPathParserService {
 
     public parse(xpath: string): ParsedXPath {
         let expression: XPathModels.XPathExpression | null;
-        let error: ParseMessage | null;
+        let error: ParseMessage | null = null;
         if (!xpath) {
             return { expression: null, warnings: [], error: null };
         }
@@ -122,11 +122,11 @@ export interface ParseMessage {
     /**
      * Zero-based character offset
      */
-    startColumn: number,
+    startColumn: number | undefined,
     /**
      * Zero-based last column, exclusive.
      */
-    lastColumn: number,
+    lastColumn: number | undefined,
     /**
      * Zero-based line number
      */
