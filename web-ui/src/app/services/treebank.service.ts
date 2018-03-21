@@ -53,12 +53,12 @@ export class TreebankService {
 
   getTreebanks(): Observable<any> {
     //TODO: make a link service
-    return this.http.get("http://localhost:8080/gretel-upload/index.php/api/treebank");
+    return this.http.get("/gretel-upload/index.php/api/treebank");
 
   }
 
   getTreebankInfo(treebank: any) {
-    return this.http.get(`http://localhost:8080/gretel-upload/index.php/api/treebank/show/${treebank.title}`)
+    return this.http.get(`/gretel-upload/index.php/api/treebank/show/${treebank.title}`)
 
   }
 }
