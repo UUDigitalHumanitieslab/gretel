@@ -1,20 +1,22 @@
-<div class="is-scrollable">
-  <p-table [columns]="columns" [value]="data">
+<p-table [columns]="columns" [value]="data" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
+    <ng-template pTemplate="colgroup" let-columns >
+        <colgroup >
+            <col *ngFor="let col of columns" [style.width]="col.width">
+        </colgroup>
+    </ng-template>
     <ng-template pTemplate="header" let-columns>
-      <tr>
-        <th *ngFor="let col of columns">
-          {{col.header}}
-        </th>
-      </tr>
+        <tr>
+            <th *ngFor="let col of columns" pResizableColumn>
+                {{col.header}}
+            </th>
+        </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-      <tr>
-        <td *ngFor="let col of columns">
-          <div *ngIf="col.field == 'number'; else field">{{i}}</div>
-          <ng-template #field  ><div [innerHTML]="rowData[col.field]"></div></ng-template>
-        </td>
-      </tr>
+        <tr>
+            <td *ngFor="let col of columns" class="ui-resizable-column">
+                <div *ngIf="col.field == 'number'; else field">{{i}}</div>
+                <ng-template #field><p [innerHTML]="rowData[col.field]"></p></ng-template>
+            </td>
+        </tr>
     </ng-template>
-  </p-table>
-
-</div>
+</p-table>

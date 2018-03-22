@@ -14,11 +14,11 @@ export class ResultsComponent implements OnInit {
   @Input() results: Result[];
   @Input() loading: boolean;
 
-  columns: TableColumn[] = [
-    {field: 'number', header: '#'},
-    {field: 'id', header: 'ID'},
-    {field: 'component', header: 'component'},
-    {field: 'sentence', header: 'Sentence'},
+  columns: any[] = [
+    {field: 'number', header: '#' , width: '5%'},
+    {field: 'id', header: 'ID', width: '10%'},
+    {field: 'component', header: 'component', width: '15%'},
+    {field: 'sentence', header: 'Sentence', width: '70%'},
   ];
 
   items: string[] = [
