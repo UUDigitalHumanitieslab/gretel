@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ScrollableTableComponent } from './scrollable-table.component';
 
-describe('ScrollableTableComponent', () => {
+describe('SelectableTable', () => {
   let component: ScrollableTableComponent;
   let fixture: ComponentFixture<ScrollableTableComponent>;
 

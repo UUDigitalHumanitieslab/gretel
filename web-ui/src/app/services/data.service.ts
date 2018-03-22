@@ -25,7 +25,7 @@ export class DataService {
     }
   }
 
-  getData(): Observable<Result> {
+  getData(): Observable<Result[]> {
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -33,10 +33,10 @@ export class DataService {
       })
     };
     let options = new RequestOptions();
-    options.withCredentials = true;
+    //options.withCredentials = true;
 
-    return this.http.get("http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=vhdkt0ane90bv81cmomsd0ckd2-1521645361", options)
-      .map((res: Response) => {
+    return this.http.get("http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=t66bosvmuf97j06vg6ldu2fec5-1521712207", {"withCredentials": true})
+      .map((res: any) => {
       let data = Object.keys(res.data).map((key: any) => {
         let entry = res.data[key];
         entry[0] = this.get_id_from_text(entry[0]);
