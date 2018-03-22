@@ -34,5 +34,8 @@ export class ResultsComponent implements OnInit {
   ngOnInit() {
   }
 
+  showTree(){
+      console.log('Show Tree');
+  }
 
 }

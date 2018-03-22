@@ -29,13 +29,13 @@ import {BreadcrumbBarComponent} from './components/breadcrumb-bar/breadcrumb-bar
 import {SelectTreebanksComponent} from "./components/step/select-treebanks/select-treebanks.component";
 import {TreebankService} from "./services/treebank.service";
 import {TableModule} from "primeng/table";
+import {DialogModule} from "primeng/dialog";
 import {CookieService} from "angular2-cookie/core";
 import {SessionService} from "./services/session.service";
 import {ResultsComponent} from './components/step/results/results.component';
 import {DataService} from "./services/data.service";
 import {DropdownWithFilterComponent} from "./components/dropdown-with-filter/dropdown-with-filter.component";
 import {FilterComponent} from "./components/dropdown-with-filter/filter/filter.component";
-import {ScrollableTableComponent} from "./components/tables/scrollable-table/scrollable-table.component";
 import {SelectableTable} from "./components/tables/selectable-table/selectable-table.component";
 
 
@@ -63,7 +63,6 @@ import {SelectableTable} from "./components/tables/selectable-table/selectable-t
         BreadcrumbBarComponent,
         SelectTreebanksComponent,
         SelectableTable,
-        ScrollableTableComponent,
         ResultsComponent,
         DropdownWithFilterComponent,
         FilterComponent
@@ -73,7 +72,8 @@ import {SelectableTable} from "./components/tables/selectable-table/selectable-t
         BrowserModule,
         HttpClientModule,
         AppRoutingModule,
-        TableModule
+        TableModule,
+        DialogModule
 
     ],
     providers: [
