@@ -1,6 +1,6 @@
 <p-table [columns]="columns" [value]="data" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
-    <ng-template pTemplate="colgroup" let-columns >
-        <colgroup >
+    <ng-template pTemplate="colgroup" let-columns>
+        <colgroup>
             <col *ngFor="let col of columns" [style.width]="col.width">
         </colgroup>
     </ng-template>
@@ -13,9 +13,15 @@
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
         <tr>
-            <td *ngFor="let col of columns" class="ui-resizable-column">
-                <div *ngIf="col.field == 'number'; else field">{{i}}</div>
-                <ng-template #field><p [innerHTML]="rowData[col.field]"></p></ng-template>
+            <td *ngFor="let col of columns" class="ui-resizable-column" >
+
+                <div [ngSwitch]="col.field">
+                    <div *ngSwitchCase="'number'">{{i}}</div>
+                    <a *ngSwitchCase="'id'" (click)="showTree($event)">{{rowData[col.field]}}</a>
+                    <p [innerHTML]="rowData[col.field]" *ngSwitchDefault></p>
+                </div>
+
+
             </td>
         </tr>
     </ng-template>
