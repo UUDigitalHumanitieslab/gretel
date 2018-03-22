@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Link, mainLinks} from "../../../links";
+import {Link} from "../../../app-routing/links";
 import {LinkService} from "../../../services/link.service";
 
 @Component({

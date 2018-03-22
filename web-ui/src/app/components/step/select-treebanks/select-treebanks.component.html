@@ -14,7 +14,7 @@
             <input type="checkbox" name="{{item.id}}" value="{{item.title}}" (change)="getTreebankInfo(item)" #checkbox> {{item.title}}
         </label>
         <p *ngIf="checkbox.checked">
-            <app-scrollable-table [columns]="columns" [data]="info[item.title]"></app-scrollable-table>
+            <app-selectable-table [columns]="columns" [data]="info[item.title]"></app-selectable-table>
         </p>
     </li>
 </ul>

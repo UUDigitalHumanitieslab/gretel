@@ -21,7 +21,6 @@ import {FooterNavigationComponent} from './components/footer/footer-navigation/f
 import {XpathSearchComponent} from './pages/xpath-search/xpath-search.component';
 import {Header3Component} from './components/header-3/header-3.component';
 import {XpathEditorComponent} from './components/xpath-editor/xpath-editor.component';
-import {StepsNavigatorComponent} from './components/steps-navigator/steps-navigator.component';
 import {XpathSearchService} from "./xpath-search.service";
 import {LinkService} from "./services/link.service";
 import {StepComponent} from './components/step/step.component';
@@ -29,7 +28,6 @@ import {XpathInputComponent} from './components/step/xpath-input/xpath-input.com
 import {BreadcrumbBarComponent} from './components/breadcrumb-bar/breadcrumb-bar.component';
 import {SelectTreebanksComponent} from "./components/step/select-treebanks/select-treebanks.component";
 import {TreebankService} from "./services/treebank.service";
-import {SelectableTable} from "./components/selectable-table/selectable-table.component";
 import {TableModule} from "primeng/table";
 import {CookieService} from "angular2-cookie/core";
 import {SessionService} from "./services/session.service";
@@ -38,6 +36,7 @@ import {DataService} from "./services/data.service";
 import {DropdownWithFilterComponent} from "./components/dropdown-with-filter/dropdown-with-filter.component";
 import {FilterComponent} from "./components/filter/filter.component";
 import {ScrollableTableComponent} from "./components/scrollable-table/scrollable-table.component";
+import {SelectableTable} from "./components/tables/selectable-table/selectable-table.component";
 
 
 @NgModule({
@@ -59,7 +58,6 @@ import {ScrollableTableComponent} from "./components/scrollable-table/scrollable
         XpathSearchComponent,
         Header3Component,
         XpathEditorComponent,
-        StepsNavigatorComponent,
         StepComponent,
         XpathInputComponent,
         BreadcrumbBarComponent,
