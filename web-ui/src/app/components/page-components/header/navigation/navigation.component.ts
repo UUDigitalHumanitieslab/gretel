@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {Link} from "../../../app-routing/links";
-import {LinkService} from "../../../services/link.service";
+import {Link} from "../../../../app-routing/links";
+import {LinkService} from "../../../../services/link.service";
 
 @Component({
   selector: 'app-navigation',

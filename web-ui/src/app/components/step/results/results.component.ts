@@ -1,6 +1,6 @@
 import {Component, Input, OnChanges, OnInit, SimpleChange} from '@angular/core';
 import {Result} from './result';
-import {TableColumn} from '../../selectable-table/TableColumn';
+import {TableColumn} from '../../tables/selectable-table/TableColumn';
 
 
 @Component({
