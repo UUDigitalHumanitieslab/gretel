@@ -33,7 +33,7 @@
 
                           <div [ngSwitch]="col.field">
                               <div *ngSwitchCase="'number'">{{i}}</div>
-                              <a *ngSwitchCase="'id'" (click)="showTree($event)">{{rowData[col.field]}}</a>
+                              <a *ngSwitchCase="'id'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                               <p [innerHTML]="rowData[col.field]" *ngSwitchDefault></p>
                           </div>
 

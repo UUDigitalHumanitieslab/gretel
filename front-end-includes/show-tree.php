@@ -15,6 +15,7 @@
  */
 
 header('Content-type: text/xml');
+header('Access-Control-Allow-Origin: http://localhost:4200');
 set_time_limit(0);
 
 // Set variables
