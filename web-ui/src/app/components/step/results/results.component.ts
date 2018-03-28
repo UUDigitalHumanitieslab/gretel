@@ -2,6 +2,8 @@ import {Component, Input, OnChanges, OnInit, SimpleChange} from '@angular/core';
 import {Result} from './result';
 import {TableColumn} from '../../tables/selectable-table/TableColumn';
 
+import * as $ from 'jquery';
+import '../../../../assets/js/tree-visualizer';
 
 @Component({
   selector: 'app-results',
@@ -35,7 +37,9 @@ export class ResultsComponent implements OnInit {
   }
 
   showTree(){
-      console.log('Show Tree');
+      let element: any = $('#output');
+      element.treeVisualizer('assets/example_tree.xml', {nvFontSize: 14,normalView: false,
+          initFSOnClick: true});
   }
 
 }
