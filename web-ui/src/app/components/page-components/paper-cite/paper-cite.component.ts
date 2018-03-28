@@ -1,3 +1,6 @@
+/**
+ * Component that can be used to cite a paper
+ */
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({

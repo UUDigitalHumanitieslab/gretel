@@ -5,6 +5,7 @@ import {TableColumn} from '../../tables/selectable-table/TableColumn';
 import * as $ from 'jquery';
 import '../../../../assets/js/tree-visualizer';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {ConfigurationService} from "../../../services/configuration.service";
 
 @Component({
     selector: 'app-results',
@@ -24,28 +25,29 @@ export class ResultsComponent implements OnInit {
         {field: 'sentence', header: 'Sentence', width: '70%'},
     ];
 
-    items: string[] = [
-    ];
+    items: string[] = [];
 
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private configurationService: ConfigurationService) {
     }
 
     ngOnInit() {
     }
 
-    showTree(item) {
-        //TODO set in configuration (service?)
-        let base = "http://localhost:8080/gretel/";
-        console.log(item);
+    /**
+     * Show a tree of the given xml file
+     * @param link to xml file
+     */
+    showTree(link) {
+
+        let base = this.configurationService.getBaseUrlXml();
         let element: any = $('#output');
+        let url = base + "/" + link;
 
-            element.treeVisualizer(base + item.link, {
-                nvFontSize: 14, normalView: false,
-                initFSOnClick: true
-            });
-
-
+        element.treeVisualizer(url, {
+            nvFontSize: 14, normalView: false,
+            initFSOnClick: true
+        });
     }
 
 }

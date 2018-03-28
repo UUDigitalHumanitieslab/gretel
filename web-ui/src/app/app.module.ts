@@ -2,7 +2,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {ParseSentenceComponent} from './components/parse-sentence/parse-sentence.component';
 import {AlpinoService} from "./services/alpino.service";
 import {HttpClientModule} from "@angular/common/http";
 import {HomePageComponent} from './pages/home-page/home-page.component';
@@ -34,15 +33,12 @@ import {CookieService} from "angular2-cookie/core";
 import {SessionService} from "./services/session.service";
 import {ResultsComponent} from './components/step/results/results.component';
 import {DataService} from "./services/data.service";
-import {DropdownWithFilterComponent} from "./components/dropdown-with-filter/dropdown-with-filter.component";
-import {FilterComponent} from "./components/dropdown-with-filter/filter/filter.component";
-import {SelectableTable} from "./components/tables/selectable-table/selectable-table.component";
+import {ConfigurationService} from "./services/configuration.service";
 
 
 @NgModule({
     declarations: [
         AppComponent,
-        ParseSentenceComponent,
         HomePageComponent,
         HeaderComponent,
         NavigationComponent,
@@ -62,10 +58,7 @@ import {SelectableTable} from "./components/tables/selectable-table/selectable-t
         XpathInputComponent,
         BreadcrumbBarComponent,
         SelectTreebanksComponent,
-        SelectableTable,
         ResultsComponent,
-        DropdownWithFilterComponent,
-        FilterComponent
 
     ],
     imports: [
@@ -83,7 +76,8 @@ import {SelectableTable} from "./components/tables/selectable-table/selectable-t
         TreebankService,
         CookieService,
         SessionService,
-        DataService
+        DataService,
+        ConfigurationService
     ],
     bootstrap: [AppComponent]
 })

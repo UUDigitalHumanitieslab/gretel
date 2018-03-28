@@ -1,3 +1,6 @@
+/**
+ * Contains all the information about the links
+ */
 interface Link{
   name: string;
   link: string;

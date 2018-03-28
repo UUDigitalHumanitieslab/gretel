@@ -116,9 +116,12 @@ export class XpathSearchComponent implements OnInit {
 
     }
 
+    /**
+     * Goes to the results step
+     */
     goToResults() {
         this.done = false;
-        this.dataService.getData().subscribe((data) => {
+        this.dataService.getResults().subscribe((data) => {
                 this.results = data;
             },
             e => console.log(e),

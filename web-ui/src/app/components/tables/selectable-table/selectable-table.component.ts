@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {TableColumn} from './TableColumn';
 
-/** A table that becomes scrollable when it passes the height of the parent. To make sure this  */
 @Component({
   selector: 'app-selectable-table',
   templateUrl: './selectable-table.component.html',

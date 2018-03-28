@@ -1,3 +1,6 @@
+/**
+ * Temporary xpath editor.
+ */
 import {Component, OnInit} from '@angular/core';
 
 @Component({
