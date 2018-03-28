@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScrollableTableComponent } from './scrollable-table.component';
+import { DropdownWithFilterComponent } from './dropdown-with-filter.component';
 
-describe('SelectableTable', () => {
-  let component: ScrollableTableComponent;
-  let fixture: ComponentFixture<ScrollableTableComponent>;
+describe('DropdownWithFilterComponent', () => {
+  let component: DropdownWithFilterComponent;
+  let fixture: ComponentFixture<DropdownWithFilterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ScrollableTableComponent ]
+      declarations: [ DropdownWithFilterComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ScrollableTableComponent);
+    fixture = TestBed.createComponent(DropdownWithFilterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

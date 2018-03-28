@@ -1,0 +1,24 @@
+<div class="dropdown" [ngClass]="{'is-active': active}" >
+  <div class="dropdown-trigger">
+    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu2" (click)="active = !active">
+      <span>Filters</span>
+      <span class="icon">
+        <i class="fas fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </button>
+  </div>
+  <div class="dropdown-menu" role="menu">
+
+    <div class="dropdown-content">
+      <div class="dropdown-item">
+            <app-filter [items]="items" (filter)="changeFilteredItems($event)"></app-filter>
+      </div>
+      <hr class="dropdown-divider">
+      <div *ngFor="let item of filteredItems" class="dropdown-item">
+        <label class="checkbox">
+          <input type="checkbox">
+            {{item}}
+        </label></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="hero">
+  <div class="hero-body">
+
+    <div class="container">
+      <h1 class="title">Results</h1>
+      <div class="box">
+        <div class="level is-light">
+          <div class="level-left">
+            <div class="level-item"><h2 class="subtitle"> Number of results: {{results.length}}</h2></div>
+            <div class="level-item " *ngIf="loading"><a class="button is-info is-loading"></a></div>
+          </div>
+          <div class="level-right">
+
+
+            <div class="level-item">
+              <app-dropdown-with-filter [items]="items"></app-dropdown-with-filter>
+            </div>
+          </div>
+
+        </div>
+
+
+      </div>
+
+      <div style="height: 500px">
+        <app-scrollable-table [data]="results" [columns]="columns"></app-scrollable-table>
+      </div>
+
+
+    </div>
+  </div>
+</div>
