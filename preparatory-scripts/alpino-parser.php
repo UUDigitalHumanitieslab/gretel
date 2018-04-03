@@ -8,6 +8,7 @@
 function alpino($sentence, $id)
 {
     global $alpinoDirectory;
+
     $descriptorspec = array(
               0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
               1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -18,7 +19,6 @@ function alpino($sentence, $id)
     $env = array('ALPINO_HOME' => $alpinoDirectory);
     $tmp = ROOT_PATH . '/tmp';
     $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
-
     $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
     if (!is_resource($process)) {

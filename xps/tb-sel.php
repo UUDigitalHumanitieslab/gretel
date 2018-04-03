@@ -19,6 +19,7 @@ if ($continueConstraints) {
   $_SESSION[SID]['xpath'] = $xpath;
 }
 
+
 require ROOT_PATH."/functions.php";
 require ROOT_PATH."/front-end-includes/head.php";
 

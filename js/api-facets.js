@@ -2,7 +2,6 @@ $(function () {
     // Update date range facet with currently selected value and redirect on change in date selection
     $('.facet input.facet-daterange').each(function () {
         $(this).css('max-width', '100px');
-
         var key = $(this).attr('name').split('_')[0];
         var type = $(this).attr('name').split('_')[1];
         var val = getParameterByName(key);
