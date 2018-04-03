@@ -1,9 +1,9 @@
-import { ParseMessage, XPathParserService } from './xpath-parser.service';
+import { ParseMessage, LassyXPathParser } from './lassy-xpath-parser';
 
 describe("XPath Parser Service", () => {
-    let parserService: XPathParserService;
+    let parserService: LassyXPathParser;
     beforeEach(() => {
-        parserService = new XPathParserService();
+        parserService = new LassyXPathParser();
     });
 
     it('Accepts valid input', () => {

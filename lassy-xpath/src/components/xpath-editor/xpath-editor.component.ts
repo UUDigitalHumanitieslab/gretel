@@ -4,8 +4,8 @@ import * as ace from 'brace';
 import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
-import { MacroService } from '../../services/macro.service';
-import { ParseMessage, XPathParserService } from '../../services/xpath-parser.service';
+import { MacroService } from '../../services/macro.jquery';
+import { ParseMessage, LassyXPathParser } from '../../services/lassy-xpath-parser';
 
 let AceRange = ace.acequire('ace/range').Range;
 
@@ -17,7 +17,7 @@ export class XPathEditorComponent {
     private editor: ace.Editor;
     private session: ace.IEditSession;
     private macroService: MacroService;
-    private xpathParserService: XPathParserService;
+    private xpathParserService: LassyXPathParser;
 
     private $element: JQuery;
     private $errorElement: JQuery;
@@ -68,7 +68,7 @@ export class XPathEditorComponent {
         this.autofocus = !!this.$element.attr('autofocus');
         this.value = this.$hiddenInput.val() as string;
 
-        this.xpathParserService = new XPathParserService();
+        this.xpathParserService = new LassyXPathParser();
 
         this.initialize(this.$element);
     }

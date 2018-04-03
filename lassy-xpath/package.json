@@ -2,8 +2,8 @@
     "name": "lassy-xpath",
     "version": "0.0.1",
     "description": "XPath format and editor for searching LASSY XML files",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "index.js",
+    "types": "index.d.ts",
     "scripts": {
         "build": "tsc",
         "test": "karma start karma.conf.js"
@@ -15,6 +15,10 @@
     "author": "Sheean Spoel, Digital Humanities Lab <s.j.j.spoel@uu.nl>",
     "license": "CC-BY-NC-SA-4.0",
     "devDependencies": {
+        "@angular/common": "^5.2.0",
+        "@angular/core": "^5.2.0",
+        "@angular/forms": "^5.2.0",
+        "@angular/http": "^5.2.0",
         "@types/es6-shim": "^0.31.36",
         "@types/jasmine": "^2.8.6",
         "@types/jquery": "^3.3.1",
@@ -29,6 +33,7 @@
         "karma-jasmine-html-reporter": "^1.0.0",
         "karma-typescript": "^3.0.12",
         "karma-webpack": "^3.0.0",
+        "rxjs": "^5.5.6",
         "ts-loader": "^4.1.0",
         "typescript": "^2.7.2",
         "webpack": "^4.1.1"

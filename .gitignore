@@ -2,6 +2,7 @@
 .gitignore*
 *.png
 *.ico
+*.log
 *~
 tmp/*
 log/*

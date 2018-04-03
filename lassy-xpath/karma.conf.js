@@ -21,7 +21,7 @@
 // }
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
-var webpackConfig = require('./webpack.config');
+var webpackConfig = require('./webpack.conf');
 module.exports = function (config) {
     config.set({
         basePath: '',

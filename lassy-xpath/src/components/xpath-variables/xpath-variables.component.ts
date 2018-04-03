@@ -1,4 +1,4 @@
-import { PathVariable, XPathExtractinator, FormatError } from '../../services/xpath-extractinator.service';
+import { PathVariable, XPathExtractinator, FormatError } from '../../services/xpath-extractinator';
 import * as $ from 'jquery';
 import { BehaviorSubject, Observable } from 'rxjs'
 import { XPathModels } from 'ts-xpath';
