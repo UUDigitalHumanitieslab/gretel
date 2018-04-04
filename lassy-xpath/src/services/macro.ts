@@ -8,6 +8,17 @@ export class Macro {
      */
     private static macroLookup: MacroLookup = {};
 
+    private loaded: () => void;
+    /**
+     * Waits for the definitions to be loaded
+     */
+    public onceLoaded: Promise<boolean> = new Promise<boolean>((resolve, reject) => {
+        this.loaded = () => {
+            resolve();
+            this.loaded = () => { };
+        };
+    });
+
     constructor() {
     }
 
@@ -17,6 +28,7 @@ export class Macro {
      */
     public loadFromText(data: string): void {
         Macro.macroLookup = this.parseValues(data);
+        this.loaded();
     }
 
     public getMacros(): MacroLookup {

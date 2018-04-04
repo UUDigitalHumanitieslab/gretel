@@ -1,34 +1,28 @@
-import { BehaviorSubject } from 'rxjs';
-import * as $ from 'jquery';
+import { BehaviorSubject, Observable } from 'rxjs';
 import * as ace from 'brace';
 import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
 import 'brace/theme/dawn';
-import { MacroService } from '../../services/macro.jquery';
+import { Macro } from '../../services/macro';
 import { ParseMessage, LassyXPathParser } from '../../services/lassy-xpath-parser';
 
 let AceRange = ace.acequire('ace/range').Range;
 
 export const Selector = 'xpath-editor';
-export class XPathEditorComponent {
-    public autofocus: boolean;
-    public value: string;
-
+export class XPathEditor {
     private editor: ace.Editor;
     private session: ace.IEditSession;
-    private macroService: MacroService;
-    private xpathParserService: LassyXPathParser;
-
-    private $element: JQuery;
-    private $errorElement: JQuery;
-    private $hiddenInput: JQuery;
 
     private existingErrorMarkerId: number | undefined = undefined;
     private existingWarningMarkerIds: number[] = [];
     private valueSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    private errorMessageSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private macroServiceLoaded = false;
 
     private beforeEnrich: string = null;
+
+    public value = this.valueSubject.asObservable();
+    public errorMessage = this.errorMessageSubject.asObservable();
 
     private parsedObservable = this.valueSubject.debounceTime(50).map(xpath => {
         if (this.macroServiceLoaded &&
@@ -52,49 +46,28 @@ export class XPathEditorComponent {
         return this.xpathParserService.parse(xpath);
     });
 
-    constructor(element: HTMLElement) {
-        this.$element = $(element);
-        this.$element.data('xpath-editor', this);
-        this.macroService = new MacroService();
-        this.macroService.loadFromUrl(this.$element.data('root-url')).then(() => {
+    constructor(private xpathParserService: LassyXPathParser, private macroService: Macro) {
+        this.macroService.onceLoaded.then(() => {
             this.macroServiceLoaded = true;
             // parse again, just to be sure
-            this.valueSubject.next(this.value);
+            this.valueSubject.next(this.valueSubject.value);
         });
-
-        this.$hiddenInput = this.$element.children('textarea');
-        this.$hiddenInput.addClass('hidden');
-
-        this.autofocus = !!this.$element.attr('autofocus');
-        this.value = this.$hiddenInput.val() as string;
-
-        this.xpathParserService = new LassyXPathParser();
-
-        this.initialize(this.$element);
     }
 
     private updateValue() {
-        this.value = this.session.getValue();
-        this.$hiddenInput.val(this.value);
-        this.$hiddenInput.trigger('change');
-        this.valueSubject.next(this.value);
+        this.valueSubject.next(this.session.getValue());
     }
 
-    private initialize(element: JQuery) {
-        element.css({
-            display: 'block',
-            width: '100%'
-        });
-        let $container = $('<div>');
-        this.$errorElement = $('<p class="errorMessage"></p>');
-        this.$element.append(...[$container, this.$errorElement]);
+    public initialize(container: HTMLElement, autofocus: boolean, value: string) {
         let languageTools = ace.acequire("ace/ext/language_tools");
         languageTools.setCompleters([new Completer()]);
 
-        let editor = this.editor = ace.edit($container[0]);
+        this.valueSubject.next(value);
+
+        let editor = this.editor = ace.edit(container);
         editor.$blockScrolling = Infinity; // disable annoying 'this will be disabled in the next version' message
-        editor.setValue(this.value, -1);
-        if (this.autofocus) {
+        editor.setValue(value, -1);
+        if (autofocus) {
             editor.focus();
         }
         editor.setTheme('ace/theme/dawn');
@@ -127,7 +100,7 @@ export class XPathEditorComponent {
                 return {
                     value: parsed,
                     key: (parsed.error ? parsed.error.startLine + parsed.error.message : '')
-                    + (parsed.warnings ? parsed.warnings.map(w => w.startLine + w.message).join('') : '')
+                        + (parsed.warnings ? parsed.warnings.map(w => w.startLine + w.message).join('') : '')
                 }
             })
             .distinctUntilKeyChanged('key')
@@ -151,7 +124,7 @@ export class XPathEditorComponent {
     private hideErrorMessage() {
         if (this.existingErrorMarkerId != undefined) {
             this.session.removeMarker(this.existingErrorMarkerId);
-            this.$errorElement.text('');
+            this.errorMessageSubject.next('');
         }
     }
 
@@ -180,7 +153,7 @@ export class XPathEditorComponent {
         }
 
         this.existingErrorMarkerId = this.session.addMarker(pathRange, 'pathError', 'text', undefined);
-        this.$errorElement.text(errorMessage.message);
+        this.errorMessageSubject.next(errorMessage.message);
     }
 
     private showWarningMessages(warningMessages: ParseMessage[]) {

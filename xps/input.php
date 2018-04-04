@@ -9,15 +9,14 @@
  * @author Liesbeth Augustinus
  * @author Bram Vanroy
  */
-
  session_start();
  header('Content-Type:text/html; charset=utf-8');
 
 $currentPage = 'xps';
 $step = 1;
 
-require "../config.php";
-require ROOT_PATH."/helpers.php";
+require '../config.php';
+require ROOT_PATH.'/helpers.php';
 
 $xpath = '//node[@cat="smain"
 	and node[@rel="su" and @pt="vnw"]
@@ -26,29 +25,27 @@ $xpath = '//node[@cat="smain"
 		and node[@rel="det" and @pt="lid"]
 		and node[@rel="hd" and @pt="n"]]]';
 
-define('SID', session_id() . '-' . time());
+define('SID', session_id().'-'.time());
 $_SESSION[SID] = array();
 $_SESSION[SID]['queryid'] = SID;
 
-require ROOT_PATH."/functions.php";
-require ROOT_PATH."/front-end-includes/head.php";
+require ROOT_PATH.'/functions.php';
+require ROOT_PATH.'/front-end-includes/head.php';
 ?>
 </head>
 <?php flush(); ?>
-<?php require ROOT_PATH."/front-end-includes/header.php"; ?>
+<?php require ROOT_PATH.'/front-end-includes/header.php'; ?>
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
-        <xpath-editor autofocus data-root-url="<?= HOME_PATH ?>macros.txt">
-          <textarea name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
-        </xpath-editor>
+        <textarea class="xpath-editor" autofocus data-root-url="<?= HOME_PATH; ?>macros.txt" name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
         <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
         <input type="hidden" name="sid" value="<?php echo SID; ?>">
         <?php setContinueNavigation(); ?>
     </form>
 
     <?php
-    require ROOT_PATH."/front-end-includes/footer.php";
-    include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+    require ROOT_PATH.'/front-end-includes/footer.php';
+    include ROOT_PATH.'/front-end-includes/analytics-tracking.php';
     ?>
 </body>
 </html>

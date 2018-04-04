@@ -13,7 +13,7 @@ export class MacroService extends Macro {
     public loadFromUrl(url: string) {
         return new Promise((resolve, reject) => {
             $.get(url, (data: string) => {
-                this.loadFromText(data)
+                this.loadFromText(data);
                 resolve();
             });
         });
