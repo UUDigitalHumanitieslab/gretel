@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs';
+import { Subscription } from 'rxjs/Subscription';
 import * as $ from 'jquery';
 import { XPathEditor } from './xpath-editor';
 import { MacroService, LassyXPathParser } from '../../services/_jquery';
@@ -43,10 +43,10 @@ class JQueryXPathEditor extends XPathEditor {
         });
 
         this.subscriptions = [
-            this.errorMessage.subscribe((message) => {
+            this.errorMessageObservable.subscribe((message) => {
                 this.$errorElement.text(message);
             }),
-            this.value.subscribe((value) => {
+            this.valueObservable.subscribe((value) => {
                 $textArea.val(value);
                 $textArea.trigger('change');
             })

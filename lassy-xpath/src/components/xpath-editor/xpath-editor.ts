@@ -1,4 +1,9 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/distinctUntilKeyChanged';
+
 import * as ace from 'brace';
 import { modeName as xpathModeName, Completer } from './xpath-mode';
 import 'brace/ext/language_tools';
@@ -21,8 +26,8 @@ export class XPathEditor {
 
     private beforeEnrich: string = null;
 
-    public value = this.valueSubject.asObservable();
-    public errorMessage = this.errorMessageSubject.asObservable();
+    public valueObservable = this.valueSubject.asObservable();
+    public errorMessageObservable = this.errorMessageSubject.asObservable();
 
     private parsedObservable = this.valueSubject.debounceTime(50).map(xpath => {
         if (this.macroServiceLoaded &&

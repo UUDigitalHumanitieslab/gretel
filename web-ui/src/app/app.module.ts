@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { LassyXPathParserService } from 'lassy-xpath/ng';
+import { LassyXPathModule } from 'lassy-xpath/ng';
 
 import { AppComponent } from './app.component';
 import { ParseSentenceComponent } from './components/parse-sentence/parse-sentence.component';
@@ -22,7 +22,6 @@ import { DocumentationContentComponent } from './pages/documentation/documentati
 import { FooterNavigationComponent } from './components/footer/footer-navigation/footer-navigation.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { Header3Component } from './components/header-3/header-3.component';
-import { XpathEditorComponent } from './components/xpath-editor/xpath-editor.component';
 import { StepsNavigatorComponent } from './components/steps-navigator/steps-navigator.component';
 import { XpathSearchService } from "./xpath-search.service";
 import { LinkService } from "./services/link.service";
@@ -61,7 +60,6 @@ import { FormsModule } from '@angular/forms';
         FooterNavigationComponent,
         XpathSearchComponent,
         Header3Component,
-        XpathEditorComponent,
         StepsNavigatorComponent,
         StepComponent,
         XpathInputComponent,
@@ -79,12 +77,12 @@ import { FormsModule } from '@angular/forms';
         HttpClientModule,
         AppRoutingModule,
         TableModule,
-        FormsModule
+        FormsModule,
+        LassyXPathModule
     ],
     providers: [
         AlpinoService,
         XpathSearchService,
-        LassyXPathParserService,
         LinkService,
         TreebankService,
         CookieService,

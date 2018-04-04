@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
 import { Macro } from './macro';
 
 /**
@@ -8,17 +7,7 @@ import { Macro } from './macro';
  */
 @Injectable()
 export class MacroService extends Macro {
-    constructor(private httpClient: HttpClient) {
+    constructor() {
         super();
-    }
-
-    /**
-     * Loads the macro definitions from a URL.
-     * @param url The URL of the macro definitions
-     */
-    public async loadFromUrl(url: string) {
-        let data = await this.httpClient.get(url, { responseType: 'text' }).toPromise();
-        this.loadFromText(data);
-        return;
     }
 }
