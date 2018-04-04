@@ -3,7 +3,7 @@
 
 <div class="container" [ngSwitch]="this.currentStep">
   <app-xpath-input *ngSwitchCase="1" (isValid)="setValid($event)" #xpathInput></app-xpath-input>
-  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValid($event)" #selectTreebanks></app-select-treebanks>
+  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanks></app-select-treebanks>
   <app-results *ngSwitchCase="3" [loading]="!done" [results]="results"></app-results>
 </div>
 

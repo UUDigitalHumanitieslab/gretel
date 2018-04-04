@@ -5,7 +5,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {FormGroup} from "@angular/forms";
 import {SessionService} from "../../services/session.service";
-import {DataService} from "../../services/data.service";
+import {ResultService} from "../../services/result.service";
 
 
 @Component({
@@ -17,9 +17,10 @@ export class XpathSearchComponent implements OnInit {
     // TODO refactor
     done = false;
     results = [];
+    selectedTreebanks = [];
 
 
-    constructor(private  http: HttpClient, private sessionService: SessionService, private dataService: DataService) {
+    constructor(private  http: HttpClient, private sessionService: SessionService, private dataService: ResultService) {
     }
 
     //All the components. used to call functions on.
@@ -108,11 +109,10 @@ export class XpathSearchComponent implements OnInit {
         formData.append("sid", id);
         formData.append("xpath", this.getXPath());
 
-        this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "json"}).subscribe((res) => {
-            //console.log(res.body);
+        this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "document"}).subscribe((res) => {
+            this.currentStep += 1;
         });
 
-        this.currentStep += 1;
 
     }
 
@@ -121,16 +121,28 @@ export class XpathSearchComponent implements OnInit {
      */
     goToResults() {
         this.done = false;
-        this.dataService.getResults().subscribe((data) => {
-                this.results = data;
-            },
-            e => console.log(e),
-            () => this.done = true
-        );
+        let id = this.sessionService.getSessionId();
+        const formData = new FormData();
+
+
+        formData.append("sid", id);
+        formData.append("treebank", this.selectedTreebanks.treebank);
+        for(let subTreebank of this.selectedTreebanks.subTreebanks){
+            formData.append("subtreebank[]", subTreebank)
+        }
+
+        this.http.post('/gretel/xps/results.php', formData, {responseType: "document"}).subscribe((res) => {
+            this.dataService.getResults().subscribe((data) => {
+                    this.results = data;
+                },
+                e => console.log(e),
+                () => this.done = true
+            );
+        });
 
 
         this.currentStep += 1;
-    }
+    };
 
 
     /**
@@ -176,6 +188,10 @@ export class XpathSearchComponent implements OnInit {
      */
     getXPath() {
         return "//node"
+    };
+
+    updateSelected(e){
+        this.selectedTreebanks = e
     }
 
 }

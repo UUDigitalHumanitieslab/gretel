@@ -32,8 +32,9 @@ import {DialogModule} from "primeng/dialog";
 import {CookieService} from "angular2-cookie/core";
 import {SessionService} from "./services/session.service";
 import {ResultsComponent} from './components/step/results/results.component';
-import {DataService} from "./services/data.service";
+import {ResultService} from "./services/result.service";
 import {ConfigurationService} from "./services/configuration.service";
+import {SelectableTable} from "./components/tables/selectable-table/selectable-table.component";
 
 
 @NgModule({
@@ -59,7 +60,7 @@ import {ConfigurationService} from "./services/configuration.service";
         BreadcrumbBarComponent,
         SelectTreebanksComponent,
         ResultsComponent,
-
+        SelectableTable
     ],
     imports: [
         BrowserModule,
@@ -76,7 +77,7 @@ import {ConfigurationService} from "./services/configuration.service";
         TreebankService,
         CookieService,
         SessionService,
-        DataService,
+        ResultService,
         ConfigurationService
     ],
     bootstrap: [AppComponent]

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output,} from '@angular/core';
 import {TableColumn} from './TableColumn';
 
 @Component({
@@ -12,6 +12,8 @@ export class SelectableTable implements OnInit {
   @Input() data: any;
   /** The columns of the table*/
   @Input() columns: TableColumn[];
+  @Output() onSelect = new EventEmitter<any>();
+
 
 
   constructor() {
@@ -23,6 +25,7 @@ export class SelectableTable implements OnInit {
 
   changeSelected(row: any){
     row.selected = !row.selected;
+    this.onSelect.emit();
   }
 
 
@@ -30,9 +33,11 @@ export class SelectableTable implements OnInit {
   changeAllSelected(e: any){
     if(e.currentTarget.checked){
       this.data.forEach((entry: any) => entry.selected = true)
+
     } else {
       this.data.forEach((entry: any) => entry.selected = false)
     }
+      this.onSelect.emit();
   }
 
   isAllChecked(){

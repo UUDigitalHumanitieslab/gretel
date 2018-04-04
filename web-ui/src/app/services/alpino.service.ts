@@ -8,8 +8,6 @@ export class AlpinoService {
 
   constructor(private http: HttpClient) { }
 
-
-
   parseSentence(sentence: string): Observable<any>{
     const httpOptions = {
       headers: new HttpHeaders({

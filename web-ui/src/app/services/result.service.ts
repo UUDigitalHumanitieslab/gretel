@@ -6,23 +6,15 @@ import 'rxjs/add/operator/map';
 import {Observable} from "rxjs/Observable";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {RequestOptions} from "@angular/http";
+import {SessionService} from "./session.service";
 @Injectable()
-export class DataService {
+export class ResultService {
 
     data: Result[];
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private sessionService: SessionService) {
         this.data = [];
-        for (const i of _.range(100)) {
-            this.data.push(
-                {
-                    id: i,
-                    component: 'AAA',
-                    sentence: 'some random sentence',
 
-                }
-            );
-        }
     }
 
     getResults(): Observable<Result[]> {
@@ -35,14 +27,12 @@ export class DataService {
         let options = new RequestOptions();
         //options.withCredentials = true;
 
-        return this.http.get("http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=e9bpdt5h71ksjosk4n2j3piho0-1522248767", {"withCredentials": true})
+        return this.http.get(`http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=${this.sessionService.getSessionId()}`, {"withCredentials": true})
             .map((res: any) => {
                 let data = Object.keys(res.data).map((key: any) => {
                     let entry = res.data[key];
                     let id = this.get_id_from_text(entry[0]);
-                    console.log(entry[0]);
                     let link = this.get_link_from_text(entry[0]);
-                    console.log(link);
                     return {
                         id: id,
                         component: entry[2],
@@ -70,8 +60,6 @@ export class DataService {
     get_link_from_text(text: string){
         let start = text.indexOf("href=\"");
         let end = text.indexOf("\" target");
-        console.log(start)
-        console.log(end)
         return text.substring(start + 6, end)
     }
 }
