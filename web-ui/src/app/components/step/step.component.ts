@@ -17,7 +17,7 @@ export class StepComponent implements OnInit {
 
   }
 
-  @Output() isValid = new EventEmitter<Boolean>();
+  @Output() onChangeValid = new EventEmitter<Boolean>();
 
   ngOnInit() {
   }

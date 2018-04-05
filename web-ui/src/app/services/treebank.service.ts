@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Observable} from "rxjs/Observable";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {SessionService} from "./session.service";
 
 
 @Injectable()
 export class TreebankService {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private sessionService: SessionService) {
   }
 
   getTreebanks(): Observable<any> {
@@ -15,7 +16,23 @@ export class TreebankService {
 
   }
 
-  //TODO: make use of typechecking
+  preGetTreebanks(xpath: string): Observable<any>{
+      let id = this.sessionService.getSessionId();
+
+      const httpOptions = {
+          headers: new HttpHeaders({
+              'responseType': 'document'
+          })
+      };
+      const formData = new FormData();
+      formData.append("sid", id);
+      formData.append("xpath", xpath);
+
+
+
+      return this.http.post("/gretel/xps/tb-sel.php", formData, {responseType: "document"})
+  }
+
   getTreebankInfo(treebankInfo: any) {
     return this.http.get(`/gretel-upload/index.php/api/treebank/show/${treebankInfo.title}`)
   }

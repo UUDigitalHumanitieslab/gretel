@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {StepComponent} from "../step.component";
 import {TreebankService} from "../../../services/treebank.service";
 import {Treebank, TreebankInfo} from "../../../treebank";
@@ -83,11 +83,12 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
   }
 
   updateSelected(){
-      this.subTreebanks = this.info[this.mainTreebank].filter(entry => entry.selected).map(entry => entry.title)
+      this.subTreebanks = this.info[this.mainTreebank].filter(entry => entry.selected).map((entry: any) => entry.title)
       this.onUpdateSelected.emit({
           treebank: this.mainTreebank,
           subTreebanks: this.subTreebanks
       })
+      this.checkIfValid()
   }
 
 
@@ -95,8 +96,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
    * Checks if there are treebanks selected
    */
   checkIfValid() {
-    //TODO: make correct
-    this.isValid.emit(this.valid);
+    this.valid = true ? this.subTreebanks.length != 0 : false
+    this.onChangeValid.emit(this.valid);
   }
 
   /**

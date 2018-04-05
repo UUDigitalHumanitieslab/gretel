@@ -17,7 +17,15 @@ export class ResultService {
 
     }
 
-    getResults(): Observable<Result[]> {
+    getResults(treebank, subTreebanks): Observable<Result[]> {
+        let id = this.sessionService.getSessionId();
+        const formData = new FormData();
+        formData.append("sid", id);
+        formData.append("treebank", treebank);
+        for (let subTreebank of subTreebanks) {
+            formData.append("subtreebank[]", subTreebank)
+        }
+
 
         const httpOptions = {
             headers: new HttpHeaders({
@@ -27,28 +35,37 @@ export class ResultService {
         let options = new RequestOptions();
         //options.withCredentials = true;
 
-        return this.http.get(`http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=${this.sessionService.getSessionId()}`, {"withCredentials": true})
-            .map((res: any) => {
-                let data = Object.keys(res.data).map((key: any) => {
-                    let entry = res.data[key];
-                    let id = this.get_id_from_text(entry[0]);
-                    let link = this.get_link_from_text(entry[0]);
-                    return {
-                        id: id,
-                        component: entry[2],
-                        sentence: entry[1],
-                        link: link
-                    }
-                });
-                return data
-            })
+        return new Observable((observer) => {
+            this.http.post('/gretel/xps/results.php', formData, {'responseType': 'document'}).subscribe((res) => {
 
-        /*
-         return Rx.Observable.interval(100)
-         .map((c: number) => this.data[c])
-         .take(this.data.length);
-         */
+                },
+                (e) => {
+                },
+                (done) => {
+                    this.http.get(`http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=${id}`, {"withCredentials": true}).map((res: any) => {
+                        console.log('Doe maar even  ook djoen')
+                        let data = Object.keys(res.data).map((key: any) => {
+                            let entry = res.data[key];
+                            let id = this.get_id_from_text(entry[0]);
+                            let link = this.get_link_from_text(entry[0]);
+                            return {
+                                id: id,
+                                component: entry[2],
+                                sentence: entry[1],
+                                link: link
+                            }
+                        });
+                        observer.next(data);
+                        observer.complete();
+
+
+                    }).subscribe()
+
+
+                });
+        })
     }
+
 
 
     get_id_from_text(text: string) {
@@ -57,7 +74,7 @@ export class ResultService {
         return text.substring(start + 1, end);
     }
 
-    get_link_from_text(text: string){
+    get_link_from_text(text: string) {
         let start = text.indexOf("href=\"");
         let end = text.indexOf("\" target");
         return text.substring(start + 6, end)

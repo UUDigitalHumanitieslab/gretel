@@ -12,11 +12,11 @@ import {ConfigurationService} from "../../../services/configuration.service";
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent implements OnInit {
+export class ResultsComponent implements OnInit, OnChanges {
 
 
-    @Input() results: Result[];
-    @Input() loading: boolean;
+    @Input() results: Result[] = [];
+    @Input() loading: boolean = true;
 
     columns: any[] = [
         {field: 'number', header: '#', width: '5%'},
@@ -32,6 +32,11 @@ export class ResultsComponent implements OnInit {
     }
 
     ngOnInit() {
+    }
+
+
+    ngOnChanges(e: any){
+        console.log(e)
     }
 
     /**
