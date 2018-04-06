@@ -1,26 +1,26 @@
 <?php
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-require "../config.php";
-require ROOT_PATH."/functions.php";
+require '../config.php';
+require ROOT_PATH.'/functions.php';
 
-require ROOT_PATH."/basex-search-scripts/basex-client.php";
-require ROOT_PATH."/basex-search-scripts/treebank-search.php";
+require ROOT_PATH.'/basex-search-scripts/basex-client.php';
+require ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 session_start();
 set_time_limit(0);
 ini_set('memory_limit', '3G');
 
 if (!isset($_GET['sid'])) {
-  $results = array(
+    $results = array(
     'error' => true,
     'data' => 'Session ID not provided. Perhaps you have disabled cookies. Please enable them.',
   );
-  echo json_encode($results);
-  exit;
+    echo json_encode($results);
+    exit;
 }
 
 define('SID', $_GET['sid']);
@@ -39,7 +39,7 @@ if ($corpus == 'sonar') {
     $needRegularSonar = $_SESSION[SID]['needRegularSonar'];
 }
 
-$xpath = $_SESSION[SID]['xpath'] . $_SESSION[SID]['metadataFilter'];
+$xpath = $_SESSION[SID]['xpath'].$_SESSION[SID]['metadataFilter'];
 $ebsxps = $_SESSION[SID]['ebsxps'];
 
 if ($ebsxps == 'ebs') {
@@ -62,12 +62,12 @@ $time = time();
 $user = (getenv('REMOTE_ADDR')) ? getenv('REMOTE_ADDR') : 'anonymous';
 
 if ($ebsxps == 'ebs') {
-    $xplog = fopen(ROOT_PATH."/log/gretel-ebq.log", 'a');
+    $xplog = fopen(ROOT_PATH.'/log/gretel-ebq.log', 'a');
     // fwrite($xplog, "Date\tIP.address\tUnique.ID\tInput.example\tTreebank\tComponent\tXPath.changed\tXPath.searched\tOriginal.xpath\n");
     fwrite($xplog, "$date\t$user\t$id-$time\t$example\t$corpus\t$componentsString\t$xpChanged\t$xpath\t$originalXp\n");
     fclose($xplog);
 } else {
-    $xplog = fopen(ROOT_PATH."/log/gretel-xps.log", 'a');
+    $xplog = fopen(ROOT_PATH.'/log/gretel-xps.log', 'a');
     fwrite($xplog, "$date\t$user\t$id-$time\t$corpus\t$componentsString\t$xpath\n");
     fclose($xplog);
 }
@@ -79,11 +79,11 @@ try {
         $serverInfo = getServerInfo($corpus, false);
     }
 
-    $dbhost = $serverInfo{'machine'};
-    $dbport = $serverInfo{'port'};
+    $dbhost = $serverInfo['machine'];
+    $dbport = $serverInfo['port'];
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList) = getSentences($databases, $already, 'all', $session, SID, $searchLimit, $variables);
+    list($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList) = getSentences($corpus, $databases, $already, 'all', $session, SID, $searchLimit, $xpath, $context, $variables);
 
     $session->close();
 
@@ -92,8 +92,8 @@ try {
         // If the file already exists, remove it and re-create it (just to be sure)
 
         // Create seperate HTML file for printing
-        $dlFileName = ROOT_PATH."/tmp/".SID."-gretel-results-dl.txt";
-        $printFileName = ROOT_PATH."/tmp/".SID."-gretel-results-print.html";
+        $dlFileName = ROOT_PATH.'/tmp/'.SID.'-gretel-results-dl.txt';
+        $printFileName = ROOT_PATH.'/tmp/'.SID.'-gretel-results-print.html';
 
         if (file_exists($dlFileName)) {
             unlink($dlFileName);
@@ -107,10 +107,10 @@ try {
         $dlFh = fopen($dlFileName, 'a');
         fwrite($dlFh, "Corpus: $corpus\nComponents: $componentsString\n");
         if ($ebsxps == 'ebs') {
-          fwrite($dlFh, "Input example: $example\n");
+            fwrite($dlFh, "Input example: $example\n");
         }
-        $timezone  = 1; //(GMT +1)
-        $date = gmdate("j/m/Y H:i:s", time() + 3600*($timezone+date("I")));
+        $timezone = 1; //(GMT +1)
+        $date = gmdate('j/m/Y H:i:s', time() + 3600 * ($timezone + date('I')));
         fwrite($dlFh, "XPath: $xpath\nDate: $date\n\n");
 
         // Print file
@@ -120,13 +120,13 @@ try {
 
         fwrite($printFh, "<ul><li>Corpus: $corpus</li><li>Components: $componentsString</li>");
         if ($ebsxps == 'ebs') {
-          fwrite($printFh, "<li>Input example: $example</li>");
+            fwrite($printFh, "<li>Input example: $example</li>");
         }
         fwrite($printFh, "<li>XPath: $xpath</li><li>Date: $date</li></ul><table><tbody>");
 
         $counter = 0;
         foreach ($sentences as $sid => $sentence) {
-            $counter++;
+            ++$counter;
             // highlight sentence
             $hlsentence = highlightSentence($sentence, $beginlist[$sid], 'strong');
 
@@ -168,28 +168,28 @@ try {
             // For Lassy and CGN tb and db are identical (i.e. lassy & lassy, or cgn & cgn).
             // For Sonar tb is sonar, and db something like WRPEC0000019treebank
             $sentenceidlink = '<a class="tv-show-fs" href="front-end-includes/show-tree.php'
-            . '?sid='.$sidString
-            . '&tb='.$corpus
-            . '&db='.$databaseString
-            . '&id='.$idlist[$sid]
-            . '" target="_blank">'.$sidString.'</a>';
+            .'?sid='.$sidString
+            .'&tb='.$corpus
+            .'&db='.$databaseString
+            .'&id='.$idlist[$sid]
+            .'" target="_blank">'.$sidString.'</a>';
 
-            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentsString, $metalist[$sid], $xmllist[$sid], $varList[$sid]);
+            $resultsArray[$sid] = array($sentenceidlink, $hlsentence, $componentsString, $metalist[$sid], $xmllist[$sid], $varList[$sid]);
 
             // Prepare files for download or print
             fwrite($dlFh, "$counter\t");
             fwrite($printFh, "<tr><td>$counter</td>");
 
             if ($addSentIds) {
-              fwrite($dlFh, "$sidString\t");
-              fwrite($printFh, "<td>$sidString</td>");
+                fwrite($dlFh, "$sidString\t");
+                fwrite($printFh, "<td>$sidString</td>");
             }
 
             fwrite($dlFh, "$corpus\t");
             fwrite($printFh, "<td>$corpus</td>");
             if (!($corpus == 'sonar' && $addSentIds)) {
-              fwrite($dlFh, "$componentsString\t");
-              fwrite($printFh, "<td>$componentsString</td>");
+                fwrite($dlFh, "$componentsString\t");
+                fwrite($printFh, "<td>$componentsString</td>");
             }
             fwrite($dlFh, "$hlsentenceDownload\n");
             fwrite($printFh, "<td>$hlsentence</td></tr>");
