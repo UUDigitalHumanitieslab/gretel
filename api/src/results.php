@@ -9,7 +9,7 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
 {
     global $dbuser, $dbpwd;
 
-    $already = array(); // TODO: what is going on here?
+    $already = array(); // TODO: unresolved Sonar behavior (see #81)
 
     // connect to BaseX
     if ($corpus == 'sonar') {
