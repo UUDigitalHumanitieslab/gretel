@@ -6,6 +6,8 @@ import { Observable } from "rxjs/Observable";
 
 import { XmlParseService } from './xml-parse.service';
 
+const url = '/gretel/api/src/router.php/results';
+
 @Injectable()
 export class ResultsService {
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
@@ -17,15 +19,15 @@ export class ResultsService {
         offset: number = 0,
         retrieveContext: boolean,
         isAnalysis = false,
+        metadataFilters: { [key: string]: FilterValue } = {},
         variables: { name: string, path: string }[] = null) {
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
             })
         };
-        const url = '/gretel/api/src/router.php/results';
         let results = await this.http.post<ApiSearchResult | false>(url, {
-            xpath,
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
             corpus,
             components,
@@ -38,6 +40,32 @@ export class ResultsService {
         }
 
         return false;
+    }
+
+    /**
+     * Builds the XQuery metadata filter.
+     *
+     * @return string The metadata filter
+     */
+    private createMetadataFilterQuery(filters: { [key: string]: FilterValue }) {
+        // Compile the filter
+        let filter = '';
+        for (let key of Object.keys(filters)) {
+            let value = filters[key];
+
+            switch (value.type) {
+                case 'single':
+                    // Single values
+                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value="${value}"]]`;
+                    break;
+                case 'range':
+                    // Ranged values
+                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value>="${value.min}" and @value<="${value.max}"]]`;
+                    break;
+            }
+        }
+
+        return filter;
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
@@ -96,7 +124,7 @@ export class ResultsService {
                 }
             }[]
         }
-    }): Hit['variableNodes'] {
+    }): Hit['variableValues'] {
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = {
                 pos: variable.$.pos,
@@ -191,3 +219,16 @@ export interface Hit {
      */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } },
 };
+
+export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
+
+export interface FilterSingleValue {
+    type: 'single';
+    value: string
+}
+
+export interface FilterRangeValue<T> {
+    type: 'range';
+    min: T,
+    max: T
+}
