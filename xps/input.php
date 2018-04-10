@@ -37,8 +37,8 @@ require ROOT_PATH.'/front-end-includes/head.php';
 <?php require ROOT_PATH.'/front-end-includes/header.php'; ?>
     <form action="xps/tb-sel.php" method="post" enctype="multipart/form-data">
         <p>Enter an <strong>XPath expression</strong> containing the (syntactic) characteristics you are looking for:</p>
-        <textarea class="xpath-editor" autofocus data-root-url="<?= HOME_PATH; ?>macros.txt" name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
-        <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
+        <textarea class="xpath-editor" autofocus data-macros-url="<?= HOME_PATH; ?>macros.txt" name="xpath" id="xpath"><?php echo $xpath; ?></textarea>
+        <data class="xpath-variables" data-name="xpath-variables" data-source="#xpath"></div>
         <input type="hidden" name="sid" value="<?php echo SID; ?>">
         <?php setContinueNavigation(); ?>
     </form>

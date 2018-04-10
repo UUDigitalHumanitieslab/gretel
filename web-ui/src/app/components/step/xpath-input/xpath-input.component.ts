@@ -18,13 +18,10 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     and node[@rel="det" and @pt="lid"]
     and node[@rel="hd" and @pt="n"]]]`;
 
-    constructor(private lassyXPathService: LassyXPathParserService, private httpClient: HttpClient, macroService: MacroService) {
+    constructor(private httpClient: HttpClient, macroService: MacroService) {
         super();
 
-        // TODO: configuration? maybe move to node_module?
-        this.httpClient.get('/gretel/macros.txt', { responseType: 'text' }).toPromise().then(data => {
-            macroService.loadFromText(data);
-        });
+        macroService.loadDefault();
     }
 
     valid: boolean = false;

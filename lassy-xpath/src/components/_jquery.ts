@@ -1,5 +1,4 @@
 export * from './_index';
-// TODO: jquery
-export * from './xpath-variables/xpath-variables.component';
 // trigger $.fn.extend
+import './xpath-variables/xpath-variables.jquery';
 import './xpath-editor/xpath-editor.jquery';

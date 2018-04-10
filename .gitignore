@@ -30,3 +30,4 @@ js/min/**
 js/ts/**
 
 vendor
+!lassy-xpath/.gitignore
