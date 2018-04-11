@@ -21,9 +21,11 @@ export class SessionService {
   private generateSessionId() {
     // the length of 50 is now a setting -> should be set somewhere central
     let id =this.cookieService.get("SessionId");
+
     if(!id){
       id = this.generateId(50)
       this.cookieService.put("SessionId", id);
+      this.cookieService.put("PHPSESSID", id);
     }
     return id;
   }

@@ -11,10 +11,10 @@
 <ul>
     <li *ngFor="let item of items">
         <label>
-            <input type="checkbox" name="{{item.id}}" value="{{item.title}}" (change)="getTreebankInfo(item)" #checkbox> {{item.title}}
+            <input type="checkbox" name="{{item.id}}" value="{{item.title}}" (click)="treebankChange($event)" #checkbox> {{item.title}}
         </label>
         <p *ngIf="checkbox.checked">
-            <app-scrollable-table [columns]="columns" [data]="info[item.title]"></app-scrollable-table>
+            <app-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></app-selectable-table>
         </p>
     </li>
 </ul>
