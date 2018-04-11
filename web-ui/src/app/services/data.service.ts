@@ -35,6 +35,7 @@ export class DataService {
     let options = new RequestOptions();
     //options.withCredentials = true;
 
+    // TODO: replace with ResultsService
     return this.http.get("http://localhost:8080/gretel//basex-search-scripts/get-all-results.php?sid=t66bosvmuf97j06vg6ldu2fec5-1521712207", {"withCredentials": true})
       .map((res: any) => {
       let data = Object.keys(res.data).map((key: any) => {

@@ -23,11 +23,11 @@ function getMoreIncludes($database, &$databases, &$already, $session)
 
 function includeAlreadyExists($include, &$already)
 {
-
-    if (isset($already{$include})) {
+    if (isset($already[$include])) {
         return true;
     } else {
-        $already{$include} = 1;
+        $already[$include] = 1;
+
         return false;
     }
 }
@@ -47,12 +47,11 @@ function corpusToDatabase($components, $corpus)
 }
 
 /**
- *
  * @param $variables An array with variables to return. Each element should contain name and path.
  */
-function getSentences($databases, $already, $endPosIteration, $session, $sid, $searchLimit, $variables = null)
+function getSentences($corpus, $databases, $already, $endPosIteration, $session, $sid, $searchLimit, $xpath, $context, $variables = null)
 {
-    global $flushLimit, $needRegularSonar, $corpus;
+    global $flushLimit, $needRegularSonar, $components;
 
     $matchesAmount = 0;
 
@@ -65,7 +64,7 @@ function getSentences($databases, $already, $endPosIteration, $session, $sid, $s
                 ++$endPosIteration;
             }
 
-            $xquery = createXquery($database, $endPosIteration, $searchLimit, $variables);
+            $xquery = createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -74,6 +73,7 @@ function getSentences($databases, $already, $endPosIteration, $session, $sid, $s
                 if ($endPosIteration !== 'all') {
                     $endPosIteration = 0;
                 }
+
                 break;
             }
 
@@ -100,15 +100,15 @@ function getSentences($databases, $already, $endPosIteration, $session, $sid, $s
                     // Add unique identifier to avoid overlapping sentences w/ same ID
                     $sentid .= '-endPos='.$endPosIteration.'+match='.$matchesAmount;
 
-                    $sentences{$sentid} = $sentence;
-                    $idlist{$sentid} = $ids;
-                    $beginlist{$sentid} = $begins;
-                    $xmllist{$sentid} = $xml_sentences;
-                    $metalist{$sentid} = $meta;
+                    $sentences[$sentid] = $sentence;
+                    $idlist[$sentid] = $ids;
+                    $beginlist[$sentid] = $begins;
+                    $xmllist[$sentid] = $xml_sentences;
+                    $metalist[$sentid] = $meta;
                     preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
-                    $varList{$sentid} = count($varMatches) == 0 ? '' : $varMatches[0];
+                    $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
                     if ($corpus == 'sonar') {
-                        $tblist{$sentid} = $tb;
+                        $tblist[$sentid] = $tb;
                     }
                 }
             }
@@ -119,44 +119,45 @@ function getSentences($databases, $already, $endPosIteration, $session, $sid, $s
                 // More results are still in that database but because of the flushlimit we
                 // have to bail out
                 $databases[] = $database;
+
                 break 2;
             }
         }
     }
 
-
     if (isset($sentences)) {
         if ($endPosIteration !== 'all') {
-            session_start();
-            $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
-            $_SESSION[$sid]['flushDatabases'] = $databases;
-            $_SESSION[$sid]['flushAlready'] = $already;
-            session_write_close();
+            if ($sid != null) {
+                session_start();
+                $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
+                $_SESSION[$sid]['flushDatabases'] = $databases;
+                $_SESSION[$sid]['flushAlready'] = $already;
+                session_write_close();
+            }
         }
         if ($corpus !== 'sonar') {
             $tblist = false;
         }
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList);
+
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration);
     } else {
         // in case there are no results to be found
         return false;
     }
 }
 
-function createXquery($database, $endPosIteration, $searchLimit, $variables)
+function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $sonarComponents, $context, $xpath, $variables)
 {
-    global $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath;
-
     $variable_declarations = '';
     $variable_results = '';
 
     if (isset($variables) && $variables != null) {
         foreach ($variables as $index => $value) {
             $name = $value['name'];
-            $variable_declarations .= 'let ' . $name . ' := (' . $value['path'] . ')[1]';
-            $variable_results .= '<var name="' . $name . '">{' . $name . '/@lemma}{' . $name . '/@pos}</var>';
+            $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
+            $variable_results .= '<var name="'.$name.'">{'.$name.'/@lemma}{'.$name.'/@pos}</var>';
         }
-        $variable_results = '<vars>' . $variable_results . '</vars>';
+        $variable_results = '<vars>'.$variable_results.'</vars>';
     }
 
     $for = 'for $node in db:open("'.$database.'")/treebank';
@@ -165,7 +166,7 @@ function createXquery($database, $endPosIteration, $searchLimit, $variables)
         $sentid = 'let $sentid := ($node/ancestor::tree/@id)';
         $sentence = '
     return
-    for $sentence in (db:open("'.$components[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
+    for $sentence in (db:open("'.$sonarComponents[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
         let $tb := ($sentence/@part)';
     } else {
         $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
@@ -174,7 +175,7 @@ function createXquery($database, $endPosIteration, $searchLimit, $variables)
 
     $regulartb = $needRegularSonar ? "let \$tb := '$database'" : '';
     $returnTb = ($corpus == 'sonar') ? '||{data($tb)}' : '';
-    
+
     $meta = 'let $meta := ($node/ancestor::alpino_ds/metadata/meta)';
 
     $ids = 'let $ids := ($node//@id)';
@@ -220,8 +221,7 @@ function createXquery($database, $endPosIteration, $searchLimit, $variables)
     // Never fetch more than the search limit, not even with all
     if ($endPosIteration == 'all') {
         $closePosition = ')[position() = 1 to '.$searchLimit.']';
-    }
-    else {
+    } else {
         // Only fetch the given flushLimit, and increment on each iteration
         $endPosition = $endPosIteration * $flushLimit;
         $startPosition = $endPosition - $flushLimit + 1;
