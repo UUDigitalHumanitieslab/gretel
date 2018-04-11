@@ -8,6 +8,7 @@ export class TreebankService {
     public getMetadata(corpus: string): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             $.get(this.api + '/treebank/metadata/' + corpus, (data: [{ field: string }]) => {
+                console.log(data);
                 resolve(data.map(item => item.field));
             });
         });

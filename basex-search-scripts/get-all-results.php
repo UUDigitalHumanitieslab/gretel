@@ -4,8 +4,12 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
+header("Access-Control-Allow-Origin: http://localhost:4200");
+header("Access-Control-Allow-Credentials: true");
+header("responseType: 'text/html'");
 require "../config.php";
 require ROOT_PATH."/functions.php";
+
 
 require ROOT_PATH."/basex-search-scripts/basex-client.php";
 require ROOT_PATH."/basex-search-scripts/treebank-search.php";
@@ -41,6 +45,7 @@ if ($corpus == 'sonar') {
 
 $xpath = $_SESSION[SID]['xpath'] . $_SESSION[SID]['metadataFilter'];
 $ebsxps = $_SESSION[SID]['ebsxps'];
+
 
 if ($ebsxps == 'ebs') {
     $example = $_SESSION[SID]['example'];

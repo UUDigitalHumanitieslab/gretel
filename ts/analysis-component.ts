@@ -4,7 +4,7 @@ import { NotificationService } from './services/notification-service';
 import { TreebankService } from './services/treebank-service';
 import { SearchService, SearchResult } from './services/search-service';
 import { FileExportRenderer } from './file-export-renderer';
-import { PathVariable } from './xpath-extractinator';
+import { PathVariable } from 'lassy-xpath';
 import * as $ from 'jquery';
 import 'jquery-ui';
 import 'jquery-ui/ui/widgets/sortable';

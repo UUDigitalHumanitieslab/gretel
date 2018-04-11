@@ -2,8 +2,12 @@
 <app-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="currentStep"></app-breadcrumb-bar>
 
 <div class="container" [ngSwitch]="this.currentStep">
-  <app-xpath-input *ngSwitchCase="1" (isValid)="setValidState($event)" #xpathInput></app-xpath-input>
+  <app-xpath-input *ngSwitchCase="1" (isValid)="setValid($event)" #xpathInput></app-xpath-input>
+  <app-select-treebanks *ngSwitchCase="2" (isValid)="setValid($event)" #selectTreebanks></app-select-treebanks>
+  <app-results *ngSwitchCase="3" [loading]="!done" [results]="results"></app-results>
 </div>
 
 <button (click)="prev()">prev</button>
 <button (click)="next()">next</button>
+<form  action="/gretel/xps/results.php" method="post" name="xpath" hidden #hiddenForm>
+</form>
