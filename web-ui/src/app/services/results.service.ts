@@ -136,6 +136,9 @@ export class ResultsService {
             }[]
         }
     }): Hit['variableValues'] {
+        if (!data) {
+            return {};
+        }
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = {
                 pos: variable.$.pos,
