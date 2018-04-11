@@ -1,16 +1,40 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import { Observable } from "rxjs/Observable";
+import {Observable} from "rxjs/Observable";
 
-import { XmlParseService } from './xml-parse.service';
+import {XmlParseService} from './xml-parse.service';
 
 const url = '/gretel/api/src/router.php/results';
 
 @Injectable()
 export class ResultsService {
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
+    }
+
+
+    //TODO: add parameters
+    getAllResults(): Observable<any> {
+        return Observable.create(async observer => {
+            let offset = 0;
+            let done = false;
+            while(!done && !observer.closed){
+                await this.results('//node', 'TEST2', ['test2', 'test2'], offset, false)
+                    .then((res) => {
+                        if (res) {
+                            observer.next(res)
+
+                        } else {
+                            observer.complete();
+                            done = true
+                        }
+                    });
+                offset += 1;
+            }
+
+
+        })
     }
 
     /**
@@ -25,13 +49,13 @@ export class ResultsService {
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
     async results(xpath: string,
-        corpus: string,
-        components: string[],
-        offset: number = 0,
-        retrieveContext: boolean,
-        isAnalysis = false,
-        metadataFilters: { [key: string]: FilterValue } = {},
-        variables: { name: string, path: string }[] = null) {
+                  corpus: string,
+                  components: string[],
+                  offset: number = 0,
+                  retrieveContext: boolean,
+                  isAnalysis = false,
+                  metadataFilters: { [key: string]: FilterValue } = {},
+                  variables: { name: string, path: string }[] = null) {
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -125,7 +149,8 @@ export class ResultsService {
         }, {});
     }
 
-    private mapVariables(data: {
+
+    private mapVariables(data: '' | {
         vars: {
             var: {
                 $: {
@@ -136,6 +161,10 @@ export class ResultsService {
             }[]
         }
     }): Hit['variableValues'] {
+        //Hotfix
+        if (!data) {
+            return {};
+        }
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = {
                 pos: variable.$.pos,
@@ -201,7 +230,7 @@ type ApiSearchResult = [
     { [id: string]: string },
     // 7 end pos iteration
     number
-];
+    ];
 
 export interface SearchResults {
     hits: Hit[],
@@ -229,7 +258,8 @@ export interface Hit {
      * Contains the properties of the node matching the variable
      */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } },
-};
+}
+;
 
 export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
 

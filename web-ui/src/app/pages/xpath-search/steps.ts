@@ -5,6 +5,8 @@ import {SessionService} from "../../services/session.service";
 import {ResultService} from "../../services/result.service";
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/takeUntil';
 /**
  * Contains all the steps that are used in the xpath search
  */
@@ -36,7 +38,7 @@ interface GlobalState {
 interface Step {
     stepNumber: number;
     // Makes sure the step is entered correctly
-    enterStep(GlobalState): Observable<GlobalState>
+    enterStep(GlobalState): Observable<GlobalState>;
 }
 
 
@@ -69,37 +71,37 @@ class ResultStep implements Step {
      * @param state
      * @returns
      */
-    public enterStep(state: GlobalState): Observable<GlobalState> {
-
-        let result = this.resultsService.results(
-            '//node',
-            'test2',
-            ['test2', 'test2'],
-            0,
-            false
+    enterStep(state: GlobalState): Observable<GlobalState> {
 
 
-        ).then( (res) => console.log(res));
 
-        return new Observable((observer) => {})
-        /*
+
         return new Observable((observer) => {
-            this.resultService.getResults(state.selectedTreebanks.treebank, state.selectedTreebanks.subTreebanks).subscribe((data) => {
-                    state.currentStep = {
-                        number: this.stepNumber,
-                        step: this
-                    };
-                    state.results = data;
-                    observer.next(state);
-                    observer.complete()
+            let obs= { next: (res)=> {
+                console.log('jaja')
+            }};
+            console.log(obs);
+            let temp = this.resultsService.getAllResults().take(5).subscribe(obs)
 
-                },
-                e => console.log(e),
-                () => {
-                }
-            );
-        });
-        */
+        })
+        /*
+         return new Observable((observer) => {
+         this.resultService.getResults(state.selectedTreebanks.treebank, state.selectedTreebanks.subTreebanks).subscribe((data) => {
+         state.currentStep = {
+         number: this.stepNumber,
+         step: this
+         };
+         state.results = data;
+         observer.next(state);
+         observer.complete()
+
+         },
+         e => console.log(e),
+         () => {
+         }
+         );
+         });
+         */
 
 
     }
