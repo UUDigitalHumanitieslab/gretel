@@ -12,13 +12,16 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     super();
   }
 
-  valid: boolean = false;
+  valid: boolean = true;
 
   ngOnInit() {
+      console.log('init');
+      //Add the moment it is always valid
+      this.onChangeValid.emit(true)
   }
 
   checkIfValid(){
-    this.isValid.emit(this.valid);
+    this.onChangeValid.emit(true);
   }
 
 

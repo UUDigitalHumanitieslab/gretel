@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Link, mainLinks} from "../links";
+import {Link, mainLinks} from "../app-routing/links";
 
 
 @Injectable()

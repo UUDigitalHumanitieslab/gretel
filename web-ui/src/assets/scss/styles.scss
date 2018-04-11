@@ -1,0 +1,56 @@
+@import "variables";
+
+body {
+    font-family: $Roboto;
+    font-size: 16px;
+    min-width: 960px;
+    color: $gray_main;
+    background: $white_smoke;
+}
+ul {
+    line-height: 1.6;
+    list-style-position: outside;
+    padding-left: 20px;
+}
+p {
+    line-height: 1.75;
+    a {
+        text-decoration: underline;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+h2 {
+    margin: 0 auto 24px;
+    font-size: 24px;
+    font-weight: bold;
+}
+header {
+    background: $green_main;
+    h1 {
+        font: {
+            size: 42px;
+            weight: 900;
+            family: $RobotoSlab;
+        };
+        margin: 0;
+        padding: 12px 0;
+        text-align: center;
+        color: white;
+        text-shadow: 0 2px 0 rgba(0,0,0,0.16);
+        sup {
+            font: {
+                family: $Roboto;
+                size: 12px;
+            };
+            top: -27px;
+            left: -48px;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+    }
+}
+#output {
+    width: 960px;
+    margin: 0 auto;
+}

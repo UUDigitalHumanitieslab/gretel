@@ -1,3 +1,8 @@
+/**
+ * A step component is a component that should be inherited from
+ * It is used to give a outline of how a step in a multi-step process should look
+ * This component is used as parent for the steps in the xpath-search page
+ */
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 
 
@@ -12,7 +17,7 @@ export class StepComponent implements OnInit {
 
   }
 
-  @Output() isValid = new EventEmitter<Boolean>();
+  @Output() onChangeValid = new EventEmitter<Boolean>();
 
   ngOnInit() {
   }

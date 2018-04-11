@@ -3,22 +3,17 @@ import {Observable} from "rxjs/Observable";
 import * as rxjs from 'rxjs';
 import {HttpClient} from "@angular/common/http";
 import { HttpHeaders } from '@angular/common/http';
+import {ConfigurationService} from "./configuration.service";
 @Injectable()
 export class AlpinoService {
+    parseSentenceUrl: string;
 
-  constructor(private http: HttpClient) { }
-
-
+  constructor(private http: HttpClient) {
+      this.parseSentenceUrl = '/api/src/router.php/parse_sentence';
+  }
 
   parseSentence(sentence: string): Observable<any>{
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-
-      })
-    };
-    const url = 'http://localhost:8080/gretel/api/src/router.php/parse_sentence';
-    return this.http.post(url, sentence);
+    return this.http.post(this.parseSentenceUrl, sentence);
 
   }
 
