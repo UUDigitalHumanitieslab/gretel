@@ -78,7 +78,7 @@ class ResultStep implements Step {
 
         return new Observable((observer) => {
             let obs= { next: (res)=> {
-                console.log('jaja')
+                console.log(res)
             }};
             console.log(obs);
             let temp = this.resultsService.getAllResults().take(5).subscribe(obs)

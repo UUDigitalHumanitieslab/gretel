@@ -5,7 +5,7 @@ import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {Observable} from "rxjs/Observable";
 
 import {XmlParseService} from './xml-parse.service';
-
+import 'rxjs/add/operator/mergeMap'
 const url = '/gretel/api/src/router.php/results';
 
 @Injectable()
@@ -21,18 +21,20 @@ export class ResultsService {
             while(!observer.closed){
                 await this.results('//node', 'TEST2', ['test2', 'test2'], offset, false)
                     .then((res) => {
+
                         if (res) {
                             observer.next(res)
 
                         } else {
                             observer.complete();
                         }
+                        offset = res.lastOffset;
                     });
-                offset += 1;
+
             }
 
 
-        })
+        }).mergeMap(results => results.hits);
     }
 
     /**
