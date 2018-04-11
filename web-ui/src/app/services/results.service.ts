@@ -6,7 +6,12 @@ import { Observable } from "rxjs/Observable";
 
 import { XmlParseService } from './xml-parse.service';
 
-const url = '/gretel/api/src/router.php/results';
+const routerUrl = '/gretel/api/src/router.php/';
+const httpOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+    })
+};
 
 @Injectable()
 export class ResultsService {
@@ -21,12 +26,7 @@ export class ResultsService {
         isAnalysis = false,
         metadataFilters: { [key: string]: FilterValue } = {},
         variables: { name: string, path: string }[] = null) {
-        const httpOptions = {
-            headers: new HttpHeaders({
-                'Content-Type': 'application/json',
-            })
-        };
-        let results = await this.http.post<ApiSearchResult | false>(url, {
+        let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
             corpus,
@@ -40,6 +40,14 @@ export class ResultsService {
         }
 
         return false;
+    }
+
+    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
+        return await this.http.post<{ [key: string]: { [value: string]: number } }>(routerUrl + 'metadata_counts', {
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
     }
 
     /**

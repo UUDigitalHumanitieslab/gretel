@@ -2,18 +2,18 @@
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
 $currentPage = 'xps';
 $step = 3;
 
-require "../config.php";
-require ROOT_PATH . "/helpers.php";
+require '../config.php';
+require ROOT_PATH.'/helpers.php';
 
-require ROOT_PATH . "/front-end-includes/metadata.php";
-require ROOT_PATH . "/front-end-includes/xpath-variables-hidden.php";
+require ROOT_PATH.'/front-end-includes/metadata.php';
+require ROOT_PATH.'/front-end-includes/xpath-variables-hidden.php';
 retrieve_metadata();
 
 $noTbFlag = 0;
@@ -46,7 +46,7 @@ if ($continueConstraints) {
 }
 
 if ($continueConstraints) {
-    require ROOT_PATH."/preparatory-scripts/prep-functions.php";
+    require ROOT_PATH.'/preparatory-scripts/prep-functions.php';
     $treeVisualizer = true;
     $onlyFullscreenTv = true;
 
@@ -68,12 +68,12 @@ if ($continueConstraints) {
     $needRegularSonar = false;
 }
 
-require ROOT_PATH . "/functions.php";
-require ROOT_PATH . "/front-end-includes/head.php";
+require ROOT_PATH.'/functions.php';
+require ROOT_PATH.'/front-end-includes/head.php';
 
 if ($continueConstraints) {
-    require ROOT_PATH."/basex-search-scripts/treebank-search.php";
-    require ROOT_PATH."/basex-search-scripts/basex-client.php";    
+    require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
+    require ROOT_PATH.'/basex-search-scripts/basex-client.php';
     if ($corpus == 'sonar') {
         $bf = xpathToBreadthFirst($xpath);
         // Get correct databases to start search with, sets to
@@ -93,8 +93,8 @@ if ($continueConstraints) {
         $_SESSION[SID]['startDatabases'] = corpusToDatabase($components, $corpus);
     }
 
-  // When flushing we update the databases on each iteration, not so in counting
-  // or when fetching all results
+    // When flushing we update the databases on each iteration, not so in counting
+    // or when fetching all results
     $_SESSION[SID]['flushAlready'] = $_SESSION[SID]['flushDatabases'] = $_SESSION[SID]['startDatabases'];
     $_SESSION[SID]['xpath'] = $xpath;
     $_SESSION[SID]['needRegularSonar'] = $needRegularSonar;
@@ -105,43 +105,39 @@ session_write_close();
 <?php
 flush();
 
-require ROOT_PATH . "/front-end-includes/header.php";
+require ROOT_PATH.'/front-end-includes/header.php';
 
 if ($continueConstraints) {
-    require ROOT_PATH."/front-end-includes/results-shared-content.php";
-    ?>
+    require ROOT_PATH.'/front-end-includes/results-shared-content.php'; ?>
     <form action="xps/analysis.php" method="post">
         <input type="hidden" name="sid" value="<?php echo SID; ?>">
         <?php
         setContinueNavigation();
-        render_xpath_variables_hidden("xpath-variables");
-        ?>
+    render_xpath_variables_hidden('xpath-variables'); ?>
     </form>
     <?php
 } else {
-    setErrorHeading();
-    ?>
+        setErrorHeading(); ?>
     <p>You did not select a treebank, or something went wrong when determining the XPath for your request. It is also
         possible that you came to this page directly without first entering an input example.</p>
     <?php
     setPreviousPageMessage(2);
-}
-require ROOT_PATH."/front-end-includes/footer.php";
-include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+    }
+require ROOT_PATH.'/front-end-includes/footer.php';
+include ROOT_PATH.'/front-end-includes/analytics-tracking.php';
 
 if ($continueConstraints) {
-    include ROOT_PATH."/front-end-includes/notifications.php";
+    include ROOT_PATH.'/front-end-includes/notifications.php';
     // Variables for JS
     $jsVars = array(
-        'fetchResultsPath' => HOME_PATH."/basex-search-scripts/flush-results.php?sid=".SID,
-        'getAllResultsPath' => HOME_PATH."/basex-search-scripts/get-all-results.php?sid=".SID,
-        'fetchCountsPath' => HOME_PATH."/basex-search-scripts/get-counts.php?sid=".SID,
-        'downloadPath' => HOME_PATH."/tmp/".SID."-gretel-results.txt",
+        'fetchResultsPath' => HOME_PATH.'/basex-search-scripts/flush-results.php?sid='.SID,
+        'getAllResultsPath' => HOME_PATH.'/basex-search-scripts/get-all-results.php?sid='.SID,
+        'fetchCountsPath' => HOME_PATH.'/basex-search-scripts/get-counts.php?sid='.SID,
+        'downloadPath' => HOME_PATH.'/tmp/'.SID.'-gretel-results.txt',
         'resultsLimit' => $resultsLimit,
         'fetchHomePath' => HOME_PATH,
         'sid' => SID,
-    );
-    ?>
+    ); ?>
     <script>
         var phpVars = <?php echo json_encode($jsVars); ?>;
     </script>

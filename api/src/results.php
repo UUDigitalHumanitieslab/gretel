@@ -1,9 +1,10 @@
 <?php
 
-require ROOT_PATH.'/functions.php';
+require_once ROOT_PATH.'/functions.php';
 
-require ROOT_PATH.'/basex-search-scripts/basex-client.php';
-require ROOT_PATH.'/basex-search-scripts/treebank-search.php';
+require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
+require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
+require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null)
 {
