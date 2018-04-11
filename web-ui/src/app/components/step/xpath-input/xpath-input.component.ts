@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { StepComponent } from "../step.component";
-import { LassyXPathParserService, MacroService, ValueEvent } from 'lassy-xpath/ng';
+import { MacroService, ValueEvent } from 'lassy-xpath/ng';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
