@@ -13,7 +13,17 @@ export class ResultsService {
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
     }
 
-
+    /**
+     * Queries the treebank and returns the matching hits.
+     * @param xpath Specification of the pattern to match
+     * @param corpus Identifier of the corpus
+     * @param components Identifiers of the sub-treebanks
+     * @param offset Zero-based index of the results
+     * @param retrieveContext Get the sentence before and after the hit
+     * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
+     * @param metadataFilters The filters to apply for the metadata properties
+     * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
+     */
     async results(xpath: string,
         corpus: string,
         components: string[],
