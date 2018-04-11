@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-
 import { AppComponent } from './app.component';
 import { ParseSentenceComponent } from './components/parse-sentence/parse-sentence.component';
 import { AlpinoService } from "./services/alpino.service";
@@ -30,6 +29,18 @@ import { XmlParseService } from './services/xml-parse.service';
 import { StepComponent } from './components/step/step.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { TreebankService } from "./services/treebank.service";
+import { SelectableTable } from "./components/selectable-table/selectable-table.component";
+import { TableModule } from "primeng/table";
+import { CookieService } from "angular2-cookie/core";
+import { SessionService } from "./services/session.service";
+import { ResultsComponent } from './components/step/results/results.component';
+import { DataService } from "./services/data.service";
+import { DropdownWithFilterComponent } from "./components/dropdown-with-filter/dropdown-with-filter.component";
+import { FilterComponent } from "./components/filter/filter.component";
+import { ScrollableTableComponent } from "./components/scrollable-table/scrollable-table.component";
+
 
 @NgModule({
     declarations: [
@@ -53,12 +64,20 @@ import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-b
         StepsNavigatorComponent,
         StepComponent,
         XpathInputComponent,
-        BreadcrumbBarComponent
+        BreadcrumbBarComponent,
+        SelectTreebanksComponent,
+        SelectableTable,
+        ScrollableTableComponent,
+        ResultsComponent,
+        DropdownWithFilterComponent,
+        FilterComponent
+
     ],
     imports: [
         BrowserModule,
         HttpClientModule,
         AppRoutingModule,
+        TableModule
 
     ],
     providers: [
@@ -67,6 +86,10 @@ import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-b
         LinkService,
         ResultsService,
         XmlParseService
+        TreebankService,
+        CookieService,
+        SessionService,
+        DataService
     ],
     bootstrap: [AppComponent]
 })

@@ -16,9 +16,12 @@ export class ParseSentenceComponent implements OnInit {
   ngOnInit() {
   }
 
+  /**
+   * Sends a sentence to the service that has to be parsed
+   * @param sentence
+   */
   parseSentence(sentence: HTMLInputElement) {
     this.alpinoService.parseSentence(sentence.value).subscribe((link: string) => {
-      console.log(link);
       this.link = link;
     });
     sentence.value = '';
