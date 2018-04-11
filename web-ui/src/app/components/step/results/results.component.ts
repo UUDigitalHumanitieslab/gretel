@@ -45,7 +45,7 @@ export class ResultsComponent implements OnInit, OnChanges {
      */
     showTree(link) {
 
-        let base = this.configurationService.getBaseUrlXml();
+        let base = this.configurationService.getBaseUrlGretel();
         let element: any = $('#output');
         let url = base + "/" + link;
 

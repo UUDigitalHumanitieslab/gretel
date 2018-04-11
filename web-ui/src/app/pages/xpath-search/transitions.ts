@@ -7,7 +7,7 @@ interface Transition {
 
 class Transitions {
 
-    constructor(private transitions) {
+    constructor(private transitions: Transition[]) {
     }
 
     fire(name: string, state: GlobalState): Observable<GlobalState> {

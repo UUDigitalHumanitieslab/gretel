@@ -24,6 +24,21 @@ interface Step {
     enterStep(GlobalState): Observable<GlobalState>
 }
 
+class InputStep implements Step {
+    stepNumber: number;
+    constructor(stepNumber: number) {
+        this.stepNumber = stepNumber;
+    }
+
+    enterStep(state: GlobalState) {
+        state.currentStep = {
+            number: this.stepNumber,
+            step: this
+        };
+        return observableOf(state)
+    }
+}
+
 
 class ResultStep implements Step {
     stepNumber: number;
@@ -75,20 +90,6 @@ class SelectTreebankStep implements Step {
     }
 }
 
-class InputStep implements Step {
-    stepNumber: number;
-    constructor(stepNumber: number) {
-        this.stepNumber = stepNumber;
-    }
-
-    enterStep(state: GlobalState) {
-        state.currentStep = {
-            number: this.stepNumber,
-            step: this
-        };
-        return observableOf(state)
-    }
-}
 
 export {
     TreebankSelection,

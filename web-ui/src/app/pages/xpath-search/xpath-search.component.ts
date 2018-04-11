@@ -61,7 +61,6 @@ export class XpathSearchComponent implements OnInit {
         };
 
         this.configuration = {
-            numberOfSteps: 4,
             steps: [
                 this.inputStep,
                 new SelectTreebankStep(1, this.treebankService, this.http, this.resultService),
