@@ -1,4 +1,4 @@
-type FunctionCompletion = { meta: string, hasArguments: boolean };
+export type FunctionCompletion = { meta: string, hasArguments: boolean };
 export let functionCompletions: { [name: string]: FunctionCompletion } = {
     'fn:replace()': { meta: 'Replace', hasArguments: true },
     'not()': { meta: 'Negation', hasArguments: true },

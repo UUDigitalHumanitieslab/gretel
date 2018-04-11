@@ -1,8 +1,6 @@
-import * as ace from 'brace';
-import { HighlighterRules } from './xpath-interfaces';
+import { TextHighlightRules } from '../../common/text-highlight-rules';
 import { AlpinoFunctionHighlighterRules } from './alpino-function-highlighter-rules';
-import { XPathHighlighterRules, identifierRe,equalityRe } from './xpath-highlighter-rules';
-let TextHighlightRules: HighlighterRules = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
+import { XPathHighlighterRules, identifierRe, equalityRe } from '../../common/xpath-highlighter-rules';
 
 export class AlpinoXPathHighlighter extends TextHighlightRules {
     constructor() {
@@ -15,7 +13,7 @@ export class AlpinoXPathHighlighter extends TextHighlightRules {
 
     private embedFunction(name: string) {
         this.$rules["start"].unshift({
-            token: ["support.type","text","keyword.operator","text","function.attribute.string"],
+            token: ["support.type", "text", "keyword.operator", "text", "function.attribute.string"],
             regex: `(@${name})(\\s*)${equalityRe}(\\s*)(\")`,
             next: `${name}-start`
         });

@@ -108,7 +108,7 @@ export class MacroService {
     }
 }
 
-type MacroLookup = { [name: string]: string };
+export type MacroLookup = { [name: string]: string };
 export type MacroReplacement = {
     offset: number,
     /**

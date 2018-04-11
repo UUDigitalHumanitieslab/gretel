@@ -1,7 +1,5 @@
 
-import * as ace from 'brace';
-import { HighlighterRules } from './xpath-interfaces';
-let TextHighlightRules: HighlighterRules = ace.acequire('ace/mode/text_highlight_rules').TextHighlightRules;
+import { TextHighlightRules } from '../../common/text-highlight-rules';
 
 const identifierRe = "[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\\d\\$_\u00a1-\uffff]*";
 

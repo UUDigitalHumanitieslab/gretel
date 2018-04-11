@@ -1,4 +1,4 @@
-import { MacroService, MacroReplacement } from './macro-service';
+import { MacroService, MacroReplacement } from './macro.service';
 
 describe("Macro service", () => {
     let macroService: MacroService;

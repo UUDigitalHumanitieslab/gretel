@@ -1,4 +1,4 @@
-import { PathVariable } from '../xpath-extractinator';
+import { PathVariable } from 'lassy-xpath';
 import * as $ from 'jquery';
 
 export class SearchService {
