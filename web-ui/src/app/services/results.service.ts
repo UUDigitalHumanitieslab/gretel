@@ -18,8 +18,7 @@ export class ResultsService {
     getAllResults(): Observable<any> {
         return Observable.create(async observer => {
             let offset = 0;
-            let done = false;
-            while(!done && !observer.closed){
+            while(!observer.closed){
                 await this.results('//node', 'TEST2', ['test2', 'test2'], offset, false)
                     .then((res) => {
                         if (res) {
@@ -27,7 +26,6 @@ export class ResultsService {
 
                         } else {
                             observer.complete();
-                            done = true
                         }
                     });
                 offset += 1;
