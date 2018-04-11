@@ -9,24 +9,44 @@
             <div class="level-item"><h2 class="subtitle"> Number of results: {{results.length}}</h2></div>
             <div class="level-item " *ngIf="loading"><a class="button is-info is-loading"></a></div>
           </div>
-          <div class="level-right">
-
-
-            <div class="level-item">
-              <app-dropdown-with-filter [items]="items"></app-dropdown-with-filter>
-            </div>
-          </div>
-
         </div>
 
-
       </div>
-
       <div style="height: 500px">
-        <app-scrollable-table [data]="results" [columns]="columns"></app-scrollable-table>
+          <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
+              <ng-template pTemplate="colgroup" let-columns>
+                  <colgroup>
+                      <col *ngFor="let col of columns" [style.width]="col.width">
+                  </colgroup>
+              </ng-template>
+              <ng-template pTemplate="header" let-columns>
+                  <tr>
+                      <th *ngFor="let col of columns" pResizableColumn>
+                          {{col.header}}
+                      </th>
+                  </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
+                  <tr>
+                      <td *ngFor="let col of columns" class="ui-resizable-column" >
+
+                          <div [ngSwitch]="col.field">
+                              <div *ngSwitchCase="'number'">{{i}}</div>
+                              <a *ngSwitchCase="'id'" (click)="showTree(rowData.link)">{{rowData[col.field]}}</a>
+                              <p [innerHTML]="rowData[col.field]" *ngSwitchDefault></p>
+                          </div>
+
+
+                      </td>
+                  </tr>
+              </ng-template>
+          </p-table>
+
       </div>
 
 
     </div>
   </div>
 </div>
+<section id="output">
+</section>

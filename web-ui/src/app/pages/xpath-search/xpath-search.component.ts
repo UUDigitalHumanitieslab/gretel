@@ -1,12 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { StepComponent } from "../../components/step/step.component";
-import { XpathInputComponent } from "../../components/step/xpath-input/xpath-input.component";
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { FormGroup } from "@angular/forms";
-import { SessionService } from "../../services/session.service";
-import { DataService } from "../../services/data.service";
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {SessionService} from "../../services/session.service";
+import {ResultService} from "../../services/result.service";
+import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep} from "./steps";
+import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from './transitions'
+import {TreebankService} from "../../services/treebank.service";
 
+/**
+ * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
+ * It uses steps and transitions to determine the next state.
+ */
 
 @Component({
     selector: 'app-x-path-search',
@@ -14,23 +18,10 @@ import { DataService } from "../../services/data.service";
     styleUrls: ['./xpath-search.component.scss']
 })
 export class XpathSearchComponent implements OnInit {
-    // TODO refactor
-    done = false;
-    results = [];
-
-
-    constructor(private http: HttpClient, private sessionService: SessionService, private dataService: DataService) {
-    }
-
-    //All the components. used to call functions on.
-    @ViewChild('xpathInput') xpathInput;
-    @ViewChild('selectTreebanks') selectTreebanks;
-    @ViewChild('hiddenForm') form;
-
-    currentStep = 1;
-    // Should be false: now true for debugging.
-    valid = true;
-
+    inputStep: XpathInputStep;
+    globalState: GlobalState;
+    configuration: any;
+    transitions: Transitions;
     crumbs: Crumb[] = [
         {
             name: "XPath",
@@ -50,83 +41,42 @@ export class XpathSearchComponent implements OnInit {
         },
     ];
 
-    ngOnInit() {
-    }
 
-    /**
-     *  go to next step. Only can continue of the current step is validated.
-     */
-    next() {
+    //All the components. used to call functions on.
+    @ViewChild('xpathInput')
+    xpathInput;
+    @ViewChild('selectTreebanks')
+    selectTreebanks;
+    @ViewChild('hiddenForm')
+    form;
+    @ViewChild('resultComponentRef')
+    resultComponent;
 
-        if (this.valid) {
-            // Should be false, for debugging only
-            this.valid = true;
-            switch (this.currentStep) {
-                case 1: {
-                    this.goToSelectTreebank();
-                    break;
-                }
-                case 2: {
-                    this.goToResults();
-                    break;
 
-                }
+    constructor(private http: HttpClient, private sessionService: SessionService, private resultService: ResultService, private treebankService: TreebankService) {
+        this.inputStep = new XpathInputStep(0);
 
-            }
-
-        }
-
-    }
-
-    /**
-     * Adds a variable to the form. Is used add information to the post request when the form is submitted
-     * @param name: name for the variable
-     * @param value: value of the variable
-     * */
-    addFormVariable(name: string, value: string) {
-        let element = document.createElement('input');
-        element.value = value;
-        element.name = name;
-        this.form.nativeElement.append(element)
-
-    }
-
-    /**
-     * Goes to the selection of the treebank.
-     * The status of this session must be updated to the server. (php *zucht*)
-     * Creates an PID and posts the PID with nodeinformation to the php server
-     */
-    goToSelectTreebank() {
-        let id = this.sessionService.getSessionId();
-
-        const httpOptions = {
-            headers: new HttpHeaders({
-                'responseType': ''
-            })
+        this.globalState = {
+            results: undefined,
+            selectedTreebanks: undefined,
+            currentStep: {number: 0, step: this.inputStep},
+            valid: false,
+            XPath: '//node'
         };
-        const formData = new FormData();
-        formData.append("sid", id);
-        formData.append("xpath", this.getXPath());
 
-        this.http.post("/gretel/xps/tb-sel.php", formData, { responseType: "json" }).subscribe((res) => {
-            //console.log(res.body);
-        });
+        this.configuration = {
+            steps: [
+                this.inputStep,
+                new SelectTreebankStep(1, this.treebankService, this.http, this.resultService),
+                new ResultStep(2,this.resultService),
+            ]
 
-        this.currentStep += 1;
-
+        };
+        this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
     }
 
-    goToResults() {
-        this.done = false;
-        this.dataService.getData().subscribe((data) => {
-            this.results = data;
-        },
-            e => console.log(e),
-            () => this.done = true
-        );
 
-
-        this.currentStep += 1;
+    ngOnInit() {
     }
 
 
@@ -134,10 +84,24 @@ export class XpathSearchComponent implements OnInit {
      * Go back one step
      */
     prev() {
-        if (this.currentStep > 1) {
-            this.currentStep -= 1;
-        }
+        this.transitions.fire('decrease', this.globalState).subscribe((s) => {
+            this.globalState = s;
+        });
 
+    }
+
+
+    /**
+     *  go to next step. Only can continue of the current step is valid.
+     */
+    next() {
+        if (this.globalState.valid) {
+            this.transitions.fire('increase', this.globalState).subscribe((s) => {
+                this.globalState = s;
+            });
+        } else {
+            this.showWarning();
+        }
     }
 
     /**
@@ -145,14 +109,14 @@ export class XpathSearchComponent implements OnInit {
      * @param boolean
      */
     setValid(valid: boolean) {
-        this.valid = valid;
+        this.globalState.valid = valid
     }
 
     /**
-     * Show the warning of the appropiate component.
+     * Show the warning of the appropriate component.
      */
     showWarning() {
-        switch (this.currentStep) {
+        switch (this.globalState.currentStep.number) {
             case 1: {
                 this.xpathInput.showWarning();
                 break;
@@ -161,18 +125,18 @@ export class XpathSearchComponent implements OnInit {
                 this.selectTreebanks.showWarning();
                 break;
             }
+            case 3: {
+                this.resultComponent.showWarning();
+                break;
+            }
 
 
         }
 
     }
 
-    //Sheean deze invullen a.u.b.
-    /**
-     * Function that gets the xpath from the xpath input component
-     */
-    getXPath() {
-        return "//node"
+    updateSelected(e) {
+        this.globalState.selectedTreebanks = e
     }
 
 }

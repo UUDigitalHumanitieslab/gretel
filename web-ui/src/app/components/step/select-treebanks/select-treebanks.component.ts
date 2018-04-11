@@ -1,8 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {StepComponent} from "../step.component";
 import {TreebankService} from "../../../services/treebank.service";
 import {Treebank, TreebankInfo} from "../../../treebank";
-import {TableColumn} from "../../selectable-table/TableColumn";
+import {TableColumn} from "../../tables/selectable-table/TableColumn";
 
 
 interface info extends TreebankInfo{
@@ -17,6 +17,10 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
   items: any[];
   info: { [title: string]: info[] } = {};
+
+  mainTreebank: string;
+  subTreebanks: string[];
+  @Output() onUpdateSelected = new EventEmitter<any>();
 
 
   constructor(private treebankService: TreebankService) {
@@ -52,26 +56,48 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     })
   }
 
+
+  treebankChange(e){
+      if(e.target.checked){
+          this.mainTreebank = e.target.value;
+          this.getTreebankInfo(this.items.find(t => t.name = e.target.value))
+      } else {
+          this.mainTreebank = undefined;
+      }
+  }
+
   /**
    * Gets the detailed info of a given treebank
    * @param treebank
    */
   getTreebankInfo(treebank: Treebank) {
     let results = [];
+
     this.treebankService.getTreebankInfo(treebank).subscribe((info: info[]) => {
       //To keep track if we selected the given subpart of the treebank.
       this.info[treebank.title] = info;
       this.info[treebank.title].forEach(entry => entry.selected = true);
+      this.updateSelected();
       }
     )
   }
+
+  updateSelected(){
+      this.subTreebanks = this.info[this.mainTreebank].filter(entry => entry.selected).map((entry: any) => entry.title)
+      this.onUpdateSelected.emit({
+          treebank: this.mainTreebank,
+          subTreebanks: this.subTreebanks
+      })
+      this.checkIfValid()
+  }
+
 
   /**
    * Checks if there are treebanks selected
    */
   checkIfValid() {
-    //TODO: make correct
-    this.isValid.emit(this.valid);
+    this.valid = true ? this.subTreebanks.length != 0 : false
+    this.onChangeValid.emit(this.valid);
   }
 
   /**
