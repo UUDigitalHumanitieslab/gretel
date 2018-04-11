@@ -1,9 +1,9 @@
-import { PathVariable, XPathExtractinator, FormatError } from '../../services/xpath-extractinator.service';
+import { PathVariable, XPathExtractinator, FormatError } from '../../services/xpath-extractinator';
 import * as $ from 'jquery';
 import { BehaviorSubject, Observable } from 'rxjs'
 import { XPathModels } from 'ts-xpath';
 
-export class XPathVariablesComponent {
+export class XPathVariablesRenderer {
     private view: View;
     private source: JQuery;
     private extractinator: XPathExtractinator;
@@ -11,12 +11,11 @@ export class XPathVariablesComponent {
     private subject: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private variables = this.subject.debounceTime(50).map(xpath => this.extract(xpath)).filter(variables => variables != null);
 
-    constructor(element: HTMLElement) {
+    constructor(element: HTMLElement, source: string | JQuery, formName: string) {
         let $element = $(element);
-        let data = $element.data();
-        this.source = $(data.source);
+        this.source = $(source);
 
-        this.view = new View(data.name, $element);
+        this.view = new View(formName, $element);
 
         this.variables.subscribe(variables => {
             this.view.render(variables);
@@ -47,6 +46,22 @@ export class XPathVariablesComponent {
     }
 }
 
+let xpathVariables: CreateXPathVariablesRenderer = function (options) {
+    return this.each(function () {
+        let target = this;
+        $(this).data('xpath-editor', new XPathVariablesRenderer(target, options.source, options.formName));
+    });
+}
+
+$.fn.extend({ xpathVariables });
+export type CreateXPathVariablesRenderer = (options: { source: string | JQuery, formName: string }) => JQuery;
+declare global {
+    interface JQuery {
+        xpathVariables: CreateXPathVariablesRenderer
+    }
+}
+
+
 class View {
     private renderedLength = 0;
     private names: JQuery[] = [];
@@ -70,7 +85,7 @@ class View {
         if (!items) {
             return;
         }
-        
+
         if (this.renderedLength != items.length) {
             this.target.empty();
             this.names = [];

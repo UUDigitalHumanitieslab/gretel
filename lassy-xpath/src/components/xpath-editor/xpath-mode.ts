@@ -3,7 +3,7 @@ import 'brace/mode/xquery';
 import * as ace from 'brace';
 import { functionCompletions, pathCompletions } from './alpino-xpath-completions';
 import { XpathAttributes } from '../../common/xpath-attributes';
-import { MacroService } from '../../services/macro.service';
+import { MacroService } from '../../services/macro.jquery';
 import { AlpinoXPathHighlighter } from './alpino-xpath-highlighter-rules';
 let TokenIterator: { new(session: ace.IEditSession, initialRow: number, initialColumn: number): ace.TokenIterator } = ace.acequire("ace/token_iterator").TokenIterator;
 export let TextMode: { new(): any } = ace.acequire('ace/mode/text').Mode;

@@ -1,4 +1,4 @@
-import { XPathExtractinator, PathVariable } from './xpath-extractinator.service';
+import { XPathExtractinator, PathVariable } from './xpath-extractinator';
 import { XPathModels } from 'ts-xpath';
 
 describe("XPath Extractinator",

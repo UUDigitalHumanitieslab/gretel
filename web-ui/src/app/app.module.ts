@@ -1,43 +1,44 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
 
-import {AppComponent} from './app.component';
-import {AlpinoService} from "./services/alpino.service";
-import {HttpClientModule} from "@angular/common/http";
-import {HomePageComponent} from './pages/home-page/home-page.component';
-import {HomeContentComponent} from './pages/home-page/home-content/home-content.component';
-import {AppRoutingModule} from "./app-routing/app-routing.module";
-import {DocumentationComponent} from './pages/documentation/documentation.component';
-import {DocumentationContentComponent} from './pages/documentation/documentation-content/documentation-content.component';
-import {XpathSearchComponent} from './pages/xpath-search/xpath-search.component';
-import {XpathEditorComponent} from './components/xpath-editor/xpath-editor.component';
-import {XpathSearchService} from "./xpath-search.service";
-import {LinkService} from "./services/link.service";
-import {ResultsService} from './services/results.service';
-import {XmlParseService} from './services/xml-parse.service';
-import {StepComponent} from './components/step/step.component';
-import {XpathInputComponent} from './components/step/xpath-input/xpath-input.component';
-import {BreadcrumbBarComponent} from './components/breadcrumb-bar/breadcrumb-bar.component';
-import {SelectTreebanksComponent} from "./components/step/select-treebanks/select-treebanks.component";
-import {TreebankService} from "./services/treebank.service";
-import {TableModule} from "primeng/table";
-import {CookieService} from "angular2-cookie/core";
-import {SessionService} from "./services/session.service";
-import {ResultsComponent} from './components/step/results/results.component';
-import {DialogModule} from "primeng/dialog";
-import {ResultService} from "./services/result.service";
-import {ConfigurationService} from "./services/configuration.service";
-import {PaperCiteComponent} from "./components/page-components/paper-cite/paper-cite.component";
-import {AdressComponent} from "./components/page-components/adress/adress.component";
-import {FooterComponent} from "./components/page-components/footer/footer.component";
-import {BodyHeaderComponent} from "./components/page-components/body-header/body-header.component";
-import {NavigationComponent} from "./components/page-components/header/navigation/navigation.component";
-import {HeaderComponent} from "./components/page-components/header/header.component";
-import {FooterNavigationComponent} from "./components/page-components/footer/footer-navigation/footer-navigation.component";
-import {Header3Component} from "./components/page-components/header-3/header-3.component";
-import {SelectableTable} from "./components/tables/selectable-table/selectable-table.component";
-import {GretelWebsiteLinkComponent} from "./components/page-components/gretel-website-link/gretel-website-link.component";
+import { LassyXPathModule } from 'lassy-xpath/ng';
 
+import { AppComponent } from './app.component';
+import { AlpinoService } from "./services/alpino.service";
+import { HttpClientModule } from "@angular/common/http";
+import { HomePageComponent } from './pages/home-page/home-page.component';
+import { HomeContentComponent } from './pages/home-page/home-content/home-content.component';
+import { AppRoutingModule } from "./app-routing/app-routing.module";
+import { DocumentationComponent } from './pages/documentation/documentation.component';
+import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
+import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
+import { XpathSearchService } from "./xpath-search.service";
+import { LinkService } from "./services/link.service";
+import { ResultsService } from './services/results.service';
+import { XmlParseService } from './services/xml-parse.service';
+import { StepComponent } from './components/step/step.component';
+import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
+import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { TreebankService } from "./services/treebank.service";
+import { TableModule } from "primeng/table";
+import { CookieService } from "angular2-cookie/core";
+import { SessionService } from "./services/session.service";
+import { ResultsComponent } from './components/step/results/results.component';
+import { DialogModule } from "primeng/dialog";
+import { ResultService } from "./services/result.service";
+import { ConfigurationService } from "./services/configuration.service";
+import { PaperCiteComponent } from "./components/page-components/paper-cite/paper-cite.component";
+import { AdressComponent } from "./components/page-components/adress/adress.component";
+import { FooterComponent } from "./components/page-components/footer/footer.component";
+import { BodyHeaderComponent } from "./components/page-components/body-header/body-header.component";
+import { NavigationComponent } from "./components/page-components/header/navigation/navigation.component";
+import { HeaderComponent } from "./components/page-components/header/header.component";
+import { FooterNavigationComponent } from "./components/page-components/footer/footer-navigation/footer-navigation.component";
+import { Header3Component } from "./components/page-components/header-3/header-3.component";
+import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
+import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
 
 @NgModule({
     declarations: [
@@ -56,7 +57,6 @@ import {GretelWebsiteLinkComponent} from "./components/page-components/gretel-we
         FooterNavigationComponent,
         XpathSearchComponent,
         Header3Component,
-        XpathEditorComponent,
         StepComponent,
         XpathInputComponent,
         BreadcrumbBarComponent,
@@ -69,6 +69,8 @@ import {GretelWebsiteLinkComponent} from "./components/page-components/gretel-we
         HttpClientModule,
         AppRoutingModule,
         TableModule,
+        FormsModule,
+        LassyXPathModule,
         DialogModule
 
     ],

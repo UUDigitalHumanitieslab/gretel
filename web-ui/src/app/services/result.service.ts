@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import {Result} from "../result";
+import { Result } from "../result";
 import * as Rx from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
-import {Observable} from "rxjs/Observable";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {RequestOptions} from "@angular/http";
-import {SessionService} from "./session.service";
+import { Observable } from "rxjs/Observable";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { RequestOptions } from "@angular/http";
+import { SessionService } from "./session.service";
 @Injectable()
 export class ResultService {
     getResultsUrl: string;
@@ -46,13 +46,13 @@ export class ResultService {
         //options.withCredentials = true;
 
         return new Observable((observer) => {
-            this.http.post(this.resultPostUrl, formData, {'responseType': 'document'}).subscribe((res) => {
+            this.http.post(this.resultPostUrl, formData, { headers: { 'responseType': 'document' } }).subscribe((res) => {
 
-                },
+            },
                 (e) => {
                 },
-                (done) => {
-                    this.http.get(`${this.getResultsUrl}?sid=${id}`, {"withCredentials": true}).map((res: any) => {
+                () => {
+                    this.http.get(`${this.getResultsUrl}?sid=${id}`, { "withCredentials": true }).map((res: any) => {
                         let data = Object.keys(res.data).map((key: any) => {
                             let entry = res.data[key];
                             let id = this.get_innerhtml_from_a_tag(entry[0]);

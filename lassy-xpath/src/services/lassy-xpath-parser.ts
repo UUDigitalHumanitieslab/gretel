@@ -2,7 +2,7 @@ import { XpathAttributes } from '../common/xpath-attributes';
 import { XPathModels, XPathParser } from 'ts-xpath';
 
 const elementNames = ['item', 'meta', 'metadata', 'node', 'parser', 'sentence'];
-export class XPathParserService {
+export class LassyXPathParser {
     private parser: XPathParser;
     constructor() {
         this.parser = new XPathParser();
