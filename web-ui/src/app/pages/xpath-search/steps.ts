@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {SessionService} from "../../services/session.service";
 import {ResultService} from "../../services/result.service";
 import {TreebankService} from "../../services/treebank.service";
+import {ResultsService} from "../../services/results.service";
 /**
  * Contains all the steps that are used in the xpath search
  */
@@ -41,6 +42,7 @@ interface Step {
 
 class XpathInputStep implements Step {
     stepNumber: number;
+
     constructor(stepNumber: number) {
         this.stepNumber = stepNumber;
     }
@@ -57,7 +59,8 @@ class XpathInputStep implements Step {
 
 class ResultStep implements Step {
     stepNumber: number;
-    constructor(stepNumber: number, private resultService: ResultService) {
+
+    constructor(stepNumber: number, private resultsService: ResultsService) {
         this.stepNumber = stepNumber;
     }
 
@@ -67,6 +70,19 @@ class ResultStep implements Step {
      * @returns
      */
     public enterStep(state: GlobalState): Observable<GlobalState> {
+
+        let result = this.resultsService.results(
+            '//node',
+            'test2',
+            ['test2', 'test2'],
+            0,
+            false
+
+
+        ).then( (res) => console.log(res));
+
+        return new Observable((observer) => {})
+        /*
         return new Observable((observer) => {
             this.resultService.getResults(state.selectedTreebanks.treebank, state.selectedTreebanks.subTreebanks).subscribe((data) => {
                     state.currentStep = {
@@ -83,6 +99,7 @@ class ResultStep implements Step {
                 }
             );
         });
+        */
 
 
     }
@@ -91,6 +108,7 @@ class ResultStep implements Step {
 
 class SelectTreebankStep implements Step {
     stepNumber: number;
+
     constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient, private resultService: ResultService) {
         this.stepNumber = stepNumber;
     }
@@ -101,16 +119,14 @@ class SelectTreebankStep implements Step {
      * @returns the updates state
      */
     enterStep(state: GlobalState): Observable<GlobalState> {
-        return new Observable((observer) => {
-            this.treebankService.preGetTreebanks(state.XPath).subscribe((res) => {
-                state.currentStep = {
-                    number: this.stepNumber,
-                    step: this,
-                };
-                observer.next(state);
-                observer.complete();
 
-            });
+        return new Observable((observer) => {
+            state.currentStep = {
+                number: this.stepNumber,
+                step: this,
+            };
+            observer.next(state);
+            observer.complete();
 
 
         });

@@ -6,6 +6,7 @@ import {ResultService} from "../../services/result.service";
 import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep} from "./steps";
 import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from './transitions'
 import {TreebankService} from "../../services/treebank.service";
+import {ResultsService} from "../../services/results.service";
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -53,7 +54,7 @@ export class XpathSearchComponent implements OnInit {
     resultComponent;
 
 
-    constructor(private http: HttpClient, private sessionService: SessionService, private resultService: ResultService, private treebankService: TreebankService) {
+    constructor(private http: HttpClient, private sessionService: SessionService, private resultService: ResultService, private treebankService: TreebankService, private resultsService: ResultsService) {
         this.inputStep = new XpathInputStep(0);
 
         this.globalState = {
@@ -68,7 +69,7 @@ export class XpathSearchComponent implements OnInit {
             steps: [
                 this.inputStep,
                 new SelectTreebankStep(1, this.treebankService, this.http, this.resultService),
-                new ResultStep(2,this.resultService),
+                new ResultStep(2,this.resultsService),
             ]
 
         };

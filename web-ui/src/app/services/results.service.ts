@@ -13,6 +13,7 @@ export class ResultsService {
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
     }
 
+
     async results(xpath: string,
         corpus: string,
         components: string[],
