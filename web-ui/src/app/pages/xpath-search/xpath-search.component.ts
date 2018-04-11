@@ -3,10 +3,14 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {SessionService} from "../../services/session.service";
 import {ResultService} from "../../services/result.service";
-import {GlobalState, Step, InputStep, ResultStep, SelectTreebankStep} from "./steps";
+import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep} from "./steps";
 import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from './transitions'
 import {TreebankService} from "../../services/treebank.service";
 
+/**
+ * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
+ * It uses steps and transitions to determine the next state.
+ */
 
 @Component({
     selector: 'app-x-path-search',
@@ -14,7 +18,7 @@ import {TreebankService} from "../../services/treebank.service";
     styleUrls: ['./xpath-search.component.scss']
 })
 export class XpathSearchComponent implements OnInit {
-    inputStep: InputStep;
+    inputStep: XpathInputStep;
     globalState: GlobalState;
     configuration: any;
     transitions: Transitions;
@@ -50,7 +54,7 @@ export class XpathSearchComponent implements OnInit {
 
 
     constructor(private http: HttpClient, private sessionService: SessionService, private resultService: ResultService, private treebankService: TreebankService) {
-        this.inputStep = new InputStep(0);
+        this.inputStep = new XpathInputStep(0);
 
         this.globalState = {
             results: undefined,

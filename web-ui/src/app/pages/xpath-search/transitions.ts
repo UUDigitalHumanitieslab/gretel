@@ -1,10 +1,28 @@
 import {GlobalState, Step} from './steps'
 import {Observable} from "rxjs/Observable";
+
+/**
+ * This file contains transitions for a state machine. A transition is used to determine the next step to go to,
+ * given the global state and the event that is triggered
+ */
+
+
 interface Transition {
+    /**
+     * Name of the transition, is used to determine if a transition should fire
+     */
     name: string
+
+    /**
+     * Performs the transition. Determines the next step based on the globalState
+     * @param state
+     */
     fire(state: GlobalState): Step
 }
 
+/***
+ * Class that keeps track of all the transitions
+ */
 class Transitions {
 
     constructor(private transitions: Transition[]) {
@@ -22,6 +40,9 @@ class Transitions {
     }
 }
 
+/**
+ * Transition that decreases the current step number (if possible)
+ */
 class DecreaseTransition implements Transition {
     name = 'decrease';
     constructor(private steps: Step[]){}
@@ -33,7 +54,9 @@ class DecreaseTransition implements Transition {
         }
     }
 }
-
+/**
+ * Transition that increases the current step number (if possible)
+ */
 class IncreaseTransition implements Transition {
     name = 'increase';
     constructor(private steps: Step[]) {}

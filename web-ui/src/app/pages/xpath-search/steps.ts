@@ -4,12 +4,22 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {SessionService} from "../../services/session.service";
 import {ResultService} from "../../services/result.service";
 import {TreebankService} from "../../services/treebank.service";
+/**
+ * Contains all the steps that are used in the xpath search
+ */
 
+
+/**
+ * Info that needs to be in a treebank selection
+ */
 interface TreebankSelection {
     treebank: string
     subTreebanks: string[]
 }
 
+/**
+ * All the information the xpath-search component should keep track of
+ */
 interface GlobalState {
     currentStep: { number: number, step: Step };
     results: any[];
@@ -18,13 +28,18 @@ interface GlobalState {
     valid: boolean;
 }
 
+
+/**
+ * A step has a number and a function that performs the nescassery actions when entering a step
+ */
 interface Step {
     stepNumber: number;
     // Makes sure the step is entered correctly
     enterStep(GlobalState): Observable<GlobalState>
 }
 
-class InputStep implements Step {
+
+class XpathInputStep implements Step {
     stepNumber: number;
     constructor(stepNumber: number) {
         this.stepNumber = stepNumber;
@@ -46,6 +61,11 @@ class ResultStep implements Step {
         this.stepNumber = stepNumber;
     }
 
+    /**
+     * Gets the results before going the next state.
+     * @param state
+     * @returns
+     */
     public enterStep(state: GlobalState): Observable<GlobalState> {
         return new Observable((observer) => {
             this.resultService.getResults(state.selectedTreebanks.treebank, state.selectedTreebanks.subTreebanks).subscribe((data) => {
@@ -67,19 +87,26 @@ class ResultStep implements Step {
 
     }
 }
+
+
 class SelectTreebankStep implements Step {
     stepNumber: number;
     constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient, private resultService: ResultService) {
         this.stepNumber = stepNumber;
     }
 
+    /**
+     * Must first do a pre treebank step
+     * @param state
+     * @returns the updates state
+     */
     enterStep(state: GlobalState): Observable<GlobalState> {
         return new Observable((observer) => {
             this.treebankService.preGetTreebanks(state.XPath).subscribe((res) => {
                 state.currentStep = {
                     number: this.stepNumber,
                     step: this,
-                }
+                };
                 observer.next(state);
                 observer.complete();
 
@@ -95,7 +122,7 @@ export {
     TreebankSelection,
     GlobalState,
     Step,
-    InputStep,
+    XpathInputStep,
     SelectTreebankStep,
     ResultStep,
 };
