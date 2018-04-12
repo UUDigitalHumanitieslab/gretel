@@ -38,8 +38,9 @@ import { FooterNavigationComponent } from "./components/page-components/footer/f
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
 import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
-
-
+import {MessagesModule} from 'primeng/messages';
+import {MessageModule} from 'primeng/message';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 @NgModule({
     declarations: [
         AppComponent,
@@ -62,7 +63,8 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         BreadcrumbBarComponent,
         SelectTreebanksComponent,
         ResultsComponent,
-        SelectableTable
+        SelectableTable,
+
     ],
     imports: [
         BrowserModule,
@@ -71,7 +73,10 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         TableModule,
         FormsModule,
         LassyXPathModule,
-        DialogModule
+        DialogModule,
+        MessageModule,
+        MessagesModule,
+        BrowserAnimationsModule
 
     ],
     providers: [

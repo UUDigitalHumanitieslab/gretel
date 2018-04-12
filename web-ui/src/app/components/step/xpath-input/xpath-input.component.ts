@@ -38,7 +38,7 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     }
 
     showWarning() {
-        console.log("Warning")
+       this.warning = true;
     }
 
     inputChanged(event: ValueEvent) {

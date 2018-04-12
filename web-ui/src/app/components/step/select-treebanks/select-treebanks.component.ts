@@ -17,6 +17,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
     items: any[];
     info: { [title: string]: info[] } = {};
+    warning: boolean = false;
 
     mainTreebank: string;
     subTreebanks: string[];
@@ -112,7 +113,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * This warning should give info why the options that the user selected is not valid.
      */
     showWarning() {
-        console.log("Warning")
+        this.warning = true;
+
     }
 
 

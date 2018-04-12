@@ -12,6 +12,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
   styleUrls: ['./step.component.scss']
 })
 export class StepComponent implements OnInit {
+    warning: boolean = false;
 
   constructor() {
 

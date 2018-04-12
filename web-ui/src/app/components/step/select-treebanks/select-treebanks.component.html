@@ -1,6 +1,7 @@
 <h2>
     Select a treebank
 </h2>
+<p-message *ngIf="this.warning" severity="error" text="Please select a treebank and the components."></p-message>
 <p>
     Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get
     more information on these treebanks, you can find the project websites in

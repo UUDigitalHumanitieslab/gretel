@@ -25,7 +25,6 @@ export class ResultsService {
                   isAnalysis = this.defaultIsAnalysis,
                   metadataFilters = this.defaultMetadataFilters,
                   variables = this.defaultVariables): Observable<any> {
-        console.log(xpath);
         return Observable.create(async observer => {
             let offset = 0;
             while(!observer.closed){
