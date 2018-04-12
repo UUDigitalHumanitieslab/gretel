@@ -61,7 +61,12 @@ export class XpathSearchComponent implements OnInit {
             selectedTreebanks: undefined,
             currentStep: {number: 0, step: this.inputStep},
             valid: false,
-            xpath: '//node',
+            xpath: `//node[@cat="smain"
+    and node[@rel="su" and @pt="vnw"]
+    and node[@rel="hd" and @pt="ww"]
+    and node[@rel="predc" and @cat="np"
+    and node[@rel="det" and @pt="lid"]
+    and node[@rel="hd" and @pt="n"]]]`,
             loading: false
         };
 
