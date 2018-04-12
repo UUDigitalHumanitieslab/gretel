@@ -13,7 +13,7 @@
 
       </div>
       <div style="height: 500px">
-          <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
+          <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px"  [resizableColumns]="true">
               <ng-template pTemplate="colgroup" let-columns>
                   <colgroup>
                       <col *ngFor="let col of columns" [style.width]="col.width">
@@ -31,9 +31,9 @@
                       <td *ngFor="let col of columns" class="ui-resizable-column" >
 
                           <div [ngSwitch]="col.field">
-                              <div *ngSwitchCase="'number'">{{i}}</div>
-                              <a *ngSwitchCase="'id'" (click)="showTree(rowData.link)">{{rowData[col.field]}}</a>
-                              <p [innerHTML]="rowData[col.field]" *ngSwitchDefault></p>
+                              <span *ngSwitchCase="'number'">{{i}}</span>
+                              <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                              <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                           </div>
 
 

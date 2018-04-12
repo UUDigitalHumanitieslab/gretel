@@ -20,9 +20,8 @@ export class ResultsComponent implements OnInit, OnChanges {
 
     columns: any[] = [
         {field: 'number', header: '#', width: '5%'},
-        {field: 'id', header: 'ID', width: '10%'},
-        {field: 'component', header: 'component', width: '15%'},
-        {field: 'sentence', header: 'Sentence', width: '70%'},
+        {field: 'fileId', header: 'component', width: '20%'},
+        {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
     ];
 
     items: string[] = [];
@@ -43,16 +42,21 @@ export class ResultsComponent implements OnInit, OnChanges {
      * Show a tree of the given xml file
      * @param link to xml file
      */
-    showTree(link) {
-
+    showTree(result) {
+        console.log(result);
         let base = this.configurationService.getBaseUrlGretel();
         let element: any = $('#output');
-        let url = base + "/" + link;
-
+        let url = base + "/" + this.constructLink(result);
+        console.log(url);
         element.treeVisualizer(url, {
             nvFontSize: 14, normalView: false,
             initFSOnClick: true
         });
+    }
+
+    //TODO: make the treebank and database variable
+    constructLink(result: any){
+        return `front-end-includes/show-tree.php?sid=${result.fileId}&tb=test2&db=test2&id=${result.nodeIds.join('-')}`;
     }
 
 }

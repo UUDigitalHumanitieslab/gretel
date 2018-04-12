@@ -10,30 +10,36 @@ const url = '/gretel/api/src/router.php/results';
 
 @Injectable()
 export class ResultsService {
+    defaultIsAnalysis = false;
+    defaultMetadataFilters: { [key: string]: FilterValue } = {};
+    defaultVariables:{ name: string, path: string }[] = null
+
+
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
     }
 
-
-    //TODO: add parameters
-    getAllResults(): Observable<any> {
+    getAllResults(xpath: string,
+                  corpus: string,
+                  components: string[],
+                  retrieveContext: boolean,
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables): Observable<any> {
         return Observable.create(async observer => {
             let offset = 0;
             while(!observer.closed){
-                await this.results('//node', 'TEST2', ['test2', 'test2'], offset, false)
+                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables)
                     .then((res) => {
-
                         if (res) {
-                            observer.next(res)
-
+                            observer.next(res);
+                            offset = res.lastOffset;
                         } else {
                             observer.complete();
                         }
-                        offset = res.lastOffset;
+
                     });
 
             }
-
-
         }).mergeMap(results => results.hits);
     }
 
@@ -53,9 +59,9 @@ export class ResultsService {
                   components: string[],
                   offset: number = 0,
                   retrieveContext: boolean,
-                  isAnalysis = false,
-                  metadataFilters: { [key: string]: FilterValue } = {},
-                  variables: { name: string, path: string }[] = null) {
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables) {
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',

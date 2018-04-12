@@ -1,8 +1,7 @@
 import {Observable} from "rxjs/Observable";
+import {Subscription} from "rxjs/Subscription";
 import {of as observableOf} from 'rxjs/observable/of'
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {SessionService} from "../../services/session.service";
-import {ResultService} from "../../services/result.service";
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
 import 'rxjs/add/operator/take';
@@ -16,8 +15,8 @@ import 'rxjs/add/operator/takeUntil';
  * Info that needs to be in a treebank selection
  */
 interface TreebankSelection {
-    treebank: string
-    subTreebanks: string[]
+    corpus: string
+    components: string[]
 }
 
 /**
@@ -27,18 +26,20 @@ interface GlobalState {
     currentStep: { number: number, step: Step };
     results: any[];
     selectedTreebanks: TreebankSelection;
-    XPath: string;
+    xpath: string;
     valid: boolean;
+    loading: boolean;
 }
 
 
 /**
- * A step has a number and a function that performs the nescassery actions when entering a step
+ * A step has a number and a function that performs the necessary actions when entering a step
  */
 interface Step {
     stepNumber: number;
     // Makes sure the step is entered correctly
     enterStep(GlobalState): Observable<GlobalState>;
+    leaveStep(GlobalState): GlobalState;
 }
 
 
@@ -56,11 +57,15 @@ class XpathInputStep implements Step {
         };
         return observableOf(state)
     }
+    leaveStep(state: GlobalState){
+        return state;
+    }
 }
 
 
 class ResultStep implements Step {
     stepNumber: number;
+    subscription: Subscription;
 
     constructor(stepNumber: number, private resultsService: ResultsService) {
         this.stepNumber = stepNumber;
@@ -73,45 +78,51 @@ class ResultStep implements Step {
      */
     enterStep(state: GlobalState): Observable<GlobalState> {
 
-
-
-
         return new Observable((observer) => {
             let obs= { next: (res)=> {
-                console.log(res)
-            }};
-            console.log(obs);
-            let temp = this.resultsService.getAllResults().take(5).subscribe(obs)
+                console.log(res);
+                state.results.push(res);
+            },
+            complete: ()=>{
+                state.loading = false;
+            }
+            };
+            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe(obs);
 
+            state.currentStep = {
+                number: this.stepNumber,
+                step: this,
+
+            };
+            state.results = [];
+            state.loading = true;
+            observer.next(state);
+            observer.complete()
         })
-        /*
-         return new Observable((observer) => {
-         this.resultService.getResults(state.selectedTreebanks.treebank, state.selectedTreebanks.subTreebanks).subscribe((data) => {
-         state.currentStep = {
-         number: this.stepNumber,
-         step: this
-         };
-         state.results = data;
-         observer.next(state);
-         observer.complete()
 
-         },
-         e => console.log(e),
-         () => {
-         }
-         );
-         });
-         */
 
 
     }
+
+    /**
+     * Makes sure the stream is ended
+     * @param state
+     * @returns {GlobalState}
+     */
+    leaveStep(state: GlobalState): GlobalState{
+        this.subscription.unsubscribe();
+        state.loading = false;
+        return state;
+    }
+
+
 }
 
 
 class SelectTreebankStep implements Step {
     stepNumber: number;
 
-    constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient, private resultService: ResultService) {
+    constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient) {
         this.stepNumber = stepNumber;
     }
 
@@ -132,6 +143,9 @@ class SelectTreebankStep implements Step {
 
 
         });
+    }
+    leaveStep(state: GlobalState){
+        return state;
     }
 }
 

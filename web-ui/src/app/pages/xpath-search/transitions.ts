@@ -33,6 +33,10 @@ class Transitions {
         let transition = this.transitions[index];
         if (transition != undefined) {
             let step = transition.fire(state);
+            //Leave the current state
+            state = state.currentStep.step.leaveStep(state);
+            //Enter the new state
+
             return step.enterStep(state)
         } else {
             throw Error('Could not find transition with name')

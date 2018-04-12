@@ -27,7 +27,6 @@ import { CookieService } from "angular2-cookie/core";
 import { SessionService } from "./services/session.service";
 import { ResultsComponent } from './components/step/results/results.component';
 import { DialogModule } from "primeng/dialog";
-import { ResultService } from "./services/result.service";
 import { ConfigurationService } from "./services/configuration.service";
 import { PaperCiteComponent } from "./components/page-components/paper-cite/paper-cite.component";
 import { AdressComponent } from "./components/page-components/adress/adress.component";
@@ -84,7 +83,6 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         TreebankService,
         CookieService,
         SessionService,
-        ResultService,
         ConfigurationService
     ],
     bootstrap: [AppComponent]

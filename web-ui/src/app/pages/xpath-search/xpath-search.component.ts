@@ -2,8 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {SessionService} from "../../services/session.service";
-import {ResultService} from "../../services/result.service";
-import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep} from "./steps";
+import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "./steps";
 import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from './transitions'
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
@@ -54,7 +53,7 @@ export class XpathSearchComponent implements OnInit {
     resultComponent;
 
 
-    constructor(private http: HttpClient, private sessionService: SessionService, private resultService: ResultService, private treebankService: TreebankService, private resultsService: ResultsService) {
+    constructor(private http: HttpClient, private sessionService: SessionService, private treebankService: TreebankService, private resultsService: ResultsService) {
         this.inputStep = new XpathInputStep(0);
 
         this.globalState = {
@@ -62,13 +61,14 @@ export class XpathSearchComponent implements OnInit {
             selectedTreebanks: undefined,
             currentStep: {number: 0, step: this.inputStep},
             valid: false,
-            XPath: '//node'
+            xpath: '//node',
+            loading: false
         };
 
         this.configuration = {
             steps: [
                 this.inputStep,
-                new SelectTreebankStep(1, this.treebankService, this.http, this.resultService),
+                new SelectTreebankStep(1, this.treebankService, this.http),
                 new ResultStep(2,this.resultsService),
             ]
 
@@ -136,7 +136,7 @@ export class XpathSearchComponent implements OnInit {
 
     }
 
-    updateSelected(e) {
+    updateSelected(e: TreebankSelection) {
         this.globalState.selectedTreebanks = e
     }
 
