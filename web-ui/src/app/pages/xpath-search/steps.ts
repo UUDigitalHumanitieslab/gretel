@@ -51,10 +51,12 @@ class XpathInputStep implements Step {
     }
 
     enterStep(state: GlobalState) {
+        //TODO: stepNumber is redundant.
         state.currentStep = {
             number: this.stepNumber,
             step: this
         };
+
         return observableOf(state)
     }
     leaveStep(state: GlobalState){
@@ -79,14 +81,15 @@ class ResultStep implements Step {
     enterStep(state: GlobalState): Observable<GlobalState> {
 
         return new Observable((observer) => {
-            let obs= { next: (res)=> {
+            let observer= { next: (res)=> {
                 state.results.push(res);
             },
             complete: ()=>{
                 state.loading = false;
             }
             };
-            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe(obs);
+            //TODO: set limit somewhere else.
+            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe(observer);
 
             state.currentStep = {
                 number: this.stepNumber,
