@@ -28,7 +28,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         this.items = [];
     }
 
-    valid: boolean = false;
+    valid: boolean;
 
 
     columns: TableColumn[] = [
@@ -64,6 +64,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         } else {
             this.mainTreebank = undefined;
         }
+        this.updateValidity();
     }
 
     /**
@@ -88,15 +89,21 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
             corpus: this.mainTreebank,
             components: this.subTreebanks
         })
-        this.checkIfValid()
+        this.updateValidity()
     }
 
 
     /**
      * Checks if there are treebanks selected
      */
-    checkIfValid() {
-        this.valid = true ? this.subTreebanks.length != 0 : false
+    updateValidity() {
+
+        //Why not a oneliner you ask? ts complains about a string type being returned
+        if(this.subTreebanks && this.subTreebanks.length != 0 && this.mainTreebank){
+            this.valid = false;
+        } else {
+            this.valid = true
+        }
         this.onChangeValid.emit(this.valid);
     }
 

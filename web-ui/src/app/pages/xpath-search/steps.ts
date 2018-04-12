@@ -80,7 +80,6 @@ class ResultStep implements Step {
 
         return new Observable((observer) => {
             let obs= { next: (res)=> {
-                console.log(res);
                 state.results.push(res);
             },
             complete: ()=>{
@@ -138,6 +137,7 @@ class SelectTreebankStep implements Step {
                 number: this.stepNumber,
                 step: this,
             };
+            state.valid = false;
             observer.next(state);
             observer.complete();
 

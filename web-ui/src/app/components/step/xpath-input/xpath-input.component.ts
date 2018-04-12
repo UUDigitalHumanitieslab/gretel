@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { StepComponent } from "../step.component";
 import { LassyXPathParserService, MacroService, ValueEvent } from 'lassy-xpath/ng';
 import { HttpClient } from '@angular/common/http';
@@ -18,6 +18,8 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     and node[@rel="det" and @pt="lid"]
     and node[@rel="hd" and @pt="n"]]]`;
 
+    @Output() onChangeValue = new EventEmitter<string>();
+
     constructor(private httpClient: HttpClient, macroService: MacroService) {
         super();
 
@@ -31,7 +33,7 @@ export class XpathInputComponent extends StepComponent implements OnInit {
         this.onChangeValid.emit(true);
     }
 
-    checkIfValid() {
+    updateValidity() {
         this.onChangeValid.emit(this.valid);
     }
 
@@ -42,5 +44,7 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     inputChanged(event: ValueEvent) {
         this.valid = !event.error;
         this.value = event.xpath;
+        this.onChangeValue.emit(this.value);
+        this.onChangeValid.emit(this.valid);
     }
 }

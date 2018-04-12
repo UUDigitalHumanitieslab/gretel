@@ -44,9 +44,9 @@ export class XpathSearchComponent implements OnInit {
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
-    xpathInput;
-    @ViewChild('selectTreebanks')
-    selectTreebanks;
+    xpathInputComponent;
+    @ViewChild('selectTreebanksComponentRef')
+    selectTreebankComponent;
     @ViewChild('hiddenForm')
     form;
     @ViewChild('resultComponentRef')
@@ -118,15 +118,15 @@ export class XpathSearchComponent implements OnInit {
      */
     showWarning() {
         switch (this.globalState.currentStep.number) {
+            case 0: {
+                this.xpathInputComponent.showWarning();
+                break;
+            }
             case 1: {
-                this.xpathInput.showWarning();
+                this.selectTreebankComponent.showWarning();
                 break;
             }
             case 2: {
-                this.selectTreebanks.showWarning();
-                break;
-            }
-            case 3: {
                 this.resultComponent.showWarning();
                 break;
             }
