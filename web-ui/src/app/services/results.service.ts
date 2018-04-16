@@ -167,7 +167,6 @@ export class ResultsService {
             }[]
         }
     }): Hit['variableValues'] {
-        //Hotfix
         if (!data) {
             return {};
         }

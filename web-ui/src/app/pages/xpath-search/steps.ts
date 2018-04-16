@@ -1,9 +1,9 @@
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
-import {of as observableOf} from 'rxjs/observable/of'
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
+import { Observable } from "rxjs/Observable";
+import { Subscription } from "rxjs/Subscription";
+import { of as observableOf } from 'rxjs/observable/of'
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 /**
@@ -59,7 +59,7 @@ class XpathInputStep implements Step {
 
         return observableOf(state)
     }
-    leaveStep(state: GlobalState){
+    leaveStep(state: GlobalState) {
         return state;
     }
 }
@@ -80,13 +80,14 @@ class ResultStep implements Step {
      */
     enterStep(state: GlobalState): Observable<GlobalState> {
 
-        return new Observable((observer) => {
-            let observer= { next: (res)=> {
-                state.results.push(res);
-            },
-            complete: ()=>{
-                state.loading = false;
-            }
+        return new Observable(() => {
+            let observer = {
+                next: (res) => {
+                    state.results.push(res);
+                },
+                complete: () => {
+                    state.loading = false;
+                }
             };
             //TODO: set limit somewhere else.
             this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe(observer);
@@ -111,7 +112,7 @@ class ResultStep implements Step {
      * @param state
      * @returns {GlobalState}
      */
-    leaveStep(state: GlobalState): GlobalState{
+    leaveStep(state: GlobalState): GlobalState {
         this.subscription.unsubscribe();
         state.loading = false;
         return state;
@@ -147,7 +148,7 @@ class SelectTreebankStep implements Step {
 
         });
     }
-    leaveStep(state: GlobalState){
+    leaveStep(state: GlobalState) {
         return state;
     }
 }
