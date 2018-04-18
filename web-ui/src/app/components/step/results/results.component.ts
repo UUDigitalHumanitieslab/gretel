@@ -18,6 +18,11 @@ export class ResultsComponent implements OnInit, OnChanges {
     @Input() results: Result[] = [];
     @Input() loading: boolean = true;
 
+
+    filters = [];
+    selectedFilters = [
+    ];
+
     columns: any[] = [
         {field: 'number', header: '#', width: '5%'},
         {field: 'fileId', header: 'component', width: '20%'},
@@ -28,6 +33,10 @@ export class ResultsComponent implements OnInit, OnChanges {
 
 
     constructor(private http: HttpClient, private configurationService: ConfigurationService) {
+        for(let i = 0; i < 100; i++){
+            this.filters.push(`${i}`)
+        }
+
     }
 
     ngOnInit() {

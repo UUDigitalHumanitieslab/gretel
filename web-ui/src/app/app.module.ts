@@ -41,6 +41,7 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
 import {MessagesModule} from 'primeng/messages';
 import {MessageModule} from 'primeng/message';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgSelectModule} from "@ng-select/ng-select";
 @NgModule({
     declarations: [
         AppComponent,
@@ -76,7 +77,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
         DialogModule,
         MessageModule,
         MessagesModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        NgSelectModule
 
     ],
     providers: [

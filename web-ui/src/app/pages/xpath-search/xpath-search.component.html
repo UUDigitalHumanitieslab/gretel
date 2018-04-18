@@ -2,6 +2,8 @@
 <app-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="this.globalState.currentStep.number + 1"></app-breadcrumb-bar>
 
 
+
+
 <div class="container" [ngSwitch]="this.globalState.currentStep.number">
   <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)"  [value]="this.globalState.xpath" #xpathInput></app-xpath-input>
   <app-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanksComponentRef></app-select-treebanks>

@@ -59,7 +59,7 @@ export class XpathSearchComponent implements OnInit {
         this.globalState = {
             results: undefined,
             selectedTreebanks: undefined,
-            currentStep: {number: 0, step: this.inputStep},
+            currentStep: this.inputStep,
             valid: false,
             xpath: `//node[@cat="smain"
     and node[@rel="su" and @pt="vnw"]
@@ -141,8 +141,12 @@ export class XpathSearchComponent implements OnInit {
 
     }
 
-    updateSelected(e: TreebankSelection) {
-        this.globalState.selectedTreebanks = e
+    /**
+     * Updates the selected treebanks with the given selection
+     * @param selectedTreebanks the new treebank selection
+     */
+    updateSelected(selectedTreebanks: TreebankSelection) {
+        this.globalState.selectedTreebanks = selectedTreebanks;
     }
 
 }

@@ -24,19 +24,21 @@ interface Transition {
  * Class that keeps track of all the transitions
  */
 class Transitions {
-
     constructor(private transitions: Transition[]) {
     }
 
+    /**
+     * Fires a transition and creates the new state
+     * @param name: the name of the transition to fire
+     * @param state: the current state
+     * @returns {Observable<GlobalState>} an observable that returns a new state.
+     */
     fire(name: string, state: GlobalState): Observable<GlobalState> {
         let index = this.transitions.findIndex(transition => transition.name == name);
         let transition = this.transitions[index];
         if (transition != undefined) {
             let step = transition.fire(state);
-            //Leave the current state
-            state = state.currentStep.step.leaveStep(state);
-            //Enter the new state
-
+            state = state.currentStep.leaveStep(state);
             return step.enterStep(state)
         } else {
             throw Error('Could not find transition with name')
@@ -52,7 +54,7 @@ class DecreaseTransition implements Transition {
     constructor(private steps: Step[]){}
     fire(state: GlobalState) {
         if (state.currentStep.number == 0) {
-            return state.currentStep.step
+            return state.currentStep
         } else {
             return this.steps[state.currentStep.number - 1]
         }
@@ -66,7 +68,7 @@ class IncreaseTransition implements Transition {
     constructor(private steps: Step[]) {}
     fire(state: GlobalState) {
         if (state.currentStep.number == this.steps.length) {
-            return state.currentStep.step
+            return state.currentStep
         } else {
             return this.steps[state.currentStep.number + 1]
         }

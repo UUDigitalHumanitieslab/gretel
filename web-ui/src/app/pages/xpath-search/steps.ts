@@ -23,7 +23,7 @@ interface TreebankSelection {
  * All the information the xpath-search component should keep track of
  */
 interface GlobalState {
-    currentStep: { number: number, step: Step };
+    currentStep: Step;
     results: any[];
     selectedTreebanks: TreebankSelection;
     xpath: string;
@@ -36,7 +36,7 @@ interface GlobalState {
  * A step has a number and a function that performs the necessary actions when entering a step
  */
 interface Step {
-    stepNumber: number;
+    number: number;
     // Makes sure the step is entered correctly
     enterStep(GlobalState): Observable<GlobalState>;
     leaveStep(GlobalState): GlobalState;
@@ -44,19 +44,11 @@ interface Step {
 
 
 class XpathInputStep implements Step {
-    stepNumber: number;
 
-    constructor(stepNumber: number) {
-        this.stepNumber = stepNumber;
-    }
+    constructor(public number: number) {}
 
     enterStep(state: GlobalState) {
-        //TODO: stepNumber is redundant.
-        state.currentStep = {
-            number: this.stepNumber,
-            step: this
-        };
-
+        state.currentStep = this;
         return observableOf(state)
     }
     leaveStep(state: GlobalState){
@@ -66,11 +58,11 @@ class XpathInputStep implements Step {
 
 
 class ResultStep implements Step {
-    stepNumber: number;
+    number: number;
     subscription: Subscription;
 
     constructor(stepNumber: number, private resultsService: ResultsService) {
-        this.stepNumber = stepNumber;
+        this.number = stepNumber;
     }
 
     /**
@@ -81,21 +73,16 @@ class ResultStep implements Step {
     enterStep(state: GlobalState): Observable<GlobalState> {
 
         return new Observable((observer) => {
-            let observer= { next: (res)=> {
+
+            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe({ next: (res)=> {
                 state.results.push(res);
             },
-            complete: ()=>{
-                state.loading = false;
-            }
-            };
-            //TODO: set limit somewhere else.
-            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe(observer);
+                complete: ()=>{
+                    state.loading = false;
+                }
+            });
 
-            state.currentStep = {
-                number: this.stepNumber,
-                step: this,
-
-            };
+            state.currentStep = this
             state.results = [];
             state.loading = true;
             observer.next(state);
@@ -122,10 +109,10 @@ class ResultStep implements Step {
 
 
 class SelectTreebankStep implements Step {
-    stepNumber: number;
+    number: number;
 
     constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient) {
-        this.stepNumber = stepNumber;
+        this.number = stepNumber;
     }
 
     /**
@@ -136,10 +123,7 @@ class SelectTreebankStep implements Step {
     enterStep(state: GlobalState): Observable<GlobalState> {
 
         return new Observable((observer) => {
-            state.currentStep = {
-                number: this.stepNumber,
-                step: this,
-            };
+            state.currentStep = this;
             state.valid = false;
             observer.next(state);
             observer.complete();
