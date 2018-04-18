@@ -45,13 +45,15 @@ interface Step {
 
 class XpathInputStep implements Step {
 
-    constructor(public number: number) {}
+    constructor(public number: number) {
+    }
 
     enterStep(state: GlobalState) {
         state.currentStep = this;
         return observableOf(state)
     }
-    leaveStep(state: GlobalState){
+
+    leaveStep(state: GlobalState) {
         return state;
     }
 }
@@ -74,21 +76,22 @@ class ResultStep implements Step {
 
         return new Observable((observer) => {
 
-            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe({ next: (res)=> {
-                state.results.push(res);
-            },
-                complete: ()=>{
+            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe({
+                next: (res) => {
+                    state.results.push(res);
+                },
+                complete: () => {
                     state.loading = false;
                 }
             });
 
             state.currentStep = this
+
             state.results = [];
             state.loading = true;
             observer.next(state);
             observer.complete()
         })
-
 
 
     }
@@ -98,7 +101,7 @@ class ResultStep implements Step {
      * @param state
      * @returns {GlobalState}
      */
-    leaveStep(state: GlobalState): GlobalState{
+    leaveStep(state: GlobalState): GlobalState {
         this.subscription.unsubscribe();
         state.loading = false;
         return state;
@@ -131,7 +134,8 @@ class SelectTreebankStep implements Step {
 
         });
     }
-    leaveStep(state: GlobalState){
+
+    leaveStep(state: GlobalState) {
         return state;
     }
 }
