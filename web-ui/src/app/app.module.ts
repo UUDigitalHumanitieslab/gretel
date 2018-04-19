@@ -42,6 +42,7 @@ import {MessagesModule} from 'primeng/messages';
 import {MessageModule} from 'primeng/message';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgSelectModule} from "@ng-select/ng-select";
+import {AngularFontAwesomeModule} from "angular-font-awesome";
 @NgModule({
     declarations: [
         AppComponent,
@@ -78,8 +79,7 @@ import {NgSelectModule} from "@ng-select/ng-select";
         MessageModule,
         MessagesModule,
         BrowserAnimationsModule,
-        NgSelectModule
-
+        NgSelectModule,
     ],
     providers: [
         AlpinoService,
