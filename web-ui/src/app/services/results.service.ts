@@ -32,7 +32,7 @@ export class ResultsService {
                     .then((res) => {
                         if (res) {
                             observer.next(res);
-                            offset = res.lastOffset;
+                            offset = res.nextOffset;
                         } else {
                             observer.complete();
                         }
@@ -112,7 +112,7 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            lastOffset: results[7]
+            nextOffset: results[7] + 1
         }
     }
 
@@ -242,7 +242,7 @@ export interface SearchResults {
     /**
      * Start offset for retrieving the next results
      */
-    lastOffset: number
+    nextOffset: number
 }
 
 export interface Hit {
