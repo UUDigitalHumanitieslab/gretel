@@ -1,11 +1,11 @@
-import {Component, Input, OnChanges, OnInit, SimpleChange} from '@angular/core';
-import {Result} from './result';
-import {TableColumn} from '../../tables/selectable-table/TableColumn';
+import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
+import { Result } from './result';
+import { TableColumn } from '../../tables/selectable-table/TableColumn';
 
 import * as $ from 'jquery';
 import '../../../../assets/js/tree-visualizer';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {ConfigurationService} from "../../../services/configuration.service";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { ConfigurationService } from "../../../services/configuration.service";
 
 @Component({
     selector: 'app-results',
@@ -24,16 +24,16 @@ export class ResultsComponent implements OnInit {
     ];
 
     columns = [
-        {field: 'number', header: '#', width: '5%'},
-        {field: 'fileId', header: 'component', width: '20%'},
-        {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
+        { field: 'number', header: '#', width: '5%' },
+        { field: 'fileId', header: 'Component', width: '20%' },
+        { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
     items: string[] = [];
 
 
     constructor(private http: HttpClient, private configurationService: ConfigurationService) {
-        for(let i = 0; i < 100; i++){
+        for (let i = 0; i < 100; i++) {
             this.filters.push(`${i}`)
         }
 
@@ -57,7 +57,7 @@ export class ResultsComponent implements OnInit {
         });
     }
 
-    constructLink(result){
+    constructLink(result) {
         return `front-end-includes/show-tree.php?sid=${result.fileId}&tb=test2&db=test2&id=${result.nodeIds.join('-')}`;
     }
 
