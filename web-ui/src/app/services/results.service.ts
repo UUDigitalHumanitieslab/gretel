@@ -1,10 +1,10 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import {Observable} from "rxjs/Observable";
+import { Observable } from "rxjs/Observable";
 
-import {XmlParseService} from './xml-parse.service';
+import { XmlParseService } from './xml-parse.service';
 import 'rxjs/add/operator/mergeMap'
 const url = '/gretel/api/src/router.php/results';
 
@@ -12,27 +12,27 @@ const url = '/gretel/api/src/router.php/results';
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: { [key: string]: FilterValue } = {};
-    defaultVariables:{ name: string, path: string }[] = null
+    defaultVariables: { name: string, path: string }[] = null
 
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
     }
 
     getAllResults(xpath: string,
-                  corpus: string,
-                  components: string[],
-                  retrieveContext: boolean,
-                  isAnalysis = this.defaultIsAnalysis,
-                  metadataFilters = this.defaultMetadataFilters,
-                  variables = this.defaultVariables): Observable<any> {
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables): Observable<any> {
         return Observable.create(async observer => {
             let offset = 0;
-            while(!observer.closed){
+            while (!observer.closed) {
                 await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables)
                     .then((res) => {
                         if (res) {
                             observer.next(res);
-                            offset = res.lastOffset;
+                            offset = res.nextOffset;
                         } else {
                             observer.complete();
                         }
@@ -55,13 +55,13 @@ export class ResultsService {
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
     async results(xpath: string,
-                  corpus: string,
-                  components: string[],
-                  offset: number = 0,
-                  retrieveContext: boolean,
-                  isAnalysis = this.defaultIsAnalysis,
-                  metadataFilters = this.defaultMetadataFilters,
-                  variables = this.defaultVariables) {
+        corpus: string,
+        components: string[],
+        offset: number = 0,
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables) {
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            lastOffset: results[7]
+            nextOffset: results[7] + 1
         }
     }
 
@@ -140,7 +140,7 @@ export class ResultsService {
 
     private mapMeta(data: {
         metadata: {
-            meta: {
+            meta?: {
                 $: {
                     type: string,
                     name: string,
@@ -149,7 +149,7 @@ export class ResultsService {
             }[]
         }
     }): Hit['metaValues'] {
-        return data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {});
@@ -235,14 +235,14 @@ type ApiSearchResult = [
     { [id: string]: string },
     // 7 end pos iteration
     number
-    ];
+];
 
 export interface SearchResults {
     hits: Hit[],
     /**
      * Start offset for retrieving the next results
      */
-    lastOffset: number
+    nextOffset: number
 }
 
 export interface Hit {

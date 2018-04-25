@@ -11,7 +11,7 @@
 
     <div class="column is-full">
         <div [ngSwitch]="this.globalState.currentStep.number">
-            <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" [value]="this.globalState.xpath"
+            <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" [value]="this.globalState.xpath"
                              #xpathInput></app-xpath-input>
             <app-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)"
                                   (onUpdateSelected)="updateSelected($event)"

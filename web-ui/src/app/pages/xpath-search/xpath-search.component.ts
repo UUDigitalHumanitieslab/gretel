@@ -1,11 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {SessionService} from "../../services/session.service";
-import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "./steps";
-import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from './transitions'
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { SessionService } from "../../services/session.service";
+import { GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection } from "./steps";
+import { Transition, Transitions, IncreaseTransition, DecreaseTransition } from './transitions'
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -74,7 +74,7 @@ export class XpathSearchComponent implements OnInit {
             steps: [
                 this.inputStep,
                 new SelectTreebankStep(1, this.treebankService, this.http),
-                new ResultStep(2,this.resultsService),
+                new ResultStep(2, this.resultsService),
             ]
 
         };
@@ -149,4 +149,7 @@ export class XpathSearchComponent implements OnInit {
         this.globalState.selectedTreebanks = selectedTreebanks;
     }
 
+    updateXPath(xpath: string) {
+        this.globalState.xpath = xpath;
+    }
 }
