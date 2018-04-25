@@ -61,7 +61,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     treebankChange(e) {
         if (e.target.checked) {
             this.mainTreebank = e.target.value;
-            this.getTreebankInfo(this.items.find(t => t.name = e.target.value))
+            let treebank = this.items.find(t => t.title == e.target.value);
+            this.getSubtreebanks(treebank)
         } else {
             this.mainTreebank = undefined;
         }
@@ -72,10 +73,10 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * Gets the detailed info of a given treebank
      * @param treebank
      */
-    getTreebankInfo(treebank: Treebank) {
+    getSubtreebanks(treebank: Treebank) {
         let results = [];
 
-        this.treebankService.getTreebankInfo(treebank).subscribe((info: info[]) => {
+        this.treebankService.getSubtreebanks(treebank).subscribe((info: info[]) => {
                 //To keep track if we selected the given subpart of the treebank.
                 this.info[treebank.title] = info;
                 this.info[treebank.title].forEach(entry => entry.selected = true);
