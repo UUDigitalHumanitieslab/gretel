@@ -1,6 +1,5 @@
-<nav class="secondary-navigation">
-  <ul class="progressbar">
-    <li *ngFor="let crumb of crumbs " class="no-hover" [ngClass]="{active: crumb.number <= currentCrumb}"><a
-      title="XPath">{{crumb.number}}<span> - {{crumb.name}}</span></a></li>
-  </ul>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <li *ngFor="let crumb of crumbs " class="no-hover" [ngClass]="{'is-active': crumb.number == currentCrumb}">
+        <a>{{crumb.name}}</a>
+    </li>
 </nav>

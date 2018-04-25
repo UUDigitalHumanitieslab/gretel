@@ -1,29 +1,16 @@
-<div class="columns is-multiline">
-    <div class="column is-full">
-        <h2 class="subtitle"> Number of results: {{results.length}}</h2>
-
-
-
-    </div>
-
-    <div class="column is-full">
+<h2 class="subtitle"> Number of Results: {{results.length}}</h2>
+<div class="columns">
+    <div class="column is-one-third">
         <div class="filter">
-            <ng-select
-                [items]="filters"
-                [multiple]="true"
-                [closeOnSelect]="false"
-                bindLabel="name"
-                placeholder="Select filters"
-                [hideSelected]="true"
+            <ng-select [items]="filters" [multiple]="true" [closeOnSelect]="false" bindLabel="name" placeholder="Select filters" [hideSelected]="true"
                 [(ngModel)]="selectedFilters">
             </ng-select>
         </div>
 
     </div>
-    <div class="column is-full">
+    <div class="column">
         <div style="height: 500px">
-            <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px"
-                     [resizableColumns]="true">
+            <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
                 <ng-template pTemplate="colgroup" let-columns>
                     <colgroup>
                         <col *ngFor="let col of columns" [style.width]="col.width">

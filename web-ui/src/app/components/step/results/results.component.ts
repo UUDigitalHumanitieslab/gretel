@@ -25,7 +25,7 @@ export class ResultsComponent implements OnInit, OnChanges {
 
     columns: any[] = [
         {field: 'number', header: '#', width: '5%'},
-        {field: 'fileId', header: 'component', width: '20%'},
+        {field: 'fileId', header: 'Component', width: '20%'},
         {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
     ];
 

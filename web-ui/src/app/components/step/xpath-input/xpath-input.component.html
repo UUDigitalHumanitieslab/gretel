@@ -1,10 +1,5 @@
 <h2 class="subtitle">
-    XPath query
+    XPath Query
 </h2>
-<div class="columns">
-    <div class="column is-half">
-        <p-message *ngIf="this.warning" severity="error"
-                   text="Please make sure the xpath query is correct."></p-message>
-        <lx-editor [value]="value" (onChange)="inputChanged($event)" autofocus="true"></lx-editor>
-    </div>
-</div>
+<p-message *ngIf="this.warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
+<lx-editor width="100%" [value]="value" (onChange)="inputChanged($event)" autofocus="true"></lx-editor>

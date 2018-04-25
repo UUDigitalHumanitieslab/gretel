@@ -1,33 +1,24 @@
-<div class="columns is-multiline">
-    <div class="column is-full"> <h2 class="subtitle">
-        Select a treebank
-
-    </h2></div>
-    <div class="column is-full">
-        <p-message *ngIf="this.warning" severity="error" text="Please select a treebank and the components."></p-message>
-        <p>
-            Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get
-            more information on these treebanks, you can find the project websites in
-            <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.
-        </p>
-        <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties some sentences
-            could not be included in the system, so the sentence and word counts may slightly differ from the official treebank counts.</p>
-
-    </div>
-    <div class="column is-full">
-        <ul>
-            <li *ngFor="let item of items">
-                <label>
-                    <input type="checkbox" name="{{item.id}}" value="{{item.title}}" (click)="treebankChange($event)" #checkbox> {{item.title}}
-                </label>
-                <p *ngIf="checkbox.checked">
-                    <app-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></app-selectable-table>
-                </p>
-            </li>
-        </ul>
-
-
-    </div>
+<h2 class="subtitle">
+    Select a Treebank
+</h2>
+<p-message *ngIf="this.warning" severity="error" text="Please select a treebank and the components."></p-message>
+<div class="content">
+    <p>
+        Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get
+        more information on these treebanks, you can find the project websites in
+        <a href="documentation.php#faq-3" target="_blank" title="More information on corpora">our FAQ</a>.
+    </p>
+    <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties some sentences
+        could not be included in the system, so the sentence and word counts may slightly differ from the official treebank
+        counts.</p>
 </div>
-
-
+<ul>
+    <li *ngFor="let item of items">
+        <label>
+            <input type="checkbox" name="{{item.id}}" value="{{item.title}}" (click)="treebankChange($event)" #checkbox> {{item.title}}
+        </label>
+        <p *ngIf="checkbox.checked">
+            <app-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></app-selectable-table>
+        </p>
+    </li>
+</ul>
