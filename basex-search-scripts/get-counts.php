@@ -1,22 +1,22 @@
 <?php
 
-require "../config.php";
-require ROOT_PATH."/functions.php";
+require '../config.php';
+require ROOT_PATH.'/functions.php';
 
-require ROOT_PATH."/basex-search-scripts/basex-client.php";
-require ROOT_PATH."/basex-search-scripts/treebank-count.php";
-require ROOT_PATH."/basex-search-scripts/treebank-search.php";
+require ROOT_PATH.'/basex-search-scripts/basex-client.php';
+require ROOT_PATH.'/basex-search-scripts/treebank-count.php';
+require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 session_start();
 set_time_limit(0);
 
 if (!isset($_GET['sid'])) {
-  $results = array(
+    $results = array(
     'error' => true,
     'data' => 'Session ID not provided. Perhaps you have disabled cookies. Please enable them.',
   );
-  echo json_encode($results);
-  exit;
+    echo json_encode($results);
+    exit;
 }
 
 define('SID', $_GET['sid']);
@@ -39,8 +39,8 @@ try {
         $serverInfo = getServerInfo($corpus, false);
     }
 
-    $dbhost = $serverInfo{'machine'};
-    $dbport = $serverInfo{'port'};
+    $dbhost = $serverInfo['machine'];
+    $dbport = $serverInfo['port'];
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
     list($sum, $counts) = getCounts($databases, $already, $session);
@@ -54,7 +54,7 @@ try {
         // # of sentences for that database
         $total = getTotalSentences($corpus);
         foreach ($counts as $database => $dbCount) {
-            $counts{$database} = array($dbCount, $total[$database]);
+            $counts[$database] = array($dbCount, $total[$database]);
         }
         createCsvCounts($sum, $counts, SID);
     }
@@ -62,7 +62,7 @@ try {
     header_remove('Set-Cookie');
     $results = array(
       'sum' => $sum,
-      'counts' => $counts
+      'counts' => $counts,
     );
     echo json_encode($results);
 } catch (Exception $e) {

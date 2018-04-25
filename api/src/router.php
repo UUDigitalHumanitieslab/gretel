@@ -35,6 +35,18 @@ $router->map('POST', '/parse_sentence', function () {
     echo json_encode($data);
 });
 
+$router->map('POST', '/metadata_counts', function () {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    $corpus = $data['corpus'];
+    $components = $data['components'];
+    $xpath = $data['xpath'];
+
+    $counts = get_metadata_counts($corpus, $components, $xpath);
+    header('Content-Type: application/json');
+    echo json_encode($counts);
+});
+
 $router->map('POST', '/results', function () {
     global $resultsLimit;
 

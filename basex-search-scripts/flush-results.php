@@ -8,7 +8,7 @@ require '../config.php';
 require ROOT_PATH.'/functions.php';
 
 require ROOT_PATH.'/basex-search-scripts/basex-client.php';
-require ROOT_PATH.'/basex-search-scripts/treebank-search.php';
+require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 session_start();
 set_time_limit(0);
