@@ -2,24 +2,24 @@
 session_cache_limiter('private');
 session_start();
 header('Content-Type:text/html; charset=utf-8');
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
 $currentPage = 'xps';
 $step = 4;
 
-require "../config.php";
-require ROOT_PATH . "/helpers.php";
+require '../config.php';
+require ROOT_PATH.'/helpers.php';
 
-require ROOT_PATH . "/front-end-includes/metadata.php";
+require ROOT_PATH.'/front-end-includes/metadata.php';
 retrieve_metadata();
- 
+
 $continueConstraints = sessionVariablesSet($_POST['sid'], array('treebank', 'subtreebank', 'xpath'));
 if ($continueConstraints) {
     define('SID', $_POST['sid']);
     $_SESSION[SID]['ebsxps'] = $currentPage;
-    require ROOT_PATH."/preparatory-scripts/prep-functions.php";
+    require ROOT_PATH.'/preparatory-scripts/prep-functions.php';
 
     $treeVisualizer = true;
     $onlyFullscreenTv = true;
@@ -42,13 +42,13 @@ if ($continueConstraints) {
 
     $needRegularSonar = false;
 }
-require ROOT_PATH . "/functions.php";
-require ROOT_PATH . "/front-end-includes/head.php";
+require ROOT_PATH.'/functions.php';
+require ROOT_PATH.'/front-end-includes/head.php';
 
 if ($continueConstraints) {
-    require ROOT_PATH . "/basex-search-scripts/treebank-search.php";
-    require ROOT_PATH . "/basex-search-scripts/basex-client.php";
-    
+    require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
+    require ROOT_PATH.'/basex-search-scripts/basex-client.php';
+
     if ($corpus == 'sonar') {
         $bf = xpathToBreadthFirst($xpath);
         // Get correct databases to start search with, sets to
@@ -74,20 +74,20 @@ session_write_close();
 <?php 
 flush();
 
-require ROOT_PATH . "/front-end-includes/header.php";
-require ROOT_PATH . "/front-end-includes/analysis.php";
+require ROOT_PATH.'/front-end-includes/header.php';
+require ROOT_PATH.'/front-end-includes/analysis.php';
 if ($continueConstraints) {
     $analysis = new Analysis();
     $analysis->continueConstraints = $continueConstraints;
     $analysis->corpus = $corpus;
     $analysis->SID = SID;
-    if (isset($_POST["xpath-variables"])) {
-        $analysis->variables = $_POST["xpath-variables"];
+    if (isset($_POST['xpath-variables'])) {
+        $analysis->variables = $_POST['xpath-variables'];
     }
     $analysis->render();
 }
-require ROOT_PATH."/front-end-includes/footer.php";
-include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+require ROOT_PATH.'/front-end-includes/footer.php';
+include ROOT_PATH.'/front-end-includes/analytics-tracking.php';
 ?>
 </body>
 </html>
