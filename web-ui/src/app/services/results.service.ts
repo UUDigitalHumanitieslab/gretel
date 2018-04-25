@@ -5,12 +5,42 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable } from "rxjs/Observable";
 
 import { XmlParseService } from './xml-parse.service';
-
+import 'rxjs/add/operator/mergeMap'
 const url = '/gretel/api/src/router.php/results';
 
 @Injectable()
 export class ResultsService {
+    defaultIsAnalysis = false;
+    defaultMetadataFilters: { [key: string]: FilterValue } = {};
+    defaultVariables: { name: string, path: string }[] = null
+
+
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
+    }
+
+    getAllResults(xpath: string,
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables): Observable<any> {
+        return Observable.create(async observer => {
+            let offset = 0;
+            while (!observer.closed) {
+                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables)
+                    .then((res) => {
+                        if (res) {
+                            observer.next(res);
+                            offset = res.nextOffset;
+                        } else {
+                            observer.complete();
+                        }
+
+                    });
+
+            }
+        }).mergeMap(results => results.hits);
     }
 
     /**
@@ -29,9 +59,9 @@ export class ResultsService {
         components: string[],
         offset: number = 0,
         retrieveContext: boolean,
-        isAnalysis = false,
-        metadataFilters: { [key: string]: FilterValue } = {},
-        variables: { name: string, path: string }[] = null) {
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables) {
         const httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/json',
@@ -82,7 +112,7 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            lastOffset: results[7]
+            nextOffset: results[7] + 1
         }
     }
 
@@ -110,7 +140,7 @@ export class ResultsService {
 
     private mapMeta(data: {
         metadata: {
-            meta: {
+            meta?: {
                 $: {
                     type: string,
                     name: string,
@@ -119,13 +149,14 @@ export class ResultsService {
             }[]
         }
     }): Hit['metaValues'] {
-        return data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {});
     }
 
-    private mapVariables(data: {
+
+    private mapVariables(data: '' | {
         vars: {
             var: {
                 $: {
@@ -211,7 +242,7 @@ export interface SearchResults {
     /**
      * Start offset for retrieving the next results
      */
-    lastOffset: number
+    nextOffset: number
 }
 
 export interface Hit {
@@ -232,7 +263,8 @@ export interface Hit {
      * Contains the properties of the node matching the variable
      */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } },
-};
+}
+;
 
 export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
 

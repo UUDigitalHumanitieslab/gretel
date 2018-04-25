@@ -27,7 +27,6 @@ import { CookieService } from "angular2-cookie/core";
 import { SessionService } from "./services/session.service";
 import { ResultsComponent } from './components/step/results/results.component';
 import { DialogModule } from "primeng/dialog";
-import { ResultService } from "./services/result.service";
 import { ConfigurationService } from "./services/configuration.service";
 import { PaperCiteComponent } from "./components/page-components/paper-cite/paper-cite.component";
 import { AdressComponent } from "./components/page-components/adress/adress.component";
@@ -39,7 +38,11 @@ import { FooterNavigationComponent } from "./components/page-components/footer/f
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
 import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
-
+import {MessagesModule} from 'primeng/messages';
+import {MessageModule} from 'primeng/message';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NgSelectModule} from "@ng-select/ng-select";
+import {AngularFontAwesomeModule} from "angular-font-awesome";
 @NgModule({
     declarations: [
         AppComponent,
@@ -62,7 +65,8 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         BreadcrumbBarComponent,
         SelectTreebanksComponent,
         ResultsComponent,
-        SelectableTable
+        SelectableTable,
+
     ],
     imports: [
         BrowserModule,
@@ -71,8 +75,11 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         TableModule,
         FormsModule,
         LassyXPathModule,
-        DialogModule
-
+        DialogModule,
+        MessageModule,
+        MessagesModule,
+        BrowserAnimationsModule,
+        NgSelectModule,
     ],
     providers: [
         AlpinoService,
@@ -83,7 +90,6 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
         TreebankService,
         CookieService,
         SessionService,
-        ResultService,
         ConfigurationService
     ],
     bootstrap: [AppComponent]

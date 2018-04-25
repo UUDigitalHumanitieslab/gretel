@@ -1,11 +1,38 @@
-<app-body-header>XPath Search</app-body-header>
-<app-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="this.globalState.currentStep.number + 1"></app-breadcrumb-bar>
+<div class="columns is-multiline">
+    <div class="column">
+        <app-body-header>XPath Search</app-body-header>
+    </div>
 
-<div class="container" [ngSwitch]="this.globalState.currentStep.number">
-  <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" #xpathInput></app-xpath-input>
-  <app-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanks></app-select-treebanks>
-  <app-results *ngSwitchCase="2" [loading]="!done" [results]="this.globalState.results" (onChangeValid)="setValid($event)" #resultsComponentRef></app-results>
+
+    <div class="column is-full">
+        <app-breadcrumb-bar [crumbs]="crumbs"
+                            [currentCrumb]="this.globalState.currentStep.number + 1"></app-breadcrumb-bar>
+    </div>
+
+    <div class="column is-full">
+        <div [ngSwitch]="this.globalState.currentStep.number">
+            <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" [value]="this.globalState.xpath"
+                             #xpathInput></app-xpath-input>
+            <app-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)"
+                                  (onUpdateSelected)="updateSelected($event)"
+                                  #selectTreebanksComponentRef></app-select-treebanks>
+            <app-results *ngSwitchCase="2" [loading]="this.globalState.loading" [results]="this.globalState.results"
+                         (onChangeValid)="setValid($event)" #resultsComponentRef></app-results>
+        </div>
+    </div>
+
+    <div class="column is-full">
+        <div class="button-container">
+            <button *ngIf="this.globalState.currentStep.number !=0 " (click)="prev()">Go Back</button>
+            <button class='right-button' (click)="next()">Continue</button>
+        </div>
+    </div>
 </div>
 
-<button (click)="prev()">prev</button>
-<button (click)="next()">next</button>
+
+
+
+
+
+
+

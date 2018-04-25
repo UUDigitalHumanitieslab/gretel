@@ -12,6 +12,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
   styleUrls: ['./step.component.scss']
 })
 export class StepComponent implements OnInit {
+    warning: boolean = false;
 
   constructor() {
 
@@ -25,7 +26,7 @@ export class StepComponent implements OnInit {
   /**
    * Check if the input of the user is valid
    */
-  public checkIfValid(){
+  public updateValidity(){
     throw new Error("checkIfValid not implemented");
   }
 
