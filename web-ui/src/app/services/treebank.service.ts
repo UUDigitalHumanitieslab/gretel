@@ -33,7 +33,7 @@ export class TreebankService {
         return this.http.post("/gretel/xps/tb-sel.php", formData, { headers: { responseType: "document" } })
     }
 
-    getTreebankInfo(treebankInfo: any) {
+    getSubtreebanks(treebankInfo: any) {
         return this.http.get(`/gretel-upload/index.php/api/treebank/show/${treebankInfo.title}`)
     }
 }

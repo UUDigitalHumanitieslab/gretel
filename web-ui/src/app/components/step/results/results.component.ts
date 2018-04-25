@@ -12,7 +12,7 @@ import {ConfigurationService} from "../../../services/configuration.service";
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent implements OnInit, OnChanges {
+export class ResultsComponent implements OnInit {
 
 
     @Input() results: Result[] = [];
@@ -42,10 +42,6 @@ export class ResultsComponent implements OnInit, OnChanges {
     ngOnInit() {
     }
 
-
-    ngOnChanges(e){
-
-    }
 
     /**
      * Show a tree of the given xml file

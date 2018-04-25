@@ -1,11 +1,7 @@
-<div class="columns is-multiline">
+<div *ngIf="results.length != 0; else warning" class="columns is-multiline">
     <div class="column is-full">
         <h2 class="subtitle"> Number of results: {{results.length}}</h2>
-
-
-
     </div>
-
     <div class="column is-full">
         <div class="filter">
             <ng-select
@@ -18,7 +14,6 @@
                 [(ngModel)]="selectedFilters">
             </ng-select>
         </div>
-
     </div>
     <div class="column is-full">
         <div style="height: 500px">
@@ -58,6 +53,8 @@
 
 </div>
 
+
+<ng-template #warning>No results found, please try again with another treebank or other xpath-query</ng-template>
 
 
 
