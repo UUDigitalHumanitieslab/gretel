@@ -99,13 +99,10 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      */
     updateValidity() {
 
-        //Why not a oneliner you ask? ts complains about a string type being returned
-        if(this.subTreebanks && this.subTreebanks.length != 0 && this.mainTreebank){
-            this.valid = true;
-        } else {
-            this.valid = false
-        }
+        this.valid = this.subTreebanks && this.subTreebanks.length && !!this.mainTreebank;
         this.onChangeValid.emit(this.valid);
+
+
     }
 
     /**

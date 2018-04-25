@@ -23,7 +23,7 @@ export class ResultsComponent implements OnInit, OnChanges {
     selectedFilters = [
     ];
 
-    columns: any[] = [
+    columns = [
         {field: 'number', header: '#', width: '5%'},
         {field: 'fileId', header: 'component', width: '20%'},
         {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
@@ -43,8 +43,8 @@ export class ResultsComponent implements OnInit, OnChanges {
     }
 
 
-    ngOnChanges(e: any){
-        console.log(e)
+    ngOnChanges(e){
+
     }
 
     /**
@@ -52,19 +52,16 @@ export class ResultsComponent implements OnInit, OnChanges {
      * @param link to xml file
      */
     showTree(result) {
-        console.log(result);
         let base = this.configurationService.getBaseUrlGretel();
         let element: any = $('#output');
         let url = base + "/" + this.constructLink(result);
-        console.log(url);
         element.treeVisualizer(url, {
             nvFontSize: 14, normalView: false,
             initFSOnClick: true
         });
     }
 
-    //TODO: make the treebank and database variable
-    constructLink(result: any){
+    constructLink(result){
         return `front-end-includes/show-tree.php?sid=${result.fileId}&tb=test2&db=test2&id=${result.nodeIds.join('-')}`;
     }
 
