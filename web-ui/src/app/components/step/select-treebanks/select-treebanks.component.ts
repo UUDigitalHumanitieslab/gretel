@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
-import {StepComponent} from "../step.component";
-import {TreebankService} from "../../../services/treebank.service";
-import {Treebank, TreebankInfo} from "../../../treebank";
-import {TableColumn} from "../../tables/selectable-table/TableColumn";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { StepComponent } from "../step.component";
+import { TreebankService } from "../../../services/treebank.service";
+import { Treebank, TreebankInfo } from "../../../treebank";
+import { TableColumn } from "../../tables/selectable-table/TableColumn";
 
 
 interface info extends TreebankInfo {
@@ -61,7 +61,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     treebankChange(e) {
         if (e.target.checked) {
             this.mainTreebank = e.target.value;
-            this.getTreebankInfo(this.items.find(t => t.name = e.target.value))
+            let treebank = this.items.find(t => t.title == e.target.value);
+            this.getSubtreebanks(treebank)
         } else {
             this.mainTreebank = undefined;
         }
@@ -72,15 +73,15 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * Gets the detailed info of a given treebank
      * @param treebank
      */
-    getTreebankInfo(treebank: Treebank) {
+    getSubtreebanks(treebank: Treebank) {
         let results = [];
 
-        this.treebankService.getTreebankInfo(treebank).subscribe((info: info[]) => {
-                //To keep track if we selected the given subpart of the treebank.
-                this.info[treebank.title] = info;
-                this.info[treebank.title].forEach(entry => entry.selected = true);
-                this.updateSelected();
-            }
+        this.treebankService.getSubtreebanks(treebank).subscribe((info: info[]) => {
+            //To keep track if we selected the given subpart of the treebank.
+            this.info[treebank.title] = info;
+            this.info[treebank.title].forEach(entry => entry.selected = true);
+            this.updateSelected();
+        }
         )
     }
 
@@ -98,13 +99,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * Checks if there are treebanks selected
      */
     updateValidity() {
-
-        //Why not a oneliner you ask? ts complains about a string type being returned
-        if(this.subTreebanks && this.subTreebanks.length != 0 && this.mainTreebank){
-            this.valid = true;
-        } else {
-            this.valid = false
-        }
+        this.valid = this.subTreebanks && this.subTreebanks.length && !!this.mainTreebank;
         this.onChangeValid.emit(this.valid);
     }
 
@@ -114,8 +109,5 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      */
     showWarning() {
         this.warning = true;
-
     }
-
-
 }
