@@ -1,52 +1,65 @@
-<div class="hero">
-  <div class="hero-body">
+<div class="columns is-multiline">
+    <div class="column is-full">
+        <h2 class="subtitle"> Number of results: {{results.length}}</h2>
 
-    <div class="container">
-      <h1 class="title">Results</h1>
-      <div class="box">
-        <div class="level is-light">
-          <div class="level-left">
-            <div class="level-item"><h2 class="subtitle"> Number of results: {{results.length}}</h2></div>
-            <div class="level-item " *ngIf="loading"><a class="button is-info is-loading"></a></div>
-          </div>
-        </div>
-
-      </div>
-      <div style="height: 500px">
-          <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
-              <ng-template pTemplate="colgroup" let-columns>
-                  <colgroup>
-                      <col *ngFor="let col of columns" [style.width]="col.width">
-                  </colgroup>
-              </ng-template>
-              <ng-template pTemplate="header" let-columns>
-                  <tr>
-                      <th *ngFor="let col of columns" pResizableColumn>
-                          {{col.header}}
-                      </th>
-                  </tr>
-              </ng-template>
-              <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                  <tr>
-                      <td *ngFor="let col of columns" class="ui-resizable-column" >
-
-                          <div [ngSwitch]="col.field">
-                              <div *ngSwitchCase="'number'">{{i}}</div>
-                              <a *ngSwitchCase="'id'" (click)="showTree(rowData.link)">{{rowData[col.field]}}</a>
-                              <p [innerHTML]="rowData[col.field]" *ngSwitchDefault></p>
-                          </div>
-
-
-                      </td>
-                  </tr>
-              </ng-template>
-          </p-table>
-
-      </div>
 
 
     </div>
-  </div>
+
+    <div class="column is-full">
+        <div class="filter">
+            <ng-select
+                [items]="filters"
+                [multiple]="true"
+                [closeOnSelect]="false"
+                bindLabel="name"
+                placeholder="Select filters"
+                [hideSelected]="true"
+                [(ngModel)]="selectedFilters">
+            </ng-select>
+        </div>
+
+    </div>
+    <div class="column is-full">
+        <div style="height: 500px">
+            <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px"
+                     [resizableColumns]="true">
+                <ng-template pTemplate="colgroup" let-columns>
+                    <colgroup>
+                        <col *ngFor="let col of columns" [style.width]="col.width">
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header" let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns" pResizableColumn>
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns" class="ui-resizable-column">
+
+                            <div [ngSwitch]="col.field">
+                                <span *ngSwitchCase="'number'">{{i}}</span>
+                                <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                                <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
+                            </div>
+
+
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+        </div>
+    </div>
+
+
 </div>
+
+
+
+
 <section id="output">
 </section>

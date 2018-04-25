@@ -1,2 +1,10 @@
-<app-xpath-editor></app-xpath-editor>
-
+<h2 class="subtitle">
+    XPath query
+</h2>
+<div class="columns">
+    <div class="column is-half">
+        <p-message *ngIf="this.warning" severity="error"
+                   text="Please make sure the xpath query is correct."></p-message>
+        <lx-editor [value]="value" (onChange)="inputChanged($event)" autofocus="true"></lx-editor>
+    </div>
+</div>

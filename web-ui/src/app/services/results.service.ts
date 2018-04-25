@@ -6,6 +6,7 @@ import { Observable } from "rxjs/Observable";
 
 import { XmlParseService } from './xml-parse.service';
 
+import 'rxjs/add/operator/mergeMap'
 const routerUrl = '/gretel/api/src/router.php/';
 const httpOptions = {
     headers: new HttpHeaders({
@@ -15,17 +16,58 @@ const httpOptions = {
 
 @Injectable()
 export class ResultsService {
+    defaultIsAnalysis = false;
+    defaultMetadataFilters: { [key: string]: FilterValue } = {};
+    defaultVariables: { name: string, path: string }[] = null
+
+
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
     }
 
+    getAllResults(xpath: string,
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables): Observable<any> {
+        return Observable.create(async observer => {
+            let offset = 0;
+            while (!observer.closed) {
+                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables)
+                    .then((res) => {
+                        if (res) {
+                            observer.next(res);
+                            offset = res.nextOffset;
+                        } else {
+                            observer.complete();
+                        }
+
+                    });
+
+            }
+        }).mergeMap(results => results.hits);
+    }
+
+    /**
+     * Queries the treebank and returns the matching hits.
+     * @param xpath Specification of the pattern to match
+     * @param corpus Identifier of the corpus
+     * @param components Identifiers of the sub-treebanks
+     * @param offset Zero-based index of the results
+     * @param retrieveContext Get the sentence before and after the hit
+     * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
+     * @param metadataFilters The filters to apply for the metadata properties
+     * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
+     */
     async results(xpath: string,
         corpus: string,
         components: string[],
         offset: number = 0,
         retrieveContext: boolean,
-        isAnalysis = false,
-        metadataFilters: { [key: string]: FilterValue } = {},
-        variables: { name: string, path: string }[] = null) {
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables) {
         let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
@@ -79,7 +121,7 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            lastOffset: results[7]
+            nextOffset: results[7] + 1
         }
     }
 
@@ -107,7 +149,7 @@ export class ResultsService {
 
     private mapMeta(data: {
         metadata: {
-            meta: {
+            meta?: {
                 $: {
                     type: string,
                     name: string,
@@ -116,13 +158,14 @@ export class ResultsService {
             }[]
         }
     }): Hit['metaValues'] {
-        return data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {});
     }
 
-    private mapVariables(data: {
+
+    private mapVariables(data: '' | {
         vars: {
             var: {
                 $: {
@@ -133,6 +176,9 @@ export class ResultsService {
             }[]
         }
     }): Hit['variableValues'] {
+        if (!data) {
+            return {};
+        }
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = {
                 pos: variable.$.pos,
@@ -205,7 +251,7 @@ export interface SearchResults {
     /**
      * Start offset for retrieving the next results
      */
-    lastOffset: number
+    nextOffset: number
 }
 
 export interface Hit {
@@ -226,7 +272,8 @@ export interface Hit {
      * Contains the properties of the node matching the variable
      */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } },
-};
+}
+;
 
 export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
 

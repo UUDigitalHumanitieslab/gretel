@@ -2,6 +2,7 @@
 .gitignore*
 *.png
 *.ico
+*.log
 *~
 tmp/*
 log/*
@@ -29,3 +30,4 @@ js/min/**
 js/ts/**
 
 vendor
+!lassy-xpath/.gitignore
