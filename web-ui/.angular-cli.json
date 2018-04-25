@@ -17,7 +17,7 @@
             "test": "test.ts",
             "tsconfig": "tsconfig.app.json",
             "testTsconfig": "tsconfig.spec.json",
-            "prefix": "app",
+            "prefix": "grt",
             "styles": [
                 "styles.scss",
                 "../node_modules/primeng/resources/themes/omega/theme.scss",

@@ -10,8 +10,8 @@
  */
 var jQuery = require('jquery');
 
-(function($) {
-    $.fn.treeVisualizer = function(xml, options) {
+(function ($) {
+    $.fn.treeVisualizer = function (xml, options) {
         var defaults = {
             normalView: true,
             nvFontSize: 12,
@@ -30,11 +30,15 @@ var jQuery = require('jquery');
             zoomOpts,
             sentenceContainer;
         var $window = $(window);
-
         if (args.normalView || args.fsView) {
             instance.children(".tree-visualizer, .tree-visualizer-fs").remove();
             initVars();
-            loadXML(xml);
+            parseXMLObj(xml);
+            if (args.initFSOnClick) {
+                FS.fadeIn(250, function () {
+                    fontToFit();
+                });
+            }
         } else {
             console.error("Cannot initialize Tree Visualizer: either the container " +
                 "does not exist, or you have set both normal and fullscreen view to " +
@@ -43,7 +47,7 @@ var jQuery = require('jquery');
 
         if (!args.initFSOnClick) {
             // Show tree-visualizer-fs tree
-            instance.find(".tv-show-fs").click(function(e) {
+            instance.find(".tv-show-fs").click(function (e) {
                 anyTooltip.css("top", "-100%").children("ul").empty();
                 if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
 
@@ -53,15 +57,15 @@ var jQuery = require('jquery');
             });
         }
         // Adjust scroll position
-        anyTree.add($window).scroll(function() {
+        anyTree.add($window).scroll(function () {
             tooltipPosition();
         });
 
         // Close fullscreen if a user clicks on an empty area
-        FS.click(function(e) {
+        FS.click(function (e) {
             var target = $(e.target);
             if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts, .sentence").length) {
-                FS.fadeOut(250, function() {
+                FS.fadeOut(250, function () {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
                 });
@@ -69,11 +73,11 @@ var jQuery = require('jquery');
             }
         });
         // Zooming
-        zoomOpts.find("button").click(function() {
+        zoomOpts.find("button").click(function () {
             var $this = $(this);
 
             if ($this.is(".close")) {
-                FS.fadeOut(250, function() {
+                FS.fadeOut(250, function () {
                     treeFS.find("a").removeClass("hovered");
                     removeError();
                 });
@@ -86,7 +90,7 @@ var jQuery = require('jquery');
                 animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
                 animationSpeed += 50;
 
-                setTimeout(function() {
+                setTimeout(function () {
                     tooltipPosition(true);
                 }, animationSpeed);
             }
@@ -95,7 +99,7 @@ var jQuery = require('jquery');
         // Make the tree-visualizer-fs tree responsive
         if (args.fsView) $window.on("resize", sizeTreeFS);
 
-        anyTree.on("click", "a", function(e) {
+        anyTree.on("click", "a", function (e) {
             var $this = $(this),
                 listItem = $this.parent("li"),
                 data = listItem.data(),
@@ -119,16 +123,16 @@ var jQuery = require('jquery');
             e.preventDefault();
         });
 
-        anyTree.on("mouseout", "a.hovered", function() {
+        anyTree.on("mouseout", "a.hovered", function () {
             var $this = $(this);
             if ($this.closest(".tree").hasClass("small")) {
-                $this.on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function() {
+                $this.on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
                     tooltipPosition(true);
                 });
             }
         });
 
-        anyTooltip.find("button").click(function() {
+        anyTooltip.find("button").click(function () {
             var $this = $(this),
                 tooltip = $this.parent(".tooltip"),
                 tree = tooltip.prev(".tree"),
@@ -197,41 +201,6 @@ var jQuery = require('jquery');
             errorContainer = anyView.children(".tv-error");
         }
 
-        function loadXML(src) {
-            $.ajax({
-                    type: "GET",
-                    url: src,
-                    dataType: "xml"
-                })
-                .done(function(data) {
-                    if (data == null) {
-                        errorHandle("Your XML appears to be empty or not in a compatible format.");
-                    } else {
-                        parseXMLObj(data);
-                    }
-                })
-                .fail(function(jqXHR, textStatus, errorThrown) {
-                    var msg = '';
-                    if (jqXHR.status === 0) {
-                        msg = 'Not connect to the Internet.<br>Verify your network connection.';
-                    } else if (jqXHR.status == 404) {
-                        msg = 'Requested XML file not found.<br>Try again with another query.';
-                    } else if (jqXHR.status == 500) {
-                        msg = 'Internal Server Error.<br>If the problem persists, contact us.';
-                    } else {
-                        msg = 'Uncaught Error.<br>Please try again at another time.';
-                    }
-                    errorHandle(msg);
-                })
-                .always(function() {
-                    if (args.normalView) SS.show();
-                    if (args.initFSOnClick) {
-                        FS.fadeIn(250);
-                        sizeTreeFS();
-                    }
-                });
-        }
-
         function parseXMLObj(xml) {
             var xmlObject = $(xml);
 
@@ -251,7 +220,7 @@ var jQuery = require('jquery');
         function buildOutputList(nodes) {
             var newList = $("<ol/>");
 
-            nodes.each(function(x, e) {
+            nodes.each(function (x, e) {
                 var newItem = $('<li><a href="#"></a></li>');
 
                 for (var i = 0, l = e.attributes.length, a = null; i < l; i++) {
@@ -276,7 +245,7 @@ var jQuery = require('jquery');
 
         // Small modifications to the tree
         function treeModifier() {
-            anyTree.find("a").each(function() {
+            anyTree.find("a").each(function () {
                 var $this = $(this),
                     li = $this.parent("li");
 
@@ -342,7 +311,28 @@ var jQuery = require('jquery');
                 noMoreZooming();
             }
         }
+        function fontToFit() {
+            var fontFitSize = parseInt(treeFS.children("ol").css("fontSize"), 10),
+                el = treeFS[0];
 
+            while (fontFitSize > 4 && (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth)) {
+                fontFitSize--;
+                treeFS.children("ol").css("fontSize", fontFitSize + "px");
+            }
+
+            while (fontFitSize < 16 && el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth) {
+                fontFitSize++;
+                treeFS.children("ol").css("fontSize", fontFitSize + "px");
+
+                if (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) {
+                    fontFitSize--;
+                    treeFS.children("ol").css("fontSize", fontFitSize + "px");
+                    break;
+                }
+            }
+            treeFS.children("ol").attr("data-tv-fontsize", fontFitSize);
+            noMoreZooming();
+        }
         function tooltipPosition(animate) {
             var tree;
             if (typeof treeFS != "undefined" && treeFS.is(":visible")) {
@@ -448,7 +438,7 @@ var jQuery = require('jquery');
 
         function jqArrayToJqObject(arr) {
             //http://stackoverflow.com/a/11304274/2919731
-            return $($.map(arr, function(el) {
+            return $($.map(arr, function (el) {
                 return el.get();
             }));
         }

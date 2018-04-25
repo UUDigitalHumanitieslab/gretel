@@ -1,11 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
-import { Result } from './result';
+import { Hit, ResultsService } from '../../../services/results.service';
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
-
-import * as $ from 'jquery';
-import '../../../../assets/js/tree-visualizer';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { ConfigurationService } from "../../../services/configuration.service";
 
 @Component({
     selector: 'app-results',
@@ -14,10 +9,11 @@ import { ConfigurationService } from "../../../services/configuration.service";
 })
 export class ResultsComponent implements OnInit {
 
-
-    @Input() results: Result[] = [];
+    @Input() treebank: string;
+    @Input() results: Hit[] = [];
     @Input() loading: boolean = true;
 
+    public treeXml?: string;
 
     filters = [];
     selectedFilters = [
@@ -32,7 +28,7 @@ export class ResultsComponent implements OnInit {
     items: string[] = [];
 
 
-    constructor(private http: HttpClient, private configurationService: ConfigurationService) {
+    constructor(private resultsService: ResultsService) {
         for (let i = 0; i < 100; i++) {
             this.filters.push(`${i}`)
         }
@@ -47,18 +43,8 @@ export class ResultsComponent implements OnInit {
      * Show a tree of the given xml file
      * @param link to xml file
      */
-    showTree(result) {
-        let base = this.configurationService.getBaseUrlGretel();
-        let element: any = $('#output');
-        let url = base + "/" + this.constructLink(result);
-        element.treeVisualizer(url, {
-            nvFontSize: 14, normalView: false,
-            initFSOnClick: true
-        });
+    async showTree(result: Hit) {
+        this.treeXml = undefined;
+        this.treeXml = await this.resultsService.highlightSentenceTree(result.fileId, this.treebank, result.nodeIds);
     }
-
-    constructLink(result) {
-        return `front-end-includes/show-tree.php?sid=${result.fileId}&tb=test2&db=test2&id=${result.nodeIds.join('-')}`;
-    }
-
 }
