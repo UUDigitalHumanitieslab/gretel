@@ -1,6 +1,106 @@
 <ng-container *ngIf="results.length != 0; else warning">
-    <h2 class="subtitle"> Number of Results: {{results.length}}</h2>
-    <div class="columns is-multiline">
+    <div class="columns">
+        <!-- XPATH -->
+        <div class="column">
+            <h2 class="subtitle">
+                <div class="level">
+                    <div class="level-item level-left">
+                        XPath
+                    </div>
+                    <div class="level-item level-right">
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button" title="Download query">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-download"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" title="Copy query to the clipboard">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-copy"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </h2>
+            <pre>{{xpath}}</pre>
+        </div>
+        <!-- DISTRIBUTION LIST -->
+        <div class="column">
+            <h2 class="subtitle">
+                <div class="level">
+                    <div class="level-item level-left">
+                        Distribution List</div>
+                    <div class="level-item level-right">
+                        <div class="field">
+                            <p class="control">
+                                <a class="button" title="Download distribution list">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-download"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </h2>
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Hits</th>
+                        <th>All Sentences</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>YEAR5</th>
+                        <td>6</td>
+                        <td>23432</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <td>6</td>
+                        <td>23432</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <h1 class="title">
+        <div class="level">
+            <div class="level-item level-left">
+                Results: {{results.length}}
+            </div>
+            <div class="level-item level-right">
+                <div class="field is-grouped">
+                    <p class="control">
+                        <a class="button is-primary" [ngClass]="{'is-loading':loading}" (click)="downloadResults()">
+                            <span class="icon is-large">
+                                <i class="fas fa-download"></i>
+                            </span>
+                            <span>Download Results</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button" [ngClass]="{'is-loading':loading}">
+                            <span class="icon is-large">
+                                <i class="fas fa-print"></i>
+                            </span>
+                            <span>Print Results</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </h1>
+    <div class="columns">
         <div class="column is-one-third">
             <div class="filter">
                 <ng-select [items]="filters" [multiple]="true" [closeOnSelect]="false" bindLabel="name" placeholder="Select filters" [hideSelected]="true"
@@ -9,37 +109,34 @@
             </div>
         </div>
         <div class="column">
-            <div style="height: 500px">
-                <p-table [columns]="columns" [value]="results" [scrollable]="true" scrollHeight="450px" [resizableColumns]="true">
-                    <ng-template pTemplate="colgroup" let-columns>
-                        <colgroup>
-                            <col *ngFor="let col of columns" [style.width]="col.width">
-                        </colgroup>
-                    </ng-template>
-                    <ng-template pTemplate="header" let-columns>
-                        <tr>
-                            <th *ngFor="let col of columns" pResizableColumn>
-                                {{col.header}}
-                            </th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                        <tr>
-                            <td *ngFor="let col of columns" class="ui-resizable-column">
+            <p-table [columns]="columns" [value]="results" [resizableColumns]="true">
+                <ng-template pTemplate="colgroup" let-columns>
+                    <colgroup>
+                        <col *ngFor="let col of columns" [style.width]="col.width">
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header" let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns" pResizableColumn>
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns" class="ui-resizable-column">
 
-                                <div [ngSwitch]="col.field">
-                                    <span *ngSwitchCase="'number'">{{i}}</span>
-                                    <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
-                                    <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
-                                </div>
+                            <div [ngSwitch]="col.field">
+                                <span *ngSwitchCase="'number'">{{i + 1}}</span>
+                                <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                                <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
+                            </div>
 
 
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-
-            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
         </div>
     </div>
 </ng-container>

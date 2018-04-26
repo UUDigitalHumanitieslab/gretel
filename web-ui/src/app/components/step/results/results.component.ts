@@ -1,11 +1,12 @@
 import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
-import { Result } from './result';
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 
 import * as $ from 'jquery';
 import '../../../../assets/js/tree-visualizer';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { ConfigurationService } from "../../../services/configuration.service";
+import { DownloadService } from '../../../services/download.service';
+import { Hit } from '../../../services/results.service';
 
 @Component({
     selector: 'app-results',
@@ -13,9 +14,10 @@ import { ConfigurationService } from "../../../services/configuration.service";
     styleUrls: ['./results.component.scss']
 })
 export class ResultsComponent implements OnInit {
-
-
-    @Input() results: Result[] = [];
+    @Input() corpus: string;
+    @Input() components: string[];
+    @Input() results: Hit[] = [];
+    @Input() xpath: string;
     @Input() loading: boolean = true;
 
 
@@ -25,14 +27,15 @@ export class ResultsComponent implements OnInit {
 
     columns = [
         { field: 'number', header: '#', width: '5%' },
-        { field: 'fileId', header: 'Component', width: '20%' },
+        { field: 'fileId', header: 'ID', width: '20%' },
+        { field: 'component', header: 'Component', width: '20%' },
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
     items: string[] = [];
 
 
-    constructor(private http: HttpClient, private configurationService: ConfigurationService) {
+    constructor(private http: HttpClient, private configurationService: ConfigurationService, private downloadService: DownloadService) {
         for (let i = 0; i < 100; i++) {
             this.filters.push(`${i}`)
         }
@@ -61,4 +64,7 @@ export class ResultsComponent implements OnInit {
         return `front-end-includes/show-tree.php?sid=${result.fileId}&tb=test2&db=test2&id=${result.nodeIds.join('-')}`;
     }
 
+    public downloadResults() {
+        this.downloadService.downloadResults(this.corpus, this.components, this.xpath, this.results);
+    }
 }

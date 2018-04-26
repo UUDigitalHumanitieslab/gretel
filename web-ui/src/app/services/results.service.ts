@@ -133,6 +133,7 @@ export class ResultsService {
             let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
+                component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results[4][hitId],
@@ -256,6 +257,7 @@ export interface SearchResults {
 
 export interface Hit {
     fileId: string,
+    component: string,
     sentence: string,
     highlightedSentence: SafeHtml,
     treeXml: string,

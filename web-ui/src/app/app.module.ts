@@ -21,6 +21,7 @@ import { StepComponent } from './components/step/step.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { DownloadService } from "./services/download.service";
 import { TreebankService } from "./services/treebank.service";
 import { TableModule } from "primeng/table";
 import { CookieService } from "angular2-cookie/core";
@@ -38,11 +39,11 @@ import { FooterNavigationComponent } from "./components/page-components/footer/f
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
 import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
-import {MessagesModule} from 'primeng/messages';
-import {MessageModule} from 'primeng/message';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {NgSelectModule} from "@ng-select/ng-select";
-import {AngularFontAwesomeModule} from "angular-font-awesome";
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgSelectModule } from "@ng-select/ng-select";
+import { AngularFontAwesomeModule } from "angular-font-awesome";
 @NgModule({
     declarations: [
         AppComponent,
@@ -90,7 +91,8 @@ import {AngularFontAwesomeModule} from "angular-font-awesome";
         TreebankService,
         CookieService,
         SessionService,
-        ConfigurationService
+        ConfigurationService,
+        DownloadService
     ],
     bootstrap: [AppComponent]
 })
