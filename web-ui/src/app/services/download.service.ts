@@ -7,6 +7,7 @@ import { Hit } from './results.service';
 export class DownloadService {
     constructor(private sanitizer: DomSanitizer) {
     }
+
     public downloadResults(corpus: string, components: string[], xpath: string, hits: Hit[]) {
         let rows: string[] = [];
         rows.push(
@@ -24,6 +25,10 @@ Date: ${new Date()}
         }
 
         this.downloadRows('gretel-results.txt', 'text/plain', rows);
+    }
+
+    public downloadXPath(xpath: string) {
+        this.downloadRows('gretel-xpath.txt', 'text/plain', [xpath]);
     }
 
     private highlightSentence(highlightedSentence: SafeHtml) {

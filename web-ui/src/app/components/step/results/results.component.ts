@@ -1,4 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
+
+import { ClipboardService } from 'ngx-clipboard';
+
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 
 import * as $ from 'jquery';
@@ -20,6 +23,7 @@ export class ResultsComponent implements OnInit {
     @Input() xpath: string;
     @Input() loading: boolean = true;
 
+    public xpathCopied = false;
 
     filters = [];
     selectedFilters = [
@@ -35,7 +39,8 @@ export class ResultsComponent implements OnInit {
     items: string[] = [];
 
 
-    constructor(private http: HttpClient, private configurationService: ConfigurationService, private downloadService: DownloadService) {
+    constructor(private http: HttpClient, private configurationService: ConfigurationService, private downloadService: DownloadService,
+        private clipboardService: ClipboardService) {
         for (let i = 0; i < 100; i++) {
             this.filters.push(`${i}`)
         }
@@ -66,5 +71,18 @@ export class ResultsComponent implements OnInit {
 
     public downloadResults() {
         this.downloadService.downloadResults(this.corpus, this.components, this.xpath, this.results);
+    }
+
+    public downloadXPath() {
+        this.downloadService.downloadXPath(this.xpath);
+    }
+
+    public copyXPath() {
+        if (this.clipboardService.copyFromContent(this.xpath)) {
+            this.xpathCopied = true;
+            setTimeout(() => {
+                this.xpathCopied = false;
+            }, 5000);
+        }
     }
 }

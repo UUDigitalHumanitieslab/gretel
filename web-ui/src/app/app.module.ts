@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
+import { ClipboardModule } from 'ngx-clipboard'
 import { LassyXPathModule } from 'lassy-xpath/ng';
 
 import { AppComponent } from './app.component';
@@ -81,6 +82,7 @@ import { AngularFontAwesomeModule } from "angular-font-awesome";
         MessagesModule,
         BrowserAnimationsModule,
         NgSelectModule,
+        ClipboardModule
     ],
     providers: [
         AlpinoService,
