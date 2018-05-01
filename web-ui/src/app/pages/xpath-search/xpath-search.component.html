@@ -7,7 +7,7 @@
     <app-results *ngSwitchCase="2" [loading]="this.globalState.loading" [corpus]="this.globalState.selectedTreebanks.corpus"  [components]="this.globalState.selectedTreebanks.components" [results]="this.globalState.results" [xpath]="this.globalState.xpath"
         (onChangeValid)="setValid($event)" #resultsComponentRef></app-results>
 </div>
-<div class="buttons is-right">
+<div class="buttons is-right is-hidden-print">
     <button class="button" *ngIf="this.globalState.currentStep.number !=0 " (click)="prev()">Previous</button>
     <button class="button is-primary" (click)="next()">Next</button>
 </div>
