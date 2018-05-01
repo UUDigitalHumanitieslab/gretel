@@ -1,8 +1,8 @@
 <?php
 
-function getCounts($databases, $already, $session)
+function getCounts($databases, $already, $session, $xpath, $corpus)
 {
-    global $corpus, $needRegularSonar;
+    global $needRegularSonar;
 
     $sum = 0;
     $counts = array();
@@ -11,13 +11,13 @@ function getCounts($databases, $already, $session)
         if ($corpus == 'sonar' && !$needRegularSonar) {
             getMoreIncludes($database, $databases, $already, $session);
         }
-        $xquery = createXqueryCount($database);
+        $xquery = createXqueryCount($database, $xpath, $corpus);
         $query = $session->query($xquery);
 
         if ($corpus == 'sonar') {
             $sum += $query->execute();
         } else {
-            $counts{$database} = $query->execute();
+            $counts[$database] = $query->execute();
         }
 
         $query->close();
@@ -50,9 +50,9 @@ function createCsvCounts($sum, $counts, $sid)
     }
 }
 
-function createXqueryCount($database)
+function createXqueryCount($database, $xpath, $corpus)
 {
-    global $needRegularSonar, $xpath, $corpus;
+    global $needRegularSonar;
     $for = 'count(for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
         $for .= '/tree';
@@ -67,16 +67,15 @@ function getTotalSentences()
 {
     global $corpus;
     if (API_URL) {
-        $components = json_decode(file_get_contents(API_URL . '/treebank/show/' . $corpus));
+        $components = json_decode(file_get_contents(API_URL.'/treebank/show/'.$corpus));
         $sum = 0;
         foreach ($components as $c) {
-            $basex_db = strtoupper($corpus . '_ID_' . $c->slug);
+            $basex_db = strtoupper($corpus.'_ID_'.$c->slug);
             $sum += intval($c->nr_sentences);
             $total[$basex_db] = $c->nr_sentences;
         }
         $total['TOTAL'] = $sum;
-    }
-    else if ($corpus == 'lassy') {
+    } elseif ($corpus == 'lassy') {
         $total['LASSY_ID_DPC'] = '11716';
         $total['LASSY_ID_WIKI'] = '7341';
         $total['LASSY_ID_WRPE'] = '14420';

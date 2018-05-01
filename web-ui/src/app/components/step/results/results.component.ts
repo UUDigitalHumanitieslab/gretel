@@ -7,9 +7,7 @@ import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import * as $ from 'jquery';
 import '../../../../assets/js/tree-visualizer';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { ConfigurationService } from "../../../services/configuration.service";
-import { DownloadService } from '../../../services/download.service';
-import { Hit } from '../../../services/results.service';
+import { ConfigurationService, DownloadService, Hit, ResultsService } from "../../../services/_index";
 
 @Component({
     selector: 'app-results',
@@ -40,6 +38,7 @@ export class ResultsComponent implements OnInit {
 
 
     constructor(private http: HttpClient, private configurationService: ConfigurationService, private downloadService: DownloadService,
+        private resultsService: ResultsService,
         private clipboardService: ClipboardService) {
         for (let i = 0; i < 100; i++) {
             this.filters.push(`${i}`)

@@ -32,24 +32,23 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     valid: boolean;
 
 
-    columns: TableColumn[] = [
-        {
-            field: "slug",
-            header: "Component"
-        },
-        {
-            field: "title",
-            header: "Contents"
-        },
-        {
-            field: "nr_sentences",
-            header: "Sentences"
-        },
-        {
-            field: "nr_words",
-            header: "Words"
-        },
-    ];
+    columns: {
+        field: keyof TreebankInfo,
+        header: string
+    }[] = [
+            {
+                field: "component",
+                header: "Component"
+            },
+            {
+                field: "sentenceCount",
+                header: "Sentences"
+            },
+            {
+                field: "wordCount",
+                header: "Words"
+            },
+        ];
 
     ngOnInit() {
         this.treebankService.getTreebanks().subscribe((treebank: any) => {
@@ -62,7 +61,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         if (e.target.checked) {
             this.mainTreebank = e.target.value;
             let treebank = this.items.find(t => t.title == e.target.value);
-            this.getSubtreebanks(treebank)
+            this.getSubTreebanks(treebank)
         } else {
             this.mainTreebank = undefined;
         }
@@ -73,20 +72,19 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * Gets the detailed info of a given treebank
      * @param treebank
      */
-    getSubtreebanks(treebank: Treebank) {
+    getSubTreebanks(treebank: Treebank) {
         let results = [];
 
-        this.treebankService.getSubtreebanks(treebank).subscribe((info: info[]) => {
+        this.treebankService.getSubTreebanks(treebank).then((info) => {
             //To keep track if we selected the given subpart of the treebank.
-            this.info[treebank.title] = info;
+            this.info[treebank.title] = info.map(x => Object.assign(x, { selected: true }) as info);
             this.info[treebank.title].forEach(entry => entry.selected = true);
             this.updateSelected();
-        }
-        )
+        });
     }
 
     updateSelected() {
-        this.subTreebanks = this.info[this.mainTreebank].filter(entry => entry.selected).map((entry: any) => entry.title)
+        this.subTreebanks = this.info[this.mainTreebank].filter(entry => entry.selected).map((entry) => entry.component);
         this.onUpdateSelected.emit({
             corpus: this.mainTreebank,
             components: this.subTreebanks

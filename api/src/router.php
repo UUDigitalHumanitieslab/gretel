@@ -4,6 +4,7 @@ require '../vendor/autoload.php';
 require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
 require './results.php';
+require './treebank-counts.php';
 
 // Maybe change this?
 header('Access-Control-Allow-Origin: *');
@@ -12,15 +13,6 @@ $router = new AltoRouter();
 $router->setBasePath('/gretel/api/src/router.php');
 $alpinoDirectory = '/opt/Alpino';
 define('ROOT_PATH', '/vagrant/vagrant_data/gretel');
-
-// Test route to show as an example (remove before merging with develop)
-$router->map('GET', '/test_route', function () {
-    $data = [
-            'payload' => 'test',
-    ];
-    header('Content-Type: application/json');
-    echo json_encode($data);
-});
 
 $router->map('POST', '/parse_sentence', function () {
     $sentence = $_POST['sentence'];
@@ -43,6 +35,18 @@ $router->map('POST', '/metadata_counts', function () {
     $xpath = $data['xpath'];
 
     $counts = get_metadata_counts($corpus, $components, $xpath);
+    header('Content-Type: application/json');
+    echo json_encode($counts);
+});
+
+$router->map('POST', '/treebank_counts', function () {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    $corpus = $data['corpus'];
+    $components = $data['components'];
+    $xpath = $data['xpath'];
+
+    $counts = getTreebankCounts($corpus, $components, $xpath);
     header('Content-Type: application/json');
     echo json_encode($counts);
 });
