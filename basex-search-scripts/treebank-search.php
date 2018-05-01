@@ -71,6 +71,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
 
             if (!$result || $result == 'false') {
                 if ($endPosIteration !== 'all') {
+                    // go to the next database and start at the first position of that
                     $endPosIteration = 0;
                 }
 
@@ -139,7 +140,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
             $tblist = false;
         }
 
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration);
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases);
     } else {
         // in case there are no results to be found
         return false;
