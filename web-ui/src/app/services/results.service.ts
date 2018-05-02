@@ -164,6 +164,7 @@ export class ResultsService {
             let metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
+                databaseId: results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
@@ -278,7 +279,9 @@ type ApiSearchResult = [
     // 7 end pos iteration
     number,
     // 8 databases left to search
-    string[]
+    string[],
+    // 9 database of each hit
+    { [id: string]: string }
 ];
 
 export interface SearchResults {
@@ -294,7 +297,11 @@ export interface SearchResults {
 }
 
 export interface Hit {
+    databaseId: string,
     fileId: string,
+    /**
+     * This value is not very reliable, because it is based on the filename
+     */
     component: string,
     sentence: string,
     highlightedSentence: SafeHtml,

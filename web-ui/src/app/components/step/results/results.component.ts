@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
 
 import { ClipboardService } from 'ngx-clipboard';
 
@@ -12,7 +12,7 @@ import { TableColumn } from '../../tables/selectable-table/TableColumn';
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent implements OnInit {
+export class ResultsComponent implements OnChanges, OnInit {
     @Input() corpus: string;
     @Input() components: string[];
     @Input() results: Hit[] = [];
@@ -20,6 +20,7 @@ export class ResultsComponent implements OnInit {
     @Input() loading: boolean = true;
 
     public treeXml?: string;
+    public filteredResults: Hit[] = [];
     public xpathCopied = false;
 
     filters = [];
@@ -32,12 +33,16 @@ export class ResultsComponent implements OnInit {
         { field: 'component', header: 'Component', width: '20%' },
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
-
-    items: string[] = [];
-
+    hiddenComponents: { [component: string]: true } = {};
 
     constructor(private configurationService: ConfigurationService, private downloadService: DownloadService,
         private clipboardService: ClipboardService, private resultsService: ResultsService) {
+    }
+
+    ngOnChanges(changes: TypedChanges) {
+        if (changes.results && (changes.results.firstChange || changes.results.previousValue != changes.results.currentValue)) {
+            this.hideComponents();
+        }
     }
 
     ngOnInit() {
@@ -70,7 +75,18 @@ export class ResultsComponent implements OnInit {
         }
     }
 
+    public hideComponents(components: string[] | undefined = undefined) {
+        if (components !== undefined) {
+            this.hiddenComponents = Object.assign({}, ...components.map(name => { return { [name]: true } }));
+        }
+
+        this.filteredResults = this.results.filter(result => !this.hiddenComponents[result.databaseId]);
+    }
+
     public print() {
         (window as any).print();
     }
+}
+type TypedChanges = {
+    [propName in keyof ResultsComponent]: SimpleChange;
 }

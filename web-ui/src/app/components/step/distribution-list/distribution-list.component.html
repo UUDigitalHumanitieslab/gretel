@@ -1,7 +1,7 @@
 <h2 class="subtitle">
     <div class="level">
         <div class="level-item level-left">
-            Distribution List
+            Components
         </div>
         <div class="level-item level-right is-hidden-print">
             <div class="field">
@@ -19,21 +19,29 @@
 <table class="table is-fullwidth" *ngIf="counts">
     <thead>
         <tr>
-            <th>Component</th>
+            <th>Name</th>
             <th>Hits</th>
             <th>All Sentences</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let count of counts">
-            <th>{{count.component}}</th>
+            <th>
+                <label class="checkbox">
+                    <input type="checkbox" [checked]="count.selected" (change)="toggleComponent(count)" /> {{count.component}}
+                </label>
+            </th>
             <td>{{count.hits}}</td>
             <td>{{count.sentences}}</td>
         </tr>
     </tbody>
     <tfoot>
         <tr>
-            <th>Total</th>
+            <th>
+                <label class="checkbox">
+                    <input type="checkbox" [checked]="totalSelected" (change)="toggleAllComponents()" /> Total
+                </label>
+            </th>
             <td>{{totalHits}}</td>
             <td>{{totalSentences}}</td>
         </tr>
