@@ -131,8 +131,6 @@
                                 <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                                 <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                             </div>
-
-
                         </td>
                     </tr>
                 </ng-template>
@@ -143,7 +141,4 @@
 <ng-template #warning>
     <div class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
 </ng-template>
-
-
-<section id="output">
-</section>
+<grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml"></grt-tree-visualizer>
