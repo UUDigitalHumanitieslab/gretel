@@ -48,6 +48,8 @@ import {
     TreebankService, XmlParseService,
     XpathSearchService
 } from "./services/_index";
+import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -72,6 +74,7 @@ import {
         ResultsComponent,
         SelectableTable,
         DistributionListComponent,
+        TreeVisualizerComponent
     ],
     imports: [
         BrowserModule,

@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { Observable } from "rxjs/Observable";
 
+import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
@@ -21,7 +22,7 @@ export class ResultsService {
     defaultVariables: { name: string, path: string }[] = null
 
 
-    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
+    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
     }
 
     getAllResults(xpath: string,
@@ -33,12 +34,17 @@ export class ResultsService {
         variables = this.defaultVariables): Observable<any> {
         return Observable.create(async observer => {
             let offset = 0;
+            let remainingDatabases: string[] | null = null;
             while (!observer.closed) {
-                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables)
+                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
                     .then((res) => {
                         if (res) {
                             observer.next(res);
                             offset = res.nextOffset;
+                            remainingDatabases = res.remainingDatabases;
+                            if (remainingDatabases.length == 0) {
+                                observer.complete();
+                            }
                         } else {
                             observer.complete();
                         }
@@ -67,7 +73,8 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables) {
+        variables = this.defaultVariables,
+        remainingDatabases: string[] | null = null) {
         let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
@@ -75,13 +82,22 @@ export class ResultsService {
             components,
             offset,
             isAnalysis,
-            variables
+            variables,
+            remainingDatabases
         }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
         }
 
         return false;
+    }
+
+    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
+        let base = this.configurationService.getBaseUrlGretel();
+        let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
+
+        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        return treeXml;
     }
 
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
@@ -136,7 +152,8 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            nextOffset: results[7] + 1
+            nextOffset: results[7],
+            remainingDatabases: results[8]
         }
     }
 
@@ -259,15 +276,21 @@ type ApiSearchResult = [
     // 6 variable list
     { [id: string]: string },
     // 7 end pos iteration
-    number
+    number,
+    // 8 databases left to search
+    string[]
 ];
 
 export interface SearchResults {
     hits: Hit[],
     /**
-     * Start offset for retrieving the next results
+     * Start offset for retrieving the next results (in the first database in `remainingDatabases`)
      */
-    nextOffset: number
+    nextOffset: number,
+    /**
+     * Databases remaining for doing a paged search
+     */
+    remainingDatabases: string[]
 }
 
 export interface Hit {

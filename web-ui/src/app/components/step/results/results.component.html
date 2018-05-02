@@ -104,7 +104,4 @@
 <ng-template #warning>
     <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
 </ng-template>
-
-
-<section id="output">
-</section>
+<grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml"></grt-tree-visualizer>

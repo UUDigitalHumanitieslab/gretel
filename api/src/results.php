@@ -6,7 +6,7 @@ require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
 require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
-function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null)
+function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null)
 {
     global $dbuser, $dbpwd;
 
@@ -23,7 +23,11 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
     $dbport = $serverInfo['port'];
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    $databases = corpusToDatabase($components, $corpus);
+    if ($remainingDatabases != null) {
+        $databases = $remainingDatabases;
+    } else {
+        $databases = corpusToDatabase($components, $corpus);
+    }
 
     $results = getSentences($corpus, $databases, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
 
