@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
+import { ClipboardModule } from 'ngx-clipboard'
 import { LassyXPathModule } from 'lassy-xpath/ng';
 
 import { AppComponent } from './app.component';
@@ -21,6 +22,7 @@ import { StepComponent } from './components/step/step.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { DownloadService } from "./services/download.service";
 import { TreebankService } from "./services/treebank.service";
 import { TableModule } from "primeng/table";
 import { CookieService } from "angular2-cookie/core";
@@ -82,6 +84,7 @@ import { AngularFontAwesomeModule } from "angular-font-awesome";
         MessagesModule,
         BrowserAnimationsModule,
         NgSelectModule,
+        ClipboardModule
     ],
     providers: [
         AlpinoService,
@@ -92,7 +95,8 @@ import { AngularFontAwesomeModule } from "angular-font-awesome";
         TreebankService,
         CookieService,
         SessionService,
-        ConfigurationService
+        ConfigurationService,
+        DownloadService
     ],
     bootstrap: [AppComponent]
 })

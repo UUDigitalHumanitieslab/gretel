@@ -62,13 +62,14 @@ $router->map('POST', '/results', function () {
         $variables = null;
     }
     $offset = $data['offset'];
+    $remainingDatabases = $data['remainingDatabases'];
 
     if (!isset($analysisLimit)) {
         $analysisLimit = $resultsLimit;
     }
     $searchLimit = isset($data['isAnalysis']) && $data['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
 
-    $results = getResults($xpath, $context, $corpus, $components, $offset, $searchLimit, $variables);
+    $results = getResults($xpath, $context, $corpus, $components, $offset, $searchLimit, $variables, $remainingDatabases);
 
     header('Content-Type: application/json');
     echo json_encode($results);

@@ -4,8 +4,8 @@
     <app-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" [value]="this.globalState.xpath"
         #xpathInput></app-xpath-input>
     <app-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanksComponentRef></app-select-treebanks>
-    <app-results *ngSwitchCase="2" [treebank]="this.globalState.selectedTreebanks.corpus" [loading]="this.globalState.loading" [results]="this.globalState.results" (onChangeValid)="setValid($event)"
-        #resultsComponentRef></app-results>
+    <app-results *ngSwitchCase="2" [loading]="this.globalState.loading" [corpus]="this.globalState.selectedTreebanks.corpus"  [components]="this.globalState.selectedTreebanks.components" [results]="this.globalState.results" [xpath]="this.globalState.xpath"
+        (onChangeValid)="setValid($event)" #resultsComponentRef></app-results>
 </div>
 <div class="buttons is-right">
     <button class="button" *ngIf="this.globalState.currentStep.number !=0 " (click)="prev()">Previous</button>
