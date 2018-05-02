@@ -49,6 +49,7 @@ import {
     XpathSearchService
 } from "./services/_index";
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
+import {FiltersModule} from "./components/filters/filters.module";
 
 @NgModule({
     declarations: [
@@ -74,7 +75,8 @@ import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visua
         ResultsComponent,
         SelectableTable,
         DistributionListComponent,
-        TreeVisualizerComponent
+        TreeVisualizerComponent,
+
     ],
     imports: [
         BrowserModule,
@@ -88,7 +90,8 @@ import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visua
         MessagesModule,
         BrowserAnimationsModule,
         NgSelectModule,
-        ClipboardModule
+        ClipboardModule,
+        FiltersModule
     ],
     providers: [
         AlpinoService,

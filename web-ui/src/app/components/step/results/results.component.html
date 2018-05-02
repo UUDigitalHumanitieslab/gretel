@@ -64,9 +64,7 @@
     <div class="columns">
         <div class="column is-one-third is-hidden-print">
             <div class="filter">
-                <ng-select [items]="filters" [multiple]="true" [closeOnSelect]="false" bindLabel="name" placeholder="Select filters" [hideSelected]="true"
-                    [(ngModel)]="selectedFilters">
-                </ng-select>
+                <app-filters></app-filters>
             </div>
         </div>
         <div class="column">
