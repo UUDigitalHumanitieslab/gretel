@@ -80,6 +80,9 @@ import {FiltersModule} from "./components/filters/filters.module";
     ],
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
+        FiltersModule,
+        FormsModule,
         HttpClientModule,
         AppRoutingModule,
         TableModule,
@@ -88,10 +91,10 @@ import {FiltersModule} from "./components/filters/filters.module";
         DialogModule,
         MessageModule,
         MessagesModule,
-        BrowserAnimationsModule,
+
         NgSelectModule,
         ClipboardModule,
-        FiltersModule
+
     ],
     providers: [
         AlpinoService,
