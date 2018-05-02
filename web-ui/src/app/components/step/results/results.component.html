@@ -7,7 +7,7 @@
                     <div class="level-item level-left">
                         XPath
                     </div>
-                    <div class="level-item level-right">
+                    <div class="level-item level-right is-hidden-print">
                         <div class="field has-addons">
                             <p class="control">
                                 <a class="button" title="Download query" (click)="downloadXPath()">
@@ -39,7 +39,7 @@
             <div class="level-item level-left">
                 Results: {{results.length}}
             </div>
-            <div class="level-item level-right">
+            <div class="level-item level-right is-hidden-print">
                 <div class="field is-grouped">
                     <p class="control">
                         <a class="button is-primary" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
@@ -50,7 +50,7 @@
                         </a>
                     </p>
                     <p class="control">
-                        <a class="button" [ngClass]="{'is-loading':loading}">
+                        <a class="button" [ngClass]="{'is-loading':loading}" (click)="print()">
                             <span class="icon is-large">
                                 <i class="fas fa-print"></i>
                             </span>
@@ -62,7 +62,7 @@
         </div>
     </h1>
     <div class="columns">
-        <div class="column is-one-third">
+        <div class="column is-one-third is-hidden-print">
             <div class="filter">
                 <ng-select [items]="filters" [multiple]="true" [closeOnSelect]="false" bindLabel="name" placeholder="Select filters" [hideSelected]="true"
                     [(ngModel)]="selectedFilters">

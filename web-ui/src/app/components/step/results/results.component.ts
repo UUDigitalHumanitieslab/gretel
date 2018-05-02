@@ -69,4 +69,8 @@ export class ResultsComponent implements OnInit {
             }, 5000);
         }
     }
+
+    public print() {
+        (window as any).print();
+    }
 }

@@ -1,4 +1,4 @@
-<nav class="breadcrumb" aria-label="breadcrumbs">
+<nav class="breadcrumb is-hidden-print" aria-label="breadcrumbs">
     <li *ngFor="let crumb of crumbs " class="no-hover" [ngClass]="{'is-active': crumb.number == currentCrumb}">
         <a>{{crumb.name}}</a>
     </li>
