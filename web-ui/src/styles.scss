@@ -8,4 +8,13 @@ $primary: rgba(168, 205, 40, 1);
     .is-hidden-print * {
         display: none !important;
     }
+
+    .ui-table .ui-table-thead,
+    .ui-table .ui-table-tbody,
+    .ui-table .ui-table-tfoot {
+        > tr > th,
+        > tr > td {
+            border: solid 1px $dark !important;
+        }
+    }
 }
