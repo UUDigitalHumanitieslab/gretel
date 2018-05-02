@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { Observable } from "rxjs/Observable";
 
+import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
@@ -21,7 +22,7 @@ export class ResultsService {
     defaultVariables: { name: string, path: string }[] = null
 
 
-    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private xmlParseService: XmlParseService) {
+    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
     }
 
     getAllResults(xpath: string,
@@ -82,6 +83,14 @@ export class ResultsService {
         }
 
         return false;
+    }
+
+    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
+        let base = this.configurationService.getBaseUrlGretel();
+        let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
+
+        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        return treeXml;
     }
 
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
