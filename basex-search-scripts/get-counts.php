@@ -43,7 +43,7 @@ try {
     $dbport = $serverInfo['port'];
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sum, $counts) = getCounts($databases, $already, $session);
+    list($sum, $counts) = getCounts($databases, $already, $session, $xpath, $corpus);
 
     $session->close();
 

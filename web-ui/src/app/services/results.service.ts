@@ -108,6 +108,21 @@ export class ResultsService {
         }, httpOptions).toPromise();
     }
 
+    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
+        let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
+
+        return Object.keys(results).map(databaseId => {
+            return {
+                databaseId,
+                count: parseInt(results[databaseId])
+            } as TreebankCount;
+        });
+    }
+
     /**
      * Builds the XQuery metadata filter.
      *
@@ -298,7 +313,7 @@ export interface Hit {
      */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } },
 }
-;
+
 
 export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
 
@@ -311,4 +326,9 @@ export interface FilterRangeValue<T> {
     type: 'range';
     min: T,
     max: T
+}
+
+export type TreebankCount = {
+    databaseId: string,
+    count: number
 }

@@ -8,6 +8,19 @@ export class DownloadService {
     constructor(private sanitizer: DomSanitizer) {
     }
 
+    public downloadDistributionList(counts: {
+        component: string,
+        hits: number,
+        sentences: number
+    }[]) {
+        let rows = [this.formatCsvRow(['Component', 'Hits', 'All Sentences'])];
+        for (let count of counts) {
+            rows.push(this.formatCsvRow([count.component, count.hits, count.sentences]));
+        }
+
+        this.downloadRows('gretel-distribution.csv', 'text/csv', rows);
+    }
+
     public downloadResults(corpus: string, components: string[], xpath: string, hits: Hit[]) {
         let rows: string[] = [];
         rows.push(
@@ -35,6 +48,10 @@ Date: ${new Date()}
         return this.sanitizer.sanitize(SecurityContext.HTML, highlightedSentence)
             .replace(/<strong>/g, '<hit>')
             .replace(/<\/strong>/g, '</hit>');
+    }
+
+    private formatCsvRow(data: any[]) {
+        return data.join(',') + '\n';
     }
 
     private downloadRows(filename: string, fileType: "text/csv" | "text/plain", rows: string[]) {
