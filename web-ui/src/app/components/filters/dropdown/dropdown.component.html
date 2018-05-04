@@ -1,19 +1,9 @@
-<div class="columns">
-  <div class="column is-1">
-    <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox>
-  </div>
-  <div class="column">
-    <ng-select [items]="filter.options"
-
-               [disabled]="!checkbox.checked"
-               [(ngModel)]="selected"
-               (change)="updateFilterChange(true)"
-    >
-    </ng-select>
-
-  </div>
+<div class="columns" *ngIf="filter">
+    <div class="column is-1">
+        <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox>
+    </div>
+    <div class="column">
+        <ng-select [items]="filter.options" [disabled]="!checkbox.checked" [(ngModel)]="selected" (change)="updateFilterChange(true)">
+        </ng-select>
+    </div>
 </div>
-
-
-
-

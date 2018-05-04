@@ -1,1 +1,3 @@
-<input type="checkbox" (change)="filterChange($event)"> {{filter.field}}
+<ng-container *ngIf="filter">
+    <input type="checkbox" (change)="filterChange($event)"> {{filter.field}}
+</ng-container>
