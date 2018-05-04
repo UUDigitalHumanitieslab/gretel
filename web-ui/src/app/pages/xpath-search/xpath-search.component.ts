@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { SessionService } from "../../services/session.service";
 import { GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection } from "./steps";
 import { Transition, Transitions, IncreaseTransition, DecreaseTransition } from './transitions'
 import { TreebankService } from "../../services/treebank.service";
@@ -53,7 +52,7 @@ export class XpathSearchComponent implements OnInit {
     resultComponent;
 
 
-    constructor(private http: HttpClient, private sessionService: SessionService, private treebankService: TreebankService, private resultsService: ResultsService) {
+    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService) {
         this.inputStep = new XpathInputStep(0);
 
         this.globalState = {

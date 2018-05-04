@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgSelectModule } from "@ng-select/ng-select";
-import { CookieService } from "angular2-cookie/core";
 import { AngularFontAwesomeModule } from "angular-font-awesome";
 import { DialogModule } from "primeng/dialog";
 import { MessageModule } from 'primeng/message';
@@ -44,64 +43,64 @@ import {
     DownloadService,
     LinkService,
     ResultsService,
-    SessionService,
-    TreebankService, XmlParseService,
+    TreebankService,
+    XmlParseService,
     XpathSearchService
 } from "./services/_index";
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
 
+export const declarations: any[] = [AppComponent,
+    HomePageComponent,
+    HeaderComponent,
+    NavigationComponent,
+    BodyHeaderComponent,
+    FooterComponent,
+    HomeContentComponent,
+    AdressComponent,
+    PaperCiteComponent,
+    DocumentationComponent,
+    GretelWebsiteLinkComponent,
+    DocumentationContentComponent,
+    FooterNavigationComponent,
+    XpathSearchComponent,
+    Header3Component,
+    StepComponent,
+    XpathInputComponent,
+    BreadcrumbBarComponent,
+    SelectTreebanksComponent,
+    ResultsComponent,
+    SelectableTable,
+    DistributionListComponent,
+    TreeVisualizerComponent];
+
+export const imports: any[] = [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    TableModule,
+    FormsModule,
+    LassyXPathModule,
+    DialogModule,
+    MessageModule,
+    MessagesModule,
+    BrowserAnimationsModule,
+    NgSelectModule,
+    ClipboardModule
+];
+
+export const providers: any[] = [AlpinoService,
+    XpathSearchService,
+    LinkService,
+    ResultsService,
+    XmlParseService,
+    TreebankService,
+    ConfigurationService,
+    DownloadService];
+
 @NgModule({
-    declarations: [
-        AppComponent,
-        HomePageComponent,
-        HeaderComponent,
-        NavigationComponent,
-        BodyHeaderComponent,
-        FooterComponent,
-        HomeContentComponent,
-        AdressComponent,
-        PaperCiteComponent,
-        DocumentationComponent,
-        GretelWebsiteLinkComponent,
-        DocumentationContentComponent,
-        FooterNavigationComponent,
-        XpathSearchComponent,
-        Header3Component,
-        StepComponent,
-        XpathInputComponent,
-        BreadcrumbBarComponent,
-        SelectTreebanksComponent,
-        ResultsComponent,
-        SelectableTable,
-        DistributionListComponent,
-        TreeVisualizerComponent
-    ],
-    imports: [
-        BrowserModule,
-        HttpClientModule,
-        AppRoutingModule,
-        TableModule,
-        FormsModule,
-        LassyXPathModule,
-        DialogModule,
-        MessageModule,
-        MessagesModule,
-        BrowserAnimationsModule,
-        NgSelectModule,
-        ClipboardModule
-    ],
-    providers: [
-        AlpinoService,
-        XpathSearchService,
-        LinkService,
-        ResultsService,
-        XmlParseService,
-        TreebankService,
-        CookieService,
-        SessionService,
-        ConfigurationService,
-        DownloadService
-    ],
+    declarations,
+    imports,
+    providers,
     bootstrap: [AppComponent]
 })
 export class AppModule {

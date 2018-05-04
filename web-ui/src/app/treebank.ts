@@ -1,10 +1,10 @@
 export interface Treebank {
-    id: string;
+    id: number;
     title: string;
-    userId?: string;
+    userId?: number;
     email?: string;
-    uploaded?: string;
-    processed?: string;
+    uploaded?: Date;
+    processed?: Date;
     isPublic?: boolean;
 }
 

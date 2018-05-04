@@ -1,25 +1,23 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { XpathInputComponent } from './xpath-input.component';
+import { commonTestBed } from '../../../common-test-bed';
 
 describe('XpathInputComponent', () => {
-  let component: XpathInputComponent;
-  let fixture: ComponentFixture<XpathInputComponent>;
+    let component: XpathInputComponent;
+    let fixture: ComponentFixture<XpathInputComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ XpathInputComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        commonTestBed().testingModule.compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(XpathInputComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(XpathInputComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });
