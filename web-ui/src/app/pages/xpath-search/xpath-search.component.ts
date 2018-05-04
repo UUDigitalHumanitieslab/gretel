@@ -13,7 +13,7 @@ import { ResultsService } from "../../services/results.service";
  */
 
 @Component({
-    selector: 'app-x-path-search',
+    selector: 'grt-x-path-search',
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })

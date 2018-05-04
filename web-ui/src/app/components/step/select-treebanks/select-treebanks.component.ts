@@ -9,7 +9,7 @@ interface info extends TreebankInfo {
     selected: boolean;
 }
 @Component({
-    selector: 'app-select-treebanks',
+    selector: 'grt-select-treebanks',
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })

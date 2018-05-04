@@ -3,7 +3,7 @@ import { Link } from "../../../../app-routing/links";
 import { LinkService } from "../../../../services/link.service";
 
 @Component({
-    selector: 'app-navigation',
+    selector: 'grt-navigation',
     templateUrl: './navigation.component.html',
     styleUrls: ['./navigation.component.scss']
 })

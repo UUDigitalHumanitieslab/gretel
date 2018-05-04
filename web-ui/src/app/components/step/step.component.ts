@@ -7,7 +7,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 
 
 @Component({
-  selector: 'app-step',
+  selector: 'grt-step',
   templateUrl: './step.component.html',
   styleUrls: ['./step.component.scss']
 })
