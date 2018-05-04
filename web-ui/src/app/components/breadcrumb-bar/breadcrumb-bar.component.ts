@@ -8,7 +8,7 @@ export interface Crumb{
 
 
 @Component({
-  selector: 'app-breadcrumb-bar',
+  selector: 'grt-breadcrumb-bar',
   templateUrl: './breadcrumb-bar.component.html',
   styleUrls: ['./breadcrumb-bar.component.scss']
 })

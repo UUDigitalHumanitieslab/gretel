@@ -4,18 +4,17 @@ import { TreebankService } from "../../../services/treebank.service";
 import { Treebank, TreebankInfo } from "../../../treebank";
 import { TableColumn } from "../../tables/selectable-table/TableColumn";
 
-
 interface info extends TreebankInfo {
     selected: boolean;
 }
 @Component({
-    selector: 'app-select-treebanks',
+    selector: 'grt-select-treebanks',
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
-    items: any[];
+    items: Treebank[];
     info: { [title: string]: info[] } = {};
     warning: boolean = false;
 
@@ -51,11 +50,10 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         ];
 
     ngOnInit() {
-        this.treebankService.getTreebanks().subscribe((treebank: any) => {
-            this.items = treebank;
+        this.treebankService.getTreebanks().then((treebanks) => {
+            this.items = treebanks;
         })
     }
-
 
     treebankChange(e) {
         if (e.target.checked) {

@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output,} from '@angular/core';
 import {TableColumn} from './TableColumn';
 
 @Component({
-  selector: 'app-selectable-table',
+  selector: 'grt-selectable-table',
   templateUrl: './selectable-table.component.html',
   styleUrls: ['./selectable-table.component.scss']
 })

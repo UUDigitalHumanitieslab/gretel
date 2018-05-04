@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-adress',
+  selector: 'grt-adress',
   templateUrl: './adress.component.html',
   styleUrls: ['./adress.component.scss']
 })
