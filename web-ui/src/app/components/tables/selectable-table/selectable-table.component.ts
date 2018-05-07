@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output,} from '@angular/core';
-import {TableColumn} from './TableColumn';
+import { Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
+import { TableColumn } from './TableColumn';
 
 @Component({
   selector: 'grt-selectable-table',
@@ -8,47 +8,48 @@ import {TableColumn} from './TableColumn';
 })
 export class SelectableTable implements OnInit {
 
-  /** The data to show in the tables */
-  @Input() data: any;
-  /** The columns of the table*/
-  @Input() columns: TableColumn[];
-  @Output() onSelect = new EventEmitter<any>();
+    /** The data to show in the tables */
+    @Input() data: any;
+    /** The columns of the table*/
+    @Input() columns: TableColumn<any>[];
+    @Input() totals: any[] | null = null;
+    @Output() onSelect = new EventEmitter<any>();
 
 
 
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-
-  changeSelected(row: any){
-    row.selected = !row.selected;
-    this.onSelect.emit();
-  }
-
-
-
-  changeAllSelected(e: any){
-    if(e.currentTarget.checked){
-      this.data.forEach((entry: any) => entry.selected = true)
-
-    } else {
-      this.data.forEach((entry: any) => entry.selected = false)
+    constructor() {
     }
-      this.onSelect.emit();
-  }
 
-  isAllChecked(){
-    if(!this.data){
-      return false;
+    ngOnInit() {
     }
-    for(let entry of this.data){
-      if(! entry.selected){
-        return false;
-      }
+
+
+    changeSelected(row: any) {
+        row.selected = !row.selected;
+        this.onSelect.emit();
     }
-    return true;
-  }
+
+
+
+    changeAllSelected(e: any) {
+        if (e.currentTarget.checked) {
+            this.data.forEach((entry: any) => entry.selected = true)
+
+        } else {
+            this.data.forEach((entry: any) => entry.selected = false)
+        }
+        this.onSelect.emit();
+    }
+
+    isAllChecked() {
+        if (!this.data) {
+            return false;
+        }
+        for (let entry of this.data) {
+            if (!entry.selected) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

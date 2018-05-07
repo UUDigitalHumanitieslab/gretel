@@ -22,6 +22,7 @@ export class ResultsComponent implements OnChanges {
     @Input() loading: boolean = true;
 
     public treeXml?: string;
+    public filteredResults: Hit[] = [];
     public xpathCopied = false;
 
     filters: Filter[] = [];
@@ -34,9 +35,7 @@ export class ResultsComponent implements OnChanges {
         { field: 'component', header: 'Component', width: '20%' },
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
-
-    items: string[] = [];
-
+    hiddenComponents: { [component: string]: true } = {};
 
     constructor(private configurationService: ConfigurationService,
         private downloadService: DownloadService,
@@ -79,6 +78,10 @@ export class ResultsComponent implements OnChanges {
                 this.filters = filters;
             });
         }
+
+        if (changes.results && (changes.results.firstChange || changes.results.previousValue != changes.results.currentValue)) {
+            this.hideComponents();
+        }
     }
 
 
@@ -106,6 +109,14 @@ export class ResultsComponent implements OnChanges {
                 this.xpathCopied = false;
             }, 5000);
         }
+    }
+
+    public hideComponents(components: string[] | undefined = undefined) {
+        if (components !== undefined) {
+            this.hiddenComponents = Object.assign({}, ...components.map(name => { return { [name]: true } }));
+        }
+
+        this.filteredResults = this.results.filter(result => !this.hiddenComponents[result.databaseId]);
     }
 
     public print() {

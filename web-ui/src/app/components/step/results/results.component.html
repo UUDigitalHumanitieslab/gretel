@@ -31,13 +31,13 @@
         </div>
         <!-- DISTRIBUTION LIST -->
         <div class="column">
-            <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath"></grt-distribution-list>
+            <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
         </div>
     </div>
     <h1 class="title">
         <div class="level">
             <div class="level-item level-left">
-                Results: {{results.length}}
+                Results: {{filteredResults.length}}
             </div>
             <div class="level-item level-right is-hidden-print">
                 <div class="field is-grouped">
@@ -68,7 +68,7 @@
             </div>
         </div>
         <div class="column">
-            <p-table [columns]="columns" [value]="results" [resizableColumns]="true">
+            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true">
                 <ng-template pTemplate="colgroup" let-columns>
                     <colgroup>
                         <col *ngFor="let col of columns" [style.width]="col.width">
@@ -90,8 +90,6 @@
                                 <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                                 <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                             </div>
-
-
                         </td>
                     </tr>
                 </ng-template>

@@ -1,9 +1,9 @@
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
-import {of as observableOf} from 'rxjs/observable/of'
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
+import { Observable } from "rxjs/Observable";
+import { Subscription } from "rxjs/Subscription";
+import { of as observableOf } from 'rxjs/observable/of'
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 /**
@@ -78,7 +78,7 @@ class ResultStep implements Step {
 
             this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe({
                 next: (res) => {
-                    state.results.push(res);
+                    state.results = [...state.results, res];
                 },
                 complete: () => {
                     state.loading = false;

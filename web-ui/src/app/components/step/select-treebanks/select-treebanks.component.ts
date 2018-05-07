@@ -31,23 +31,20 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     valid: boolean;
 
 
-    columns: {
-        field: keyof TreebankInfo,
-        header: string
-    }[] = [
-            {
-                field: "component",
-                header: "Component"
-            },
-            {
-                field: "sentenceCount",
-                header: "Sentences"
-            },
-            {
-                field: "wordCount",
-                header: "Words"
-            },
-        ];
+    columns: TableColumn<TreebankInfo>[] = [
+        {
+            field: "component",
+            header: "Component"
+        },
+        {
+            field: "sentenceCount",
+            header: "Sentences"
+        },
+        {
+            field: "wordCount",
+            header: "Words"
+        },
+    ];
 
     ngOnInit() {
         this.treebankService.getTreebanks().then((treebanks) => {
