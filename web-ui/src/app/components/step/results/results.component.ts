@@ -33,6 +33,9 @@ export class ResultsComponent implements OnChanges, OnInit {
         { field: 'component', header: 'Component', width: '20%' },
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
+    /**
+     * The components unchecked by the user, the sub-results of these components should be filtered out
+     */
     hiddenComponents: { [component: string]: true } = {};
 
     constructor(private configurationService: ConfigurationService, private downloadService: DownloadService,
