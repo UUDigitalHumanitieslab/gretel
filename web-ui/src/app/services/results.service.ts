@@ -164,6 +164,7 @@ export class ResultsService {
             let metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
+                databaseId: results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
@@ -260,25 +261,34 @@ export class ResultsService {
     }
 }
 
+/**
+ * The results as returned by the API. The results consist of an array containing various parts
+ * of the results. These are described for each item position below.
+ * Each result has an ID which corresponds. For example results[0] contains a dictionary with
+ * the plain text sentences, they same keys are used for results[4] containing the xml of
+ * each hit.
+ */
 type ApiSearchResult = [
-    // 0 sentences
+    // 0 plain text sentences containing the hit
     { [id: string]: string },
     // 1 tblist (used for Sonar)
     false,
-    // 2 ids
+    // 2 ids (dash-separated ids of the matched nodes)
     { [id: string]: string },
-    // 3 begin positions
+    // 3 begin positions (zero based)
     { [id: string]: string },
-    // 4 xml
+    // 4 xml structure of the hit itself, does not include the containing the sentence
     { [id: string]: string },
-    // 5 meta list
+    // 5 meta list (xml structure containing the meta values)
     { [id: string]: string },
-    // 6 variable list
+    // 6 variable list (xml structure containing the variables)
     { [id: string]: string },
-    // 7 end pos iteration
+    // 7 end pos iteration (used for retrieving the next results when scrolling/paging)
     number,
-    // 8 databases left to search
-    string[]
+    // 8 databases left to search (if this is empty, the search is done)
+    string[],
+    // 9 database ID of each hit
+    { [id: string]: string }
 ];
 
 export interface SearchResults {
@@ -294,7 +304,11 @@ export interface SearchResults {
 }
 
 export interface Hit {
+    databaseId: string,
     fileId: string,
+    /**
+     * This value is not very reliable, because it is based on the filename
+     */
     component: string,
     sentence: string,
     highlightedSentence: SafeHtml,
