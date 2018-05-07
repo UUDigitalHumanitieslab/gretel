@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FilterComponent } from "../filter/filter.component";
+import { Filter } from '../filters.component';
 
 @Component({
     selector: 'date',
@@ -7,12 +8,12 @@ import { FilterComponent } from "../filter/filter.component";
     styleUrls: ['./date.component.scss']
 })
 export class DateComponent extends FilterComponent {
-    min_value: Date;
-    max_value: Date;
+    minValue: Date;
+    maxValue: Date;
 
-    onFilterSet(filter) {
-        this.min_value = filter.min_value;
-        this.max_value = filter.max_value;
+    onFilterSet(filter: Filter) {
+        this.minValue = filter.minValue as Date;
+        this.maxValue = filter.maxValue as Date;
     }
 
     updateFilterChange(selected: boolean) {
@@ -20,7 +21,8 @@ export class DateComponent extends FilterComponent {
             field: this.filter.field,
             selected: selected,
             value: {
-                'min_value': this.dateToString(this.min_value), 'max_value': this.dateToString(this.max_value)
+                minValue: this.dateToString(this.minValue),
+                maxValue: this.dateToString(this.maxValue)
             }
         };
 

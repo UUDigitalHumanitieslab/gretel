@@ -11,10 +11,10 @@ export class IntComponent extends FilterComponent {
     public value: number;
 
     onFilterSet(filter: Filter) {
-        if (filter.min_value) {
-            this.value = filter.min_value;
-        } else if (filter.max_value) {
-            this.value = filter.max_value;
+        if (filter.minValue) {
+            this.value = filter.minValue as number;
+        } else if (filter.maxValue) {
+            this.value = filter.maxValue as number;
         } else {
             this.value = 0;
         }

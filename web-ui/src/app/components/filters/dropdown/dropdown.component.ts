@@ -8,7 +8,7 @@ import { Filter } from '../filters.component';
     styleUrls: ['./dropdown.component.scss']
 })
 export class DropdownComponent extends FilterComponent {
-    public selected: boolean;
+    public selected: string;
 
     onFilterSet(filter: Filter) {
         this.selected = filter.options[0];

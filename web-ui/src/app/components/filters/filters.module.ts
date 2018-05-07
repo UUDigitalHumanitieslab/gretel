@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FiltersComponent } from './filters.component';
-import { FilterService } from './filter.service';
 import { HttpClientModule } from "@angular/common/http";
 import { TextComponent } from './text/text.component';
 import { IntComponent } from './int/int.component';
@@ -40,7 +39,7 @@ export const
         DateComponent,
         DropdownComponent
     ],
-    providers: any[] = [FilterService];
+    providers = [];
 
 @NgModule({
     imports,

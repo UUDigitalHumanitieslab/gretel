@@ -1,7 +1,8 @@
 <ng-container *ngIf="filter">
-    <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox>
-    <label [for]="filter.field"> {{filter.field}} </label>
-    <mat-slider [disabled]="!checkbox.checked" [max]="this.filter.max_value" [min]="this.filter.min_value" [step]="1" [thumb-label]="true"
+    <label>
+        <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox> {{filter.field}}
+    </label>
+    <mat-slider [disabled]="!checkbox.checked" [max]="this.filter.maxValue" [min]="this.filter.minValue" [step]="1" [thumb-label]="true"
         [(ngModel)]="value" (ngModelChange)="updateFilterChange(true)">
     </mat-slider>
     {{value}}
