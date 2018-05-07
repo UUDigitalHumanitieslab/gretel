@@ -76,7 +76,6 @@ export class ResultsComponent implements OnChanges {
                         });
                     }
                 }
-                console.log(filters);
                 this.filters = filters;
             });
         }
