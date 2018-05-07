@@ -38,6 +38,10 @@ export class ResultsComponent implements OnDestroy {
     private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts>({});
     private metadataSubject = new BehaviorSubject<TreebankMetadata[]>([]);
     private filterValuesSubject = new BehaviorSubject<FilterValue[]>([]);
+
+    /**
+     * The components unchecked by the user, the sub-results of these components should be filtered out
+     */
     public hiddenComponents: { [component: string]: true } = {};
 
     @Input('corpus')
