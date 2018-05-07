@@ -4,7 +4,7 @@ import { MacroService, ValueEvent } from 'lassy-xpath/ng';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-    selector: 'app-xpath-input',
+    selector: 'grt-xpath-input',
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })

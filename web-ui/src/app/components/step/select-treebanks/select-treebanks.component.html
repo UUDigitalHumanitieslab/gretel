@@ -16,7 +16,7 @@
             <input type="radio" name="Treebank" value="{{item.title}}" (click)="treebankChange($event)" #checkbox> {{item.title}}
         </label>
         <p *ngIf="checkbox.checked">
-            <app-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></app-selectable-table>
+            <grt-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></grt-selectable-table>
         </p>
     </li>
 </ul>

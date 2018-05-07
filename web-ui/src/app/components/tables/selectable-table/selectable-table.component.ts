@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
 import { TableColumn } from './TableColumn';
 
 @Component({
-    selector: 'app-selectable-table',
-    templateUrl: './selectable-table.component.html',
-    styleUrls: ['./selectable-table.component.scss']
+  selector: 'grt-selectable-table',
+  templateUrl: './selectable-table.component.html',
+  styleUrls: ['./selectable-table.component.scss']
 })
 export class SelectableTable implements OnInit {
 

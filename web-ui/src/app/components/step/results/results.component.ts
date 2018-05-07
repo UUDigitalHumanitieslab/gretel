@@ -8,7 +8,7 @@ import { DownloadService } from '../../../services/download.service';
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 
 @Component({
-    selector: 'app-results',
+    selector: 'grt-results',
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
