@@ -111,6 +111,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                     if ($corpus == 'sonar') {
                         $tblist[$sentid] = $tb;
                     }
+                    $sentenceDatabases[$sentid] = $database;
                 }
             }
             if ($endPosIteration === 'all') {
@@ -140,7 +141,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
             $tblist = false;
         }
 
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases);
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases, $sentenceDatabases);
     } else {
         // in case there are no results to be found
         return false;
