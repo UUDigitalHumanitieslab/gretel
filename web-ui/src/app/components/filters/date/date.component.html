@@ -1,6 +1,7 @@
-<input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox>
 <ng-container *ngIf="filter">
-    <label>{{filter.field}}</label>
+    <label>
+        <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox> {{filter.field}}
+    </label>
     <div class="columns">
         <div class="column is-half">
             <label class="label">Start Date</label>

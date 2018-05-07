@@ -25,12 +25,11 @@ export class IntComponent extends FilterComponent {
     }
 
     updateFilterChange(selected: boolean) {
-        const change = {
+        this.onFilterChange.emit({
             field: this.filter.field,
+            type: 'single',
             selected: selected,
-            value: this.value,
-        };
-
-        this.onFilterChange.emit(change);
+            value: `${this.value}`,
+        });
     }
 }

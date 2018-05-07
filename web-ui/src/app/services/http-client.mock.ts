@@ -6,7 +6,8 @@ import { Subject } from "rxjs";
 @Injectable()
 export class HttpClientMock {
     private readonly mockData = {
-        'get': {} as MockResponseData
+        'get': {} as MockResponseData<any>,
+        'post': {} as MockResponseData<(body: any) => any>
     }
 
     public setData(method: keyof HttpClientMock['mockData'], url: string, data: any) {
@@ -31,12 +32,34 @@ export class HttpClientMock {
                 observer.next(this.mockData['get'][url]);
                 observer.complete();
             } else {
-                observer.error('No data available');
+                observer.error(`No data available for [GET] ${url}`);
+            }
+        });
+    }
+
+    post<T>(url: string, body: any | null, options?: {
+        headers?: HttpHeaders | {
+            [header: string]: string | string[];
+        };
+        observe?: 'body';
+        params?: HttpParams | {
+            [param: string]: string | string[];
+        };
+        reportProgress?: boolean;
+        responseType?: 'json';
+        withCredentials?: boolean;
+    }): Observable<T> {
+        return new Observable<T>(observer => {
+            if (url in this.mockData['post']) {
+                observer.next(this.mockData['post'][url](body));
+                observer.complete();
+            } else {
+                observer.error(`No data available for [POST] ${url}`);
             }
         });
     }
 }
 
-export type MockResponseData = {
-    [url: string]: any
+export type MockResponseData<T> = {
+    [url: string]: T
 }

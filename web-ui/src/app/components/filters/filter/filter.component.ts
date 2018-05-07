@@ -1,10 +1,9 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import { Filter } from "../filters.component";
+import { FilterValue } from '../../../services/_index';
 
-interface ChangeEvent {
-    field: any;
-    selected: boolean;
-    value;
+type ChangeEvent = FilterValue & {
+    selected: boolean
 }
 
 export abstract class FilterComponent {

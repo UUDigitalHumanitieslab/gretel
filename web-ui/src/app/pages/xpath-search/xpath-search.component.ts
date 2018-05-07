@@ -56,7 +56,6 @@ export class XpathSearchComponent implements OnInit {
         this.inputStep = new XpathInputStep(0);
 
         this.globalState = {
-            results: undefined,
             selectedTreebanks: undefined,
             currentStep: this.inputStep,
             valid: false,

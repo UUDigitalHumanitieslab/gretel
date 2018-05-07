@@ -18,7 +18,7 @@ const httpOptions = {
 @Injectable()
 export class ResultsService {
     defaultIsAnalysis = false;
-    defaultMetadataFilters: { [key: string]: FilterValue } = {};
+    defaultMetadataFilters: FilterValue[] = [];
     defaultVariables: { name: string, path: string }[] = null
 
 
@@ -31,8 +31,9 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables): Observable<any> {
-        return Observable.create(async observer => {
+        variables = this.defaultVariables,
+        complete: () => void = undefined) {
+        let observable: Observable<SearchResults> = Observable.create(async observer => {
             let offset = 0;
             let remainingDatabases: string[] | null = null;
             while (!observer.closed) {
@@ -46,13 +47,17 @@ export class ResultsService {
                                 observer.complete();
                             }
                         } else {
+                            if (complete) {
+                                complete();
+                            }
                             observer.complete();
                         }
-
                     });
 
             }
-        }).mergeMap(results => results.hits);
+        });
+
+        return observable.mergeMap((results) => results.hits);
     }
 
     /**
@@ -100,15 +105,15 @@ export class ResultsService {
         return treeXml;
     }
 
-    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
-        return await this.http.post<{ [key: string]: { [value: string]: number } }>(routerUrl + 'metadata_counts', {
+    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+        return await this.http.post<MetadataValueCounts>(routerUrl + 'metadata_counts', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             corpus,
             components,
         }, httpOptions).toPromise();
     }
 
-    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
+    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             corpus,
@@ -128,25 +133,23 @@ export class ResultsService {
      *
      * @return string The metadata filter
      */
-    private createMetadataFilterQuery(filters: { [key: string]: FilterValue }) {
+    private createMetadataFilterQuery(filters: FilterValue[]) {
         // Compile the filter
-        let filter = '';
-        for (let key of Object.keys(filters)) {
-            let value = filters[key];
-
-            switch (value.type) {
+        let filterQuery = '';
+        for (let filter of filters) {
+            switch (filter.type) {
                 case 'single':
                     // Single values
-                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value="${value}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
                     break;
                 case 'range':
                     // Ranged values
-                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value>="${value.min}" and @value<="${value.max}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>="${filter.min}" and @value<="${filter.max}"]]`;
                     break;
             }
         }
 
-        return filter;
+        return filterQuery;
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
@@ -326,16 +329,20 @@ export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterR
 
 export interface FilterSingleValue {
     type: 'single';
-    value: string
+    field: string;
+    value: string;
 }
 
 export interface FilterRangeValue<T> {
     type: 'range';
-    min: T,
-    max: T
+    field: string;
+    min: T;
+    max: T;
 }
 
 export type TreebankCount = {
     databaseId: string,
     count: number
 }
+
+export type MetadataValueCounts = { [key: string]: { [value: string]: number } }

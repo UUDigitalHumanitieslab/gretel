@@ -15,12 +15,11 @@ export class DropdownComponent extends FilterComponent {
     }
 
     updateFilterChange(selected) {
-        const change = {
+        this.onFilterChange.emit({
             field: this.filter.field,
+            type: 'single',
             selected: selected,
             value: this.selected
-        };
-
-        this.onFilterChange.emit(change);
+        });
     }
 }

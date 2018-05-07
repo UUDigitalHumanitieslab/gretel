@@ -66,6 +66,10 @@ export function commonTestBed() {
         title: 'TestTitle2'
     }]);
 
+    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body) => {
+        return { 'TEST_DATABASE1_COMPONENT1': '42' }
+    });
+
     return {
         testingModule: TestBed.configureTestingModule({
             declarations,

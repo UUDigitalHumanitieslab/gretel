@@ -17,16 +17,13 @@ export class DateComponent extends FilterComponent {
     }
 
     updateFilterChange(selected: boolean) {
-        const change = {
+        this.onFilterChange.emit({
             field: this.filter.field,
-            selected: selected,
-            value: {
-                minValue: this.dateToString(this.minValue),
-                maxValue: this.dateToString(this.maxValue)
-            }
-        };
-
-        this.onFilterChange.emit(change);
+            selected,
+            type: 'range',
+            min: this.dateToString(this.minValue),
+            max: this.dateToString(this.maxValue)
+        });
     }
 
     dateToString(date: Date) {

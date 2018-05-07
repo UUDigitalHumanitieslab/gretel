@@ -24,10 +24,10 @@ interface TreebankSelection {
  */
 interface GlobalState {
     currentStep: Step;
-    results: any[];
     selectedTreebanks: TreebankSelection;
     xpath: string;
     valid: boolean;
+    // TODO: should this even be in this state?
     loading: boolean;
 }
 
@@ -61,7 +61,6 @@ class XpathInputStep implements Step {
 
 class ResultStep implements Step {
     number: number;
-    subscription: Subscription;
 
     constructor(stepNumber: number, private resultsService: ResultsService) {
         this.number = stepNumber;
@@ -73,27 +72,12 @@ class ResultStep implements Step {
      * @returns
      */
     enterStep(state: GlobalState): Observable<GlobalState> {
-
         return new Observable((observer) => {
+            state.currentStep = this;
 
-            this.subscription = this.resultsService.getAllResults(state.xpath, state.selectedTreebanks.corpus, state.selectedTreebanks.components, false).take(200).subscribe({
-                next: (res) => {
-                    state.results = [...state.results, res];
-                },
-                complete: () => {
-                    state.loading = false;
-                }
-            });
-
-            state.currentStep = this
-
-            state.results = [];
-            state.loading = true;
             observer.next(state);
-            observer.complete()
-        })
-
-
+            observer.complete();
+        });
     }
 
     /**
@@ -102,14 +86,10 @@ class ResultStep implements Step {
      * @returns {GlobalState}
      */
     leaveStep(state: GlobalState): GlobalState {
-        this.subscription.unsubscribe();
         state.loading = false;
         return state;
     }
-
-
 }
-
 
 class SelectTreebankStep implements Step {
     number: number;

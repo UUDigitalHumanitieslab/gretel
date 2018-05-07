@@ -11,12 +11,11 @@ export class TextComponent extends FilterComponent {
     }
 
     filterChange(e) {
-        const change = {
+        this.onFilterChange.emit({
             field: this.filter.field,
             selected: e.target.checked,
+            type: 'single',
             value: e.target.checked,
-        };
-
-        this.onFilterChange.emit(change);
+        });
     }
 }

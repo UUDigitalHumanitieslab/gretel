@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FilterValue } from '../../services/_index';
 
 export interface Filter {
     field: string;
@@ -7,11 +8,6 @@ export interface Filter {
     options: string[];
     minValue?: Date | number;
     maxValue?: Date | number;
-}
-
-export interface FilterValue {
-    field: string;
-    value;
 }
 
 @Component({
