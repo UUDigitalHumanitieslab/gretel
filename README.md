@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/gretel.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/gretel)
+
 # GrETEL 4
 
 This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
