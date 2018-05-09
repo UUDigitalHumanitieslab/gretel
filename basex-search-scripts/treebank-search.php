@@ -225,7 +225,7 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
         $closePosition = ')[position() = 1 to '.$searchLimit.']';
     } else {
         // Only fetch the given flushLimit, and increment on each iteration
-        $endPosition = $endPosIteration * $flushLimit;
+        $endPosition = min($searchLimit, $endPosIteration * $flushLimit);
         $startPosition = $endPosition - $flushLimit + 1;
         $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
     }

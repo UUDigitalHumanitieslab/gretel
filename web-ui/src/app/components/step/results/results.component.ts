@@ -42,7 +42,7 @@ export class ResultsComponent implements OnDestroy {
     /**
      * The components unchecked by the user, the sub-results of these components should be filtered out
      */
-    public hiddenComponents: { [component: string]: true } = {};
+    private hiddenComponents: { [component: string]: true } = {};
 
     @Input('corpus')
     public set corpus(value: string) {
@@ -151,13 +151,13 @@ export class ResultsComponent implements OnDestroy {
                         false,
                         filterValues,
                         [],
-                        () => { this.loading = false; })
+                        () => { this.loading = false; });
                 })
-                .do(hit => this.results.push(hit)) // TODO: filter right here
-                .debounceTime(debounceTime)
-                .subscribe((hit) => {
-                    this.hideComponents();
+                .do(results => {
+                    this.results.push(...results.hits);
+                    this.filteredResults.push(...this.filterHits(results.hits));
                 })
+                .subscribe()
         ];
     }
 
@@ -198,7 +198,7 @@ export class ResultsComponent implements OnDestroy {
             this.hiddenComponents = Object.assign({}, ...components.map(name => { return { [name]: true } }));
         }
 
-        this.filteredResults = this.results.filter(result => !this.hiddenComponents[result.databaseId]);
+        this.filteredResults = this.filterHits(this.results);
     }
 
     public filterChange(filterValues: FilterValue[]) {
@@ -207,6 +207,14 @@ export class ResultsComponent implements OnDestroy {
 
     public print() {
         (window as any).print();
+    }
+
+    /**
+     * Filter out the hits which are part of hidden components
+     * @param hits
+     */
+    private filterHits(hits: Hit[]) {
+        return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 }
 type TypedChanges = {

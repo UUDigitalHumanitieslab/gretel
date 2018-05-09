@@ -30,7 +30,10 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
     }
 
     $results = getSentences($corpus, $databases, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
-
+    if ($results[7] >= $searchLimit) {
+        // clear the remaining databases to signal the search is done
+        $results[8] = array();
+    }
     $session->close();
 
     return $results;

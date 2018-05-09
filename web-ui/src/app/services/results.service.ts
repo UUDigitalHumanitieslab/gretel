@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { Observable } from "rxjs/Observable";
+import { Observer } from 'rxjs/Observer';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
@@ -33,9 +34,16 @@ export class ResultsService {
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
         complete: () => void = undefined) {
-        let observable: Observable<SearchResults> = Observable.create(async observer => {
+        let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
             let offset = 0;
             let remainingDatabases: string[] | null = null;
+            let completeObserver = () => {
+                if (complete) {
+                    complete();
+                }
+                observer.complete();
+            }
+
             while (!observer.closed) {
                 await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
                     .then((res) => {
@@ -44,20 +52,16 @@ export class ResultsService {
                             offset = res.nextOffset;
                             remainingDatabases = res.remainingDatabases;
                             if (remainingDatabases.length == 0) {
-                                observer.complete();
+                                completeObserver();
                             }
                         } else {
-                            if (complete) {
-                                complete();
-                            }
-                            observer.complete();
+                            completeObserver();
                         }
                     });
-
             }
         });
 
-        return observable.mergeMap((results) => results.hits);
+        return observable;
     }
 
     /**

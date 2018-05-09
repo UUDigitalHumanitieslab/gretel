@@ -67,7 +67,7 @@
         </div>
     </div>
     <div class="column">
-        <ng-container *ngIf="results.length != 0; else warning">
+        <ng-container *ngIf="filteredResults.length != 0; else warning">
             <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true">
                 <ng-template pTemplate="colgroup" let-columns>
                     <colgroup>
