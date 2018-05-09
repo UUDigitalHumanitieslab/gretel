@@ -1,10 +1,10 @@
 export interface Treebank {
-    id: string;
+    id: number;
     title: string;
-    userId?: string;
+    userId?: number;
     email?: string;
-    uploaded?: string;
-    processed?: string;
+    uploaded?: Date;
+    processed?: Date;
     isPublic?: boolean;
 }
 
@@ -14,4 +14,15 @@ export interface TreebankInfo {
     component: string,
     sentenceCount: number,
     wordCount: number
+}
+
+export interface TreebankMetadata {
+    id: number,
+    treebankId: number,
+    field: string,
+    type: 'text' | 'int' | 'date',
+    facet: 'checkbox' | 'slider' | 'range' | 'dropdown',
+    show: boolean,
+    minValue?: number | Date,
+    maxValue?: number | Date
 }

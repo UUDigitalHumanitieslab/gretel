@@ -4,7 +4,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'app-paper-cite',
+  selector: 'grt-paper-cite',
   templateUrl: './paper-cite.component.html',
   styleUrls: ['./paper-cite.component.scss']
 })

@@ -3,7 +3,7 @@ import {Link} from "../../../../app-routing/links";
 import {LinkService} from "../../../../services/link.service";
 
 @Component({
-  selector: 'app-footer-navigation',
+  selector: 'grt-footer-navigation',
   templateUrl: './footer-navigation.component.html',
   styleUrls: ['./footer-navigation.component.scss']
 })

@@ -1,68 +1,49 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FilterService} from './filter.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FilterValue } from '../../services/_index';
 
-
-
-
-
-
-export interface Filter{
-  field;
-  dataType;
-  filterType;
-  options;
-  min_value;
-  max_value;
-}
-
-export interface FilterValue {
-  field: string;
-  value;
+export interface Filter {
+    field: string;
+    dataType: string;
+    filterType: 'checkbox' | 'slider' | 'range' | 'dropdown';
+    options: string[];
+    minValue?: Date | number;
+    maxValue?: Date | number;
 }
 
 @Component({
-  selector: 'app-filters',
-  templateUrl: './filters.component.html',
-  styleUrls: ['./filters.component.scss']
+    selector: 'grt-filters',
+    templateUrl: './filters.component.html',
+    styleUrls: ['./filters.component.scss']
 })
-export class FiltersComponent implements OnInit {
+export class FiltersComponent {
+    @Input() filters: Filter[];
 
-  @Input() filters;
+    @Output() filterChange = new EventEmitter<FilterValue[]>();
 
-  @Output() filterChange = new EventEmitter<FilterValue[]>();
+    selectedFilters = [];
 
-  selectedFilters = [];
+    filterChanged(e) {
+        if (e.selected) {
+            this.addToSelectedFilters(e);
+        } else {
+            this.removeFromSelectedFilters(e);
+        }
 
-  constructor(private filterService: FilterService) {
-  }
-
-  ngOnInit() {
-      this.filters = this.filterService.getExampleFilters()
-  }
-
-  filterChanged(e) {
-    if (e.selected) {
-      this.addToSelectedFilters(e);
-    } else {
-      this.removeFromSelectedFilters(e);
     }
 
-  }
-
-  addToSelectedFilters(e) {
-    const location = this.selectedFilters.findIndex((el) => el.field === e.field);
-    if (location === -1) {
-      this.selectedFilters.push(e);
-    } else {
-      this.selectedFilters[location] = e;
-      this.selectedFilters = this.selectedFilters.slice();
+    addToSelectedFilters(e) {
+        const location = this.selectedFilters.findIndex((el) => el.field === e.field);
+        if (location === -1) {
+            this.selectedFilters.push(e);
+        } else {
+            this.selectedFilters[location] = e;
+            this.selectedFilters = this.selectedFilters.slice();
+        }
+        this.filterChange.emit(this.selectedFilters);
     }
-    this.filterChange.emit(this.selectedFilters);
-  }
 
-  removeFromSelectedFilters(e) {
-    this.selectedFilters = this.selectedFilters.filter((el) => el.field !== e.field);
-    this.filterChange.emit(this.selectedFilters);
-  }
-
+    removeFromSelectedFilters(e) {
+        this.selectedFilters = this.selectedFilters.filter((el) => el.field !== e.field);
+        this.filterChange.emit(this.selectedFilters);
+    }
 }

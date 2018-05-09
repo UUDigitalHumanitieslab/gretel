@@ -1,36 +1,36 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Filter} from "../filters.component";
+import { EventEmitter, Input, Output } from '@angular/core';
+import { Filter } from "../filters.component";
+import { FilterValue } from '../../../services/_index';
 
-
-interface ChangeEvent {
-  field: any;
-  selected: boolean;
-  value;
+type ChangeEvent = FilterValue & {
+    selected: boolean
 }
 
+export abstract class FilterComponent {
+    private filterValue;
+    @Input('filter') set filter(value: Filter) {
+        this.filterValue = value;
+        if (value !== undefined) {
+            this.onFilterSet(value);
+        }
+    }
+    get filter() { return this.filterValue };
 
-@Component({
-  selector: 'filter',
-  templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss']
-})
-export class FilterComponent implements OnInit {
+    @Output() onFilterChange = new EventEmitter<ChangeEvent>();
 
-  @Input() filter: Filter;
-  @Output() onFilterChange = new EventEmitter<ChangeEvent>();
+    constructor() {
+    }
 
-  constructor() {
-  }
+    onCheckBoxClicked(e) {
+        this.updateFilterChange(e.target.checked);
+    }
 
-  onCheckBoxClicked(e) {
-    this.updateFilterChange(e.target.checked);
-  }
+    ngOnInit() {
+    }
 
-  ngOnInit() {
-  }
+    updateFilterChange(selected) {
+        throw Error('Not implemented');
+    }
 
-  updateFilterChange(selected) {
-    throw Error('Not implemented');
-  }
-
+    abstract onFilterSet(filter: Filter);
 }

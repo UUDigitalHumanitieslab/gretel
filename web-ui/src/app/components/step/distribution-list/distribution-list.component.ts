@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChange } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from "@angular/core";
 import { DownloadService, ResultsService, TreebankCount, TreebankService } from "../../../services/_index";
 
 @Component({
@@ -16,12 +16,12 @@ export class DistributionListComponent implements OnChanges {
     @Input()
     public xpath: string;
 
+    @Output()
+    public onHidingComponents = new EventEmitter<string[]>();
+
+    public totalSelected: boolean = true;
     public loading: boolean = true;
-    public counts: {
-        component: string,
-        hits: number,
-        sentences: number
-    }[];
+    public counts: Count[];
     public totalHits: number;
     public totalSentences: number;
 
@@ -33,14 +33,18 @@ export class DistributionListComponent implements OnChanges {
     }
 
     public async ngOnChanges(changes: TypedChanges) {
+        if (this.corpus == undefined || this.xpath == undefined || this.components == undefined) {
+            return;
+        }
         let redoCounts = false;
+
         // check that we have all the mappings available
         if (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue) {
             redoCounts = true;
             this.componentProperties = this.treebankService.getSubTreebanks({ title: this.corpus })
-                .then(subTreebanks => {
+                .then(components => {
                     let properties = {};
-                    for (let component of subTreebanks) {
+                    for (let component of components) {
                         properties[component.component] = {
                             databaseId: component.databaseId,
                             sentenceCount: component.sentenceCount
@@ -79,10 +83,26 @@ export class DistributionListComponent implements OnChanges {
                 totalSentences += sentences;
                 return {
                     component,
+                    databaseId: componentProperties[component].databaseId,
                     hits,
+                    selected: true,
                     sentences
                 }
             });
+
+            // Restore the selection made by the user (if any), assume the list of components is the same
+            // and has the same order. Allows for differences.
+            if (this.counts !== undefined) {
+                for (let i = 0; i < counts.length; i++) {
+                    let count = counts[i];
+                    for (let j = i; j < this.counts.length + i; j++) {
+                        let existingCount = this.counts[j % this.counts.length];
+                        if (count.databaseId == existingCount.databaseId) {
+                            count.selected = existingCount.selected;
+                        }
+                    }
+                }
+            }
 
             this.counts = counts;
             this.totalHits = totalHits;
@@ -92,10 +112,39 @@ export class DistributionListComponent implements OnChanges {
         }
     }
 
+    public toggleComponent(count: Count) {
+        count.selected = !count.selected;
+        if (!count.selected) {
+            this.totalSelected = false;
+        } else if (this.counts.find(x => !x.selected) === undefined) {
+            this.totalSelected = true;
+        }
+        this.emitHiddenComponents();
+    }
+
+    public toggleAllComponents() {
+        this.totalSelected = !this.totalSelected;
+        for (let count of this.counts) {
+            count.selected = this.totalSelected;
+        }
+        this.emitHiddenComponents();
+    }
+
     public download() {
         this.downloadService.downloadDistributionList(this.counts);
+    }
+
+    private emitHiddenComponents() {
+        this.onHidingComponents.emit(this.counts.filter(c => !c.selected).map(c => c.databaseId));
     }
 }
 type TypedChanges = {
     [propName in keyof DistributionListComponent]: SimpleChange;
+}
+type Count = {
+    component: string,
+    databaseId: string,
+    hits: number,
+    selected: boolean,
+    sentences: number
 }

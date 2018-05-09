@@ -1,40 +1,32 @@
-import {Component, OnInit} from '@angular/core';
-import {FilterComponent} from "../filter/filter.component";
+import { Component } from '@angular/core';
+import { FilterComponent } from "../filter/filter.component";
+import { Filter } from '../filters.component';
 
 @Component({
-  selector: 'date',
-  templateUrl: './date.component.html',
-  styleUrls: ['./date.component.scss']
+    selector: 'date',
+    templateUrl: './date.component.html',
+    styleUrls: ['./date.component.scss']
 })
-export class DateComponent extends FilterComponent implements OnInit {
+export class DateComponent extends FilterComponent {
+    minValue: Date;
+    maxValue: Date;
 
+    onFilterSet(filter: Filter) {
+        this.minValue = filter.minValue as Date;
+        this.maxValue = filter.maxValue as Date;
+    }
 
-  min_value: Date;
-  max_value: Date;
+    updateFilterChange(selected: boolean) {
+        this.onFilterChange.emit({
+            field: this.filter.field,
+            selected,
+            type: 'range',
+            min: this.dateToString(this.minValue),
+            max: this.dateToString(this.maxValue)
+        });
+    }
 
-  ngOnInit() {
-    this.min_value = this.filter.min_value;
-    this.max_value = this.filter.max_value;
-  }
-
-
-
-  updateFilterChange(selected: boolean) {
-    const change = {
-      field: this.filter.field,
-      selected: selected,
-      value: {
-        'min_value': this.dateToString(this.min_value), 'max_value': this.dateToString(this.max_value)
-      }
-    };
-
-    this.onFilterChange.emit(change);
-  }
-
-  dateToString(date: Date) {
-    return date.toISOString().split('T')[0];
-  }
-
+    dateToString(date: Date) {
+        return date.toISOString().split('T')[0];
+    }
 }
-
-

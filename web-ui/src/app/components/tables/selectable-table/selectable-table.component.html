@@ -1,26 +1,25 @@
-<div class="is-scrollable">
-  <p-table [columns]="columns" [value]="data">
+<p-table [columns]="columns" [value]="data" scrollable="true" [autoLayout]="true">
     <ng-template pTemplate="header" let-columns>
-      <tr>
-        <th>
-          <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)">
-        </th>
-        <th *ngFor="let col of columns">
-          {{col.header}}
-        </th>
-      </tr>
+        <tr>
+            <th *ngFor="let col of columns; let i = index">
+                <input *ngIf="i == 0" type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)"> {{col.header}}
+            </th>
+        </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-      <tr>
-        <td>
-          <input type="checkbox" (change)="changeSelected(rowData)" [checked]="rowData['selected']">
-        </td>
-        <td *ngFor="let col of columns">
-          <div *ngIf="col.field == 'number'; else field">{{i}}</div>
-          <ng-template #field>{{rowData[col.field]}}</ng-template>
-        </td>
-      </tr>
+        <tr>
+            <td *ngFor="let col of columns; let j = index">
+                <input *ngIf="j == 0" type="checkbox" (change)="changeSelected(rowData)" [checked]="rowData['selected']">
+                <div *ngIf="col.field == 'number'; else field">{{i}}</div>
+                <ng-template #field>{{rowData[col.field]}}</ng-template>
+            </td>
+        </tr>
     </ng-template>
-  </p-table>
-
-</div>
+    <ng-template pTemplate="footer" let-columns="totals" *ngIf="totals">
+        <tr>
+            <td *ngFor="let total of totals">
+                {{total}}
+            </td>
+        </tr>
+    </ng-template>
+</p-table>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-documentation-content',
+  selector: 'grt-documentation-content',
   templateUrl: './documentation-content.component.html',
   styleUrls: ['./documentation-content.component.scss']
 })

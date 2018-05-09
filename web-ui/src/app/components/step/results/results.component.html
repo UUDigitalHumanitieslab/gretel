@@ -1,74 +1,74 @@
-<ng-container *ngIf="results.length != 0; else warning">
-    <div class="columns">
-        <!-- XPATH -->
-        <div class="column">
-            <h2 class="subtitle">
-                <div class="level">
-                    <div class="level-item level-left">
-                        XPath
-                    </div>
-                    <div class="level-item level-right is-hidden-print">
-                        <div class="field has-addons">
-                            <p class="control">
-                                <a class="button" title="Download query" (click)="downloadXPath()">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-download"></i>
-                                    </span>
-                                </a>
-                            </p>
-                            <p class="control">
-                                <a class="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-copy"></i>
-                                    </span>
-                                </a>
-                            </p>
-                        </div>
+<div class="columns">
+    <!-- XPATH -->
+    <div class="column">
+        <h2 class="subtitle">
+            <div class="level">
+                <div class="level-item level-left">
+                    XPath
+                </div>
+                <div class="level-item level-right is-hidden-print">
+                    <div class="field has-addons">
+                        <p class="control">
+                            <a class="button" title="Download query" (click)="downloadXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                <span class="icon is-large">
+                                    <i class="fas fa-copy"></i>
+                                </span>
+                            </a>
+                        </p>
                     </div>
                 </div>
-            </h2>
-            <pre>{{xpath}}</pre>
+            </div>
+        </h2>
+        <pre>{{xpath}}</pre>
+    </div>
+    <!-- DISTRIBUTION LIST -->
+    <div class="column">
+        <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
+    </div>
+</div>
+<h1 class="title">
+    <div class="level">
+        <div class="level-item level-left">
+            Results: {{filteredResults.length}}
         </div>
-        <!-- DISTRIBUTION LIST -->
-        <div class="column">
-            <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath"></grt-distribution-list>
+        <div class="level-item level-right is-hidden-print">
+            <div class="field is-grouped">
+                <p class="control">
+                    <a class="button is-primary" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
+                        <span class="icon is-large">
+                            <i class="fas fa-download"></i>
+                        </span>
+                        <span>Download Results</span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a class="button" [ngClass]="{'is-loading':loading}" (click)="print()">
+                        <span class="icon is-large">
+                            <i class="fas fa-print"></i>
+                        </span>
+                        <span>Print Results</span>
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
-    <h1 class="title">
-        <div class="level">
-            <div class="level-item level-left">
-                Results: {{results.length}}
-            </div>
-            <div class="level-item level-right is-hidden-print">
-                <div class="field is-grouped">
-                    <p class="control">
-                        <a class="button is-primary" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
-                            <span class="icon is-large">
-                                <i class="fas fa-download"></i>
-                            </span>
-                            <span>Download Results</span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a class="button" [ngClass]="{'is-loading':loading}" (click)="print()">
-                            <span class="icon is-large">
-                                <i class="fas fa-print"></i>
-                            </span>
-                            <span>Print Results</span>
-                        </a>
-                    </p>
-                </div>
-            </div>
+</h1>
+<div class="columns">
+    <div class="column is-one-third is-hidden-print">
+        <div class="filter">
+            <grt-filters [filters]="filters" (filterChange)="filterChange($event)"></grt-filters>
         </div>
-    </h1>
-    <div class="columns">
-        <div class="column is-one-third is-hidden-print">
-            <div class="filter">
-                <app-filters></app-filters>
-            </div>
-        </div>
-        <div class="column">
-            <p-table [columns]="columns" [value]="results" [resizableColumns]="true">
+    </div>
+    <div class="column">
+        <ng-container *ngIf="filteredResults.length != 0; else warning">
+            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true">
                 <ng-template pTemplate="colgroup" let-columns>
                     <colgroup>
                         <col *ngFor="let col of columns" [style.width]="col.width">
@@ -90,16 +90,14 @@
                                 <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                                 <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                             </div>
-
-
                         </td>
                     </tr>
                 </ng-template>
             </p-table>
-        </div>
+        </ng-container>
+        <ng-template #warning>
+            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
+        </ng-template>
     </div>
-</ng-container>
-<ng-template #warning>
-    <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
-</ng-template>
+</div>
 <grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml"></grt-tree-visualizer>

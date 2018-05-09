@@ -111,6 +111,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                     if ($corpus == 'sonar') {
                         $tblist[$sentid] = $tb;
                     }
+                    $sentenceDatabases[$sentid] = $database;
                 }
             }
             if ($endPosIteration === 'all') {
@@ -140,7 +141,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
             $tblist = false;
         }
 
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases);
+        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases, $sentenceDatabases);
     } else {
         // in case there are no results to be found
         return false;
@@ -224,8 +225,8 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
         $closePosition = ')[position() = 1 to '.$searchLimit.']';
     } else {
         // Only fetch the given flushLimit, and increment on each iteration
-        $endPosition = $endPosIteration * $flushLimit;
-        $startPosition = $endPosition - $flushLimit + 1;
+        $startPosition = (($endPosIteration - 1) * $flushLimit) + 1; // position() is one-based
+        $endPosition = min($searchLimit, $endPosIteration * $flushLimit);
         $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
     }
 
