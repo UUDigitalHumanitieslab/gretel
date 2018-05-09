@@ -35,7 +35,7 @@ export class ResultsService {
         variables = this.defaultVariables,
         complete: () => void = undefined) {
         let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
-            let offset = 0;
+            let iteration = 0;
             let remainingDatabases: string[] | null = null;
             let completeObserver = () => {
                 if (complete) {
@@ -45,11 +45,11 @@ export class ResultsService {
             }
 
             while (!observer.closed) {
-                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
+                await this.results(xpath, corpus, components, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
                     .then((res) => {
                         if (res) {
                             observer.next(res);
-                            offset = res.nextOffset;
+                            iteration = res.nextIteration;
                             remainingDatabases = res.remainingDatabases;
                             if (remainingDatabases.length == 0) {
                                 completeObserver();
@@ -69,7 +69,7 @@ export class ResultsService {
      * @param xpath Specification of the pattern to match
      * @param corpus Identifier of the corpus
      * @param components Identifiers of the sub-treebanks
-     * @param offset Zero-based index of the results
+     * @param iteration Zero-based iteration number of the results
      * @param retrieveContext Get the sentence before and after the hit
      * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
      * @param metadataFilters The filters to apply for the metadata properties
@@ -78,7 +78,7 @@ export class ResultsService {
     async results(xpath: string,
         corpus: string,
         components: string[],
-        offset: number = 0,
+        iteration: number = 0,
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
@@ -89,7 +89,7 @@ export class ResultsService {
             retrieveContext,
             corpus,
             components,
-            offset,
+            iteration,
             isAnalysis,
             variables,
             remainingDatabases
@@ -159,7 +159,7 @@ export class ResultsService {
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            nextOffset: results[7],
+            nextIteration: results[7],
             remainingDatabases: results[8]
         }
     }
@@ -301,9 +301,9 @@ type ApiSearchResult = [
 export interface SearchResults {
     hits: Hit[],
     /**
-     * Start offset for retrieving the next results (in the first database in `remainingDatabases`)
+     * Start iteration for retrieving the next results (in the first database in `remainingDatabases`)
      */
-    nextOffset: number,
+    nextIteration: number,
     /**
      * Databases remaining for doing a paged search
      */

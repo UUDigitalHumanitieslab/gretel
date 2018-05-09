@@ -8,7 +8,7 @@ require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null)
 {
-    global $dbuser, $dbpwd;
+    global $dbuser, $dbpwd, $flushLimit;
 
     $already = array(); // TODO: unresolved Sonar behavior (see #81)
 
@@ -30,7 +30,7 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
     }
 
     $results = getSentences($corpus, $databases, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
-    if ($results[7] >= $searchLimit) {
+    if ($results[7] * $flushLimit >= $searchLimit) {
         // clear the remaining databases to signal the search is done
         $results[8] = array();
     }

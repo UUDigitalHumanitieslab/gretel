@@ -65,7 +65,7 @@ $router->map('POST', '/results', function () {
     } else {
         $variables = null;
     }
-    $offset = $data['offset'];
+    $iteration = $data['iteration'];
     $remainingDatabases = $data['remainingDatabases'];
 
     if (!isset($analysisLimit)) {
@@ -73,7 +73,7 @@ $router->map('POST', '/results', function () {
     }
     $searchLimit = isset($data['isAnalysis']) && $data['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
 
-    $results = getResults($xpath, $context, $corpus, $components, $offset, $searchLimit, $variables, $remainingDatabases);
+    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
 
     header('Content-Type: application/json');
     echo json_encode($results);
