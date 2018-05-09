@@ -14,7 +14,7 @@ import { routes } from './app-routing/routes';
 import { ClipboardServiceMock } from './mocks/clipboard.service.mock';
 
 import { ConfigurationService } from './services/_index';
-import { HttpClientMock } from './services/http-client.mock';
+import { HttpClientMock } from './mocks/http-client.mock';
 import { ConfigurationServiceMock } from './services/configuration.service.mock';
 
 export function commonTestBed() {

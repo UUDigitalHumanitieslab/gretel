@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { declarations, imports, providers, FiltersModule } from './filters.module';
 
-import { HttpClientMock } from '../../services/http-client.mock';
+import { HttpClientMock } from '../../mocks/http-client.mock';
 
 export function filtersTestBed() {
     let httpClientMock = new HttpClientMock();

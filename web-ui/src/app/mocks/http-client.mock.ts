@@ -37,7 +37,7 @@ export class HttpClientMock {
         });
     }
 
-    post<T>(url: string, body: any | null, options?: {
+    public post<T>(url: string, body: any | null, options?: {
         headers?: HttpHeaders | {
             [header: string]: string | string[];
         };

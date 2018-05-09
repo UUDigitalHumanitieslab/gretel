@@ -2,7 +2,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 
 import { ResultsService } from './results.service';
-import { HttpClientMock } from './http-client.mock';
+import { HttpClientMock } from '../mocks/http-client.mock';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConfigurationService, XmlParseService } from './_index';
 import { ConfigurationServiceMock } from './configuration.service.mock';

@@ -92,72 +92,10 @@ export class ResultsComponent implements OnDestroy {
         private resultsService: ResultsService,
         private treebankService: TreebankService) {
         this.subscriptions = [
-            // get the counts for the metadata
-            // TODO: handle when filters have been applied (part of #36)
-            Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject)
-                .filter((values) => values.every(value => value !== undefined))
-                .debounceTime(debounceTime)
-                .distinctUntilChanged()
-                .switchMap(([corpus, components, xpath]) =>
-                    this.resultsService.metadataCounts(this.xpath, this.corpus, this.components))
-                .subscribe(counts => {
-                    this.metadataValueCountsSubject.next(counts);
-                }),
-            // get the metadata for the current corpus
-            this.corpusSubject.filter(corpus => corpus !== undefined)
-                .distinctUntilChanged()
-                .switchMap(corpus => this.treebankService.getMetadata(corpus))
-                .subscribe(metadata => this.metadataSubject.next(metadata)),
-            // get the filters
-            Observable.combineLatest(this.metadataSubject, this.metadataValueCountsSubject)
-                .subscribe(([metadata, counts]) => {
-                    let filters: Filter[] = [];
-                    for (let filter of metadata) {
-                        if (filter.show) {
-                            let options: string[] = [];
-                            if (filter.field in counts) {
-                                for (let key of Object.keys(counts[filter.field])) {
-                                    // TODO: show the frequency (the data it right here now!)
-                                    options.push(key);
-                                }
-                            }
-                            filters.push({
-                                field: filter.field,
-                                dataType: filter.type,
-                                filterType: filter.facet,
-                                minValue: filter.minValue,
-                                maxValue: filter.maxValue,
-                                options
-                            });
-                        }
-                    }
-
-                    this.filters = filters;
-                }),
-            // get the results
-            Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
-                .filter((values) => values.every(value => value !== undefined))
-                .debounceTime(debounceTime)
-                .distinctUntilChanged()
-                .switchMap(([corpus, components, xpath, filterValues]) => {
-                    this.loading = true;
-                    this.results = [];
-                    this.filteredResults = [];
-                    return this.resultsService.getAllResults(
-                        xpath,
-                        corpus,
-                        components,
-                        false,
-                        false,
-                        filterValues,
-                        [],
-                        () => { this.loading = false; });
-                })
-                .do(results => {
-                    this.results.push(...results.hits);
-                    this.filteredResults.push(...this.filterHits(results.hits));
-                })
-                .subscribe()
+            this.liveMetadataCounts(),
+            this.liveMetadataProperties(),
+            this.liveFilters(),
+            this.liveResults()
         ];
     }
 
@@ -207,6 +145,92 @@ export class ResultsComponent implements OnDestroy {
 
     public print() {
         (window as any).print();
+    }
+
+    /**
+     * Get the counts for the metadata
+     */
+    private liveMetadataCounts() {
+        // TODO: handle when filters have been applied (part of #36)
+        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject)
+            .filter((values) => values.every(value => value !== undefined))
+            .debounceTime(debounceTime)
+            .distinctUntilChanged()
+            .switchMap(([corpus, components, xpath]) =>
+                this.resultsService.metadataCounts(this.xpath, this.corpus, this.components))
+            .subscribe(counts => {
+                this.metadataValueCountsSubject.next(counts);
+            });
+    }
+
+    /**
+     * Get the metadata for the current corpus
+     */
+    private liveMetadataProperties() {
+        return this.corpusSubject.filter(corpus => corpus !== undefined)
+            .distinctUntilChanged()
+            .switchMap(corpus => this.treebankService.getMetadata(corpus))
+            .subscribe(metadata => this.metadataSubject.next(metadata));
+    }
+
+    /**
+     * Get the filters
+     */
+    private liveFilters() {
+        return Observable.combineLatest(this.metadataSubject, this.metadataValueCountsSubject)
+            .subscribe(([metadata, counts]) => {
+                let filters: Filter[] = [];
+                for (let filter of metadata) {
+                    if (filter.show) {
+                        let options: string[] = [];
+                        if (filter.field in counts) {
+                            for (let key of Object.keys(counts[filter.field])) {
+                                // TODO: show the frequency (the data it right here now!)
+                                options.push(key);
+                            }
+                        }
+                        filters.push({
+                            field: filter.field,
+                            dataType: filter.type,
+                            filterType: filter.facet,
+                            minValue: filter.minValue,
+                            maxValue: filter.maxValue,
+                            options
+                        });
+                    }
+                }
+
+                this.filters = filters;
+            });
+    }
+
+    /**
+     * Get the results
+     */
+    private liveResults() {
+        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
+            .filter((values) => values.every(value => value !== undefined))
+            .debounceTime(debounceTime)
+            .distinctUntilChanged()
+            .switchMap(([corpus, components, xpath, filterValues]) => {
+                this.loading = true;
+                this.results = [];
+                this.filteredResults = [];
+                return this.resultsService.getAllResults(
+                    xpath,
+                    corpus,
+                    components,
+                    false,
+                    false,
+                    filterValues,
+                    [],
+                    () => { this.loading = false; });
+            })
+            .do(results => {
+                this.results.push(...results.hits);
+                this.filteredResults.push(...this.filterHits(results.hits));
+            })
+            .subscribe();
     }
 
     /**
