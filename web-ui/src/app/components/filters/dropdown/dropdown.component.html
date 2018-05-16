@@ -2,6 +2,7 @@
     <label>
         <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox> {{filter.field}}
     </label>
-    <ng-select [items]="filter.options" [disabled]="!checkbox.checked" [(ngModel)]="selected" (change)="updateFilterChange(true)">
+    <ng-select [items]="filter.options" [multiple]="true" [disabled]="!checkbox.checked" [(ngModel)]="selected"
+               (change)="updateFilterChange(true)">
     </ng-select>
 </ng-container>

@@ -8,18 +8,18 @@ import { Filter } from '../filters.component';
     styleUrls: ['./dropdown.component.scss']
 })
 export class DropdownComponent extends FilterComponent {
-    public selected: string;
+    public selected: string[];
 
     onFilterSet(filter: Filter) {
-        this.selected = filter.options[0];
+        this.selected = [];
     }
 
     updateFilterChange(selected) {
         this.onFilterChange.emit({
             field: this.filter.field,
-            type: 'single',
+            type: 'multiple',
             selected: selected,
-            value: this.selected
+            values: this.selected
         });
     }
 }

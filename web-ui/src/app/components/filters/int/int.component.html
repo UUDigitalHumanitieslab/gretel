@@ -2,8 +2,11 @@
     <label>
         <input type="checkbox" (change)="onCheckBoxClicked($event)" #checkbox> {{filter.field}}
     </label>
-    <mat-slider [disabled]="!checkbox.checked" [max]="this.filter.maxValue" [min]="this.filter.minValue" [step]="1" [thumb-label]="true"
-        [(ngModel)]="value" (ngModelChange)="updateFilterChange(true)">
-    </mat-slider>
-    {{value}}
+    <h3> Range: {{rangeValues[0] + ' - ' + rangeValues[1]}} </h3>
+
+    <p-slider [(ngModel)]="rangeValues" (ngModelChange)="updateFilterChange(true)"
+              [range]="true" [max]="this.filter.maxValue"
+              [min]="this.filter.minValue" [disabled]="!checkbox.checked" >
+    </p-slider>
+
 </ng-container>

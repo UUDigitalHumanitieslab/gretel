@@ -1,20 +1,24 @@
-import { EventEmitter, Input, Output } from '@angular/core';
-import { Filter } from "../filters.component";
-import { FilterValue } from '../../../services/_index';
+import {EventEmitter, Input, Output} from '@angular/core';
+import {Filter} from "../filters.component";
+import {FilterValue} from '../../../services/_index';
 
 type ChangeEvent = FilterValue & {
     selected: boolean
-}
+};
 
 export abstract class FilterComponent {
     private filterValue;
+
     @Input('filter') set filter(value: Filter) {
         this.filterValue = value;
         if (value !== undefined) {
             this.onFilterSet(value);
         }
     }
-    get filter() { return this.filterValue };
+
+    get filter() {
+        return this.filterValue
+    };
 
     @Output() onFilterChange = new EventEmitter<ChangeEvent>();
 

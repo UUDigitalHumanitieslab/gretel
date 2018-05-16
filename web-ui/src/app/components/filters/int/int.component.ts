@@ -1,23 +1,25 @@
-import { Component } from '@angular/core';
-import { FilterComponent } from "../filter/filter.component";
-import { Filter } from '../filters.component';
+import {Component, OnInit} from '@angular/core';
+import {FilterComponent} from "../filter/filter.component";
+import {Filter} from '../filters.component';
+import {FilterRangeValue} from "../../../services/results.service";
 
 @Component({
     selector: 'int',
     templateUrl: './int.component.html',
     styleUrls: ['./int.component.scss']
 })
-export class IntComponent extends FilterComponent {
+export class IntComponent extends FilterComponent implements OnInit {
     public value: number;
 
+    rangeValues: number[];
+
+    ngOnInit() {
+        this.rangeValues = [this.filter.minValue as number, this.filter.maxValue as number];
+
+    }
+
     onFilterSet(filter: Filter) {
-        if (filter.minValue) {
-            this.value = filter.minValue as number;
-        } else if (filter.maxValue) {
-            this.value = filter.maxValue as number;
-        } else {
-            this.value = 0;
-        }
+        this.rangeValues = [filter.minValue as number, filter.maxValue as number];
     }
 
     onCheckBoxClicked(e) {
@@ -26,10 +28,14 @@ export class IntComponent extends FilterComponent {
 
     updateFilterChange(selected: boolean) {
         this.onFilterChange.emit({
+            type: 'range',
             field: this.filter.field,
-            type: 'single',
             selected: selected,
-            value: `${this.value}`,
-        });
+            min: this.rangeValues[0],
+            max: this.rangeValues[1]
+        } );
+
     }
+
+
 }

@@ -16,6 +16,8 @@ import {
     MatFormFieldModule, MatInputModule, MatNativeDateModule, MatOptionModule,
     MatSelectModule
 } from "@angular/material";
+import {CheckboxModule} from "primeng/primeng";
+import {SliderModule} from "primeng/slider";
 
 export const
     imports: any[] = [
@@ -30,7 +32,9 @@ export const
         MatFormFieldModule,
         MatOptionModule,
         MatSelectModule,
-        NgSelectModule
+        NgSelectModule,
+        CheckboxModule,
+        SliderModule
     ],
     declarations: any[] = [
         FiltersComponent,

@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import { Observable } from "rxjs/Observable";
-import { Observer } from 'rxjs/Observer';
+import {Observable} from "rxjs/Observable";
+import {Observer} from 'rxjs/Observer';
 
-import { ConfigurationService } from './configuration.service';
-import { XmlParseService } from './xml-parse.service';
+import {ConfigurationService} from './configuration.service';
+import {XmlParseService} from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
 const routerUrl = '/gretel/api/src/router.php/';
@@ -27,13 +27,13 @@ export class ResultsService {
     }
 
     getAllResults(xpath: string,
-        corpus: string,
-        components: string[],
-        retrieveContext: boolean,
-        isAnalysis = this.defaultIsAnalysis,
-        metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables,
-        complete: () => void = undefined) {
+                  corpus: string,
+                  components: string[],
+                  retrieveContext: boolean,
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables,
+                  complete: () => void = undefined) {
         let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
             let iteration = 0;
             let remainingDatabases: string[] | null = null;
@@ -76,14 +76,14 @@ export class ResultsService {
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
     async results(xpath: string,
-        corpus: string,
-        components: string[],
-        iteration: number = 0,
-        retrieveContext: boolean,
-        isAnalysis = this.defaultIsAnalysis,
-        metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null) {
+                  corpus: string,
+                  components: string[],
+                  iteration: number = 0,
+                  retrieveContext: boolean,
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables,
+                  remainingDatabases: string[] | null = null) {
         let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
@@ -105,7 +105,7 @@ export class ResultsService {
         let base = this.configurationService.getBaseUrlGretel();
         let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
 
-        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        let treeXml = await this.http.get(url, {responseType: 'text'}).toPromise();
         return treeXml;
     }
 
@@ -296,7 +296,7 @@ type ApiSearchResult = [
     string[],
     // 9 database ID of each hit
     { [id: string]: string }
-];
+    ];
 
 export interface SearchResults {
     hits: Hit[],
@@ -336,7 +336,11 @@ export interface Hit {
 }
 
 
-export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
+export type FilterValue =
+    FilterSingleValue
+    | FilterRangeValue<string>
+    | FilterRangeValue<number>
+    | FilterMultipleValues<string>;
 
 export interface FilterSingleValue {
     type: 'single';
@@ -349,6 +353,12 @@ export interface FilterRangeValue<T> {
     field: string;
     min: T;
     max: T;
+}
+
+export interface FilterMultipleValues<T> {
+    type: 'multiple';
+    values: Array<T>;
+    field: string;
 }
 
 export type TreebankCount = {
