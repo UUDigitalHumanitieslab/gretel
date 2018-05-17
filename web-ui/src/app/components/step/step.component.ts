@@ -13,6 +13,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 })
 export class StepComponent implements OnInit {
     warning: boolean = false;
+    valid = false;
 
   constructor() {
 

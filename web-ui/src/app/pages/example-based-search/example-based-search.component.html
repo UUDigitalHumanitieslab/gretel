@@ -1,8 +1,7 @@
 <grt-body-header>Example Based Search</grt-body-header>
-<grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="this.globalState.currentStep.number + 1"></grt-breadcrumb-bar>
+<grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="this.globalState.currentStep.number"></grt-breadcrumb-bar>
 <div [ngSwitch]="this.globalState.currentStep.number">
-
-    <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)"></grt-sentence-input>
+    <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" #sentenceInput></grt-sentence-input>
 </div>
 <br />
 <div class="buttons is-right is-hidden-print">

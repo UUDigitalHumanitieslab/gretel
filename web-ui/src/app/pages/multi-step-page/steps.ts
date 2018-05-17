@@ -1,9 +1,9 @@
-import { Observable } from "rxjs/Observable";
-import { Subscription } from "rxjs/Subscription";
-import { of as observableOf } from 'rxjs/observable/of'
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TreebankService } from "../../services/treebank.service";
-import { ResultsService } from "../../services/results.service";
+import {Observable} from "rxjs/Observable";
+import {Subscription} from "rxjs/Subscription";
+import {of as observableOf} from 'rxjs/observable/of'
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {TreebankService} from "../../services/treebank.service";
+import {ResultsService} from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 /**
@@ -35,30 +35,50 @@ interface GlobalState {
 /**
  * A step has a number and a function that performs the necessary actions when entering a step
  */
-interface Step {
-    number: number;
+class Step {
+
+
+    constructor(public number: number) {
+
+    }
+
     // Makes sure the step is entered correctly
-    enterStep(GlobalState): Observable<GlobalState>;
-    leaveStep(GlobalState): GlobalState;
+    enterStep(GlobalState): Observable<GlobalState> {
+        throw Error('Not implemented');
+    };
+
+    leaveStep(GlobalState): GlobalState {
+        throw Error('Not implemented')
+    };
 }
 
-class SentenceInputStep implements Step{
-    constructor(public number: number){}
+class SentenceInputStep extends Step {
 
-    enterStep(state: GlobalState){
+
+    enterStep(state: GlobalState) {
         state.currentStep = this;
         return observableOf(state)
     }
 
-    leaveStep(state: GlobalState){
+    leaveStep(state: GlobalState) {
         return state;
     }
 }
 
-class XpathInputStep implements Step {
+class ParseStep extends Step {
 
-    constructor(public number: number) {
+    enterStep(state: GlobalState){
+        state.currentStep = this;
+        return observableOf(state);
     }
+    leaveStep(state: GlobalState){
+        return state;
+    }
+
+}
+
+class XpathInputStep extends Step {
+
 
     enterStep(state: GlobalState) {
         state.currentStep = this;
@@ -71,11 +91,11 @@ class XpathInputStep implements Step {
 }
 
 
-class ResultStep implements Step {
+class ResultStep extends Step {
     number: number;
 
-    constructor(stepNumber: number, private resultsService: ResultsService) {
-        this.number = stepNumber;
+    constructor(number: number, private resultsService: ResultsService) {
+        super(number);
     }
 
     /**
@@ -103,11 +123,11 @@ class ResultStep implements Step {
     }
 }
 
-class SelectTreebankStep implements Step {
-    number: number;
+class SelectTreebankStep extends Step {
 
-    constructor(stepNumber, private treebankService: TreebankService, private http: HttpClient) {
-        this.number = stepNumber;
+
+    constructor(public number: number, private treebankService: TreebankService, private http: HttpClient) {
+        super(number);
     }
 
     /**
@@ -140,5 +160,6 @@ export {
     XpathInputStep,
     SelectTreebankStep,
     ResultStep,
-    SentenceInputStep
+    SentenceInputStep,
+    ParseStep
 };

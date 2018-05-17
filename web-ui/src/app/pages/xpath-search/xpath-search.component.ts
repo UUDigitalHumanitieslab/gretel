@@ -17,7 +17,7 @@ import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.compone
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent implements OnInit {
+export class XpathSearchComponent extends MultiStepPageComponent {
     xpathInputStep: XpathInputStep;
 
 
@@ -41,19 +41,19 @@ export class XpathSearchComponent extends MultiStepPageComponent implements OnIn
         this.crumbs = [
             {
                 name: "XPath",
-                number: 1,
+                number: 0,
             },
             {
                 name: "Treebanks",
-                number: 2,
+                number: 1,
             },
             {
                 name: "Results",
-                number: 3,
+                number: 2,
             },
             {
                 name: "Analysis",
-                number: 4,
+                number: 3,
             },
         ];
 

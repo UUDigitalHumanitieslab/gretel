@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {GlobalState} from "./steps";
 import {Transitions} from "./transitions";
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
@@ -8,7 +8,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
     templateUrl: './multi-step-page.component.html',
     styleUrls: ['./multi-step-page.component.scss']
 })
-export class MultiStepPageComponent implements OnInit{
+export class MultiStepPageComponent implements AfterViewInit{
 
 
     globalState: GlobalState;
@@ -44,8 +44,10 @@ export class MultiStepPageComponent implements OnInit{
         throw new Error('Not implemented');
     }
 
-    ngOnInit(){
-        initializeComponents();
+
+
+    ngAfterViewInit(){
+        this.initializeComponents();
     }
 
     /**
@@ -84,7 +86,8 @@ export class MultiStepPageComponent implements OnInit{
      * Show the warning of the appropriate component.
      */
     showWarning() {
-        this.components[this.globalState.currentStep.number - 1].showWarning();
+        console.log(this.components);
+        this.components[this.globalState.currentStep.number].showWarning();
 
     }
 
