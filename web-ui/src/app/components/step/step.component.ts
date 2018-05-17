@@ -27,7 +27,7 @@ export class StepComponent implements OnInit {
    * Check if the input of the user is valid
    */
   public updateValidity(){
-    throw new Error("checkIfValid not implemented");
+    throw new Error("updateValidity not implemented");
   }
 
   /**

@@ -27,7 +27,7 @@ interface GlobalState {
     selectedTreebanks: TreebankSelection;
     xpath: string;
     valid: boolean;
-    // TODO: should this even be in this state?
+    // Question: should this even be in this state?
     loading: boolean;
 }
 
@@ -42,6 +42,18 @@ interface Step {
     leaveStep(GlobalState): GlobalState;
 }
 
+class SentenceInputStep implements Step{
+    constructor(public number: number){}
+
+    enterStep(state: GlobalState){
+        state.currentStep = this;
+        return observableOf(state)
+    }
+
+    leaveStep(state: GlobalState){
+        return state;
+    }
+}
 
 class XpathInputStep implements Step {
 
@@ -128,4 +140,5 @@ export {
     XpathInputStep,
     SelectTreebankStep,
     ResultStep,
+    SentenceInputStep
 };
