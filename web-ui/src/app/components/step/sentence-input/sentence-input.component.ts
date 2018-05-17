@@ -9,6 +9,8 @@ import {StepComponent} from "../step.component";
 export class SentenceInputComponent extends StepComponent implements OnInit {
     @Output() onChangeValue = new EventEmitter<string>();
 
+    startingSentence = 'Dit is een voorbeeld zin';
+
     constructor() {
         super();
     }
@@ -16,6 +18,7 @@ export class SentenceInputComponent extends StepComponent implements OnInit {
     ngOnInit() {
         //Add the moment it is always valid
         this.onChangeValid.emit(true);
+        this.onChangeValue.emit(this.startingSentence)
     }
 
     showWarning() {

@@ -11,14 +11,20 @@ export class TreeVisualizerComponent implements OnChanges {
     @Input()
     public xml: string;
 
+    @Input()
+    public normalView = false;
+
     constructor() {
     }
 
     ngOnChanges() {
+        console.log(this.normalView);
         let element: any = $(`.output`);
         element.treeVisualizer(this.xml, {
-            nvFontSize: 14, normalView: false,
-            initFSOnClick: true
+            // nvFontSize: 14,
+            // normalView: false,
+            // initFSOnClick: true,
+            // fsView: false
         });
     }
 }

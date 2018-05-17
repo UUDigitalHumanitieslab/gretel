@@ -15,6 +15,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
 
     @ViewChild('sentenceInput')
     sentenceInputComponent;
+    @ViewChild('parse')
+    parseComponent;
 
     constructor() {
         super();
@@ -55,9 +57,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
     }
 
     initializeComponents(){
-        console.log('initialize components');
         this.components = [
-            this.sentenceInputComponent
+            this.sentenceInputComponent,
+            this.parseComponent
         ]
     }
 
@@ -88,6 +90,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
     }
 
 
+    updateSentence(sentence: string){
+        this.globalState.inputSentence = sentence;
+    }
 
 
 

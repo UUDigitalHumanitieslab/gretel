@@ -19,6 +19,8 @@ interface TreebankSelection {
     components: string[]
 }
 
+
+// TODO: make multiple types of states (One for XPath search and one for Example Based Search)
 /**
  * All the information the xpath-search component should keep track of
  */
@@ -29,7 +31,10 @@ interface GlobalState {
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
+    inputSentence? : string;
 }
+
+
 
 
 /**

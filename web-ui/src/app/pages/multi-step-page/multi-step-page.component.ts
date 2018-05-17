@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, Component, OnInit} from '@angular/core';
 import {GlobalState} from "./steps";
 import {Transitions} from "./transitions";
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
@@ -8,7 +8,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
     templateUrl: './multi-step-page.component.html',
     styleUrls: ['./multi-step-page.component.scss']
 })
-export class MultiStepPageComponent implements AfterViewInit{
+export class MultiStepPageComponent implements AfterViewChecked{
 
 
     globalState: GlobalState;
@@ -46,7 +46,7 @@ export class MultiStepPageComponent implements AfterViewInit{
 
 
 
-    ngAfterViewInit(){
+    ngAfterViewChecked(){
         this.initializeComponents();
     }
 

@@ -113,29 +113,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     setValid(valid: boolean) {
         this.globalState.valid = valid
     }
-
-    /**
-     * Show the warning of the appropriate component.
-     */
-    showWarning() {
-        switch (this.globalState.currentStep.number) {
-            case 0: {
-                this.xpathInputComponent.showWarning();
-                break;
-            }
-            case 1: {
-                this.selectTreebankComponent.showWarning();
-                break;
-            }
-            case 2: {
-                this.resultComponent.showWarning();
-                break;
-            }
-
-
-        }
-
-    }
+    
 
     /**
      * Updates the selected treebanks with the given selection
