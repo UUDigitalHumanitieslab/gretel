@@ -25,7 +25,7 @@ const links: Link[] = [
   },
   {
     name: 'Example-based search',
-    link: '/gretel/ebs/input.php',
+    link: '/example-based-search',
     proxy: true,
   },
   {

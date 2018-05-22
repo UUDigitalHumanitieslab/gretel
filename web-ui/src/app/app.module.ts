@@ -49,6 +49,10 @@ import {
 } from "./services/_index";
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
 import { FiltersModule } from "./components/filters/filters.module";
+import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
+import { MultiStepPageComponent } from './pages/multi-step-page/multi-step-page.component';
+import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
+import { ParseComponent } from './components/step/parse/parse.component';
 
 export const declarations: any[] = [
     AppComponent,
@@ -73,7 +77,10 @@ export const declarations: any[] = [
     ResultsComponent,
     SelectableTable,
     DistributionListComponent,
-    TreeVisualizerComponent];
+    TreeVisualizerComponent,ExampleBasedSearchComponent,
+    MultiStepPageComponent,
+    SentenceInputComponent,
+    ParseComponent];
 
 export const imports: any[] = [
     BrowserModule,
@@ -107,7 +114,7 @@ export const providers: any[] = [
     declarations,
     imports,
     providers,
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
 export class AppModule {
 }

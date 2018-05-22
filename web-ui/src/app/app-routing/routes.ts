@@ -6,6 +6,7 @@ import {HomePageComponent} from "../pages/home-page/home-page.component";
 import {Route, Routes} from "@angular/router";
 import {DocumentationComponent} from "../pages/documentation/documentation.component";
 import {XpathSearchComponent} from "../pages/xpath-search/xpath-search.component";
+import {ExampleBasedSearchComponent} from "../pages/example-based-search/example-based-search.component";
 
 
 const routes: Routes = [
@@ -15,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'example-based-search',
-    component: DocumentationComponent,
+    component: ExampleBasedSearchComponent,
   },
   {
     path: 'xpath-search',
