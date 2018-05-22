@@ -33,7 +33,11 @@ export class DistributionListComponent implements OnChanges {
     }
 
     public async ngOnChanges(changes: TypedChanges) {
+        if (this.corpus == undefined || this.xpath == undefined || this.components == undefined) {
+            return;
+        }
         let redoCounts = false;
+
         // check that we have all the mappings available
         if (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue) {
             redoCounts = true;

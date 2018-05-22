@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
 
 import { TreebankService } from './treebank.service';
-import { HttpClientMock } from './http-client.mock';
+import { HttpClientMock } from '../mocks/http-client.mock';
 import { HttpClient } from '@angular/common/http';
 import { commonTestBed } from '../common-test-bed';
 

@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
-import { Observable } from "rxjs/Observable";
+import {Observable} from "rxjs/Observable";
+import {Observer} from 'rxjs/Observer';
 
-import { ConfigurationService } from './configuration.service';
-import { XmlParseService } from './xml-parse.service';
+import {ConfigurationService} from './configuration.service';
+import {XmlParseService} from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
 const routerUrl = '/gretel/api/src/router.php/';
@@ -18,7 +19,7 @@ const httpOptions = {
 @Injectable()
 export class ResultsService {
     defaultIsAnalysis = false;
-    defaultMetadataFilters: { [key: string]: FilterValue } = {};
+    defaultMetadataFilters: FilterValue[] = [];
     defaultVariables: { name: string, path: string }[] = null
 
 
@@ -26,33 +27,41 @@ export class ResultsService {
     }
 
     getAllResults(xpath: string,
-        corpus: string,
-        components: string[],
-        retrieveContext: boolean,
-        isAnalysis = this.defaultIsAnalysis,
-        metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables): Observable<any> {
-        return Observable.create(async observer => {
-            let offset = 0;
+                  corpus: string,
+                  components: string[],
+                  retrieveContext: boolean,
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables,
+                  complete: () => void = undefined) {
+        let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
+            let iteration = 0;
             let remainingDatabases: string[] | null = null;
+            let completeObserver = () => {
+                if (complete) {
+                    complete();
+                }
+                observer.complete();
+            }
+
             while (!observer.closed) {
-                await this.results(xpath, corpus, components, offset, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
+                await this.results(xpath, corpus, components, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
                     .then((res) => {
                         if (res) {
                             observer.next(res);
-                            offset = res.nextOffset;
+                            iteration = res.nextIteration;
                             remainingDatabases = res.remainingDatabases;
                             if (remainingDatabases.length == 0) {
-                                observer.complete();
+                                completeObserver();
                             }
                         } else {
-                            observer.complete();
+                            completeObserver();
                         }
-
                     });
-
             }
-        }).mergeMap(results => results.hits);
+        });
+
+        return observable;
     }
 
     /**
@@ -60,27 +69,27 @@ export class ResultsService {
      * @param xpath Specification of the pattern to match
      * @param corpus Identifier of the corpus
      * @param components Identifiers of the sub-treebanks
-     * @param offset Zero-based index of the results
+     * @param iteration Zero-based iteration number of the results
      * @param retrieveContext Get the sentence before and after the hit
      * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
     async results(xpath: string,
-        corpus: string,
-        components: string[],
-        offset: number = 0,
-        retrieveContext: boolean,
-        isAnalysis = this.defaultIsAnalysis,
-        metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null) {
+                  corpus: string,
+                  components: string[],
+                  iteration: number = 0,
+                  retrieveContext: boolean,
+                  isAnalysis = this.defaultIsAnalysis,
+                  metadataFilters = this.defaultMetadataFilters,
+                  variables = this.defaultVariables,
+                  remainingDatabases: string[] | null = null) {
         let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
             corpus,
             components,
-            offset,
+            iteration,
             isAnalysis,
             variables,
             remainingDatabases
@@ -96,19 +105,19 @@ export class ResultsService {
         let base = this.configurationService.getBaseUrlGretel();
         let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
 
-        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        let treeXml = await this.http.get(url, {responseType: 'text'}).toPromise();
         return treeXml;
     }
 
-    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
-        return await this.http.post<{ [key: string]: { [value: string]: number } }>(routerUrl + 'metadata_counts', {
+    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+        return await this.http.post<MetadataValueCounts>(routerUrl + 'metadata_counts', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             corpus,
             components,
         }, httpOptions).toPromise();
     }
 
-    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: { [key: string]: FilterValue } = {}) {
+    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             corpus,
@@ -128,31 +137,29 @@ export class ResultsService {
      *
      * @return string The metadata filter
      */
-    private createMetadataFilterQuery(filters: { [key: string]: FilterValue }) {
+    private createMetadataFilterQuery(filters: FilterValue[]) {
         // Compile the filter
-        let filter = '';
-        for (let key of Object.keys(filters)) {
-            let value = filters[key];
-
-            switch (value.type) {
+        let filterQuery = '';
+        for (let filter of filters) {
+            switch (filter.type) {
                 case 'single':
                     // Single values
-                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value="${value}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
                     break;
                 case 'range':
                     // Ranged values
-                    filter += `[ancestor::alpino_ds/metadata/meta[@name="${key}" and @value>="${value.min}" and @value<="${value.max}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>="${filter.min}" and @value<="${filter.max}"]]`;
                     break;
             }
         }
 
-        return filter;
+        return filterQuery;
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
         return {
             hits: await this.mapHits(results),
-            nextOffset: results[7],
+            nextIteration: results[7],
             remainingDatabases: results[8]
         }
     }
@@ -289,14 +296,14 @@ type ApiSearchResult = [
     string[],
     // 9 database ID of each hit
     { [id: string]: string }
-];
+    ];
 
 export interface SearchResults {
     hits: Hit[],
     /**
-     * Start offset for retrieving the next results (in the first database in `remainingDatabases`)
+     * Start iteration for retrieving the next results (in the first database in `remainingDatabases`)
      */
-    nextOffset: number,
+    nextIteration: number,
     /**
      * Databases remaining for doing a paged search
      */
@@ -329,20 +336,34 @@ export interface Hit {
 }
 
 
-export type FilterValue = FilterSingleValue | FilterRangeValue<string> | FilterRangeValue<number>;
+export type FilterValue =
+    FilterSingleValue
+    | FilterRangeValue<string>
+    | FilterRangeValue<number>
+    | FilterMultipleValues<string>;
 
 export interface FilterSingleValue {
     type: 'single';
-    value: string
+    field: string;
+    value: string;
 }
 
 export interface FilterRangeValue<T> {
     type: 'range';
-    min: T,
-    max: T
+    field: string;
+    min: T;
+    max: T;
+}
+
+export interface FilterMultipleValues<T> {
+    type: 'multiple';
+    values: Array<T>;
+    field: string;
 }
 
 export type TreebankCount = {
     databaseId: string,
     count: number
 }
+
+export type MetadataValueCounts = { [key: string]: { [value: string]: number } }

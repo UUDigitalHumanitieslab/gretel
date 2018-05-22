@@ -1,0 +1,13 @@
+<ng-container *ngIf="filter">
+    <b>{{filter.field}}</b>
+    <div class="columns">
+        <div class="column is-offset-1">
+            <ul >
+                <li *ngFor="let value of filter.options">
+                    <input type="checkbox" (change)="filterChange({event: $event, value: value})"> {{value}}
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</ng-container>

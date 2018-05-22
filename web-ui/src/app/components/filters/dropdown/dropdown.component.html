@@ -1,0 +1,12 @@
+<ng-container *ngIf="filter">
+    <label>
+        <b>{{filter.field}}</b>
+    </label>
+    <ng-select [items]="filter.options" [multiple]="true" [(ngModel)]="selected"
+               (change)="updateFilterChange(true)">
+    </ng-select>
+</ng-container>
+
+
+
+
