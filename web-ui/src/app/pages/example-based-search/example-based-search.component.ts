@@ -1,17 +1,16 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import {GlobalState, XpathInputStep, SentenceInputStep, ParseStep} from "../multi-step-page/steps";
-import {DecreaseTransition, IncreaseTransition, Transitions} from "../multi-step-page/transitions";
-import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.component";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { GlobalState, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep, MatrixStep } from "../multi-step-page/steps";
+import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
+import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 
 @Component({
-  selector: 'grt-example-based-search',
-  templateUrl: './example-based-search.component.html',
-  styleUrls: ['./example-based-search.component.scss']
+    selector: 'grt-example-based-search',
+    templateUrl: './example-based-search.component.html',
+    styleUrls: ['./example-based-search.component.scss']
 })
 export class ExampleBasedSearchComponent extends MultiStepPageComponent {
     sentenceInputStep: SentenceInputStep;
-
 
     @ViewChild('sentenceInput')
     sentenceInputComponent;
@@ -22,8 +21,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
         super();
     }
 
-
-    initializeCrumbs(){
+    initializeCrumbs() {
         this.crumbs = [
             {
                 name: "Example",
@@ -34,7 +32,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
                 number: 1,
             },
             {
-                name: "matrix",
+                name: "Matrix",
                 number: 2,
             },
             {
@@ -56,14 +54,14 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
         ];
     }
 
-    initializeComponents(){
+    initializeComponents() {
         this.components = [
             this.sentenceInputComponent,
             this.parseComponent
         ]
     }
 
-    initializeGlobalState(){
+    initializeGlobalState() {
         this.sentenceInputStep = new SentenceInputStep(0);
         this.globalState = {
             selectedTreebanks: undefined,
@@ -74,28 +72,23 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent {
         };
     }
 
-    initializeConfiguration(){
-
+    initializeConfiguration() {
         this.configuration = {
             steps: [
                 this.sentenceInputStep,
-                new ParseStep(1)
+                new ParseStep(1),
+                new MatrixStep(2),
+                new SelectTreebankStep(3),
+                new ResultStep(4),
             ]
-
         };
     }
 
-    initializeTransitions(){
+    initializeTransitions() {
         this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
     }
 
-
-    updateSentence(sentence: string){
+    updateSentence(sentence: string) {
         this.globalState.inputSentence = sentence;
     }
-
-
-
-
-
 }

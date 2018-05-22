@@ -70,6 +70,17 @@ class SentenceInputStep extends Step {
     }
 }
 
+class MatrixStep extends Step {
+    enterStep(state: GlobalState) {
+        state.currentStep = this;
+        return observableOf(state)
+    }
+
+    leaveStep(state: GlobalState) {
+        return state;
+    }
+}
+
 class ParseStep extends Step {
 
     enterStep(state: GlobalState){
@@ -99,7 +110,7 @@ class XpathInputStep extends Step {
 class ResultStep extends Step {
     number: number;
 
-    constructor(number: number, private resultsService: ResultsService) {
+    constructor(number: number) {
         super(number);
     }
 
@@ -131,7 +142,7 @@ class ResultStep extends Step {
 class SelectTreebankStep extends Step {
 
 
-    constructor(public number: number, private treebankService: TreebankService, private http: HttpClient) {
+    constructor(public number: number) {
         super(number);
     }
 
@@ -166,5 +177,6 @@ export {
     SelectTreebankStep,
     ResultStep,
     SentenceInputStep,
-    ParseStep
+    ParseStep,
+    MatrixStep
 };

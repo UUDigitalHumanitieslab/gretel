@@ -90,8 +90,8 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         this.configuration = {
             steps: [
                 this.xpathInputStep,
-                new SelectTreebankStep(1, this.treebankService, this.http),
-                new ResultStep(2, this.resultsService),
+                new SelectTreebankStep(1),
+                new ResultStep(2),
             ]
 
         };
@@ -113,7 +113,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     setValid(valid: boolean) {
         this.globalState.valid = valid
     }
-    
+
 
     /**
      * Updates the selected treebanks with the given selection
