@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "../multi-step-page/steps";
+import {GlobalState, Step, AnalysisStep, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "../multi-step-page/steps";
 import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from '../multi-step-page/transitions'
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
@@ -92,6 +92,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
                 this.xpathInputStep,
                 new SelectTreebankStep(1, this.treebankService, this.http),
                 new ResultStep(2, this.resultsService),
+                new AnalysisStep(3)
             ]
 
         };
@@ -113,7 +114,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     setValid(valid: boolean) {
         this.globalState.valid = valid
     }
-    
+
 
     /**
      * Updates the selected treebanks with the given selection
