@@ -17,7 +17,7 @@ import { FileExportRenderer } from './file-export-renderer';
 })
 export class AnalysisComponent implements OnInit {
     private variables: PathVariable[];
-    private isLoading = true;
+    public isLoading = true;
 
     @Input()
     public corpus: string;
