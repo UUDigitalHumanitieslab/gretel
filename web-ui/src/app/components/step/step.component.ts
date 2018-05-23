@@ -13,6 +13,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 })
 export class StepComponent implements OnInit {
     warning: boolean = false;
+    valid = false;
 
   constructor() {
 
@@ -27,7 +28,7 @@ export class StepComponent implements OnInit {
    * Check if the input of the user is valid
    */
   public updateValidity(){
-    throw new Error("checkIfValid not implemented");
+    throw new Error("updateValidity not implemented");
   }
 
   /**
