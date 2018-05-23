@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/gretel.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/gretel)
+
 # GrETEL 4
 
 This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
@@ -37,7 +39,8 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
 5. Run `npm install` and `grunt` to compile all the JavaScript and stylesheet files.
-6. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
+6. Run [composer](https://getcomposer.org/) in `/api` directory to install PHP dependencies.
+7. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
 ## Notes for users
 
