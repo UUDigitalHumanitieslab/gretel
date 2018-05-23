@@ -9,7 +9,7 @@ import {StepComponent} from "../step.component";
 export class SentenceInputComponent extends StepComponent implements OnInit {
     @Output() onChangeValue = new EventEmitter<string>();
 
-    startingSentence = 'Dit is een voorbeeld zin';
+    startingSentence = 'Dit is een voorbeeldzin.';
 
     constructor() {
         super();

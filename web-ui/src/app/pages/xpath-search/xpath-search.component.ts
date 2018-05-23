@@ -1,11 +1,11 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {GlobalState, Step, AnalysisStep, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "../multi-step-page/steps";
-import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from '../multi-step-page/transitions'
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
-import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.component";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { GlobalState, Step, AnalysisStep, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection } from "../multi-step-page/steps";
+import { Transition, Transitions, IncreaseTransition, DecreaseTransition } from '../multi-step-page/transitions'
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
+import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -20,7 +20,6 @@ import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.compone
 export class XpathSearchComponent extends MultiStepPageComponent {
     xpathInputStep: XpathInputStep;
 
-
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
     xpathInputComponent;
@@ -31,13 +30,11 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     @ViewChild('resultComponentRef')
     resultComponent;
 
-
     constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService) {
         super();
     }
 
-
-    initializeCrumbs(){
+    initializeCrumbs() {
         this.crumbs = [
             {
                 name: "XPath",
@@ -56,19 +53,17 @@ export class XpathSearchComponent extends MultiStepPageComponent {
                 number: 3,
             },
         ];
-
     }
 
-    initializeComponents(){
+    initializeComponents() {
         this.components = [
             this.xpathInputComponent,
             this.selectTreebankComponent,
             this.resultComponent
-
         ]
     }
 
-    initializeGlobalState(){
+    initializeGlobalState() {
         this.xpathInputStep = new XpathInputStep(0);
 
 
@@ -86,26 +81,23 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         };
     }
 
-    initializeConfiguration(){
+    initializeConfiguration() {
         this.configuration = {
             steps: [
                 this.xpathInputStep,
-                new SelectTreebankStep(1, this.treebankService, this.http),
-                new ResultStep(2, this.resultsService),
+                new SelectTreebankStep(1),
+                new ResultStep(2),
                 new AnalysisStep(3)
             ]
-
         };
     }
 
-    initializeTransitions(){
+    initializeTransitions() {
         this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
     }
 
-
     ngOnInit() {
     }
-
 
     /**
      * Sets
@@ -114,7 +106,6 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     setValid(valid: boolean) {
         this.globalState.valid = valid
     }
-
 
     /**
      * Updates the selected treebanks with the given selection

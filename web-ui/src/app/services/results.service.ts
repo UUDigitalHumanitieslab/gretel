@@ -169,7 +169,7 @@ export class ResultsService {
                     break;
                 case 'range':
                     // Ranged values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>="${filter.min}" and @value<="${filter.max}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>=${filter.min} and @value<=${filter.max}]]`;
                     break;
             }
         }

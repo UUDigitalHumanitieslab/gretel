@@ -10,5 +10,7 @@
 </p>
 
 <p>
-    Your input sentence was: <i>{{inputSentence}}</i>
+    Your input sentence was: <i>{{sentence}}</i>
 </p>
+<p *ngIf="!xml;else tree">Loading ...</p>
+<grt-tree-visualizer #tree [xml]="xml"></grt-tree-visualizer>
