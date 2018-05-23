@@ -1,0 +1,21 @@
+<div *ngFor="let filter of this.filters">
+    <div [ngSwitch]="filter.filterType">
+
+        <div *ngSwitchCase="'checkbox'">
+            <text [filter]="filter" (onFilterChange)="filterChanged($event)"></text>
+        </div>
+
+        <div *ngSwitchCase="'slider'">
+            <int [filter]="filter" (onFilterChange)="filterChanged($event)"></int>
+        </div>
+
+        <div *ngSwitchCase="'range'">
+            <date [filter]="filter" (onFilterChange)="filterChanged($event)"></date>
+        </div>
+
+        <div *ngSwitchCase="'dropdown'">
+            <dropdown [filter]="filter" (onFilterChange)="filterChanged($event)"></dropdown>
+        </div>
+    </div>
+</div>
+

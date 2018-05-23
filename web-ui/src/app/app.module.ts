@@ -48,8 +48,10 @@ import {
     XpathSearchService
 } from "./services/_index";
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
+import { FiltersModule } from "./components/filters/filters.module";
 
-export const declarations: any[] = [AppComponent,
+export const declarations: any[] = [
+    AppComponent,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
@@ -75,6 +77,9 @@ export const declarations: any[] = [AppComponent,
 
 export const imports: any[] = [
     BrowserModule,
+    BrowserAnimationsModule,
+    FiltersModule,
+    FormsModule,
     HttpClientModule,
     AppRoutingModule,
     TableModule,
@@ -83,19 +88,20 @@ export const imports: any[] = [
     DialogModule,
     MessageModule,
     MessagesModule,
-    BrowserAnimationsModule,
     NgSelectModule,
-    ClipboardModule
+    ClipboardModule,
 ];
 
-export const providers: any[] = [AlpinoService,
+export const providers: any[] = [
+    AlpinoService,
     XpathSearchService,
     LinkService,
     ResultsService,
     XmlParseService,
     TreebankService,
     ConfigurationService,
-    DownloadService];
+    DownloadService
+];
 
 @NgModule({
     declarations,

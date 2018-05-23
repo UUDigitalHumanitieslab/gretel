@@ -8,7 +8,8 @@ describe('ResultsComponent', () => {
     let fixture: ComponentFixture<ResultsComponent>;
 
     beforeEach(async(() => {
-        commonTestBed().testingModule.compileComponents();
+        let testBed = commonTestBed();
+        testBed.testingModule.compileComponents();
     }));
 
     beforeEach(() => {
