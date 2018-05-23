@@ -14,7 +14,10 @@ export class ParseComponent implements OnInit {
     set sentence(value: string) {
         this.sentenceValue = value;
         this.xml = null;
-        this.alpinoService.parseSentence(value).toPromise().then(xml => this.xml = xml);
+        this.alpinoService.parseSentence(value).toPromise().then(xml =>{
+            this.xml = xml
+            console.log(xml)
+        } );
     }
     get sentence() {
         return this.sentenceValue;
