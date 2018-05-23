@@ -15,8 +15,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <th>Word</th>
+        <tr *ngFor="let part of parts">
+            <th>{{part.label}}</th>
             <td *ngFor="let word of tokens">
                 <input type="radio">
             </td>
