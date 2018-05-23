@@ -15,8 +15,11 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let part of parts">
-            <th>{{part.label}}</th>
+        <tr *ngFor="let part of parts" [hidden]="part.advanced && !showAdvanced">
+            <th>
+                {{part.label}}
+                <i *ngIf="part.description" class="fa fa-fw fa-info-circle" aria-hidden="true" title="{{part.description}}"></i>
+            </th>
             <td *ngFor="let word of tokens">
                 <input type="radio">
             </td>
@@ -25,7 +28,7 @@
 </table>
 <div class="field">
     <label class="checkbox">
-        <input type="checkbox" name="advanced" aria-describedby="order-tooltip"> Enable advanced options
+        <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced"> Enable advanced options
     </label>
 </div>
 <div class="columns">
@@ -37,7 +40,7 @@
         <h2 class="subtitle">Additional Search Options</h2>
         <div class="field">
             <label class="checkbox">
-                <input type="checkbox" name="order" aria-describedby="order-tooltip"> Respect word order
+                <input type="checkbox" name="order"> Respect word order
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="Only search for patterns that have the same word order as your input example"></i>
             </label>
         </div>
