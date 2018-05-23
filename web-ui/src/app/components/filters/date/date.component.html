@@ -1,0 +1,27 @@
+<ng-container *ngIf="filter">
+    <label>
+        <b>{{filter.field}}</b>
+    </label>
+    <div class="columns">
+        <div class="column is-half">
+            <label class="label">Start Date</label>
+            <mat-form-field>
+
+                <input matInput [min]="filter.minValue" [max]="maxValue" [matDatepicker]="picker1" placeholder="Choose a date"
+                    [(ngModel)]="minValue" (ngModelChange)="updateFilterChange()">
+                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="column is-half">
+            <label class="label">End Date</label>
+            <mat-form-field>
+                <input matInput [min]="minValue" [max]="filter.maxValue" [matDatepicker]="picker2" placeholder="Choose a date"
+                    [(ngModel)]="maxValue" (ngModelChange)="updateFilterChange()">
+                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+            <!-- <input type="date" class="input is-info" [disabled]="!checkbox.checked" [value]="max_value" (change)="keepValidmax($event)"> -->
+        </div>
+    </div>
+</ng-container>

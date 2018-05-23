@@ -11,14 +11,23 @@ export class TreeVisualizerComponent implements OnChanges {
     @Input()
     public xml: string;
 
+    @Input()
+    public fullScreen = false;
+
     constructor() {
     }
 
     ngOnChanges() {
         let element: any = $(`.output`);
         element.treeVisualizer(this.xml, {
-            nvFontSize: 14, normalView: false,
-            initFSOnClick: true
+            nvFontSize: 14,
+            initFSOnClick: this.fullScreen
         });
+
+        if(! this.fullScreen){
+            const tree = $('.tree-visualizer');
+            tree.attr("style", "");
+        }
+
     }
 }

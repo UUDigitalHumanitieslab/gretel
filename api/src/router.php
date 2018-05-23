@@ -15,16 +15,14 @@ $alpinoDirectory = '/opt/Alpino';
 define('ROOT_PATH', '/vagrant/vagrant_data/gretel');
 
 $router->map('POST', '/parse_sentence', function () {
-    $sentence = $_POST['sentence'];
-    //TODO: make the id random.
-    $location = alpino($sentence, 1233);
+    $sentence = file_get_contents('php://input');
+    $location = alpino($sentence, 'ng'.time());
 
-    $data = [
-        'file_ref' => $location,
-    ];
-
-    header('Content-Type: application/json');
-    echo json_encode($data);
+    header('Content-Type: application/xml');
+    $parsed = fopen($location, 'r') or die('Unable to open parsed file!');
+    echo fread($parsed, filesize($location));
+    fclose($parsed);
+    unlink($location);
 });
 
 $router->map('POST', '/metadata_counts', function () {
@@ -65,7 +63,7 @@ $router->map('POST', '/results', function () {
     } else {
         $variables = null;
     }
-    $offset = $data['offset'];
+    $iteration = $data['iteration'];
     $remainingDatabases = $data['remainingDatabases'];
 
     if (!isset($analysisLimit)) {
@@ -73,7 +71,7 @@ $router->map('POST', '/results', function () {
     }
     $searchLimit = isset($data['isAnalysis']) && $data['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
 
-    $results = getResults($xpath, $context, $corpus, $components, $offset, $searchLimit, $variables, $remainingDatabases);
+    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
 
     header('Content-Type: application/json');
     echo json_encode($results);

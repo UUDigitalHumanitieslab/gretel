@@ -14,7 +14,7 @@ import { routes } from './app-routing/routes';
 import { ClipboardServiceMock } from './mocks/clipboard.service.mock';
 
 import { ConfigurationService } from './services/_index';
-import { HttpClientMock } from './services/http-client.mock';
+import { HttpClientMock } from './mocks/http-client.mock';
 import { ConfigurationServiceMock } from './services/configuration.service.mock';
 
 export function commonTestBed() {
@@ -65,6 +65,10 @@ export function commonTestBed() {
         slug: 'TestSlug2',
         title: 'TestTitle2'
     }]);
+
+    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body) => {
+        return { 'TEST_DATABASE1_COMPONENT1': '42' }
+    });
 
     return {
         testingModule: TestBed.configureTestingModule({

@@ -48,8 +48,15 @@ import {
     XpathSearchService
 } from "./services/_index";
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
+import { FiltersModule } from "./components/filters/filters.module";
+import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
+import { MultiStepPageComponent } from './pages/multi-step-page/multi-step-page.component';
+import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
+import { ParseComponent } from './components/step/parse/parse.component';
+import { MatrixComponent } from './components/step/matrix/matrix.component';
 
-export const declarations: any[] = [AppComponent,
+export const declarations: any[] = [
+    AppComponent,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
@@ -71,10 +78,18 @@ export const declarations: any[] = [AppComponent,
     ResultsComponent,
     SelectableTable,
     DistributionListComponent,
-    TreeVisualizerComponent];
+    TreeVisualizerComponent,
+    ExampleBasedSearchComponent,
+    MultiStepPageComponent,
+    SentenceInputComponent,
+    ParseComponent,
+    MatrixComponent];
 
 export const imports: any[] = [
     BrowserModule,
+    BrowserAnimationsModule,
+    FiltersModule,
+    FormsModule,
     HttpClientModule,
     AppRoutingModule,
     TableModule,
@@ -83,25 +98,26 @@ export const imports: any[] = [
     DialogModule,
     MessageModule,
     MessagesModule,
-    BrowserAnimationsModule,
     NgSelectModule,
-    ClipboardModule
+    ClipboardModule,
 ];
 
-export const providers: any[] = [AlpinoService,
+export const providers: any[] = [
+    AlpinoService,
     XpathSearchService,
     LinkService,
     ResultsService,
     XmlParseService,
     TreebankService,
     ConfigurationService,
-    DownloadService];
+    DownloadService
+];
 
 @NgModule({
     declarations,
     imports,
     providers,
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
 export class AppModule {
 }
