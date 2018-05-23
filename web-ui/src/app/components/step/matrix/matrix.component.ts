@@ -10,10 +10,16 @@ export class MatrixComponent implements OnInit {
     private sentenceValue: string;
     public xml: string;
     public xpath: string;
-    public tokens: string[];
+    public tokens: { value: string, index: number }[];
     public showAdvanced: boolean;
+    /**
+     * If an advanced option has been selected, the toggle will be disabled.
+     */
+    public alwaysAdvanced: boolean;
 
-    public parts = [
+    public tokenValues: Part[];
+
+    public options: Part[] = [
         {
             label: "Word",
             description: "The exact word form (also known as token).",
@@ -35,7 +41,7 @@ export class MatrixComponent implements OnInit {
         {
             label: "Word class",
             description: "Short Dutch part-of-speech tag. The different tags are: n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun), vg (conjunction), bw (adverb), tw (numeral), vz (preposition), tsw (interjection), spec (special token), and let (punctuation).",
-            value: "",
+            value: "pos",
             advanced: false
         },
         {
@@ -62,7 +68,9 @@ export class MatrixComponent implements OnInit {
     set sentence(value: string) {
         this.sentenceValue = value;
         this.xml = null;
-        this.tokens = this.alpinoService.tokenize(value).split(' ');
+        this.tokens = this.alpinoService.tokenize(value).split(' ').map((value, index) => { return { value, index } });
+        let defaultValue = this.options.find(o => o.value == 'pos');
+        this.tokenValues = this.tokens.map(() => defaultValue);
         this.alpinoService.parseSentence(value).toPromise().then(xml => this.xml = xml);
     }
     get sentence() {
@@ -74,4 +82,21 @@ export class MatrixComponent implements OnInit {
 
     ngOnInit() {
     }
+
+    public setTokenPart(tokenIndex: number, part: Part) {
+        if (part.advanced) {
+            this.alwaysAdvanced = true;
+        }
+        this.tokenValues[tokenIndex] = part;
+        if (!part.advanced) {
+            this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
+        }
+    }
+}
+
+type Part = {
+    label: string,
+    description: string,
+    value: string,
+    advanced: boolean
 }
