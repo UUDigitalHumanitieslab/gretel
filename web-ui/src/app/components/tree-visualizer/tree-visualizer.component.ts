@@ -21,14 +21,12 @@ export class TreeVisualizerComponent implements OnChanges {
         let element: any = $(`.output`);
         element.treeVisualizer(this.xml, {
             nvFontSize: 14,
-            //normalView: true,
             initFSOnClick: this.fullScreen
-            //fsView: false
         });
 
         if(! this.fullScreen){
-            const tree = document.getElementsByClassName('tree-visualizer')[0];
-            tree.setAttribute("style", "");
+            const tree = $('.tree-visualizer');
+            tree.attr("style", "");
         }
 
     }
