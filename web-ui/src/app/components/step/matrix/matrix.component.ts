@@ -12,6 +12,14 @@ export class MatrixComponent implements OnInit {
     public xpath: string;
     public tokens: string[];
 
+    public parts = [
+        { label: "Word" },
+        { label: "Lemma" },
+        { label: "Word class" },
+        { label: "Detailed word class" },
+        { label: "Optional" },
+        { label: "Exclude" }]
+
     // TODO: don't reparse
     @Input('sentence')
     set sentence(value: string) {
