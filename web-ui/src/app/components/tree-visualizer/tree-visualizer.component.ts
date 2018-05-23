@@ -12,19 +12,24 @@ export class TreeVisualizerComponent implements OnChanges {
     public xml: string;
 
     @Input()
-    public normalView = false;
+    public fullScreen = false;
 
     constructor() {
     }
 
     ngOnChanges() {
-        console.log(this.normalView);
         let element: any = $(`.output`);
         element.treeVisualizer(this.xml, {
-            // nvFontSize: 14,
-            // normalView: false,
-            // initFSOnClick: true,
-            // fsView: false
+            nvFontSize: 14,
+            //normalView: true,
+            initFSOnClick: this.fullScreen
+            //fsView: false
         });
+
+        if(! this.fullScreen){
+            const tree = document.getElementsByClassName('tree-visualizer')[0];
+            tree.setAttribute("style", "");
+        }
+
     }
 }
