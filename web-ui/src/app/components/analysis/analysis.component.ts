@@ -1,6 +1,6 @@
 ///<reference path="pivottable.d.ts"/>
 import { Component, Input, OnInit } from '@angular/core';
-import * as $ from 'jquery';
+import 'jquery';
 import 'jquery-ui';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
