@@ -8,7 +8,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
     templateUrl: './multi-step-page.component.html',
     styleUrls: ['./multi-step-page.component.scss']
 })
-export class MultiStepPageComponent implements AfterViewChecked{
+export class MultiStepPageComponent implements AfterViewChecked, onInit{
 
 
     globalState: GlobalState;
@@ -18,6 +18,9 @@ export class MultiStepPageComponent implements AfterViewChecked{
     components: any[];
 
     constructor() {
+    }
+
+    async ngOnInit(){
         // Template Design Pattern
         this.initializeCrumbs();
         this.initializeGlobalState();

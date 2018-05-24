@@ -54,6 +54,7 @@ import { MultiStepPageComponent } from './pages/multi-step-page/multi-step-page.
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
+import {ActivatedRoute, Router, RouterModule} from "@angular/router";
 
 export const declarations: any[] = [
     AppComponent,
@@ -92,6 +93,7 @@ export const imports: any[] = [
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
+    RouterModule,
     TableModule,
     FormsModule,
     LassyXPathModule,
@@ -110,7 +112,7 @@ export const providers: any[] = [
     XmlParseService,
     TreebankService,
     ConfigurationService,
-    DownloadService
+    DownloadService,
 ];
 
 @NgModule({

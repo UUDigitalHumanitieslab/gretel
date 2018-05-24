@@ -1,11 +1,19 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {GlobalState, Step, XpathInputStep, ResultStep, SelectTreebankStep, TreebankSelection} from "../multi-step-page/steps";
+import {
+    GlobalState,
+    Step,
+    XpathInputStep,
+    ResultStep,
+    SelectTreebankStep,
+    TreebankSelection
+} from "../multi-step-page/steps";
 import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from '../multi-step-page/transitions'
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
 import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.component";
+import {ActivatedRoute, Router} from "@angular/router";
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -32,12 +40,12 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     resultComponent;
 
 
-    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService) {
+    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, private route: ActivatedRoute, private router: Router) {
         super();
     }
 
 
-    initializeCrumbs(){
+    initializeCrumbs() {
         this.crumbs = [
             {
                 name: "XPath",
@@ -59,7 +67,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
 
     }
 
-    initializeComponents(){
+    initializeComponents() {
         this.components = [
             this.xpathInputComponent,
             this.selectTreebankComponent,
@@ -68,25 +76,48 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         ]
     }
 
-    initializeGlobalState(){
-        this.xpathInputStep = new XpathInputStep(0);
 
+    getGlobalStateFromUrl() {
 
-        this.globalState = {
-            selectedTreebanks: undefined,
-            currentStep: this.xpathInputStep,
-            valid: false,
-            xpath: `//node[@cat="smain"
-    and node[@rel="su" and @pt="vnw"]
-    and node[@rel="hd" and @pt="ww"]
-    and node[@rel="predc" and @cat="np"
-    and node[@rel="det" and @pt="lid"]
-    and node[@rel="hd" and @pt="n"]]]`,
-            loading: false
-        };
+        return this.route.queryParams._value
     }
 
-    initializeConfiguration(){
+    queryParamsToGlobalState(queryParams: any){
+
+
+        let step = this.getStepFromNumber(queryParams.currentStep);
+        return {
+            selectedTreebanks: queryParams.selectedTreebanks || undefined,
+            currentStep: step,
+            xpath: queryParams.xpath || 'node',
+
+            valid: false,
+            loading: false
+
+        }
+
+    }
+
+    // TODO finish function
+    getStepFromNumber(number: Number){
+        return new XpathInputStep(0)
+    }
+
+    initializeGlobalState() {
+
+
+        let globalState = this.getGlobalStateFromUrl();
+        let state = this.queryParamsToGlobalState(globalState);
+
+        // Fill in the global state
+        this.xpathInputStep = new XpathInputStep(0);
+        this.globalState = state
+
+
+
+    }
+
+    initializeConfiguration() {
         this.configuration = {
             steps: [
                 this.xpathInputStep,
@@ -97,12 +128,8 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         };
     }
 
-    initializeTransitions(){
+    initializeTransitions() {
         this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
-    }
-
-
-    ngOnInit() {
     }
 
 
@@ -121,9 +148,29 @@ export class XpathSearchComponent extends MultiStepPageComponent {
      */
     updateSelected(selectedTreebanks: TreebankSelection) {
         this.globalState.selectedTreebanks = selectedTreebanks;
+        this.writeStateToUrl();
     }
 
     updateXPath(xpath: string) {
         this.globalState.xpath = xpath;
+        this.writeStateToUrl();
+    }
+
+    stateToString(state: GlobalState) {
+        return {
+            'currentStep': state.currentStep.number,
+            'xpath': state.xpath,
+            'selectedTreebanks': JSON.stringify(state.selectedTreebanks)
+        }
+    }
+
+    writeStateToUrl() {
+
+        let state = this.stateToString(this.globalState);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: state,
+            skipLocationChange: false
+        })
     }
 }
