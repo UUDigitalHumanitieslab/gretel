@@ -53,98 +53,105 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
 {
     global $flushLimit, $needRegularSonar, $components;
 
-    $matchesAmount = 0;
+    $xquery = 'N/A';
+    try {
+        $matchesAmount = 0;
 
-    while ($database = array_pop($databases)) {
-        if ($corpus == 'sonar' && !$needRegularSonar) {
-            getMoreIncludes($database, $databases, $already, $session);
-        }
-        while (1) {
-            if ($endPosIteration !== 'all') {
-                ++$endPosIteration;
+        while ($database = array_pop($databases)) {
+            if ($corpus == 'sonar' && !$needRegularSonar) {
+                getMoreIncludes($database, $databases, $already, $session);
             }
-
-            $xquery = createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath, $variables);
-            $query = $session->query($xquery);
-            $result = $query->execute();
-            $query->close();
-
-            if (!$result || $result == 'false') {
+            while (1) {
                 if ($endPosIteration !== 'all') {
-                    // go to the next database and start at the first position of that
-                    $endPosIteration = 0;
+                    ++$endPosIteration;
                 }
 
-                break;
-            }
+                $xquery = createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath, $variables);
+                $query = $session->query($xquery);
+                $result = $query->execute();
+                $query->close();
 
-            $matches = explode('</match>', $result);
-            $matches = array_cleaner($matches);
-
-            while ($match = array_shift($matches)) {
-                if ($endPosIteration === 'all' && $matchesAmount >= $searchLimit) {
-                    break 3;
-                }
-                $match = str_replace('<match>', '', $match);
-
-                if ($corpus == 'sonar') {
-                    list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
-                } else {
-                    list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
-                }
-
-                if (isset($sentid, $sentence, $ids, $begins)) {
-                    ++$matchesAmount;
-
-                    $sentid = trim($sentid);
-
-                    // Add unique identifier to avoid overlapping sentences w/ same ID
-                    $sentid .= '-endPos='.$endPosIteration.'+match='.$matchesAmount;
-
-                    $sentences[$sentid] = $sentence;
-                    $idlist[$sentid] = $ids;
-                    $beginlist[$sentid] = $begins;
-                    $xmllist[$sentid] = $xml_sentences;
-                    $metalist[$sentid] = $meta;
-                    preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
-                    $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
-                    if ($corpus == 'sonar') {
-                        $tblist[$sentid] = $tb;
+                if (!$result || $result == 'false') {
+                    if ($endPosIteration !== 'all') {
+                        // go to the next database and start at the first position of that
+                        $endPosIteration = 0;
                     }
-                    $sentenceDatabases[$sentid] = $database;
+
+                    break;
+                }
+
+                $matches = explode('</match>', $result);
+                $matches = array_cleaner($matches);
+
+                while ($match = array_shift($matches)) {
+                    if ($endPosIteration === 'all' && $matchesAmount >= $searchLimit) {
+                        break 3;
+                    }
+                    $match = str_replace('<match>', '', $match);
+
+                    if ($corpus == 'sonar') {
+                        list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
+                    } else {
+                        list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
+                    }
+
+                    if (isset($sentid, $sentence, $ids, $begins)) {
+                        ++$matchesAmount;
+
+                        $sentid = trim($sentid);
+
+                        // Add unique identifier to avoid overlapping sentences w/ same ID
+                        $sentid .= '-endPos='.$endPosIteration.'+match='.$matchesAmount;
+
+                        $sentences[$sentid] = $sentence;
+                        $idlist[$sentid] = $ids;
+                        $beginlist[$sentid] = $begins;
+                        $xmllist[$sentid] = $xml_sentences;
+                        $metalist[$sentid] = $meta;
+                        preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
+                        $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
+                        if ($corpus == 'sonar') {
+                            $tblist[$sentid] = $tb;
+                        }
+                        $sentenceDatabases[$sentid] = $database;
+                    }
+                }
+                if ($endPosIteration === 'all') {
+                    break;
+                } elseif ($matchesAmount >= $flushLimit) {
+                    // Re-add pop'd database because it is very likely we aren't finished with it
+                    // More results are still in that database but because of the flushlimit we
+                    // have to bail out
+                    $databases[] = $database;
+
+                    break 2;
                 }
             }
-            if ($endPosIteration === 'all') {
-                break;
-            } elseif ($matchesAmount >= $flushLimit) {
-                // Re-add pop'd database because it is very likely we aren't finished with it
-                // More results are still in that database but because of the flushlimit we
-                // have to bail out
-                $databases[] = $database;
+        }
 
-                break 2;
+        if (isset($sentences)) {
+            if ($endPosIteration !== 'all') {
+                if ($sid != null) {
+                    session_start();
+                    $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
+                    $_SESSION[$sid]['flushDatabases'] = $databases;
+                    $_SESSION[$sid]['flushAlready'] = $already;
+                    session_write_close();
+                }
             }
-        }
-    }
-
-    if (isset($sentences)) {
-        if ($endPosIteration !== 'all') {
-            if ($sid != null) {
-                session_start();
-                $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
-                $_SESSION[$sid]['flushDatabases'] = $databases;
-                $_SESSION[$sid]['flushAlready'] = $already;
-                session_write_close();
+            if ($corpus !== 'sonar') {
+                $tblist = false;
             }
-        }
-        if ($corpus !== 'sonar') {
-            $tblist = false;
-        }
 
-        return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases, $sentenceDatabases);
-    } else {
-        // in case there are no results to be found
-        return false;
+            return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases, $sentenceDatabases, $xquery);
+        } else {
+            // in case there are no results to be found
+            return false;
+        }
+    } catch (Exception $e) {
+        // allow a developer to directly debug this query (log is truncated)
+        echo $xquery;
+        die;
     }
 }
 
