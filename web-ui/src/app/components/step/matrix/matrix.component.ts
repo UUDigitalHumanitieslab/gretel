@@ -9,6 +9,7 @@ import { AlpinoService } from '../../../services/_index';
 export class MatrixComponent implements OnInit {
     private sentenceValue: string;
     public xml: string;
+    public subTreeXml: string;
     public xpath: string;
     public tokens: { value: string, index: number }[];
     public showAdvanced: boolean;
@@ -71,7 +72,7 @@ export class MatrixComponent implements OnInit {
         this.tokens = this.alpinoService.tokenize(value).split(' ').map((value, index) => { return { value, index } });
         let defaultValue = this.options.find(o => o.value == 'pos');
         this.tokenValues = this.tokens.map(() => defaultValue);
-        this.alpinoService.parseSentence(value).toPromise().then(xml => this.xml = xml);
+        this.alpinoService.parseSentence(value).then(xml => this.xml = xml);
     }
     get sentence() {
         return this.sentenceValue;
@@ -90,6 +91,21 @@ export class MatrixComponent implements OnInit {
         this.tokenValues[tokenIndex] = part;
         if (!part.advanced) {
             this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
+        }
+        this.generateXPath();
+    }
+
+    async generateXPath() {
+        if (this.xml) {
+            // TODO: xml required, this needs to be fixed somehow
+            let generated = await this.alpinoService.generateXPath(
+                this.xml,
+                this.tokens.map(t => t.value),
+                this.tokenValues.map(t => t.value),
+                false,
+                false);
+            this.subTreeXml = generated.subTree;
+            this.xpath = generated.xpath;
         }
     }
 }

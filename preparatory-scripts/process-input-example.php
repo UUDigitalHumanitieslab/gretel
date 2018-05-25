@@ -1,68 +1,39 @@
 <?php
+
+require 'xpath-generator.php';
 session_start();
 
-require "../config.php";
-require ROOT_PATH."/helpers.php";
-require ROOT_PATH."/functions.php";
-require ROOT_PATH."/preparatory-scripts/prep-functions.php";
-
 if (!isset($_GET['sid'])) {
-  $results = array(
+    $results = array(
     'error' => true,
     'data' => 'Session ID not provided. Perhaps you have disabled cookies. Please enable them.',
   );
-  echo json_encode($results);
-  exit;
+    echo json_encode($results);
+    exit;
 }
 
 define('SID', $_GET['sid']);
 
-$lpxml = simplexml_load_string(file_get_contents(ROOT_PATH."/tmp/".SID."-pt.xml"));
+$lpxml = simplexml_load_string(file_get_contents(ROOT_PATH.'/tmp/'.SID.'-pt.xml'));
 
 // Set tokenized input sentence to variable
 $tokinput = $_SESSION[SID]['sentence'];
-$sentence = explode(' ', $tokinput);
-  // add info annotation matrix to alpino parse
-foreach ($sentence as $begin => $word) {
-    $postword = preg_replace('/\./', '_', $word);
+$tokens = explode(' ', $tokinput);
+$attributes = array();
 
-    if (preg_match("/([_<>\.,\?!\(\)\"\'])|(\&quot;)|(\&apos;)/", $word)) {
-        $xp = $lpxml->xpath("//node[@begin='$begin']");
-    } else {
-        $xp = $lpxml->xpath("//node[@word='$word' and @begin='$begin']");
-    }
+foreach ($tokens as $begin => $word) {
+    $postword = preg_replace('/\./', '_', $word);
 
     if (isset($_POST["$postword--$begin"])) {
         $postvalue = $_POST["$postword--$begin"];
-        foreach ($xp as $x) {
-            $x->addAttribute('interesting', $postvalue);
-            if ($postvalue == 'token' && !isset($_POST["$postword--$begin-case"])) {
-              $x->addAttribute('caseinsensitive', 'yes');
-            }
+        $attributes[$begin] = $postvalue;
+        if (isset($_POST["$postword--$begin-case"])) {
+            $attributes[$begin] = 'cs';
         }
     }
 }
-// save parse with @interesting annotations
-$treefileName = ROOT_PATH."/tmp/".SID."-int.xml";
-if (file_exists($treefileName)) {
-    unlink($treefileName);
-}
-$tree = $lpxml->asXML();
 
-$treeFh = fopen($treefileName, 'w');
-fwrite($treeFh, "$tree\n");
-fclose($treeFh);
-
-// Remove top category?
-if (isset($_POST['topcat'])) {
-    $remove = 'relcat';
-} else {
-    $remove = 'rel';
-}
-
-$subTreefileName = ROOT_PATH."/tmp/".SID."-sub.xml";
-$pathToRoot = ROOT_PATH;
-`perl -CS $pathToRoot/preparatory-scripts/get-subtree.pl $treefileName $remove > $subTreefileName`;
+$generated = generate_xpath(file_get_contents(ROOT_PATH.'/tmp/'.SID.'-pt.xml'), $tokens, $attributes, isset($_POST['topcat']), isset($_POST['order']));
 
 if (isset($_POST['order'])) {
     $order = 'true';
@@ -71,17 +42,17 @@ if (isset($_POST['order'])) {
     $order = 'false';
 }
 
-// generate XPath from sentence
-$xpath = `perl -CS $pathToRoot/preparatory-scripts/xpath-generator.pl $subTreefileName $order`;
-$xpath = preg_replace('/@cat="\s+"/', '@cat', $xpath);
+$_SESSION[SID]['xpath'] = $generated['xpath'];
 
-// Apply case (in)sensitivity where necessary
-$xpath = applyCs($xpath);
-$_SESSION[SID]['xpath'] = $xpath;
 session_write_close();
 
+$sub_tree = $generated['subTree'];
+$treeFh = fopen(ROOT_PATH.'/tmp/'.SID.'-sub.xml', 'w');
+fwrite($treeFh, "$sub_tree\n");
+fclose($treeFh);
+
 $results = array(
-  'location' => "tmp/".SID."-sub.xml",
+  'location' => 'tmp/'.SID.'-sub.xml',
   'xpath' => $xpath,
 );
 

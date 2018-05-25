@@ -3,6 +3,7 @@
 require '../vendor/autoload.php';
 require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
+require '../../preparatory-scripts/xpath-generator.php';
 require './results.php';
 require './treebank-counts.php';
 
@@ -13,6 +14,20 @@ $router = new AltoRouter();
 $router->setBasePath('/gretel/api/src/router.php');
 $alpinoDirectory = '/opt/Alpino';
 define('ROOT_PATH', '/vagrant/vagrant_data/gretel');
+
+$router->map('POST', '/generate_xpath', function () {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    $xml = $data['xml'];
+    $tokens = $data['tokens'];
+    $attributes = $data['attributes'];
+    $remove_top_cat = $data['removeTopCat'];
+    $order = $data['order'];
+
+    $generated = generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order);
+    header('Content-Type: application/json');
+    echo json_encode($generated);
+});
 
 $router->map('POST', '/parse_sentence', function () {
     $sentence = file_get_contents('php://input');

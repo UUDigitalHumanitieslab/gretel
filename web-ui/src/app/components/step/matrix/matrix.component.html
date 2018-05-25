@@ -22,7 +22,7 @@
             <tr *ngIf="!option.advanced || showAdvanced">
                 <th>
                     {{option.label}}
-                    <i *ngIf="options.description" class="fa fa-fw fa-info-circle" aria-hidden="true" title="{{option.description}}"></i>
+                    <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true" title="{{option.description}}"></i>
                 </th>
                 <td *ngFor="let token of tokens">
                     <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)">
@@ -39,7 +39,7 @@
 <div class="columns">
     <div class="column">
         <h2 class="subtitle">XPath</h2>
-        <pre>{{xpath}}</pre>
+        <pre class="xpath">{{xpath}}</pre>
     </div>
     <div class="column">
         <h2 class="subtitle">Additional Search Options</h2>
@@ -70,4 +70,8 @@
     </div>
 </div>
 <h2 class="subtitle">Tree</h2>
-<pre>TODO: show the tree here</pre>
+<p *ngIf="!subTreeXml;else tree">Loading ...</p>
+<ng-template #tree>
+    <grt-tree-visualizer [xml]="subTreeXml"></grt-tree-visualizer>
+</ng-template>
+

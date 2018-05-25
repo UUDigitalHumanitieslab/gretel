@@ -8,13 +8,28 @@ import { ConfigurationService } from "./configuration.service";
 @Injectable()
 export class AlpinoService {
     parseSentenceUrl: string;
+    generateXPathUrl: string;
 
     constructor(private http: HttpClient) {
         this.parseSentenceUrl = '/gretel/api/src/router.php/parse_sentence';
+        this.generateXPathUrl = '/gretel/api/src/router.php/generate_xpath';
     }
 
-    parseSentence(sentence: string): Observable<string> {
-        return this.http.post(this.parseSentenceUrl, this.tokenize(sentence), { responseType: 'text' });
+    async generateXPath(xml: string, tokens: string[], attributes: string[], removeTopCat: boolean, order: boolean) {
+        return this.http.post<{
+            xpath: string,
+            subTree: string
+        }>(this.generateXPathUrl, {
+            xml,
+            tokens,
+            attributes,
+            removeTopCat,
+            order
+        }).toPromise();
+    }
+
+    async parseSentence(sentence: string) {
+        return this.http.post(this.parseSentenceUrl, this.tokenize(sentence), { responseType: 'text' }).toPromise();
     }
 
     tokenize(sentence: string) {

@@ -33,7 +33,7 @@ else {
 
 my $twig = XML::Twig->new( 'pretty_print' => 'indented' );
 
-$twig->parsefile($inputxml);
+$twig->parse($inputxml);
 
 my $root = $twig->root;
 my $subtree;
