@@ -1,5 +1,5 @@
 ///<reference path="pivottable.d.ts"/>
-import 'jquery';
+import * as $ from 'jquery';
 import 'pivottable';
 import 'pivottable/dist/export_renderers';
 import * as XLSX from 'xlsx';
