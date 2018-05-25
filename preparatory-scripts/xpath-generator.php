@@ -30,6 +30,8 @@ function generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order)
             foreach ($xp as $x) {
                 if ($attr == 'cs') {
                     $x->addAttribute('interesting', 'token');
+                } elseif ($attr = 'token') {
+                    $x->addAttribute('interesting', 'token');
                     $x->addAttribute('caseinsensitive', 'yes');
                 } else {
                     $x->addAttribute('interesting', $attr);
@@ -70,7 +72,6 @@ function generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order)
     $results = array(
   'xpath' => $xpath,
   'markedTree' => $marked_tree,
-  'sub_tree_arg' => 'perl -CS $pathToRoot/preparatory-scripts/get-subtree.pl {escapeshellarg($marked_tree)} $remove',
   'subTree' => $sub_tree,
 );
 

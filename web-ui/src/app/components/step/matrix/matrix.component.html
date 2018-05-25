@@ -10,11 +10,11 @@
         <em>XPath query</em>, which will be used to do the actual treebank search.
     </p>
 </div>
-<table class="table is-striped is-bordered is-fullwidth" *ngIf="tokens">
+<table class="table is-striped is-bordered is-fullwidth" *ngIf="indexedTokens">
     <thead>
         <tr>
             <th>Sentence</th>
-            <td *ngFor="let token of tokens">{{token.value}}</td>
+            <td *ngFor="let token of indexedTokens">{{token.value}}</td>
         </tr>
     </thead>
     <tbody>
@@ -24,7 +24,7 @@
                     {{option.label}}
                     <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true" title="{{option.description}}"></i>
                 </th>
-                <td *ngFor="let token of tokens">
+                <td *ngFor="let token of indexedTokens">
                     <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)">
                 </td>
             </tr>

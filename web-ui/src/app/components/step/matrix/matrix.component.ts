@@ -1,17 +1,41 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AlpinoService } from '../../../services/_index';
+import { StepComponent } from '../step.component';
 
 @Component({
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent implements OnInit {
-    private sentenceValue: string;
-    public xml: string;
+export class MatrixComponent extends StepComponent implements OnInit {
+    @Input('attributes')
+    public set attributes(values: string[]) {
+        this.tokenValues = values.map(value => this.options.find(o => o.value == value));
+    }
+
+    public get attributes() {
+        return this.tokenValues.map(t => t.value);
+    }
+
+    @Input('tokens')
+    public set tokens(value: string[]) {
+        this.indexedTokens = value.map((value, index) => { return { value, index } });
+    }
+    public get tokens() {
+        return this.indexedTokens.map(t => t.value);
+    }
+
+    @Input()
     public subTreeXml: string;
+    @Input('xml')
+    public xml: string;
+    @Input()
     public xpath: string;
-    public tokens: { value: string, index: number }[];
+
+    @Output()
+    public onChange = new EventEmitter<MatrixSettings>();
+
+    public indexedTokens: { value: string, index: number }[];
     public showAdvanced: boolean;
     /**
      * If an advanced option has been selected, the toggle will be disabled.
@@ -64,21 +88,8 @@ export class MatrixComponent implements OnInit {
             advanced: true
         }];
 
-    // TODO: don't reparse
-    @Input('sentence')
-    set sentence(value: string) {
-        this.sentenceValue = value;
-        this.xml = null;
-        this.tokens = this.alpinoService.tokenize(value).split(' ').map((value, index) => { return { value, index } });
-        let defaultValue = this.options.find(o => o.value == 'pos');
-        this.tokenValues = this.tokens.map(() => defaultValue);
-        this.alpinoService.parseSentence(value).then(xml => this.xml = xml);
-    }
-    get sentence() {
-        return this.sentenceValue;
-    }
-
     constructor(private alpinoService: AlpinoService) {
+        super();
     }
 
     ngOnInit() {
@@ -92,21 +103,12 @@ export class MatrixComponent implements OnInit {
         if (!part.advanced) {
             this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
         }
-        this.generateXPath();
-    }
 
-    async generateXPath() {
-        if (this.xml) {
-            // TODO: xml required, this needs to be fixed somehow
-            let generated = await this.alpinoService.generateXPath(
-                this.xml,
-                this.tokens.map(t => t.value),
-                this.tokenValues.map(t => t.value),
-                false,
-                false);
-            this.subTreeXml = generated.subTree;
-            this.xpath = generated.xpath;
-        }
+        this.onChange.next({
+            attributes: this.tokenValues.map(t => t.value),
+            customXPath: null,
+            tokens: [...this.tokens]
+        });
     }
 }
 
@@ -115,4 +117,10 @@ type Part = {
     description: string,
     value: string,
     advanced: boolean
+}
+
+export type MatrixSettings = {
+    attributes: string[],
+    customXPath: string,
+    tokens: string[]
 }

@@ -6,6 +6,7 @@ import { TreebankService } from "../../services/treebank.service";
 import { ResultsService } from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
+import { AlpinoService } from "../../services/_index";
 /**
  * Contains all the steps that are used in the xpath search
  */
@@ -25,7 +26,7 @@ interface TreebankSelection {
  * All the information the xpath-search component should keep track of
  */
 interface GlobalState {
-    currentStep: Step;
+    currentStep: Step<this>;
     selectedTreebanks: TreebankSelection;
     xpath: string;
     valid: boolean;
@@ -34,13 +35,21 @@ interface GlobalState {
     inputSentence?: string;
 }
 
+interface GlobalStateExampleBased extends GlobalState {
+    isCustomXPath: boolean,
+    exampleXml: string,
+    subTreeXml: string,
+    tokens: string[],
+    attributes: string[]
+}
+
 
 
 
 /**
  * A step has a number and a function that performs the necessary actions when entering a step
  */
-class Step {
+class Step<T> {
 
 
     constructor(public number: number) {
@@ -48,65 +57,101 @@ class Step {
     }
 
     // Makes sure the step is entered correctly
-    enterStep(GlobalState): Observable<GlobalState> {
+    enterStep(GlobalState): Observable<T> {
         throw Error('Not implemented');
     };
 
-    leaveStep(GlobalState): GlobalState {
+    leaveStep(GlobalState): T {
         throw Error('Not implemented')
     };
 }
 
-class SentenceInputStep extends Step {
+class SentenceInputStep<T extends GlobalState> extends Step<T> {
 
 
-    enterStep(state: GlobalState) {
+    enterStep(state: T) {
         state.currentStep = this;
         return observableOf(state)
     }
 
-    leaveStep(state: GlobalState) {
+    leaveStep(state: T) {
         return state;
     }
 }
 
-class MatrixStep extends Step {
-    enterStep(state: GlobalState) {
+class MatrixStep extends Step<GlobalStateExampleBased> {
+    constructor(number: number, private alpinoService: AlpinoService) {
+        super(number)
+    }
+
+    enterStep(state: GlobalStateExampleBased): Observable<GlobalStateExampleBased> {
+        return new Observable((observer) => {
+            state.currentStep = this;
+            state.tokens = this.alpinoService.tokenize(state.inputSentence).split(' ');
+            state.attributes = state.tokens.map(t => 'pos'); // default value
+            this.updateMatrix(state).then(newState => {
+                observer.next(newState);
+                observer.complete();
+            });
+        });
+    }
+
+    leaveStep(state: GlobalStateExampleBased) {
+        return state;
+    }
+
+    async updateMatrix(state: GlobalStateExampleBased) {
+        state.loading = true;
+        if (!state.isCustomXPath) {
+            let generated = await this.alpinoService.generateXPath(
+                state.exampleXml,
+                state.tokens,
+                state.attributes,
+                false,
+                false);
+            state.subTreeXml = generated.subTree;
+            state.xpath = generated.xpath;
+        }
+        state.loading = false;
+        return state;
+    }
+}
+
+class ParseStep extends Step<GlobalStateExampleBased> {
+    constructor(number: number, private alpinoService: AlpinoService) {
+        super(number);
+    }
+
+    enterStep(state: GlobalStateExampleBased): Observable<GlobalStateExampleBased> {
+        return new Observable((observer) => {
+            state.currentStep = this;
+            this.alpinoService.parseSentence(state.inputSentence).then(xml => {
+                state.exampleXml = xml;
+                observer.next(state);
+                observer.complete();
+            });
+        });
+    }
+    leaveStep(state: GlobalStateExampleBased) {
+        return state;
+    }
+
+}
+
+class XpathInputStep<T extends GlobalState> extends Step<T> {
+
+
+    enterStep(state: T) {
         state.currentStep = this;
         return observableOf(state)
     }
 
-    leaveStep(state: GlobalState) {
+    leaveStep(state: T) {
         return state;
     }
 }
 
-class ParseStep extends Step {
-
-    enterStep(state: GlobalState) {
-        state.currentStep = this;
-        return observableOf(state);
-    }
-    leaveStep(state: GlobalState) {
-        return state;
-    }
-
-}
-
-class XpathInputStep extends Step {
-
-
-    enterStep(state: GlobalState) {
-        state.currentStep = this;
-        return observableOf(state)
-    }
-
-    leaveStep(state: GlobalState) {
-        return state;
-    }
-}
-
-class AnalysisStep extends Step {
+class AnalysisStep<T extends GlobalState> extends Step<T>{
     number: number;
 
     constructor(number: number) {
@@ -118,7 +163,7 @@ class AnalysisStep extends Step {
      * @param state
      * @returns
      */
-    enterStep(state: GlobalState): Observable<GlobalState> {
+    enterStep(state: T): Observable<T> {
         return new Observable((observer) => {
             state.currentStep = this;
 
@@ -132,13 +177,13 @@ class AnalysisStep extends Step {
      * @param state
      * @returns {GlobalState}
      */
-    leaveStep(state: GlobalState): GlobalState {
+    leaveStep(state: T): T {
         state.loading = false;
         return state;
     }
 }
 
-class ResultStep extends Step {
+class ResultStep<T extends GlobalState> extends Step<T>{
     number: number;
 
     constructor(number: number) {
@@ -150,7 +195,7 @@ class ResultStep extends Step {
      * @param state
      * @returns
      */
-    enterStep(state: GlobalState): Observable<GlobalState> {
+    enterStep(state: T): Observable<T> {
         return new Observable((observer) => {
             state.currentStep = this;
 
@@ -162,15 +207,15 @@ class ResultStep extends Step {
     /**
      * Makes sure the stream is ended
      * @param state
-     * @returns {GlobalState}
+     * @returns {T}
      */
-    leaveStep(state: GlobalState): GlobalState {
+    leaveStep(state: T): T {
         state.loading = false;
         return state;
     }
 }
 
-class SelectTreebankStep extends Step {
+class SelectTreebankStep<T extends GlobalState> extends Step<T>{
 
 
     constructor(public number: number) {
@@ -182,7 +227,7 @@ class SelectTreebankStep extends Step {
      * @param state
      * @returns the updates state
      */
-    enterStep(state: GlobalState): Observable<GlobalState> {
+    enterStep(state: T): Observable<T> {
 
         return new Observable((observer) => {
             state.currentStep = this;
@@ -194,7 +239,7 @@ class SelectTreebankStep extends Step {
         });
     }
 
-    leaveStep(state: GlobalState) {
+    leaveStep(state: T) {
         return state;
     }
 }
@@ -203,6 +248,7 @@ class SelectTreebankStep extends Step {
 export {
     TreebankSelection,
     GlobalState,
+    GlobalStateExampleBased,
     Step,
     AnalysisStep,
     XpathInputStep,

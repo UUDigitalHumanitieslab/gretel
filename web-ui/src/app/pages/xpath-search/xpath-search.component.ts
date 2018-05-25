@@ -17,8 +17,8 @@ import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.compo
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent {
-    xpathInputStep: XpathInputStep;
+export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
+    xpathInputStep: XpathInputStep<GlobalState>;
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
