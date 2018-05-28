@@ -35,6 +35,10 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Output()
     public onChangeValue = new EventEmitter<MatrixSettings>();
 
+    public respectOrder;
+    public retrieveContext;
+    public ignoreTopNode;
+
     public indexedTokens: { value: string, index: number }[];
     public showAdvanced: boolean;
     /**
@@ -103,11 +107,17 @@ export class MatrixComponent extends StepComponent implements OnInit {
         if (!part.advanced) {
             this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
         }
+        this.emitChange();
+    }
 
+    public emitChange() {
         this.onChangeValue.next({
             attributes: this.tokenValues.map(t => t.value),
+            retrieveContext: this.retrieveContext,
             customXPath: null,
-            tokens: [...this.tokens]
+            respectOrder: this.respectOrder,
+            tokens: [...this.tokens],
+            ignoreTopNode: this.ignoreTopNode
         });
         this.updateValidity();
     }
@@ -132,5 +142,8 @@ type Part = {
 export type MatrixSettings = {
     attributes: string[],
     customXPath: string,
-    tokens: string[]
+    retrieveContext: boolean,
+    respectOrder: boolean,
+    tokens: string[],
+    ignoreTopNode: boolean
 }

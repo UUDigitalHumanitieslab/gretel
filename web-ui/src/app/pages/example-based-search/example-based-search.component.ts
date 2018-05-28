@@ -43,16 +43,12 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
                 number: 3,
             },
             {
-                name: "Query",
+                name: "Results",
                 number: 4,
             },
             {
-                name: "Results",
-                number: 5,
-            },
-            {
                 name: "Analysis",
-                number: 6,
+                number: 5,
             },
         ];
     }
@@ -78,7 +74,10 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             inputSentence: 'Dit is een voorbeeldzin.',
             isCustomXPath: false,
             attributes: [],
-            tokens: []
+            tokens: [],
+            retrieveContext: false,
+            respectOrder: false,
+            ignoreTopNode: false
         };
     }
 
@@ -110,7 +109,11 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.globalState.inputSentence = sentence;
         this.globalState.exampleXml = undefined; // reset parse
     }
+
     updateMatrix(matrixSettings: MatrixSettings) {
+        this.globalState.retrieveContext = matrixSettings.retrieveContext;
+        this.globalState.ignoreTopNode = matrixSettings.ignoreTopNode;
+        this.globalState.respectOrder = matrixSettings.respectOrder;
         if (matrixSettings.customXPath) {
             this.globalState.isCustomXPath = true;
             this.globalState.xpath = matrixSettings.customXPath;

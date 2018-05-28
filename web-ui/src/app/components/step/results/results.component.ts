@@ -68,6 +68,9 @@ export class ResultsComponent implements OnDestroy {
         return this.xpathSubject.value;
     }
 
+    @Input()
+    public retrieveContext: boolean = false;
+
     public loading: boolean = true;
 
     public treeXml?: string;
@@ -220,7 +223,7 @@ export class ResultsComponent implements OnDestroy {
                     xpath,
                     corpus,
                     components,
-                    false,
+                    this.retrieveContext,
                     false,
                     filterValues,
                     [],

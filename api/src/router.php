@@ -21,10 +21,10 @@ $router->map('POST', '/generate_xpath', function () {
     $xml = $data['xml'];
     $tokens = $data['tokens'];
     $attributes = $data['attributes'];
-    $remove_top_cat = $data['removeTopCat'];
-    $order = $data['order'];
+    $ignore_top_node = $data['ignoreTopNode'];
+    $respect_order = $data['respectOrder'];
 
-    $generated = generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order);
+    $generated = generate_xpath($xml, $tokens, $attributes, $ignore_top_node, $respect_order);
     header('Content-Type: application/json');
     echo json_encode($generated);
 });

@@ -7,6 +7,7 @@ import { ResultsService } from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 import { AlpinoService } from "../../services/_index";
+import { XPathModels } from "ts-xpath";
 /**
  * Contains all the steps that are used in the xpath search
  */
@@ -27,6 +28,10 @@ interface TreebankSelection {
  */
 interface GlobalState {
     currentStep: Step<this>;
+    /**
+     * Include context in results (the preceding and following sentence)
+     */
+    retrieveContext: boolean,
     selectedTreebanks: TreebankSelection;
     xpath: string;
     valid: boolean;
@@ -40,7 +45,15 @@ interface GlobalStateExampleBased extends GlobalState {
     exampleXml: string,
     subTreeXml: string,
     tokens: string[],
-    attributes: string[]
+    attributes: string[],
+    /**
+     * Ignores properties of the dominating node
+     */
+    ignoreTopNode: boolean,
+    /**
+     * Respect word order
+     */
+    respectOrder: boolean
 }
 
 
@@ -107,8 +120,8 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
                 state.exampleXml,
                 state.tokens,
                 state.attributes,
-                false,
-                false);
+                state.ignoreTopNode,
+                state.respectOrder);
             state.subTreeXml = generated.subTree;
             state.xpath = generated.xpath;
             state.valid = true;

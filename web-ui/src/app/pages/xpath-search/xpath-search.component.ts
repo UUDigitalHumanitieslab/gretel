@@ -75,7 +75,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     and node[@rel="predc" and @cat="np"
     and node[@rel="det" and @pt="lid"]
     and node[@rel="hd" and @pt="n"]]]`,
-            loading: false
+            loading: false,
+            retrieveContext: false
         };
     }
 
@@ -99,9 +100,12 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
      * @param boolean
      */
     setValid(valid: boolean) {
-        this.globalState.valid = valid
+        this.globalState.valid = valid;
     }
 
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.globalState.retrieveContext = retrieveContext;
+    }
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection

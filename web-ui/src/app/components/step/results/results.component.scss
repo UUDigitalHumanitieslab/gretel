@@ -12,6 +12,6 @@ a:hover {
 }
 
 .xpath {
-    // don't put a long query on a single line
-    white-space: normal;
+    // don't make a long query ruin the interface
+    overflow: auto;
 }
