@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
-import { GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep, MatrixStep, TreebankSelection } from "../multi-step-page/steps";
+import { GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep, MatrixStep, TreebankSelection, AnalysisStep } from "../multi-step-page/steps";
 import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
 import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 import { AlpinoService } from '../../services/_index';
@@ -19,6 +19,14 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     sentenceInputComponent;
     @ViewChild('parse')
     parseComponent;
+    @ViewChild('matrix')
+    matrixComponent;
+    @ViewChild('selectTreebanks')
+    selectTreebanksComponent;
+    @ViewChild('results')
+    resultsComponent;
+    @ViewChild('analysis')
+    analysisComponent;
 
     constructor(private alpinoService: AlpinoService) {
         super();
@@ -56,7 +64,11 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     initializeComponents() {
         this.components = [
             this.sentenceInputComponent,
-            this.parseComponent
+            this.parseComponent,
+            this.matrixComponent,
+            this.selectTreebanksComponent,
+            this.resultsComponent,
+            this.analysisComponent
         ]
     }
 
@@ -89,6 +101,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
                 this.matrixStep,
                 new SelectTreebankStep(3),
                 new ResultStep(4),
+                new AnalysisStep(5)
             ]
         };
     }

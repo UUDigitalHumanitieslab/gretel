@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AlpinoService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
+import { ValueEvent } from 'lassy-xpath/ng';
 
 @Component({
     selector: 'grt-matrix',
@@ -31,10 +32,13 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public xml: string;
     @Input()
     public xpath: string;
+    @Input()
+    public isCustomXPath: boolean;
 
     @Output()
     public onChangeValue = new EventEmitter<MatrixSettings>();
 
+    public warning: boolean;
     public respectOrder;
     public retrieveContext;
     public ignoreTopNode;
@@ -110,11 +114,11 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.emitChange();
     }
 
-    public emitChange() {
+    public emitChange(customXPath: string = null) {
         this.onChangeValue.next({
             attributes: this.tokenValues.map(t => t.value),
             retrieveContext: this.retrieveContext,
-            customXPath: null,
+            customXPath,
             respectOrder: this.respectOrder,
             tokens: [...this.tokens],
             ignoreTopNode: this.ignoreTopNode
@@ -122,13 +126,26 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.updateValidity();
     }
 
+    public customXPathChanged(valueEvent: ValueEvent) {
+        this.valid = !valueEvent.error;
+        this.emitChange(valueEvent.xpath);
+    }
+
+    public editXPath() {
+        this.emitChange(this.xpath);
+    }
+
+    public resetXPath() {
+        this.valid = true;
+        this.emitChange();
+    }
+
     public updateValidity() {
-        this.valid = true; // TODO: validate XPATH. Note that updateMatrix in the step component also has validation
         this.onChangeValid.emit(this.valid);
     }
 
     public showWarning() {
-        throw new Error("Method not implemented.");
+        this.warning = true;
     }
 }
 

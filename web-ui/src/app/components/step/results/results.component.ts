@@ -71,6 +71,9 @@ export class ResultsComponent implements OnDestroy {
     @Input()
     public retrieveContext: boolean = false;
 
+    @Input()
+    public inputSentence: string = null;
+
     public loading: boolean = true;
 
     public treeXml?: string;

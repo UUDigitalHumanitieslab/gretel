@@ -25,7 +25,7 @@
                     <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true" title="{{option.description}}"></i>
                 </th>
                 <td *ngFor="let token of indexedTokens">
-                    <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)">
+                    <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)" [disabled]="isCustomXPath">
                 </td>
             </tr>
         </ng-container>
@@ -33,18 +33,44 @@
 </table>
 <div class="field">
     <label class="checkbox">
-        <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced" [disabled]="alwaysAdvanced"> Enable advanced options
+        <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced" [disabled]="alwaysAdvanced || isCustomXPath"> Enable advanced options
     </label>
 </div>
 <div class="columns">
     <div class="column xpath">
-        <h2 class="subtitle">XPath</h2>
-        <pre>{{xpath}}</pre>
+        <h2 class="subtitle">
+            <div class="level">
+                <div class="level-item level-left">
+                    XPath
+                </div>
+                <div class="level-item level-right">
+                    <div class="field">
+                        <p class="control" *ngIf="!isCustomXPath">
+                            <a class="button" title="Edit query" (click)="editXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control" *ngIf="isCustomXPath">
+                            <a class="button is-danger" title="Reset query" (click)="resetXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </h2>
+        <pre *ngIf="!isCustomXPath" (click)="editXPath()">{{xpath}}</pre>
+        <p-message *ngIf="isCustomXPath && warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
+        <lx-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
     </div>
     <div class="column">
         <h2 class="subtitle">Additional Search Options</h2>
         <div class="field">
-            <label class="checkbox">
+            <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
                 <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()"> Respect word order
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="Only search for patterns that have the same word order as your input example"></i>
             </label>
@@ -56,7 +82,7 @@
             </label>
         </div>
         <div class="field">
-            <label class="checkbox">
+            <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
                 <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()"> Ignore properties of the dominating node
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses"></i>
             </label>

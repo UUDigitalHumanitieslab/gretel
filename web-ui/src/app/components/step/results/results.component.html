@@ -26,7 +26,10 @@
                 </div>
             </div>
         </h2>
-        <pre>{{xpath}}</pre>
+        <div class="content">
+            <pre>{{xpath}}</pre>
+            <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+        </div>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">

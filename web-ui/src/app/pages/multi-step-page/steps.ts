@@ -138,19 +138,21 @@ class ParseStep extends Step<GlobalStateExampleBased> {
     }
 
     enterStep(state: GlobalStateExampleBased): Observable<GlobalStateExampleBased> {
+        state.loading = true;
         return new Observable((observer) => {
             state.currentStep = this;
             this.alpinoService.parseSentence(state.inputSentence).then(xml => {
                 state.exampleXml = xml;
+                state.loading = false;
                 observer.next(state);
                 observer.complete();
             });
         });
     }
+
     leaveStep(state: GlobalStateExampleBased) {
         return state;
     }
-
 }
 
 class XpathInputStep<T extends GlobalState> extends Step<T> {
