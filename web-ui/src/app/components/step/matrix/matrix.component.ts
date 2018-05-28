@@ -33,7 +33,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public xpath: string;
 
     @Output()
-    public onChange = new EventEmitter<MatrixSettings>();
+    public onChangeValue = new EventEmitter<MatrixSettings>();
 
     public indexedTokens: { value: string, index: number }[];
     public showAdvanced: boolean;
@@ -104,11 +104,21 @@ export class MatrixComponent extends StepComponent implements OnInit {
             this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
         }
 
-        this.onChange.next({
+        this.onChangeValue.next({
             attributes: this.tokenValues.map(t => t.value),
             customXPath: null,
             tokens: [...this.tokens]
         });
+        this.updateValidity();
+    }
+
+    public updateValidity() {
+        this.valid = true; // TODO: validate XPATH. Note that updateMatrix in the step component also has validation
+        this.onChangeValid.emit(this.valid);
+    }
+
+    public showWarning() {
+        throw new Error("Method not implemented.");
     }
 }
 

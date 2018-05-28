@@ -72,9 +72,10 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             subTreeXml: undefined,
             selectedTreebanks: undefined,
             currentStep: this.sentenceInputStep,
-            valid: false,
+            valid: true,
             xpath: '',
             loading: false,
+            inputSentence: 'Dit is een voorbeeldzin.',
             isCustomXPath: false,
             attributes: [],
             tokens: []

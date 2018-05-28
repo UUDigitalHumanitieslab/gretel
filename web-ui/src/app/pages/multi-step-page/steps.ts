@@ -111,7 +111,9 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
                 false);
             state.subTreeXml = generated.subTree;
             state.xpath = generated.xpath;
+            state.valid = true;
         }
+        // TODO: validate custom XPATH!
         state.loading = false;
         return state;
     }
@@ -139,7 +141,9 @@ class ParseStep extends Step<GlobalStateExampleBased> {
 }
 
 class XpathInputStep<T extends GlobalState> extends Step<T> {
-
+    constructor(number: number) {
+        super(number);
+    }
 
     enterStep(state: T) {
         state.currentStep = this;
@@ -152,8 +156,6 @@ class XpathInputStep<T extends GlobalState> extends Step<T> {
 }
 
 class AnalysisStep<T extends GlobalState> extends Step<T>{
-    number: number;
-
     constructor(number: number) {
         super(number);
     }
@@ -184,8 +186,6 @@ class AnalysisStep<T extends GlobalState> extends Step<T>{
 }
 
 class ResultStep<T extends GlobalState> extends Step<T>{
-    number: number;
-
     constructor(number: number) {
         super(number);
     }
@@ -215,9 +215,7 @@ class ResultStep<T extends GlobalState> extends Step<T>{
     }
 }
 
-class SelectTreebankStep<T extends GlobalState> extends Step<T>{
-
-
+class SelectTreebankStep<T extends GlobalState> extends Step<T> {
     constructor(public number: number) {
         super(number);
     }
@@ -228,14 +226,11 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T>{
      * @returns the updates state
      */
     enterStep(state: T): Observable<T> {
-
         return new Observable((observer) => {
             state.currentStep = this;
             state.valid = false;
             observer.next(state);
             observer.complete();
-
-
         });
     }
 

@@ -1,35 +1,32 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {StepComponent} from "../step.component";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { StepComponent } from "../step.component";
 
 @Component({
     selector: 'grt-sentence-input',
     templateUrl: './sentence-input.component.html',
     styleUrls: ['./sentence-input.component.scss']
 })
-export class SentenceInputComponent extends StepComponent implements OnInit {
-    @Output() onChangeValue = new EventEmitter<string>();
-
-    startingSentence = 'Dit is een voorbeeldzin.';
+export class SentenceInputComponent extends StepComponent {
+    @Output()
+    public onChangeValue = new EventEmitter<string>();
+    @Input()
+    public inputSentence: string;
 
     constructor() {
         super();
-    }
-
-    ngOnInit() {
-        //Add the moment it is always valid
-        this.onChangeValid.emit(true);
-        this.onChangeValue.emit(this.startingSentence)
     }
 
     showWarning() {
         this.warning = true;
     }
 
-    inputChanges(event){
-        this.valid = event.target.value.length != 0;
+    inputChanges(event) {
         this.onChangeValue.emit(event.target.value);
-        this.onChangeValid.emit(this.valid);
-
+        this.updateValidity(event.target.value);
     }
 
+    public updateValidity(sentence = this.inputSentence) {
+        this.valid = sentence.trim().length != 0;
+        this.onChangeValid.emit(this.valid);
+    }
 }

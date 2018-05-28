@@ -65,8 +65,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     initializeGlobalState() {
         this.xpathInputStep = new XpathInputStep(0);
-
-
         this.globalState = {
             selectedTreebanks: undefined,
             currentStep: this.xpathInputStep,
@@ -94,9 +92,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     initializeTransitions() {
         this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
-    }
-
-    ngOnInit() {
     }
 
     /**
