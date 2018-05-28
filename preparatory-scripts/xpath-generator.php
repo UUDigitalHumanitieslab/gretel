@@ -30,7 +30,7 @@ function generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order)
             foreach ($xp as $x) {
                 if ($attr == 'cs') {
                     $x->addAttribute('interesting', 'token');
-                } elseif ($attr = 'token') {
+                } elseif ($attr == 'token') {
                     $x->addAttribute('interesting', 'token');
                     $x->addAttribute('caseinsensitive', 'yes');
                 } else {
