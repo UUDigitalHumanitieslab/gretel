@@ -1,11 +1,12 @@
 <grt-body-header>XPath Search</grt-body-header>
 <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
 <div [ngSwitch]="globalState.currentStep.number">
-    <grt-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event)" [retrieveContext]="globalState.retrieveContext" [value]="globalState.xpath"
-        #xpathInput></grt-xpath-input>
+    <grt-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event)"
+        [retrieveContext]="globalState.retrieveContext" [value]="globalState.xpath" #xpathInput></grt-xpath-input>
     <grt-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanksComponentRef></grt-select-treebanks>
-    <grt-results *ngSwitchCase="2" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components" [retrieveContext]="globalState.retrieveContext"
-        [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #resultsComponentRef></grt-results>
+    <grt-results *ngSwitchCase="2" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
+        [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)" (onChangeValid)="setValid($event)"
+        #resultsComponentRef></grt-results>
     <grt-analysis *ngSwitchCase="3" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
         [xpath]="globalState.xpath" (onChangeValid)="setValid($event)"></grt-analysis>
 </div>

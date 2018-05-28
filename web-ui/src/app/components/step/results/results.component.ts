@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChange } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
@@ -23,6 +23,7 @@ import {
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
+import { ValueEvent } from 'lassy-xpath/ng';
 
 const debounceTime = 200;
 
@@ -74,11 +75,17 @@ export class ResultsComponent implements OnDestroy {
     @Input()
     public inputSentence: string = null;
 
+    @Output()
+    public xpathChange = new EventEmitter<string>();
+
     public loading: boolean = true;
 
     public treeXml?: string;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
+    public customXPath: string;
+    public validXPath: boolean = true;
+    public isModifyingXPath: boolean = false;
 
     public filters: Filter[] = [];
 
@@ -151,6 +158,28 @@ export class ResultsComponent implements OnDestroy {
 
     public print() {
         (window as any).print();
+    }
+
+    public editXPath() {
+        this.isModifyingXPath = true;
+    }
+
+    public updateXPath() {
+        if (this.validXPath) {
+            this.xpathChange.next(this.customXPath);
+            this.isModifyingXPath = false;
+        }
+    }
+
+    public resetXPath() {
+        this.isModifyingXPath = false;
+    }
+
+    public customXPathChanged(valueEvent: ValueEvent) {
+        this.validXPath = !valueEvent.error;
+        if (this.validXPath) {
+            this.customXPath = valueEvent.xpath;
+        }
     }
 
     /**

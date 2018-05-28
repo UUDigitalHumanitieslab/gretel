@@ -10,7 +10,7 @@
         #matrix></grt-matrix>
     <grt-select-treebanks *ngSwitchCase="3" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanks></grt-select-treebanks>
     <grt-results *ngSwitchCase="4" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-        [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
+        [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)"
         (onChangeValid)="setValid($event)" #results></grt-results>
     <grt-analysis *ngSwitchCase="5" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
         [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>

@@ -137,4 +137,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.matrixStep.updateMatrix(this.globalState);
         }
     }
+
+    updateXPath(xpath: string) {
+        this.globalState.xpath = xpath;
+        this.globalState.isCustomXPath = true;
+    }
 }
