@@ -9,6 +9,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/switchMap';
 
+import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
 
 import {
@@ -23,7 +24,6 @@ import {
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
-import { ValueEvent } from 'lassy-xpath/ng';
 
 const debounceTime = 200;
 

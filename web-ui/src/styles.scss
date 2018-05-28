@@ -11,6 +11,10 @@ $primary: rgba(168, 205, 40, 1);
         display: none !important;
     }
 
+    .is-print-paddingless {
+        padding: 0 !important;
+    }
+
     .ui-table .ui-table-thead,
     .ui-table .ui-table-tbody,
     .ui-table .ui-table-tfoot {

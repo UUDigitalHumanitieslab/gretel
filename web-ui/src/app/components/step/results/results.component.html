@@ -1,4 +1,4 @@
-<div class="columns">
+<div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column xpath">
         <h2 class="subtitle">
@@ -52,7 +52,7 @@
             </div>
         </h2>
         <div class="content" *ngIf="!isModifyingXPath">
-            <pre (click)="editXPath()">{{xpath}}</pre>
+            <pre (click)="editXPath()" class="is-print-paddingless">{{xpath}}</pre>
             <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
         </div>
         <lx-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
