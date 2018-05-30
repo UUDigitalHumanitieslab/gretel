@@ -17,8 +17,8 @@ import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.compo
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent {
-    xpathInputStep: XpathInputStep;
+export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
+    xpathInputStep: XpathInputStep<GlobalState>;
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -65,8 +65,6 @@ export class XpathSearchComponent extends MultiStepPageComponent {
 
     initializeGlobalState() {
         this.xpathInputStep = new XpathInputStep(0);
-
-
         this.globalState = {
             selectedTreebanks: undefined,
             currentStep: this.xpathInputStep,
@@ -77,7 +75,8 @@ export class XpathSearchComponent extends MultiStepPageComponent {
     and node[@rel="predc" and @cat="np"
     and node[@rel="det" and @pt="lid"]
     and node[@rel="hd" and @pt="n"]]]`,
-            loading: false
+            loading: false,
+            retrieveContext: false
         };
     }
 
@@ -96,17 +95,17 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
     }
 
-    ngOnInit() {
-    }
-
     /**
      * Sets
      * @param boolean
      */
     setValid(valid: boolean) {
-        this.globalState.valid = valid
+        this.globalState.valid = valid;
     }
 
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.globalState.retrieveContext = retrieveContext;
+    }
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection

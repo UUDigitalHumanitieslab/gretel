@@ -20,7 +20,6 @@ import { AppRoutingModule } from "./app-routing/app-routing.module";
 import { DocumentationComponent } from './pages/documentation/documentation.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
-import { StepComponent } from './components/step/step.component';
 import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
@@ -74,7 +73,6 @@ export const declarations: any[] = [
     FooterNavigationComponent,
     XpathSearchComponent,
     Header3Component,
-    StepComponent,
     XpathInputComponent,
     BreadcrumbBarComponent,
     SelectTreebanksComponent,

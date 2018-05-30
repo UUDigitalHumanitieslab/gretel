@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })
-export class XpathInputComponent extends StepComponent implements OnInit {
+export class XpathInputComponent extends StepComponent  {
     // TODO: might want to detect changes afterwards?
     @Input()
     public value: string = `//node[@cat="smain"
@@ -18,7 +18,14 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     and node[@rel="det" and @pt="lid"]
     and node[@rel="hd" and @pt="n"]]]`;
 
-    @Output() onChangeValue = new EventEmitter<string>();
+    @Input()
+    public retrieveContext: boolean;
+
+    @Output()
+    public onChangeValue = new EventEmitter<string>();
+
+    @Output()
+    public onChangeRetrieveContext = new EventEmitter<boolean>();
 
     constructor(private httpClient: HttpClient, macroService: MacroService) {
         super();
@@ -27,11 +34,6 @@ export class XpathInputComponent extends StepComponent implements OnInit {
     }
 
     valid: boolean = false;
-
-    ngOnInit() {
-        //Add the moment it is always valid
-        this.onChangeValid.emit(true);
-    }
 
     updateValidity() {
         this.onChangeValid.emit(this.valid);
@@ -46,5 +48,9 @@ export class XpathInputComponent extends StepComponent implements OnInit {
         this.value = event.xpath;
         this.onChangeValue.emit(this.value);
         this.onChangeValid.emit(this.valid);
+    }
+
+    emitRetrieveContextChanged() {
+        this.onChangeRetrieveContext.emit(this.retrieveContext);
     }
 }

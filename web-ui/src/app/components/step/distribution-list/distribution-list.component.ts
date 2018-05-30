@@ -39,7 +39,7 @@ export class DistributionListComponent implements OnChanges {
         let redoCounts = false;
 
         // check that we have all the mappings available
-        if (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue) {
+        if (changes.corpus && (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue)) {
             redoCounts = true;
             this.componentProperties = this.treebankService.getSubTreebanks({ title: this.corpus })
                 .then(components => {
@@ -54,13 +54,13 @@ export class DistributionListComponent implements OnChanges {
                 });
         }
 
-        if (changes.xpath.firstChange || changes.xpath.currentValue != changes.xpath.previousValue) {
+        if (changes.xpath && (changes.xpath.firstChange || changes.xpath.currentValue != changes.xpath.previousValue)) {
             redoCounts = true;
         }
 
         if (!redoCounts) {
             // check that the components have changed
-            redoCounts = changes.components.firstChange || changes.components.currentValue != changes.components.previousValue;
+            redoCounts = changes.components && (changes.components.firstChange || changes.components.currentValue != changes.components.previousValue);
         }
 
         if (redoCounts) {

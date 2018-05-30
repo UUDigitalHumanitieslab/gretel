@@ -11,3 +11,7 @@ a:hover {
 
 }
 
+.xpath {
+    // don't make a long query ruin the interface
+    overflow: auto;
+}

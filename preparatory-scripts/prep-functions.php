@@ -7,22 +7,22 @@ function xpathToBreadthFirst($xpath)
     if (preg_match("/^\/*node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
         $topcat;
-         // Find category of top node
+        // Find category of top node
         if ($topattrs && preg_match_all("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
-           // If we are dealing with more than one topcat, use ALL instead
+            // If we are dealing with more than one topcat, use ALL instead
             if (count($toppattrsArray[1]) == 1) {
                 $topcat = $toppattrsArray[1][0];
             } else {
                 $topcat = 'ALL';
             }
         } // If the top node doesn't have any attributes
-         // or if value is not specified, return ALL
+        // or if value is not specified, return ALL
         else {
             $topcat = 'ALL';
         }
 
-         $descendants = trim($descendants);
-         // Only continue if there is more than one level
+        $descendants = trim($descendants);
+        // Only continue if there is more than one level
         if ($descendants) {
             // Remove fixed-order nodes, not relevant
             $descendants = preg_replace("/(?:and )?number\(\@begin\).*?\@begin\)/", '', $descendants);
@@ -51,8 +51,8 @@ function xpathToBreadthFirst($xpath)
                     $children = preg_replace('/(and )?node$/', '', $children);
                 }
 
-               // Only decrement depth after operations to ensure closing brackets
-               // of nodes that are too deep are excluded
+                // Only decrement depth after operations to ensure closing brackets
+                // of nodes that are too deep are excluded
                 if ($char == ']') {
                     --$depth;
                 }
@@ -68,13 +68,13 @@ function xpathToBreadthFirst($xpath)
             // e.g. count(node[@pt="n"]) > 1 -> node[@pt="n"] and node[@pt="n"]
             $children = preg_replace_callback("/(count\((.*)\) *> *([1-9]+))/",
             function ($matches) {
-                   return $matches[2].str_repeat(' and '.$matches[2], $matches[3]);
+                return $matches[2].str_repeat(' and '.$matches[2], $matches[3]);
             }, $children);
 
             $dfpatterns = array();
 
-           // Loop through all remaining node[...] matches and extract rel
-           // and cat values
+            // Loop through all remaining node[...] matches and extract rel
+            // and cat values
             preg_match_all("/node\[([^\]]*)/", $children, $childrenArray);
 
             foreach ($childrenArray[0] as $childNode) {
@@ -131,7 +131,7 @@ function xpathToBreadthFirst($xpath)
 
 function cleanXpath($xpath, $trimSlash = true)
 {
-  // Clean up XPath and original XPath
+    // Clean up XPath and original XPath
     $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
 
     $xpath = strtr($xpath, $trans);
@@ -149,28 +149,28 @@ function checkBfPattern($bf, $sid)
     global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
-    echo "check??";
+    echo 'check??';
     echo $id;
     $component = $components[0];
 
-  // If bf-pattern == ALL, we're faster searching through regular version
+    // If bf-pattern == ALL, we're faster searching through regular version
     if ($bf && $bf != 'ALL') {
         $tempDatabases = array();
         // If is substring (eg. ALLnp%det)
         if (strpos($bf, 'ALL') !== false) {
             foreach ($cats as $cat) {
-                $bfcopy = $component . str_replace('ALL', $cat, $bf);
+                $bfcopy = $component.str_replace('ALL', $cat, $bf);
                 $tempDatabases[] = $bfcopy;
             }
         } else {
-            $tempDatabases[] = $component . $bf;
+            $tempDatabases[] = $component.$bf;
         }
 
         try {
             $serverInfo = getServerInfo('sonar', $component);
 
-            $dbhost = $serverInfo{'machine'};
-            $dbport = $serverInfo{'port'};
+            $dbhost = $serverInfo['machine'];
+            $dbport = $serverInfo['port'];
             $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
             foreach ($tempDatabases as $database) {
@@ -195,14 +195,15 @@ function checkBfPattern($bf, $sid)
 
 function tokenize($sentence)
 {
-  // Add space before and after punctuation marks
+    // Add space before and after punctuation marks
     $sentence = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence);
-  // Deal wth ...
+    // Deal wth ...
     $sentence = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $sentence);
-  // Delete first and last space(s)
+    // Delete first and last space(s)
     $sentence = preg_replace('/^\s*(.*?)\s*$/', '$1', $sentence);
-  // Change multiple spaces to single space
+    // Change multiple spaces to single space
     $sentence = preg_replace('/\s+/', ' ', $sentence);
+
     return $sentence;
 }
 
@@ -241,11 +242,11 @@ function applyCs($xpath)
         preg_match_all("/(?<=node\[).*?(?=node\[|\])/", $xpath, $matches);
         foreach ($matches[0] as $match) {
             if (strpos($match, '@caseinsensitive="yes"') !== false) {
-                $dummyMatch = preg_replace('/(?: and )?@caseinsensitive="yes"/', '', $match);
+                $dummyMatch = preg_replace('/(?:and @caseinsensitive="yes"|@caseinsensitive="yes" (?:and )?)/', '', $match);
                 if (strpos($dummyMatch, '@word') !== false || strpos($dummyMatch, '@lemma') !== false) {
-                  // Wrap attribute in lower-case(), and lower-case the value
+                    // Wrap attribute in lower-case(), and lower-case the value
                     $dummyMatch = preg_replace_callback('/@(word|lemma)="([^"]+)"/', function ($matches) {
-                         return 'lower-case(@'. $matches[1]. ')="'.strtolower($matches[2]).'"';
+                        return 'lower-case(@'.$matches[1].')="'.strtolower($matches[2]).'"';
                     }, $dummyMatch);
                 }
 
@@ -253,6 +254,7 @@ function applyCs($xpath)
             }
         }
     }
+
     return $xpath;
 }
 
@@ -263,5 +265,6 @@ function isSpam($string)
     if (preg_match($websiteRegex, $string) || filter_var($string, FILTER_VALIDATE_EMAIL)) {
         return true;
     }
+
     return false;
 }

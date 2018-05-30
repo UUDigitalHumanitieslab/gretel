@@ -7,21 +7,11 @@ import { AlpinoService } from '../../../services/_index';
     styleUrls: ['./parse.component.scss']
 })
 export class ParseComponent implements OnInit {
-    private sentenceValue: string;
+    @Input()
     public xml: string;
 
     @Input('sentence')
-    set sentence(value: string) {
-        this.sentenceValue = value;
-        this.xml = null;
-        this.alpinoService.parseSentence(value).toPromise().then(xml =>{
-            this.xml = xml
-            console.log(xml)
-        } );
-    }
-    get sentence() {
-        return this.sentenceValue;
-    }
+    public sentence: string;
 
     constructor(private alpinoService: AlpinoService) {
     }
