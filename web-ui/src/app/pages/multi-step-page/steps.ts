@@ -1,9 +1,9 @@
-import {Observable} from "rxjs/Observable";
-import {Subscription} from "rxjs/Subscription";
-import {of as observableOf} from 'rxjs/observable/of'
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
+import { Observable } from "rxjs/Observable";
+import { Subscription } from "rxjs/Subscription";
+import { of as observableOf } from 'rxjs/observable/of'
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 /**
@@ -31,7 +31,7 @@ interface GlobalState {
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
-    inputSentence? : string;
+    inputSentence?: string;
 }
 
 
@@ -83,11 +83,11 @@ class MatrixStep extends Step {
 
 class ParseStep extends Step {
 
-    enterStep(state: GlobalState){
+    enterStep(state: GlobalState) {
         state.currentStep = this;
         return observableOf(state);
     }
-    leaveStep(state: GlobalState){
+    leaveStep(state: GlobalState) {
         return state;
     }
 
@@ -106,6 +106,37 @@ class XpathInputStep extends Step {
     }
 }
 
+class AnalysisStep extends Step {
+    number: number;
+
+    constructor(number: number) {
+        super(number);
+    }
+
+    /**
+     * Gets the results before going the next state.
+     * @param state
+     * @returns
+     */
+    enterStep(state: GlobalState): Observable<GlobalState> {
+        return new Observable((observer) => {
+            state.currentStep = this;
+
+            observer.next(state);
+            observer.complete();
+        });
+    }
+
+    /**
+     * Makes sure the stream is ended
+     * @param state
+     * @returns {GlobalState}
+     */
+    leaveStep(state: GlobalState): GlobalState {
+        state.loading = false;
+        return state;
+    }
+}
 
 class ResultStep extends Step {
     number: number;
@@ -173,6 +204,7 @@ export {
     TreebankSelection,
     GlobalState,
     Step,
+    AnalysisStep,
     XpathInputStep,
     SelectTreebankStep,
     ResultStep,

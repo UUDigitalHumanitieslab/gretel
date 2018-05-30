@@ -39,6 +39,7 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
 
 import {
     AlpinoService,
+    AnalysisService,
     ConfigurationService,
     DownloadService,
     LinkService,
@@ -47,6 +48,7 @@ import {
     XmlParseService,
     XpathSearchService
 } from "./services/_index";
+import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
 import { FiltersModule } from "./components/filters/filters.module";
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
@@ -57,6 +59,7 @@ import { MatrixComponent } from './components/step/matrix/matrix.component';
 
 export const declarations: any[] = [
     AppComponent,
+    AnalysisComponent,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
@@ -104,6 +107,7 @@ export const imports: any[] = [
 
 export const providers: any[] = [
     AlpinoService,
+    AnalysisService,
     XpathSearchService,
     LinkService,
     ResultsService,
