@@ -152,6 +152,7 @@ class SelectTreebankStep extends Step {
      * @returns the updates state
      */
     enterStep(state: GlobalState): Observable<GlobalState> {
+        console.log(state);
 
         return new Observable((observer) => {
             state.currentStep = this;

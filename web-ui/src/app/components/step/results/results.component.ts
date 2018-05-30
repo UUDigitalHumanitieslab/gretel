@@ -46,6 +46,8 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('corpus')
     public set corpus(value: string) {
+        console.log('set corpus');
+        console.log(value);
         this.corpusSubject.next(value);
     }
     public get corpus() {
@@ -54,6 +56,8 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('components')
     public set components(value: string[]) {
+        console.log('set components');
+        console.log(value);
         this.componentsSubject.next(value);
     }
     public get components() {
@@ -62,6 +66,8 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('xpath')
     public set xpath(value: string) {
+        console.log('set xpath');
+        console.log(value);
         this.xpathSubject.next(value);
     }
     public get xpath() {
@@ -208,11 +214,14 @@ export class ResultsComponent implements OnDestroy {
      * Get the results
      */
     private liveResults() {
+        console.log('live results');
         return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
             .filter((values) => values.every(value => value !== undefined))
             .debounceTime(debounceTime)
             .distinctUntilChanged()
             .switchMap(([corpus, components, xpath, filterValues]) => {
+                console.log('ik ben binnen');
+                console.log([corpus, components, xpath, filterValues]);
                 this.loading = true;
                 this.results = [];
                 this.filteredResults = [];

@@ -8,7 +8,7 @@ import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
     templateUrl: './multi-step-page.component.html',
     styleUrls: ['./multi-step-page.component.scss']
 })
-export class MultiStepPageComponent implements AfterViewChecked, onInit{
+export class MultiStepPageComponent implements AfterViewChecked, OnInit {
 
 
     globalState: GlobalState;
@@ -18,38 +18,40 @@ export class MultiStepPageComponent implements AfterViewChecked, onInit{
     components: any[];
 
     constructor() {
+
     }
 
-    async ngOnInit(){
+    ngOnInit() {
         // Template Design Pattern
         this.initializeCrumbs();
         this.initializeGlobalState();
         this.initializeConfiguration();
         this.initializeTransitions();
+        this.globalState.currentStep.enterStep(this.globalState);
     }
 
-    initializeCrumbs(){
+    initializeCrumbs() {
         throw new Error('Not implemented');
     }
 
-    initializeComponents(){
-        throw new Error('Not implemented');
-    }
-    initializeGlobalState(){
+    initializeComponents() {
         throw new Error('Not implemented');
     }
 
-    initializeConfiguration(){
+    initializeGlobalState() {
         throw new Error('Not implemented');
     }
 
-    initializeTransitions(){
+    initializeConfiguration() {
+        throw new Error('Not implemented');
+    }
+
+    initializeTransitions() {
         throw new Error('Not implemented');
     }
 
 
-
-    ngAfterViewChecked(){
+    ngAfterViewChecked() {
         this.initializeComponents();
     }
 
@@ -63,6 +65,10 @@ export class MultiStepPageComponent implements AfterViewChecked, onInit{
 
     }
 
+    updateGlobalState(state: GlobalState) {
+        this.globalState = state;
+    }
+
 
     /**
      *  go to next step. Only can continue of the current step is valid.
@@ -70,7 +76,7 @@ export class MultiStepPageComponent implements AfterViewChecked, onInit{
     next() {
         if (this.globalState.valid) {
             this.transitions.fire('increase', this.globalState).subscribe((s) => {
-                this.globalState = s;
+                this.updateGlobalState(s)
             });
         } else {
             this.showWarning();

@@ -19,15 +19,17 @@ import {ActivatedRoute, Router} from "@angular/router";
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
  * It uses steps and transitions to determine the next state.
  */
-
 @Component({
     selector: 'grt-x-path-search',
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
 export class XpathSearchComponent extends MultiStepPageComponent {
-    xpathInputStep: XpathInputStep;
-
+    steps = [
+        new XpathInputStep(0),
+        new SelectTreebankStep(1),
+        new ResultStep(2),
+    ];
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -67,6 +69,7 @@ export class XpathSearchComponent extends MultiStepPageComponent {
 
     }
 
+
     initializeComponents() {
         this.components = [
             this.xpathInputComponent,
@@ -78,18 +81,19 @@ export class XpathSearchComponent extends MultiStepPageComponent {
 
 
     getGlobalStateFromUrl() {
-
-        return this.route.queryParams._value
+        // TO make sure there is no compile time error
+        let temp: any = this.route
+        return temp.queryParams._value
     }
 
-    queryParamsToGlobalState(queryParams: any){
+    queryParamsToGlobalState(queryParams: any) {
 
 
         let step = this.getStepFromNumber(queryParams.currentStep);
         return {
-            selectedTreebanks: queryParams.selectedTreebanks || undefined,
+            selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
             currentStep: step,
-            xpath: queryParams.xpath || 'node',
+            xpath: queryParams.xpath || '//node',
 
             valid: false,
             loading: false
@@ -97,41 +101,6 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         }
 
     }
-
-    // TODO finish function
-    getStepFromNumber(number: Number){
-        return new XpathInputStep(0)
-    }
-
-    initializeGlobalState() {
-
-
-        let globalState = this.getGlobalStateFromUrl();
-        let state = this.queryParamsToGlobalState(globalState);
-
-        // Fill in the global state
-        this.xpathInputStep = new XpathInputStep(0);
-        this.globalState = state
-
-
-
-    }
-
-    initializeConfiguration() {
-        this.configuration = {
-            steps: [
-                this.xpathInputStep,
-                new SelectTreebankStep(1),
-                new ResultStep(2),
-            ]
-
-        };
-    }
-
-    initializeTransitions() {
-        this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
-    }
-
 
     /**
      * Sets
@@ -156,6 +125,38 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         this.writeStateToUrl();
     }
 
+    getStepFromNumber(n: number) {
+        if (n) {
+            return this.steps[n]
+        } else {
+            return this.steps[0]
+        }
+
+    }
+
+    initializeGlobalState() {
+
+
+        let globalState = this.getGlobalStateFromUrl();
+        let state = this.queryParamsToGlobalState(globalState);
+        // Fill in the global state
+
+        this.globalState = state
+    }
+
+    initializeConfiguration() {
+        this.configuration = {
+            steps: this.steps
+
+        };
+    }
+
+
+    initializeTransitions() {
+        this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
+    }
+
+
     stateToString(state: GlobalState) {
         return {
             'currentStep': state.currentStep.number,
@@ -164,8 +165,13 @@ export class XpathSearchComponent extends MultiStepPageComponent {
         }
     }
 
-    writeStateToUrl() {
 
+    updateGlobalState(state: GlobalState) {
+        this.globalState = state;
+        this.writeStateToUrl();
+    }
+
+    writeStateToUrl() {
         let state = this.stateToString(this.globalState);
         this.router.navigate([], {
             relativeTo: this.route,
