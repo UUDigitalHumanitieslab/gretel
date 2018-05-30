@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChange } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
@@ -9,6 +9,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/switchMap';
 
+import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
 
 import {
@@ -46,8 +47,6 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('corpus')
     public set corpus(value: string) {
-        console.log('set corpus');
-        console.log(value);
         this.corpusSubject.next(value);
     }
     public get corpus() {
@@ -56,8 +55,6 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('components')
     public set components(value: string[]) {
-        console.log('set components');
-        console.log(value);
         this.componentsSubject.next(value);
     }
     public get components() {
@@ -66,19 +63,29 @@ export class ResultsComponent implements OnDestroy {
 
     @Input('xpath')
     public set xpath(value: string) {
-        console.log('set xpath');
-        console.log(value);
         this.xpathSubject.next(value);
     }
     public get xpath() {
         return this.xpathSubject.value;
     }
 
+    @Input()
+    public retrieveContext: boolean = false;
+
+    @Input()
+    public inputSentence: string = null;
+
+    @Output()
+    public xpathChange = new EventEmitter<string>();
+
     public loading: boolean = true;
 
     public treeXml?: string;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
+    public customXPath: string;
+    public validXPath: boolean = true;
+    public isModifyingXPath: boolean = false;
 
     public filters: Filter[] = [];
 
@@ -153,6 +160,28 @@ export class ResultsComponent implements OnDestroy {
         (window as any).print();
     }
 
+    public editXPath() {
+        this.isModifyingXPath = true;
+    }
+
+    public updateXPath() {
+        if (this.validXPath) {
+            this.xpathChange.next(this.customXPath);
+            this.isModifyingXPath = false;
+        }
+    }
+
+    public resetXPath() {
+        this.isModifyingXPath = false;
+    }
+
+    public customXPathChanged(valueEvent: ValueEvent) {
+        this.validXPath = !valueEvent.error;
+        if (this.validXPath) {
+            this.customXPath = valueEvent.xpath;
+        }
+    }
+
     /**
      * Get the counts for the metadata
      */
@@ -214,14 +243,11 @@ export class ResultsComponent implements OnDestroy {
      * Get the results
      */
     private liveResults() {
-        console.log('live results');
         return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
             .filter((values) => values.every(value => value !== undefined))
             .debounceTime(debounceTime)
             .distinctUntilChanged()
             .switchMap(([corpus, components, xpath, filterValues]) => {
-                console.log('ik ben binnen');
-                console.log([corpus, components, xpath, filterValues]);
                 this.loading = true;
                 this.results = [];
                 this.filteredResults = [];
@@ -229,7 +255,7 @@ export class ResultsComponent implements OnDestroy {
                     xpath,
                     corpus,
                     components,
-                    false,
+                    this.retrieveContext,
                     false,
                     filterValues,
                     [],

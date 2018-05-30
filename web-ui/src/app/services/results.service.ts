@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import {Observable} from "rxjs/Observable";
-import {Observer} from 'rxjs/Observer';
+import { Observable } from "rxjs/Observable";
+import { Observer } from 'rxjs/Observer';
 
-import {ConfigurationService} from './configuration.service';
-import {XmlParseService} from './xml-parse.service';
+import { ConfigurationService } from './configuration.service';
+import { XmlParseService } from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
 const routerUrl = '/gretel/api/src/router.php/';
@@ -26,14 +26,35 @@ export class ResultsService {
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
     }
 
+    promiseAllResults(xpath: string,
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables) {
+        return new Promise<Hit[]>((resolve, reject) => {
+            let hits: Hit[] = [];
+            this.getAllResults(xpath,
+                corpus,
+                components,
+                retrieveContext,
+                isAnalysis,
+                metadataFilters,
+                variables,
+                () => resolve(hits))
+                .subscribe(results => hits.push(...results.hits));
+        });
+    }
+
     getAllResults(xpath: string,
-                  corpus: string,
-                  components: string[],
-                  retrieveContext: boolean,
-                  isAnalysis = this.defaultIsAnalysis,
-                  metadataFilters = this.defaultMetadataFilters,
-                  variables = this.defaultVariables,
-                  complete: () => void = undefined) {
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables,
+        complete: () => void = undefined) {
         let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
             let iteration = 0;
             let remainingDatabases: string[] | null = null;
@@ -76,14 +97,14 @@ export class ResultsService {
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
     async results(xpath: string,
-                  corpus: string,
-                  components: string[],
-                  iteration: number = 0,
-                  retrieveContext: boolean,
-                  isAnalysis = this.defaultIsAnalysis,
-                  metadataFilters = this.defaultMetadataFilters,
-                  variables = this.defaultVariables,
-                  remainingDatabases: string[] | null = null) {
+        corpus: string,
+        components: string[],
+        iteration: number = 0,
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables,
+        remainingDatabases: string[] | null = null) {
         let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
             xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
             retrieveContext,
@@ -105,7 +126,7 @@ export class ResultsService {
         let base = this.configurationService.getBaseUrlGretel();
         let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
 
-        let treeXml = await this.http.get(url, {responseType: 'text'}).toPromise();
+        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
         return treeXml;
     }
 
@@ -295,8 +316,10 @@ type ApiSearchResult = [
     // 8 databases left to search (if this is empty, the search is done)
     string[],
     // 9 database ID of each hit
-    { [id: string]: string }
-    ];
+    { [id: string]: string },
+    // 10 XQuery
+    string
+];
 
 export interface SearchResults {
     hits: Hit[],

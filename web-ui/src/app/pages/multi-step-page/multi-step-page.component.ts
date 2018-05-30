@@ -1,19 +1,21 @@
-import {AfterViewChecked, AfterViewInit, Component, OnInit} from '@angular/core';
-import {GlobalState} from "./steps";
-import {Transitions} from "./transitions";
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
+import { GlobalState } from "./steps";
+import { Transitions } from "./transitions";
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 
 @Component({
     selector: 'grt-multi-step-page',
     templateUrl: './multi-step-page.component.html',
     styleUrls: ['./multi-step-page.component.scss']
 })
-export class MultiStepPageComponent implements AfterViewChecked, OnInit {
+
+export class MultiStepPageComponent<T extends GlobalState> implements OnInit, AfterViewChecked {
 
 
-    globalState: GlobalState;
+
+    globalState: T;
     configuration: any;
-    transitions: Transitions;
+    transitions: Transitions<T>;
     crumbs: Crumb[];
     components: any[];
 
@@ -24,10 +26,12 @@ export class MultiStepPageComponent implements AfterViewChecked, OnInit {
     ngOnInit() {
         // Template Design Pattern
         this.initializeCrumbs();
+
         this.initializeGlobalState();
         this.initializeConfiguration();
         this.initializeTransitions();
         this.globalState.currentStep.enterStep(this.globalState);
+
     }
 
     initializeCrumbs() {
@@ -37,7 +41,6 @@ export class MultiStepPageComponent implements AfterViewChecked, OnInit {
     initializeComponents() {
         throw new Error('Not implemented');
     }
-
     initializeGlobalState() {
         throw new Error('Not implemented');
     }
@@ -55,6 +58,7 @@ export class MultiStepPageComponent implements AfterViewChecked, OnInit {
         this.initializeComponents();
     }
 
+
     /**
      * Go back one step
      */
@@ -65,7 +69,7 @@ export class MultiStepPageComponent implements AfterViewChecked, OnInit {
 
     }
 
-    updateGlobalState(state: GlobalState) {
+    updateGlobalState(state: T) {
         this.globalState = state;
     }
 

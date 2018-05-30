@@ -3,3 +3,9 @@
 </h2>
 <p-message *ngIf="this.warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
 <lx-editor width="100%" [value]="value" (onChange)="inputChanged($event)" autofocus="true"></lx-editor>
+<div class="field">
+    <label class="checkbox">
+        <input type="checkbox" name="retrieveContext" [(ngModel)]="retrieveContext" (change)="emitRetrieveContextChanged()"> Include context in results
+        <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="In the results, show the sentence before and after the matching sentence to provide a broader context"></i>
+    </label>
+</div>

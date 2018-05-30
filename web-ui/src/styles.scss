@@ -1,5 +1,6 @@
 $primary: rgba(168, 205, 40, 1);
 
+@import "~pivottable/dist/pivot.css";
 @import "~bulma/bulma";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~@ng-select/ng-select/themes/default.theme.css";
@@ -8,6 +9,10 @@ $primary: rgba(168, 205, 40, 1);
     .is-hidden-print,
     .is-hidden-print * {
         display: none !important;
+    }
+
+    .is-print-paddingless {
+        padding: 0 !important;
     }
 
     .ui-table .ui-table-thead,

@@ -52,6 +52,18 @@ export function commonTestBed() {
             "public": "1"
         }]);
 
+    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/metadata/test-treebank',
+        [{
+            id: 'test_database1',
+            treebank_id: 'test_database1',
+            field: 'test_field1',
+            type: 'text',
+            facet: 'checkbox',
+            min_value: null,
+            max_value: null,
+            show: '1'
+        }]);
+
     httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/show/test-treebank', [{
         basex_db: 'test_database1',
         nr_sentences: '250',
@@ -68,6 +80,10 @@ export function commonTestBed() {
 
     httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body) => {
         return { 'TEST_DATABASE1_COMPONENT1': '42' }
+    });
+
+    httpClientMock.setData('post', '/gretel/api/src/router.php/results', (body) => {
+        return false;
     });
 
     return {

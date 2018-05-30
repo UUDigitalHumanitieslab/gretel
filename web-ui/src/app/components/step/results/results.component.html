@@ -1,6 +1,6 @@
-<div class="columns">
+<div class="columns is-desktop">
     <!-- XPATH -->
-    <div class="column">
+    <div class="column xpath">
         <h2 class="subtitle">
             <div class="level">
                 <div class="level-item level-left">
@@ -8,25 +8,54 @@
                 </div>
                 <div class="level-item level-right is-hidden-print">
                     <div class="field has-addons">
-                        <p class="control">
-                            <a class="button" title="Download query" (click)="downloadXPath()">
-                                <span class="icon is-large">
-                                    <i class="fas fa-download"></i>
-                                </span>
-                            </a>
-                        </p>
-                        <p class="control">
-                            <a class="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
-                                <span class="icon is-large">
-                                    <i class="fas fa-copy"></i>
-                                </span>
-                            </a>
-                        </p>
+                        <ng-container *ngIf="isModifyingXPath">
+                            <p class="control">
+                                <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null" title="Save query" (click)="updateXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Reset query" (click)="resetXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-undo"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </ng-container>
+                        <ng-container *ngIf="!isModifyingXPath">
+                            <p class="control">
+                                <a class="button" role="button" title="Edit query" (click)="editXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Download query" (click)="downloadXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-download"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-copy"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </ng-container>
                     </div>
                 </div>
             </div>
         </h2>
-        <pre>{{xpath}}</pre>
+        <div class="content" *ngIf="!isModifyingXPath">
+            <pre (click)="editXPath()" class="is-print-paddingless">{{xpath}}</pre>
+            <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+        </div>
+        <lx-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
@@ -41,7 +70,7 @@
         <div class="level-item level-right is-hidden-print">
             <div class="field is-grouped">
                 <p class="control">
-                    <a class="button is-primary" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
+                    <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
                         <span class="icon is-large">
                             <i class="fas fa-download"></i>
                         </span>
@@ -49,7 +78,7 @@
                     </a>
                 </p>
                 <p class="control">
-                    <a class="button" [ngClass]="{'is-loading':loading}" (click)="print()">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
                         </span>
@@ -84,7 +113,6 @@
                 <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
                     <tr>
                         <td *ngFor="let col of columns" class="ui-resizable-column">
-
                             <div [ngSwitch]="col.field">
                                 <span *ngSwitchCase="'number'">{{i + 1}}</span>
                                 <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>

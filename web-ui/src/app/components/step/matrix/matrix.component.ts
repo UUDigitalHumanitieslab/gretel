@@ -1,19 +1,58 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AlpinoService } from '../../../services/_index';
+import { StepComponent } from '../step.component';
+import { ValueEvent } from 'lassy-xpath/ng';
 
 @Component({
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent implements OnInit {
-    private sentenceValue: string;
-    public xml: string;
-    public xpath: string;
-    public tokens: string[];
-    public showAdvanced: boolean;
+export class MatrixComponent extends StepComponent implements OnInit {
+    @Input('attributes')
+    public set attributes(values: string[]) {
+        this.tokenValues = values.map(value => this.options.find(o => o.value == value));
+    }
 
-    public parts = [
+    public get attributes() {
+        return this.tokenValues.map(t => t.value);
+    }
+
+    @Input('tokens')
+    public set tokens(value: string[]) {
+        this.indexedTokens = value.map((value, index) => { return { value, index } });
+    }
+    public get tokens() {
+        return this.indexedTokens.map(t => t.value);
+    }
+
+    @Input()
+    public subTreeXml: string;
+    @Input('xml')
+    public xml: string;
+    @Input()
+    public xpath: string;
+    @Input()
+    public isCustomXPath: boolean;
+
+    @Output()
+    public onChangeValue = new EventEmitter<MatrixSettings>();
+
+    public warning: boolean;
+    public respectOrder;
+    public retrieveContext;
+    public ignoreTopNode;
+
+    public indexedTokens: { value: string, index: number }[];
+    public showAdvanced: boolean;
+    /**
+     * If an advanced option has been selected, the toggle will be disabled.
+     */
+    public alwaysAdvanced: boolean;
+
+    public tokenValues: Part[];
+
+    public options: Part[] = [
         {
             label: "Word",
             description: "The exact word form (also known as token).",
@@ -35,7 +74,7 @@ export class MatrixComponent implements OnInit {
         {
             label: "Word class",
             description: "Short Dutch part-of-speech tag. The different tags are: n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun), vg (conjunction), bw (adverb), tw (numeral), vz (preposition), tsw (interjection), spec (special token), and let (punctuation).",
-            value: "",
+            value: "pos",
             advanced: false
         },
         {
@@ -57,21 +96,71 @@ export class MatrixComponent implements OnInit {
             advanced: true
         }];
 
-    // TODO: don't reparse
-    @Input('sentence')
-    set sentence(value: string) {
-        this.sentenceValue = value;
-        this.xml = null;
-        this.tokens = this.alpinoService.tokenize(value).split(' ');
-        this.alpinoService.parseSentence(value).toPromise().then(xml => this.xml = xml);
-    }
-    get sentence() {
-        return this.sentenceValue;
-    }
-
     constructor(private alpinoService: AlpinoService) {
+        super();
     }
 
     ngOnInit() {
     }
+
+    public setTokenPart(tokenIndex: number, part: Part) {
+        if (part.advanced) {
+            this.alwaysAdvanced = true;
+        }
+        this.tokenValues[tokenIndex] = part;
+        if (!part.advanced) {
+            this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
+        }
+        this.emitChange();
+    }
+
+    public emitChange(customXPath: string = null) {
+        this.onChangeValue.next({
+            attributes: this.tokenValues.map(t => t.value),
+            retrieveContext: this.retrieveContext,
+            customXPath,
+            respectOrder: this.respectOrder,
+            tokens: [...this.tokens],
+            ignoreTopNode: this.ignoreTopNode
+        });
+        this.updateValidity();
+    }
+
+    public customXPathChanged(valueEvent: ValueEvent) {
+        this.valid = !valueEvent.error;
+        this.emitChange(valueEvent.xpath);
+    }
+
+    public editXPath() {
+        this.emitChange(this.xpath);
+    }
+
+    public resetXPath() {
+        this.valid = true;
+        this.emitChange();
+    }
+
+    public updateValidity() {
+        this.onChangeValid.emit(this.valid);
+    }
+
+    public showWarning() {
+        this.warning = true;
+    }
+}
+
+type Part = {
+    label: string,
+    description: string,
+    value: string,
+    advanced: boolean
+}
+
+export type MatrixSettings = {
+    attributes: string[],
+    customXPath: string,
+    retrieveContext: boolean,
+    respectOrder: boolean,
+    tokens: string[],
+    ignoreTopNode: boolean
 }

@@ -20,7 +20,6 @@ import { AppRoutingModule } from "./app-routing/app-routing.module";
 import { DocumentationComponent } from './pages/documentation/documentation.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
-import { StepComponent } from './components/step/step.component';
 import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
@@ -39,6 +38,7 @@ import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-
 
 import {
     AlpinoService,
+    AnalysisService,
     ConfigurationService,
     DownloadService,
     LinkService,
@@ -47,6 +47,7 @@ import {
     XmlParseService,
     XpathSearchService
 } from "./services/_index";
+import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
 import { FiltersModule } from "./components/filters/filters.module";
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
@@ -58,6 +59,7 @@ import {ActivatedRoute, Router, RouterModule} from "@angular/router";
 
 export const declarations: any[] = [
     AppComponent,
+    AnalysisComponent,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
@@ -72,7 +74,6 @@ export const declarations: any[] = [
     FooterNavigationComponent,
     XpathSearchComponent,
     Header3Component,
-    StepComponent,
     XpathInputComponent,
     BreadcrumbBarComponent,
     SelectTreebanksComponent,
@@ -106,6 +107,7 @@ export const imports: any[] = [
 
 export const providers: any[] = [
     AlpinoService,
+    AnalysisService,
     XpathSearchService,
     LinkService,
     ResultsService,
