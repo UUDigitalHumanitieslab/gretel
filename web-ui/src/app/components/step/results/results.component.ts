@@ -24,6 +24,7 @@ import {
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
+import {StepComponent} from "../step.component";
 
 const debounceTime = 200;
 
@@ -32,7 +33,7 @@ const debounceTime = 200;
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent implements OnDestroy {
+export class ResultsComponent extends StepComponent implements OnDestroy {
     private corpusSubject = new BehaviorSubject<string>(undefined);
     private componentsSubject = new BehaviorSubject<string[]>([]);
     private xpathSubject = new BehaviorSubject<string>(undefined);
@@ -44,6 +45,7 @@ export class ResultsComponent implements OnDestroy {
      * The components unchecked by the user, the sub-results of these components should be filtered out
      */
     private hiddenComponents: { [component: string]: true } = {};
+
 
     @Input('corpus')
     public set corpus(value: string) {
@@ -110,6 +112,9 @@ export class ResultsComponent implements OnDestroy {
             this.liveFilters(),
             this.liveResults()
         ];
+
+        super();
+        this.onChangeValid = new EventEmitter();
     }
 
     ngOnDestroy() {
@@ -274,6 +279,14 @@ export class ResultsComponent implements OnDestroy {
      */
     private filterHits(hits: Hit[]) {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
+    }
+
+    showWarning(){
+        throw new Error('Should never show warning');
+    }
+
+    updateValidity(){
+
     }
 }
 type TypedChanges = {

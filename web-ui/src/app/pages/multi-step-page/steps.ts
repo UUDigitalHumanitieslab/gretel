@@ -245,6 +245,10 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
         return new Observable((observer) => {
             state.currentStep = this;
             state.valid = false;
+            state.selectedTreebanks = {
+                corpus: state.selectedTreebanks ? state.selectedTreebanks.corpus : undefined,
+                subTreebanks: state.selectedTreebanks ? state.selectedTreebanks.subTreebanks : undefined
+            }
             observer.next(state);
             observer.complete();
         });

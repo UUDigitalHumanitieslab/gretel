@@ -33,6 +33,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         new AnalysisStep(3)
     ];
 
+    x: any;
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -41,7 +42,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     selectTreebankComponent;
     @ViewChild('hiddenForm')
     form;
-    @ViewChild('resultComponentRef')
+    @ViewChild('resultsComponentRef')
     resultComponent;
 
 
@@ -82,20 +83,17 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
 
     getGlobalStateFromUrl() {
-        // TO make sure there is no compile time error
-        let temp: any = this.route
+        // To make sure there is no compile time error
+        let temp: any = this.route;
         return temp.queryParams._value
     }
 
     queryParamsToGlobalState(queryParams: any) {
 
-
-        let step = this.getStepFromNumber(queryParams.currentStep);
         return {
             selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-            currentStep: step,
+            currentStep: this.getStepFromNumber(queryParams.currentStep),
             xpath: queryParams.xpath || '//node',
-
             valid: false,
             loading: false,
             retrieveContext: false
@@ -103,10 +101,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         }
 
     }
-
-
-
-
 
 
     /**
@@ -129,6 +123,17 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.writeStateToUrl();
     }
 
+    updateSelectedMainTreebank(mainTreebank: string){
+        this.globalState.selectedTreebanks.corpus = mainTreebank;
+        this.writeStateToUrl();
+    }
+
+
+    updateSelectedSubTreebanks(subTreebanks: string[]){
+        this.globalState.selectedTreebanks.components = subTreebanks;
+        this.writeStateToUrl();
+    }
+
     updateXPath(xpath: string) {
         this.globalState.xpath = xpath;
         this.writeStateToUrl();
@@ -146,8 +151,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     initializeGlobalState() {
 
 
-        let globalState = this.getGlobalStateFromUrl();
-        let state = this.queryParamsToGlobalState(globalState);
+        let queryParams = this.getGlobalStateFromUrl();
+        let state = this.queryParamsToGlobalState(queryParams);
         // Fill in the global state
 
         this.globalState = state

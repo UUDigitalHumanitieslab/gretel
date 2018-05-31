@@ -30,7 +30,9 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.initializeGlobalState();
         this.initializeConfiguration();
         this.initializeTransitions();
-        this.globalState.currentStep.enterStep(this.globalState);
+        this.globalState.currentStep.enterStep(this.globalState).subscribe( state =>{
+            this.globalState = state;
+        })
 
     }
 
@@ -64,7 +66,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
      */
     prev() {
         this.transitions.fire('decrease', this.globalState).subscribe((s) => {
-            this.globalState = s;
+            this.updateGlobalState(s)
         });
 
     }
@@ -99,7 +101,6 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
      * Show the warning of the appropriate component.
      */
     showWarning() {
-        console.log(this.components);
         this.components[this.globalState.currentStep.number].showWarning();
 
     }
