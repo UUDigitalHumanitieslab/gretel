@@ -1,7 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
-import { GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep, MatrixStep, TreebankSelection, AnalysisStep } from "../multi-step-page/steps";
+import {
+    GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
+    MatrixStep, TreebankSelection, AnalysisStep, Step
+} from "../multi-step-page/steps";
 import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
 import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 import { AlpinoService } from '../../services/_index';
@@ -14,6 +17,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalStateExampleBased> {
     sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
+    steps: any[];
 
     @ViewChild('sentenceInput')
     sentenceInputComponent;
@@ -28,8 +32,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     @ViewChild('analysis')
     analysisComponent;
 
-    constructor(private alpinoService: AlpinoService, private route: ActivatedRoute, private router: Router) {
-        super();
+    constructor(private alpinoService: AlpinoService, route: ActivatedRoute, router: Router) {
+        super(route, router);
     }
 
     initializeCrumbs() {
@@ -72,7 +76,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         ]
     }
 
-    queryParamsToGlobalState(queryParams){
+    queryParamsToGlobalState(queryParams: any){
         return {
             exampleXml: undefined,
             subTreeXml: undefined,
@@ -126,12 +130,12 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.updateGlobalState(this.globalState);
     }
 
-    stateToString(state: T){
+    stateToJson(state: GlobalStateExampleBased){
         return {
             'currentStep': state.currentStep.number,
             'xpath': state.xpath,
             'inputSentence': state.inputSentence,
-            'selectedTreebanks':  JSON.stringify(state.selectedTreebanks)
+            'selectedTreebanks':  JSON.stringify(state.selectedTreebanks),
             'isCustomXPath': state.isCustomXPath,
             'attributes': state.attributes,
             'tokens': state.tokens,

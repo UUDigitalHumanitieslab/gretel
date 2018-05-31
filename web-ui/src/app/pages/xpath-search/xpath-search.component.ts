@@ -31,7 +31,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     x: any;
-    steps: Step;
+    
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -44,8 +44,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     resultComponent;
 
 
-    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, private route: ActivatedRoute, private router: Router) {
-        super();
+    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
+        super(route, router);
     }
 
 
@@ -144,7 +144,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
 
 
-    stateToString(state: GlobalState) {
+    stateToJson(state: GlobalState) {
         return {
             'currentStep': state.currentStep.number,
             'xpath': state.xpath,

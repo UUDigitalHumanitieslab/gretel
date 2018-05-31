@@ -1,7 +1,8 @@
-import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
-import { GlobalState } from "./steps";
+import {AfterViewChecked, AfterViewInit, Component, OnInit} from '@angular/core';
+import {GlobalState, Step} from "./steps";
 import {DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions} from "./transitions";
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
     selector: 'grt-multi-step-page',
@@ -12,14 +13,15 @@ import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component"
 export class MultiStepPageComponent<T extends GlobalState> implements OnInit, AfterViewChecked {
 
 
-
     globalState: T;
     configuration: any;
     transitions: Transitions<T>;
     crumbs: Crumb[];
     components: any[];
 
-    constructor() {
+    steps: any[];
+
+    constructor(private route: ActivatedRoute, private router: Router) {
 
     }
 
@@ -31,7 +33,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.initializeGlobalState();
 
         this.initializeTransitions();
-        this.globalState.currentStep.enterStep(this.globalState).subscribe( state =>{
+        this.globalState.currentStep.enterStep(this.globalState).subscribe(state => {
             this.globalState = state;
         })
 
@@ -41,7 +43,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         throw new Error('Not implemented');
     }
 
-    initializeSteps(){
+    initializeSteps() {
         throw new Error('not implemented')
     }
 
@@ -50,14 +52,13 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     }
 
 
-    getGlobalStateFromUrl(){
+    getGlobalStateFromUrl(): T {
         let queryParams = this.getQueryParams();
         return this.queryParamsToGlobalState(queryParams);
     }
 
 
     initializeGlobalState() {
-
         this.globalState = this.getGlobalStateFromUrl();
     }
 
@@ -66,17 +67,14 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     }
 
     initializeTransitions() {
-        let transitions: Transition[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
+        let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
         console.log(this.crumbs);
-        for(const crumb of this.crumbs){
-            console.log(crumb);
-            console.log(this.steps);
+        for (const crumb of this.crumbs) {
             transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
         }
 
         this.transitions = new Transitions(transitions);
     }
-
 
 
     ngAfterViewChecked() {
@@ -136,7 +134,6 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     }
 
 
-
     getStepFromNumber(n: number) {
         if (n) {
             return this.steps[n]
@@ -147,7 +144,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     }
 
     writeStateToUrl() {
-        let state = this.stateToString(this.globalState);
+        let state = this.stateToJson(this.globalState);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: state,
@@ -155,19 +152,27 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         })
     }
 
-    goToStep(stepNumber: number){
+    goToStep(stepNumber: number) {
         this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
     }
 
-    updateSelectedMainTreebank(mainTreebank: string){
+    updateSelectedMainTreebank(mainTreebank: string) {
         this.globalState.selectedTreebanks.corpus = mainTreebank;
         this.writeStateToUrl();
     }
 
 
-    updateSelectedSubTreebanks(subTreebanks: string[]){
+    updateSelectedSubTreebanks(subTreebanks: string[]) {
         this.globalState.selectedTreebanks.components = subTreebanks;
         this.writeStateToUrl();
+    }
+
+    queryParamsToGlobalState(queryParams: any): T {
+        throw Error('Not Implemented');
+    }
+
+    stateToJson(state: T): any{
+        throw Error('Not Implemented');
     }
 
 
