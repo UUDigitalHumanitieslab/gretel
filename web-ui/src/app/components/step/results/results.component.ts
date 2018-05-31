@@ -106,6 +106,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
         private treebankService: TreebankService) {
+        super();
         this.subscriptions = [
             this.liveMetadataCounts(),
             this.liveMetadataProperties(),
@@ -113,7 +114,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
             this.liveResults()
         ];
 
-        super();
         this.onChangeValid = new EventEmitter();
     }
 

@@ -1,5 +1,5 @@
 <grt-body-header>XPath Search</grt-body-header>
-<grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
+<grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number" (crumbClick)="goToStep($event)"></grt-breadcrumb-bar>
 <div [ngSwitch]="globalState.currentStep.number">
     <grt-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event)"
         [retrieveContext]="globalState.retrieveContext" [value]="globalState.xpath" #xpathInput></grt-xpath-input>

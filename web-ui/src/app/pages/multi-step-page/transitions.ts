@@ -24,8 +24,7 @@ interface Transition<T extends GlobalState> {
  * Class that keeps track of all the transitions
  */
 class Transitions<T extends GlobalState> {
-    constructor(private transitions: Transition<T>[]) {
-    }
+    constructor(private transitions: Transition<T>[]) {}
 
     /**
      * Fires a transition and creates the new state
@@ -41,7 +40,7 @@ class Transitions<T extends GlobalState> {
             state = state.currentStep.leaveStep(state);
             return step.enterStep(state)
         } else {
-            throw Error('Could not find transition with name')
+            throw Error(`Could not find transition with name: ${name}`)
         }
     }
 }
@@ -76,9 +75,27 @@ class IncreaseTransition<T extends GlobalState> implements Transition<T> {
 }
 
 
+class JumpToStepTransition<T extends GlobalState> implements Transition<T>{
+    name = 'jumpTo';
+    constructor(private step: Step<T>){
+        this.name = `jumpTo_${this.step.number}`
+    }
+
+    fire(state: T){
+        if(state.currentStep.number > this.step.number){
+            return this.step
+        } else {
+            return state.currentStep
+        }
+    }
+
+}
+
+
 export {
     Transition,
     Transitions,
     IncreaseTransition,
-    DecreaseTransition
+    DecreaseTransition,
+    JumpToStepTransition,
 }

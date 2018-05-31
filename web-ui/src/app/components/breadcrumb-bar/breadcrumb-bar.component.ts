@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 
 export interface Crumb{
@@ -19,7 +19,10 @@ export class BreadcrumbBarComponent implements OnInit {
   @Input() crumbs: Crumb[]= [];
   @Input() currentCrumb: number;
 
+  @Output() crumbClick = new EventEmitter<number>();
+
   ngOnInit() {
   }
+
 
 }

@@ -9,7 +9,10 @@ import {
     SelectTreebankStep,
     TreebankSelection, AnalysisStep
 } from "../multi-step-page/steps";
-import {Transition, Transitions, IncreaseTransition, DecreaseTransition} from '../multi-step-page/transitions'
+import {
+    Transition, Transitions, IncreaseTransition, DecreaseTransition,
+    JumpToStepTransition
+} from '../multi-step-page/transitions'
 import {TreebankService} from "../../services/treebank.service";
 import {ResultsService} from "../../services/results.service";
 import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.component";
@@ -167,7 +170,12 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
 
     initializeTransitions() {
-        this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
+        let transitions: Transition[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
+        for(const crumb of this.crumbs){
+            transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
+        }
+
+        this.transitions = new Transitions(transitions);
     }
 
 
@@ -193,4 +201,9 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
             skipLocationChange: false
         })
     }
+
+    goToStep(stepNumber: number){
+       this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
+    }
+
 }

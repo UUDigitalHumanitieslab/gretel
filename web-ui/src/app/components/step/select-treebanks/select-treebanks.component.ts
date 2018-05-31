@@ -17,7 +17,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     items: Treebank[];
     info: { [title: string]: info[] } = {};
     warning: boolean = false;
-
+    treebank: string;
+    loading: boolean = false;
 
     @Output() onUpdateSelected = new EventEmitter<any>();
 
@@ -35,7 +36,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         //
         this.treebank = treebank;
         if(treebank){
-            this.getSubTreebanks({title: treebank});
+            this.getSubTreebanks({title: treebank, id: -1});
         }
 
     }
