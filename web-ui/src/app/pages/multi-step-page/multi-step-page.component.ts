@@ -1,6 +1,6 @@
 import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
 import { GlobalState } from "./steps";
-import { Transitions } from "./transitions";
+import {DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions} from "./transitions";
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 
 @Component({
@@ -43,8 +43,12 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     initializeComponents() {
         throw new Error('Not implemented');
     }
+
+
     initializeGlobalState() {
-        throw new Error('Not implemented');
+        let queryParams = this.getGlobalStateFromUrl();
+        let state = this.queryParamsToGlobalState(queryParams);
+        this.globalState = state
     }
 
     initializeConfiguration() {
@@ -52,8 +56,14 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     }
 
     initializeTransitions() {
-        throw new Error('Not implemented');
+        let transitions: Transition[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
+        for(const crumb of this.crumbs){
+            transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
+        }
+
+        this.transitions = new Transitions(transitions);
     }
+
 
 
     ngAfterViewChecked() {
@@ -104,6 +114,37 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.components[this.globalState.currentStep.number].showWarning();
 
     }
+
+    getGlobalStateFromUrl() {
+        // To make sure there is no compile time error
+        let temp: any = this.route;
+        return temp.queryParams._value
+    }
+
+
+
+    getStepFromNumber(n: number) {
+        if (n) {
+            return this.steps[n]
+        } else {
+            return this.steps[0]
+        }
+
+    }
+
+    writeStateToUrl() {
+        let state = this.stateToString(this.globalState);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: state,
+            skipLocationChange: false
+        })
+    }
+
+    goToStep(stepNumber: number){
+        this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
+    }
+
 
 
 }

@@ -85,11 +85,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     }
 
 
-    getGlobalStateFromUrl() {
-        // To make sure there is no compile time error
-        let temp: any = this.route;
-        return temp.queryParams._value
-    }
 
     queryParamsToGlobalState(queryParams: any) {
 
@@ -142,24 +137,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.writeStateToUrl();
     }
 
-    getStepFromNumber(n: number) {
-        if (n) {
-            return this.steps[n]
-        } else {
-            return this.steps[0]
-        }
-
-    }
-
-    initializeGlobalState() {
-
-
-        let queryParams = this.getGlobalStateFromUrl();
-        let state = this.queryParamsToGlobalState(queryParams);
-        // Fill in the global state
-
-        this.globalState = state
-    }
 
     initializeConfiguration() {
         this.configuration = {
@@ -169,14 +146,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     }
 
 
-    initializeTransitions() {
-        let transitions: Transition[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
-        for(const crumb of this.crumbs){
-            transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
-        }
-
-        this.transitions = new Transitions(transitions);
-    }
 
 
     stateToString(state: GlobalState) {
@@ -193,17 +162,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.writeStateToUrl();
     }
 
-    writeStateToUrl() {
-        let state = this.stateToString(this.globalState);
-        this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: state,
-            skipLocationChange: false
-        })
-    }
 
-    goToStep(stepNumber: number){
-       this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
-    }
 
 }

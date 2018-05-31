@@ -94,21 +94,19 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     }
 
     initializeConfiguration() {
+        this.steps = [
+            this.sentenceInputStep,
+            new ParseStep(1, this.alpinoService),
+            this.matrixStep,
+            new SelectTreebankStep(3),
+            new ResultStep(4),
+            new AnalysisStep(5)
+        ];
         this.configuration = {
-            steps: [
-                this.sentenceInputStep,
-                new ParseStep(1, this.alpinoService),
-                this.matrixStep,
-                new SelectTreebankStep(3),
-                new ResultStep(4),
-                new AnalysisStep(5)
-            ]
+            steps: this.steps
         };
     }
 
-    initializeTransitions() {
-        this.transitions = new Transitions([new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)]);
-    }
 
     /**
      * Updates the selected treebanks with the given selection
