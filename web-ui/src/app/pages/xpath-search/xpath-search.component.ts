@@ -29,14 +29,9 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
-    steps = [
-        new XpathInputStep(0),
-        new SelectTreebankStep(1),
-        new ResultStep(2),
-        new AnalysisStep(3)
-    ];
 
     x: any;
+    steps: Step;
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -73,6 +68,16 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
                 number: 3,
             },
         ];
+    }
+
+    initializeSteps(){
+        this.steps = [
+            new XpathInputStep(0),
+            new SelectTreebankStep(1),
+            new ResultStep(2),
+            new AnalysisStep(3)
+        ];
+
     }
 
 
@@ -121,16 +126,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.writeStateToUrl();
     }
 
-    updateSelectedMainTreebank(mainTreebank: string){
-        this.globalState.selectedTreebanks.corpus = mainTreebank;
-        this.writeStateToUrl();
-    }
 
-
-    updateSelectedSubTreebanks(subTreebanks: string[]){
-        this.globalState.selectedTreebanks.components = subTreebanks;
-        this.writeStateToUrl();
-    }
 
     updateXPath(xpath: string) {
         this.globalState.xpath = xpath;
@@ -157,10 +153,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     }
 
 
-    updateGlobalState(state: GlobalState) {
-        this.globalState = state;
-        this.writeStateToUrl();
-    }
+
 
 
 

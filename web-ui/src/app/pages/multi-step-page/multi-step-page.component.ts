@@ -26,9 +26,10 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
     ngOnInit() {
         // Template Design Pattern
         this.initializeCrumbs();
-
-        this.initializeGlobalState();
+        this.initializeSteps();
         this.initializeConfiguration();
+        this.initializeGlobalState();
+
         this.initializeTransitions();
         this.globalState.currentStep.enterStep(this.globalState).subscribe( state =>{
             this.globalState = state;
@@ -40,15 +41,24 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         throw new Error('Not implemented');
     }
 
+    initializeSteps(){
+        throw new Error('not implemented')
+    }
+
     initializeComponents() {
         throw new Error('Not implemented');
     }
 
 
+    getGlobalStateFromUrl(){
+        let queryParams = this.getQueryParams();
+        return this.queryParamsToGlobalState(queryParams);
+    }
+
+
     initializeGlobalState() {
-        let queryParams = this.getGlobalStateFromUrl();
-        let state = this.queryParamsToGlobalState(queryParams);
-        this.globalState = state
+
+        this.globalState = this.getGlobalStateFromUrl();
     }
 
     initializeConfiguration() {
@@ -57,7 +67,10 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
 
     initializeTransitions() {
         let transitions: Transition[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
+        console.log(this.crumbs);
         for(const crumb of this.crumbs){
+            console.log(crumb);
+            console.log(this.steps);
             transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
         }
 
@@ -83,6 +96,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
 
     updateGlobalState(state: T) {
         this.globalState = state;
+        this.writeStateToUrl();
     }
 
 
@@ -115,7 +129,7 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
 
     }
 
-    getGlobalStateFromUrl() {
+    getQueryParams() {
         // To make sure there is no compile time error
         let temp: any = this.route;
         return temp.queryParams._value
@@ -145,6 +159,16 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
     }
 
+    updateSelectedMainTreebank(mainTreebank: string){
+        this.globalState.selectedTreebanks.corpus = mainTreebank;
+        this.writeStateToUrl();
+    }
+
+
+    updateSelectedSubTreebanks(subTreebanks: string[]){
+        this.globalState.selectedTreebanks.components = subTreebanks;
+        this.writeStateToUrl();
+    }
 
 
 }

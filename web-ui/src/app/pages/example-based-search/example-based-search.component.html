@@ -8,7 +8,8 @@
     <grt-matrix *ngSwitchCase="2" (onChangeValid)="setValid($event)" (onChangeValue)="updateMatrix($event)" [attributes]="globalState.attributes"
         [isCustomXPath]="globalState.isCustomXPath" [tokens]="globalState.tokens" [xpath]="globalState.xpath" [subTreeXml]="globalState.subTreeXml"
         #matrix></grt-matrix>
-    <grt-select-treebanks *ngSwitchCase="3" (onChangeValid)="setValid($event)" (onUpdateSelected)="updateSelected($event)" #selectTreebanks></grt-select-treebanks>
+    <grt-select-treebanks *ngSwitchCase="3" (onChangeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus" [subTreebanks]="globalState.selectedTreebanks.components"
+                          (mainTreebankChange)="updateSelectedMainTreebank($event)" (subTreebanksChange)="updateSelectedSubTreebanks($event)" #selectTreebanks></grt-select-treebanks>
     <grt-results *ngSwitchCase="4" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
         [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)"
         (onChangeValid)="setValid($event)" #results></grt-results>
