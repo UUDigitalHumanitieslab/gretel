@@ -38,9 +38,6 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.initializeGlobalState();
         this.initializeTransitions();
 
-        // make sure at least step 0 is entered
-        this.globalState = await this.steps[0].enterStep(this.globalState);
-
         this.subscriptions.push(
             this.route.queryParams.subscribe(params => {
                 let decoded = this.decodeGlobalState(params);

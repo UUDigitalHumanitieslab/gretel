@@ -79,15 +79,21 @@ class JumpToStepTransition<T extends GlobalState> implements Transition<T>{
     }
 
     async fire(state: T) {
+        // don't modify the original state
+        // (otherwise the interface might display the intermediate components)
+        state = Object.assign({}, state);
+
+        if (!state.currentStep) {
+            // no step yet, start at the first one
+            state = await this.steps[0].enterStep(state);
+        }
+
         if (state.currentStep.number > this.number) {
             // jumping backwards is always fine
             state.currentStep.leaveStep(state);
             return this.steps[this.number].enterStep(state);
         }
 
-        // don't modify the original state
-        // (otherwise the interface might display the intermediate components)
-        state = Object.assign({}, state);
         while (state.currentStep.number < this.number && state.valid) {
             state.currentStep.leaveStep(state);
             state = await this.steps[state.currentStep.number + 1].enterStep(state);
