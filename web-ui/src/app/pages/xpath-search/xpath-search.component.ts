@@ -1,22 +1,23 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute, Router } from "@angular/router";
+
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { TreebankService } from "../../services/treebank.service";
+import { ResultsService } from "../../services/results.service";
+import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 import {
+    AnalysisStep,
     GlobalState,
     Step,
     XpathInputStep,
     ResultStep,
     SelectTreebankStep,
-    TreebankSelection, AnalysisStep
+    TreebankSelection,
 } from "../multi-step-page/steps";
 import {
-    Transition, Transitions, IncreaseTransition, DecreaseTransition,
-    JumpToStepTransition
+    Transition, Transitions, IncreaseTransition, DecreaseTransition, JumpToStepTransition
 } from '../multi-step-page/transitions'
-import {TreebankService} from "../../services/treebank.service";
-import {ResultsService} from "../../services/results.service";
-import {MultiStepPageComponent} from "../multi-step-page/multi-step-page.component";
-import {ActivatedRoute, Router} from "@angular/router";
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -29,11 +30,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
-
-    x: any;
-
-
-    //All the components. used to call functions on.
+    // All the components. used to call functions on.
     @ViewChild('xpathInput')
     xpathInputComponent;
     @ViewChild('selectTreebanksComponentRef')
@@ -43,11 +40,9 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     @ViewChild('resultsComponentRef')
     resultComponent;
 
-
     constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
         super(route, router);
     }
-
 
     initializeCrumbs() {
         this.crumbs = [
@@ -70,29 +65,24 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         ];
     }
 
-    initializeSteps(){
+    initializeSteps() {
         this.steps = [
             new XpathInputStep(0),
             new SelectTreebankStep(1),
             new ResultStep(2),
             new AnalysisStep(3)
         ];
-
     }
-
 
     initializeComponents() {
         this.components = [
             this.xpathInputComponent,
             this.selectTreebankComponent,
             this.resultComponent
-        ]
+        ];
     }
 
-
-
     queryParamsToGlobalState(queryParams: any) {
-
         return {
             selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
             currentStep: this.getStepFromNumber(queryParams.currentStep),
@@ -100,11 +90,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
             valid: false,
             loading: false,
             retrieveContext: false
-
         }
-
     }
-
 
     /**
      * Sets
@@ -117,6 +104,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     updateRetrieveContext(retrieveContext: boolean) {
         this.globalState.retrieveContext = retrieveContext;
     }
+
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection
@@ -126,23 +114,16 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.writeStateToUrl();
     }
 
-
-
     updateXPath(xpath: string) {
         this.globalState.xpath = xpath;
         this.writeStateToUrl();
     }
 
-
     initializeConfiguration() {
         this.configuration = {
             steps: this.steps
-
         };
     }
-
-
-
 
     stateToJson(state: GlobalState) {
         return {

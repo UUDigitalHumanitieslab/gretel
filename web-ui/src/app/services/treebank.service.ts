@@ -14,7 +14,7 @@ export class TreebankService {
             treebank_id: string,
             field: string,
             type: 'text' | 'int' | 'date',
-            facet: 'checkbox' | 'slider' |'date_range',
+            facet: 'checkbox' | 'slider' | 'date_range',
             min_value: string | null,
             max_value: string | null,
             show: '1' | '0'
@@ -86,6 +86,4 @@ export class TreebankService {
             }
         });
     }
-
-
 }
