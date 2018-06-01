@@ -63,10 +63,7 @@ interface GlobalStateExampleBased extends GlobalState {
  * A step has a number and a function that performs the necessary actions when entering a step
  */
 class Step<T> {
-
-
     constructor(public number: number) {
-
     }
 
     // Makes sure the step is entered correctly

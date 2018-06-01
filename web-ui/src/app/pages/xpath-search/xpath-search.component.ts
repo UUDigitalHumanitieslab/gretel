@@ -31,7 +31,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     x: any;
-    
+
 
     //All the components. used to call functions on.
     @ViewChild('xpathInput')
@@ -151,10 +151,4 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
             'selectedTreebanks': JSON.stringify(state.selectedTreebanks)
         }
     }
-
-
-
-
-
-
 }

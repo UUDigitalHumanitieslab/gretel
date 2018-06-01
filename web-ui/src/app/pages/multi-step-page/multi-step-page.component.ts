@@ -1,28 +1,20 @@
-import {AfterViewChecked, AfterViewInit, Component, OnInit} from '@angular/core';
-import {GlobalState, Step} from "./steps";
-import {DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions} from "./transitions";
-import {Crumb} from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import {ActivatedRoute, Router} from "@angular/router";
+import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from "@angular/router";
+import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { GlobalState, Step } from "./steps";
+import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from "./transitions";
 
-@Component({
-    selector: 'grt-multi-step-page',
-    templateUrl: './multi-step-page.component.html',
-    styleUrls: ['./multi-step-page.component.scss']
-})
+export abstract class MultiStepPageComponent<T extends GlobalState> implements OnInit, AfterViewChecked {
+    public crumbs: Crumb[];
+    public globalState: T;
 
-export class MultiStepPageComponent<T extends GlobalState> implements OnInit, AfterViewChecked {
+    protected configuration: { steps: Step<T>[] };
+    protected components: any[];
+    protected steps: Step<T>[];
 
-
-    globalState: T;
-    configuration: any;
-    transitions: Transitions<T>;
-    crumbs: Crumb[];
-    components: any[];
-
-    steps: any[];
+    private transitions: Transitions<T>;
 
     constructor(private route: ActivatedRoute, private router: Router) {
-
     }
 
     ngOnInit() {
@@ -35,40 +27,28 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.initializeTransitions();
         this.globalState.currentStep.enterStep(this.globalState).subscribe(state => {
             this.globalState = state;
-        })
-
+        });
     }
 
-    initializeCrumbs() {
-        throw new Error('Not implemented');
-    }
+    abstract initializeConfiguration();
+    abstract initializeCrumbs();
+    abstract initializeSteps();
+    abstract initializeComponents();
 
-    initializeSteps() {
-        throw new Error('not implemented')
-    }
-
-    initializeComponents() {
-        throw new Error('Not implemented');
-    }
-
+    abstract queryParamsToGlobalState(queryParams: any): T;
+    abstract stateToJson(state: T): {};
 
     getGlobalStateFromUrl(): T {
         let queryParams = this.getQueryParams();
         return this.queryParamsToGlobalState(queryParams);
     }
 
-
     initializeGlobalState() {
         this.globalState = this.getGlobalStateFromUrl();
     }
 
-    initializeConfiguration() {
-        throw new Error('Not implemented');
-    }
-
     initializeTransitions() {
         let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
-        console.log(this.crumbs);
         for (const crumb of this.crumbs) {
             transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
         }
@@ -76,11 +56,9 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.transitions = new Transitions(transitions);
     }
 
-
     ngAfterViewChecked() {
         this.initializeComponents();
     }
-
 
     /**
      * Go back one step
@@ -89,14 +67,12 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.transitions.fire('decrease', this.globalState).subscribe((s) => {
             this.updateGlobalState(s)
         });
-
     }
 
     updateGlobalState(state: T) {
         this.globalState = state;
         this.writeStateToUrl();
     }
-
 
     /**
      *  go to next step. Only can continue of the current step is valid.
@@ -124,7 +100,6 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
      */
     showWarning() {
         this.components[this.globalState.currentStep.number].showWarning();
-
     }
 
     getQueryParams() {
@@ -140,7 +115,6 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         } else {
             return this.steps[0]
         }
-
     }
 
     writeStateToUrl() {
@@ -161,19 +135,8 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
         this.writeStateToUrl();
     }
 
-
     updateSelectedSubTreebanks(subTreebanks: string[]) {
         this.globalState.selectedTreebanks.components = subTreebanks;
         this.writeStateToUrl();
     }
-
-    queryParamsToGlobalState(queryParams: any): T {
-        throw Error('Not Implemented');
-    }
-
-    stateToJson(state: T): any{
-        throw Error('Not Implemented');
-    }
-
-
 }

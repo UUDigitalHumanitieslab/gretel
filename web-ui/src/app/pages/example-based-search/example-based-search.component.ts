@@ -3,12 +3,12 @@ import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component"
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
     GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
-    MatrixStep, TreebankSelection, AnalysisStep, Step
+    MatrixStep, TreebankSelection, AnalysisStep, Step, GlobalState
 } from "../multi-step-page/steps";
 import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
 import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 import { AlpinoService } from '../../services/_index';
-import {ActivatedRoute, Router} from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 @Component({
     selector: 'grt-example-based-search',
     templateUrl: './example-based-search.component.html',
@@ -17,7 +17,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalStateExampleBased> {
     sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
-    steps: any[];
+    steps: Step<GlobalStateExampleBased>[];
 
     @ViewChild('sentenceInput')
     sentenceInputComponent;
@@ -76,11 +76,11 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         ]
     }
 
-    queryParamsToGlobalState(queryParams: any){
+    queryParamsToGlobalState(queryParams: any) {
         return {
             exampleXml: undefined,
             subTreeXml: undefined,
-            selectedTreebanks:  queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+            selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
             currentStep: this.getStepFromNumber(queryParams.currentStep),
             valid: true,
             xpath: queryParams.xpath || '',
@@ -95,7 +95,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         };
     }
 
-    initializeSteps(){
+    initializeSteps() {
         this.matrixStep = new MatrixStep(2, this.alpinoService);
         this.sentenceInputStep = new SentenceInputStep(0);
         this.steps = [
@@ -109,12 +109,10 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     }
 
     initializeConfiguration() {
-
         this.configuration = {
             steps: this.steps
         };
     }
-
 
     /**
      * Updates the selected treebanks with the given selection
@@ -130,12 +128,12 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.updateGlobalState(this.globalState);
     }
 
-    stateToJson(state: GlobalStateExampleBased){
+    stateToJson(state: GlobalStateExampleBased) {
         return {
             'currentStep': state.currentStep.number,
             'xpath': state.xpath,
             'inputSentence': state.inputSentence,
-            'selectedTreebanks':  JSON.stringify(state.selectedTreebanks),
+            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
             'isCustomXPath': state.isCustomXPath,
             'attributes': state.attributes,
             'tokens': state.tokens,
@@ -158,7 +156,6 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.globalState.attributes = matrixSettings.attributes;
             this.matrixStep.updateMatrix(this.globalState);
         }
-
     }
 
     updateXPath(xpath: string) {

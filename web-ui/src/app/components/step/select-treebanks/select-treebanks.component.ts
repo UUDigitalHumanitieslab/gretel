@@ -13,32 +13,28 @@ interface info extends TreebankInfo {
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
-
     items: Treebank[];
     info: { [title: string]: info[] } = {};
     warning: boolean = false;
     treebank: string;
     loading: boolean = false;
 
-    @Output() onUpdateSelected = new EventEmitter<any>();
-
-    @Output() mainTreebankChange = new EventEmitter<string>();
     @Input() subTreebanks: string[];
+
+    @Output() onUpdateSelected = new EventEmitter<any>();
+    @Output() mainTreebankChange = new EventEmitter<string>();
     @Output() subTreebanksChange = new EventEmitter<string[]>();
 
     /**
-     *  gets the subtreebansk whenever the mainTreebank is set
+     * Gets the sub-treebanks whenever the main treebank is set
      * @param treebank
      */
     @Input()
     set mainTreebank(treebank: string) {
-
-        //
         this.treebank = treebank;
         if (treebank) {
             this.getSubTreebanks({ title: treebank, id: -1 });
         }
-
     }
 
     constructor(private treebankService: TreebankService) {
@@ -47,7 +43,6 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     }
 
     valid: boolean;
-
 
     columns: TableColumn<TreebankInfo>[] = [
         {
@@ -84,7 +79,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         let results = [];
         this.loading = true;
         this.treebankService.getSubTreebanks(treebank).then((info) => {
-            //To keep track if we selected the given subpart of the treebank.
+            // To keep track whether we selected the given sub-part of the treebank.
             this.info[treebank.title] = info.map(x => Object.assign(x, { selected: true }) as info);
             this.info[treebank.title].forEach(entry => entry.selected = true);
             this.updateSelected();
