@@ -12,6 +12,7 @@ import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transitio
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
     public crumbs: Crumb[];
     public globalState: T;
+    public warning: string | false;
 
     protected abstract defaultGlobalState: T;
 
@@ -29,7 +30,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.subscriptions.forEach(s => s.unsubscribe());
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         // Template Design Pattern
         this.initializeCrumbs();
         this.initializeSteps();
@@ -37,12 +38,14 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.initializeGlobalState();
         this.initializeTransitions();
 
+        // make sure at least step 0 is entered
+        this.globalState = await this.steps[0].enterStep(this.globalState);
+
         this.subscriptions.push(
             this.route.queryParams.subscribe(params => {
                 let decoded = this.decodeGlobalState(params);
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
-                this.globalState.currentStep = this.steps[decoded.step];
-                this.goToStep(decoded.step);
+                this.goToStep(decoded.step, false);
             }));
     }
 
@@ -73,7 +76,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     initializeTransitions() {
         let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
         for (const crumb of this.crumbs) {
-            transitions.push(new JumpToStepTransition(this.steps[crumb.number]));
+            transitions.push(new JumpToStepTransition(this.steps, crumb.number));
         }
 
         this.transitions = new Transitions(transitions);
@@ -86,27 +89,28 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     /**
      * Go back one step
      */
-    prev() {
-        this.transitions.fire('decrease', this.globalState).subscribe((s) => {
-            this.updateGlobalState(s)
-        });
+    async prev() {
+        let state = await this.transitions.fire('decrease', this.globalState);
+        this.updateGlobalState(state);
     }
 
-    updateGlobalState(state: T) {
+    updateGlobalState(state: T, updateUrl = true) {
         this.globalState = state;
-        this.updateUrl();
+        if (updateUrl) {
+            this.updateUrl();
+        }
     }
 
     /**
      * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
-    next() {
+    async next() {
         if (this.globalState.valid) {
-            this.transitions.fire('increase', this.globalState).subscribe((s) => {
-                this.updateGlobalState(s)
-            });
+            let state = await this.transitions.fire('increase', this.globalState);
+            this.updateGlobalState(state);
+            this.warning = false;
         } else {
-            this.showWarning();
+            this.showWarning(this.globalState);
         }
     }
 
@@ -121,8 +125,13 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     /**
      * Show the warning of the appropriate component.
      */
-    showWarning() {
-        this.components[this.globalState.currentStep.number].showWarning();
+    showWarning(state: T) {
+        let component = this.components[state.currentStep.number];
+        if (component && component.getValidationMessage) {
+            this.warning = component.getValidationMessage();
+        } else {
+            this.warning = 'Please check your input and retry.';
+        }
     }
 
     getStepFromNumber(n: number) {
@@ -140,11 +149,18 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             queryParams: state,
             skipLocationChange: false,
             replaceUrl: writeState ? false : true
-        })
+        });
     }
 
-    goToStep(stepNumber: number) {
-        this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState).subscribe(state => this.globalState = state);
+    async goToStep(stepNumber: number, updateUrl = true) {
+        let state = await this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState);
+        if (!state.valid && state.currentStep.number != stepNumber) {
+            this.showWarning(state);
+        } else {
+            this.warning = false;
+        }
+
+        this.updateGlobalState(state, state.currentStep.number == stepNumber && updateUrl);
     }
 
     updateSelectedMainTreebank(mainTreebank: string) {

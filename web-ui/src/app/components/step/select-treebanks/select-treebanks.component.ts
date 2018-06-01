@@ -15,7 +15,6 @@ interface Info extends TreebankInfo {
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
     items: Treebank[];
     info: { [title: string]: Info[] } = {};
-    warning: boolean = false;
     treebank: string;
     loading: boolean = false;
 
@@ -104,11 +103,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         this.onChangeValid.emit(this.valid);
     }
 
-    /**
-     * Shows a warning.
-     * This warning should give info why the options that the user selected is not valid.
-     */
-    showWarning() {
-        this.warning = true;
+    getValidationMessage() {
+        return 'Please select a treebank and the components.';
     }
 }

@@ -24,7 +24,7 @@ import {
 import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
-import {StepComponent} from "../step.component";
+import { StepComponent } from "../step.component";
 
 const debounceTime = 200;
 
@@ -281,12 +281,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 
-    showWarning(){
-        throw new Error('Should never show warning');
+    getValidationMessage() {
+        // Should never show warning
     }
 
-    updateValidity(){
-
+    updateValidity() {
     }
 }
 type TypedChanges = {

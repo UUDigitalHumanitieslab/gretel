@@ -17,6 +17,7 @@
         [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
 </div>
 <br />
+<div *ngIf="warning" class="notification is-danger">{{warning}}</div>
 <div class="buttons is-right is-hidden-print">
     <button class="button" *ngIf="globalState.currentStep.number !=0 " (click)="prev()">Previous</button>
     <button class="button is-primary" (click)="next()" [ngClass]="{'is-loading':globalState.loading}">Next</button>

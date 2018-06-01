@@ -33,7 +33,7 @@ export class XpathInputComponent extends StepComponent {
         this.onChangeValid.emit(this.valid);
     }
 
-    showWarning() {
+    getValidationMessage() {
         this.warning = true;
     }
 
