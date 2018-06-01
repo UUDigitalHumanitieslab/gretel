@@ -15,6 +15,23 @@ import { ActivatedRoute, Router } from "@angular/router";
     styleUrls: ['./example-based-search.component.scss']
 })
 export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalStateExampleBased> {
+    protected defaultGlobalState: GlobalStateExampleBased = {
+        exampleXml: undefined,
+        subTreeXml: undefined,
+        selectedTreebanks: undefined,
+        currentStep: undefined,
+        valid: true,
+        xpath: undefined,
+        loading: false,
+        inputSentence: 'Dit is een voorbeeldzin.',
+        isCustomXPath: false,
+        attributes: [],
+        tokens: [],
+        retrieveContext: false,
+        respectOrder: false,
+        ignoreTopNode: false
+    };
+
     sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
     steps: Step<GlobalStateExampleBased>[];
@@ -76,22 +93,33 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         ]
     }
 
-    queryParamsToGlobalState(queryParams: any) {
+    encodeGlobalState(state: GlobalStateExampleBased) {
         return {
-            exampleXml: undefined,
-            subTreeXml: undefined,
-            selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-            currentStep: this.getStepFromNumber(queryParams.currentStep),
-            valid: true,
-            xpath: queryParams.xpath || '',
-            loading: false,
-            inputSentence: queryParams.inputSentence || 'Dit is een voorbeeldzin.',
-            isCustomXPath: false,
-            attributes: [],
-            tokens: [],
-            retrieveContext: false,
-            respectOrder: false,
-            ignoreTopNode: false
+            'currentStep': state.currentStep.number,
+            'xpath': state.xpath,
+            'inputSentence': state.inputSentence,
+            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
+            'isCustomXPath': this.encodeBool(state.isCustomXPath),
+            'attributes': state.attributes,
+            'retrieveContext': this.encodeBool(state.retrieveContext),
+            'respectOrder': this.encodeBool(state.respectOrder),
+            'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
+        }
+    }
+
+    decodeGlobalState(queryParams) {
+        return {
+            step: queryParams.currentStep || 0 as number,
+            state: {
+                selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                xpath: queryParams.xpath || undefined,
+                inputSentence: queryParams.inputSentence || undefined,
+                isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
+                attributes: queryParams.attributes,
+                retrieveContext: this.decodeBool(queryParams.retrieveContext),
+                respectOrder: this.decodeBool(queryParams.respectOrder),
+                ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
+            }
         };
     }
 
@@ -126,21 +154,6 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.globalState.inputSentence = sentence;
         this.globalState.exampleXml = undefined; // reset parse
         this.updateGlobalState(this.globalState);
-    }
-
-    stateToJson(state: GlobalStateExampleBased) {
-        return {
-            'currentStep': state.currentStep.number,
-            'xpath': state.xpath,
-            'inputSentence': state.inputSentence,
-            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
-            'isCustomXPath': state.isCustomXPath,
-            'attributes': state.attributes,
-            'tokens': state.tokens,
-            'retrieveContext': state.retrieveContext,
-            'respectOrder': state.respectOrder,
-            'ignoreTopNode': state.ignoreTopNode
-        }
     }
 
     updateMatrix(matrixSettings: MatrixSettings) {

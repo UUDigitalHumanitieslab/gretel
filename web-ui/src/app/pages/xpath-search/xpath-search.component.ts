@@ -28,8 +28,21 @@ import {
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
+    protected defaultGlobalState: GlobalState = {
+        currentStep: undefined,
+        retrieveContext: false,
+        selectedTreebanks: undefined,
+        xpath: `//node[@cat="smain"
+        and node[@rel="su" and @pt="vnw"]
+        and node[@rel="hd" and @pt="ww"]
+        and node[@rel="predc" and @cat="np"
+        and node[@rel="det" and @pt="lid"]
+        and node[@rel="hd" and @pt="n"]]]`,
+        valid: true,
+        loading: false
+    };
+
     // All the components. used to call functions on.
     @ViewChild('xpathInput')
     xpathInputComponent;
@@ -82,14 +95,24 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         ];
     }
 
-    queryParamsToGlobalState(queryParams: any) {
+    encodeGlobalState(state: GlobalState) {
         return {
-            selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-            currentStep: this.getStepFromNumber(queryParams.currentStep),
-            xpath: queryParams.xpath || '//node',
-            valid: false,
-            loading: false,
-            retrieveContext: false
+            'currentStep': state.currentStep.number,
+            'xpath': state.xpath,
+            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
+            'retrieveContext': this.encodeBool(state.retrieveContext)
+        }
+    }
+
+    decodeGlobalState(queryParams) {
+        return {
+            step: queryParams.currentStep || 0 as number,
+            state:
+                {
+                    selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                    xpath: queryParams.xpath || undefined,
+                    retrieveContext: this.decodeBool( queryParams.retrieveContext)
+                }
         }
     }
 
@@ -123,13 +146,5 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.configuration = {
             steps: this.steps
         };
-    }
-
-    stateToJson(state: GlobalState) {
-        return {
-            'currentStep': state.currentStep.number,
-            'xpath': state.xpath,
-            'selectedTreebanks': JSON.stringify(state.selectedTreebanks)
-        }
     }
 }

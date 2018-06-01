@@ -1,20 +1,32 @@
-import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
+
+import * as _ from 'lodash';
+
+import { Subscription } from 'rxjs/Subscription';
+
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { GlobalState, Step } from "./steps";
 import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from "./transitions";
 
-export abstract class MultiStepPageComponent<T extends GlobalState> implements OnInit, AfterViewChecked {
+export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
     public crumbs: Crumb[];
     public globalState: T;
+
+    protected abstract defaultGlobalState: T;
 
     protected configuration: { steps: Step<T>[] };
     protected components: any[];
     protected steps: Step<T>[];
+    protected subscriptions: Subscription[] = [];
 
     private transitions: Transitions<T>;
 
     constructor(private route: ActivatedRoute, private router: Router) {
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(s => s.unsubscribe());
     }
 
     ngOnInit() {
@@ -23,11 +35,15 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.initializeSteps();
         this.initializeConfiguration();
         this.initializeGlobalState();
-
         this.initializeTransitions();
-        this.globalState.currentStep.enterStep(this.globalState).subscribe(state => {
-            this.globalState = state;
-        });
+
+        this.subscriptions.push(
+            this.route.queryParams.subscribe(params => {
+                let decoded = this.decodeGlobalState(params);
+                Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
+                this.globalState.currentStep = this.steps[decoded.step];
+                this.goToStep(decoded.step);
+            }));
     }
 
     abstract initializeConfiguration();
@@ -35,22 +51,21 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     abstract initializeSteps();
     abstract initializeComponents();
 
-    abstract queryParamsToGlobalState(queryParams: any): T;
-    abstract stateToJson(state: T): {};
-
-    getGlobalStateFromUrl(): T {
-        let queryParams = this.getQueryParams();
-        return this.queryParamsToGlobalState(queryParams);
-    }
+    /**
+     * Returns the properties of the global state which are set in the URL.
+     * @param queryParams
+     */
+    abstract decodeGlobalState(queryParams: { [key: string]: any }): { step: number, state: { [K in keyof GlobalState]?: GlobalState[K] | undefined } };
+    abstract encodeGlobalState(state: T): {};
 
     initializeGlobalState() {
-        this.globalState = this.getGlobalStateFromUrl();
+        this.globalState = Object.assign({}, this.defaultGlobalState);
     }
 
     initializeTransitions() {
         let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
         for (const crumb of this.crumbs) {
-            transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
+            transitions.push(new JumpToStepTransition(this.steps[crumb.number]));
         }
 
         this.transitions = new Transitions(transitions);
@@ -102,13 +117,6 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.components[this.globalState.currentStep.number].showWarning();
     }
 
-    getQueryParams() {
-        // To make sure there is no compile time error
-        let temp: any = this.route;
-        return temp.queryParams._value
-    }
-
-
     getStepFromNumber(n: number) {
         if (n) {
             return this.steps[n]
@@ -118,7 +126,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     writeStateToUrl() {
-        let state = this.stateToJson(this.globalState);
+        let state = this.encodeGlobalState(this.globalState);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: state,
@@ -138,5 +146,18 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     updateSelectedSubTreebanks(subTreebanks: string[]) {
         this.globalState.selectedTreebanks.components = subTreebanks;
         this.writeStateToUrl();
+    }
+
+    protected decodeBool(param: string | undefined): boolean | undefined {
+        if (param == '1') {
+            return true;
+        } else if (param == '0') {
+            return false;
+        }
+        return undefined;
+    }
+
+    protected encodeBool(bool: boolean) {
+        return bool ? '1' : '0';
     }
 }
