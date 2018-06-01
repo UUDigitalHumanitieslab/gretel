@@ -11,10 +11,11 @@ describe('XpathInputComponent', () => {
         commonTestBed().testingModule.compileComponents();
     }));
 
-    beforeEach(() => {
+    beforeEach(async () => {
         fixture = TestBed.createComponent(XpathInputComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+        component.value = '//node';
+        return fixture.detectChanges();
     });
 
     it('should create', () => {
