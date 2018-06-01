@@ -213,7 +213,7 @@ class ResultStep<T extends GlobalState> extends Step<T>{
     enterStep(state: T): Observable<T> {
         return new Observable((observer) => {
             state.currentStep = this;
-
+            state.valid = true;
             observer.next(state);
             observer.complete();
         });
@@ -240,10 +240,15 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      * @param state
      * @returns the updates state
      */
+
     enterStep(state: T): Observable<T> {
         return new Observable((observer) => {
             state.currentStep = this;
             state.valid = false;
+            state.selectedTreebanks = {
+                corpus: state.selectedTreebanks ? state.selectedTreebanks.corpus : undefined,
+                components: state.selectedTreebanks ? state.selectedTreebanks.components : undefined
+            }
             observer.next(state);
             observer.complete();
         });

@@ -1,16 +1,16 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes, Route } from '@angular/router';
-import {HomePageComponent} from "../pages/home-page/home-page.component";
-import {DocumentationComponent} from "../pages/documentation/documentation.component";
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes, Route} from '@angular/router';
 import {routes} from "./routes";
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes)
-  ],
-  exports: [
-    RouterModule
-  ],
-  declarations: []
+    imports: [
+        RouterModule.forRoot(routes),
+        RouterModule
+    ],
+    exports: [
+        RouterModule,
+    ],
+    declarations: []
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

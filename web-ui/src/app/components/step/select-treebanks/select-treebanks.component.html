@@ -13,9 +13,9 @@
 <ul>
     <li *ngFor="let item of items">
         <label>
-            <input type="radio" name="Treebank" value="{{item.title}}" (click)="treebankChange($event)" #checkbox> {{item.title}}
+            <input type="radio" name="Treebank" value="{{item.title}}"  [checked]="item.title == treebank" (click)="treebankChange($event)" #checkbox> {{item.title}}
         </label>
-        <p *ngIf="checkbox.checked">
+        <p *ngIf="!loading && item.title == treebank">
             <grt-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></grt-selectable-table>
         </p>
     </li>
