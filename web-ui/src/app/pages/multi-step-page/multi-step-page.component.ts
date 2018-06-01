@@ -75,7 +75,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     /**
-     *  go to next step. Only can continue of the current step is valid.
+     * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
     next() {
         if (this.globalState.valid) {
