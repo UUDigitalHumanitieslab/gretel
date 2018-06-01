@@ -1,5 +1,9 @@
 // rudimentary override of primeng theme to make it more Bulma-ish
 .ui-table.bulma {
+    table {
+        border-collapse: collapse;
+    }
+
     %cell {
         background: $white;
         border: $table-cell-border;
@@ -8,19 +12,69 @@
         padding: $table-cell-padding;
     }
 
-    &.is-bordered {
-        border: 1px solid $grey-lighter;
+    .ui-table-thead > tr {
+        > th,
+        > td {
+            @extend %cell;
 
-        .ui-table-tbody > tr:last-child {
-            > td,
-            > th {
-                border-bottom-width: 1px;
+            border-width: $table-head-cell-border-width;
+            color: $table-head-cell-color;
+        }
+    }
+
+    .ui-table-tbody > tr {
+        > th,
+        > td {
+            @extend %cell;
+        }
+    }
+
+    .ui-table-tfoot > tr {
+        > th,
+        > td {
+            @extend %cell;
+
+            border-width: $table-foot-cell-border-width;
+            color: $table-foot-cell-color;
+        }
+    }
+
+    &.is-bordered {
+        table {
+            border: $table-cell-border;
+        }
+
+        table.ui-table-scrollable-header-table {
+            border: none;
+
+            .ui-table-thead > tr > {
+                td, th {
+                    border-bottom: none;
+                }
+            }
+        }
+
+        .ui-table-thead > tr,
+        .ui-table-tbody > tr,
+        .ui-table-tfoot > tr {
+            > th,
+            > td {
+                border-width: 1px;
+            }
+
+            &:last-child {
+                > th,
+                > td {
+                    border-bottom-width: 1px;
+                }
             }
         }
     }
 
     &:not(.is-bordered) {
-        border: none;
+        table {
+            border: none;
+        }
 
         .ui-table-tbody > tr:last-child {
             > td,
@@ -63,33 +117,6 @@
             > td, > th {
                 background-color: $table-row-hover-background-color;
             }
-        }
-    }
-
-    .ui-table-thead > tr {
-        > th,
-        > td {
-            @extend %cell;
-
-            border-width: $table-head-cell-border-width;
-            color: $table-head-cell-color;
-        }
-    }
-
-    .ui-table-tbody > tr {
-        > th,
-        > td {
-            @extend %cell;
-        }
-    }
-
-    .ui-table-tfoot > tr {
-        > th,
-        > td {
-            @extend %cell;
-
-            border-width: $table-foot-cell-border-width;
-            color: $table-foot-cell-color;
         }
     }
 }
