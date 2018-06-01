@@ -34,9 +34,9 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         retrieveContext: false,
         selectedTreebanks: undefined,
         xpath: `//node[@cat="smain"
-        and node[@rel="su" and @pt="vnw"]
-        and node[@rel="hd" and @pt="ww"]
-        and node[@rel="predc" and @cat="np"
+    and node[@rel="su" and @pt="vnw"]
+    and node[@rel="hd" and @pt="ww"]
+    and node[@rel="predc" and @cat="np"
         and node[@rel="det" and @pt="lid"]
         and node[@rel="hd" and @pt="n"]]]`,
         valid: true,
@@ -95,15 +95,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         ];
     }
 
-    encodeGlobalState(state: GlobalState) {
-        return {
-            'currentStep': state.currentStep.number,
-            'xpath': state.xpath,
-            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
-            'retrieveContext': this.encodeBool(state.retrieveContext)
-        }
-    }
-
     decodeGlobalState(queryParams) {
         return {
             step: queryParams.currentStep || 0 as number,
@@ -111,7 +102,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
                 {
                     selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                     xpath: queryParams.xpath || undefined,
-                    retrieveContext: this.decodeBool( queryParams.retrieveContext)
+                    retrieveContext: this.decodeBool(queryParams.retrieveContext)
                 }
         }
     }
@@ -134,12 +125,12 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
      */
     updateSelected(selectedTreebanks: TreebankSelection) {
         this.globalState.selectedTreebanks = selectedTreebanks;
-        this.writeStateToUrl();
+        this.updateUrl(false);
     }
 
-    updateXPath(xpath: string) {
+    updateXPath(xpath: string, writeState: boolean) {
         this.globalState.xpath = xpath;
-        this.writeStateToUrl();
+        this.updateUrl(writeState);
     }
 
     initializeConfiguration() {

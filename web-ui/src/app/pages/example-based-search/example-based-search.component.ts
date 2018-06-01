@@ -94,17 +94,14 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     }
 
     encodeGlobalState(state: GlobalStateExampleBased) {
-        return {
-            'currentStep': state.currentStep.number,
-            'xpath': state.xpath,
-            'inputSentence': state.inputSentence,
-            'selectedTreebanks': JSON.stringify(state.selectedTreebanks),
-            'isCustomXPath': this.encodeBool(state.isCustomXPath),
-            'attributes': state.attributes,
-            'retrieveContext': this.encodeBool(state.retrieveContext),
-            'respectOrder': this.encodeBool(state.respectOrder),
-            'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
-        }
+        return Object.assign(
+            super.encodeGlobalState(state), {
+                'inputSentence': state.inputSentence,
+                'isCustomXPath': this.encodeBool(state.isCustomXPath),
+                'attributes': state.attributes,
+                'respectOrder': this.encodeBool(state.respectOrder),
+                'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
+            });
     }
 
     decodeGlobalState(queryParams) {

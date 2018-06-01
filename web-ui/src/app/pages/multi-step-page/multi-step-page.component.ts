@@ -56,7 +56,15 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      * @param queryParams
      */
     abstract decodeGlobalState(queryParams: { [key: string]: any }): { step: number, state: { [K in keyof GlobalState]?: GlobalState[K] | undefined } };
-    abstract encodeGlobalState(state: T): {};
+    encodeGlobalState(state: T): { [key: string]: any } {
+        return {
+            'currentStep': state.currentStep.number,
+            // don't encode the default state
+            'xpath': state.xpath != this.defaultGlobalState.xpath ? state.xpath : undefined,
+            'selectedTreebanks': state.selectedTreebanks && state.selectedTreebanks.corpus ? JSON.stringify(state.selectedTreebanks) : undefined,
+            'retrieveContext': this.encodeBool(state.retrieveContext)
+        }
+    }
 
     initializeGlobalState() {
         this.globalState = Object.assign({}, this.defaultGlobalState);
@@ -86,7 +94,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     updateGlobalState(state: T) {
         this.globalState = state;
-        this.writeStateToUrl();
+        this.updateUrl();
     }
 
     /**
@@ -125,12 +133,13 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         }
     }
 
-    writeStateToUrl() {
+    updateUrl(writeState = true) {
         let state = this.encodeGlobalState(this.globalState);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: state,
-            skipLocationChange: false
+            skipLocationChange: false,
+            replaceUrl: writeState ? false : true
         })
     }
 
@@ -140,12 +149,12 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     updateSelectedMainTreebank(mainTreebank: string) {
         this.globalState.selectedTreebanks.corpus = mainTreebank;
-        this.writeStateToUrl();
+        this.updateUrl(false);
     }
 
     updateSelectedSubTreebanks(subTreebanks: string[]) {
         this.globalState.selectedTreebanks.components = subTreebanks;
-        this.writeStateToUrl();
+        this.updateUrl(false);
     }
 
     protected decodeBool(param: string | undefined): boolean | undefined {
