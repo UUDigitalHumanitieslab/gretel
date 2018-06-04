@@ -98,4 +98,5 @@ When searching for a more specific structure, this is unlikely to occur.
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
 * [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
 * [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 4 functionality and improvements;
+* [Gerson Foks](https://www.uu.nl/staff/GFoks): additional GrETEL 4 functionality and improvements;
 * Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.

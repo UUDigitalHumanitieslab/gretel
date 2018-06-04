@@ -1,17 +1,24 @@
-<p-table [columns]="columns" [value]="data" scrollable="true" [autoLayout]="true">
+<p-table [columns]="columns" [value]="data" scrollable="true" [autoLayout]="true" styleClass="bulma is-bordered">
     <ng-template pTemplate="header" let-columns>
         <tr>
             <th *ngFor="let col of columns; let i = index">
-                <input *ngIf="i == 0" type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)"> {{col.header}}
+                <label class="checkbox">
+                    <input *ngIf="i == 0" type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)"> {{col.header}}
+                </label>
             </th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
         <tr>
             <td *ngFor="let col of columns; let j = index">
-                <input *ngIf="j == 0" type="checkbox" (change)="changeSelected(rowData)" [checked]="rowData['selected']">
-                <div *ngIf="col.field == 'number'; else field">{{i}}</div>
-                <ng-template #field>{{rowData[col.field]}}</ng-template>
+                <label class="checkbox" *ngIf="j == 0; else content">
+                    <input type="checkbox" (change)="changeSelected(rowData)" [checked]="rowData['selected']">
+                    <ng-container *ngTemplateOutlet="content"></ng-container>
+                </label>
+                <ng-template #content>
+                    <div *ngIf="col.field == 'number'; else field">{{i}}</div>
+                    <ng-template #field>{{rowData[col.field]}}</ng-template>
+                </ng-template>
             </td>
         </tr>
     </ng-template>

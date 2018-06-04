@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { StepComponent } from "../step.component";
 import { MacroService, ValueEvent } from 'lassy-xpath/ng';
 import { HttpClient } from '@angular/common/http';
@@ -8,15 +8,9 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })
-export class XpathInputComponent extends StepComponent  {
-    // TODO: might want to detect changes afterwards?
+export class XpathInputComponent extends StepComponent {
     @Input()
-    public value: string = `//node[@cat="smain"
-    and node[@rel="su" and @pt="vnw"]
-    and node[@rel="hd" and @pt="ww"]
-    and node[@rel="predc" and @cat="np"
-    and node[@rel="det" and @pt="lid"]
-    and node[@rel="hd" and @pt="n"]]]`;
+    public value: string;
 
     @Input()
     public retrieveContext: boolean;
@@ -39,8 +33,8 @@ export class XpathInputComponent extends StepComponent  {
         this.onChangeValid.emit(this.valid);
     }
 
-    showWarning() {
-       this.warning = true;
+    getValidationMessage() {
+        this.warning = true;
     }
 
     inputChanged(event: ValueEvent) {
