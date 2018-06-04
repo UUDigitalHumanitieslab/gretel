@@ -1,17 +1,17 @@
 <body <?php setBodyClasses(); ?>>
     <div id="container">
         <header class="page-header">
-            <h1>GrETEL <sup>3</<sup></h1>
+            <h1>GrETEL <sup class="version">4</sup> <sup>alpha!</sup></h1>
             <p>Greedy Extraction of Trees for Empirical Linguistics</p>
             <nav class="primary-navigation">
                 <ul>
-                    <li><a href="index.php" title="Home"
+                    <li><a href="../home" title="Home"
                     <?php if ($currentPage == "home") echo 'class="active"'; ?>>Home</a></li>
                     <li><a href="ebs/input.php" title="Example-based search"
                     <?php if ($currentPage == "ebs") echo 'class="active"'; ?>>Example-based search</a></li>
                     <li><a href="xps/input.php" title="XPath search"
                     <?php if ($currentPage == "xps") echo 'class="active"'; ?>>XPath search</a></li>
-                    <li><a href="documentation.php" title="Documentation"
+                    <li><a href="../documentation" title="Documentation"
                     <?php if ($currentPage == "docs") echo 'class="active"'; ?>>Documentation</a></li>
                 </ul>
                 <button name="show-menu">

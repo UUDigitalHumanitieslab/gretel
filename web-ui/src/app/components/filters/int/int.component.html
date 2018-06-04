@@ -1,0 +1,12 @@
+<ng-container *ngIf="filter">
+    <label>
+        <b>{{filter.field}}</b>
+    </label>
+    <h3> Range: {{rangeValues[0] + ' - ' + rangeValues[1]}} </h3>
+
+    <p-slider [(ngModel)]="rangeValues" (ngModelChange)="updateFilterChange(true)"
+              [range]="true" [max]="this.filter.maxValue"
+              [min]="this.filter.minValue">
+    </p-slider>
+
+</ng-container>

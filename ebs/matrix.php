@@ -23,30 +23,31 @@
  $currentPage = 'ebs';
  $step = 3;
 
- require "../config.php";
- require ROOT_PATH."/helpers.php";
+ require '../config.php';
+ require ROOT_PATH.'/helpers.php';
 
-$continueConstraints = sessionVariablesSet(array('example', 'sentence'));
+$continueConstraints = isset($_POST['sid']) && sessionVariablesSet($_POST['sid'], array('example', 'sentence'));
 
 if ($continueConstraints) {
     $treeVisualizer = true;
-    $id = session_id();
 
-    $input = $_SESSION['example'];
+    define('SID', $_POST['sid']);
+
+    $input = $_SESSION[SID]['example'];
 
     // Set tokenized input sentence to variable
-    $tokinput = $_SESSION['sentence'];
+    $tokinput = $_SESSION[SID]['sentence'];
     $sentence = explode(' ', $tokinput);
 }
 
-require ROOT_PATH."/functions.php";
-require ROOT_PATH."/front-end-includes/head.php";
+require ROOT_PATH.'/functions.php';
+require ROOT_PATH.'/front-end-includes/head.php';
 
 ?>
 </head>
 <?php flush(); ?>
 <?php
-require ROOT_PATH."/front-end-includes/header.php";
+require ROOT_PATH.'/front-end-includes/header.php';
 
 if ($continueConstraints):
 ?>
@@ -101,12 +102,24 @@ if ($continueConstraints):
       </div>
 
       <div>
+        <div class="label-wrapper">
+          <label>
+            <input type="checkbox" name="sentids" aria-describedby="sentids-tooltip" checked> Include sentence IDs in downloadable results
+          </label>
+          <div class="help-tooltip" id="sentids-tooltip" role="tooltip" data-title="Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+            <span class="sr-only">Add sentence identifiers to downloads. A sentence identifier is a unique identifier given to each sentence in a corpus. Given an identifier you can look up the sentence in the original corpus</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
         <h3 class="advanced-option">Modify XPath</h3>
         <input type="hidden" name="originalXp" value="">
         <input type="hidden" name="manualMode" value="false">
 
         <textarea id="xpath" class="advanced-option" name="xpath" spellcheck="false" wrap="soft" required></textarea>
-        <xpath-variables data-name="xpath-variables" data-source="#xpath"></xpath-variables>
+        <div class="xpath-variables" data-name="xpath-variables" data-source="#xpath"></div>
         <div class="open-beautifier-wrapper advanced-option">
           <input type="reset" value="Reset XPath" style="font-size: 88%">
 
@@ -128,8 +141,9 @@ if ($continueConstraints):
   </div>
 
   <div id="tree-output">
-      <?php include ROOT_PATH."/front-end-includes/tv-wrappers.php"; ?>
+      <?php include ROOT_PATH.'/front-end-includes/tv-wrappers.php'; ?>
   </div>
+  <input type="hidden" name="sid" value="<?php echo SID; ?>">
   <?php setContinueNavigation(); ?>
 </form>
 
@@ -138,15 +152,15 @@ else:
   setErrorHeading(); ?>
   <p>No search instruction could be generated, since you did not enter a sentence.
     It is also possible that you came to this page directly without first entering a query.</p>
-  <?php setPreviousPageMessage($step-1);
+  <?php setPreviousPageMessage($step - 1);
 endif;
 
-require ROOT_PATH."/front-end-includes/footer.php";
-include ROOT_PATH."/front-end-includes/analytics-tracking.php";
+require ROOT_PATH.'/front-end-includes/footer.php';
+include ROOT_PATH.'/front-end-includes/analytics-tracking.php';
 ?>
 
 <script>
-    var getTreePathScript = <?php echo json_encode(HOME_PATH."/preparatory-scripts/process-input-example.php"); ?>;
+    var getTreePathScript = <?php echo json_encode(HOME_PATH.'/preparatory-scripts/process-input-example.php?sid='.SID); ?>;
 </script>
 
 </body>

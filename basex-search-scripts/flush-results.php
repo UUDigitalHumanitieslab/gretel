@@ -1,32 +1,43 @@
 <?php
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-require "../config.php";
-require ROOT_PATH."/functions.php";
+require '../config.php';
+require ROOT_PATH.'/functions.php';
 
-require ROOT_PATH."/basex-search-scripts/basex-client.php";
-require ROOT_PATH."/basex-search-scripts/treebank-search.php";
+require ROOT_PATH.'/basex-search-scripts/basex-client.php';
+require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
 session_start();
 set_time_limit(0);
 
-$queryIteration = $_SESSION['endPosIteration'];
+if (!isset($_GET['sid'])) {
+    $results = array(
+    'error' => true,
+    'data' => 'Session ID not provided. Perhaps you have disabled cookies. Please enable them.',
+  );
+    echo json_encode($results);
+    exit;
+}
 
-$corpus = $_SESSION['treebank'];
-$components = $_SESSION['subtreebank'];
-$databases = $_SESSION['flushDatabases'];
-$already = $_SESSION['flushAlready'];
+define('SID', $_GET['sid']);
+$queryIteration = $_SESSION[SID]['endPosIteration'];
+
+$corpus = $_SESSION[SID]['treebank'];
+$components = $_SESSION[SID]['subtreebank'];
+$databases = $_SESSION[SID]['flushDatabases'];
+$already = $_SESSION[SID]['flushAlready'];
 if ($corpus == 'sonar') {
-    $needRegularSonar = $_SESSION['needRegularSonar'];
+    $needRegularSonar = $_SESSION[SID]['needRegularSonar'];
 }
 
 $databaseString = $corpus;
-$xpath = $_SESSION['xpath'] . $_SESSION['metadataFilter'];
+$xpath = $_SESSION[SID]['xpath'].$_SESSION[SID]['metadataFilter'];
+
 // get context option
-$context = $_SESSION['ct'];
+$context = $_SESSION[SID]['ct'];
 
 session_write_close();
 
@@ -37,11 +48,11 @@ try {
         $serverInfo = getServerInfo($corpus, false);
     }
 
-    $dbhost = $serverInfo{'machine'};
-    $dbport = $serverInfo{'port'};
+    $dbhost = $serverInfo['machine'];
+    $dbport = $serverInfo['port'];
     $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
 
-    list($sentences, $tblist, $idlist, $beginlist) = getSentences($databases, $already, $queryIteration, $session);
+    list($sentences, $tblist, $idlist, $beginlist) = getSentences($corpus, $databases, $already, $queryIteration, $session, SID, $resultsLimit, $xpath, $context);
     $session->close();
 
     if (isset($sentences)) {
@@ -62,8 +73,7 @@ try {
             // subtreebank where the sentence was found:
             if (API_URL) {
                 $componentString = substr($sidString, 0, strrpos($sidString, '-'));
-            }
-            else if ($corpus == 'lassy') {
+            } elseif ($corpus == 'lassy') {
                 preg_match('/([^<>]+?)(?:-\d+(?:-|\.).*)/', $sidString, $componentFromRegex);
                 $componentFromRegex = preg_replace('/^((?:[a-zA-Z]{3,4})|(?:WR(?:-[a-zA-Z]){3}))-.*/', '$1', $componentFromRegex[1]);
 
@@ -82,13 +92,13 @@ try {
             $componentString = strtoupper($componentString);
 
             $sentenceidlink = '<a class="tv-show-fs" href="front-end-includes/show-tree.php'
-            . '?sid='.$sidString
-            . '&tb='.$corpus
-            . '&db='.$databaseString
-            . '&id='.$idlist[$sid]
-            . '" target="_blank">'.$sidString.'</a>';
+            .'?sid='.$sidString
+            .'&tb='.$corpus
+            .'&db='.$databaseString
+            .'&id='.$idlist[$sid]
+            .'" target="_blank">'.$sidString.'</a>';
 
-            $resultsArray{$sid} = array($sentenceidlink, $hlsentence, $componentString);
+            $resultsArray[$sid] = array($sentenceidlink, $hlsentence, $componentString);
         }
         $results = array(
           'error' => false,

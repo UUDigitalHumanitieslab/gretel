@@ -40,14 +40,8 @@ describe("Analysis Service", () => {
             ['$node1'],
             ['meta1']);
         expect(result).toEqual([
-            ['meta1',
-                'pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'pos7', 'pos8',
-                'lem1', 'lem2', 'lem3', 'lem4', 'lem5', 'lem6', 'lem7', 'lem8',
-                'pos_node1', 'lem_node1'],
-            ['hallo',
-                'tag', 'adj', 'noun', 'det', 'verb', 'det', 'noun', 'punct',
-                'hallo', 'lief', 'mens', 'dit', 'zijn', 'een', 'test_zin', '.',
-                '(none)', '(none)']
+            ['meta1', 'pos_node1', 'lem_node1'],
+            ['hallo', '(none)', '(none)']
         ]);
     });
 
@@ -63,23 +57,11 @@ describe("Analysis Service", () => {
             ['meta1'],
         );
         expect(result).toEqual([
-            ['meta1', 'pos1', 'pos2', 'pos3', 'pos4', 'lem1', 'lem2', 'lem3', 'lem4', 'pos_node1', 'lem_node1'],
-            ['hallo', // meta1
-                'verb', 'verb', 'verb', '(none)', // pos1 ... pos4
-                'word', 'word', 'word', '(none)', // lem1 ... lem4
-                'test', 'test'], // pos_node1, lem_node1
-            ['hallo',
-                'verb', 'verb', 'verb', '(none)',
-                'word', 'word', 'word', '(none)',
-                'test', 'test'],
-            ['hallo',
-                'verb', 'verb', 'verb', 'verb',
-                'word', 'word', 'word', 'word',
-                'test', 'test'],
-            ['hallo',
-                'verb', '(none)', '(none)', '(none)',
-                'word', '(none)', '(none)', '(none)',
-                'test', 'test'],
+            ['meta1', 'pos_node1', 'lem_node1'],
+            ['hallo', 'test', 'test'],
+            ['hallo', 'test', 'test'],
+            ['hallo', 'test', 'test'],
+            ['hallo', 'test', 'test'],
         ]);
     });
 

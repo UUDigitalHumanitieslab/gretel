@@ -1,0 +1,5 @@
+{
+  "/gretel": "http://localhost:8080/",
+  "/gretel-upload": "http://localhost:8080/",
+  "secure": false
+}

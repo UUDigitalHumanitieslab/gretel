@@ -34,7 +34,7 @@ my $refpos = &initialize;
 my ( $inputxml, $options ) = @ARGV;
 
 my $twig = XML::Twig->new( 'pretty_print' => 'indented' );
-$twig->parsefile($inputxml);
+$twig->parse($inputxml);
 
 # start at 'top' node (leave out alpino_ds node, skip 'parser' tag)
 my $root = $twig->root->first_child('node');

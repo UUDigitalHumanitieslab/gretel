@@ -5,6 +5,11 @@
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noImplicitUseStrict": true,
-        "noImplicitReturns": true       
-    }
+        "noImplicitReturns": true,
+        "typeRoots" : ["./node_modules/@types/"]
+    },
+    "exclude": [
+        "lassy-xpath",
+        "web-ui"
+    ]
 }

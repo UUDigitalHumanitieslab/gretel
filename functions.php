@@ -97,8 +97,12 @@
               if (isset($step)) {
                   $class .= " step-$step";
               }
-              $pageType = array_values(${$currentPage.'Pages'});
-              $class .= ' ' . strtolower($pageType[$step-1]);
+              if (isset($step) && $step == 1) {
+                $class .= ' input';
+              }  else {
+                $pageType = array_values(${$currentPage.'Pages'});
+                $class .= ' ' . strtolower($pageType[$step-1]);
+              }
           }
           $class .= '"';
       } else {
@@ -141,7 +145,7 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="ebs/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
+              $output .= '<li '.$class.'><a '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
         }
@@ -150,7 +154,7 @@
               ++$i;
               $class = setProgressClasses($i);
               $onclick = setProgressGoBack($i);
-              $output .= '<li '.$class.'><a href="xps/'.$uri.'" '.$onclick.' title="'.$title.'">'.$i.
+              $output .= '<li '.$class.'><a '.$onclick.' title="'.$title.'">'.$i.
                 '<span> - '.$title.'</span></a></li>';
           }
         }

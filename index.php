@@ -1,5 +1,4 @@
 <?php
-
 $currentPage = 'home';
 require "config.php";
 require ROOT_PATH."/helpers.php";
@@ -11,11 +10,17 @@ require ROOT_PATH."/front-end-includes/head.php";
 
 
         <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
-            <p style="text-align: center; padding: 10px; margin-bottom: 10px; background-color: #F2DEDE; border: 1px solid red;">
-              <em>
-              This is a development version for GrETEL which includes functionality to upload your own corpus and faceted search. All features are experimental and might break unexpectedly. <br> Please <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official version</a> if you want to use GrETEL for research purposes.
-              </em>
-            </p>
+            <div style="padding: 10px; margin-bottom: 10px; background-color: #F2DEDE; border: 1px solid red;">
+              <p>
+                This is a preview of the next version of GrETEL, developed by the Digital Humanities Lab at Utrecht University. <strong>This is currently under active development!</strong> It includes additional functionality to <a href="/gretel-upload">upload your own corpus</a>, faceted search, analysis and improved usability.
+              </p>
+              <p>
+                <em>All features are experimental and might break or change unexpectedly!</em>
+              </p>
+              <p>
+                Please <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official stable version</a> (developed by University of Leuven) if you want to use GrETEL for research purposes.
+              </p>
+            </div>
             <p>GrETEL stands for <strong>Gr</strong>eedy <strong>E</strong>xtraction of <strong>T</strong>rees for
                 <strong>E</strong>mpirical <strong>L</strong>inguistics. It is a user-friendly search engine for
                 the exploitation of syntactically annotated coropra or <i>treebanks</i>. If you are new to GrETEL
@@ -24,7 +29,7 @@ require ROOT_PATH."/front-end-includes/head.php";
 
             <p>GrETEL has two search modes:</p>
             <p><b><a href="ebs/input.php">Example-based search</a></b> enables you to use a natural language example as a starting point for searching
-  a treebank. The query procedure consists of several steps, which allows you to define how similar the search results and the input example should be. In this way you can query a treebank without knowledge of the XPath query language, the tree representations, nor the exact grammar implementation used for the annotation of the trees.</p>            
+  a treebank. The query procedure consists of several steps, which allows you to define how similar the search results and the input example should be. In this way you can query a treebank without knowledge of the XPath query language, the tree representations, nor the exact grammar implementation used for the annotation of the trees.</p>
 
             <p><b><a href="xps/input.php">XPath search</a></b> enables you to query a treebank by means of an XPath query. This search mode is intended for experienced XPath users, as you need to build the XPath query yourself.</p>
 
@@ -43,11 +48,7 @@ require ROOT_PATH."/front-end-includes/head.php";
                     </span>
                     <span class="sr-only">Download Example-Based Treebank Querying</span>
                  </a>
-                  <p>
-                    Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012).
-                    <strong>"Example-Based Treebank Querying"</strong>. In: <em>Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012)</em>.
-                    Istanbul, Turkey. pp. 3161-3167.
-                  </p>
+                 <p>Liesbeth Augustinus, Vincent Vandeghinste, and Frank Van Eynde (2012). <a href="http://gretel.ccl.kuleuven.be/docs/Augustinus2012-ebq-LREC.pdf" title="Download Example-Based Treebank Querying" target="_blank"><strong>"Example-Based Treebank Querying"</strong></a>. In: <em>Proceedings of the 8th International Conference on Language Resources and Evaluation (LREC-2012)</em>. Istanbul, Turkey. pp. 3161-3167.</p>
                 </cite>
               </div>
         </main>

@@ -1,7 +1,9 @@
+<?php header('Access-Control-Allow-Origin: *') ?>
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
 <title><?php setPageTitle(); ?></title>
 <meta name="description" content="GrETEL is an online tool that facilitates the exploitation of treebanks, large pieces of text that are syntactically annotated, by only requiring an input example instead of a formal query, or hard to understand computer code.">
 <meta name="keywords" content="GrETEL, treebank, sonar, cgn, lassy, dependency, syntax, dutch, corpus, example based, ccl, centre for computational linguistics, search">
@@ -21,25 +23,6 @@
 <?php if (isset($treeVisualizer) && $treeVisualizer): ?>
   <link rel="stylesheet" href="style/css/min/tree-visualizer.min.css">
 <?php endif; ?>
-
-<?php
-  // Prefetch links. Don't prefetch too much, only required pages such as
-  // the next page in the process
-?>
-<?php if (isSearch()): ?>
-    <?php if (isset($step) && $step < count(${$currentPage.'Pages'})):
-        $keys = array_keys(${$currentPage.'Pages'});
-    ?>
-        <link rel="prefetch" href='<?php echo $currentPage.'/'.$keys[$step]; ?>'>
-    <?php endif;?>
-<?php else:
-    $ebsKeys = array_keys($ebsPages);
-    $xpsKeys = array_keys($xpsPages);
-?>
-    <link rel="prefetch" href="ebs/<?php echo $ebsKeys[0]; ?>">
-    <link rel="prefetch" href="xps/<?php echo $xpsKeys[0]; ?>">
-<?php endif;?>
-
 <?php
   // Load low-priority fonts asynchronously and add classes to HTML element when finished
  ?>

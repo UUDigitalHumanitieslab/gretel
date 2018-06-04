@@ -1,0 +1,392 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+import { Observable } from "rxjs/Observable";
+import { Observer } from 'rxjs/Observer';
+
+import { ConfigurationService } from './configuration.service';
+import { XmlParseService } from './xml-parse.service';
+
+import 'rxjs/add/operator/mergeMap'
+const routerUrl = '/gretel/api/src/router.php/';
+const httpOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+    })
+};
+
+@Injectable()
+export class ResultsService {
+    defaultIsAnalysis = false;
+    defaultMetadataFilters: FilterValue[] = [];
+    defaultVariables: { name: string, path: string }[] = null
+
+
+    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
+    }
+
+    promiseAllResults(xpath: string,
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables) {
+        return new Promise<Hit[]>((resolve, reject) => {
+            let hits: Hit[] = [];
+            this.getAllResults(xpath,
+                corpus,
+                components,
+                retrieveContext,
+                isAnalysis,
+                metadataFilters,
+                variables,
+                () => resolve(hits))
+                .subscribe(results => hits.push(...results.hits));
+        });
+    }
+
+    getAllResults(xpath: string,
+        corpus: string,
+        components: string[],
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables,
+        complete: () => void = undefined) {
+        let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
+            let iteration = 0;
+            let remainingDatabases: string[] | null = null;
+            let completeObserver = () => {
+                if (complete) {
+                    complete();
+                }
+                observer.complete();
+            }
+
+            while (!observer.closed) {
+                await this.results(xpath, corpus, components, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
+                    .then((res) => {
+                        if (res) {
+                            observer.next(res);
+                            iteration = res.nextIteration;
+                            remainingDatabases = res.remainingDatabases;
+                            if (remainingDatabases.length == 0) {
+                                completeObserver();
+                            }
+                        } else {
+                            completeObserver();
+                        }
+                    });
+            }
+        });
+
+        return observable;
+    }
+
+    /**
+     * Queries the treebank and returns the matching hits.
+     * @param xpath Specification of the pattern to match
+     * @param corpus Identifier of the corpus
+     * @param components Identifiers of the sub-treebanks
+     * @param iteration Zero-based iteration number of the results
+     * @param retrieveContext Get the sentence before and after the hit
+     * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
+     * @param metadataFilters The filters to apply for the metadata properties
+     * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
+     */
+    async results(xpath: string,
+        corpus: string,
+        components: string[],
+        iteration: number = 0,
+        retrieveContext: boolean,
+        isAnalysis = this.defaultIsAnalysis,
+        metadataFilters = this.defaultMetadataFilters,
+        variables = this.defaultVariables,
+        remainingDatabases: string[] | null = null) {
+        let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+            retrieveContext,
+            corpus,
+            components,
+            iteration,
+            isAnalysis,
+            variables,
+            remainingDatabases
+        }, httpOptions).toPromise();
+        if (results) {
+            return this.mapResults(results);
+        }
+
+        return false;
+    }
+
+    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
+        let base = this.configurationService.getBaseUrlGretel();
+        let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
+
+        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        return treeXml;
+    }
+
+    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+        return await this.http.post<MetadataValueCounts>(routerUrl + 'metadata_counts', {
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
+    }
+
+    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+        let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
+            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
+
+        return Object.keys(results).map(databaseId => {
+            return {
+                databaseId,
+                count: parseInt(results[databaseId])
+            } as TreebankCount;
+        });
+    }
+
+    /**
+     * Builds the XQuery metadata filter.
+     *
+     * @return string The metadata filter
+     */
+    private createMetadataFilterQuery(filters: FilterValue[]) {
+        // Compile the filter
+        let filterQuery = '';
+        for (let filter of filters) {
+            switch (filter.type) {
+                case 'single':
+                    // Single values
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
+                    break;
+                case 'range':
+                    // Ranged values
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>=${filter.min} and @value<=${filter.max}]]`;
+                    break;
+            }
+        }
+
+        return filterQuery;
+    }
+
+    private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
+        return {
+            hits: await this.mapHits(results),
+            nextIteration: results[7],
+            remainingDatabases: results[8]
+        }
+    }
+
+    private mapHits(results: ApiSearchResult): Promise<Hit[]> {
+        return Promise.all(Object.keys(results[0]).map(async hitId => {
+            let sentence = results[0][hitId];
+            let nodeStarts = results[3][hitId].split('-').map(x => parseInt(x));
+            let metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
+            let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
+            return {
+                databaseId: results[9][hitId],
+                fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
+                component: hitId.replace(/\-.*/, '').toUpperCase(),
+                sentence,
+                highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
+                treeXml: results[4][hitId],
+                nodeIds: results[2][hitId].split('-').map(x => parseInt(x)),
+                nodeStarts,
+                metaValues,
+                /**
+                 * Contains the XML of the node matching the variable
+                 */
+                variableValues
+            };
+        }));
+    }
+
+    private mapMeta(data: {
+        metadata: {
+            meta?: {
+                $: {
+                    type: string,
+                    name: string,
+                    value: string
+                }
+            }[]
+        }
+    }): Hit['metaValues'] {
+        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
+            values[meta.$.name] = meta.$.value;
+            return values;
+        }, {});
+    }
+
+
+    private mapVariables(data: '' | {
+        vars: {
+            var: {
+                $: {
+                    name: string,
+                    pos?: string,
+                    lemma?: string
+                }
+            }[]
+        }
+    }): Hit['variableValues'] {
+        if (!data) {
+            return {};
+        }
+        return data.vars.var.reduce((values, variable) => {
+            values[variable.$.name] = {
+                pos: variable.$.pos,
+                lemma: variable.$.lemma
+            };
+            return values;
+        }, {});
+    }
+
+    private highlightSentence(sentence: string, nodeStarts: number[], tag: string) {
+        // translated from treebank-search.php
+        let prev: string, next: string;
+
+        if (sentence.indexOf('<em>') >= 0) {
+            // Showing the context of this hit
+            let $groups = /(.*<em>)(.*?)(<\/em>.*)/.exec(sentence);
+            sentence = $groups[2];
+            prev = $groups[1];
+            next = $groups[3];
+        }
+
+        let words = sentence.split(' ');
+
+        // Instead of wrapping each individual word in a tag, merge sequences
+        // of words in one <tag>...</tag>
+        for (let i = 0; i < words.length; i++) {
+            let word = words[i];
+            if (nodeStarts.indexOf(i) >= 0) {
+                let value = '';
+                if (nodeStarts.indexOf(i - 1) == -1) {
+                    value += `<${tag}>`;
+                }
+                value += words[i];
+                if (nodeStarts.indexOf(i + 1) == -1) {
+                    value += `</${tag}>`;
+                }
+                words[i] = value;
+            }
+        }
+        let highlightedSentence = words.join(' ');
+        if (prev || next) {
+            highlightedSentence = prev + ' ' + highlightedSentence + ' ' + next;
+        }
+
+        return this.sanitizer.bypassSecurityTrustHtml(highlightedSentence);
+    }
+}
+
+/**
+ * The results as returned by the API. The results consist of an array containing various parts
+ * of the results. These are described for each item position below.
+ * Each result has an ID which corresponds. For example results[0] contains a dictionary with
+ * the plain text sentences, they same keys are used for results[4] containing the xml of
+ * each hit.
+ */
+type ApiSearchResult = [
+    // 0 plain text sentences containing the hit
+    { [id: string]: string },
+    // 1 tblist (used for Sonar)
+    false,
+    // 2 ids (dash-separated ids of the matched nodes)
+    { [id: string]: string },
+    // 3 begin positions (zero based)
+    { [id: string]: string },
+    // 4 xml structure of the hit itself, does not include the containing the sentence
+    { [id: string]: string },
+    // 5 meta list (xml structure containing the meta values)
+    { [id: string]: string },
+    // 6 variable list (xml structure containing the variables)
+    { [id: string]: string },
+    // 7 end pos iteration (used for retrieving the next results when scrolling/paging)
+    number,
+    // 8 databases left to search (if this is empty, the search is done)
+    string[],
+    // 9 database ID of each hit
+    { [id: string]: string },
+    // 10 XQuery
+    string
+];
+
+export interface SearchResults {
+    hits: Hit[],
+    /**
+     * Start iteration for retrieving the next results (in the first database in `remainingDatabases`)
+     */
+    nextIteration: number,
+    /**
+     * Databases remaining for doing a paged search
+     */
+    remainingDatabases: string[]
+}
+
+export interface Hit {
+    databaseId: string,
+    fileId: string,
+    /**
+     * This value is not very reliable, because it is based on the filename
+     */
+    component: string,
+    sentence: string,
+    highlightedSentence: SafeHtml,
+    treeXml: string,
+    /**
+     * The ids of the matching nodes
+     */
+    nodeIds: number[],
+    /**
+     * The begin position of the matching nodes
+     */
+    nodeStarts: number[],
+    metaValues: { [key: string]: string },
+    /**
+     * Contains the properties of the node matching the variable
+     */
+    variableValues: { [variableName: string]: { [propertyKey: string]: string } },
+}
+
+
+export type FilterValue =
+    FilterSingleValue
+    | FilterRangeValue<string>
+    | FilterRangeValue<number>
+    | FilterMultipleValues<string>;
+
+export interface FilterSingleValue {
+    type: 'single';
+    field: string;
+    value: string;
+}
+
+export interface FilterRangeValue<T> {
+    type: 'range';
+    field: string;
+    min: T;
+    max: T;
+}
+
+export interface FilterMultipleValues<T> {
+    type: 'multiple';
+    values: Array<T>;
+    field: string;
+}
+
+export type TreebankCount = {
+    databaseId: string,
+    count: number
+}
+
+export type MetadataValueCounts = { [key: string]: { [value: string]: number } }

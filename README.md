@@ -1,10 +1,19 @@
-# GrETEL 3
+[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/gretel.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/gretel)
+
+# GrETEL 4
+
+This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
 
 ## Info
+* v3.9.99 November 2017: GrETEL 4 currently under development!
+* v3.0.2 July 2017: Show error message if the BaseX server is down  
+* v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
 
-v3.0. November 2016: GrETEL 3 initial release
+### Branches
 
-Available at http://gretel.ccl.kuleuven.be/gretel3
+master: official version of GrETEL 4, available at http://gretel.hum.uu.nl/gretel3/
+dev: development version  
+gretel2.0: official version of GrETEL 2.0, available at http://gretel.ccl.kuleuven.be/gretel-2.0  
 
 ## Installation
 
@@ -12,10 +21,11 @@ Available at http://gretel.ccl.kuleuven.be/gretel3
 
 Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the following packages to be installed on your machine:
 
-* BaseX (https://packages.debian.org/jessie/database/basex)
-* Perl (https://packages.debian.org/jessie/perl/perl) with:
-  * XML::Twig (https://packages.debian.org/jessie/libxml-twig-perl)
-  * XML::XPath (https://packages.debian.org/jessie/libxml-xpath-perl)
+* [BaseX](https://packages.debian.org/jessie/database/basex)
+* [SimpleXML](http://php.net/manual/en/book.simplexml.php)
+* [Perl](https://packages.debian.org/jessie/perl/perl) with:
+  * [XML::Twig](https://packages.debian.org/jessie/libxml-twig-perl)
+  * [XML::XPath](https://packages.debian.org/jessie/libxml-xpath-perl)
 
 ### Next steps
 
@@ -24,10 +34,13 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 
 > It is recommended to use the same version used for creating the treebanks. This way an example based search will result in the same search structure as stored in the database.
 
-3. Create BaseX databases containing the treebanks you want to make available.
+3. Create BaseX databases containing the treebanks you want to make available (not necessary when using GrETEL-upload).
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
+5. Run `npm install` and `grunt` to compile all the JavaScript and stylesheet files.
+6. Run [composer](https://getcomposer.org/) in `/api` directory to install PHP dependencies.
+7. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
 ## Notes for users
 
@@ -65,7 +78,7 @@ When searching for a more specific structure, this is unlikely to occur.
   * `helpers.php`: basic helper functions that return booleans.
 
 ### During development
-* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS and TypeScript, and auto-minify CSS and JavaScript.
+* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS (Ruby and Sass have to be installed in the PATH: https://github.com/gruntjs/grunt-contrib-sass) and auto-minify CSS and JavaScript.
 * Note that some client-side code is in Typescript `ts/`, this code is automatically compiled using Grunt.
 * Commands to install Grunt, local dependencies and then to watch for changes:
 
@@ -83,6 +96,6 @@ When searching for a more specific structure, this is unlikely to occur.
 * [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
 * [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
-* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 3.1 functionality and improvements;
-* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 3.1 functionality and improvements;
-* Colleagues at the Centre for Computational Linguistics at KU Leuven for their feedback.
+* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
+* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 4 functionality and improvements;
+* Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.

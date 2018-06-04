@@ -3,7 +3,8 @@ import { AnalysisService } from './services/analysis-service';
 import { NotificationService } from './services/notification-service';
 import { TreebankService } from './services/treebank-service';
 import { SearchService, SearchResult } from './services/search-service';
-import { PathVariable } from './xpath-extractinator';
+import { FileExportRenderer } from './file-export-renderer';
+import { PathVariable } from 'lassy-xpath';
 import * as $ from 'jquery';
 import 'jquery-ui';
 import 'jquery-ui/ui/widgets/sortable';
@@ -25,6 +26,7 @@ export class AnalysisComponent {
         let data = element.data();
         this.apiUrl = data.apiUrl;
         this.treebankService = new TreebankService(this.apiUrl);
+        this.searchService.resultsUrl = data.resultsUrl;
         this.corpus = data.corpus;
         this.variables =
             $.makeArray($('#xpath-variables .path-variable'))
@@ -38,22 +40,29 @@ export class AnalysisComponent {
     }
 
     private show(element: JQuery<HTMLElement>) {
+        element.addClass('is-loading');
         Promise.all([
             this.treebankService.getMetadata(this.corpus) as any,
-            this.searchService.getAllResults(this.variables) as any])
+            this.searchService.getAllResults(this.variables, true) as any])
             .then((values: any) => {
                 let [metadataKeys, searchResults] = values;
-                this.pivot(element, metadataKeys, searchResults);
+                this.pivot(element, metadataKeys, searchResults)
+                    .removeClass('is-loading');
             }).catch(error => {
                 this.notificationService.messageOnError(`An error occurred: ${error}.`);
             });
     }
 
     private pivot(element: JQuery, metadataKeys: string[], searchResults: SearchResult[]) {
-        var utils = $.pivotUtilities;
-        var heatmap = utils.renderers["Heatmap"];
+        let utils = $.pivotUtilities;
+        let heatmap = utils.renderers["Heatmap"];
+        let renderers = $.extend($.pivotUtilities.renderers,
+            { 'File export': (new FileExportRenderer()).render });
         let pivotData = this.analysisService.getFlatTable(searchResults, this.variables.map(x => x.name), metadataKeys);
-        element.pivotUI(
+        // Show a default pivot using the first node variable's lemma property against the POS property.
+        // This way the user will get to see some useable values to help clarify the interface.
+        let defaultVariable = this.variables.length > 0 ? [this.variables[0].name.substr(1)] : [];
+        return element.pivotUI(
             pivotData, {
                 aggregators: {
                     'Count': utils.aggregators['Count'],
@@ -63,9 +72,10 @@ export class AnalysisComponent {
                     'First': utils.aggregators['First'],
                     'Last': utils.aggregators['Last']
                 },
-                rows: ['lem1'],
-                cols: ['pos1'],
-                renderer: heatmap
+                rows: defaultVariable.map(v => `lem_${v}`),
+                cols: defaultVariable.map(v => `pos_${v}`),
+                renderer: heatmap,
+                renderers
             });
     }
 }

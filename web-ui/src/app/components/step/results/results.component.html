@@ -1,0 +1,131 @@
+<div class="columns is-desktop">
+    <!-- XPATH -->
+    <div class="column xpath">
+        <h2 class="subtitle">
+            <div class="level">
+                <div class="level-item level-left">
+                    XPath
+                </div>
+                <div class="level-item level-right is-hidden-print">
+                    <div class="field has-addons">
+                        <ng-container *ngIf="isModifyingXPath">
+                            <p class="control">
+                                <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null" title="Save query" (click)="updateXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Reset query" (click)="resetXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-undo"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </ng-container>
+                        <ng-container *ngIf="!isModifyingXPath">
+                            <p class="control">
+                                <a class="button" role="button" title="Edit query" (click)="editXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-edit"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Download query" (click)="downloadXPath()">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-download"></i>
+                                    </span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <a class="button" role="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-copy"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </h2>
+        <div class="content" *ngIf="!isModifyingXPath">
+            <pre (click)="editXPath()" class="is-print-paddingless">{{xpath}}</pre>
+            <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+        </div>
+        <lx-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
+    </div>
+    <!-- DISTRIBUTION LIST -->
+    <div class="column">
+        <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
+    </div>
+</div>
+<h1 class="title">
+    <div class="level">
+        <div class="level-item level-left">
+            Results: {{filteredResults.length}}
+        </div>
+        <div class="level-item level-right is-hidden-print">
+            <div class="field is-grouped">
+                <p class="control">
+                    <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
+                        <span class="icon is-large">
+                            <i class="fas fa-download"></i>
+                        </span>
+                        <span>Download Results</span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
+                        <span class="icon is-large">
+                            <i class="fas fa-print"></i>
+                        </span>
+                        <span>Print Results</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</h1>
+<div class="columns">
+    <div class="column is-one-third is-hidden-print">
+        <div class="filter">
+            <grt-filters [filters]="filters" (filterChange)="filterChange($event)"></grt-filters>
+        </div>
+    </div>
+    <div class="column">
+        <ng-container *ngIf="filteredResults.length != 0; else warning">
+            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true">
+                <ng-template pTemplate="colgroup" let-columns>
+                    <colgroup>
+                        <col *ngFor="let col of columns" [style.width]="col.width">
+                    </colgroup>
+                </ng-template>
+                <ng-template pTemplate="header" let-columns>
+                    <tr>
+                        <th *ngFor="let col of columns" pResizableColumn>
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns" class="ui-resizable-column">
+                            <div [ngSwitch]="col.field">
+                                <span *ngSwitchCase="'number'">{{i + 1}}</span>
+                                <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                                <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </ng-container>
+        <ng-template #warning>
+            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
+        </ng-template>
+    </div>
+</div>
+<grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml" [fullScreen]="true"></grt-tree-visualizer>

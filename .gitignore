@@ -1,7 +1,7 @@
 .tscache
-.gitignore*
 *.png
 *.ico
+*.log
 *~
 tmp/*
 log/*
@@ -20,3 +20,13 @@ config/
 
 # NPM
 node_modules/
+
+.idea
+
+# Grunt output
+style/css/**
+js/min/**
+js/ts/**
+
+vendor
+!lassy-xpath/.gitignore

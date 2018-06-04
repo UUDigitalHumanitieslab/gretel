@@ -1,0 +1,8 @@
+<ul class="fa-ul">
+  <li *ngFor="let link of links">
+    <span class="fa-li"><i class="fas fa-caret-right"></i></span>
+    <a *ngIf="! link.proxy; else phplink" title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="active">{{link.name}}</a>
+    <ng-template #phplink><a href="{{link.link}}">{{link.name}}</a></ng-template>
+  </li>
+</ul>
+

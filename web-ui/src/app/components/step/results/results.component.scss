@@ -1,0 +1,17 @@
+.is-loading{
+  width: 50px;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+.filter{
+    width:100%
+
+}
+
+.xpath {
+    // don't make a long query ruin the interface
+    overflow: auto;
+}
