@@ -36,3 +36,15 @@
         top: calc(50px - (1em / 2));
     }
 }
+
+:host ::ng-deep .xpath {
+    .ui-draggable {
+        background: #a8cd28;
+        color: white !important;
+    }
+
+    .ui-draggable:hover {
+        cursor: move;
+        opacity: 0.8;
+    }
+}

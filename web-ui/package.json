@@ -28,6 +28,7 @@
     "@ng-select/ng-select": "^1.0.4",
     "@types/file-saver": "0.0.1",
     "@types/jquery": "^3.3.2",
+    "@types/jqueryui": "^1.12.2",
     "@types/lodash": "^4.14.109",
     "@types/xml2js": "^0.4.2",
     "angular-font-awesome": "^3.1.2",

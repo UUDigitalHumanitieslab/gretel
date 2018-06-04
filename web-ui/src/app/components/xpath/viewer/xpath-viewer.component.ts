@@ -36,7 +36,8 @@ export class XPathViewerComponent implements OnChanges, OnInit {
                 return {
                     classNames: a.token.type.replace('.', '-') + (a.variable ? ' path-variable' : ''),
                     content: a.token.text,
-                    variable: a.variable
+                    variable: a.variable,
+                    variableName: a.variable ? a.variable.name : null
                 }
             });
         } else {
@@ -49,4 +50,4 @@ type TypedChanges = {
     [propName in keyof XPathViewerComponent]: SimpleChange;
 }
 
-export type XPathPart = { classNames: string, content: string, variable: PathVariable }
+export type XPathPart = { classNames: string, content: string, variable: PathVariable, variableName: string | null }

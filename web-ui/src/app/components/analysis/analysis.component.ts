@@ -1,7 +1,11 @@
 ///<reference path="pivottable.d.ts"/>
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
+
 import * as $ from 'jquery';
 import 'jquery-ui';
+import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
@@ -18,6 +22,10 @@ import { FileExportRenderer } from './file-export-renderer';
 export class AnalysisComponent implements OnInit {
     public variables: PathVariable[];
     public isLoading = true;
+    public addVariable?: {
+        variable: PathVariable,
+        axis: 'row' | 'col'
+    };
 
     @Input()
     public corpus: string;
@@ -31,7 +39,8 @@ export class AnalysisComponent implements OnInit {
     constructor(private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService) {
+        private treebankService: TreebankService,
+        private ngZone: NgZone) {
     }
 
     ngOnInit() {
@@ -44,6 +53,45 @@ export class AnalysisComponent implements OnInit {
         // TODO: on change
         // skip the $node variable, this is already defined in the query
         this.variables = this.extractinatorService.extract(this.xpath).filter(v => v.name != '$node');
+    }
+
+    private makeDraggable() {
+        $('.path-variable').draggable({
+            appendTo: "body",
+            connectToSortable: ".pvtHorizList,.pvtRows",
+            drag: (event, ui) => {
+                ui.helper.css('cursor', 'move').addClass('tag');
+            },
+            stop: (event, ui) => {
+                setTimeout(() => {
+                    if ($('.pvtHorizList').find(ui.helper).length) {
+                        this.showVariableToAdd(ui.helper, 'col');
+                    }
+                });
+                setTimeout(() => {
+                    if ($('.pvtRows').find(ui.helper).length) {
+                        this.showVariableToAdd(ui.helper, 'row');
+                    }
+                });
+            },
+            helper: "clone",
+            revert: true
+        });
+    }
+
+    private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
+        console.log('shoooow');
+        let variableName = helper.data('variable');
+        helper.remove();
+        this.ngZone.run(() => {
+            console.log(variableName);
+            console.log(this.variables);
+            console.log(this.variables.find(v => v.name === variableName));
+            this.addVariable = {
+                axis,
+                variable: this.variables.find(v => v.name === variableName)
+            }
+        });
     }
 
     private async show(element: JQuery<HTMLElement>) {
@@ -59,6 +107,8 @@ export class AnalysisComponent implements OnInit {
             // TODO: improved error notification
             console.error(error);
         }
+
+        this.makeDraggable();
 
         this.isLoading = false;
     }

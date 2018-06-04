@@ -1,2 +1,10 @@
 <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
+<div class="box" *ngIf="addVariable">
+    Some nice confirmation question.
+    {{addVariable.axis}}
+    {{addVariable.variable.name}}
+    <pre>{{addVariable.variable.path}}</pre>
+    SELECT PROPERTY
+    ADD CANCEL
+</div>
 <div class="analysis-component" [ngClass]="{'is-loading': isLoading}"></div>
