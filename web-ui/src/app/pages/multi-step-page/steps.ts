@@ -208,11 +208,14 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
-        state.valid = false;
         state.selectedTreebanks = {
             corpus: state.selectedTreebanks ? state.selectedTreebanks.corpus : undefined,
             components: state.selectedTreebanks ? state.selectedTreebanks.components : undefined
         }
+        state.valid = state.selectedTreebanks.corpus !== undefined &&
+            state.selectedTreebanks.components !== undefined &&
+            state.selectedTreebanks.components.length > 0;
+
         return state;
     }
 
