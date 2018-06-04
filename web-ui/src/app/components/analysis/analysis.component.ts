@@ -16,7 +16,7 @@ import { FileExportRenderer } from './file-export-renderer';
     styleUrls: ['./analysis.component.scss']
 })
 export class AnalysisComponent implements OnInit {
-    private variables: PathVariable[];
+    public variables: PathVariable[];
     public isLoading = true;
 
     @Input()
