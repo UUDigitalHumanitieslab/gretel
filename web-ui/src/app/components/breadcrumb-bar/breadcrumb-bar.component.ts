@@ -12,17 +12,7 @@ export interface Crumb{
   templateUrl: './breadcrumb-bar.component.html',
   styleUrls: ['./breadcrumb-bar.component.scss']
 })
-export class BreadcrumbBarComponent implements OnInit {
-
-  constructor() { }
-
+export class BreadcrumbBarComponent {
   @Input() crumbs: Crumb[]= [];
   @Input() currentCrumb: number;
-
-  @Output() crumbClick = new EventEmitter<number>();
-
-  ngOnInit() {
-  }
-
-
 }

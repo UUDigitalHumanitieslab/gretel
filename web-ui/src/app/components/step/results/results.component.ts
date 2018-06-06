@@ -1,7 +1,7 @@
-import {Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Subscription} from 'rxjs/Subscription';
-import {Observable} from 'rxjs/Observable';
+import { Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -9,8 +9,8 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/switchMap';
 
-import {ValueEvent} from 'lassy-xpath/ng';
-import {ClipboardService} from 'ngx-clipboard';
+import { ValueEvent } from 'lassy-xpath/ng';
+import { ClipboardService } from 'ngx-clipboard';
 
 import {
     ConfigurationService,
@@ -21,10 +21,10 @@ import {
     ResultsService,
     TreebankService
 } from '../../../services/_index';
-import {TableColumn} from '../../tables/selectable-table/TableColumn';
-import {Filter} from '../../filters/filters.component';
-import {TreebankMetadata} from '../../../treebank';
-import {StepComponent} from "../step.component";
+import { TableColumn } from '../../tables/selectable-table/TableColumn';
+import { Filter } from '../../filters/filters.component';
+import { TreebankMetadata } from '../../../treebank';
+import { StepComponent } from "../step.component";
 
 const debounceTime = 200;
 
@@ -95,20 +95,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public filters: Filter[] = [];
 
     public columns = [
-        {field: 'number', header: '#', width: '5%'},
-        {field: 'fileId', header: 'ID', width: '20%'},
-        {field: 'component', header: 'Component', width: '20%'},
-        {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
+        { field: 'number', header: '#', width: '5%' },
+        { field: 'fileId', header: 'ID', width: '20%' },
+        { field: 'component', header: 'Component', width: '20%' },
+        { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
     private results: Hit[] = [];
     private subscriptions: Subscription[];
 
     constructor(private configurationService: ConfigurationService,
-                private downloadService: DownloadService,
-                private clipboardService: ClipboardService,
-                private resultsService: ResultsService,
-                private treebankService: TreebankService) {
+        private downloadService: DownloadService,
+        private clipboardService: ClipboardService,
+        private resultsService: ResultsService,
+        private treebankService: TreebankService) {
         super();
         this.subscriptions = [
             this.liveMetadataCounts(),
@@ -169,7 +169,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public hideComponents(components: string[] | undefined = undefined) {
         if (components !== undefined) {
             this.hiddenComponents = Object.assign({}, ...components.map(name => {
-                return {[name]: true}
+                return { [name]: true }
             }));
         }
 
@@ -302,14 +302,13 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 
-    showWarning() {
-        throw new Error('Should never show warning');
+    getValidationMessage() {
+        // Should never show warning
     }
 
     updateValidity() {
-
     }
 }
 type TypedChanges = {
     [propName in keyof ResultsComponent]: SimpleChange;
-    }
+}

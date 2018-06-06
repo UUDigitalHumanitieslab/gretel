@@ -1,0 +1,128 @@
+// rudimentary override of primeng theme to make it more Bulma-ish
+.ui-table.bulma {
+    table {
+        border-collapse: collapse;
+    }
+
+    %cell {
+        background: $white;
+        border: $table-cell-border;
+        border-width: $table-cell-border-width;
+        color: $table-color;
+        padding: $table-cell-padding;
+    }
+
+    .ui-table-thead > tr {
+        > th,
+        > td {
+            @extend %cell;
+
+            border-width: $table-head-cell-border-width;
+            color: $table-head-cell-color;
+        }
+    }
+
+    .ui-table-tbody > tr {
+        > th,
+        > td {
+            @extend %cell;
+        }
+    }
+
+    .ui-table-tfoot > tr {
+        > th,
+        > td {
+            @extend %cell;
+
+            border-width: $table-foot-cell-border-width;
+            color: $table-foot-cell-color;
+        }
+    }
+
+    &.is-bordered {
+        table {
+            border: $table-cell-border;
+        }
+
+        table.ui-table-scrollable-header-table {
+            border: none;
+
+            .ui-table-thead > tr > {
+                td, th {
+                    border-bottom: none;
+                }
+            }
+        }
+
+        .ui-table-thead > tr,
+        .ui-table-tbody > tr,
+        .ui-table-tfoot > tr {
+            > th,
+            > td {
+                border-width: 1px;
+            }
+
+            &:last-child {
+                > th,
+                > td {
+                    border-bottom-width: 1px;
+                }
+            }
+        }
+    }
+
+    &:not(.is-bordered) {
+        table {
+            border: none;
+        }
+
+        .ui-table-tbody > tr:last-child {
+            > td,
+            > th {
+                border-bottom-width: 0;
+            }
+        }
+    }
+
+    &.is-striped {
+        .ui-table-tbody > tr:nth-child(even) {
+            > td, > th {
+                background-color: $table-striped-row-even-background-color;
+            }
+        }
+
+        &.is-hoverable .ui-table-tbody > tr:nth-child(even):hover {
+            > td, > th {
+                background-color: $table-striped-row-even-hover-background-color;
+            }
+        }
+
+        &:not(.is-hoverable) .ui-table-tbody > tr:nth-child(even):hover {
+            > td, > th {
+                background-color: $table-striped-row-even-background-color;
+            }
+        }
+    }
+
+    &:not(.is-striped) {
+        .ui-table-tbody > tr:nth-child(even) {
+            > td, > th {
+                background-color: $table-background-color;
+            }
+        }
+    }
+
+    &.is-hoverable {
+        .ui-table-tbody > tr:hover {
+            > td, > th {
+                background-color: $table-row-hover-background-color;
+            }
+        }
+    }
+}
+
+// $table-head-cell-color	$text-strong
+// $table-foot-cell-border-width	2px 0 0
+// $table-foot-cell-color	$text-strong
+// $table-row-active-background-color	$primary
+// $table-row-active-color	$primary-invert

@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
-import {StepComponent} from "../step.component";
-import {TreebankService} from "../../../services/treebank.service";
-import {Treebank, TreebankInfo} from "../../../treebank";
-import {TableColumn} from "../../tables/selectable-table/TableColumn";
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { StepComponent } from "../step.component";
+import { TreebankService } from "../../../services/treebank.service";
+import { Treebank, TreebankInfo } from "../../../treebank";
+import { TableColumn } from "../../tables/selectable-table/TableColumn";
 
-interface info extends TreebankInfo {
+interface Info extends TreebankInfo {
     selected: boolean;
 }
 @Component({
@@ -13,32 +13,27 @@ interface info extends TreebankInfo {
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
-
     items: Treebank[];
-    info: { [title: string]: info[] } = {};
-    warning: boolean = false;
+    info: { [title: string]: Info[] } = {};
     treebank: string;
     loading: boolean = false;
 
-    @Output() onUpdateSelected = new EventEmitter<any>();
-
-    @Output() mainTreebankChange = new EventEmitter<string>();
     @Input() subTreebanks: string[];
+
+    @Output() onUpdateSelected = new EventEmitter<any>();
+    @Output() mainTreebankChange = new EventEmitter<string>();
     @Output() subTreebanksChange = new EventEmitter<string[]>();
 
     /**
-     *  gets the subtreebansk whenever the mainTreebank is set
+     * Gets the sub-treebanks whenever the main treebank is set
      * @param treebank
      */
     @Input()
-    set mainTreebank(treebank: string){
-
-        //
+    set mainTreebank(treebank: string) {
         this.treebank = treebank;
-        if(treebank){
-            this.getSubTreebanks({title: treebank, id: -1});
+        if (treebank) {
+            this.getSubTreebanks({ title: treebank, id: -1 });
         }
-
     }
 
     constructor(private treebankService: TreebankService) {
@@ -47,7 +42,6 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     }
 
     valid: boolean;
-
 
     columns: TableColumn<TreebankInfo>[] = [
         {
@@ -70,14 +64,9 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         })
     }
 
-    treebankChange(e) {
-        if (e.target.checked) {
-            this.treebank = e.target.value;
-            let treebank = this.items.find(t => t.title == e.target.value);
-            this.getSubTreebanks(treebank)
-        } else {
-            this.treebank = undefined;
-        }
+    treebankChange(treebank: Treebank) {
+        this.treebank = treebank.title;
+        this.getSubTreebanks(treebank);
         this.updateValidity();
     }
 
@@ -89,8 +78,8 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         let results = [];
         this.loading = true;
         this.treebankService.getSubTreebanks(treebank).then((info) => {
-            //To keep track if we selected the given subpart of the treebank.
-            this.info[treebank.title] = info.map(x => Object.assign(x, {selected: true}) as info);
+            // To keep track whether we selected the given sub-part of the treebank.
+            this.info[treebank.title] = info.map(x => Object.assign(x, { selected: true }) as Info);
             this.info[treebank.title].forEach(entry => entry.selected = true);
             this.updateSelected();
             this.loading = false;
@@ -114,11 +103,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
         this.onChangeValid.emit(this.valid);
     }
 
-    /**
-     * Shows a warning.
-     * This warning should give info why the options that the user selected is not valid.
-     */
-    showWarning() {
-        this.warning = true;
+    getValidationMessage() {
+        return 'Please select a treebank and the components.';
     }
 }

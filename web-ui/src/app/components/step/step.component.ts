@@ -22,6 +22,9 @@ export abstract class StepComponent {
 
     /**
      * Gives an warning that helps the user to understand why the current input is not valid
+     *
+     * @returns a message explaining the situation, or nothing when the component will show
+     * the feedback itself.
      */
-    public abstract showWarning();
+    public abstract getValidationMessage(): string | void;
 }
