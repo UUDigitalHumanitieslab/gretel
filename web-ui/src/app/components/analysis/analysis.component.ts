@@ -9,7 +9,7 @@ import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, XPathAttribute } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable, XPathAttribute, ReconstructorService } from 'lassy-xpath/ng';
 
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
@@ -29,6 +29,8 @@ export class AnalysisComponent implements OnInit {
     private metadata: TreebankMetadata[];
 
     public variables: PathVariable[];
+    public treeXml: string;
+
     public isLoading = true;
     public selectedVariable?: SelectedVariable;
 
@@ -43,13 +45,11 @@ export class AnalysisComponent implements OnInit {
     @Input()
     public xpath: string;
 
-    @Input()
-    public subTreeXml: string;
-
     public attributes: { value: string, label: string }[];
 
     constructor(private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
+        private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
         private ngZone: NgZone) {
@@ -64,6 +64,7 @@ export class AnalysisComponent implements OnInit {
     private initialize() {
         // TODO: on change
         this.variables = this.extractinatorService.extract(this.xpath);
+        this.treeXml = this.reconstructorService.construct(this.variables, this.xpath);
 
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.

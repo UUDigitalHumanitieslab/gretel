@@ -6,9 +6,9 @@
             <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
         </div>
     </div>
-    <div class="column" *ngIf="subTreeXml">
+    <div class="column" *ngIf="treeXml">
         <h2 class="subtitle">Tree</h2>
-        <grt-tree-visualizer [xml]="subTreeXml"></grt-tree-visualizer>
+        <grt-tree-visualizer [xml]="treeXml"></grt-tree-visualizer>
     </div>
 </div>
 <div class="modal is-active" *ngIf="selectedVariable">

@@ -9,3 +9,8 @@
         <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="In the results, show the sentence before and after the matching sentence to provide a broader context"></i>
     </label>
 </div>
+<ng-container *ngIf="treeXml">
+    <h2 class="subtitle">Tree</h2>
+    <p>This is a visualization of the entered query.</p>
+    <grt-tree-visualizer [xml]="treeXml"></grt-tree-visualizer>
+</ng-container>
