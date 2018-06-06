@@ -10,7 +10,7 @@
         <em>XPath query</em>, which will be used to do the actual treebank search.
     </p>
 </div>
-<table class="table is-striped is-bordered is-fullwidth" *ngIf="indexedTokens">
+<table class="table is-striped is-fullwidth" *ngIf="indexedTokens">
     <thead>
         <tr>
             <th>Sentence</th>
@@ -63,9 +63,9 @@
                 </div>
             </div>
         </h2>
-        <pre *ngIf="!isCustomXPath" (click)="editXPath()">{{xpath}}</pre>
+        <grt-xpath-viewer *ngIf="!isCustomXPath" (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
         <p-message *ngIf="isCustomXPath && warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
-        <lx-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
+        <grt-xpath-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></grt-xpath-editor>
     </div>
     <div class="column">
         <h2 class="subtitle">Additional Search Options</h2>

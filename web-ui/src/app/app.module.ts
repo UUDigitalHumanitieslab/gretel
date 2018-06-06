@@ -49,13 +49,14 @@ import {
 } from "./services/_index";
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
+import { XPathEditorComponent } from "./components/xpath/editor/xpath-editor.component";
+import { XPathViewerComponent } from "./components/xpath/viewer/xpath-viewer.component";
 import { FiltersModule } from "./components/filters/filters.module";
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
-import { MultiStepPageComponent } from './pages/multi-step-page/multi-step-page.component';
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
-import {ActivatedRoute, Router, RouterModule} from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 
 export const declarations: any[] = [
     AppComponent,
@@ -82,10 +83,11 @@ export const declarations: any[] = [
     DistributionListComponent,
     TreeVisualizerComponent,
     ExampleBasedSearchComponent,
-    MultiStepPageComponent,
     SentenceInputComponent,
     ParseComponent,
-    MatrixComponent];
+    MatrixComponent,
+    XPathEditorComponent,
+    XPathViewerComponent];
 
 export const imports: any[] = [
     BrowserModule,

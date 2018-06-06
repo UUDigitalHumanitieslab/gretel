@@ -16,7 +16,7 @@ export class SentenceInputComponent extends StepComponent {
         super();
     }
 
-    showWarning() {
+    getValidationMessage() {
         this.warning = true;
     }
 

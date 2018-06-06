@@ -21,6 +21,7 @@ import {
     ResultsService,
     TreebankService
 } from '../../../services/_index';
+
 import {TableColumn} from '../../tables/selectable-table/TableColumn';
 import {Filter} from '../../filters/filters.component';
 import {TreebankMetadata} from '../../../treebank';
@@ -302,12 +303,17 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 
+
     showWarning() {
         throw new Error('Should never show warning');
     }
 
-    updateValidity() {
 
+    getValidationMessage() {
+        // Should never show warning
+    }
+
+    updateValidity() {
     }
 }
 type TypedChanges = {

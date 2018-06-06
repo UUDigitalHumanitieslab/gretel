@@ -163,8 +163,11 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     if (isset($variables) && $variables != null) {
         foreach ($variables as $index => $value) {
             $name = $value['name'];
-            $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
-            $variable_results .= '<var name="'.$name.'">{'.$name.'/@lemma}{'.$name.'/@pos}</var>';
+            if ($name != '$node') {
+                // the root node is already declared in the query itself, do not declare it again
+                $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
+                $variable_results .= '<var name="'.$name.'">{'.$name.'/@*}</var>';
+            }
         }
         $variable_results = '<vars>'.$variable_results.'</vars>';
     }

@@ -1,21 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { XpathInputComponent } from './xpath-input.component';
+import { XPathEditorComponent } from './xpath-editor.component';
 import { commonTestBed } from '../../../common-test-bed';
 
-describe('XpathInputComponent', () => {
-    let component: XpathInputComponent;
-    let fixture: ComponentFixture<XpathInputComponent>;
+describe('XPath Editor', () => {
+    let component: XPathEditorComponent;
+    let fixture: ComponentFixture<XPathEditorComponent>;
 
     beforeEach(async(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 
-    beforeEach(async () => {
-        fixture = TestBed.createComponent(XpathInputComponent);
+    beforeEach(() => {
+        fixture = TestBed.createComponent(XPathEditorComponent);
         component = fixture.componentInstance;
-        component.value = '//node';
-        return fixture.detectChanges();
+        fixture.detectChanges();
     });
 
     it('should create', () => {

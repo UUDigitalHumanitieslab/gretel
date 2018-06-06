@@ -1,0 +1,30 @@
+@import "../../../../colors";
+
+.xpath {
+    // don't make a long query ruin the interface
+    overflow: auto;
+
+    .path {
+        color: $xpath-path;
+    }
+
+    :not(.attribute-sigil) + .node-name,
+    .function-name {
+        color: $xpath-name;
+        font-weight: bold;
+    }
+
+    .attribute-sigil,
+    .attribute-sigil + .node-name {
+        color: $xpath-attribute;
+    }
+
+    .operator {
+        color: $xpath-operator;
+    }
+
+    .string-delimiter,
+    .string-value {
+        color: $xpath-string;
+    }
+}

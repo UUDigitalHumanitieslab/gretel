@@ -52,10 +52,10 @@
             </div>
         </h2>
         <div class="content" *ngIf="!isModifyingXPath">
-            <pre (click)="editXPath()" class="is-print-paddingless">{{xpath}}</pre>
+            <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
             <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
         </div>
-        <lx-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></lx-editor>
+        <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></grt-xpath-editor>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
@@ -105,7 +105,7 @@
     </div>
     <div class="column">
         <ng-container *ngIf="filteredResults.length != 0; else warning">
-            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true">
+            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true" styleClass="bulma">
                 <ng-template pTemplate="colgroup" let-columns>
                     <colgroup>
                         <col *ngFor="let col of columns" [style.width]="col.width">
