@@ -37,15 +37,22 @@
     }
 }
 
-:host ::ng-deep .xpath {
-    .ui-draggable {
-        background: #a8cd28;
-        color: white !important;
+:host ::ng-deep {
+    .pvtUi, .pvtTriangle {
+        // work-around from https://github.com/nicolaskruchten/pivottable/issues/865#issuecomment-361775178
+        position: relative;
     }
 
-    .ui-draggable:hover {
-        cursor: move;
-        opacity: 0.8;
+    .xpath {
+        .ui-draggable {
+            background: #a8cd28;
+            color: white !important;
+        }
+
+        .ui-draggable:hover {
+            cursor: move;
+            opacity: 0.8;
+        }
     }
 }
 

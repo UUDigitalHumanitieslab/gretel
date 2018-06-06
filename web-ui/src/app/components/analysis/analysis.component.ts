@@ -9,7 +9,7 @@ import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, XPathAttribute, XpathAttributes } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable, XPathAttribute } from 'lassy-xpath/ng';
 
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
@@ -43,13 +43,7 @@ export class AnalysisComponent implements OnInit {
     @Input()
     public xpath: string;
 
-    public attributes = Object.keys(XpathAttributes).map(p => {
-        let description = XpathAttributes[p].description;
-        return {
-            value: p,
-            label: description ? `${p} (${description})` : p
-        };
-    });
+    public attributes: { value: string, label: string }[];
 
     constructor(private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
@@ -71,7 +65,7 @@ export class AnalysisComponent implements OnInit {
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.
         if (this.variables.length > 0) {
-            let firstVariable = this.variables[0];
+            let firstVariable = this.variables[this.variables.length > 1 ? 1 : 0];
             this.selectedVariables = [{
                 attribute: 'pos',
                 axis: 'row',
@@ -149,13 +143,19 @@ export class AnalysisComponent implements OnInit {
         this.left = offset.left;
 
         helper.remove();
+
+        // only work with available attributes
+        let attributes = this.analysisService.getVariableAttributes(variableName, this.hits);
+
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
+            this.attributes = attributes;
+            let values = attributes.map(x => x.value);
             this.selectedVariable = {
-                attribute: 'pos',
+                attribute: values.find(v => v == 'pos') || values.find(v => v == 'cat') || values[0],
                 axis,
                 variable: this.variables.find(v => v.name === variableName)
-            }
+            };
         });
     }
 
