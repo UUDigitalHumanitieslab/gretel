@@ -44,6 +44,13 @@ Date: ${new Date()}
         this.downloadRows('gretel-xpath.txt', 'text/plain', [xpath]);
     }
 
+    public downloadFilelist(filenames: string[], name: string, header: string = undefined, extension: string ='.fl'){
+        if(!header){
+            header = name
+        }
+        saveAs(new Blob([`${header}\n${filenames.join('\n')}`], {type:'text/txt'}), `${name}${extension}`)
+    }
+
     private highlightSentence(highlightedSentence: SafeHtml) {
         return this.sanitizer.sanitize(SecurityContext.HTML, highlightedSentence)
             .replace(/<strong>/g, '<hit>')

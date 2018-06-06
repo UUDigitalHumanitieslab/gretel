@@ -51,6 +51,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set corpus(value: string) {
         this.corpusSubject.next(value);
     }
+
     public get corpus() {
         return this.corpusSubject.value;
     }
@@ -59,6 +60,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set components(value: string[]) {
         this.componentsSubject.next(value);
     }
+
     public get components() {
         return this.componentsSubject.value;
     }
@@ -67,6 +69,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set xpath(value: string) {
         this.xpathSubject.next(value);
     }
+
     public get xpath() {
         return this.xpathSubject.value;
     }
@@ -140,6 +143,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.downloadService.downloadXPath(this.xpath);
     }
 
+
+    public downloadFilelist() {
+        const fileNames = this.getFileNames();
+        this.downloadService.downloadFilelist(fileNames, 'filelist');
+    }
+
+    /**
+     * Returns the unique file names from the filtered results sorted on name.
+     */
+    public getFileNames() {
+        const allNames = new Set(this.filteredResults.map((result) => result.fileId));
+        return Array.from(allNames).sort()
+    }
+
     public copyXPath() {
         if (this.clipboardService.copyFromContent(this.xpath)) {
             this.xpathCopied = true;
@@ -151,7 +168,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     public hideComponents(components: string[] | undefined = undefined) {
         if (components !== undefined) {
-            this.hiddenComponents = Object.assign({}, ...components.map(name => { return { [name]: true } }));
+            this.hiddenComponents = Object.assign({}, ...components.map(name => {
+                return { [name]: true }
+            }));
         }
 
         this.filteredResults = this.filterHits(this.results);
@@ -264,7 +283,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     false,
                     filterValues,
                     [],
-                    () => { this.loading = false; });
+                    () => {
+                        this.loading = false;
+                    });
             })
             .do(results => {
                 this.results.push(...results.hits);
