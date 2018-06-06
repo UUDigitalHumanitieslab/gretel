@@ -1,14 +1,14 @@
 ///<reference path="pivottable.d.ts"/>
-import { Component, Input, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import * as $ from 'jquery';
 import 'jquery-ui';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
+import {ExtractinatorService, PathVariable} from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
-import { FileExportRenderer } from './file-export-renderer';
+import {AnalysisService, ResultsService, TreebankService, Hit} from '../../services/_index';
+import {FileExportRenderer} from './file-export-renderer';
 
 @Component({
     selector: 'grt-analysis',
@@ -28,10 +28,13 @@ export class AnalysisComponent implements OnInit {
     @Input()
     public xpath: string;
 
+    count: number;
+
     constructor(private analysisService: AnalysisService,
-        private extractinatorService: ExtractinatorService,
-        private resultsService: ResultsService,
-        private treebankService: TreebankService) {
+                private extractinatorService: ExtractinatorService,
+                private resultsService: ResultsService,
+                private treebankService: TreebankService) {
+        this.count = 0;
     }
 
     ngOnInit() {
@@ -55,6 +58,7 @@ export class AnalysisComponent implements OnInit {
             ]);
 
             this.pivot(element, metadata.map(m => m.field), hits);
+
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -67,7 +71,7 @@ export class AnalysisComponent implements OnInit {
         let utils = $.pivotUtilities;
         let heatmap = utils.renderers["Heatmap"];
         let renderers = $.extend($.pivotUtilities.renderers,
-            { 'File export': (new FileExportRenderer()).render });
+            {'File export': (new FileExportRenderer()).render});
         let pivotData = this.analysisService.getFlatTable(hits, this.variables.map(x => x.name), metadataKeys);
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.
@@ -86,6 +90,26 @@ export class AnalysisComponent implements OnInit {
                 cols: defaultVariable.map(v => `pos_${v}`),
                 renderer: heatmap,
                 renderers
-            });
+            }).on('mouseup', () => this.addEvents());
+
+    }
+
+    private addEvents() {
+        $('.pvtVal').off('click');
+        $('.pvtVal').on('click', ($event) => {
+            const parent = $event.currentTarget.parentNode;
+            console.log(this.getElementByClass(parent.children,'pvtRowLabel'));
+
+        } );
+    }
+
+    private getElementByClass(htmlCollection: HtmlCollection, className: string){
+        const result = [];
+        for(let i = 0; i < htmlCollection.length; i++){
+            if($(htmlCollection[i]).hasClass(className)){
+                result.push(htmlCollection[i])
+            }
+        }
+        return result
     }
 }
