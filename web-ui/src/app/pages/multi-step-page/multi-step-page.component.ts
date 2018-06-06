@@ -68,7 +68,6 @@ export class MultiStepPageComponent<T extends GlobalState> implements OnInit, Af
 
     initializeTransitions() {
         let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
-        console.log(this.crumbs);
         for (const crumb of this.crumbs) {
             transitions.push(new JumpToStepTransition(this.steps[crumb.number]))
         }
