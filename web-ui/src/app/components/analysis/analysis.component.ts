@@ -1,18 +1,19 @@
 ///<reference path="pivottable.d.ts"/>
+///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
 import * as $ from 'jquery';
-import 'jquery-ui';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable, XPathAttribute, XpathAttributes } from 'lassy-xpath/ng';
 
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
+import { TreebankMetadata } from '../../treebank';
 
 @Component({
     selector: 'grt-analysis',
@@ -20,12 +21,18 @@ import { FileExportRenderer } from './file-export-renderer';
     styleUrls: ['./analysis.component.scss']
 })
 export class AnalysisComponent implements OnInit {
+    left: number;
+    top: number;
+    private $element: JQuery<HTMLElement>;
+    private pivotUiOptions: PivotUiOptions;
+    private hits: Hit[];
+    private metadata: TreebankMetadata[];
+
     public variables: PathVariable[];
     public isLoading = true;
-    public addVariable?: {
-        variable: PathVariable,
-        axis: 'row' | 'col'
-    };
+    public selectedVariable?: SelectedVariable;
+
+    public selectedVariables: SelectedVariable[];
 
     @Input()
     public corpus: string;
@@ -36,6 +43,14 @@ export class AnalysisComponent implements OnInit {
     @Input()
     public xpath: string;
 
+    public attributes = Object.keys(XpathAttributes).map(p => {
+        let description = XpathAttributes[p].description;
+        return {
+            value: p,
+            label: description ? `${p} (${description})` : p
+        };
+    });
+
     constructor(private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private resultsService: ResultsService,
@@ -44,15 +59,54 @@ export class AnalysisComponent implements OnInit {
     }
 
     ngOnInit() {
-        let $element = $('.analysis-component');
+        this.$element = $('.analysis-component');
         this.initialize();
-        this.show($element);
+        this.show(this.$element);
     }
 
     private initialize() {
         // TODO: on change
-        // skip the $node variable, this is already defined in the query
-        this.variables = this.extractinatorService.extract(this.xpath).filter(v => v.name != '$node');
+        this.variables = this.extractinatorService.extract(this.xpath);
+
+        // Show a default pivot using the first node variable's lemma property against the POS property.
+        // This way the user will get to see some useable values to help clarify the interface.
+        if (this.variables.length > 0) {
+            let firstVariable = this.variables[0];
+            this.selectedVariables = [{
+                attribute: 'pos',
+                axis: 'row',
+                variable: firstVariable
+            }, {
+                attribute: 'lemma',
+                axis: 'col',
+                variable: firstVariable
+            }];
+
+            let utils = $.pivotUtilities;
+            let heatmap = utils.renderers["Heatmap"];
+            let renderers = $.extend($.pivotUtilities.renderers,
+                { 'File export': (new FileExportRenderer()).render });
+
+            this.pivotUiOptions = {
+                aggregators: {
+                    'Count': utils.aggregators['Count'],
+                    'Count Unique Values': utils.aggregators['Count Unique Values'],
+                    'Count as Fraction of Columns': utils.aggregators['Count as Fraction of Columns'],
+                    'Count as Fraction of Total': utils.aggregators['Count as Fraction of Total'],
+                    'First': utils.aggregators['First'],
+                    'Last': utils.aggregators['Last']
+                },
+                rows: [firstVariable.name + '.pos'],
+                cols: [firstVariable.name + '.lemma'],
+                renderer: heatmap,
+                renderers,
+                onRefresh: (data) => {
+                    this.pivotUiOptions = data;
+                }
+            }
+        } else {
+            this.selectedVariables = [];
+        }
     }
 
     private makeDraggable() {
@@ -63,31 +117,42 @@ export class AnalysisComponent implements OnInit {
                 ui.helper.css('cursor', 'move').addClass('tag');
             },
             stop: (event, ui) => {
-                setTimeout(() => {
-                    if ($('.pvtHorizList').find(ui.helper).length) {
-                        this.showVariableToAdd(ui.helper, 'col');
-                    }
-                });
-                setTimeout(() => {
-                    if ($('.pvtRows').find(ui.helper).length) {
-                        this.showVariableToAdd(ui.helper, 'row');
-                    }
-                });
+                if ($('.pvtHorizList').find(ui.helper).length) {
+                    this.showVariableToAdd(ui.helper, 'col');
+                }
+                if ($('.pvtRows').find(ui.helper).length) {
+                    this.showVariableToAdd(ui.helper, 'row');
+                }
             },
             helper: "clone",
             revert: true
         });
     }
 
+    public cancelVariable() {
+        this.selectedVariable = undefined;
+    }
+
+    public async addVariable() {
+        this.selectedVariables.push(this.selectedVariable);
+        this.pivotUiOptions[this.selectedVariable.axis == 'row' ? 'rows' : 'cols']
+            .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
+        this.selectedVariable = undefined;
+        this.$element.empty();
+        this.show(this.$element);
+    }
+
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        console.log('shoooow');
         let variableName = helper.data('variable');
+        let offset = $('.pvtRendererArea').offset();
+        this.top = offset.top;
+        this.left = offset.left;
+
         helper.remove();
         this.ngZone.run(() => {
-            console.log(variableName);
-            console.log(this.variables);
-            console.log(this.variables.find(v => v.name === variableName));
-            this.addVariable = {
+            // show the window to add a new variable for analysis
+            this.selectedVariable = {
+                attribute: 'pos',
                 axis,
                 variable: this.variables.find(v => v.name === variableName)
             }
@@ -97,12 +162,14 @@ export class AnalysisComponent implements OnInit {
     private async show(element: JQuery<HTMLElement>) {
         this.isLoading = true;
         try {
-            let [metadata, hits] = await Promise.all([
-                this.treebankService.getMetadata(this.corpus),
-                this.resultsService.promiseAllResults(this.xpath, this.corpus, this.components, false, true, [], this.variables)
-            ]);
+            if (!this.metadata || !this.hits) {
+                [this.metadata, this.hits] = await Promise.all([
+                    this.treebankService.getMetadata(this.corpus),
+                    this.resultsService.promiseAllResults(this.xpath, this.corpus, this.components, false, true, [], this.variables)
+                ]);
+            }
 
-            this.pivot(element, metadata.map(m => m.field), hits);
+            this.pivot(element, this.metadata.map(m => m.field), this.hits);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -114,28 +181,26 @@ export class AnalysisComponent implements OnInit {
     }
 
     private pivot(element: JQuery, metadataKeys: string[], hits: Hit[]) {
-        let utils = $.pivotUtilities;
-        let heatmap = utils.renderers["Heatmap"];
-        let renderers = $.extend($.pivotUtilities.renderers,
-            { 'File export': (new FileExportRenderer()).render });
-        let pivotData = this.analysisService.getFlatTable(hits, this.variables.map(x => x.name), metadataKeys);
-        // Show a default pivot using the first node variable's lemma property against the POS property.
-        // This way the user will get to see some useable values to help clarify the interface.
-        let defaultVariable = this.variables.length > 0 ? [this.variables[0].name.substr(1)] : [];
-        return element.pivotUI(
-            pivotData, {
-                aggregators: {
-                    'Count': utils.aggregators['Count'],
-                    'Count Unique Values': utils.aggregators['Count Unique Values'],
-                    'Count as Fraction of Columns': utils.aggregators['Count as Fraction of Columns'],
-                    'Count as Fraction of Total': utils.aggregators['Count as Fraction of Total'],
-                    'First': utils.aggregators['First'],
-                    'Last': utils.aggregators['Last']
-                },
-                rows: defaultVariable.map(v => `lem_${v}`),
-                cols: defaultVariable.map(v => `pos_${v}`),
-                renderer: heatmap,
-                renderers
-            });
+        let variables = this.selectedVariables.reduce((grouped, s) => {
+            grouped[s.variable.name]
+                ? grouped[s.variable.name].push(s.attribute)
+                : grouped[s.variable.name] = [s.attribute];
+            return grouped;
+        }, {});
+        let pivotData = this.analysisService.getFlatTable(
+            hits,
+            variables,
+            metadataKeys);
+        element.empty();
+        let table = $('<div>');
+        element.append(table);
+        table.pivotUI(pivotData, this.pivotUiOptions);
+        $('.pvtUi').addClass('table is-bordered');
     }
+}
+
+type SelectedVariable = {
+    attribute: string,
+    variable: PathVariable,
+    axis: 'row' | 'col'
 }

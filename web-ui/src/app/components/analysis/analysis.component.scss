@@ -48,3 +48,12 @@
         opacity: 0.8;
     }
 }
+
+.analysis-component {
+    overflow: auto;
+}
+
+.modal-content {
+    // make sure the variable dropdown can be used
+    overflow: visible;
+}
