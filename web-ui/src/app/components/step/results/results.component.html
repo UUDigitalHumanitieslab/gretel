@@ -1,4 +1,4 @@
-<div class="columns is-desktop">
+ <div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column xpath">
         <h2 class="subtitle">
@@ -69,6 +69,14 @@
         </div>
         <div class="level-item level-right is-hidden-print">
             <div class="field is-grouped">
+                <p class="control">
+                    <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadFilelist()" title="Download the names of the files in a filelist (.fl)">
+                        <span class="icon is-large">
+                            <i class="fas fa-download"></i>
+                        </span>
+                        <span>Download Filelist</span>
+                    </a>
+                </p>
                 <p class="control">
                     <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
                         <span class="icon is-large">
