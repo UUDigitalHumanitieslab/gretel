@@ -2,3 +2,11 @@
     // they can be nested quite deeply
     overflow: auto;
 }
+.sentence-matrix {
+    // loooong sentence
+    overflow: auto;
+
+    .table th {
+        white-space: nowrap;
+    }
+}

@@ -16,7 +16,7 @@
             [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
             (xpathChange)="updateXPath($event)" (onChangeValid)="setValid($event)" #results></grt-results>
         <grt-analysis *ngSwitchCase="5" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-            [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
+            [xpath]="globalState.xpath" [subTreeXml]="globalState.subTreeXml" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
     </div>
     <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>

@@ -1,7 +1,15 @@
-<h2 class="subtitle">XPath</h2>
-<div class="content">
-    <p>Drag a node into the analysis table below to analyse its properties.</p>
-    <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
+<div class="columns">
+    <div class="column">
+        <h2 class="subtitle">XPath</h2>
+        <div class="content">
+            <p>Drag a node into the analysis table below to analyse its properties.</p>
+            <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
+        </div>
+    </div>
+    <div class="column" *ngIf="subTreeXml">
+        <h2 class="subtitle">Tree</h2>
+        <grt-tree-visualizer [xml]="subTreeXml"></grt-tree-visualizer>
+    </div>
 </div>
 <div class="modal is-active" *ngIf="selectedVariable">
     <div class="modal-background"></div>

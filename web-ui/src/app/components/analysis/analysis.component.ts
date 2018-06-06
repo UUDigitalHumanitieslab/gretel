@@ -43,6 +43,9 @@ export class AnalysisComponent implements OnInit {
     @Input()
     public xpath: string;
 
+    @Input()
+    public subTreeXml: string;
+
     public attributes: { value: string, label: string }[];
 
     constructor(private analysisService: AnalysisService,
