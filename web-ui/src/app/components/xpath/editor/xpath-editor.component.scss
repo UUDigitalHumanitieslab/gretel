@@ -1,0 +1,24 @@
+@import "../../../../colors";
+
+:host ::ng-deep .ace-dawn {
+    .ace_punctuation {
+        color: $xpath-path;
+    }
+
+    .ace_keyword:not(.ace_operator) {
+        color: $xpath-name;
+        font-weight: bold;
+    }
+
+    .ace_support.ace_type {
+        color: $xpath-attribute;
+    }
+
+    .ace_operator {
+        color: $xpath-operator;
+    }
+
+    .ace_string {
+        color: $xpath-string;
+    }
+}

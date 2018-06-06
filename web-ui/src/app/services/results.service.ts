@@ -242,10 +242,7 @@ export class ResultsService {
             return {};
         }
         return data.vars.var.reduce((values, variable) => {
-            values[variable.$.name] = {
-                pos: variable.$.pos,
-                lemma: variable.$.lemma
-            };
+            values[variable.$.name] = variable.$;
             return values;
         }, {});
     }

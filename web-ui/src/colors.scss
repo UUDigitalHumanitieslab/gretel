@@ -1,0 +1,9 @@
+$primary: rgba(168, 205, 40, 1);
+$secondary: #7E6748;
+@import "~bulma/sass/utilities/_all";
+
+$xpath-path: $pre;
+$xpath-name: $primary;
+$xpath-attribute: $secondary;
+$xpath-operator: $pre;
+$xpath-string: $code;
