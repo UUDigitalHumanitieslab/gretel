@@ -1,7 +1,7 @@
-import { Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
+import {Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter} from '@angular/core';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subscription} from 'rxjs/Subscription';
+import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -9,8 +9,8 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/switchMap';
 
-import { ValueEvent } from 'lassy-xpath/ng';
-import { ClipboardService } from 'ngx-clipboard';
+import {ValueEvent} from 'lassy-xpath/ng';
+import {ClipboardService} from 'ngx-clipboard';
 
 import {
     ConfigurationService,
@@ -21,9 +21,9 @@ import {
     ResultsService,
     TreebankService
 } from '../../../services/_index';
-import { TableColumn } from '../../tables/selectable-table/TableColumn';
-import { Filter } from '../../filters/filters.component';
-import { TreebankMetadata } from '../../../treebank';
+import {TableColumn} from '../../tables/selectable-table/TableColumn';
+import {Filter} from '../../filters/filters.component';
+import {TreebankMetadata} from '../../../treebank';
 import {StepComponent} from "../step.component";
 
 const debounceTime = 200;
@@ -51,6 +51,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set corpus(value: string) {
         this.corpusSubject.next(value);
     }
+
     public get corpus() {
         return this.corpusSubject.value;
     }
@@ -59,6 +60,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set components(value: string[]) {
         this.componentsSubject.next(value);
     }
+
     public get components() {
         return this.componentsSubject.value;
     }
@@ -67,6 +69,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public set xpath(value: string) {
         this.xpathSubject.next(value);
     }
+
     public get xpath() {
         return this.xpathSubject.value;
     }
@@ -92,20 +95,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public filters: Filter[] = [];
 
     public columns = [
-        { field: 'number', header: '#', width: '5%' },
-        { field: 'fileId', header: 'ID', width: '20%' },
-        { field: 'component', header: 'Component', width: '20%' },
-        { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
+        {field: 'number', header: '#', width: '5%'},
+        {field: 'fileId', header: 'ID', width: '20%'},
+        {field: 'component', header: 'Component', width: '20%'},
+        {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
     ];
 
     private results: Hit[] = [];
     private subscriptions: Subscription[];
 
     constructor(private configurationService: ConfigurationService,
-        private downloadService: DownloadService,
-        private clipboardService: ClipboardService,
-        private resultsService: ResultsService,
-        private treebankService: TreebankService) {
+                private downloadService: DownloadService,
+                private clipboardService: ClipboardService,
+                private resultsService: ResultsService,
+                private treebankService: TreebankService) {
         super();
         this.subscriptions = [
             this.liveMetadataCounts(),
@@ -140,6 +143,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.downloadService.downloadXPath(this.xpath);
     }
 
+
+    public downloadFilelist() {
+        const fileNames = this.getFileNames();
+        this.downloadService.downloadFilelist(fileNames, 'filelist');
+    }
+
+    /**
+     * Returns the unique file names from the filtered results sorted on name.
+     */
+    public getFileNames() {
+        const allNames = new Set(this.filteredResults.map((result) => result.fileId));
+        return Array.from(allNames).sort()
+    }
+
     public copyXPath() {
         if (this.clipboardService.copyFromContent(this.xpath)) {
             this.xpathCopied = true;
@@ -151,7 +168,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     public hideComponents(components: string[] | undefined = undefined) {
         if (components !== undefined) {
-            this.hiddenComponents = Object.assign({}, ...components.map(name => { return { [name]: true } }));
+            this.hiddenComponents = Object.assign({}, ...components.map(name => {
+                return {[name]: true}
+            }));
         }
 
         this.filteredResults = this.filterHits(this.results);
@@ -264,7 +283,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     false,
                     filterValues,
                     [],
-                    () => { this.loading = false; });
+                    () => {
+                        this.loading = false;
+                    });
             })
             .do(results => {
                 this.results.push(...results.hits);
@@ -281,14 +302,14 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 
-    showWarning(){
+    showWarning() {
         throw new Error('Should never show warning');
     }
 
-    updateValidity(){
+    updateValidity() {
 
     }
 }
 type TypedChanges = {
     [propName in keyof ResultsComponent]: SimpleChange;
-}
+    }
