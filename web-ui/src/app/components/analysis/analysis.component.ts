@@ -108,7 +108,7 @@ export class AnalysisComponent implements OnInit {
     }
 
     private makeDraggable() {
-        $('.path-variable').draggable({
+        $('.path-variable,.tree-visualizer li[data-varname]').draggable({
             appendTo: "body",
             connectToSortable: ".pvtHorizList,.pvtRows",
             drag: (event, ui) => {
@@ -141,7 +141,7 @@ export class AnalysisComponent implements OnInit {
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        let variableName = helper.data('variable');
+        let variableName = helper.data('variable') || helper.data('varname');
         let offset = $('.pvtRendererArea').offset();
         this.top = offset.top;
         this.left = offset.left;
