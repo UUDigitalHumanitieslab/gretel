@@ -107,7 +107,7 @@ export class AnalysisComponent implements OnInit {
                 renderers,
                 onRefresh: (data) => {
                     this.pivotUiOptions = data;
-                    this.addEvents();
+                    this.addTableClickEvent();
                 }
             }
         } else {
@@ -205,20 +205,125 @@ export class AnalysisComponent implements OnInit {
         element.append(table);
         table.pivotUI(pivotData, this.pivotUiOptions);
         $('.pvtUi').addClass('table is-bordered');
+    }
+
+
+    private getRowFilters(element: HTMLElement) {
+        const rows = this.getRowElements(element);
+        return this.getValueFromFilters(rows, this.getRowIndex(element), 'rowSpan');
+    }
+
+    private getColumnFilters(element: HTMLElement) {
+        let columns = this.getColumnElements(element);
+        return this.getValueFromFilters(columns, this.getColumnIndex(element), 'colSpan')
+    }
+
+    /**
+     * Returns the value of the given filters, based on the given index and the spanname from which we must get the spanwidth
+     * @param filters
+     * @param index
+     * @param spanName
+     * @returns {{}}
+     */
+    private getValueFromFilters(filters, index: number, spanName: string){
+        let results = {};
+        for (let key in filters) {
+            let values = filters[key];
+            let spans = values.map(v => [v.innerHTML, v[spanName]]);
+            let value = '';
+            let total = 0;
+            for (let span of spans) {
+                total += span[1];
+                if (index < total) {
+                    value = span[0];
+                    break;
+                }
+            }
+            results[key] = value;
+        }
+        return results;
+    }
+
+
+    private getColumnIndex(element: HTMLElement) {
+        return this.getNumberFromClass(element, 'col')
 
     }
 
-    private addEvents() {
+    private getRowIndex(element: HTMLElement) {
+        return this.getNumberFromClass(element, 'row')
+    }
+
+    private getNumberFromClass(element: HTMLElement, className: string): number {
+        let name = Array.from(element.classList).filter((cName: string) => cName.includes(className))[0];
+        return parseInt(name.replace(className, ''))
+    }
+
+
+    /**
+     * Gets the columns by name containing the head elements
+     *
+     * @param element
+     * @returns {string: HTMLElement[]}
+     */
+    private getColumnElements(element: HTMLElement) {
+        let columns = {}
+        let topRows = element.parentElement.parentElement.parentElement.childNodes[0];
+        //Only use the last row.
+        let rows = Array.from(topRows.childNodes).slice(0, topRows.childNodes.length - 1);
+        for (let child of rows) {
+            let newChild: any = child //To make sure there is no compile error
+            let name = this.getElementByClass(newChild.children, 'pvtAxisLabel')[0].innerHTML;
+            let children = this.getElementByClass(newChild.children, 'pvtColLabel');
+            columns[name] = children;
+
+        }
+        return columns
+    }
+
+
+    private getRowElements(element: HTMLElement) {
+        let rows = {}
+        // First get the titles
+        let head = element.parentElement.parentElement.parentElement.childNodes[0];
+        let body = element.parentElement.parentElement.parentElement.childNodes[1];
+        //Only use the last row.
+        let headRows = Array.from(head.childNodes)[head.childNodes.length - 1];
+        let bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1);
+        let titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML);
+        let filters = {};
+        for (let title of titles) {
+            filters[title] = []
+        }
+        for (let row of bodyRows) {
+            let tempRow: any = row
+            let childElements = this.getElementByClass(tempRow.children, 'pvtRowLabel');
+
+            let index = titles.length;
+            for (let i = childElements.length -1 ; i >= 0; i--) {
+                let element = childElements[i];
+                index = index - 1;
+                let title = titles[index];
+                filters[title].push(element)
+            }
+        }
+        return filters
+    }
+
+    private addTableClickEvent() {
         $('.pvtVal').off('click');
         $('.pvtVal').on('click', ($event) => {
-            const parent = $event.currentTarget.parentElement;
-            console.log(this.getElementByClass(parent.children,'pvtRowLabel'));
+            const element = $event.currentTarget;
+            const rowFilters = this.getRowFilters(element);
+            const columnFilters = this.getColumnFilters(element);
 
-        } );
+            //TODO: Add the routing to results page
+
+        });
     }
 
-    private getElementByClass(htmlCollection: HTMLCollection, className: string) {
 
+    private getElementByClass(htmlCollection: HTMLCollection, className: string) {
         const result = [];
         for (let i = 0; i < htmlCollection.length; i++) {
             if ($(htmlCollection[i]).hasClass(className)) {
