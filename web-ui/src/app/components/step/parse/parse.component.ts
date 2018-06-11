@@ -1,22 +1,19 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { AlpinoService } from '../../../services/_index';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'grt-parse',
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent implements OnInit {
+export class ParseComponent {
     @Input()
     public xml: string;
 
     @Input('sentence')
     public sentence: string;
 
-    constructor(private alpinoService: AlpinoService) {
-    }
+    public display = 'inline';
 
-    ngOnInit() {
+    constructor() {
     }
-
 }
