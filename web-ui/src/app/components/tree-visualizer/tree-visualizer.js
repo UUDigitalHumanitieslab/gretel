@@ -15,6 +15,7 @@ var jQuery = require('jquery');
         var defaults = {
             normalView: true,
             nvFontSize: 12,
+            noFsButton: false,
             fsView: true,
             fsFontSize: 14,
             sentence: "",
@@ -65,11 +66,7 @@ var jQuery = require('jquery');
         FS.click(function (e) {
             var target = $(e.target);
             if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts, .sentence").length) {
-                FS.fadeOut(250, function () {
-                    treeFS.find("a").removeClass("hovered");
-                    removeError();
-                });
-                if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
+                close();
             }
         });
         // Zooming
@@ -77,11 +74,7 @@ var jQuery = require('jquery');
             var $this = $(this);
 
             if ($this.is(".close")) {
-                FS.fadeOut(250, function () {
-                    treeFS.find("a").removeClass("hovered");
-                    removeError();
-                });
-                if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
+                close();
             } else {
                 fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
                 sizeTreeFS();
@@ -154,7 +147,7 @@ var jQuery = require('jquery');
                     '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
                     '<aside class="tooltip" style="display: none; font-size: ' + args.nvFontSize + 'px;"">' +
                     '<ul></ul><button>&#10005;</button></aside>';
-                if (args.fsView) {
+                if (args.fsView && !args.noFsButton) {
                     SSHTML += '<button class="tv-show-fs">Fullscreen</button>';
                 }
                 SS.append(SSHTML);
@@ -214,6 +207,15 @@ var jQuery = require('jquery');
 
             // Do some small tree modifications
             treeModifier();
+        }
+
+        function close() {
+            instance.trigger('close');
+            FS.fadeOut(250, function () {
+                treeFS.find("a").removeClass("hovered");
+                removeError();
+            });
+            if (args.initFSOnClick) history.replaceState("", document.title, window.location.pathname + window.location.search);
         }
 
         // Build the HTML list output

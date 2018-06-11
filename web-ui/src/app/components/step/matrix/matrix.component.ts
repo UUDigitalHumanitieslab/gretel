@@ -38,6 +38,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Output()
     public onChangeValue = new EventEmitter<MatrixSettings>();
 
+    public subTreeDisplay = 'inline';
     public warning: boolean;
     public respectOrder;
     public retrieveContext;

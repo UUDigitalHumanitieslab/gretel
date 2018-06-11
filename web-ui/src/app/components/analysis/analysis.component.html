@@ -1,14 +1,31 @@
+<div class="notification is-primary">
+    <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to analyse its properties.</p>
+</div>
 <div class="columns">
     <div class="column">
         <h2 class="subtitle">XPath</h2>
         <div class="content">
-            <p>Drag a node into the analysis table below to analyse its properties.</p>
             <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
         </div>
     </div>
     <div class="column" *ngIf="treeXml">
-        <h2 class="subtitle">Tree</h2>
-        <grt-tree-visualizer [xml]="treeXml"></grt-tree-visualizer>
+        <h2 class="subtitle">
+            <div class="level">
+                <div class="level-item level-left">
+                    Tree
+                </div>
+                <div class="level-item level-right is-hidden-print">
+                    <p class="control">
+                        <a class="button" role="button" (click)="treeDisplay = 'both'" title="Full screen display of the tree.">
+                            <span class="icon is-large">
+                                <i class="fas fa-expand"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </h2>
+        <grt-tree-visualizer [xml]="treeXml" [display]="treeDisplay" [fullScreenButton]="false" (onDisplayChange)="treeDisplay = $event"></grt-tree-visualizer>
     </div>
 </div>
 <div class="modal is-active" *ngIf="selectedVariable">
@@ -38,5 +55,5 @@
     </div>
     <button class="modal-close is-large" aria-label="close" (click)="cancelVariable()"></button>
 </div>
-<h1 class="title">Analysis</h1>
+<h1 class="title">Analysis Table</h1>
 <div class="analysis-component box" [ngClass]="{'is-loading': isLoading}"></div>

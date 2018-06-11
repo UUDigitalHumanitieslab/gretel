@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, OnChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild } from '@angular/core';
 import * as $ from 'jquery';
 import './tree-visualizer';
 
@@ -12,7 +12,13 @@ export class TreeVisualizerComponent implements OnChanges {
     public xml: string;
 
     @Input()
-    public fullScreen = false;
+    public display: 'fullscreen' | 'inline' | 'both' = 'inline';
+
+    @Input()
+    public fullScreenButton = true;
+
+    @Output()
+    public onDisplayChange = new EventEmitter<TreeVisualizerComponent["display"]>();
 
     constructor() {
     }
@@ -21,13 +27,27 @@ export class TreeVisualizerComponent implements OnChanges {
         let element: any = $(`.output`);
         element.treeVisualizer(this.xml, {
             nvFontSize: 14,
-            initFSOnClick: this.fullScreen
+            noFsButton: !this.fullScreenButton
         });
+        element.on('close', () => {
+            if (this.display == 'both') {
+                this.onDisplayChange.next('inline')
+            }
+        });
+        this.updateVisibility();
+    }
 
-        if(! this.fullScreen){
-            const tree = $('.tree-visualizer');
-            tree.attr("style", "");
+    private updateVisibility() {
+        if (this.display != 'fullscreen') {
+            $('.tree-visualizer').show();
+        } else {
+            $('.tree-visualizer').hide();
         }
 
+        if (this.display != 'inline') {
+            $('.tree-visualizer-fs').show();
+        } else {
+            $('.tree-visualizer-fs').hide();
+        }
     }
 }

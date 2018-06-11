@@ -30,6 +30,7 @@ export class AnalysisComponent implements OnInit {
 
     public variables: PathVariable[];
     public treeXml: string;
+    public treeDisplay = 'inline';
 
     public isLoading = true;
     public selectedVariable?: SelectedVariable;
@@ -71,7 +72,7 @@ export class AnalysisComponent implements OnInit {
         if (this.variables.length > 0) {
             let firstVariable = this.variables[this.variables.length > 1 ? 1 : 0];
             this.selectedVariables = [{
-                attribute: 'pos',
+                attribute: 'pt',
                 axis: 'row',
                 variable: firstVariable
             }, {
@@ -94,7 +95,7 @@ export class AnalysisComponent implements OnInit {
                     'First': utils.aggregators['First'],
                     'Last': utils.aggregators['Last']
                 },
-                rows: [firstVariable.name + '.pos'],
+                rows: [firstVariable.name + '.pt'],
                 cols: [firstVariable.name + '.lemma'],
                 renderer: heatmap,
                 renderers,
@@ -111,9 +112,6 @@ export class AnalysisComponent implements OnInit {
         $('.path-variable,.tree-visualizer li[data-varname]').draggable({
             appendTo: "body",
             connectToSortable: ".pvtHorizList,.pvtRows",
-            drag: (event, ui) => {
-                ui.helper.css('cursor', 'move').addClass('tag');
-            },
             stop: (event, ui) => {
                 if ($('.pvtHorizList').find(ui.helper).length) {
                     this.showVariableToAdd(ui.helper, 'col');
@@ -122,7 +120,11 @@ export class AnalysisComponent implements OnInit {
                     this.showVariableToAdd(ui.helper, 'row');
                 }
             },
-            helper: "clone",
+            helper: (event) => {
+                let data = $(event.currentTarget).data();
+                let variable = data['variable'] || data['varname'];
+                return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');
+            },
             revert: true
         });
     }
@@ -141,7 +143,7 @@ export class AnalysisComponent implements OnInit {
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        let variableName = helper.data('variable') || helper.data('varname');
+        let variableName = helper.text().trim();
         let offset = $('.pvtRendererArea').offset();
         this.top = offset.top;
         this.left = offset.left;
@@ -156,7 +158,7 @@ export class AnalysisComponent implements OnInit {
             this.attributes = attributes;
             let values = attributes.map(x => x.value);
             this.selectedVariable = {
-                attribute: values.find(v => v == 'pos') || values.find(v => v == 'cat') || values[0],
+                attribute: values.find(v => v == 'pt') || values.find(v => v == 'cat') || values[0],
                 axis,
                 variable: this.variables.find(v => v.name === variableName)
             };

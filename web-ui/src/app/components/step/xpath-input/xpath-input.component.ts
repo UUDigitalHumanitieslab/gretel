@@ -14,6 +14,7 @@ import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, P
 })
 export class XpathInputComponent extends StepComponent implements OnChanges {
     public treeXml: string;
+    public treeDisplay = 'inline';
 
     private valueSubject = new Subject<string>();
     private subscriptions: Subscription[] = [];
