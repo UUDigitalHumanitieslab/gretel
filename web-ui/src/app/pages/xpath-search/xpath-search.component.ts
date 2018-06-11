@@ -24,7 +24,7 @@ import {
  * It uses steps and transitions to determine the next state.
  */
 @Component({
-    selector: 'grt-x-path-search',
+    selector: 'grt-xpath-search',
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })

@@ -39,10 +39,10 @@ describe("Analysis Service", () => {
   </node>`,
                 variableValues: { '$node1': { lemma: undefined, pos: undefined } }
             }],
-            ['$node1'],
+            {'$node1':['pos','lemma']},
             ['meta1']);
         expect(result).toEqual([
-            ['meta1', 'pos_node1', 'lem_node1'],
+            ['meta1', '$node1.pos', '$node1.lemma'],
             ['hallo', '(none)', '(none)']
         ]);
     });
@@ -55,11 +55,11 @@ describe("Analysis Service", () => {
                 generateResult(4),
                 generateResult(1)
             ],
-            ['$node1'],
+            {'$node1':['pos','lemma']},
             ['meta1'],
         );
         expect(result).toEqual([
-            ['meta1', 'pos_node1', 'lem_node1'],
+            ['meta1', '$node1.pos', '$node1.lemma'],
             ['hallo', 'test', 'test'],
             ['hallo', 'test', 'test'],
             ['hallo', 'test', 'test'],

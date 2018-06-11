@@ -1,1 +1,34 @@
-<div class="analysis-component" [ngClass]="{'is-loading': isLoading}"></div>
+<h2 class="subtitle">XPath</h2>
+<div class="content">
+    <p>Drag a node into the analysis table below to analyse its properties.</p>
+    <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
+</div>
+<div class="modal is-active" *ngIf="selectedVariable">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <div class="content">
+                Which property of
+                <span class="tag">{{selectedVariable.variable.name}}</span> should be analyzed?
+            </div>
+            <grt-xpath-viewer [value]="selectedVariable.variable.path"></grt-xpath-viewer>
+            <br />
+            <div class="field">
+                <ng-select [(ngModel)]="selectedVariable.attribute" required="true">
+                    <ng-option *ngFor="let attribute of attributes" [value]="attribute.value">{{attribute.label}}</ng-option>
+                </ng-select>
+            </div>
+            <div class="buttons is-right">
+                <div class="button" role="button" (click)="cancelVariable()">
+                    Cancel
+                </div>
+                <div class="button is-primary" role="button" (click)="addVariable()">
+                    Add
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" (click)="cancelVariable()"></button>
+</div>
+<h1 class="title">Analysis</h1>
+<div class="analysis-component box" [ngClass]="{'is-loading': isLoading}"></div>
