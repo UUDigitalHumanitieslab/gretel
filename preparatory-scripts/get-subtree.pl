@@ -3,6 +3,7 @@
 # GetSubtree.pl
 # Subtree finder which extracts a subtree from an Alpino XML tree
 
+# version 1.8 date: 23.05.2018 made more robust for new versions of Alpino
 # version 1.7 date: 15.12.2014  bug fix
 # version 1.6 date: 15.10.2014  RELEASED WITH GrETEL2.0
 # written by Liesbeth Augustinus (c) 2014
@@ -37,7 +38,8 @@ my ($inputxml, $options) = @ARGV;
 my $twig=XML::Twig->new('pretty_print' => 'indented');
 $twig->parsefile($inputxml);
 
-my $root=$twig->root->first_child; # start at 'top' node (leave out alpino_ds node)
+# 1.9 added 'node'restriction to make sure the first_child is the syntax tree
+my $root=$twig->root->first_child('node'); # start at 'top' node (leave out alpino_ds node)
 $tree=$twig->children;
 @children=$tree->children;
 $children[1]->cut;
