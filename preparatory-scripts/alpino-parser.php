@@ -1,12 +1,20 @@
 <?php
 /**
+ * version 0.4 date: 15.06.2018 updated for alpino server mode by Vincent Vandeghinste for CLARIN @ ivdnt.org
  * version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0
  * written by Liesbeth Augustinus (c) 2014
  * for the GrETEL2.0 project
  */
 
+function alpino_server($sentence,$id) {
+   global $alpinoServerAddress;
+   $tmp=ROOT_PATH.'/tmp/';
+   `echo $sentence | nc $alpinoServerAddress > $tmp/$id.xml`;
+   return ROOT_PATH."/tmp/$id.xml";
+}
+  
 function alpino($sentence,$id) {
-    global $alpinoDirectory;
+  global $alpinoDirectory;
   $descriptorspec = array(
 			  0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 			  1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
@@ -17,6 +25,7 @@ function alpino($sentence,$id) {
   $env = array('ALPINO_HOME' => $alpinoDirectory);
   $tmp = ROOT_PATH . '/tmp';
   $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
+
 
   $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
