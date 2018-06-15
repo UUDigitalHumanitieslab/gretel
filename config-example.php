@@ -12,7 +12,13 @@ function buildHomeURL()
 define('ROOT_PATH', __DIR__);
 define('HOME_PATH', buildHomeURL());
 
+// === ALPINO SERVER  MODE ===
+// set to 1 when using alpino in server modus
+$alpinoServerMode=1;
+$alpinoServerAddress = 'url port';
+
 // === CHANGE PATH TO ALPINO DIRECTORY === //
+// only used when alpino is working in non-server mode
 $alpinoDirectory = ROOT_PATH."/parsers/Alpino";
 
 // In the recursive Javascript call, how many sentences to flush each time
