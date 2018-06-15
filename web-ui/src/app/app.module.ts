@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgSelectModule } from "@ng-select/ng-select";
-import { AngularFontAwesomeModule } from "angular-font-awesome";
 import { DialogModule } from "primeng/dialog";
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
