@@ -83,6 +83,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     @Output()
     public xpathChange = new EventEmitter<string>();
 
+    @Output()
+    public onChangeRetrieveContext = new EventEmitter<boolean>();
+
     public loading: boolean = true;
 
     public treeXml?: string;
@@ -204,6 +207,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         if (this.validXPath) {
             this.customXPath = valueEvent.xpath;
         }
+    }
+
+    toggleContext() {
+        this.onChangeRetrieveContext.emit(!this.retrieveContext);
     }
 
     /**

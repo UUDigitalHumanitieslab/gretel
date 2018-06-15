@@ -117,15 +117,16 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     updateRetrieveContext(retrieveContext: boolean) {
         this.globalState.retrieveContext = retrieveContext;
+        this.updateUrl(false);
     }
 
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection
      */
-    updateSelected(selectedTreebanks: TreebankSelection) {
+    updateSelected(selectedTreebanks: TreebankSelection, writeState = false) {
         this.globalState.selectedTreebanks = selectedTreebanks;
-        this.updateUrl(false);
+        this.updateUrl(writeState);
     }
 
     updateXPath(xpath: string, writeState: boolean) {

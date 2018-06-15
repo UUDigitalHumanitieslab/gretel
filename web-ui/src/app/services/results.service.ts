@@ -20,8 +20,7 @@ const httpOptions = {
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: FilterValue[] = [];
-    defaultVariables: { name: string, path: string }[] = null
-
+    defaultVariables: { name: string, path: string }[] = null;
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
     }

@@ -168,6 +168,12 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         }
     }
 
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.globalState.retrieveContext = retrieveContext;
+
+        this.updateGlobalState(this.globalState);
+    }
+
     updateXPath(xpath: string) {
         this.globalState.xpath = xpath;
         this.globalState.isCustomXPath = true;

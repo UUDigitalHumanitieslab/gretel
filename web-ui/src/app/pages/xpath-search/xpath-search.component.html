@@ -8,7 +8,7 @@
             [subTreebanks]="globalState.selectedTreebanks.components" (mainTreebankChange)="updateSelectedMainTreebank($event)"
             (subTreebanksChange)="updateSelectedSubTreebanks($event)" #selectTreebanksComponentRef></grt-select-treebanks>
         <grt-results *ngSwitchCase="2" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-            [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)" (onChangeValid)="setValid($event)"
+            [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event, true)" (onChangeValid)="setValid($event)"
             #resultsComponentRef></grt-results>
         <grt-analysis *ngSwitchCase="3" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [xpath]="globalState.xpath" (onChangeValid)="setValid($event)"></grt-analysis>

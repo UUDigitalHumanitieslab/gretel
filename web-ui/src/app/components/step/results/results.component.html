@@ -1,4 +1,4 @@
- <div class="columns is-desktop">
+<div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column xpath">
         <h2 class="subtitle">
@@ -62,41 +62,60 @@
         <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
     </div>
 </div>
-<h1 class="title">
-    <div class="level">
-        <div class="level-item level-left">
+<div class="level">
+    <div class="level-left">
+        <h1 class="title">
             Results: {{filteredResults.length}}
+        </h1>
+    </div>
+    <div class="level-right is-hidden-print">
+        <div class="level-item" *ngIf="!loading">
+            <div class="field has-addons">
+                <p class="control">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
+                        <span class="icon is-large">
+                            <i class="fas fa-download"></i>
+                        </span>
+                    </a>
+                </p>
+                <p class="control">
+                    <a class="button" role="button" (click)="downloadFilelist()" title="Download the names of the files in a filelist (.fl)">
+                        <span class="icon is-large">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+                    </a>
+                </p>
+            </div>
         </div>
-        <div class="level-item level-right is-hidden-print">
-            <div class="field is-grouped">
+        <div class="level-item">
+            <div class="field">
                 <p class="control">
-                    <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadFilelist()" title="Download the names of the files in a filelist (.fl)">
-                        <span class="icon is-large">
-                            <i class="fas fa-download"></i>
-                        </span>
-                        <span>Download Filelist</span>
-                    </a>
-                </p>
-                <p class="control">
-                    <a class="button is-primary" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
-                        <span class="icon is-large">
-                            <i class="fas fa-download"></i>
-                        </span>
-                        <span>Download Results</span>
-                    </a>
-                </p>
-                <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()" title="Print Results">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
                         </span>
-                        <span>Print Results</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="level-item">
+            <div class="field">
+                <p class="control" (click)="toggleContext()">
+                    <a class="button is-warning" role="button" title="Show context: show the sentences directly before and after the hits." *ngIf="!retrieveContext">
+                        <span class="icon is-large">
+                            <i class="fas fa-comment-dots"></i>
+                        </span>
+                    </a>
+                    <a class="button is-primary" role="button" title="Hide context: no longer show the sentences surrounding the hits." *ngIf="retrieveContext">
+                        <span class="icon is-large">
+                            <i class="fas fa-comment-slash"></i>
+                        </span>
                     </a>
                 </p>
             </div>
         </div>
     </div>
-</h1>
+</div>
 <div class="columns">
     <div class="column is-one-third is-hidden-print">
         <div class="filter">
@@ -136,4 +155,4 @@
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml" [display]="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer [xml]="treeXml" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>
