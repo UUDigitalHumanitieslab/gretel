@@ -101,14 +101,14 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="toggleContext()">
-                    <a class="button is-warning" role="button" title="Show context: show the sentences directly before and after the hits." *ngIf="!retrieveContext">
-                        <span class="icon is-large">
-                            <i class="fas fa-comment-dots"></i>
-                        </span>
-                    </a>
-                    <a class="button is-primary" role="button" title="Hide context: no longer show the sentences surrounding the hits." *ngIf="retrieveContext">
+                    <a class="button is-warning" role="button" title="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-slash"></i>
+                        </span>
+                    </a>
+                    <a class="button is-primary" role="button" title="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
+                        <span class="icon is-large">
+                            <i class="fas fa-comment-dots"></i>
                         </span>
                     </a>
                 </p>
