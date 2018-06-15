@@ -33,7 +33,7 @@ Date: ${new Date()}
 
         for (let i = 0; i < hits.length; i++) {
             let hit = hits[i];
-            rows.push(`${i + 1}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}
+            rows.push(`${i + 1}\t${hit.fileId}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}
 `);
         }
 
