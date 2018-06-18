@@ -148,11 +148,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     public async addVariable() {
-        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat(this.selectedVariable));
         this.pivotUiOptions[this.selectedVariable.axis == 'row' ? 'rows' : 'cols']
             .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
+        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([this.selectedVariable]));
         this.selectedVariable = undefined;
-        this.$element.empty();
     }
 
     private livePivot() {
