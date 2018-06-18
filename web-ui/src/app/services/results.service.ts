@@ -30,10 +30,11 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables) {
+        variables = this.defaultVariables,
+        cancellationToken: Observable<{}> | null = null) {
         return new Promise<Hit[]>((resolve, reject) => {
             let hits: Hit[] = [];
-            this.getAllResults(xpath,
+            let subscription = this.getAllResults(xpath,
                 corpus,
                 components,
                 retrieveContext,
@@ -42,6 +43,9 @@ export class ResultsService {
                 variables,
                 () => resolve(hits))
                 .subscribe(results => hits.push(...results.hits));
+            cancellationToken.subscribe(() => {
+                subscription.unsubscribe();
+            });
         });
     }
 

@@ -107,8 +107,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     private results: Hit[] = [];
     private subscriptions: Subscription[];
 
-    constructor(private configurationService: ConfigurationService,
-        private downloadService: DownloadService,
+    constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
         private treebankService: TreebankService) {
@@ -218,12 +217,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     private liveMetadataCounts() {
         // TODO: handle when filters have been applied (part of #36)
-        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject)
+        return Observable.combineLatest(this.xpathSubject, this.corpusSubject, this.componentsSubject)
             .filter((values) => values.every(value => value !== undefined))
             .debounceTime(debounceTime)
             .distinctUntilChanged()
             .switchMap(([corpus, components, xpath]) =>
-                this.resultsService.metadataCounts(this.xpath, this.corpus, this.components))
+                this.resultsService.metadataCounts(corpus, components, xpath))
             .subscribe(counts => {
                 this.metadataValueCountsSubject.next(counts);
             });
@@ -315,7 +314,4 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     updateValidity() {
     }
-}
-type TypedChanges = {
-    [propName in keyof ResultsComponent]: SimpleChange;
 }
