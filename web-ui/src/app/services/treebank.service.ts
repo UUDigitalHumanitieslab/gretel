@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from '@angular/core';
-import { Observable } from "rxjs/Observable";
 import { Treebank, TreebankInfo, TreebankMetadata } from '../treebank';
+import { ConfigurationService } from "./configuration.service";
 
 @Injectable()
 export class TreebankService {
-    constructor(private http: HttpClient) {
+    constructor(private configurationService: ConfigurationService, private http: HttpClient) {
     }
 
     public async getMetadata(corpus: string): Promise<TreebankMetadata[]> {
@@ -18,7 +18,7 @@ export class TreebankService {
             min_value: string | null,
             max_value: string | null,
             show: '1' | '0'
-        }[]>('/gretel-upload/index.php/api/treebank/metadata/' + corpus).toPromise();
+        }[]>(await this.configurationService.getUploadApiUrl('treebank/metadata/' + corpus)).toPromise();
 
         return data.map(item => {
             let metadata: TreebankMetadata = {
@@ -55,7 +55,7 @@ export class TreebankService {
             title: string,
             uploaded, string,
             user_id: string
-        }[]>("/gretel-upload/index.php/api/treebank").toPromise();
+        }[]>(await this.configurationService.getUploadApiUrl("treebank")).toPromise();
         return data.map(item => {
             return {
                 id: parseInt(item.id),
@@ -76,7 +76,7 @@ export class TreebankService {
             nr_words: string,
             slug: string,
             title: string
-        }[]>(`/gretel-upload/index.php/api/treebank/show/${treebankInfo.title}`).toPromise();
+        }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${treebankInfo.title}`)).toPromise();
         return results.map(x => {
             return {
                 databaseId: x.basex_db,
