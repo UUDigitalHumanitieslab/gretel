@@ -115,10 +115,11 @@
 
     <h2 class="subtitle">How can I contact you?</h2>
     <div class="content">
-        <p>This website and this tool were developed at the Centre for Computational Linguistics (CCL). If you have any suggestions,
-            questions, or general feedback you are welcome to give us a ring, or send us an email. You can find contact information
+        <p>This website and this tool were originally developed at the Centre for Computational Linguistics (CCL). The current
+            version is developed by the Digital Humanities Lab at Utrecht University. If you have any suggestions, questions,
+            or general feedback you are welcome to give us a ring, or send us an email. You can find contact information
             on
-            <a href="http://www.arts.kuleuven.be/ling/ccl" title="Centre for Computational Linguistics homepage" target="_blank">CCL's website</a> or in the footer of this website.</p>
+            <a href="https://dig.hum.uu.nl/" title="Digital Humanities Lab" target="_blank">Digital Humanities Lab's website</a> or in the footer of this website.</p>
     </div>
 
     <h2 class="subtitle">Why does XPath generated for SoNaR only have one leading slash, when the code for LASSY and CGN has two?
@@ -148,5 +149,33 @@
             are presented as soon as they are found, so you can browse the matching sentences before the treebank search
             is completed. Furthermore it is possible to query the 500-million word SoNaR treebank in a similar fashion as
             the two one-million word treebanks CGN and LASSY Small.</p>
+    </div>
+    <h2 class="subtitle">What is new in version 4?</h2>
+    <div class="content">
+        <p>A rewrite of the user interface. Links to results can now be shared and navigation is more flexible, quicker and more reliable.
+            The entry of XPATH has been updated with a highlighted editor, performing live validation and showing suggestions.
+            It's also possible now to show the context of a search (the preceding and following sentence) for an XPATH-based
+            search. We've also added an application for uploading new corpora. Furthermore filtering has been added to be
+            able to filter results by metadata. Finally a completely new analysis module has been added allowing the properties
+            of syntax nodes to be compared using a graphical interface.</p>
+    </div>
+    <h2 class="subtitle">How are properties analysed?</h2>
+    <div class="content">
+        <p>Only the properties of the first node matched by an XPATH variable is returned for analysis. For example:</p>
+
+        <p>
+            A user searches for
+            <code>//node[node]</code>. Two variables are found in this query:
+            <code>$node1 = //node</code> and
+            <code>$node2 = $node1[node]</code>. A sentence with the following structure would match this query:
+        </p>
+        <pre>node[np] (node[det] node[noun])</pre>
+        <p>The node found for
+            <code>$node1</code> will then be
+            <code>node[np]</code>. The node found for
+            <code>$node2</code> will then be
+            <code>node[det]</code>. The properties of
+            <code>node[noun]</code> will not be available for analysis using this query. When searching for a more specific structure, this is unlikely
+            to occur.</p>
     </div>
 </section>
