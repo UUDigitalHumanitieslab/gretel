@@ -1,32 +1,36 @@
 ///<reference path="pivottable.d.ts"/>
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/operator/do';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, XPathAttribute, ReconstructorService } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'grt-analysis',
     templateUrl: './analysis.component.html',
     styleUrls: ['./analysis.component.scss']
 })
-export class AnalysisComponent implements OnInit {
+export class AnalysisComponent implements OnInit, OnDestroy {
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;
     private pivotUiOptions: PivotUiOptions;
     private hits: Hit[];
     private metadata: TreebankMetadata[];
+    private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
     public variables: PathVariable[];
     public treeXml: string;
@@ -34,8 +38,6 @@ export class AnalysisComponent implements OnInit {
 
     public isLoading = true;
     public selectedVariable?: SelectedVariable;
-
-    public selectedVariables: SelectedVariable[];
 
     @Input()
     public corpus: string;
@@ -48,6 +50,9 @@ export class AnalysisComponent implements OnInit {
 
     public attributes: { value: string, label: string }[];
 
+    private subscriptions: Subscription[];
+    private cancellationToken = new Subject<{}>();
+
     constructor(private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
@@ -59,7 +64,16 @@ export class AnalysisComponent implements OnInit {
     ngOnInit() {
         this.$element = $('.analysis-component');
         this.initialize();
-        this.show(this.$element);
+        this.subscriptions = [
+            this.livePivot()
+        ];
+    }
+
+    ngOnDestroy() {
+        for (let subscription of this.subscriptions) {
+            subscription.unsubscribe();
+        }
+        this.cancellationToken.next();
     }
 
     private initialize() {
@@ -71,7 +85,7 @@ export class AnalysisComponent implements OnInit {
         // This way the user will get to see some useable values to help clarify the interface.
         if (this.variables.length > 0) {
             let firstVariable = this.variables[this.variables.length > 1 ? 1 : 0];
-            this.selectedVariables = [{
+            this.selectedVariablesSubject.next([{
                 attribute: 'pt',
                 axis: 'row',
                 variable: firstVariable
@@ -79,7 +93,7 @@ export class AnalysisComponent implements OnInit {
                 attribute: 'lemma',
                 axis: 'col',
                 variable: firstVariable
-            }];
+            }]);
 
             let utils = $.pivotUtilities;
             let heatmap = utils.renderers["Heatmap"];
@@ -104,7 +118,7 @@ export class AnalysisComponent implements OnInit {
                 }
             }
         } else {
-            this.selectedVariables = [];
+            this.selectedVariablesSubject.next([]);
         }
     }
 
@@ -134,12 +148,18 @@ export class AnalysisComponent implements OnInit {
     }
 
     public async addVariable() {
-        this.selectedVariables.push(this.selectedVariable);
         this.pivotUiOptions[this.selectedVariable.axis == 'row' ? 'rows' : 'cols']
             .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
+        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([this.selectedVariable]));
         this.selectedVariable = undefined;
-        this.$element.empty();
-        this.show(this.$element);
+    }
+
+    private livePivot() {
+        return Observable.combineLatest([this.selectedVariablesSubject])
+            .do(([selectedVariables]) => {
+                this.show(this.$element, selectedVariables);
+            }).subscribe();
+
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
@@ -165,17 +185,17 @@ export class AnalysisComponent implements OnInit {
         });
     }
 
-    private async show(element: JQuery<HTMLElement>) {
+    private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
         this.isLoading = true;
         try {
             if (!this.metadata || !this.hits) {
                 [this.metadata, this.hits] = await Promise.all([
                     this.treebankService.getMetadata(this.corpus),
-                    this.resultsService.promiseAllResults(this.xpath, this.corpus, this.components, false, true, [], this.variables)
+                    this.resultsService.promiseAllResults(this.xpath, this.corpus, this.components, false, true, [], this.variables, this.cancellationToken)
                 ]);
             }
 
-            this.pivot(element, this.metadata.map(m => m.field), this.hits);
+            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -186,8 +206,8 @@ export class AnalysisComponent implements OnInit {
         this.isLoading = false;
     }
 
-    private pivot(element: JQuery, metadataKeys: string[], hits: Hit[]) {
-        let variables = this.selectedVariables.reduce((grouped, s) => {
+    private pivot(element: JQuery, metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
+        let variables = selectedVariables.reduce((grouped, s) => {
             grouped[s.variable.name]
                 ? grouped[s.variable.name].push(s.attribute)
                 : grouped[s.variable.name] = [s.attribute];

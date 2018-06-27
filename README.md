@@ -5,6 +5,8 @@
 This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
 
 ## Info
+
+* v4.0.0 June 2018: First GrETEL 4 release with new interface.
 * v3.9.99 November 2017: GrETEL 4 currently under development!
 * v3.0.2 July 2017: Show error message if the BaseX server is down  
 * v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
@@ -38,8 +40,9 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
-5. Run `npm install` and `grunt` to compile all the JavaScript and stylesheet files.
-6. Run [composer](https://getcomposer.org/) in `/api` directory to install PHP dependencies.
+5. Install [composer](https://getcomposer.org/) to be able to install PHP dependencies.
+6. Enable the rewrite mdoule (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
+6. Run `npm run build` to compile all the dependencies.
 7. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
 ## Notes for users
@@ -61,11 +64,7 @@ When searching for a more specific structure, this is unlikely to occur.
 
 
 ### Front-end
-* We used [SCSS](http://sass-lang.com/documentation/file.SCSS_FOR_SASS_USERS.html) as our stylesheet markdown of preference. All styles are available as `.scss` files (`styles/scss/`). For users who do not want to work with SCSS/SASS we also included the expanded CSS output of the SCSS files (`styles/css/`). In production, however, we use the minfied files (`styles/css/min/`) to decrease load times.
-* We do not support Internet Explorer because we highly rely on the power of the flexbox specification. Internet Explorer does not provide (good) support for flex properties. Microsoft's newer, and better, browser Edge is supported.
-* JavaScript files are also provided as expanded (`js/`) as well as minified files (`js/min/`). We use jQuery as the library of choice.
-* Results are 'flushed' to the user by use of subsequent ajax requests. Therefore, JavaScript _has_ to be enabled by users.
-* Newer functionality is built in TypeScript and can be found under `ts/`. This code is transpiled to JavaScript and placed under `js/ts`.
+The [Angular 5](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`.
 
 
 ### Back-end
@@ -76,20 +75,6 @@ When searching for a more specific structure, this is unlikely to occur.
   * `preparatory-scripts/`: scripts that run functions on the input leading up to but not including the actual fetching of results. These scripts manipulate do things such as creating XPath, generating breadth-first patterns, parsing the input, and modifying input examples.
   * `functions.php`: contains general functions that are often required but that are not specific to any part of the process
   * `helpers.php`: basic helper functions that return booleans.
-
-### During development
-* We use [Grunt](https://gruntjs.com/) to auto-compile SCSS (Ruby and Sass have to be installed in the PATH: https://github.com/gruntjs/grunt-contrib-sass) and auto-minify CSS and JavaScript.
-* Note that some client-side code is in Typescript `ts/`, this code is automatically compiled using Grunt.
-* Commands to install Grunt, local dependencies and then to watch for changes:
-
-
-      sudo apt-get install npm
-      sudo apt-get install nodejs-legacy
-      sudo npm install -g grunt-cli
-
-      npm install
-
-      grunt watch
 
 ## Credits
 

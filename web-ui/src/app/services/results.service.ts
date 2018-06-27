@@ -9,7 +9,6 @@ import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
 
 import 'rxjs/add/operator/mergeMap'
-const routerUrl = '/gretel/api/src/router.php/';
 const httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -31,10 +30,11 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables) {
+        variables = this.defaultVariables,
+        cancellationToken: Observable<{}> | null = null) {
         return new Promise<Hit[]>((resolve, reject) => {
             let hits: Hit[] = [];
-            this.getAllResults(xpath,
+            let subscription = this.getAllResults(xpath,
                 corpus,
                 components,
                 retrieveContext,
@@ -43,6 +43,9 @@ export class ResultsService {
                 variables,
                 () => resolve(hits))
                 .subscribe(results => hits.push(...results.hits));
+            cancellationToken.subscribe(() => {
+                subscription.unsubscribe();
+            });
         });
     }
 
@@ -104,16 +107,17 @@ export class ResultsService {
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
         remainingDatabases: string[] | null = null) {
-        let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            retrieveContext,
-            corpus,
-            components,
-            iteration,
-            isAnalysis,
-            variables,
-            remainingDatabases
-        }, httpOptions).toPromise();
+        let results = await this.http.post<ApiSearchResult | false>(
+            await this.configurationService.getApiUrl('results'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                retrieveContext,
+                corpus,
+                components,
+                iteration,
+                isAnalysis,
+                variables,
+                remainingDatabases
+            }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
         }
@@ -122,27 +126,29 @@ export class ResultsService {
     }
 
     async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
-        let base = this.configurationService.getBaseUrlGretel();
-        let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
+        let url = await this.configurationService.getGretelUrl(
+            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
 
         let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
         return treeXml;
     }
 
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        return await this.http.post<MetadataValueCounts>(routerUrl + 'metadata_counts', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            corpus,
-            components,
-        }, httpOptions).toPromise();
+        return await this.http.post<MetadataValueCounts>(
+            await this.configurationService.getApiUrl('metadata_counts'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                corpus,
+                components,
+            }, httpOptions).toPromise();
     }
 
     async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            corpus,
-            components,
-        }, httpOptions).toPromise();
+        let results = await this.http.post<{ [databaseId: string]: string }>(
+            await this.configurationService.getApiUrl('treebank_counts'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                corpus,
+                components,
+            }, httpOptions).toPromise();
 
         return Object.keys(results).map(databaseId => {
             return {

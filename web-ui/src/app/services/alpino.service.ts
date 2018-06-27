@@ -1,25 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { HttpHeaders } from '@angular/common/http';
-import { Observable } from "rxjs/Observable";
 import { ParserService } from 'lassy-xpath/ng';
 import { ConfigurationService } from "./configuration.service";
 
 @Injectable()
 export class AlpinoService {
-    parseSentenceUrl: string;
-    generateXPathUrl: string;
+    parseSentenceUrl: Promise<string>;
+    generateXPathUrl: Promise<string>;
 
-    constructor(private http: HttpClient, private parserService: ParserService) {
-        this.parseSentenceUrl = '/gretel/api/src/router.php/parse_sentence';
-        this.generateXPathUrl = '/gretel/api/src/router.php/generate_xpath';
+    constructor(configurationService: ConfigurationService, private http: HttpClient, private parserService: ParserService) {
+        this.parseSentenceUrl = configurationService.getApiUrl('parse_sentence');
+        this.generateXPathUrl = configurationService.getApiUrl('generate_xpath');
     }
 
     async generateXPath(xml: string, tokens: string[], attributes: string[], ignoreTopNode: boolean, respectOrder: boolean) {
         let result = await this.http.post<{
             xpath: string,
             subTree: string
-        }>(this.generateXPathUrl, {
+        }>(await this.generateXPathUrl, {
             xml,
             tokens,
             attributes,
@@ -34,7 +32,7 @@ export class AlpinoService {
     }
 
     async parseSentence(sentence: string) {
-        return this.http.post(this.parseSentenceUrl, this.tokenize(sentence), { responseType: 'text' }).toPromise();
+        return this.http.post(await this.parseSentenceUrl, this.tokenize(sentence), { responseType: 'text' }).toPromise();
     }
 
     tokenize(sentence: string) {

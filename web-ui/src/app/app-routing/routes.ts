@@ -26,16 +26,12 @@ const routes: Routes = [
     path: 'documentation',
     component: DocumentationComponent,
   },
-
   {
     path: '',
     redirectTo: '/home',
     pathMatch: 'full'
   }
-
-
 ];
-
 
 export {routes}
 
