@@ -1,7 +1,7 @@
 <grt-body-header>Example-based Search</grt-body-header>
 <ng-container *ngIf="globalState.currentStep">
     <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
-    <div [ngSwitch]="globalState.currentStep.number">
+    <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
         <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateSentence($event)" [inputSentence]="globalState.inputSentence"
             #sentenceInput></grt-sentence-input>
         <grt-parse *ngSwitchCase="1" (onChangeValid)="setValid($event)" [sentence]="globalState.inputSentence" [xml]="globalState.exampleXml"

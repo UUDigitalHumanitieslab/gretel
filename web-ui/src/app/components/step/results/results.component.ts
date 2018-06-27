@@ -1,19 +1,12 @@
-import { Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/switchMap';
+import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+
+import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
+import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
 
 import {
-    ConfigurationService,
     DownloadService,
     FilterValue,
     Hit,
@@ -21,12 +14,11 @@ import {
     ResultsService,
     TreebankService
 } from '../../../services/_index';
-import { TableColumn } from '../../tables/selectable-table/TableColumn';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from "../step.component";
 
-const debounceTime = 200;
+const DebounceTime = 200;
 
 @Component({
     selector: 'grt-results',
@@ -217,12 +209,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     private liveMetadataCounts() {
         // TODO: handle when filters have been applied (part of #36)
-        return Observable.combineLatest(this.xpathSubject, this.corpusSubject, this.componentsSubject)
-            .filter((values) => values.every(value => value !== undefined))
-            .debounceTime(debounceTime)
-            .distinctUntilChanged()
-            .switchMap(([corpus, components, xpath]) =>
-                this.resultsService.metadataCounts(corpus, components, xpath))
+        return observableCombineLatest(this.xpathSubject, this.corpusSubject, this.componentsSubject).pipe(
+            filter((values) => values.every(value => value !== undefined)),
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([corpus, components, xpath]) =>
+                this.resultsService.metadataCounts(corpus, components, xpath)))
             .subscribe(counts => {
                 this.metadataValueCountsSubject.next(counts);
             });
@@ -232,9 +224,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the metadata for the current corpus
      */
     private liveMetadataProperties() {
-        return this.corpusSubject.filter(corpus => corpus !== undefined)
-            .distinctUntilChanged()
-            .switchMap(corpus => this.treebankService.getMetadata(corpus))
+        return this.corpusSubject.pipe(filter(corpus => corpus !== undefined),
+            distinctUntilChanged(),
+            switchMap(corpus => this.treebankService.getMetadata(corpus)))
             .subscribe(metadata => this.metadataSubject.next(metadata));
     }
 
@@ -242,7 +234,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the filters
      */
     private liveFilters() {
-        return Observable.combineLatest(this.metadataSubject, this.metadataValueCountsSubject)
+        return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
             .subscribe(([metadata, counts]) => {
                 let filters: Filter[] = [];
                 for (let filter of metadata) {
@@ -273,11 +265,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the results
      */
     private liveResults() {
-        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
-            .filter((values) => values.every(value => value !== undefined))
-            .debounceTime(debounceTime)
-            .distinctUntilChanged()
-            .switchMap(([corpus, components, xpath, filterValues]) => {
+        return observableCombineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject).pipe(
+            filter((values) => values.every(value => value !== undefined)),
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([corpus, components, xpath, filterValues]) => {
                 this.loading = true;
                 this.results = [];
                 this.filteredResults = [];
@@ -292,11 +284,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     () => {
                         this.loading = false;
                     });
-            })
-            .do(results => {
+            }),
+            tap(results => {
                 this.results.push(...results.hits);
                 this.filteredResults.push(...this.filterHits(results.hits));
-            })
+            }))
             .subscribe();
     }
 

@@ -1,10 +1,8 @@
 ///<reference path="pivottable.d.ts"/>
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/do';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -16,7 +14,6 @@ import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'grt-analysis',
@@ -155,10 +152,9 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private livePivot() {
-        return Observable.combineLatest([this.selectedVariablesSubject])
-            .do(([selectedVariables]) => {
-                this.show(this.$element, selectedVariables);
-            }).subscribe();
+        return this.selectedVariablesSubject.map((selectedVariables) => {
+            this.show(this.$element, selectedVariables);
+        }).subscribe();
 
     }
 

@@ -20,5 +20,8 @@
                 "./node_modules/@angular/"
             ]
         }
+    },
+    "angularCompilerOptions": {
+        "enableIvy": true
     }
 }

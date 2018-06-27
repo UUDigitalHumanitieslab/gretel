@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable } from "rxjs/Observable";
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer } from "rxjs";
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
 
-import 'rxjs/add/operator/mergeMap'
 const httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',

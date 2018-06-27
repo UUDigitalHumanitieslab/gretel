@@ -62,12 +62,12 @@ When searching for a more specific structure, this is unlikely to occur.
 
 ## Notes for developers
 
-
 ### Front-end
-The [Angular 5](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`.
 
+The [Angular 6](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`.
 
 ### Back-end
+
 * The results that are flushed to the user at a time as well as the maximum results that will be fetched is stored in variables in `config.php`. Change `$flushLimit` and `$resultsLimit` to the values that you want.
 * Scripts are organised according to their function:
   * `basex-search-scripts/`: scripts that are required to do the actual searching for results. However, the `basex-client.php` is sometimes needed in other cases as well to open up a BaseX session.

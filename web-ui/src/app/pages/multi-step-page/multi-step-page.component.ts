@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import * as _ from 'lodash';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { GlobalState, Step } from "./steps";
@@ -13,6 +13,10 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     public crumbs: Crumb[];
     public globalState: T;
     public warning: string | false;
+    /**
+     * Whether the next step is currently being resolved
+     */
+    public isTransitioning = false;
 
     protected abstract defaultGlobalState: T;
 
@@ -87,11 +91,13 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      * Go back one step
      */
     async prev() {
+        this.isTransitioning = true;
         let state = await this.transitions.fire('decrease', this.globalState);
         this.updateGlobalState(state);
     }
 
     updateGlobalState(state: T, updateUrl = true) {
+        this.isTransitioning = false;
         this.globalState = state;
         if (updateUrl) {
             this.updateUrl();
@@ -103,6 +109,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      */
     async next() {
         if (this.globalState.valid) {
+            this.isTransitioning = true;
             let state = await this.transitions.fire('increase', this.globalState);
             this.updateGlobalState(state);
             this.warning = false;
@@ -150,6 +157,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     async goToStep(stepNumber: number, updateUrl = true) {
+        this.isTransitioning = true;
         let state = await this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState);
         if (!state.valid && state.currentStep.number != stepNumber) {
             this.showWarning(state);
