@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import * as _ from 'lodash';
 
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { GlobalState, Step } from "./steps";

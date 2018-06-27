@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { StepComponent } from "../step.component";
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
@@ -31,13 +30,13 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
     @Output()
     public onChangeRetrieveContext = new EventEmitter<boolean>();
 
-    constructor(private httpClient: HttpClient, macroService: MacroService,
+    constructor(macroService: MacroService,
         extractinatorService: ExtractinatorService,
         reconstructorService: ReconstructorService) {
         super();
 
         macroService.loadDefault();
-        this.subscriptions.push(this.valueSubject.debounceTime(500).subscribe(value => {
+        this.subscriptions.push(this.valueSubject.pipe(debounceTime(500)).subscribe(value => {
             let paths: PathVariable[] = null;
             try {
                 paths = extractinatorService.extract(value);
