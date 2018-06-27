@@ -1,7 +1,7 @@
 <grt-body-header>XPath Search</grt-body-header>
 <ng-container *ngIf="globalState.currentStep">
     <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
-    <div [ngSwitch]="globalState.currentStep.number">
+    <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
         <grt-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateXPath($event, false)" (onChangeRetrieveContext)="updateRetrieveContext($event)"
             [retrieveContext]="globalState.retrieveContext" [value]="globalState.xpath" #xpathInput></grt-xpath-input>
         <grt-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus"
