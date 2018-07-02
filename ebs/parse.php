@@ -40,7 +40,12 @@ if ($continueConstraints) {
       // Prepare/clean up input to be tokenized in next step
       $tokinput = tokenize($input);
       $_SESSION[SID]['sentence'] = $tokinput;
-      $parse = alpino($tokinput, SID);
+      if ($alpinoServerMode) {
+        $parse = alpino_server($tokinput, SID);
+      }
+      else {
+        $parse = alpino($tokinput, SID);
+      }
       modifyLemma($parse, SID);
     }
 }
@@ -49,6 +54,7 @@ require ROOT_PATH."/front-end-includes/head.php";
 ?>
 </head>
 <?php flush(); ?>
+
 <?php require ROOT_PATH."/front-end-includes/header.php"; ?>
 <?php if ($continueConstraints && !$isSpam) { ?>
 
