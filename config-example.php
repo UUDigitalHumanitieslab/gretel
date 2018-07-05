@@ -26,22 +26,6 @@ $analysisLimit = 50000;
 $cats = array('advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
     'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub', );
 
-$ebsPages = array(
-    'input.php' => 'Example',
-    'parse.php' => 'Parse',
-    'matrix.php' => 'Matrix',
-    'tb-sel.php' => 'Treebanks',
-    'query.php' => 'Query',
-    'results.php' => 'Results',
-    'analysis.php' => 'Analysis',
-);
-$xpsPages = array(
-    'input.php' => 'XPath',
-    'tb-sel.php' => 'Treebanks',
-    'results.php' => 'Results',
-    'analysis.php' => 'Analysis',
-);
-
 $matrixOptions = array(
     array(
         'word' => 'token',

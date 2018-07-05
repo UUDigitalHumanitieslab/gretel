@@ -9,6 +9,6 @@
   "scripts": {
     "build": "npm run build:api && npm run build:web-ui",
     "build:api": "cd api && composer install",
-    "build:web-ui": "cd web-ui && npm install && ng build --prod --base-href=/ng/ --output-path=../ng"
+    "build:web-ui": "cd web-ui && npm install && npm run build"
   }
 }
