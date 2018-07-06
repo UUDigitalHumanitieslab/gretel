@@ -1,6 +1,4 @@
 .tscache
-*.png
-*.ico
 *.log
 *~
 tmp/*

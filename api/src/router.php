@@ -10,10 +10,10 @@ require './treebank-counts.php';
 // Maybe change this?
 header('Access-Control-Allow-Origin: *');
 
+$base = $_SERVER['REQUEST_URI'];
+$base = explode('/router.php/', $_SERVER['REQUEST_URI'])[0].'/router.php';
 $router = new AltoRouter();
-$router->setBasePath('/gretel/api/src/router.php');
-$alpinoDirectory = '/opt/Alpino';
-define('ROOT_PATH', '/vagrant/vagrant_data/gretel');
+$router->setBasePath($base);
 
 $router->map('POST', '/generate_xpath', function () {
     $input = file_get_contents('php://input');
@@ -34,7 +34,7 @@ $router->map('POST', '/parse_sentence', function () {
     $location = alpino($sentence, 'ng'.time());
 
     header('Content-Type: application/xml');
-    $parsed = fopen($location, 'r') or die('Unable to open parsed file!');
+    $parsed = fopen($location, 'r') or die('Unable to open parsed file! '.$location);
     echo fread($parsed, filesize($location));
     fclose($parsed);
     unlink($location);
