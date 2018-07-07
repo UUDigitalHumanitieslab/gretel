@@ -45,12 +45,10 @@
   height: 100%;
   background: #f7f7f7;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   border-radius: 4px;
@@ -61,11 +59,9 @@
 .tv .tv-toolbar-wrapper {
   background: #f0f0f0;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding: 12px;
@@ -74,7 +70,6 @@
 .tv .tv-sentence-wrapper {
   display: none;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
   text-align: left;
@@ -86,7 +81,6 @@
 
 .tv .tv-sentence-wrapper.has-sentence {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -106,17 +100,14 @@
 
 .tv .tv-tree {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   overflow: scroll;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
   /* If we use 0% a minifer will cut off %, which leads to another effect */
   -webkit-box-flex: 1;
-  -webkit-flex: 1 0 0.00000001%;
   -ms-flex: 1 0 0.00000001%;
   flex: 1 0 0.00000001%;
 }
@@ -389,13 +380,10 @@
   padding: 0 8px;
   list-style: none;
   -webkit-columns: 2;
-  -moz-columns: 2;
   columns: 2;
   -webkit-column-gap: 24px;
-  -moz-column-gap: 24px;
   column-gap: 24px;
   -webkit-column-rule: 1px solid #ccc;
-  -moz-column-rule: 1px solid #ccc;
   column-rule: 1px solid #ccc;
 }
 
@@ -498,11 +486,9 @@
 #tree-visualizer-fs .tv-navigation-wrapper {
   margin-right: 24px;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -521,11 +507,9 @@
 #tree-visualizer-fs .tv-zoom-wrapper {
   z-index: 9;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
   margin-left: auto;
@@ -538,11 +522,9 @@
 
 #tree-visualizer-fs .tv-zoom-opts {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }

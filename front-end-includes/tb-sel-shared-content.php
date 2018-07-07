@@ -11,31 +11,21 @@
 <form action="<?php echo $nextPage; ?>" method="post">
   <div class="flex-content">
     <div class="labels-wrapper">
-      <div class="label-wrapper">
-        <label>
-          <input type="radio" name="treebank" value="cgn"> <strong>CGN treebank</strong>: spoken Dutch - version 2.0.1
-        </label>
-      </div>
-      <div class="label-wrapper">
-        <label>
-          <input type="radio" name="treebank" value="lassy"> <strong>LASSY Small</strong>: written Dutch - version 1.1
-        </label>
-      </div>
-      <div class="label-wrapper">
-        <label>
-          <input type="radio" name="treebank" value="sonar"> <strong>SoNaR treebank</strong>: written Dutch - version 1.0
-        </label>
-      </div>
+      <?php
+      foreach ($databaseGroups as $corpus => $arr) {
+        echo "<div class=\"label-wrapper\">
+          <label>
+            <input type=\"radio\" name=\"treebank\" value=\"{$corpus}\" data-multioption=\"{$arr['multioption']}\">
+            <strong>{$arr['fullName']}</strong>: {$arr['production']} {$arr['language']} - version {$arr['version']}
+          </label>
+        </div>";
+      } ?>
     </div>
   </div>
   <div class="corpora-wrapper">
-      <div class="cgn" style="display:none">
-        <?php require ROOT_PATH."/front-end-includes/tb-cgn.php"; ?>
-      </div>
-      <div class="lassy" style="display:none">
-        <?php require ROOT_PATH."/front-end-includes/tb-lassy.php"; ?>
-      </div>
-      <div class="sonar" style="display:none">
-        <?php require ROOT_PATH."/front-end-includes/tb-sonar.php"; ?>
-      </div>
+    <?php foreach ($databaseGroups as $corpus => $arr) {
+      echo "<div class=\"{$corpus}\" style=\"display:none\">";
+      require ROOT_PATH."/front-end-includes/tb-{$corpus}.php";
+      echo '</div>';
+    } ?>
   </div>

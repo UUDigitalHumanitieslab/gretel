@@ -287,11 +287,11 @@ $(function() {
       var $this = $(this),
         value = $this.val();
       if ($this.is("[name='treebank']")) {
-        $(".cgn, .lassy, .sonar").hide().removeClass("active");
-        $(".cgn, .lassy, .sonar").find("[type='checkbox'], [type='radio']").prop("disabled", true);
+        $(".corpora-wrapper > div").hide().removeClass("active");
+        $(".corpora-wrapper > div").find("[type='checkbox'], [type='radio']").prop("disabled", true);
         $("." + value).show().addClass("active").find("label:not(.disabled)").find("[type='checkbox'], [type='radio']").prop("disabled", false);
 
-        if (value != 'sonar' && $("." + value + " [type='checkbox']:checked").length == 0) {
+        if $this.data("multioption") === 'false' && $("." + value + " [type='checkbox']:checked").length == 0) {
           $(".continue-btn-wrapper [type='submit']").prop("disabled", true);
         } else {
           $(".continue-btn-wrapper [type='submit']").prop("disabled", false);
@@ -299,6 +299,7 @@ $(function() {
       }
     });
     // Selecting subtreebanks
+    // TODO: make usale for any corpus
     $("[type='checkbox']").change(function() {
       var $this = $(this);
 

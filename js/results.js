@@ -265,7 +265,8 @@ $(function() {
     controls.find(".count strong").text(resultIDString);
 
     if (!returnAllResults && !done) {
-      getSentences();
+      // Prevent any blocking with setTimeout
+      setTimeout(getSentences(), 0);
     } else {
       messageAllResultsFound();
     }

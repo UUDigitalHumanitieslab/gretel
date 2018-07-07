@@ -71,34 +71,39 @@ $databaseGroups = array(
         'WRPPI', 'WRPPJ', 'WRPPK', 'WRUEA', 'WRUED', 'WRUEE',
         'WSUEA', 'WSUTB'
       ),
-      'machine' => 'machinename',
+      'machine' => 'machine',
       'port' => 0000
     ),
     'WRPEA' => array(
-      'machine' => 'machinename',
+      'machine' => 'machine',
       'port' => 0000,
       'sentences' => 4395094
     ),
     'WRPEJ' => array(
-      'machine' => 'machinename',
+      'machine' => 'machine',
       'port' => 0000,
       'sentences' => 1354245
     ),
     'WRPPB' =>  array(
-      'machine' => 'machinename',
+      'machine' => 'machine',
       'port' => 0000,
       'sentences' => 1709808
     ),
     'WRPPG' => array(
-      'machine' => 'machinename',
+      'machine' => 'suske',
       'port' => 0000,
       'sentences' => 14973209
     ),
     'WRPPH' => array(
-      'machine' => 'machinename',
+      'machine' => 'machine',
       'port' => 0000,
       'sentences' => 5475556
-    )
+    ),
+    'fullName' => 'SoNaR',
+    'version' => '1.0',
+    'production' => 'written',
+    'language' => 'Dutch',
+    'multioption' => false
   ),
   'cgn' => array(
     'components' => array(
@@ -108,15 +113,25 @@ $databaseGroups = array(
       'NL', 'VL', 'NM', 'VM', 'NN', 'VN',
       'NO', 'VO'
     ),
-    'machine' => 'machinename',
-    'port' => 0000
+    'machine' => 'machine',
+    'port' => 0000,
+    'fullName' => 'Corpus Gesproken Nederlands',
+    'version' => '2.0.1',
+    'production' => 'spoken',
+    'language' => 'Dutch',
+    'multioption' => true
   ),
   'lassy' => array(
     'components' => array(
       'DPC', 'WIKI', 'WRPE', 'WRPP', 'WSU'
     ),
-    'machine' => 'machinename',
-    'port' => 0000
+    'machine' => 'machine',
+    'port' => 0000,
+    'fullName' => 'LASSY Small',
+    'version' => '1.1',
+    'production' => 'written',
+    'language' => 'Dutch',
+    'multioption' => true
   )
 );
 

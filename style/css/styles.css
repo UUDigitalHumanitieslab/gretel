@@ -253,12 +253,10 @@ label.disabled {
 
 body {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: scroll;
@@ -269,7 +267,6 @@ body {
   font-family: "Open Sans", sans-serif;
   line-height: 1.625;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -353,15 +350,12 @@ body {
 
 .popup .btn-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin-top: 16px;
-  -webkit-justify-content: space-around;
   -ms-flex-pack: distribute;
   justify-content: space-around;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -375,7 +369,6 @@ svg[class^="logo-"] {
 
 .flex-content {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -391,7 +384,6 @@ svg[class^="logo-"] {
 
 cite {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 1.25em auto;
@@ -405,7 +397,6 @@ cite {
   font-style: normal;
   font-size: 88%;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -685,18 +676,15 @@ dd p:last-child {
 .page-header {
   position: relative;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 0 auto 0.34em;
   padding-bottom: 0.89em;
   border-bottom: 1px solid #F0F0F0;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -706,7 +694,6 @@ dd p:last-child {
   white-space: nowrap;
   font-size: 2em;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -738,20 +725,17 @@ dd p:last-child {
 
 .primary-navigation {
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
 
 .primary-navigation ul {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
-  -webkit-justify-content: space-around;
   -ms-flex-pack: distribute;
   justify-content: space-around;
 }
@@ -759,7 +743,6 @@ dd p:last-child {
 .primary-navigation ul li {
   text-align: center;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -818,7 +801,6 @@ dd p:last-child {
 .primary-navigation button {
   display: none;
   width: 40px;
-  -webkit-align-self: flex-end;
   -ms-flex-item-align: end;
   align-self: flex-end;
 }
@@ -838,12 +820,10 @@ dd p:last-child {
   position: relative;
   z-index: 1;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: reverse;
-  -webkit-flex-direction: column-reverse;
   -ms-flex-direction: column-reverse;
   flex-direction: column-reverse;
   text-align: right;
@@ -856,7 +836,6 @@ dd p:last-child {
   display: none;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   border: 1px solid #DDDDDD;
@@ -898,7 +877,6 @@ dd p:last-child {
 
 .primary-navigation.small.active ul {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -918,7 +896,6 @@ dd p:last-child {
   border-radius: 0 0 6px 6px;
   background: #FFFFFF;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -926,15 +903,12 @@ dd p:last-child {
 /* Progress bar */
 .secondary-navigation {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -1122,7 +1096,6 @@ body:not(.tv-success):not(.tv-fail) #tree-output::before {
 
 a.collapse {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 1.34em auto;
@@ -1137,7 +1110,6 @@ a.collapse {
   -o-transition: all 250ms;
   transition: all 250ms;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -1205,15 +1177,12 @@ a.collapse[data-collapse="hidden"]:hover i {
 .docs main header,
 .home main header {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -1262,11 +1231,9 @@ a.collapse[data-collapse="hidden"]:hover i {
 /* DOCUMENTATION */
 .docs .flex-content {
   font-size: 88%;
-  -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -1275,7 +1242,6 @@ a.collapse[data-collapse="hidden"]:hover i {
   padding: 0.67em;
   min-width: 240px;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -1333,11 +1299,9 @@ a.collapse[data-collapse="hidden"]:hover i {
 
 .ebs.step-1 .input-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: start;
-  -webkit-align-items: flex-start;
   -ms-flex-align: start;
   align-items: flex-start;
 }
@@ -1405,7 +1369,6 @@ a.collapse[data-collapse="hidden"]:hover i {
 
 .ebs.step-3 .flex-content {
   margin: 0 -24px;
-  -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
 }
@@ -1415,7 +1378,6 @@ a.collapse[data-collapse="hidden"]:hover i {
   margin: 0;
   padding: 24px;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -1612,7 +1574,6 @@ a.collapse[data-collapse="hidden"]:hover i {
 
 .results .filter-wrapper.active .filter-sel-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -1635,11 +1596,9 @@ a.collapse[data-collapse="hidden"]:hover i {
   -webkit-transform: translateY(100%);
   -ms-transform: translateY(100%);
   transform: translateY(100%);
-  -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -1761,7 +1720,6 @@ a.collapse[data-collapse="hidden"]:hover i {
 .results .controls {
   position: relative;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 1.67em auto;
@@ -1771,11 +1729,9 @@ a.collapse[data-collapse="hidden"]:hover i {
   background: #eee;
   font-size: 12px;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -2108,14 +2064,12 @@ a.collapse[data-collapse="hidden"]:hover i {
 #download-overview .flex-content,
 #query-overview .flex-content {
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
 #query-overview .flex-content {
   -webkit-box-align: start;
-  -webkit-align-items: flex-start;
   -ms-flex-align: start;
   align-items: flex-start;
 }
@@ -2131,11 +2085,9 @@ a.collapse[data-collapse="hidden"]:hover i {
 
 .xps.step-1 .input-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: start;
-  -webkit-align-items: flex-start;
   -ms-flex-align: start;
   align-items: flex-start;
 }
@@ -2194,17 +2146,14 @@ a.collapse[data-collapse="hidden"]:hover i {
 .ebs .progress-header,
 .xps .progress-header {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin-top: 1em;
   white-space: nowrap;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -2230,7 +2179,6 @@ a.collapse[data-collapse="hidden"]:hover i {
 .ebs .continue-btn-wrapper,
 .xps .continue-btn-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin-top: 1.6em;
@@ -2265,7 +2213,6 @@ a.collapse[data-collapse="hidden"]:hover i {
   width: 100%;
   background-color: #7E6748;
   -webkit-box-flex: 0;
-  -webkit-flex: 0;
   -ms-flex: 0;
   flex: 0;
 }
@@ -2273,7 +2220,6 @@ a.collapse[data-collapse="hidden"]:hover i {
 .page-footer .content {
   position: relative;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 0 auto;
@@ -2282,7 +2228,6 @@ a.collapse[data-collapse="hidden"]:hover i {
   color: #FFFFFF;
   font-size: smaller;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
@@ -2371,22 +2316,18 @@ a.collapse[data-collapse="hidden"]:hover i {
 
 .page-footer .other {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
   padding-top: 20px;
   min-width: 100px;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   -webkit-box-align: center;
-  -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
 }
