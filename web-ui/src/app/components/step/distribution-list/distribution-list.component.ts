@@ -41,7 +41,7 @@ export class DistributionListComponent implements OnChanges {
         // check that we have all the mappings available
         if (changes.corpus && (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue)) {
             redoCounts = true;
-            this.componentProperties = this.treebankService.getSubTreebanks({ title: this.corpus })
+            this.componentProperties = this.treebankService.getSubTreebanks({ name: this.corpus })
                 .then(components => {
                     let properties = {};
                     for (let component of components) {

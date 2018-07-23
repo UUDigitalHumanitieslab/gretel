@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { StepComponent } from "../step.component";
 import { TreebankService } from "../../../services/treebank.service";
-import { Treebank, TreebankInfo } from "../../../treebank";
+import { Treebank, SubTreebank } from "../../../treebank";
 import { TableColumn } from "../../tables/selectable-table/TableColumn";
 
-interface Info extends TreebankInfo {
+interface Info extends SubTreebank {
     selected: boolean;
 }
 @Component({
@@ -14,7 +14,7 @@ interface Info extends TreebankInfo {
 })
 export class SelectTreebanksComponent extends StepComponent implements OnInit {
     items: Treebank[];
-    info: { [title: string]: Info[] } = {};
+    info: { [name: string]: Info[] } = {};
     treebank: string;
     loading: boolean = false;
 
@@ -32,7 +32,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     set mainTreebank(treebank: string) {
         this.treebank = treebank;
         if (treebank) {
-            this.getSubTreebanks({ title: treebank, id: -1 });
+            this.getSubTreebanks({ name: treebank, id: -1 });
         }
     }
 
@@ -43,7 +43,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
 
     valid: boolean;
 
-    columns: TableColumn<TreebankInfo>[] = [
+    columns: TableColumn<SubTreebank>[] = [
         {
             field: "component",
             header: "Component"
@@ -65,7 +65,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
     }
 
     treebankChange(treebank: Treebank) {
-        this.treebank = treebank.title;
+        this.treebank = treebank.name;
         this.getSubTreebanks(treebank);
         this.updateValidity();
     }
@@ -75,12 +75,11 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      * @param treebank
      */
     getSubTreebanks(treebank: Treebank) {
-        let results = [];
         this.loading = true;
         this.treebankService.getSubTreebanks(treebank).then((info) => {
             // To keep track whether we selected the given sub-part of the treebank.
-            this.info[treebank.title] = info.map(x => Object.assign(x, { selected: true }) as Info);
-            this.info[treebank.title].forEach(entry => entry.selected = true);
+            this.info[treebank.name] = info.map(x => Object.assign(x, { selected: true }) as Info);
+            this.info[treebank.name].forEach(entry => entry.selected = true);
             this.updateSelected();
             this.loading = false;
         });

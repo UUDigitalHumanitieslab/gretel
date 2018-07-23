@@ -1,24 +1,34 @@
 export interface Treebank {
-    id: number;
-    title: string;
+    id?: number;
+    name: string;
+    /**
+     * The user-friendly title to use, uploaded treebanks have the same
+     * value here as the treebank's name.
+     */
+    title?: string;
+    description?: string;
     userId?: number;
     email?: string;
-    uploaded?: Date;
+    /**
+     * When this has been uploaded, or false if this treebank is
+     * specified in the configuration.
+     */
+    uploaded?: Date | false;
     processed?: Date;
     isPublic?: boolean;
 }
 
-// Do not know a proper name: any suggestions?
-export interface TreebankInfo {
+/**
+ * Component of a treebank.
+ */
+export interface SubTreebank {
     databaseId: string,
     component: string,
-    sentenceCount: number,
-    wordCount: number
+    sentenceCount: number | '?',
+    wordCount: number | '?'
 }
 
 export interface TreebankMetadata {
-    id: number,
-    treebankId: number,
     field: string,
     type: 'text' | 'int' | 'date',
     facet: 'checkbox' | 'slider' | 'range' | 'dropdown',

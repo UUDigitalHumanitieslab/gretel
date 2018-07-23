@@ -95,8 +95,50 @@ $databaseGroups = array(
     'port' => 0000,
   ),
   'lassy' => array(
+    'title' => 'LASSY Small',
+    'description' => 'written Dutch - version 1.1',
     'components' => array(
       'DPC', 'WIKI', 'WRPE', 'WRPP', 'WSU',
+    ),
+    'component_descriptions' => array(
+      'DPC' => array(
+        'description' => 'Dutch Parallel Corpus',
+        'sentences' => 11716,
+        'words' => 193029,
+      ),
+      'WIKI' => array(
+        'title' => 'Wikipedia',
+        'description' => 'Dutch Wikipedia pages',
+        'sentences' => 7341,
+        'words' => 83360,
+      ),
+      'WRPE' => array(
+        'title' => 'WR-P-E',
+        'description' => 'E-magazines, newsletters, teletext pages, web sites, Wikipedia',
+        'sentences' => 14420,
+        'words' => 232631,
+      ),
+      'WRPP' => array(
+        'title' => 'WR-P-P',
+        'description' => 'Books, brochures, guides and manuals, legal texts, newspapers, periodicals and magazines, policy documents, proceedings, reports, surveys',
+        'sentences' => 17691,
+        'words' => 281424,
+      ),
+      'WSU' => array(
+        'title' => 'WS-U',
+        'description' => 'Auto cues, news scripts, text for the visually impaired',
+        'sentences' => 14032,
+        'words' => 184611,
+      ),
+    ),
+    'metadata' => array(
+      // array(
+      // 'field' => /* name of the field */,
+      // 'type' => 'text' | 'int' | 'date',
+      // 'facet' => 'checkbox' | 'slider' | 'range' | 'dropdown',
+      // 'show' => boolean,
+      // 'minValue' => int | Date | NULL,
+      // 'maxValue' => int | Date | NULL)
     ),
     'machine' => 'machinename',
     'port' => 0000,

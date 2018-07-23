@@ -15,10 +15,11 @@
 <ng-container *ngFor="let item of items">
     <div class="field">
         <label class="radio">
-            <input type="radio" name="Treebank" [(ngModel)]="treebank" [value]="item.title" (click)="treebankChange(item)"> {{item.title}}
+            <input type="radio" name="Treebank" [(ngModel)]="treebank" [value]="item.name" (click)="treebankChange(item)">
+            {{item.title}}<ng-container *ngIf="item.description">: <em>{{item.description}}</em></ng-container>
         </label>
     </div>
-    <div *ngIf="!loading && item.title == treebank" class="box is-shadowless">
-        <grt-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></grt-selectable-table>
+    <div *ngIf="!loading && item.name == treebank" class="box is-shadowless">
+        <grt-selectable-table [columns]="columns" [data]="info[item.name]" (onSelect)="updateSelected()"></grt-selectable-table>
     </div>
 </ng-container>

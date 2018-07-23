@@ -5,6 +5,7 @@ require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
 require '../../preparatory-scripts/xpath-generator.php';
 require './results.php';
+require './configured-treebanks.php';
 require './treebank-counts.php';
 
 // Maybe change this?
@@ -14,6 +15,11 @@ $base = $_SERVER['REQUEST_URI'];
 $base = explode('/router.php/', $_SERVER['REQUEST_URI'])[0].'/router.php';
 $router = new AltoRouter();
 $router->setBasePath($base);
+
+$router->map('GET', '/configured_treebanks', function () {
+    header('Content-Type: application/json');
+    echo json_encode(getConfiguredTreebanks());
+});
 
 $router->map('POST', '/generate_xpath', function () {
     $input = file_get_contents('php://input');
