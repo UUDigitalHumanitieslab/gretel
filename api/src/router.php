@@ -31,13 +31,14 @@ $router->map('POST', '/generate_xpath', function () {
 
 $router->map('POST', '/parse_sentence', function () {
     $sentence = file_get_contents('php://input');
-    $location = alpino($sentence, 'ng'.time());
-
-    header('Content-Type: application/xml');
-    $parsed = fopen($location, 'r') or die('Unable to open parsed file! '.$location);
-    echo fread($parsed, filesize($location));
-    fclose($parsed);
-    unlink($location);
+    try {
+        $xml =  alpino($sentence, 'ng'.time());
+        header('Content-Type: application/xml');
+        echo $xml;
+    } catch(Exception $e) {
+        http_response_code(500);
+        die($e->getMessage());
+    }
 });
 
 $router->map('POST', '/metadata_counts', function () {
