@@ -40,7 +40,7 @@
         "lassy-xpath": "^0.2.3",
         "lodash": "^4.17.10",
         "ngx-clipboard": "^10.0.0",
-        "node-sass": "^4.9.0",
+        "node-sass": "^4.9.2",
         "pivottable": "^2.20.0",
         "primeng": "^5.2.3",
         "rxjs": "^6.2.1",

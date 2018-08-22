@@ -13,7 +13,14 @@ defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
 // Whether or not to use an API to retrieve uploaded corpora. If empty, the corpora will need to be defined in the code.
 defined('API_URL') or define('API_URL', '');
 
+// === ALPINO SERVER  MODE ===
+// Whether or not to use alpino-server instead of starting a local instance
+$alpinoServerMode = false;
+$alpinoServerAddress = '';
+$alpinoServerPort = 0;
+
 // === CHANGE PATH TO ALPINO DIRECTORY === //
+// Only when $alpinoServerMode = false
 $alpinoDirectory = ROOT_PATH.'/parsers/Alpino';
 
 // In the recursive Javascript call, how many sentences to flush each time
