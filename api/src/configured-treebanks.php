@@ -16,6 +16,7 @@ function getConfiguredTreebanks()
 
                 foreach ($settings['components'] as $component_name) {
                     $component_description = array(
+                        'database_id' => strtoupper($corpus).'_ID_'.strtoupper($component_name),
                         'title' => $component_name,
                         'description' => '',
                         'sentences' => '?',

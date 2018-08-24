@@ -24,7 +24,7 @@
             <tr *ngFor="let subtree of subTreebanks" (click)="changeSelected(subtree)">
                 <td>
                     <label class="checkbox">
-                        <input type="checkbox" (change)="changeSelected(subtree, $event)" [checked]="selectedTreebanks[subtree.component]"> {{subtree.component}}
+                        <input type="checkbox" (change)="changeSelected(subtree, $event)" [checked]="selectedTreebanks[subtree.component]"> {{subtree.title}}
                     </label>
                 </td>
                 <td *ngIf="showDescription">
