@@ -63,6 +63,7 @@ export class TreebankService {
                         return {
                             databaseId: databaseId,
                             component: component.title,
+                            description: component.description,
                             sentenceCount: component.sentences,
                             wordCount: component.words
                         }
@@ -146,8 +147,8 @@ export class TreebankService {
             })).sort((a, b) => a.title.localeCompare(b.title));
     }
 
-    async getSubTreebanks(treebank: { name: string }): Promise<SubTreebank[]> {
-        let configuredTreebank = (await this.getConfiguredTreebanks())[treebank.name];
+    async getSubTreebanks(treebankName: string): Promise<SubTreebank[]> {
+        let configuredTreebank = (await this.getConfiguredTreebanks())[treebankName];
         if (configuredTreebank) {
             return configuredTreebank.subTreebanks;
         }
@@ -158,7 +159,7 @@ export class TreebankService {
             nr_words: string,
             slug: string,
             title: string
-        }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${treebank.name}`)).toPromise();
+        }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${treebankName}`)).toPromise();
         return results.map(x => {
             return {
                 databaseId: x.basex_db,

@@ -24,6 +24,7 @@ export interface Treebank {
 export interface SubTreebank {
     databaseId: string,
     component: string,
+    description?: string,
     sentenceCount: number | '?',
     wordCount: number | '?'
 }

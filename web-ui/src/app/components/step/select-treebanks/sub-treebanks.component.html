@@ -1,0 +1,50 @@
+<div class="is-loading" *ngIf="loading;else table">
+</div>
+<ng-template #table>
+    <table class="table is-hoverable is-fullwidth">
+        <thead>
+            <tr (click)="changeAllSelected($event)">
+                <th>
+                    <label class="checkbox">
+                        <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)"> Component
+                    </label>
+                </th>
+                <th *ngIf="showDescription">
+                    Description
+                </th>
+                <th class="has-text-right">
+                    Sentences
+                </th>
+                <th class="has-text-right">
+                    Words
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let subtree of subTreebanks" (click)="changeSelected(subtree)">
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox" (change)="changeSelected(subtree, $event)" [checked]="selectedTreebanks[subtree.component]"> {{subtree.component}}
+                    </label>
+                </td>
+                <td *ngIf="showDescription">
+                    {{subtree.description}}
+                </td>
+                <td class="is-number">
+                    {{subtree.sentenceCount | formatNumber}}
+                </td>
+                <td class="is-number">
+                    {{subtree.wordCount | formatNumber}}
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td *ngIf="showDescription"></td>
+                <td class="is-number">{{totalSentenceCount | formatNumber}}</td>
+                <td class="is-number">{{totalWordCount | formatNumber}}</td>
+            </tr>
+        </tfoot>
+    </table>
+</ng-template>

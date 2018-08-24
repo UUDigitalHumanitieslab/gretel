@@ -1,19 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectableTable } from './selectable-table.component';
+import { SubTreebanksComponent } from './sub-treebanks.component';
 import { commonTestBed } from '../../../common-test-bed';
 
-describe('SelectableTable', () => {
-    let component: SelectableTable;
-    let fixture: ComponentFixture<SelectableTable>;
+describe('SubTreebanksComponents', () => {
+    let component: SubTreebanksComponent;
+    let fixture: ComponentFixture<SubTreebanksComponent>;
 
     beforeEach(async(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(SelectableTable);
+        fixture = TestBed.createComponent(SubTreebanksComponent);
         component = fixture.componentInstance;
+        component.treebankName = 'test-treebank';
         fixture.detectChanges();
     });
 
