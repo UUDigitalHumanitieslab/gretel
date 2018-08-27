@@ -1,0 +1,45 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+@function create-mat-color($color, $color-invert) {
+    @return (
+        50: desaturate(lighten($primary, 25%), 25%),
+        100: desaturate(lighten($primary, 20%), 20%),
+        200: desaturate(lighten($primary, 15%), 15%),
+        300: desaturate(lighten($primary, 10%), 10%),
+        400: desaturate(lighten($primary, 5%), 5%),
+        500: $primary,
+        600: saturate(darken($primary, 5%), 5%),
+        700: saturate(darken($primary, 10%), 10%),
+        800: saturate(darken($primary, 15%), 15%),
+        900: saturate(darken($primary, 20%), 20%),
+        A100: saturate(lighten($primary, 20%), 20%),
+        A200: saturate(lighten($primary, 15%), 20%),
+        A400: saturate(lighten($primary, 10%), 20%),
+        A700: saturate(lighten($primary, 5%), 20%),
+        contrast: (
+            50: $color-invert,
+            100: $color-invert,
+            200: $color-invert,
+            300: $color-invert,
+            400: $color-invert,
+            500: $color-invert,
+            600: $color-invert,
+            700: $color-invert,
+            800: $color-invert,
+            900: $color-invert,
+            A100: $color-invert,
+            A200: $color-invert,
+            A400: $color-invert,
+            A700: $color-invert,
+        )
+    );
+}
+
+$primary-palette: mat-palette(create-mat-color($primary, $primary-invert));
+$accent-palette: mat-palette(create-mat-color($secondary, $secondary-invert));
+$warn-palette: mat-palette(create-mat-color($danger, $danger-invert));
+
+$mat-bulma-theme: mat-light-theme($primary-palette, $accent-palette, $warn-palette);
+
+@include angular-material-theme($mat-bulma-theme);

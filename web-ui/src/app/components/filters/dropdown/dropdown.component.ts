@@ -3,7 +3,7 @@ import { FilterComponent } from "../filter/filter.component";
 import { Filter } from '../filters.component';
 
 @Component({
-    selector: 'dropdown',
+    selector: 'grt-dropdown',
     templateUrl: './dropdown.component.html',
     styleUrls: ['./dropdown.component.scss']
 })

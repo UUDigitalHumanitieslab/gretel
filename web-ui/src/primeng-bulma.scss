@@ -1,4 +1,61 @@
-// rudimentary override of primeng theme to make it more Bulma-ish
+// variables to make primeng components look more Bulma-ish
+$fontFamily: $family-primary;
+$fontSize: $size-normal;
+$borderRadius: $radius;
+
+$disabledOpacity: 0.35;
+
+//Header
+$headerBorderWidth: 1px;
+$headerBorderColor: $primary;
+$headerBgColor: $primary;
+$headerTextColor: $primary-invert;
+$headerFontWeight: bold;
+$headerIconTextColor: $primary-invert;
+
+//Content
+$contentBorderWidth: 1px;
+$contentBorderColor: $border;
+$contentBgColor: $background;
+$contentTextColor: $text;
+
+//Default State
+$stateDefaultBorderWidth: 1px;
+$stateDefaultBorderColor: $link;
+$stateDefaultBgColor: $link-invert;
+$stateDefaultTextColor: $link;
+
+//Active State
+$stateActiveBorderColor: $primary;
+$stateActiveBgColor: $primary;
+$stateActiveTextColor: $primary-invert;
+
+//Focus State
+$stateFocusBorderColor: $primary;
+$stateFocusBgColor: $primary-invert;
+$stateFocusTextColor: $primary;
+
+//Error State
+$stateErrorBorderColor: $danger;
+$stateErrorBgColor: $danger;
+$stateErrorTextColor: $danger-invert;
+
+//Highlight State
+$stateHighlightBorderColor: $yellow;
+$stateHighlightBgColor: $yellow;
+$stateHighlightTextColor: #000000;
+
+//Hover State
+$stateHoverBorderColor: lighten($primary, 20%);
+$stateHoverBgColor: lighten($primary, 20%);
+$stateHoverTextColor: lighten($primary-invert, 20%);
+
+//Forms
+$inputBgColor: $text-invert;
+$inputTextColor: $text;
+$invalidInputBorderColor: $danger;
+$inputGroupTextColor: $text;
+
 .ui-table.bulma {
     table {
         border-collapse: collapse;
@@ -120,9 +177,21 @@
         }
     }
 }
+.ui-slider {
+    .ui-slider-range {
+        background: $primary;
+    }
 
+    .ui-slider-handle {
+        background: $secondary;
+        border-color: $secondary;
+        color: $secondary;
+    }
+}
 // $table-head-cell-color	$text-strong
 // $table-foot-cell-border-width	2px 0 0
 // $table-foot-cell-color	$text-strong
 // $table-row-active-background-color	$primary
 // $table-row-active-color	$primary-invert
+
+@import "~primeng/resources/themes/_theme.scss";

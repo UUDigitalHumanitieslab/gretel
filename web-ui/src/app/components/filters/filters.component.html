@@ -1,21 +1,13 @@
-<div *ngFor="let filter of this.filters">
-    <div [ngSwitch]="filter.filterType">
-
-        <div *ngSwitchCase="'checkbox'">
-            <text [filter]="filter" (onFilterChange)="filterChanged($event)"></text>
-        </div>
-
-        <div *ngSwitchCase="'slider'">
-            <int [filter]="filter" (onFilterChange)="filterChanged($event)"></int>
-        </div>
-
-        <div *ngSwitchCase="'range'">
-            <date [filter]="filter" (onFilterChange)="filterChanged($event)"></date>
-        </div>
-
-        <div *ngSwitchCase="'dropdown'">
-            <dropdown [filter]="filter" (onFilterChange)="filterChanged($event)"></dropdown>
-        </div>
-    </div>
+<div class="panel" *ngFor="let filter of this.filters">
+    <ng-container *ngIf="filter">
+        <p class="panel-heading">
+            {{filter.field}}
+        </p>
+        <ng-container [ngSwitch]="filter.filterType">
+            <grt-text *ngSwitchCase="'checkbox'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-text>
+            <grt-int *ngSwitchCase="'slider'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-int>
+            <grt-date *ngSwitchCase="'range'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-date>
+            <grt-dropdown *ngSwitchCase="'dropdown'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-dropdown>
+        </ng-container>
+    </ng-container>
 </div>
-

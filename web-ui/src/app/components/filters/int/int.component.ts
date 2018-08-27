@@ -4,7 +4,7 @@ import { Filter } from '../filters.component';
 import { FilterRangeValue } from "../../../services/results.service";
 
 @Component({
-    selector: 'int',
+    selector: 'grt-int',
     templateUrl: './int.component.html',
     styleUrls: ['./int.component.scss']
 })

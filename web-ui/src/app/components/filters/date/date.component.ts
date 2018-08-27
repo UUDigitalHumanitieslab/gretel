@@ -3,7 +3,7 @@ import { FilterComponent } from "../filter/filter.component";
 import { Filter } from '../filters.component';
 
 @Component({
-    selector: 'date',
+    selector: 'grt-date',
     templateUrl: './date.component.html',
     styleUrls: ['./date.component.scss']
 })

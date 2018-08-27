@@ -162,17 +162,29 @@ export class ResultsService {
      * @return string The metadata filter
      */
     private createMetadataFilterQuery(filters: FilterValue[]) {
+        function escape(value: string | number) {
+            return value.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;');
+        }
+
         // Compile the filter
         let filterQuery = '';
         for (let filter of filters) {
             switch (filter.type) {
                 case 'single':
                     // Single values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`;
                     break;
                 case 'range':
                     // Ranged values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>=${filter.min} and @value<=${filter.max}]]`;
+                    // TODO: range with string???
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value>=${escape(filter.min)} and @value<=${escape(filter.max)}]]`;
+                    break;
+                case 'multiple':
+                    // Single values
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and (${
+                        filter.values.map((value) => `@value="${escape(value)}"`).join(' or ')})]]`;
                     break;
             }
         }

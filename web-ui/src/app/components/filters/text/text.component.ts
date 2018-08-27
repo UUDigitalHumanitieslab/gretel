@@ -1,22 +1,27 @@
-import {Component} from '@angular/core';
-import {FilterComponent} from "../filter/filter.component";
-import {FilterMultipleValues} from "../../../services/results.service";
+import { Component } from '@angular/core';
+import { FilterComponent } from "../filter/filter.component";
+import { FilterMultipleValues } from "../../../services/results.service";
+import { Filter } from '../filters.component';
 
 @Component({
-    selector: 'text',
+    selector: 'grt-text',
     templateUrl: './text.component.html',
     styleUrls: ['./text.component.scss']
 })
 export class TextComponent extends FilterComponent {
+    public options: string[] = [];
 
-    values: string[] = [];
+    private values: string[] = [];
 
-
-    onFilterSet() {
-
-
+    onFilterSet(filter: Filter) {
+        this.options = filter.options.sort((a, b) => a.localeCompare(
+            b,
+            undefined,
+            {
+                sensitivity: 'base',
+                numeric: true
+            }));
     }
-
 
     filterChange(e) {
         if (e.event.target.checked) {
