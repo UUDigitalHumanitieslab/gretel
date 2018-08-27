@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FilterComponent } from "../filter/filter.component";
-import { FilterMultipleValues } from "../../../services/results.service";
 import { Filter } from '../filters.component';
 
 @Component({
