@@ -1,0 +1,17 @@
+@import "../../../../colors";
+
+.checkbox {
+    white-space: nowrap;
+}
+
+thead,
+tbody {
+    tr {
+        cursor: pointer;
+    }
+}
+
+.is-number {
+    font-family: $family-monospace;
+    text-align: right;
+}

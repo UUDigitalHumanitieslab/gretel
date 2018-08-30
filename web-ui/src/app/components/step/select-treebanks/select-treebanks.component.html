@@ -12,13 +12,14 @@
         counts.
     </p>
 </div>
-<ng-container *ngFor="let item of items">
+<ng-container *ngFor="let treebank of treebanks">
     <div class="field">
         <label class="radio">
-            <input type="radio" name="Treebank" [(ngModel)]="treebank" [value]="item.title" (click)="treebankChange(item)"> {{item.title}}
+            <input type="radio" name="Treebank" [(ngModel)]="selectedTreebank" [value]="treebank.name" (click)="treebankChange(treebank)">
+            {{treebank.title}}<ng-container *ngIf="treebank.description">: <em>{{treebank.description}}</em></ng-container>
         </label>
     </div>
-    <div *ngIf="!loading && item.title == treebank" class="box is-shadowless">
-        <grt-selectable-table [columns]="columns" [data]="info[item.title]" (onSelect)="updateSelected()"></grt-selectable-table>
+    <div *ngIf="treebank.name == selectedTreebank" class="box is-shadowless">
+        <grt-sub-treebanks [treebankName]="treebank.name" (onSelect)="updateSelected($event)"></grt-sub-treebanks>
     </div>
 </ng-container>

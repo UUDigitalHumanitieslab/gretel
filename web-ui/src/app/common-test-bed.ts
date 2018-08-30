@@ -41,6 +41,9 @@ export function commonTestBed() {
         });
 
     // common mock data
+    httpClientMock.setData('get', '/gretel/api/src/router.php/configured_treebanks', () => {
+        return {}
+    });
     httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank',
         [{
             "id": "42",
