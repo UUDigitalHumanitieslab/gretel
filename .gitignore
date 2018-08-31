@@ -4,6 +4,7 @@
 tmp/*
 log/*
 ng/
+.DS_Store
 
 prepros.cfg
 prepros-6.config
