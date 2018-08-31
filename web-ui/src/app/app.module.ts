@@ -23,6 +23,7 @@ import { DistributionListComponent } from './components/step/distribution-list/d
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { SubTreebanksComponent } from "./components/step/select-treebanks/sub-treebanks.component";
 import { ResultsComponent } from './components/step/results/results.component';
 import { PaperCiteComponent } from "./components/page-components/paper-cite/paper-cite.component";
 import { AdressComponent } from "./components/page-components/adress/adress.component";
@@ -32,7 +33,6 @@ import { NavigationComponent } from "./components/page-components/header/navigat
 import { HeaderComponent } from "./components/page-components/header/header.component";
 import { FooterNavigationComponent } from "./components/page-components/footer/footer-navigation/footer-navigation.component";
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
-import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
 
 import {
@@ -56,6 +56,7 @@ import { SentenceInputComponent } from './components/step/sentence-input/sentenc
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { FormatNumberPipe } from './format-number.pipe';
 
 export const declarations: any[] = [
     AppComponent,
@@ -72,13 +73,14 @@ export const declarations: any[] = [
     GretelWebsiteLinkComponent,
     DocumentationContentComponent,
     FooterNavigationComponent,
+    FormatNumberPipe,
     XpathSearchComponent,
     Header3Component,
     XpathInputComponent,
     BreadcrumbBarComponent,
     SelectTreebanksComponent,
     ResultsComponent,
-    SelectableTable,
+    SubTreebanksComponent,
     DistributionListComponent,
     TreeVisualizerComponent,
     ExampleBasedSearchComponent,
