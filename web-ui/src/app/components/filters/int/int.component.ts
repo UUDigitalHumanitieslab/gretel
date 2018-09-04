@@ -23,6 +23,7 @@ export class IntComponent extends FilterComponent {
 
     updateFilterChange(selected: boolean) {
         this.onFilterChange.emit({
+            dataType: 'int',
             type: 'range',
             field: this.filter.field,
             selected: selected,

@@ -43,8 +43,7 @@ import {
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService,
-    XpathSearchService
+    XmlParseService
 } from "./services/_index";
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
@@ -109,7 +108,6 @@ export const imports: any[] = [
 export const providers: any[] = [
     AlpinoService,
     AnalysisService,
-    XpathSearchService,
     LinkService,
     ResultsService,
     XmlParseService,

@@ -16,13 +16,31 @@ export class DateComponent extends FilterComponent {
         this.maxValue = filter.maxValue as Date;
     }
 
-    updateFilterChange(selected: boolean) {
+    updateFilterChange() {
+        function bound(min: any, value: Date, max: any) {
+            if (value < min) {
+                return min;
+            }
+            if (value > max) {
+                return max;
+            }
+
+            return value;
+        }
+
+        let min = bound(this.filter.minValue, this.minValue, this.filter.maxValue);
+        let max = bound(min, this.maxValue, this.filter.maxValue);
+        if (min > max) {
+            min = max;
+        }
+
         this.onFilterChange.emit({
+            dataType: 'date',
             field: this.filter.field,
-            selected,
+            selected: min > this.filter.minValue || max < this.filter.maxValue,
             type: 'range',
-            min: this.dateToString(this.minValue),
-            max: this.dateToString(this.maxValue)
+            min: this.dateToString(min),
+            max: this.dateToString(max)
         });
     }
 

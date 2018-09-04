@@ -178,8 +178,19 @@ export class ResultsService {
                     break;
                 case 'range':
                     // Ranged values
-                    // TODO: range with string???
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value>=${escape(filter.min)} and @value<=${escape(filter.max)}]]`;
+                    let min: string, max: string, value: string;
+                    if (filter.dataType == 'date') {
+                        // gets number in the format YYYYMMDD e.g. 19870227
+                        min = filter.min.replace(/-/g, '');
+                        max = filter.max.replace(/-/g, '');
+                        value = "number(translate(@value,'-',''))";
+                    } else {
+                        min = escape(filter.min);
+                        max = escape(filter.max);
+                        value = '@value';
+                    }
+
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and ${value}>=${min} and ${value}<=${max}]]`;
                     break;
                 case 'multiple':
                     // Single values
@@ -188,7 +199,6 @@ export class ResultsService {
                     break;
             }
         }
-
         return filterQuery;
     }
 
@@ -373,25 +383,28 @@ export interface Hit {
 
 export type FilterValue =
     FilterSingleValue
-    | FilterRangeValue<string>
-    | FilterRangeValue<number>
-    | FilterMultipleValues<string>;
+    | FilterRangeValue<string, 'date'>
+    | FilterRangeValue<number, 'int'>
+    | FilterMultipleValues<string, 'text'>;
 
 export interface FilterSingleValue {
     type: 'single';
+    dataType: 'text',
     field: string;
     value: string;
 }
 
-export interface FilterRangeValue<T> {
+export interface FilterRangeValue<T, U> {
     type: 'range';
+    dataType: U,
     field: string;
     min: T;
     max: T;
 }
 
-export interface FilterMultipleValues<T> {
+export interface FilterMultipleValues<T, U> {
     type: 'multiple';
+    dataType: U,
     values: Array<T>;
     field: string;
 }

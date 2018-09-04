@@ -2,18 +2,18 @@
     <div class="columns">
         <div class="column">
             <mat-form-field>
-                <input matInput [min]="filter.minValue" [max]="maxValue" [matDatepicker]="picker1" placeholder="Start Date" [(ngModel)]="minValue"
+                <input matInput [min]="filter.minValue" [max]="maxValue || filter.maxValue" [matDatepicker]="minPicker" placeholder="Start Date" [(ngModel)]="minValue"
                     (ngModelChange)="updateFilterChange()">
-                <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                <mat-datepicker #picker1></mat-datepicker>
+                <mat-datepicker-toggle matSuffix [for]="minPicker"></mat-datepicker-toggle>
+                <mat-datepicker #minPicker></mat-datepicker>
             </mat-form-field>
         </div>
         <div class="column">
             <mat-form-field>
-                <input matInput [min]="minValue" [max]="filter.maxValue" [matDatepicker]="picker2" placeholder="End Date" [(ngModel)]="maxValue"
+                <input matInput [min]="minValue || filter.minValue" [max]="filter.maxValue" [matDatepicker]="maxPicker" placeholder="End Date" [(ngModel)]="maxValue"
                     (ngModelChange)="updateFilterChange()">
-                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                <mat-datepicker #picker2></mat-datepicker>
+                <mat-datepicker-toggle matSuffix [for]="maxPicker"></mat-datepicker-toggle>
+                <mat-datepicker #maxPicker></mat-datepicker>
             </mat-form-field>
         </div>
     </div>

@@ -6,4 +6,3 @@ export * from './link.service';
 export * from './results.service';
 export * from './treebank.service';
 export * from './xml-parse.service';
-export * from './xpath-search.service';

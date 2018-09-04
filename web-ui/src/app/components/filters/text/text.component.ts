@@ -30,6 +30,7 @@ export class TextComponent extends FilterComponent {
         }
 
         this.onFilterChange.emit({
+            dataType: 'text',
             type: 'multiple',
             field: this.filter.field,
             selected: this.values.length > 0,

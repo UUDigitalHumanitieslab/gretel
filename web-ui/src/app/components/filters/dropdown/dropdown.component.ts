@@ -16,6 +16,7 @@ export class DropdownComponent extends FilterComponent {
 
     updateFilterChange(selected) {
         this.onFilterChange.emit({
+            dataType: 'text',
             field: this.filter.field,
             type: 'multiple',
             selected: selected,
