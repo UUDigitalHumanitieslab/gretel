@@ -2,7 +2,7 @@ import {EventEmitter, Input, Output} from '@angular/core';
 import {Filter} from "../filters.component";
 import {FilterValue} from '../../../services/_index';
 
-type ChangeEvent = FilterValue & {
+export type FilterChangeEvent = FilterValue & {
     selected: boolean
 };
 
@@ -20,7 +20,7 @@ export abstract class FilterComponent {
         return this.filterValue
     };
 
-    @Output() onFilterChange = new EventEmitter<ChangeEvent>();
+    @Output() onFilterChange = new EventEmitter<FilterChangeEvent>();
 
     constructor() {
     }
