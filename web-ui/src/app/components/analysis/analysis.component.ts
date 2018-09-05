@@ -2,7 +2,7 @@
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-
+import { map } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -152,9 +152,9 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private livePivot() {
-        return this.selectedVariablesSubject.map((selectedVariables) => {
+        return this.selectedVariablesSubject.pipe(map((selectedVariables) => {
             this.show(this.$element, selectedVariables);
-        }).subscribe();
+        })).subscribe();
 
     }
 
