@@ -56,6 +56,7 @@ import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { FormatNumberPipe } from './format-number.pipe';
+import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 
 export const declarations: any[] = [
     AppComponent,
@@ -84,6 +85,7 @@ export const declarations: any[] = [
     TreeVisualizerComponent,
     ExampleBasedSearchComponent,
     SentenceInputComponent,
+    StepButtonsComponent,
     ParseComponent,
     MatrixComponent,
     XPathEditorComponent,
