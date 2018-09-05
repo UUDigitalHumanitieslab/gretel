@@ -3,7 +3,7 @@
     <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
     <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
         <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateSentence($event)"
-            [inputSentence]="globalState.inputSentence" #sentenceInput></grt-sentence-input>
+            [inputSentence]="globalState.inputSentence" (onNext)="next()" #sentenceInput></grt-sentence-input>
         <grt-parse *ngSwitchCase="1" (onChangeValid)="setValid($event)" [sentence]="globalState.inputSentence" [xml]="globalState.exampleXml"
             #parse></grt-parse>
         <grt-matrix *ngSwitchCase="2" (onChangeValid)="setValid($event)" (onChangeValue)="updateMatrix($event)"
@@ -15,11 +15,12 @@
         <grt-results *ngSwitchCase="4" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
             (xpathChange)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event)"
-            (onChangeValid)="setValid($event)" #results></grt-results>
+            (onChangeValid)="setValid($event)" (onPrev)="prev()" (onNext)="next()" #results></grt-results>
         <grt-analysis *ngSwitchCase="5" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
     </div>
     <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>
-    <grt-step-buttons (onPrev)="prev()" (onNext)="next()" [currentStep]="globalState.currentStep" [steps]="steps"></grt-step-buttons>
+    <grt-step-buttons *ngIf="globalState.currentStep.number > 0" (onPrev)="prev()" (onNext)="next()" [currentStep]="globalState.currentStep"
+        [steps]="steps"></grt-step-buttons>
 </ng-container>

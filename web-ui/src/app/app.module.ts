@@ -18,6 +18,7 @@ import { HomeContentComponent } from './pages/home-page/home-content/home-conten
 import { AppRoutingModule } from "./app-routing/app-routing.module";
 import { DocumentationComponent } from './pages/documentation/documentation.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
+import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
@@ -56,7 +57,6 @@ import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { FormatNumberPipe } from './format-number.pipe';
-import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 
 export const declarations: any[] = [
     AppComponent,

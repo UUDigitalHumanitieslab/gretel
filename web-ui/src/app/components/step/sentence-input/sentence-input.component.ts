@@ -9,6 +9,10 @@ import { StepComponent } from "../step.component";
 export class SentenceInputComponent extends StepComponent {
     @Output()
     public onChangeValue = new EventEmitter<string>();
+
+    @Output()
+    public onNext = new EventEmitter();
+
     @Input()
     public inputSentence: string;
 
