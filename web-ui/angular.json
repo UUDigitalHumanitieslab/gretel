@@ -20,9 +20,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/primeng/resources/themes/omega/theme.scss",
               "node_modules/primeng/resources/primeng.min.css",
+              "src/styles.scss",
               "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fontawesome.scss",
               "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fa-solid.scss"
             ],

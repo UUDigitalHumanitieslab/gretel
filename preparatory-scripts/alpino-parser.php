@@ -2,14 +2,16 @@
 /**
  * version 0.3 date: 14.10.2014  RELEASED WITH GrETEL2.0
  * written by Liesbeth Augustinus (c) 2014
- * for the GrETEL2.0 project
+ * for the GrETEL2.0 project.
  */
 
- /**
-  * @return string the sentence as parsed by alpino.
-  * @throws Exception when Alpino cannot be contacted or fails to return in a timely manner
-  */
-function alpino_server($sentence) {
+/**
+ * @return string the sentence as parsed by alpino
+ *
+ * @throws Exception when Alpino cannot be contacted or fails to return in a timely manner
+ */
+function alpino_server($sentence)
+{
     global $alpinoServerAddress;
     global $alpinoServerPort;
 
@@ -19,19 +21,21 @@ function alpino_server($sentence) {
     }
     fwrite($fs, $sentence."\n\n");
 
-    while(!feof($fs) && ($part = fread($fs, 8096))) {
+    while (!feof($fs) && ($part = fread($fs, 8096))) {
         $xml .= $part;
     }
     fclose($fs);
 
     if (!$xml) {
-        throw new Exception("Error parsing sentence with Alpino.");
+        throw new Exception('Error parsing sentence with Alpino.');
     }
+
     return $xml;
 }
 
 /**
- * @return string the sentence as parsed by alpino.
+ * @return string the sentence as parsed by alpino
+ *
  * @throws Exception when Alpino cannot be started/contacted or fails to return in a timely manner
  */
 function alpino($sentence, $id)
@@ -43,20 +47,20 @@ function alpino($sentence, $id)
     }
 
     $descriptorspec = array(
-              0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-              1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-              2 => array("file", ROOT_PATH."/log/alpino.log", "a") // stderr is a file to write to
+              0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
+              1 => array('pipe', 'w'),  // stdout is a pipe that the child will write to
+              2 => array('file', ROOT_PATH.'/log/alpino.log', 'a'), // stderr is a file to write to
               );
 
     $cwd = '/';
     $env = array('ALPINO_HOME' => $alpinoDirectory);
-    $tmp = ROOT_PATH . '/tmp';
+    $tmp = ROOT_PATH.'/tmp';
     $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
     $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
     if (!is_resource($process)) {
         // die('Error when parsing input with Alpino');
-        throw new Exception("Error starting Alpino.");
+        throw new Exception('Error starting Alpino.');
     }
 
     // $pipes now looks like this:
@@ -78,19 +82,19 @@ function alpino($sentence, $id)
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
     if ($return_value != 0) {
-        throw new Exception("Error parsing sentence with Alpino");
+        throw new Exception('Error parsing sentence with Alpino');
     }
 
     //    echo "command returned $return_value\n";
     $location = ROOT_PATH."/tmp/$id.xml";
-    $parsed = fopen($location, 'r'); if (!$parsed);
-    if ($parsed) {
-        throw new Exception("Unable to open Alpino output");
+    $parsed = fopen($location, 'r');
+    if (!$parsed) {
+        throw new Exception('Unable to open Alpino output');
     }
 
-    return false;
     $xml = fread($parsed, filesize($location));
     fclose($parsed);
     unlink($location);
+
     return $xml;
 }

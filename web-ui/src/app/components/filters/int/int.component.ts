@@ -4,7 +4,7 @@ import { Filter } from '../filters.component';
 import { FilterRangeValue } from "../../../services/results.service";
 
 @Component({
-    selector: 'int',
+    selector: 'grt-int',
     templateUrl: './int.component.html',
     styleUrls: ['./int.component.scss']
 })
@@ -23,6 +23,7 @@ export class IntComponent extends FilterComponent {
 
     updateFilterChange(selected: boolean) {
         this.onFilterChange.emit({
+            dataType: 'int',
             type: 'range',
             field: this.filter.field,
             selected: selected,

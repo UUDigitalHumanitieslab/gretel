@@ -14,6 +14,14 @@ describe('IntComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(IntComponent);
         component = fixture.componentInstance;
+        component.filter = {
+            dataType: 'int',
+            field: 'range',
+            filterType: 'range',
+            minValue: -42,
+            maxValue: 42,
+            options: []
+        };
         fixture.detectChanges();
     });
 

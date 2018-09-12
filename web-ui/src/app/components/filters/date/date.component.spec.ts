@@ -14,6 +14,14 @@ describe('DateComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(DateComponent);
         component = fixture.componentInstance;
+        component.filter = {
+            dataType: 'date',
+            field: 'date',
+            filterType: 'range',
+            minValue: new Date(1987, 1, 27),
+            maxValue: new Date(2017, 8, 8),
+            options: []
+        };
         fixture.detectChanges();
     });
 

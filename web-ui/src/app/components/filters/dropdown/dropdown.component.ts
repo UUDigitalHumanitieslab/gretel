@@ -3,7 +3,7 @@ import { FilterComponent } from "../filter/filter.component";
 import { Filter } from '../filters.component';
 
 @Component({
-    selector: 'dropdown',
+    selector: 'grt-dropdown',
     templateUrl: './dropdown.component.html',
     styleUrls: ['./dropdown.component.scss']
 })
@@ -16,6 +16,7 @@ export class DropdownComponent extends FilterComponent {
 
     updateFilterChange(selected) {
         this.onFilterChange.emit({
+            dataType: 'text',
             field: this.filter.field,
             type: 'multiple',
             selected: selected,

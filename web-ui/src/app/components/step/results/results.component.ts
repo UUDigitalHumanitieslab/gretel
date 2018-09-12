@@ -78,6 +78,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     @Output()
     public onChangeRetrieveContext = new EventEmitter<boolean>();
 
+    @Output()
+    public onPrev = new EventEmitter();
+
+    @Output()
+    public onNext = new EventEmitter();
+
     public loading: boolean = true;
 
     public treeXml?: string;

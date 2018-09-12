@@ -69,6 +69,15 @@
         </h1>
     </div>
     <div class="level-right is-hidden-print">
+        <div class="level-item">
+            <div class="field">
+                <p class="control">
+                    <a class="button" role="button" (click)="onPrev.next()">
+                        Previous
+                    </a>
+                </p>
+            </div>
+        </div>
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                 <p class="control">
@@ -110,6 +119,15 @@
                         <span class="icon is-large">
                             <i class="fas fa-comment-dots"></i>
                         </span>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="level-item">
+            <div class="field">
+                <p class="control">
+                    <a class="button is-primary" role="button" (click)="onNext.next()">
+                        Next
                     </a>
                 </p>
             </div>

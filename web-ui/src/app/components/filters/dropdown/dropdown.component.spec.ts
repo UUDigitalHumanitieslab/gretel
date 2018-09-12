@@ -14,6 +14,12 @@ describe('DropdownComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(DropdownComponent);
         component = fixture.componentInstance;
+        component.filter = {
+            dataType: 'text',
+            field: 'dropdown',
+            filterType: 'dropdown',
+            options: ['A', 'B', 'C']
+        };
         fixture.detectChanges();
     });
 

@@ -18,6 +18,7 @@ import { HomeContentComponent } from './pages/home-page/home-content/home-conten
 import { AppRoutingModule } from "./app-routing/app-routing.module";
 import { DocumentationComponent } from './pages/documentation/documentation.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
+import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
@@ -43,8 +44,7 @@ import {
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService,
-    XpathSearchService
+    XmlParseService
 } from "./services/_index";
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
@@ -85,6 +85,7 @@ export const declarations: any[] = [
     TreeVisualizerComponent,
     ExampleBasedSearchComponent,
     SentenceInputComponent,
+    StepButtonsComponent,
     ParseComponent,
     MatrixComponent,
     XPathEditorComponent,
@@ -111,7 +112,6 @@ export const imports: any[] = [
 export const providers: any[] = [
     AlpinoService,
     AnalysisService,
-    XpathSearchService,
     LinkService,
     ResultsService,
     XmlParseService,

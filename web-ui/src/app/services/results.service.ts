@@ -162,21 +162,43 @@ export class ResultsService {
      * @return string The metadata filter
      */
     private createMetadataFilterQuery(filters: FilterValue[]) {
+        function escape(value: string | number) {
+            return value.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;');
+        }
+
         // Compile the filter
         let filterQuery = '';
         for (let filter of filters) {
             switch (filter.type) {
                 case 'single':
                     // Single values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`;
                     break;
                 case 'range':
                     // Ranged values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>=${filter.min} and @value<=${filter.max}]]`;
+                    let min: string, max: string, value: string;
+                    if (filter.dataType == 'date') {
+                        // gets number in the format YYYYMMDD e.g. 19870227
+                        min = filter.min.replace(/-/g, '');
+                        max = filter.max.replace(/-/g, '');
+                        value = "number(translate(@value,'-',''))";
+                    } else {
+                        min = escape(filter.min);
+                        max = escape(filter.max);
+                        value = '@value';
+                    }
+
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and ${value}>=${min} and ${value}<=${max}]]`;
+                    break;
+                case 'multiple':
+                    // Single values
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and (${
+                        filter.values.map((value) => `@value="${escape(value)}"`).join(' or ')})]]`;
                     break;
             }
         }
-
         return filterQuery;
     }
 
@@ -361,25 +383,28 @@ export interface Hit {
 
 export type FilterValue =
     FilterSingleValue
-    | FilterRangeValue<string>
-    | FilterRangeValue<number>
-    | FilterMultipleValues<string>;
+    | FilterRangeValue<string, 'date'>
+    | FilterRangeValue<number, 'int'>
+    | FilterMultipleValues<string, 'text'>;
 
 export interface FilterSingleValue {
     type: 'single';
+    dataType: 'text',
     field: string;
     value: string;
 }
 
-export interface FilterRangeValue<T> {
+export interface FilterRangeValue<T, U> {
     type: 'range';
+    dataType: U,
     field: string;
     min: T;
     max: T;
 }
 
-export interface FilterMultipleValues<T> {
+export interface FilterMultipleValues<T, U> {
     type: 'multiple';
+    dataType: U,
     values: Array<T>;
     field: string;
 }
