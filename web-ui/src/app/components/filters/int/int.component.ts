@@ -14,7 +14,7 @@ export class IntComponent extends FilterComponent {
     rangeValues: number[];
 
     onFilterSet(filter: Filter) {
-        this.rangeValues = [filter.minValue as number, filter.maxValue as number];
+        this.rangeValues = [filter.minValue as number || 0, filter.maxValue as number || 0];
     }
 
     onCheckBoxClicked(e) {
