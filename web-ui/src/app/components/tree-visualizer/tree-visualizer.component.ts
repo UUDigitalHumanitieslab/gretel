@@ -13,6 +13,10 @@ type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
 export class TreeVisualizerComponent implements OnChanges, OnInit {
     @ViewChild('output', { read: ElementRef })
     public output: ElementRef;
+    @ViewChild('inline', { read: ElementRef })
+    public inlineRef: ElementRef;
+    @ViewChild('fullScreen', { read: ElementRef })
+    public fullScreenRef: ElementRef;
 
     @Input()
     public xml: string;
@@ -23,6 +27,9 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public fullScreenButton = true;
 
+    @Input()
+    public showMatrixDetails: boolean;
+
     @Output()
     public onDisplayChange = new EventEmitter<TreeVisualizerDisplay>();
 
@@ -31,13 +38,12 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
 
     ngOnInit() {
         let element = $(this.output.nativeElement);
-        this.visualize(element);
         element.on('close', () => {
             if (this.display == 'both') {
                 this.onDisplayChange.next('inline')
             }
         });
-        this.updateVisibility(element);
+        this.updateVisibility();
     }
 
     ngOnChanges(changes: TypedChanges) {
@@ -45,19 +51,23 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         if (changes.xml && changes.xml.currentValue != changes.xml.previousValue) {
             this.visualize(element);
         }
-        this.updateVisibility(element);
+        this.updateVisibility();
     }
 
     private visualize(element: any) {
-        element.treeVisualizer(this.xml, {
-            nvFontSize: 14,
-            noFsButton: !this.fullScreenButton
+        setTimeout(() => {
+            // Make sure the visualization happens after the
+            // view (which acts a placeholder) has been rendered.
+            element.treeVisualizer(this.xml, {
+                nvFontSize: 14,
+                showMatrixDetails: this.showMatrixDetails
+            });
         });
     }
 
-    private updateVisibility(element: JQuery<Element>) {
-        let inline = element.children('.tree-visualizer');
-        let fullscreen = element.children('.tree-visualizer-fs');
+    private updateVisibility() {
+        let inline = $(this.inlineRef && this.inlineRef.nativeElement);
+        let fullscreen = $(this.fullScreenRef && this.fullScreenRef.nativeElement);
 
         if (this.display != 'fullscreen') {
             inline.show();
