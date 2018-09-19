@@ -14,11 +14,6 @@ const links: Link[] = [
     proxy: false,
   },
   {
-    name: 'select treebank',
-    link: '/gretel/ebs/tb-sel.php',
-    proxy: true,
-  },
-  {
     name: 'Home',
     link: '/home',
     proxy: false,
