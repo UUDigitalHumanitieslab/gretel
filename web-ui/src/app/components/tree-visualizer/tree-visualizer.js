@@ -198,8 +198,7 @@ var jQuery = require('jquery');
             removeError();
 
             // See the buildOutputList function below
-            anyTree.html(buildOutputList(xmlObject.find("node").first()));
-
+            anyTree.html(buildOutputList(xmlObject.find("node").addBack('node').first()));
             // Empty tooltips
             anyTooltip.children("ul").empty();
 
