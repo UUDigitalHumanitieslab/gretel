@@ -54,6 +54,10 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         if (changes.xml && changes.xml.currentValue != changes.xml.previousValue) {
             this.visualize(element);
         }
+
+        if (this.instance) {
+            this.updateVisibility();
+        }
     }
 
     private visualize(element: any) {
