@@ -109,7 +109,7 @@ var jQuery = require('jquery');
                     $this.addClass("hovered");
 
                     for (i in data) {
-                        if (data.hasOwnProperty(i)) {
+                        if (data.hasOwnProperty(i) && i != 'uiDraggable') {
                             $("<li>", {
                                 html: "<strong>" + i + "</strong>: " + data[i]
                             }).prependTo(tooltipList);
@@ -326,6 +326,24 @@ var jQuery = require('jquery');
                         if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
                         else $this.append("<span class='cat'>" + li.data("cat") + "</span>");
                     }
+                } else if (li.data("pos")) {
+                    if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pos"));
+                    else $this.append("<span>" + li.data("pos") + "</span>");
+                } else if (!li.data("rel")) {
+                    // nothing specified, set something from the query
+                    // (when doing a custom xpath query)
+                    let keys = Object.keys(li.data());
+                    let key = null;
+                    for (let i in keys) {
+                        key = keys[i];
+                        if (key == 'varname') {
+                            key = null;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    $this.append(`<em>${(key && li.data()[key]) || 'node'}</em>`);
                 }
 
                 if ($this.is(":only-child")) {
