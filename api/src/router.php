@@ -38,10 +38,10 @@ $router->map('POST', '/generate_xpath', function () {
 $router->map('POST', '/parse_sentence', function () {
     $sentence = file_get_contents('php://input');
     try {
-        $xml =  alpino($sentence, 'ng'.time());
+        $xml = alpino($sentence, 'ng'.time());
         header('Content-Type: application/xml');
         echo $xml;
-    } catch(Exception $e) {
+    } catch (Exception $e) {
         http_response_code(500);
         die($e->getMessage());
     }
@@ -72,7 +72,7 @@ $router->map('POST', '/treebank_counts', function () {
 });
 
 $router->map('POST', '/results', function () {
-    global $resultsLimit;
+    global $resultsLimit, $analysisLimit, $analysisFlushLimit, $flushLimit;
 
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -91,8 +91,14 @@ $router->map('POST', '/results', function () {
     if (!isset($analysisLimit)) {
         $analysisLimit = $resultsLimit;
     }
-    $searchLimit = isset($data['isAnalysis']) && $data['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
-
+    if (isset($data['isAnalysis']) && $data['isAnalysis']) {
+        $searchLimit = $analysisLimit;
+        if (isset($analysisFlushLimit)) {
+            $flushLimit = $analysisFlushLimit;
+        }
+    } else {
+        $searchLimit = $resultsLimit;
+    }
     $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
 
     header('Content-Type: application/json');
