@@ -35,10 +35,12 @@ $router->map('POST', '/generate_xpath', function () {
     echo json_encode($generated);
 });
 
-$router->map('POST', '/parse_sentence', function () {
-    $sentence = file_get_contents('php://input');
+$router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
     try {
-        $xml = alpino($sentence, 'ng'.time());
+        $xml = alpino(str_replace(
+            '_SLASH_',
+            '/',
+            urldecode($sentence)), 'ng'.time());
         header('Content-Type: application/xml');
         echo $xml;
     } catch (Exception $e) {

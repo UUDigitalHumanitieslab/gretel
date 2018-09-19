@@ -1,7 +1,10 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild, SimpleChange, SecurityContext } from '@angular/core';
-import * as $ from 'jquery';
-import './tree-visualizer';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
+
+import * as $ from 'jquery';
+
+import { DownloadService } from '../../services/_index';
+import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
 type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
@@ -16,11 +19,15 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     public output: ElementRef;
     @ViewChild('inline', { read: ElementRef })
     public inlineRef: ElementRef;
+
     @Input()
     public xml: string;
 
     @Input()
     public sentence: SafeHtml;
+
+    @Input()
+    public filename: string;
 
     @Input()
     public display: TreeVisualizerDisplay = 'inline';
@@ -31,13 +38,16 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public showMatrixDetails: boolean;
 
+    @Input()
+    public url: string;
+
     @Output()
     public onDisplayChange = new EventEmitter<TreeVisualizerDisplay>();
 
     // jquery tree visualizer
     private instance: any;
 
-    constructor(private sanitizer: DomSanitizer) {
+    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService) {
     }
 
     ngOnInit() {
@@ -58,6 +68,12 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         if (this.instance) {
             this.updateVisibility();
         }
+    }
+
+    downloadXml() {
+        this.downloadService.downloadXml(
+            this.filename || 'tree.xml',
+            this.xml);
     }
 
     private visualize(element: any) {

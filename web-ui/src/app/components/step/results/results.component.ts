@@ -88,6 +88,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public loading: boolean = true;
 
     public treeXml?: string;
+    public treeXmlUrl?: string;
     public treeSentence?: SafeHtml;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
@@ -135,7 +136,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     async showTree(result: Hit) {
         this.treeXml = undefined;
         this.treeSentence = result.highlightedSentence;
-        this.treeXml = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        let { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        this.treeXml = treeXml;
+        this.treeXmlUrl = url;
     }
 
     public downloadResults() {
