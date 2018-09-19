@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
 import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -17,7 +18,6 @@ import {
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from "../step.component";
-import { SafeHtml } from '@angular/platform-browser';
 
 const DebounceTime = 200;
 
