@@ -6,7 +6,7 @@
  *
  * @version 0.3
  * @license MIT
- * @author Bram Vanroy
+ * @author Bram Vanroy (modified by Sheean Spoel)
  */
 var jQuery = require('jquery');
 
@@ -14,184 +14,182 @@ var jQuery = require('jquery');
     $.fn.treeVisualizer = function (xml, options) {
         var defaults = {
             normalView: true,
-            nvFontSize: 12,
-            noFsButton: false,
-            fsView: true,
-            fsFontSize: 14,
-            sentence: "",
+            sentence: '',
             initFSOnClick: false,
-            extendedPOS: false
+            extendedPOS: false,
+            hasNavigation: false,
+            showMatrixDetails: false
         };
         var args = $.extend({}, defaults, options);
         var instance = this,
-            FS, SS,
-            treeFS, treeSS, tooltipFS, tooltipSS,
+            FS, NS,
+            treeFS, treeNS, tooltipFS, tooltipNS,
             anyTree,
             anyTooltip,
-            zoomOpts,
-            sentenceContainer;
-        var $window = $(window);
-        if (args.normalView || args.fsView) {
-            instance.children(".tree-visualizer, .tree-visualizer-fs").remove();
-            initVars();
-            parseXMLObj(xml);
-            if (args.initFSOnClick) {
-                FS.fadeIn(250, function () {
-                    fontToFit();
-                });
-            }
-        } else {
-            console.error("Cannot initialize Tree Visualizer: either the container " +
-                "does not exist, or you have set both normal and fullscreen view to " +
-                "false, which does not make sense.");
-        }
-
-        if (!args.initFSOnClick) {
-            // Show tree-visualizer-fs tree
-            instance.find(".tv-show-fs").click(function (e) {
-                anyTooltip.css("top", "-100%").children("ul").empty();
-                if (typeof treeSS != "undefined") treeSS.find("a").removeClass("hovered");
-
-                FS.fadeIn(250);
-                sizeTreeFS();
-                e.preventDefault();
-            });
-        }
-        // Adjust scroll position
-        anyTree.add($window).scroll(function () {
+            zoomOpts, tooltipTimeout;
+        var $window = $(window),
+            $body = $("body");
+        initVars();
+        parseXMLObj(xml);
+        navigationDisabler();
+        // Window event only need to be bound once
+        $window.on("scroll", function () {
             tooltipPosition();
         });
 
-        // Close fullscreen if a user clicks on an empty area
-        FS.click(function (e) {
-            var target = $(e.target);
-            if (!target.closest(".tv-error, .tree, .tooltip, .zoom-opts, .sentence").length) {
-                close();
+        function bindInitEvents() {
+            if (!args.initFSOnClick) {
+                // Show tree-visualizer-fs tree
+                instance.find(".tv-show-fs").on("click", function (e) {
+                    instance.trigger('open-fullscreen');
+
+                    e.preventDefault();
+                });
             }
-        });
-        // Zooming
-        zoomOpts.find("button").click(function () {
-            var $this = $(this);
+            // Adjust scroll position
+            anyTree.on("scroll", function () {
+                tooltipPosition();
+            });
 
-            if ($this.is(".close")) {
-                close();
-            } else {
+            // Close fullscreen if a user clicks on an empty area
+            FS.on("click", function (e) {
+                var target = $(e.target);
+                if (!target.closest(".tv-error, .tv-content-wrapper").length) {
+                    closeFullscreen();
+                }
+            });
+            // Zooming
+            zoomOpts.find("button").on("click", function () {
+                var $this = $(this);
+                clearTimeout(tooltipTimeout);
                 fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
-                sizeTreeFS();
-                var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
 
+                var animationSpeed = treeFS.find("a.hovered").css("transition-duration") || 200;
                 animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
                 animationSpeed += 50;
 
-                setTimeout(function () {
+                tooltipTimeout = setTimeout(function () {
                     tooltipPosition(true);
                 }, animationSpeed);
-            }
-        });
+            });
+            // Close button
+            instance.find(".tv-close-fs").on('click', function () {
+                closeFullscreen();
+            });
 
-        // Make the tree-visualizer-fs tree responsive
-        if (args.fsView) $window.on("resize", sizeTreeFS);
+            FS.find(".tv-navigation-wrapper button").on("click", function () {
 
-        anyTree.on("click", "a", function (e) {
-            var $this = $(this),
-                listItem = $this.parent("li"),
-                data = listItem.data(),
-                tree = $this.closest(".tree"),
-                treeLeafs = tree.find("a"),
-                tooltipList = tree.next(".tooltip").children("ul");
+                var index = FS.attr("data-tv-active-index"),
+                    resultsTable = $(".results-ajax-wrapper tbody:not(.empty)");
 
-            tooltipList.empty();
-            treeLeafs.removeClass("hovered");
-            $this.addClass("hovered");
-            var i;
-            for (i in data) {
-                if (data.hasOwnProperty(i) && i != 'uiDraggable') {
-                    $("<li>", {
-                        html: "<strong>" + i + "</strong>: " + data[i]
-                    }).prependTo(tooltipList);
+                treeFS.find("a").removeClass("hovered");
+                tooltipFS.hide();
+
+                if ($(this).is(".tv-prev-tree")) {
+                    if (index > 0) index--;
+                } else {
+                    if (index < resultsTable.find("tr").length - 1) index++;
                 }
+
+                navigationDisabler();
+
+                resultsTable.find("tr").eq(index).find("a").click();
+            });
+
+            anyTree.on("click", "a", function (e) {
+                if (!$(this).hasClass("ignored")) {
+                    var $this = $(this),
+                        data = $this.parent("li").data(),
+                        tree = $this.closest(".tv-tree"),
+                        tooltipList = tree.next(".tv-tooltip").children("ul"),
+                        i;
+
+                    tooltipList.empty();
+                    tree.find("a").removeClass("hovered");
+                    $this.addClass("hovered");
+
+                    for (i in data) {
+                        if (data.hasOwnProperty(i) && i != 'uiDraggable') {
+                            $("<li>", {
+                                html: "<strong>" + i + "</strong>: " + data[i]
+                            }).prependTo(tooltipList);
+                        }
+                    }
+                    tooltipPosition();
+                }
+
+                e.preventDefault();
+            });
+
+            anyTree.on("mouseout", "a.hovered", function () {
+                if ($(this).closest(".tv-tree").hasClass("small")) {
+                    $(this).on("transitionend", function () {
+                        tooltipPosition(true);
+                    });
+                }
+            });
+
+            anyTooltip.children("button").on("click", function () {
+                var tooltip = $(this).parent(".tv-tooltip");
+                tooltip.fadeOut(250);
+                tooltip.prev(".tv-tree").find("a").removeClass("hovered");
+            });
+        }
+
+        function navigationDisabler() {
+            FS.find(".tv-navigation-wrapper button").prop("disabled", false);
+            var index = FS.attr("data-tv-active-index");
+            if (index <= 0) {
+                FS.find(".tv-navigation-wrapper .tv-prev-tree").prop("disabled", true);
+            } else if (index >= $(".results-ajax-wrapper tbody:not(.empty)").find("tr").length - 1) {
+                FS.find(".tv-navigation-wrapper .tv-next-tree").prop("disabled", true);
             }
-            tooltipPosition();
-
-            e.preventDefault();
-        });
-
-        anyTree.on("mouseout", "a.hovered", function () {
-            var $this = $(this);
-            if ($this.closest(".tree").hasClass("small")) {
-                $this.on("webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend", function () {
-                    tooltipPosition(true);
-                });
-            }
-        });
-
-        anyTooltip.find("button").click(function () {
-            var $this = $(this),
-                tooltip = $this.parent(".tooltip"),
-                tree = tooltip.prev(".tree"),
-                treeLeafs = tree.find("a");
-
-            tooltip.fadeOut(250);
-            treeLeafs.removeClass("hovered");
-        });
+        }
 
         function initVars() {
             var trees = [],
                 tooltips = [],
-                views = [];
+                screens = [];
 
             if (args.normalView) {
-                instance.append('<div class="tree-visualizer" style="display: none"></div>');
-                SS = instance.children(".tree-visualizer");
-                var SSHTML = '<div class="tv-error" style="display: none"><p></p></div>' +
-                    '<div class="tree" style="font-size: ' + args.nvFontSize + 'px;"></div>' +
-                    '<aside class="tooltip" style="display: none; font-size: ' + args.nvFontSize + 'px;"">' +
-                    '<ul></ul><button>&#10005;</button></aside>';
-                if (args.fsView && !args.noFsButton) {
-                    SSHTML += '<button class="tv-show-fs">Fullscreen</button>';
-                }
-                SS.append(SSHTML);
+                NS = instance.children(".tree-visualizer");
 
-                treeSS = SS.children(".tree");
-                tooltipSS = SS.children(".tooltip");
+                treeNS = NS.find(".tv-tree");
+                tooltipNS = treeNS.next(".tv-tooltip");
 
-                views.push(SS);
-                trees.push(treeSS);
-                tooltips.push(tooltipSS);
+                screens.push(NS);
+                trees.push(treeNS);
+                tooltips.push(tooltipNS);
             }
-            if (args.fsView) {
-                instance.append('<div class="tree-visualizer-fs" style="display: none"></div>');
-                FS = instance.children(".tree-visualizer-fs");
-                var FSHTML = "";
-                if (!args.normalView) {
-                    FSHTML += '<div class="tv-error" style="display: none"><p></p></div>';
-                }
-                FSHTML += '<div class="tree" style="font-size: ' + args.fsFontSize + 'px;"></div>' +
-                    '<aside class="tooltip" style="display: none"><ul></ul>' +
-                    '<button>&#10005;</button></aside><div class="zoom-opts"><button class="zoom-out">-</button>' +
-                    '<button class="zoom-default">Default</button><button class="zoom-in">+</button>' +
-                    '<button class="close">&#10005;</button></div>';
 
-                FS.append(FSHTML);
+            FS = instance.children(".tree-visualizer-fs");
 
-                treeFS = FS.children(".tree");
-                tooltipFS = FS.children(".tooltip");
-                zoomOpts = FS.children(".zoom-opts");
+            treeFS = FS.find(".tv-tree");
+            tooltipFS = treeFS.next(".tv-tooltip");
+            zoomOpts = FS.find(".tv-zoom-opts");
 
-                if (args.sentence != "") {
-                    treeFS.before('<div class="sentence">' + decodeURI(args.sentence) + '</div>');
-                    sentenceContainer = FS.children(".sentence");
-                }
+            // TODO: https://github.com/UUDigitalHumanitieslab/gretel/issues/154
+            // zoomOpts.prev("a").attr('href', xml);
 
-                views.push(FS);
-                trees.push(treeFS);
-                tooltips.push(tooltipFS);
-            }
+            screens.push(FS);
+            trees.push(treeFS);
+            tooltips.push(tooltipFS);
+
             anyTree = jqArrayToJqObject(trees);
             anyTooltip = jqArrayToJqObject(tooltips);
-            anyView = jqArrayToJqObject(views);
+            anyView = jqArrayToJqObject(screens);
 
             errorContainer = anyView.children(".tv-error");
+
+            if (args.sentence != "") {
+                anyView.find(".tv-sentence-wrapper").addClass("has-sentence").children("span").html(args.sentence);
+            }
+
+            if (!args.hasNavigation) {
+                FS.find(".tv-navigation-wrapper").hide();
+            }
+            anyView.find("*").off();
+            bindInitEvents();
         }
 
         function parseXMLObj(xml) {
@@ -200,17 +198,64 @@ var jQuery = require('jquery');
             removeError();
 
             // See the buildOutputList function below
-            anyTree.html(buildOutputList(xmlObject.find("node").first()));
-
+            anyTree.html(buildOutputList(xmlObject.find("node").addBack('node').first()));
             // Empty tooltips
             anyTooltip.children("ul").empty();
 
+            // Add metadata
+            var metadata = $("<table>");
+            xmlObject.find("metadata").children("meta").sort(function (a, b) {
+                return a.getAttribute("name").localeCompare(b.getAttribute("name"));
+            }).each(function (i, e) {
+                var meta = $("<tr>");
+
+                var th = $("<th>");
+                th.append(e.getAttribute("name"));
+                meta.append(th);
+
+                var td = $("<td>");
+                td.append(e.getAttribute("value"));
+                meta.append(td);
+
+                metadata.append(meta);
+            })
+            // TODO: fix! (and what does this do?)
+            // $(document).tooltip({
+            // 	items: ".fa-commenting",
+            // 	content: metadata
+            // });
+
             // Do some small tree modifications
             treeModifier();
+
+            if (args.normalView) {
+                $body.addClass("tv-ns-open");
+            }
+            if (args.initFSOnClick) {
+                FS.fadeIn(250, function () {
+                    fontToFit();
+                });
+            }
         }
 
-        function close() {
+        instance.bind('open-fullscreen', openFullscreen);
+
+        function openFullscreen() {
+            anyTooltip.css("top", "-100%").children("ul").empty();
+            if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
+            $body.addClass("tv-fs-open");
+            FS.fadeIn(250, function () {
+                if (!FS.children("ol").is("[data-tv-fontsize]")) {
+                    fontToFit();
+                }
+            });
+        }
+
+        instance.bind('close-fullscreen', closeFullscreen);
+
+        function closeFullscreen() {
             instance.trigger('close');
+            $body.removeClass("tv-fs-open");
             FS.fadeOut(250, function () {
                 treeFS.find("a").removeClass("hovered");
                 removeError();
@@ -231,10 +276,10 @@ var jQuery = require('jquery');
                     // Some data-attributes have initial spaces. Get rid of them
                     if (a.nodeName == "highlight") {
                         newItem.addClass("highlight");
-                    } else {
-                        if (a.nodeName != "begin" && a.nodeName != "end") {
-                            newItem.attr("data-" + a.nodeName, a.value.replace(/^\s(.+)/g, "$1"));
-                        }
+                    } else if (a.nodeName == "not") {
+                        newItem.addClass("excluded");
+                    } else if (a.nodeName != "begin" && a.nodeName != "end") {
+                        newItem.attr("data-" + a.nodeName, a.value.replace(/^\s(.+)/, "$1"));
                     }
                 }
                 if ($(this).children("node").length) {
@@ -246,24 +291,40 @@ var jQuery = require('jquery');
         }
 
         // Small modifications to the tree
+        // Only add certain things (e.g. CS) on the matrix page
         function treeModifier() {
             anyTree.find("a").each(function () {
                 var $this = $(this),
                     li = $this.parent("li");
 
+                if (args.showMatrixDetails && li.data("word")) {
+                    if (li.data("caseinsensitive")) {
+                        li.data("word", li.data("word").toLowerCase());
+                        li.data("lemma", li.data("lemma").toLowerCase());
+                    } else {
+                        $this.addClass("cs");
+                    }
+                }
+
                 if (li.data("rel")) {
-                    $this.append("<span>" + li.data("rel") + "<span>");
-                    if (li.data("index")) $this.append("<span>" + li.data("index") + "</span>");
+                    $this.append("<span class='rel'>" + li.data("rel") + "</span>");
+                    if (li.data("index")) $this.append("<span class='index'>" + li.data("index") + "</span>");
                 }
 
                 if (li.data("postag") && args.extendedPOS) {
-                    $this.append("<span>" + li.data("postag") + "</span>");
+                    $this.append("<span class='postag'>" + li.data("postag") + "</span>");
                 } else if (li.data("pt")) {
                     if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pt"));
-                    else $this.append("<span>" + li.data("pt") + "</span>");
+                    else $this.append("<span class='pt'>" + li.data("pt") + "</span>");
                 } else if (li.data("cat")) {
-                    if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
-                    else $this.append("<span>" + li.data("cat") + "</span>");
+                    if (li.data("cat") == " ") {
+                        li.removeAttr("data-cat");
+                        li.removeData("cat");
+                        $this.addClass("ignored").text("?").attr("title", "Top node's properties will be ignored");
+                    } else {
+                        if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
+                        else $this.append("<span class='cat'>" + li.data("cat") + "</span>");
+                    }
                 } else if (li.data("pos")) {
                     if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pos"));
                     else $this.append("<span>" + li.data("pos") + "</span>");
@@ -285,11 +346,20 @@ var jQuery = require('jquery');
                 }
 
                 if ($this.is(":only-child")) {
-                    if (li.data("lemma")) li.append("<span>" + li.data("lemma") + "</span>");
-                    if (li.data("word")) li.append("<span><em>" + li.data("word") + "</em></span>");
+                    if (li.data("lemma")) li.append("<span class='lemma'>" + li.data("lemma") + "</span>");
+                    if (li.data("word")) {
+                        var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? ' title="Case sensitive word"' : '';
+                        li.append("<span class='word'><em" + csTitle + ">" + li.data("word") + "</em></span>");
+                    }
                     // addClass because after appending new children, it isn't necessarily the
                     // only child any longer
                     $this.addClass("only-child");
+                }
+
+
+                if (li.data("caseinsensitive")) {
+                    li.removeAttr("data-caseinsensitive");
+                    li.removeData("caseinsensitive");
                 }
             });
 
@@ -299,37 +369,47 @@ var jQuery = require('jquery');
         }
 
         function noMoreZooming() {
-            var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
+            var currentFontSize = parseInt(treeFS.children("ol").css("fontSize"), 10),
+                fitSize = treeFS.children("ol").attr("data-tv-fontsize");
+
+            zoomOpts.find("button").prop("disabled", false);
+            treeFS.removeClass("tv-small tv-x-small");
+
             if (currentFontSize <= 4) {
-                zoomOpts.find("button.zoom-out").prop("disabled", true);
-            } else if (currentFontSize >= 32) {
-                zoomOpts.find("button.zoom-in").prop("disabled", true);
-            } else {
-                zoomOpts.find("button").prop("disabled", false);
-                treeFS.removeClass("small x-small");
+                zoomOpts.find("button.tv-zoom-out").prop("disabled", true);
+                treeFS.children("ol").css("fontSize", "4px");
+            } else if (currentFontSize >= 16) {
+                zoomOpts.find("button.tv-zoom-in").prop("disabled", true);
+            }
+
+            if (currentFontSize == fitSize) {
+                zoomOpts.find("button.tv-zoom-default").prop("disabled", true);
             }
 
             if (currentFontSize <= 8) {
-                treeFS.addClass("small");
+                treeFS.addClass("tv-small");
                 if (currentFontSize <= 4) {
-                    treeFS.addClass("x-small");
+                    treeFS.addClass("tv-x-small");
                 }
             }
         }
 
         function fontSizeTreeFS(mode) {
-            if (treeFS.is(":visible")) {
-                if (mode == 'zoom-default') treeFS.css("fontSize", args.fsFontSize + "px");
-                else {
-                    var currentFontSize = parseInt(treeFS.css("fontSize"), 10);
-                    if (mode == 'zoom-in') {
-                        treeFS.css("fontSize", currentFontSize + 2 + "px");
-                    } else if (mode == 'zoom-out') {
-                        treeFS.css("fontSize", currentFontSize - 2 + "px");
-                    }
+            if (mode == 'zoom-default') {
+                if (treeFS.children("ol").is("[data-tv-fontsize]")) {
+                    treeFS.children("ol").css("fontSize", treeFS.children("ol").attr("data-tv-fontsize") + "px");
+                } else {
+                    fontToFit();
                 }
-                noMoreZooming();
+            } else {
+                var currentFontSize = parseInt(treeFS.children("ol").css("fontSize"), 10);
+                if (mode == 'zoom-in') {
+                    treeFS.children("ol").css("fontSize", currentFontSize + 2 + "px");
+                } else if (mode == 'zoom-out') {
+                    treeFS.children("ol").css("fontSize", currentFontSize - 2 + "px");
+                }
             }
+            noMoreZooming();
         }
 
         function fontToFit() {
@@ -357,50 +437,47 @@ var jQuery = require('jquery');
 
         function tooltipPosition(animate) {
             var tree;
-            if (typeof treeFS != "undefined" && treeFS.is(":visible")) {
+            if (typeof treeFS != "undefined" && $body.hasClass("tv-fs-open")) {
                 tree = treeFS;
-            } else if (typeof treeSS != "undefined" && treeSS.is(":visible")) {
-                tree = treeSS;
+            } else if (typeof treeNS != "undefined" && $body.hasClass("tv-ns-open")) {
+                tree = treeNS;
             }
             if (typeof tree != "undefined") {
                 var targetLink = tree.find("a.hovered");
                 if (targetLink.length) {
-                    var tooltip = tree.next(".tooltip"),
+                    var tooltip = tree.next(".tv-tooltip"),
                         targetRect = targetLink[0].getBoundingClientRect(),
                         treeRect = tree[0].getBoundingClientRect(),
-                        linkV = {
-                            top: targetRect.top,
-                            right: targetRect.left + treeRect.width,
-                            bottom: targetRect.top + treeRect.height,
-                            left: targetRect.left,
-                            w: targetRect.width,
-                            h: targetRect.height
+                        targetV = {
+                            right: $window.outerWidth() - targetRect.right,
+                            bottom: $window.outerHeight() - targetRect.bottom,
                         },
                         treeV = {
-                            top: treeRect.top,
-                            right: treeRect.left + treeRect.width,
-                            bottom: treeRect.top + treeRect.height,
-                            left: treeRect.left,
-                            w: treeRect.width,
-                            h: treeRect.height
+                            right: $window.outerWidth() - treeRect.right,
+                            bottom: $window.outerHeight() - treeRect.bottom,
                         };
+
+                    var tooltipV = {
+                        left: parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10) + "px",
+                        top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
+                    }
+
                     if (animate) {
                         tooltip.stop(true).animate({
-                            "left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
-                            "top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10)
+                            "left": tooltipV.left,
+                            "top": tooltipV.top
                         }, 250);
                     } else {
                         tooltip.css({
-                            "left": parseInt(linkV.left + (linkV.w / 2) - (tooltip.outerWidth() / 2) + 7.5, 10),
-                            "top": parseInt(linkV.top - tooltip.outerHeight() - 24, 10)
+                            "left": tooltipV.left,
+                            "top": tooltipV.top
                         });
                     }
 
-
-                    if (((linkV.left + (linkV.w / 2)) < treeV.left) ||
-                        ((linkV.right + (linkV.w / 2)) < treeV.right) ||
-                        ((linkV.top + (linkV.h / 2)) < treeV.top) ||
-                        ((linkV.bottom + linkV.h) < treeV.bottom)) {
+                    if (((targetRect.left + (targetRect.width / 2)) < treeRect.left) ||
+                        ((targetV.right + (targetRect.width / 2)) < treeV.right) ||
+                        ((targetRect.top + (targetRect.height / 2)) < treeRect.top) ||
+                        ((targetV.bottom + targetRect.height) < treeV.bottom)) {
                         tooltip.fadeOut(400);
                     } else {
                         tooltip.fadeIn(250);
@@ -409,52 +486,10 @@ var jQuery = require('jquery');
             }
         }
 
-        /* Set width of the tree-visualizer-fs elements
-        Can't be done in CSS without losing other functionality.
-        IF you know a way, make a pull request!
-        */
-        function sizeTreeFS() {
-            if (treeFS.is(":visible")) {
-                var padR = parseInt(treeFS.css("paddingRight"), 10) || 0,
-                    padL = parseInt(treeFS.css("paddingLeft"), 10) || 0,
-                    padT = parseInt(treeFS.css("paddingTop"), 10) || 0,
-                    padB = parseInt(treeFS.css("paddingBottom"), 10) || 0,
-                    FSpadR = parseInt(FS.css("paddingRight"), 10) || 0,
-                    FSpadL = parseInt(FS.css("paddingLeft"), 10) || 0,
-                    FSpadT = parseInt(FS.css("paddingTop"), 10) || 0,
-                    FSpadB = parseInt(FS.css("paddingBottom"), 10) || 0,
-                    children = treeFS.children("ol"),
-                    w = $window;
-
-                treeFS.css({
-                    "width": children[0].getBoundingClientRect().width + padR + padL,
-                    "width": children[0].getBoundingClientRect().width + padR + padL,
-                    "height": children[0].getBoundingClientRect().height + padT + padB,
-                    "max-width": w.width() - FSpadR - FSpadL,
-                    "max-height": w.height() - FSpadT - FSpadB
-                });
-
-                if (args.sentence != "") {
-                    treeFS.css("max-height", w.height() - FSpadT - FSpadB - (sentenceContainer[0].getBoundingClientRect().height * 2));
-                    sentenceContainer.css("max-width", treeFS[0].getBoundingClientRect().width);
-                }
-            }
-        }
-
-        function errorHandle(message) {
-            errorContainer.children("p").html(message).parent().fadeIn(250);
-            if (args.normalView) {
-                treeSS.hide();
-                SS.children(".tv-show-fs").prop("disabled", true).hide();
-            }
-            if (args.fsView) treeFS.hide();
-        }
 
         function removeError() {
-            errorContainer.hide();
-            treeFS.show();
             if (args.normalView) {
-                SS.children(".tv-show-fs").prop("disabled", false).show();
+                NS.children(".tv-show-fs").prop("disabled", false);
             }
         }
 
@@ -464,5 +499,7 @@ var jQuery = require('jquery');
                 return el.get();
             }));
         }
+
+        return this;
     }
 }(jQuery));

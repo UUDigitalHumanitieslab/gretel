@@ -1,6 +1,7 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild, SimpleChange } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild, SimpleChange, SecurityContext } from '@angular/core';
 import * as $ from 'jquery';
 import './tree-visualizer';
+import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
 type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
@@ -13,9 +14,13 @@ type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
 export class TreeVisualizerComponent implements OnChanges, OnInit {
     @ViewChild('output', { read: ElementRef })
     public output: ElementRef;
-
+    @ViewChild('inline', { read: ElementRef })
+    public inlineRef: ElementRef;
     @Input()
     public xml: string;
+
+    @Input()
+    public sentence: SafeHtml;
 
     @Input()
     public display: TreeVisualizerDisplay = 'inline';
@@ -23,21 +28,25 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public fullScreenButton = true;
 
+    @Input()
+    public showMatrixDetails: boolean;
+
     @Output()
     public onDisplayChange = new EventEmitter<TreeVisualizerDisplay>();
 
-    constructor() {
+    // jquery tree visualizer
+    private instance: any;
+
+    constructor(private sanitizer: DomSanitizer) {
     }
 
     ngOnInit() {
         let element = $(this.output.nativeElement);
-        this.visualize(element);
         element.on('close', () => {
             if (this.display == 'both') {
                 this.onDisplayChange.next('inline')
             }
         });
-        this.updateVisibility(element);
     }
 
     ngOnChanges(changes: TypedChanges) {
@@ -45,19 +54,28 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         if (changes.xml && changes.xml.currentValue != changes.xml.previousValue) {
             this.visualize(element);
         }
-        this.updateVisibility(element);
+
+        if (this.instance) {
+            this.updateVisibility();
+        }
     }
 
     private visualize(element: any) {
-        element.treeVisualizer(this.xml, {
-            nvFontSize: 14,
-            noFsButton: !this.fullScreenButton
+        setTimeout(() => {
+            // Make sure the visualization happens after the
+            // view (which acts a placeholder) has been rendered.
+            this.instance = element.treeVisualizer(this.xml, {
+                nvFontSize: 14,
+                sentence: (this.sentence && this.sanitizer.sanitize(SecurityContext.HTML, this.sentence)) || '',
+                showMatrixDetails: this.showMatrixDetails
+            });
+
+            this.updateVisibility();
         });
     }
 
-    private updateVisibility(element: JQuery<Element>) {
-        let inline = element.children('.tree-visualizer');
-        let fullscreen = element.children('.tree-visualizer-fs');
+    private updateVisibility() {
+        let inline = $(this.inlineRef && this.inlineRef.nativeElement);
 
         if (this.display != 'fullscreen') {
             inline.show();
@@ -66,9 +84,9 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         }
 
         if (this.display != 'inline') {
-            fullscreen.show();
+            this.instance.trigger('open-fullscreen');
         } else {
-            fullscreen.hide();
+            this.instance.trigger('close-fullscreen');
         }
     }
 }

@@ -1,4 +1,7 @@
-$tree_highlight: #73C78C;
+@import '../../../colors';
+
+$tree_highlight: $primary;
 $tree_branch : #CCC;
-$error : #DF5F5F;
+$tree_hovered: $secondary;
+$error : $danger;
 $text_main : #565656;
