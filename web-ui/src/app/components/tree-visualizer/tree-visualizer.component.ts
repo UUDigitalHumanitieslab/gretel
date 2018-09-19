@@ -1,6 +1,7 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild, SimpleChange } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild, SimpleChange, SecurityContext } from '@angular/core';
 import * as $ from 'jquery';
 import './tree-visualizer';
+import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
 type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
@@ -15,11 +16,11 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     public output: ElementRef;
     @ViewChild('inline', { read: ElementRef })
     public inlineRef: ElementRef;
-    @ViewChild('fullScreen', { read: ElementRef })
-    public fullScreenRef: ElementRef;
-
     @Input()
     public xml: string;
+
+    @Input()
+    public sentence: SafeHtml;
 
     @Input()
     public display: TreeVisualizerDisplay = 'inline';
@@ -33,7 +34,10 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Output()
     public onDisplayChange = new EventEmitter<TreeVisualizerDisplay>();
 
-    constructor() {
+    // jquery tree visualizer
+    private instance: any;
+
+    constructor(private sanitizer: DomSanitizer) {
     }
 
     ngOnInit() {
@@ -43,7 +47,6 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
                 this.onDisplayChange.next('inline')
             }
         });
-        this.updateVisibility();
     }
 
     ngOnChanges(changes: TypedChanges) {
@@ -51,23 +54,24 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         if (changes.xml && changes.xml.currentValue != changes.xml.previousValue) {
             this.visualize(element);
         }
-        this.updateVisibility();
     }
 
     private visualize(element: any) {
         setTimeout(() => {
             // Make sure the visualization happens after the
             // view (which acts a placeholder) has been rendered.
-            element.treeVisualizer(this.xml, {
+            this.instance = element.treeVisualizer(this.xml, {
                 nvFontSize: 14,
+                sentence: (this.sentence && this.sanitizer.sanitize(SecurityContext.HTML, this.sentence)) || '',
                 showMatrixDetails: this.showMatrixDetails
             });
+
+            this.updateVisibility();
         });
     }
 
     private updateVisibility() {
         let inline = $(this.inlineRef && this.inlineRef.nativeElement);
-        let fullscreen = $(this.fullScreenRef && this.fullScreenRef.nativeElement);
 
         if (this.display != 'fullscreen') {
             inline.show();
@@ -76,9 +80,9 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         }
 
         if (this.display != 'inline') {
-            fullscreen.show();
+            this.instance.trigger('open-fullscreen');
         } else {
-            fullscreen.hide();
+            this.instance.trigger('close-fullscreen');
         }
     }
 }

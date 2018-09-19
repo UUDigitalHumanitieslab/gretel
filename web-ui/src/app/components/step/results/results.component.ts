@@ -17,6 +17,7 @@ import {
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from "../step.component";
+import { SafeHtml } from '@angular/platform-browser';
 
 const DebounceTime = 200;
 
@@ -87,6 +88,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public loading: boolean = true;
 
     public treeXml?: string;
+    public treeSentence?: SafeHtml;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
@@ -132,6 +134,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     async showTree(result: Hit) {
         this.treeXml = undefined;
+        this.treeSentence = result.highlightedSentence;
         this.treeXml = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
     }
 
