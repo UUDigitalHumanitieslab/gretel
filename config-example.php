@@ -29,6 +29,7 @@ $flushLimit = 50;
 $resultsLimit = 500;
 // Global limit on the max amount of sentences returned for analysis
 $analysisLimit = 50000;
+$analysisFlushLimit = 500;
 
 $cats = array('advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
     'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub', );

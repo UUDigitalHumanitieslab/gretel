@@ -149,7 +149,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
 
     updateSentence(sentence: string) {
         this.globalState.inputSentence = sentence;
-        this.globalState.exampleXml = undefined; // reset parse
+        // reset parse/previous settings
+        this.globalState.exampleXml = undefined;
+        this.globalState.isCustomXPath = false;
         this.updateGlobalState(this.globalState);
     }
 

@@ -2,7 +2,7 @@
     <p>This page gathers all sorts of documentation on GrETEL, such as tutorials, related tools, and frequently asked questions.
         If you have any more questions, you can always consult the GrETEL
         <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">project website</a> or you can
-        <a href="documentation.php#faq-4" title="FAQ how to contact us">contact us</a>.</p>
+        <a [routerLink] fragment="contact" title="FAQ how to contact us">contact us</a>.</p>
     <p>Please cite the following paper if you have used GrETEL for your research:</p>
 </div>
 <grt-paper-cite href="http://aclweb.org/anthology/W/W17/W17-7608.pdf">
@@ -113,7 +113,7 @@
         </ul>
     </div>
 
-    <h2 class="subtitle">How can I contact you?</h2>
+    <h2 class="subtitle" id="contact">How can I contact you?</h2>
     <div class="content">
         <p>This website and this tool were originally developed at the Centre for Computational Linguistics (CCL). The current
             version is developed by the Digital Humanities Lab at Utrecht University. If you have any suggestions, questions,
