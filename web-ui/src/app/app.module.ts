@@ -35,6 +35,7 @@ import { HeaderComponent } from "./components/page-components/header/header.comp
 import { FooterNavigationComponent } from "./components/page-components/footer/footer-navigation/footer-navigation.component";
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
+import { BalloonDirective } from './balloon.directive';
 
 import {
     AlpinoService,
@@ -61,6 +62,7 @@ import { FormatNumberPipe } from './format-number.pipe';
 export const declarations: any[] = [
     AppComponent,
     AnalysisComponent,
+    BalloonDirective,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
