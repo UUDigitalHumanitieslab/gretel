@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
 import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -87,6 +88,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public loading: boolean = true;
 
     public treeXml?: string;
+    public treeXmlUrl?: string;
+    public treeSentence?: SafeHtml;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
@@ -132,7 +135,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     async showTree(result: Hit) {
         this.treeXml = undefined;
-        this.treeXml = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        this.treeSentence = result.highlightedSentence;
+        let { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        this.treeXml = treeXml;
+        this.treeXmlUrl = url;
     }
 
     public downloadResults() {

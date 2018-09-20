@@ -1,11 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { AlpinoService } from '../../../services/_index';
 
 @Component({
     selector: 'grt-parse',
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent {
+export class ParseComponent implements OnChanges {
     @Input()
     public xml: string;
 
@@ -14,6 +15,14 @@ export class ParseComponent {
 
     public display = 'inline';
 
-    constructor() {
+    public url: string
+
+    constructor(private alpinoService: AlpinoService) {
+    }
+
+    async ngOnChanges(simpleChanges: SimpleChanges) {
+        if (simpleChanges['sentence']) {
+            this.url = await this.alpinoService.parseSentenceUrl(this.sentence);
+        }
     }
 }

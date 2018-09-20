@@ -26,7 +26,7 @@
 </h2>
 <p *ngIf="!xml;else tree">Loading ...</p>
 <ng-template #tree>
-    <grt-tree-visualizer [xml]="xml" [display]="display" [fullScreenButton]="false" (onDisplayChange)="display = $event"></grt-tree-visualizer>
+    <grt-tree-visualizer [xml]="xml" [url]="url" [display]="display" [fullScreenButton]="false" (onDisplayChange)="display = $event"></grt-tree-visualizer>
     <div class="content">
         <em>
             Your input sentence was: &ldquo;{{sentence}}&rdquo;

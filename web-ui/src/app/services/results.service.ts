@@ -128,7 +128,7 @@ export class ResultsService {
             `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
 
         let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return treeXml;
+        return { url, treeXml };
     }
 
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
