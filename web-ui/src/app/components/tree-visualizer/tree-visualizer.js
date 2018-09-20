@@ -449,16 +449,17 @@ var jQuery = require('jquery');
                         targetRect = targetLink[0].getBoundingClientRect(),
                         treeRect = tree[0].getBoundingClientRect(),
                         targetV = {
-                            right: $window.outerWidth() - targetRect.right,
-                            bottom: $window.outerHeight() - targetRect.bottom,
+                            right: $window.width() - targetRect.right,
+                            bottom: $window.innerHeight() - targetRect.bottom,
                         },
                         treeV = {
-                            right: $window.outerWidth() - treeRect.right,
-                            bottom: $window.outerHeight() - treeRect.bottom,
+                            right: $window.width() - treeRect.right,
+                            bottom: $window.innerHeight() - treeRect.bottom,
                         };
 
+                    var rightestLeft = $window.width() - tooltip.outerWidth() - 10;
                     var tooltipV = {
-                        left: parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10) + "px",
+                        left: Math.max(10, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))) + "px",
                         top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
                     }
 
@@ -478,6 +479,7 @@ var jQuery = require('jquery');
                         ((targetV.right + (targetRect.width / 2)) < treeV.right) ||
                         ((targetRect.top + (targetRect.height / 2)) < treeRect.top) ||
                         ((targetV.bottom + targetRect.height) < treeV.bottom)) {
+                        // the node is scrolled outside of the view
                         tooltip.fadeOut(400);
                     } else {
                         tooltip.fadeIn(250);
