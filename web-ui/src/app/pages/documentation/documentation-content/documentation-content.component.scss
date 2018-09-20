@@ -1,0 +1,14 @@
+@import '../../../../colors';
+
+.scrolled,
+.scrolled+div,
+.scrolled+div a {
+    color: $primary !important;
+    transition: color none;
+}
+
+h2.subtitle,
+div.content,
+div.content a {
+    transition: color ease-in-out 1s;
+}
