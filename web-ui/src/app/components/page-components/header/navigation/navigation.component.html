@@ -1,5 +1,5 @@
 <nav class="navbar">
     <div class="navbar-start">
-        <a *ngFor="let link of links" title="{{link.title}}" routerLink="{{link.link}}" routerLinkActive="is-active" class="navbar-item">{{link.name}}</a>
+        <a *ngFor="let link of links" routerLink="{{link.link}}" routerLinkActive="is-active" class="navbar-item">{{link.name}}</a>
     </div>
 </nav>
