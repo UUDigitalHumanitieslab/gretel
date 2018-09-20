@@ -437,6 +437,7 @@ var jQuery = require('jquery');
 
         function tooltipPosition(animate) {
             var tree;
+
             if (typeof treeFS != "undefined" && $body.hasClass("tv-fs-open")) {
                 tree = treeFS;
             } else if (typeof treeNS != "undefined" && $body.hasClass("tv-ns-open")) {
@@ -446,8 +447,10 @@ var jQuery = require('jquery');
                 var targetLink = tree.find("a.hovered");
                 if (targetLink.length) {
                     var tooltip = tree.next(".tv-tooltip"),
+                        arrow = tooltip.siblings(".arrow"),
                         targetRect = targetLink[0].getBoundingClientRect(),
                         treeRect = tree[0].getBoundingClientRect(),
+                        arrowRect = arrow[0].getBoundingClientRect(),
                         targetV = {
                             right: $window.width() - targetRect.right,
                             bottom: $window.innerHeight() - targetRect.bottom,
@@ -456,22 +459,35 @@ var jQuery = require('jquery');
                             right: $window.width() - treeRect.right,
                             bottom: $window.innerHeight() - treeRect.bottom,
                         };
-
+                    console.log(arrowRect);
+                    console.log(targetRect);
                     var rightestLeft = $window.width() - tooltip.outerWidth() - 10;
                     var tooltipV = {
                         left: Math.max(10, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))) + "px",
                         top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
+                    }
+                    var arrowV = {
+                        left: parseInt(targetRect.left + (targetRect.width / 2) - (arrowRect.width / 2), 10),
+                        top: targetRect.top - 24
                     }
 
                     if (animate) {
                         tooltip.stop(true).animate({
                             "left": tooltipV.left,
                             "top": tooltipV.top
-                        }, 250);
+                        }, { duration: 250, queue: false });
+                        arrow.stop(true).animate({
+                            "left": targetRect.left + targetRect.width,
+                            "top": targetRect.top
+                        }, { duration: 250, queue: false });
                     } else {
                         tooltip.css({
                             "left": tooltipV.left,
                             "top": tooltipV.top
+                        });
+                        arrow.css({
+                            "left": arrowV.left,
+                            "top": targetRect.top - 24
                         });
                     }
 
