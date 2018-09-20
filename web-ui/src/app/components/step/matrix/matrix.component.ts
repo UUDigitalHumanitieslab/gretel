@@ -21,6 +21,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Input('tokens')
     public set tokens(value: string[]) {
         this.indexedTokens = value.map((value, index) => { return { value, index } });
+        this.filename = value.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
     public get tokens() {
         return this.indexedTokens.map(t => t.value);
@@ -28,8 +29,6 @@ export class MatrixComponent extends StepComponent implements OnInit {
 
     @Input()
     public subTreeXml: string;
-    @Input('xml')
-    public xml: string;
     @Input()
     public xpath: string;
     @Input()
@@ -38,6 +37,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Output()
     public onChangeValue = new EventEmitter<MatrixSettings>();
 
+    public filename: string;
     public subTreeDisplay = 'inline';
     public warning: boolean;
     public respectOrder;
