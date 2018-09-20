@@ -348,7 +348,7 @@ var jQuery = require('jquery');
                 if ($this.is(":only-child")) {
                     if (li.data("lemma")) li.append("<span class='lemma'>" + li.data("lemma") + "</span>");
                     if (li.data("word")) {
-                        var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? ' title="Case sensitive word"' : '';
+                        var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? ' grBalloonPosition="down" grBalloon="Case sensitive word"' : '';
                         li.append("<span class='word'><em" + csTitle + ">" + li.data("word") + "</em></span>");
                     }
                     // addClass because after appending new children, it isn't necessarily the

@@ -10,14 +10,14 @@
                     <div class="field has-addons">
                         <ng-container *ngIf="isModifyingXPath">
                             <p class="control">
-                                <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null" title="Save query" (click)="updateXPath()">
+                                <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null" grBalloonPosition="down" grBalloon="Save query" (click)="updateXPath()">
                                     <span class="icon is-large">
                                         <i class="fas fa-check"></i>
                                     </span>
                                 </a>
                             </p>
                             <p class="control">
-                                <a class="button" role="button" title="Reset query" (click)="resetXPath()">
+                                <a class="button" role="button" grBalloonPosition="down" grBalloon="Reset query" (click)="resetXPath()">
                                     <span class="icon is-large">
                                         <i class="fas fa-undo"></i>
                                     </span>
@@ -26,21 +26,21 @@
                         </ng-container>
                         <ng-container *ngIf="!isModifyingXPath">
                             <p class="control">
-                                <a class="button" role="button" title="Edit query" (click)="editXPath()">
+                                <a class="button" role="button" grBalloonPosition="down" grBalloon="Edit query" (click)="editXPath()">
                                     <span class="icon is-large">
                                         <i class="fas fa-edit"></i>
                                     </span>
                                 </a>
                             </p>
                             <p class="control">
-                                <a class="button" role="button" title="Download query" (click)="downloadXPath()">
+                                <a class="button" role="button" grBalloonPosition="down" grBalloon="Download query" (click)="downloadXPath()">
                                     <span class="icon is-large">
                                         <i class="fas fa-download"></i>
                                     </span>
                                 </a>
                             </p>
                             <p class="control">
-                                <a class="button" role="button" title="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                <a class="button" role="button" grBalloonPosition="down-right" grBalloon="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
                                     <span class="icon is-large">
                                         <i class="fas fa-copy"></i>
                                     </span>
@@ -81,14 +81,14 @@
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                 <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" title="Download the results as a .csv-file">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" grBalloonLength="medium" grBalloonPosition="down" grBalloon="Download the results as a .csv-file">
                         <span class="icon is-large">
                             <i class="fas fa-download"></i>
                         </span>
                     </a>
                 </p>
                 <p class="control">
-                    <a class="button" role="button" (click)="downloadFilelist()" title="Download the names of the files in a filelist (.fl)">
+                    <a class="button" role="button" (click)="downloadFilelist()" grBalloonLength="medium" grBalloonPosition="down" grBalloon="Download the names of the files in a filelist (.fl)">
                         <span class="icon is-large">
                             <i class="fas fa-file-alt"></i>
                         </span>
@@ -99,7 +99,7 @@
         <div class="level-item">
             <div class="field">
                 <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()" title="Print Results">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()" grBalloonLength="medium" grBalloonPosition="down" grBalloon="Print Results">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
                         </span>
@@ -110,12 +110,12 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="toggleContext()">
-                    <a class="button is-warning" role="button" title="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
+                    <a class="button is-warning" role="button" grBalloonLength="medium" grBalloonPosition="down" grBalloon="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-slash"></i>
                         </span>
                     </a>
-                    <a class="button is-primary" role="button" title="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
+                    <a class="button is-primary" role="button" grBalloonLength="medium" grBalloonPosition="down" grBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-dots"></i>
                         </span>
