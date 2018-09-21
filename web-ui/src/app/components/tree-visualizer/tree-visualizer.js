@@ -465,7 +465,6 @@ var jQuery = require('jquery');
                         left: Math.max(10, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))) + "px",
                         top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
                     }
-                    // console.log(tooltipV.top, tooltop.outerHeight()
                     // Speech bubble arrow positioned independently from tooltip rectangle
                     var arrowV = {
                         left: parseInt(targetRect.left + (targetRect.width / 2) - (arrowRect.width / 2), 10), //the centre of the target node
