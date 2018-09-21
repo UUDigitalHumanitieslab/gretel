@@ -465,10 +465,11 @@ var jQuery = require('jquery');
                         left: Math.max(10, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))) + "px",
                         top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
                     }
+                    // console.log(tooltipV.top, tooltop.outerHeight()
                     // Speech bubble arrow positioned independently from tooltip rectangle
                     var arrowV = {
-                        left: parseInt(targetRect.left + (targetRect.width / 2) - (arrowRect.width / 2), 10),
-                        top: targetRect.top - 23
+                        left: parseInt(targetRect.left + (targetRect.width / 2) - (arrowRect.width / 2), 10), //the centre of the target node
+                        top: parseInt(tooltipV.top + tooltip.outerHeight() - 1) //the bottom of the tooltip balloon
                     }
 
                     if (animate) {
@@ -477,8 +478,8 @@ var jQuery = require('jquery');
                             "top": tooltipV.top
                         }, { duration: 250, queue: false });
                         arrow.stop(true).animate({
-                            "left": targetRect.left + targetRect.width,
-                            "top": targetRect.top
+                            "left": arrowV.left,
+                            "top": arrowV.top
                         }, { duration: 250, queue: false });
                     } else {
                         tooltip.css({
@@ -487,7 +488,7 @@ var jQuery = require('jquery');
                         });
                         arrow.css({
                             "left": arrowV.left,
-                            "top": targetRect.top - 24
+                            "top": arrowV.top
                         });
                     }
 
@@ -497,8 +498,10 @@ var jQuery = require('jquery');
                         ((targetV.bottom + targetRect.height) < treeV.bottom)) {
                         // the node is scrolled outside of the view
                         tooltip.fadeOut(400);
+                        arrow.fadeOut(400);
                     } else {
                         tooltip.fadeIn(250);
+                        arrow.fadeIn(250);
                     }
                 }
             }
