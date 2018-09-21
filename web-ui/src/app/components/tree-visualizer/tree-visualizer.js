@@ -10,8 +10,8 @@
  */
 var jQuery = require('jquery');
 
-(function ($) {
-    $.fn.treeVisualizer = function (xml, options) {
+(function($) {
+    $.fn.treeVisualizer = function(xml, options) {
         var defaults = {
             normalView: true,
             sentence: '',
@@ -33,33 +33,33 @@ var jQuery = require('jquery');
         parseXMLObj(xml);
         navigationDisabler();
         // Window event only need to be bound once
-        $window.on("scroll", function () {
+        $window.on("scroll", function() {
             tooltipPosition();
         });
 
         function bindInitEvents() {
             if (!args.initFSOnClick) {
                 // Show tree-visualizer-fs tree
-                instance.find(".tv-show-fs").on("click", function (e) {
+                instance.find(".tv-show-fs").on("click", function(e) {
                     instance.trigger('open-fullscreen');
 
                     e.preventDefault();
                 });
             }
             // Adjust scroll position
-            anyTree.on("scroll", function () {
+            anyTree.on("scroll", function() {
                 tooltipPosition();
             });
 
             // Close fullscreen if a user clicks on an empty area
-            FS.on("click", function (e) {
+            FS.on("click", function(e) {
                 var target = $(e.target);
                 if (!target.closest(".tv-error, .tv-content-wrapper").length) {
                     closeFullscreen();
                 }
             });
             // Zooming
-            zoomOpts.find("button").on("click", function () {
+            zoomOpts.find("button").on("click", function() {
                 var $this = $(this);
                 clearTimeout(tooltipTimeout);
                 fontSizeTreeFS($this.attr("class").match(/\b(zoom-[^\s]+)\b/)[0]);
@@ -68,16 +68,16 @@ var jQuery = require('jquery');
                 animationSpeed = (String(animationSpeed).indexOf("ms") > -1) ? parseFloat(animationSpeed) : (parseFloat(animationSpeed) * 1000);
                 animationSpeed += 50;
 
-                tooltipTimeout = setTimeout(function () {
+                tooltipTimeout = setTimeout(function() {
                     tooltipPosition(true);
                 }, animationSpeed);
             });
             // Close button
-            instance.find(".tv-close-fs").on('click', function () {
+            instance.find(".tv-close-fs").on('click', function() {
                 closeFullscreen();
             });
 
-            FS.find(".tv-navigation-wrapper button").on("click", function () {
+            FS.find(".tv-navigation-wrapper button").on("click", function() {
 
                 var index = FS.attr("data-tv-active-index"),
                     resultsTable = $(".results-ajax-wrapper tbody:not(.empty)");
@@ -96,7 +96,7 @@ var jQuery = require('jquery');
                 resultsTable.find("tr").eq(index).find("a").click();
             });
 
-            anyTree.on("click", "a", function (e) {
+            anyTree.on("click", "a", function(e) {
                 if (!$(this).hasClass("ignored")) {
                     var $this = $(this),
                         data = $this.parent("li").data(),
@@ -121,15 +121,15 @@ var jQuery = require('jquery');
                 e.preventDefault();
             });
 
-            anyTree.on("mouseout", "a.hovered", function () {
+            anyTree.on("mouseout", "a.hovered", function() {
                 if ($(this).closest(".tv-tree").hasClass("small")) {
-                    $(this).on("transitionend", function () {
+                    $(this).on("transitionend", function() {
                         tooltipPosition(true);
                     });
                 }
             });
 
-            anyTooltip.children("button").on("click", function () {
+            anyTooltip.children("button").on("click", function() {
                 var tooltip = $(this).parent(".tv-tooltip");
                 tooltip.fadeOut(250);
                 tooltip.prev(".tv-tree").find("a").removeClass("hovered");
@@ -204,9 +204,9 @@ var jQuery = require('jquery');
 
             // Add metadata
             var metadata = $("<table>");
-            xmlObject.find("metadata").children("meta").sort(function (a, b) {
+            xmlObject.find("metadata").children("meta").sort(function(a, b) {
                 return a.getAttribute("name").localeCompare(b.getAttribute("name"));
-            }).each(function (i, e) {
+            }).each(function(i, e) {
                 var meta = $("<tr>");
 
                 var th = $("<th>");
@@ -232,7 +232,7 @@ var jQuery = require('jquery');
                 $body.addClass("tv-ns-open");
             }
             if (args.initFSOnClick) {
-                FS.fadeIn(250, function () {
+                FS.fadeIn(250, function() {
                     fontToFit();
                 });
             }
@@ -244,7 +244,7 @@ var jQuery = require('jquery');
             anyTooltip.css("top", "-100%").children("ul").empty();
             if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
             $body.addClass("tv-fs-open");
-            FS.fadeIn(250, function () {
+            FS.fadeIn(250, function() {
                 if (!FS.children("ol").is("[data-tv-fontsize]")) {
                     fontToFit();
                 }
@@ -256,7 +256,7 @@ var jQuery = require('jquery');
         function closeFullscreen() {
             instance.trigger('close');
             $body.removeClass("tv-fs-open");
-            FS.fadeOut(250, function () {
+            FS.fadeOut(250, function() {
                 treeFS.find("a").removeClass("hovered");
                 removeError();
             });
@@ -267,7 +267,7 @@ var jQuery = require('jquery');
         function buildOutputList(nodes) {
             var newList = $("<ol/>");
 
-            nodes.each(function (x, e) {
+            nodes.each(function(x, e) {
                 var newItem = $('<li><a href="#"></a></li>');
 
                 for (var i = 0, l = e.attributes.length, a = null; i < l; i++) {
@@ -293,7 +293,7 @@ var jQuery = require('jquery');
         // Small modifications to the tree
         // Only add certain things (e.g. CS) on the matrix page
         function treeModifier() {
-            anyTree.find("a").each(function () {
+            anyTree.find("a").each(function() {
                 var $this = $(this),
                     li = $this.parent("li");
 
@@ -348,7 +348,7 @@ var jQuery = require('jquery');
                 if ($this.is(":only-child")) {
                     if (li.data("lemma")) li.append("<span class='lemma'>" + li.data("lemma") + "</span>");
                     if (li.data("word")) {
-                        var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? ' title="Case sensitive word"' : '';
+                        var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? 'data-balloon-pos="down" data-balloon="Case sensitive word"' : '';
                         li.append("<span class='word'><em" + csTitle + ">" + li.data("word") + "</em></span>");
                     }
                     // addClass because after appending new children, it isn't necessarily the
@@ -495,7 +495,7 @@ var jQuery = require('jquery');
 
         function jqArrayToJqObject(arr) {
             //http://stackoverflow.com/a/11304274/2919731
-            return $($.map(arr, function (el) {
+            return $($.map(arr, function(el) {
                 return el.get();
             }));
         }

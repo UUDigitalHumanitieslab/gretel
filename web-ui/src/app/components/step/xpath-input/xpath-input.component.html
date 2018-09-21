@@ -6,18 +6,25 @@
 <div class="field">
     <label class="checkbox">
         <input type="checkbox" name="retrieveContext" [(ngModel)]="retrieveContext" (change)="emitRetrieveContextChanged()"> Include context in results
-        <i class="fa fa-fw fa-info-circle" aria-hidden="true" title="In the results, show the sentence before and after the matching sentence to provide a broader context"></i>
+        <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="In the results, show the sentence before and after the matching sentence to provide a broader context">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+        </label>
+        
     </label>
 </div>
 <ng-container *ngIf="treeXml">
     <h2 class="subtitle">
         <div class="level">
             <div class="level-item level-left">
-                Tree&nbsp;<i class="fa fa-fw fa-info-circle" aria-hidden="true" title="This is a visualization of the entered query."></i>
+                Tree&nbsp;
+                <label grtBalloonLength="medium" grtBalloonPosition="right" grtBalloon="This is a visualization of the entered query.">
+                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+                </label>
+                
             </div>
             <div class="level-item level-right is-hidden-print">
                 <p class="control">
-                    <a class="button" role="button" (click)="treeDisplay = 'both'" title="Full screen display of the tree.">
+                    <a class="button" role="button" (click)="treeDisplay = 'both'" grtBalloonPosition="left" grtBalloon="Full screen display of the tree.">
                         <span class="icon is-large">
                             <i class="fas fa-expand"></i>
                         </span>
