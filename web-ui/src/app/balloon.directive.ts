@@ -4,22 +4,22 @@ import { Directive, ElementRef, Input, OnChanges } from '@angular/core';
  * Directive for showing styled tooltip balloons.
 */
 @Directive({
-    selector: '[grBalloon]'
+    selector: '[grtBalloon]'
 })
 export class BalloonDirective implements OnChanges {
-    @Input("grBalloon")
+    @Input("grtBalloon")
     public text: string;
 
-    @Input("grBalloonPosition")
+    @Input("grtBalloonPosition")
     public position: "up" | "left" | "right" | "down" | "up-left" | "up-right" | "down-left" | "down-right" = "down";
 
-    @Input("grBalloonLength")
+    @Input("grtBalloonLength")
     public length: "small" | "medium" | "large" | "fit";
 
     /**
      * Show or hide the balloon, or show it on hover.
      */
-    @Input("grBalloonVisible")
+    @Input("grtBalloonVisible")
     public visible: boolean | undefined;
 
     constructor(private el: ElementRef) {
