@@ -353,22 +353,6 @@
             }
         }
 
-        .arrow {
-            position: fixed;
-            top: -100%;
-            left: 0;
-            z-index:12;
-            width: 0;
-            height: 0;
-            border: 12px solid;
-            border-color: transparent transparent white white;
-            box-shadow: -6px 6px 6px -2px rgba(0, 0, 0, 0.2);
-            content: '';
-            transform: rotate(-45deg);
-            transform-origin: 0 0;
-        }
-
-
         .tv-tooltip {
             position: fixed;
             top: -100%;
@@ -380,6 +364,30 @@
             background: darken(#F5F5F5, 2%);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
             text-align: left;
+
+            .arrow {
+                position: relative;
+                top: 15px;
+                z-index:12;
+                box-sizing: border-box;
+                background: white;
+                box-shadow: 0px 3px 3px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            .arrow::after{
+                content: "";
+                position: absolute;
+                width: 0;
+                height: 0;
+                left: 50%;
+                box-sizing: border-box;
+                border: 12px solid black;
+                border-color: transparent transparent white white;
+                transform-origin: 0 0;
+                transform: rotate(-45deg);
+                box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.2);
+              }
+              
 
             >ul {
                 padding: 0 8px;
