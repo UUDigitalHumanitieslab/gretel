@@ -460,17 +460,20 @@ var jQuery = require('jquery');
                         };
 
                     // The maximum to the right the tooltip can be positioned without overlapping the viewport
-                    var rightestLeft = parseInt($window.width() - tooltip.outerWidth() - 20, 10); var tooltipV = {
-                        left: Math.max(20, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))),
-                        top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
+                    var rightestLeft = $window.width() - tooltip.outerWidth() - 20;
+                    var tooltipV = {
+                        left: Math.max(20, Math.min(rightestLeft,
+                            targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8)),
+                        top: targetRect.top - tooltip.outerHeight() - 24
                     };
 
                     var absoluteLeftSide = tooltipV.left + 15; // padding and border of the tooltip
                     var targetRectCenter = targetRect.left + targetRect.width / 2; //absolute center of target node
-                    var arrowWidth = 16.97; //found by inspecting in browser
+                    const borderWidth = 12
+                    const arrowLongSide = Math.sqrt(borderWidth * borderWidth * 2)
                     // Speech bubble arrow positioned independently from tooltip rectangle
                     var arrowV = {
-                        left: Math.min(Math.max((targetRectCenter - absoluteLeftSide - arrowWidth), 0), (tooltip.width() - 24))
+                        left: Math.min(Math.max((targetRectCenter - absoluteLeftSide - arrowLongSide), 0), (tooltip.width() - 24))
                     };
                     if (animate) {
                         tooltip.stop(true).animate({
