@@ -451,7 +451,6 @@ var jQuery = require('jquery');
                         arrow = tooltip.find(".arrow"),
                         targetRect = targetLink[0].getBoundingClientRect(),
                         treeRect = tree[0].getBoundingClientRect(),
-                        arrowRect = arrow[0].getBoundingClientRect(),
                         targetV = {
                             right: $window.width() - targetRect.right,
                             bottom: $window.innerHeight() - targetRect.bottom,
@@ -462,17 +461,18 @@ var jQuery = require('jquery');
                         };
 
                     // The maximum to the right the tooltip can be positioned without overlapping the viewport
-                    var rightestLeft = parseInt($window.width() - tooltip.outerWidth() - 20, 10);
-                    // var rightestLeft = parseInt(Math.max($window.width() - tooltip.outerWidth() - 20, targetRect.right), 10);
-                    var tooltipV = {
-                        left: Math.max(20, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))) + "px",
+                    var rightestLeft = parseInt($window.width() - tooltip.outerWidth() - 20, 10); var tooltipV = {
+                        left: Math.max(20, Math.min(rightestLeft, parseInt(targetRect.left + (targetRect.width / 2) - (tooltip.outerWidth() / 2) + 8, 10))),
                         top: parseInt(targetRect.top - tooltip.outerHeight() - 24, 10)
                     };
+
+                    var absoluteLeftSide = tooltipV.left + 15; // padding and border of the tooltip
+                    var targetRectCenter = targetRect.left + targetRect.width / 2; //absolute center of target node
+                    var arrowWidth = 16.97; //found by inspecting in browser
                     // Speech bubble arrow positioned independently from tooltip rectangle
                     var arrowV = {
-                        left: Math.min(Math.max((targetRect.left - parseInt(tooltipV.left, 10) - 8), 0), tooltip.width())
+                        left: Math.min(Math.max((targetRectCenter - absoluteLeftSide - arrowWidth), 0), (tooltip.width() - 24))
                     };
-
                     if (animate) {
                         tooltip.stop(true).animate({
                             "left": tooltipV.left,
@@ -495,9 +495,8 @@ var jQuery = require('jquery');
                         ((targetV.right + (targetRect.width / 2)) < treeV.right) ||
                         ((targetRect.top + (targetRect.height / 2)) < treeRect.top) ||
                         ((targetV.bottom + targetRect.height) < treeV.bottom) ||
-                        ((parseInt(tooltipV.left, 10) + tooltip.outerWidth()) < targetRect.right) ||
-                        (parseInt(tooltipV.left, 10) > targetRect.left)
-                        //right edge of tooltip goed beyond right edge of node
+                        ((tooltipV.left + tooltip.outerWidth()) < targetRect.right) ||
+                        (tooltipV.left > targetRect.left)
                     ) {
                         // the node is scrolled outside of the view
                         tooltip.fadeOut(400);
