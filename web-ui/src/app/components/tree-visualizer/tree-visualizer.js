@@ -241,7 +241,6 @@ var jQuery = require('jquery');
         instance.bind('open-fullscreen', openFullscreen);
 
         function openFullscreen() {
-            // anyTooltip.css("top", "-100%").children("ul").empty();
             anyTooltip.hide().children("ul").empty();
             if (typeof treeNS != "undefined") treeNS.find("a").removeClass("hovered");
             $body.addClass("tv-fs-open");
