@@ -31,7 +31,7 @@ else {
     $order = 1;
 }
 
-my $twig = XML::Twig->new( 'pretty_print' => 'indented' );
+my $twig = XML::Twig->new( 'pretty_print' => 'indented' );    # create the twig
 
 $twig->parse($inputxml);
 
@@ -47,16 +47,12 @@ else {
 }
 
 # generate XPath expression
-my $topxpath = GetXPath($subtree);
-$xpath = ProcessTree($subtree);
 
-my $orderString =
-  $order
-  ? ' and not(.//node[position() < last()][number(@begin) > number(following-sibling::node[0]/@begin)])'
-  : '';
+my $topxpath = GetXPath($subtree);
+$xpath = ProcessTree( $subtree, $order );
 
 if ( $xpath && $topxpath ) {    # if more than one node is selected
-    $xpath = '//' . $topxpath . $orderString . ' and ' . $xpath . ']';
+    $xpath = '//' . $topxpath . ' and ' . $xpath . ']';
 }
 
 elsif ( $xpath && !$topxpath ) {
@@ -78,7 +74,7 @@ if ( $xpath =~ /not/ ) {                # exclude nodes using not-function
 print $xpath;
 
 sub ProcessTree {
-    my ($tree) = @_;
+    my ( $tree, $order ) = @_;
     my ( $xpath, $nextpath, $childxpath );
     my @children = $tree->children;
     my ( @childxpaths, %COUNTS, %ALREADY );
@@ -87,7 +83,7 @@ sub ProcessTree {
             $childxpath = GetXPath($_);
 
             if ($childxpath) {
-                $lower = &ProcessTree($_);
+                $lower = &ProcessTree( $_, $order );
                 if ($lower) {
                     $childxpath .= ' and ' . $lower . ']';
                 }
@@ -132,6 +128,28 @@ sub ProcessTree {
         else {
             #die "not implemented yet\n";
             return undef;
+        }
+    }
+    else {    # no children
+        if ($order) {
+            $xpath = 'number(@begin)';
+            ( $next_term, $nextpath ) = &FindNextTerminalToCompare($tree);
+            if ($next_term) {
+                if (
+                    $tree->{'att'}->{'begin'} < $next_term->{'att'}->{'begin'} )
+                {
+                    $xpath .= " < ";
+                }
+                else {
+                    $xpath .= " > ";
+                }
+                $xpath .= $nextpath;
+            }
+            else {
+                return undef;
+            }
+        }
+        else {
         }
     }
     return $xpath;
