@@ -1,13 +1,8 @@
 <grt-header></grt-header>
-<div class="main section">
-
+<div class="main section" [@routeAnimations]="prepareRoute(outlet)">
     <div class="container">
-        <router-outlet></router-outlet>
+        <router-outlet #outlet="outlet"></router-outlet>
     </div>
-
 </div>
-
 <grt-footer></grt-footer>
-
-
 <div id="popup-wrapper"></div>
