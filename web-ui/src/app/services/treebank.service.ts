@@ -1,13 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from '@angular/core';
-import { Treebank, SubTreebank, TreebankMetadata } from '../treebank';
+import { Treebank, SubTreebank, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from "./configuration.service";
 
 type ConfiguredTreebanks = {
     [corpus: string]: {
         treebank: Treebank,
-        subTreebanks: SubTreebank[],
-        metadata: TreebankMetadata[]
+        componentGroups: ComponentGroup[],
+        metadata: TreebankMetadata[],
+        variants: string[]
     }
 };
 let configuredTreebanks: Promise<ConfiguredTreebanks> | null = null;
@@ -21,6 +22,19 @@ type ConfiguredTreebanksResponse = {
                 'sentences': number | '?',
                 'title': string,
                 'words': number | '?',
+                'group'?: string,
+                'variant'?: string,
+                'disabled'?: boolean
+            }
+        },
+        'groups'?: {
+            [component: string]: {
+                'description': string
+            }
+        },
+        'variants'?: {
+            [component: string]: {
+                'display': string
             }
         },
         'description': string,
@@ -31,8 +45,9 @@ type ConfiguredTreebanksResponse = {
             facet: 'checkbox' | 'slider' | 'range' | 'dropdown',
             show: boolean,
             minValue?: number | Date,
-            maxValue?: number | Date
-        }[]
+            maxValue?: number | Date,
+        }[],
+        'multioption': boolean
     }
 };
 @Injectable()
@@ -61,17 +76,42 @@ export class TreebankService {
                         uploaded: false
                     },
                     metadata: treebank.metadata,
-                    subTreebanks: Object.keys(treebank.components).map(key => {
+                    variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
+                    componentGroups: Object.keys(treebank.components).map(key => {
                         let component = treebank.components[key];
                         return {
                             databaseId: component.database_id,
+                            disabled: !!component.disabled,
                             component: key,
                             title: component.title,
                             description: component.description,
                             sentenceCount: component.sentences,
-                            wordCount: component.words
+                            wordCount: component.words,
+                            group: component.group || key,
+                            variant: component.variant || 'default'
                         }
-                    })
+                    }).reduce((groups, component) => {
+                        let group = groups.find(g => g.key == component.group);
+
+                        if (!group.description) {
+                            group.description = component.description;
+                        }
+
+                        group.components[component.variant] = component;
+                        group.sentenceCount.add(component.sentenceCount);
+                        group.wordCount.add(component.wordCount);
+
+                        return groups;
+                    }, Object.keys(treebank.groups ? treebank.groups : treebank.components).map(key => ({
+                        components: {},
+                        description: treebank.groups &&
+                            treebank.groups[key] &&
+                            treebank.groups[key].description ||
+                            null,
+                        key: key,
+                        sentenceCount: new FuzzyNumber(0),
+                        wordCount: new FuzzyNumber(0)
+                    })))
                 };
             }
 
@@ -151,10 +191,10 @@ export class TreebankService {
             })).sort((a, b) => a.title.localeCompare(b.title));
     }
 
-    async getSubTreebanks(treebankName: string): Promise<SubTreebank[]> {
+    async getComponentGroups(treebankName: string): Promise<{ variants: string[], groups: ComponentGroup[] }> {
         let configuredTreebank = (await this.getConfiguredTreebanks())[treebankName];
         if (configuredTreebank) {
-            return configuredTreebank.subTreebanks;
+            return { variants: configuredTreebank.variants, groups: configuredTreebank.componentGroups };
         }
 
         let results = await this.http.get<{
@@ -164,12 +204,27 @@ export class TreebankService {
             slug: string,
             title: string
         }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${treebankName}`)).toPromise();
-        return results.map(subtree => ({
-            databaseId: subtree.basex_db,
-            component: subtree.slug.toUpperCase(),
-            title: subtree.title,
-            sentenceCount: parseInt(subtree.nr_sentences),
-            wordCount: parseInt(subtree.nr_words)
-        }));
+        return {
+            variants: ['default'],
+            groups:
+                results.map(subtree => {
+                    let component = subtree.slug.toUpperCase()
+                    return {
+                        group: component,
+                        variant: 'default',
+                        databaseId: subtree.basex_db,
+                        component,
+                        title: subtree.title,
+                        sentenceCount: parseInt(subtree.nr_sentences),
+                        wordCount: parseInt(subtree.nr_words),
+                        disabled: false
+                    }
+                }).map(component => ({
+                    key: component.component,
+                    components: { default: component },
+                    sentenceCount: new FuzzyNumber(component.sentenceCount),
+                    wordCount: new FuzzyNumber(component.wordCount)
+                }))
+        };
     }
 }

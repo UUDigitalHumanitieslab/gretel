@@ -55,6 +55,14 @@ function getConfiguredTreebanks()
                     'multioption' => $multioption,
                 );
 
+                if (array_key_exists('groups', $settings)) {
+                    $corpus_definition['groups'] = $settings['groups'];
+                }
+
+                if (array_key_exists('variants', $settings)) {
+                    $corpus_definition['variants'] = $settings['variants'];
+                }
+
                 $configured_treebanks[$corpus] = $corpus_definition;
             } else {
                 // TODO: this is a grinded database
