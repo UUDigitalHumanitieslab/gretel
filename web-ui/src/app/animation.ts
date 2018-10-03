@@ -54,14 +54,12 @@ export const slideInAnimation =
     trigger('routeAnimations', Array.from(createTransitions(4)));
 
 function* createTransitions(max: number) {
-    yield transition(`* => 0`, slideLeft);
-    for (let i = 1; i <= max; i++) {
-        for (let j = 0; j < i; j++) {
-            yield transition(`${j} => ${i}`, slideRight);
+    for (let to = 0; to <= max; to++) {
+        for (let from = 0; from < to; from++) {
+            yield transition(`${from} => ${to}`, slideRight);
         }
-        for (let j = i; j < max; j++) {
-            yield transition(`${j} => ${i}`, slideLeft);
+        for (let from = to; from <= max; from++) {
+            yield transition(`${from} => ${to}`, slideLeft);
         }
     }
-    yield transition(`* => ${max}`, slideRight);
 }
