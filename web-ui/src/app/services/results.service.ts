@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable } from "rxjs/Observable";
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer } from "rxjs";
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
 
-import 'rxjs/add/operator/mergeMap'
-const routerUrl = '/gretel/api/src/router.php/';
 const httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -20,8 +17,7 @@ const httpOptions = {
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: FilterValue[] = [];
-    defaultVariables: { name: string, path: string }[] = null
-
+    defaultVariables: { name: string, path: string }[] = null;
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
     }
@@ -32,10 +28,11 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables) {
+        variables = this.defaultVariables,
+        cancellationToken: Observable<{}> | null = null) {
         return new Promise<Hit[]>((resolve, reject) => {
             let hits: Hit[] = [];
-            this.getAllResults(xpath,
+            let subscription = this.getAllResults(xpath,
                 corpus,
                 components,
                 retrieveContext,
@@ -44,6 +41,9 @@ export class ResultsService {
                 variables,
                 () => resolve(hits))
                 .subscribe(results => hits.push(...results.hits));
+            cancellationToken.subscribe(() => {
+                subscription.unsubscribe();
+            });
         });
     }
 
@@ -105,16 +105,17 @@ export class ResultsService {
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
         remainingDatabases: string[] | null = null) {
-        let results = await this.http.post<ApiSearchResult | false>(routerUrl + 'results', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            retrieveContext,
-            corpus,
-            components,
-            iteration,
-            isAnalysis,
-            variables,
-            remainingDatabases
-        }, httpOptions).toPromise();
+        let results = await this.http.post<ApiSearchResult | false>(
+            await this.configurationService.getApiUrl('results'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                retrieveContext,
+                corpus,
+                components,
+                iteration,
+                isAnalysis,
+                variables,
+                remainingDatabases
+            }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
         }
@@ -123,27 +124,29 @@ export class ResultsService {
     }
 
     async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
-        let base = this.configurationService.getBaseUrlGretel();
-        let url = `${base}/front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`;
+        let url = await this.configurationService.getGretelUrl(
+            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
 
         let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return treeXml;
+        return { url, treeXml };
     }
 
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        return await this.http.post<MetadataValueCounts>(routerUrl + 'metadata_counts', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            corpus,
-            components,
-        }, httpOptions).toPromise();
+        return await this.http.post<MetadataValueCounts>(
+            await this.configurationService.getApiUrl('metadata_counts'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                corpus,
+                components,
+            }, httpOptions).toPromise();
     }
 
     async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        let results = await this.http.post<{ [databaseId: string]: string }>(routerUrl + 'treebank_counts', {
-            xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
-            corpus,
-            components,
-        }, httpOptions).toPromise();
+        let results = await this.http.post<{ [databaseId: string]: string }>(
+            await this.configurationService.getApiUrl('treebank_counts'), {
+                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                corpus,
+                components,
+            }, httpOptions).toPromise();
 
         return Object.keys(results).map(databaseId => {
             return {
@@ -159,21 +162,43 @@ export class ResultsService {
      * @return string The metadata filter
      */
     private createMetadataFilterQuery(filters: FilterValue[]) {
+        function escape(value: string | number) {
+            return value.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;');
+        }
+
         // Compile the filter
         let filterQuery = '';
         for (let filter of filters) {
             switch (filter.type) {
                 case 'single':
                     // Single values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value="${filter.value}"]]`;
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`;
                     break;
                 case 'range':
                     // Ranged values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${filter.field}" and @value>=${filter.min} and @value<=${filter.max}]]`;
+                    let min: string, max: string, value: string;
+                    if (filter.dataType == 'date') {
+                        // gets number in the format YYYYMMDD e.g. 19870227
+                        min = filter.min.replace(/-/g, '');
+                        max = filter.max.replace(/-/g, '');
+                        value = "number(translate(@value,'-',''))";
+                    } else {
+                        min = escape(filter.min);
+                        max = escape(filter.max);
+                        value = '@value';
+                    }
+
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and ${value}>=${min} and ${value}<=${max}]]`;
+                    break;
+                case 'multiple':
+                    // Single values
+                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and (${
+                        filter.values.map((value) => `@value="${escape(value)}"`).join(' or ')})]]`;
                     break;
             }
         }
-
         return filterQuery;
     }
 
@@ -358,25 +383,28 @@ export interface Hit {
 
 export type FilterValue =
     FilterSingleValue
-    | FilterRangeValue<string>
-    | FilterRangeValue<number>
-    | FilterMultipleValues<string>;
+    | FilterRangeValue<string, 'date'>
+    | FilterRangeValue<number, 'int'>
+    | FilterMultipleValues<string, 'text'>;
 
 export interface FilterSingleValue {
     type: 'single';
+    dataType: 'text',
     field: string;
     value: string;
 }
 
-export interface FilterRangeValue<T> {
+export interface FilterRangeValue<T, U> {
     type: 'range';
+    dataType: U,
     field: string;
     min: T;
     max: T;
 }
 
-export interface FilterMultipleValues<T> {
+export interface FilterMultipleValues<T, U> {
     type: 'multiple';
+    dataType: U,
     values: Array<T>;
     field: string;
 }

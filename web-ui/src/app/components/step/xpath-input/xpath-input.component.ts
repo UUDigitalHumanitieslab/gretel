@@ -1,14 +1,23 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
 import { StepComponent } from "../step.component";
-import { MacroService, ValueEvent } from 'lassy-xpath/ng';
-import { HttpClient } from '@angular/common/http';
+import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
 
 @Component({
     selector: 'grt-xpath-input',
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })
-export class XpathInputComponent extends StepComponent {
+export class XpathInputComponent extends StepComponent implements OnChanges {
+    public treeXml: string;
+    public treeDisplay = 'inline';
+
+    private valueSubject = new Subject<string>();
+    private subscriptions: Subscription[] = [];
+
     @Input()
     public value: string;
 
@@ -21,10 +30,23 @@ export class XpathInputComponent extends StepComponent {
     @Output()
     public onChangeRetrieveContext = new EventEmitter<boolean>();
 
-    constructor(private httpClient: HttpClient, macroService: MacroService) {
+    constructor(macroService: MacroService,
+        extractinatorService: ExtractinatorService,
+        reconstructorService: ReconstructorService) {
         super();
 
         macroService.loadDefault();
+        this.subscriptions.push(this.valueSubject.pipe(debounceTime(500)).subscribe(value => {
+            let paths: PathVariable[] = null;
+            try {
+                paths = extractinatorService.extract(value);
+                this.treeXml = reconstructorService.construct(paths, value);
+            }
+            catch (err) {
+                // probably some malformed input
+                console.debug(err)
+            }
+        }));
     }
 
     valid: boolean = false;
@@ -42,6 +64,11 @@ export class XpathInputComponent extends StepComponent {
         this.value = event.xpath;
         this.onChangeValue.emit(this.value);
         this.onChangeValid.emit(this.valid);
+        this.valueSubject.next(this.value);
+    }
+
+    ngOnChanges() {
+        this.valueSubject.next(this.value);
     }
 
     emitRetrieveContextChanged() {

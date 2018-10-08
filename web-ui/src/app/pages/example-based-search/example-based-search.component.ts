@@ -149,7 +149,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
 
     updateSentence(sentence: string) {
         this.globalState.inputSentence = sentence;
-        this.globalState.exampleXml = undefined; // reset parse
+        // reset parse/previous settings
+        this.globalState.exampleXml = undefined;
+        this.globalState.isCustomXPath = false;
         this.updateGlobalState(this.globalState);
     }
 
@@ -166,6 +168,12 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.globalState.attributes = matrixSettings.attributes;
             this.matrixStep.updateMatrix(this.globalState);
         }
+    }
+
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.globalState.retrieveContext = retrieveContext;
+
+        this.updateGlobalState(this.globalState);
     }
 
     updateXPath(xpath: string) {

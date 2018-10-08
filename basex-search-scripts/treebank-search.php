@@ -166,8 +166,8 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
             if ($name != '$node') {
                 // the root node is already declared in the query itself, do not declare it again
                 $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
-                $variable_results .= '<var name="'.$name.'">{'.$name.'/@*}</var>';
             }
+            $variable_results .= '<var name="'.$name.'">{'.$name.'/@*}</var>';
         }
         $variable_results = '<vars>'.$variable_results.'</vars>';
     }
@@ -175,57 +175,62 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     $for = 'for $node in db:open("'.$database.'")/treebank';
     if ($corpus == 'sonar' && !$needRegularSonar) {
         $for .= '/tree';
-        $sentid = 'let $sentid := ($node/ancestor::tree/@id)';
+        $tree = 'let $tree := ($node/ancestor::tree)';
         $sentence = '
     return
     for $sentence in (db:open("'.$sonarComponents[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
         let $tb := ($sentence/@part)';
     } else {
-        $sentid = 'let $sentid := ($node/ancestor::alpino_ds/@id)';
-        $sentence = 'let $sentence := ($node/ancestor::alpino_ds/sentence)';
+        $tree = 'let $tree := ($node/ancestor::alpino_ds)';
+        $sentence = 'let $sentence := ($tree/sentence)';
     }
+    $sentid = 'let $sentid := ($tree/@id)';
 
     $regulartb = $needRegularSonar ? "let \$tb := '$database'" : '';
     $returnTb = ($corpus == 'sonar') ? '||{data($tb)}' : '';
 
-    $meta = 'let $meta := ($node/ancestor::alpino_ds/metadata/meta)';
+    $meta = 'let $meta := ($tree/metadata/meta)';
 
     $ids = 'let $ids := ($node//@id)';
     $begins = 'let $begins := ($node//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
-    if ($context && !$needRegularSonar) {
-        if ($corpus == 'sonar') {
+    if ($context) {
+        if ($corpus == 'sonar' && !$needRegularSonar) {
             $databases = $component[0].'sentence2treebank';
-        } else {
-            $databases = strtoupper($corpus).'_ID_S';
-        }
 
-        $text = 'let $text := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$1\')';
-        $snr = 'let $snr := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$2\')';
-        $prev = 'let $prev := (number($snr)-1)';
-        $next = 'let $next := (number($snr)+1)';
-        $previd = 'let $previd := concat($text, $prev)';
-        $nextid = 'let $nextid := concat($text, $next)';
+            $text = 'let $text := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$1\')';
+            $snr = 'let $snr := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$2\')';
+            $prev = 'let $prev := (number($snr)-1)';
+            $next = 'let $next := (number($snr)+1)';
+            $previd = 'let $previd := concat($text, $prev)';
+            $nextid = 'let $nextid := concat($text, $next)';
 
-        $prevs = 'let $prevs := (db:open("'.$databases.'")';
-        $nexts = 'let $nexts := (db:open("'.$databases.'")';
+            $prevs = 'let $prevs := (db:open("'.$databases.'")';
+            $nexts = 'let $nexts := (db:open("'.$databases.'")';
 
-        if ($corpus != 'sonar') {
-            $prevs .= '//s[id=$previd]/sentence)';
-            $nexts .= '//s[id=$nextid]/sentence)';
-        } else {
-            $prevs .= '/sentence2treebank/sentence[@nr=$previd])';
-            $nexts .= '/sentence2treebank/sentence[@nr=$nextid])';
-        }
+            if ($corpus != 'sonar') {
+                $prevs .= '//s[id=$previd]/sentence)';
+                $nexts .= '//s[id=$nextid]/sentence)';
+            } else {
+                $prevs .= '/sentence2treebank/sentence[@nr=$previd])';
+                $nexts .= '/sentence2treebank/sentence[@nr=$nextid])';
+            }
 
-        $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
+            $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||'.$variable_results.'</match>';
 
-        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$variable_declarations.$return;
+            $xquery = $for.$xpath.PHP_EOL.$tree.$sentid.$sentence.$ids.$begins.$beginlist.$text.$snr.$prev.$next.$previd.$nextid.$prevs.$nexts.$variable_declarations.$return;
+        } else {
+            $context_sentences = 'let $prevs := ($tree/preceding-sibling::alpino_ds[1]/sentence)
+let $nexts := ($tree/following-sibling::alpino_ds[1]/sentence)';
+            $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'.$returnTb
+                .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}||'.$variable_results.'</match>';
+            $xquery = $for.$xpath.PHP_EOL.$tree.$sentid.$sentence.$context_sentences.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
+        }
     } else {
         $return = ' return <match>{data($sentid)}||{data($sentence)}'.$returnTb
             .'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||{$node}||{$meta}||'.$variable_results.'</match>';
-        $xquery = $for.$xpath.PHP_EOL.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
+        $xquery = $for.$xpath.PHP_EOL.$tree.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
     }
 
     // Adds positioning values:; limits possible output

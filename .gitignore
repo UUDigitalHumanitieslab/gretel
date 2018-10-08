@@ -1,18 +1,16 @@
 .tscache
-*.png
-*.ico
 *.log
 *~
 tmp/*
 log/*
+ng/
+.DS_Store
 
 prepros.cfg
 prepros-6.config
 config.php
 sitemap.xml
 robots.txt
-.htaccess
-config/
 
 # Sass
 *.css.map

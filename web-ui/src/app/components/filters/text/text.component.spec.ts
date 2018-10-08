@@ -14,6 +14,12 @@ describe('TextComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(TextComponent);
         component = fixture.componentInstance;
+        component.filter = {
+            dataType: 'text',
+            field: 'text',
+            filterType: 'checkbox',
+            options: ['A', 'B', 'C']
+        };
         fixture.detectChanges();
     });
 

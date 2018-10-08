@@ -1,0 +1,5 @@
+{
+    "apiUrl": "../api/src/router.php/",
+    "gretelUrl": "../",
+    "uploadUrl": "../../gretel-upload/index.php/api/"
+}

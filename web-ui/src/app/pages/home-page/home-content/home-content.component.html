@@ -29,7 +29,7 @@
     <div class="column">
         <div class="card">
             <header class="card header">
-                <a href="ebs/input.php" class="card-header-title">Example-based Search</a>
+                <a [routerLink]="['/example-based-search']" class="card-header-title">Example-based Search</a>
             </header>
             <div class="card-content">
                 <div class="content">
@@ -58,7 +58,7 @@
     <div class="column">
         <div class="card">
             <header class="card header">
-                <a href="../gretel-upload" class="card-header-title">Corpus Upload</a>
+                <a [href]="uploadUrl" class="card-header-title">Corpus Upload</a>
             </header>
             <div class="card-content">
                 <div class="content">

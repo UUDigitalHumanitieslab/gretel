@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FilterValue } from '../../services/_index';
+import { FilterChangeEvent } from './filter/filter.component';
 
 export interface Filter {
     field: string;
@@ -16,34 +17,35 @@ export interface Filter {
     styleUrls: ['./filters.component.scss']
 })
 export class FiltersComponent {
-    @Input() filters: Filter[];
+    @Input()
+    public filters: Filter[];
 
-    @Output() filterChange = new EventEmitter<FilterValue[]>();
+    @Output()
+    public filterChange = new EventEmitter<FilterValue[]>();
 
-    selectedFilters = [];
+    private selectedFilters: FilterValue[] = [];
 
-    filterChanged(e) {
-        if (e.selected) {
-            this.addToSelectedFilters(e);
+    public filterChanged(event: FilterChangeEvent) {
+        if (event.selected) {
+            this.addToSelectedFilters(event);
         } else {
-            this.removeFromSelectedFilters(e);
+            this.removeFromSelectedFilters(event);
         }
-
     }
 
-    addToSelectedFilters(e) {
-        const location = this.selectedFilters.findIndex((el) => el.field === e.field);
+    private addToSelectedFilters(filterValue: FilterValue) {
+        const location = this.selectedFilters.findIndex((el) => el.field === filterValue.field);
         if (location === -1) {
-            this.selectedFilters.push(e);
+            this.selectedFilters.push(filterValue);
         } else {
-            this.selectedFilters[location] = e;
+            this.selectedFilters[location] = filterValue;
             this.selectedFilters = this.selectedFilters.slice();
         }
         this.filterChange.emit(this.selectedFilters);
     }
 
-    removeFromSelectedFilters(e) {
-        this.selectedFilters = this.selectedFilters.filter((el) => el.field !== e.field);
+    private removeFromSelectedFilters(filterValue: FilterValue) {
+        this.selectedFilters = this.selectedFilters.filter((el) => el.field !== filterValue.field);
         this.filterChange.emit(this.selectedFilters);
     }
 }

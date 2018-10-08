@@ -33,7 +33,7 @@ Date: ${new Date()}
 
         for (let i = 0; i < hits.length; i++) {
             let hit = hits[i];
-            rows.push(`${i + 1}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}
+            rows.push(`${i + 1}\t${hit.fileId}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}
 `);
         }
 
@@ -44,11 +44,15 @@ Date: ${new Date()}
         this.downloadRows('gretel-xpath.txt', 'text/plain', [xpath]);
     }
 
-    public downloadFilelist(filenames: string[], name: string, header: string = undefined, extension: string ='.fl'){
-        if(!header){
+    public downloadXml(filename: string, xml: string) {
+        saveAs(new Blob([xml], { type: `text/xml;charset=utf-8` }), filename);
+    }
+
+    public downloadFilelist(filenames: string[], name: string, header: string = undefined, extension: string = '.fl') {
+        if (!header) {
             header = name
         }
-        saveAs(new Blob([`${header}\n${filenames.join('\n')}`], {type:'text/txt'}), `${name}${extension}`)
+        saveAs(new Blob([`${header}\n${filenames.join('\n')}`], { type: 'text/txt' }), `${name}${extension}`)
     }
 
     private highlightSentence(highlightedSentence: SafeHtml) {

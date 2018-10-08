@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgSelectModule } from "@ng-select/ng-select";
-import { AngularFontAwesomeModule } from "angular-font-awesome";
 import { DialogModule } from "primeng/dialog";
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
@@ -19,11 +18,13 @@ import { HomeContentComponent } from './pages/home-page/home-content/home-conten
 import { AppRoutingModule } from "./app-routing/app-routing.module";
 import { DocumentationComponent } from './pages/documentation/documentation.component';
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
+import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from "./components/step/select-treebanks/select-treebanks.component";
+import { SubTreebanksComponent } from "./components/step/select-treebanks/sub-treebanks.component";
 import { ResultsComponent } from './components/step/results/results.component';
 import { PaperCiteComponent } from "./components/page-components/paper-cite/paper-cite.component";
 import { AdressComponent } from "./components/page-components/adress/adress.component";
@@ -31,10 +32,9 @@ import { FooterComponent } from "./components/page-components/footer/footer.comp
 import { BodyHeaderComponent } from "./components/page-components/body-header/body-header.component";
 import { NavigationComponent } from "./components/page-components/header/navigation/navigation.component";
 import { HeaderComponent } from "./components/page-components/header/header.component";
-import { FooterNavigationComponent } from "./components/page-components/footer/footer-navigation/footer-navigation.component";
 import { Header3Component } from "./components/page-components/header-3/header-3.component";
-import { SelectableTable } from "./components/tables/selectable-table/selectable-table.component";
 import { GretelWebsiteLinkComponent } from "./components/page-components/gretel-website-link/gretel-website-link.component";
+import { BalloonDirective } from './balloon.directive';
 
 import {
     AlpinoService,
@@ -44,8 +44,7 @@ import {
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService,
-    XpathSearchService
+    XmlParseService
 } from "./services/_index";
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from "./components/tree-visualizer/tree-visualizer.component";
@@ -57,10 +56,12 @@ import { SentenceInputComponent } from './components/step/sentence-input/sentenc
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
+import { FormatNumberPipe } from './format-number.pipe';
 
 export const declarations: any[] = [
     AppComponent,
     AnalysisComponent,
+    BalloonDirective,
     HomePageComponent,
     HeaderComponent,
     NavigationComponent,
@@ -72,18 +73,19 @@ export const declarations: any[] = [
     DocumentationComponent,
     GretelWebsiteLinkComponent,
     DocumentationContentComponent,
-    FooterNavigationComponent,
+    FormatNumberPipe,
     XpathSearchComponent,
     Header3Component,
     XpathInputComponent,
     BreadcrumbBarComponent,
     SelectTreebanksComponent,
     ResultsComponent,
-    SelectableTable,
+    SubTreebanksComponent,
     DistributionListComponent,
     TreeVisualizerComponent,
     ExampleBasedSearchComponent,
     SentenceInputComponent,
+    StepButtonsComponent,
     ParseComponent,
     MatrixComponent,
     XPathEditorComponent,
@@ -110,7 +112,6 @@ export const imports: any[] = [
 export const providers: any[] = [
     AlpinoService,
     AnalysisService,
-    XpathSearchService,
     LinkService,
     ResultsService,
     XmlParseService,

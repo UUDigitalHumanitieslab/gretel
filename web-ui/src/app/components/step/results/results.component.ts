@@ -1,19 +1,13 @@
-import {Component, Input, OnChanges, OnDestroy, Output, SimpleChange, EventEmitter} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Subscription} from 'rxjs/Subscription';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/switchMap';
+import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 
-import {ValueEvent} from 'lassy-xpath/ng';
-import {ClipboardService} from 'ngx-clipboard';
+import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
+import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+
+import { ValueEvent } from 'lassy-xpath/ng';
+import { ClipboardService } from 'ngx-clipboard';
 
 import {
-    ConfigurationService,
     DownloadService,
     FilterValue,
     Hit,
@@ -21,13 +15,11 @@ import {
     ResultsService,
     TreebankService
 } from '../../../services/_index';
+import { Filter } from '../../filters/filters.component';
+import { TreebankMetadata } from '../../../treebank';
+import { StepComponent } from "../step.component";
 
-import {TableColumn} from '../../tables/selectable-table/TableColumn';
-import {Filter} from '../../filters/filters.component';
-import {TreebankMetadata} from '../../../treebank';
-import {StepComponent} from "../step.component";
-
-const debounceTime = 200;
+const DebounceTime = 200;
 
 @Component({
     selector: 'grt-results',
@@ -84,9 +76,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     @Output()
     public xpathChange = new EventEmitter<string>();
 
+    @Output()
+    public onChangeRetrieveContext = new EventEmitter<boolean>();
+
+    @Output()
+    public onPrev = new EventEmitter();
+
+    @Output()
+    public onNext = new EventEmitter();
+
     public loading: boolean = true;
 
     public treeXml?: string;
+    public treeXmlUrl?: string;
+    public treeSentence?: SafeHtml;
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
@@ -96,20 +99,19 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public filters: Filter[] = [];
 
     public columns = [
-        {field: 'number', header: '#', width: '5%'},
-        {field: 'fileId', header: 'ID', width: '20%'},
-        {field: 'component', header: 'Component', width: '20%'},
-        {field: 'highlightedSentence', header: 'Sentence', width: 'fill'},
+        { field: 'number', header: '#', width: '5%' },
+        { field: 'fileId', header: 'ID', width: '20%' },
+        { field: 'component', header: 'Component', width: '20%' },
+        { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
     private results: Hit[] = [];
     private subscriptions: Subscription[];
 
-    constructor(private configurationService: ConfigurationService,
-                private downloadService: DownloadService,
-                private clipboardService: ClipboardService,
-                private resultsService: ResultsService,
-                private treebankService: TreebankService) {
+    constructor(private downloadService: DownloadService,
+        private clipboardService: ClipboardService,
+        private resultsService: ResultsService,
+        private treebankService: TreebankService) {
         super();
         this.subscriptions = [
             this.liveMetadataCounts(),
@@ -133,7 +135,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     async showTree(result: Hit) {
         this.treeXml = undefined;
-        this.treeXml = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        this.treeSentence = result.highlightedSentence;
+        let { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        this.treeXml = treeXml;
+        this.treeXmlUrl = url;
     }
 
     public downloadResults() {
@@ -170,7 +175,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public hideComponents(components: string[] | undefined = undefined) {
         if (components !== undefined) {
             this.hiddenComponents = Object.assign({}, ...components.map(name => {
-                return {[name]: true}
+                return { [name]: true }
             }));
         }
 
@@ -207,17 +212,21 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         }
     }
 
+    toggleContext() {
+        this.onChangeRetrieveContext.emit(!this.retrieveContext);
+    }
+
     /**
      * Get the counts for the metadata
      */
     private liveMetadataCounts() {
         // TODO: handle when filters have been applied (part of #36)
-        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject)
-            .filter((values) => values.every(value => value !== undefined))
-            .debounceTime(debounceTime)
-            .distinctUntilChanged()
-            .switchMap(([corpus, components, xpath]) =>
-                this.resultsService.metadataCounts(this.xpath, this.corpus, this.components))
+        return observableCombineLatest(this.xpathSubject, this.corpusSubject, this.componentsSubject).pipe(
+            filter((values) => values.every(value => value !== undefined)),
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([corpus, components, xpath]) =>
+                this.resultsService.metadataCounts(corpus, components, xpath)))
             .subscribe(counts => {
                 this.metadataValueCountsSubject.next(counts);
             });
@@ -227,9 +236,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the metadata for the current corpus
      */
     private liveMetadataProperties() {
-        return this.corpusSubject.filter(corpus => corpus !== undefined)
-            .distinctUntilChanged()
-            .switchMap(corpus => this.treebankService.getMetadata(corpus))
+        return this.corpusSubject.pipe(filter(corpus => corpus !== undefined),
+            distinctUntilChanged(),
+            switchMap(corpus => this.treebankService.getMetadata(corpus)))
             .subscribe(metadata => this.metadataSubject.next(metadata));
     }
 
@@ -237,7 +246,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the filters
      */
     private liveFilters() {
-        return Observable.combineLatest(this.metadataSubject, this.metadataValueCountsSubject)
+        return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
             .subscribe(([metadata, counts]) => {
                 let filters: Filter[] = [];
                 for (let filter of metadata) {
@@ -268,11 +277,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the results
      */
     private liveResults() {
-        return Observable.combineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject)
-            .filter((values) => values.every(value => value !== undefined))
-            .debounceTime(debounceTime)
-            .distinctUntilChanged()
-            .switchMap(([corpus, components, xpath, filterValues]) => {
+        return observableCombineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject).pipe(
+            filter((values) => values.every(value => value !== undefined)),
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([corpus, components, xpath, filterValues]) => {
                 this.loading = true;
                 this.results = [];
                 this.filteredResults = [];
@@ -287,11 +296,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     () => {
                         this.loading = false;
                     });
-            })
-            .do(results => {
+            }),
+            tap(results => {
                 this.results.push(...results.hits);
                 this.filteredResults.push(...this.filterHits(results.hits));
-            })
+            }))
             .subscribe();
     }
 
@@ -303,12 +312,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
     }
 
-
-    showWarning() {
-        throw new Error('Should never show warning');
-    }
-
-
     getValidationMessage() {
         // Should never show warning
     }
@@ -316,6 +319,3 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     updateValidity() {
     }
 }
-type TypedChanges = {
-    [propName in keyof ResultsComponent]: SimpleChange;
-    }

@@ -5,15 +5,21 @@ require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
 require '../../preparatory-scripts/xpath-generator.php';
 require './results.php';
+require './configured-treebanks.php';
 require './treebank-counts.php';
 
 // Maybe change this?
 header('Access-Control-Allow-Origin: *');
 
+$base = $_SERVER['REQUEST_URI'];
+$base = explode('/router.php/', $_SERVER['REQUEST_URI'])[0].'/router.php';
 $router = new AltoRouter();
-$router->setBasePath('/gretel/api/src/router.php');
-$alpinoDirectory = '/opt/Alpino';
-define('ROOT_PATH', '/vagrant/vagrant_data/gretel');
+$router->setBasePath($base);
+
+$router->map('GET', '/configured_treebanks', function () {
+    header('Content-Type: application/json');
+    echo json_encode(getConfiguredTreebanks());
+});
 
 $router->map('POST', '/generate_xpath', function () {
     $input = file_get_contents('php://input');
@@ -29,15 +35,18 @@ $router->map('POST', '/generate_xpath', function () {
     echo json_encode($generated);
 });
 
-$router->map('POST', '/parse_sentence', function () {
-    $sentence = file_get_contents('php://input');
-    $location = alpino($sentence, 'ng'.time());
-
-    header('Content-Type: application/xml');
-    $parsed = fopen($location, 'r') or die('Unable to open parsed file!');
-    echo fread($parsed, filesize($location));
-    fclose($parsed);
-    unlink($location);
+$router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
+    try {
+        $xml = alpino(str_replace(
+            '_SLASH_',
+            '/',
+            urldecode($sentence)), 'ng'.time());
+        header('Content-Type: application/xml');
+        echo $xml;
+    } catch (Exception $e) {
+        http_response_code(500);
+        die($e->getMessage());
+    }
 });
 
 $router->map('POST', '/metadata_counts', function () {
@@ -65,7 +74,7 @@ $router->map('POST', '/treebank_counts', function () {
 });
 
 $router->map('POST', '/results', function () {
-    global $resultsLimit;
+    global $resultsLimit, $analysisLimit, $analysisFlushLimit, $flushLimit;
 
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -84,8 +93,14 @@ $router->map('POST', '/results', function () {
     if (!isset($analysisLimit)) {
         $analysisLimit = $resultsLimit;
     }
-    $searchLimit = isset($data['isAnalysis']) && $data['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
-
+    if (isset($data['isAnalysis']) && $data['isAnalysis']) {
+        $searchLimit = $analysisLimit;
+        if (isset($analysisFlushLimit)) {
+            $flushLimit = $analysisFlushLimit;
+        }
+    } else {
+        $searchLimit = $resultsLimit;
+    }
     $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
 
     header('Content-Type: application/json');
