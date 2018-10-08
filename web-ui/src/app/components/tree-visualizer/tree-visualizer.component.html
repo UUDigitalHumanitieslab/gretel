@@ -14,16 +14,20 @@
                     <span class="sr-only">Open in fullscreen</span>
                 </button>
             </div>
+            <ng-container *ngTemplateOutlet="metadataTemplate"></ng-container>
             <div class="tv-tree">
             </div>
 
             <aside class="tv-tooltip" style="display: none">
                 <ul></ul>
-                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button"><i class="fa fa-loaded fa-fw fa-times"></i><span class="sr-only">Close</span></button>
+                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button">
+                    <i class="fa fa-loaded fa-fw fa-times"></i>
+                    <span class="sr-only">Close</span>
+                </button>
                 <span class="arrow"></span>
             </aside>
-            
-            
+
+
         </div>
     </div>
     <div class="tree-visualizer-fs tv tv-fs">
@@ -31,7 +35,7 @@
             <p></p>
         </div>
         <div class="tv-content-wrapper">
-            <div class="tv-toolbar-wrapper level">
+            <div class="tv-toolbar-wrapper level is-marginless">
                 <div class="tv-sentence-wrapper level-left">
                     <i class="level-item fas fa-comment-dots" aria-hidden="true"></i>
                     <span class="level-item"></span>
@@ -101,14 +105,32 @@
                     </div>
                 </div>
             </div>
+            <ng-container *ngTemplateOutlet="metadataTemplate"></ng-container>
             <div class="tv-tree">
             </div>
             <aside class="tv-tooltip" style="display: none">
                 <ul></ul>
-                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button"><i class="fa fa-loaded fa-fw fa-times"></i><span class="sr-only">Close</span></button>
+                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button">
+                    <i class="fa fa-loaded fa-fw fa-times"></i>
+                    <span class="sr-only">Close</span>
+                </button>
                 <span class="arrow"></span>
             </aside>
-            
+
         </div>
     </div>
 </div>
+<ng-template #metadataTemplate>
+    <ng-container *ngIf="metadata">
+        <div class="metadata">
+            <div class="card">
+                <table class="table">
+                    <tr *ngFor="let item of metadata">
+                        <th>{{item.name}}</th>
+                        <td>{{item.value}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>

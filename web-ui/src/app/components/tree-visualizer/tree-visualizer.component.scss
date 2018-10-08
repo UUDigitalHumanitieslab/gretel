@@ -17,6 +17,22 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.metadata {
+    display: none;
+    position: relative;
+
+    .tv-toolbar-wrapper:hover + &,
+    &:hover {
+        display: block;
+    }
+
+    .card {
+        position: absolute;
+        margin-left: 1px;
+    }
+}
+
+
 :host ::ng-deep {
     .tv {
         box-sizing: border-box;
@@ -372,7 +388,7 @@
                 box-sizing: border-box;
                 background: white;
                 box-shadow: 0px 3px 3px 0 rgba(0, 0, 0, 0.2);
-            
+
                 &::after {
                     content: "";
                     position: absolute;
