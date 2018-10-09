@@ -1,6 +1,6 @@
 /// <reference path="pivottable.d.ts"/>
 /// <reference types="jqueryui"/>
-import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, NgZone, EventEmitter, Output } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,7 +11,7 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, FilterValues, FilterValue } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 
@@ -26,7 +26,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     private $element: JQuery<HTMLElement>;
     private pivotUiOptions: PivotUiOptions;
     private hits: Hit[];
-    private metadata: TreebankMetadata[];
+    private metadata: { [field: string]: TreebankMetadata };
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
     public variables: PathVariable[];
@@ -44,6 +44,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     @Input()
     public xpath: string;
+
+    @Output()
+    public filterResults = new EventEmitter<{
+        xpath: string,
+        filterValues: FilterValues
+    }>();
 
     public attributes: { value: string, label: string }[];
 
@@ -186,14 +192,19 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         try {
             if (!this.metadata || !this.hits) {
-                [this.metadata, this.hits] = await Promise.all([
+                const [metadata, hits] = await Promise.all([
                     this.treebankService.getMetadata(this.corpus),
                     this.resultsService.promiseAllResults(
                         this.xpath, this.corpus, this.components, false, true, [], this.variables, this.cancellationToken)
                 ]);
+                this.metadata = metadata.reduce((dict, item) => {
+                    dict[item.field] = item;
+                    return dict;
+                }, {});
+                this.hits = hits;
             }
 
-            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
+            this.pivot(element, Object.keys(this.metadata), this.hits, selectedVariables);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -234,29 +245,69 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Returns the value of the given filters, based on the given index and the spanname from which we must get the spanwidth
-     * @param filters
+     * Returns the value of the given filters, based on the given index and the span name from which we must get the span width
+     * @param elementGroups
      * @param index
      * @param spanName
      * @returns {{}}
      */
-    private getValueFromFilters(filters: { [name: string]: Element[] }, index: number, spanName: string) {
-        const results: { [key: string]: string } = {};
-        for (const key of Object.keys(filters)) {
-            const values = filters[key],
-                spans = values.map(v => [v.innerHTML, v[spanName]]);
+    private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: string) {
+        const results: FilterValues = {};
+        for (const field of Object.keys(elementGroups)) {
+            const elements = elementGroups[field],
+                spans = elements.map(v => ({
+                    value: v.innerHTML,
+                    size: v[spanName]
+                }));
             let value = '',
                 total = 0;
             for (const span of spans) {
-                total += span[1];
+                total += span.size;
                 if (index < total) {
-                    value = span[0];
+                    value = span.value;
                     break;
                 }
             }
-            results[key] = value;
+            if (field[0] !== '$') {
+                results[field] = this.getFilterValue(field, value);
+            }
+            // TODO: $node
         }
         return results;
+    }
+
+    private getFilterValue(field: string, value: string): FilterValue {
+        const metadata = this.metadata[field];
+        switch (metadata.facet) {
+            case 'checkbox':
+            case 'dropdown':
+                return {
+                    dataType: 'text',
+                    type: 'multiple',
+                    values: [value],
+                    field
+                };
+            case 'range':
+            case 'slider':
+                switch (metadata.type) {
+                    case 'date':
+                        return {
+                            dataType: 'date',
+                            type: 'range',
+                            min: value,
+                            max: value,
+                            field,
+                        };
+                    case 'int':
+                        return {
+                            dataType: 'int',
+                            type: 'range',
+                            min: parseInt(value, 10),
+                            max: parseInt(value, 10),
+                            field,
+                        };
+                }
+        }
     }
 
 
@@ -325,11 +376,18 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     private addTableClickEvent() {
         $('.pvtVal').off('click');
         $('.pvtVal').on('click', ($event) => {
-            const element = $event.currentTarget,
-                rowFilters = this.getRowFilters(element),
-                columnFilters = this.getColumnFilters(element);
-            // TODO: Add the routing to results page
+            this.ngZone.run(() => {
+                const element = $event.currentTarget;
+                const filterValues = {
+                    ...this.getRowFilters(element),
+                    ...this.getColumnFilters(element)
+                };
 
+                this.filterResults.next({
+                    xpath: this.xpath,
+                    filterValues
+                });
+            });
         });
 
         // TODO: pvtTotal

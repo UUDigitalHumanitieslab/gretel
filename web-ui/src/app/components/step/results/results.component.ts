@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
@@ -13,7 +13,8 @@ import {
     Hit,
     MetadataValueCounts,
     ResultsService,
-    TreebankService
+    TreebankService,
+    FilterValues
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
@@ -26,7 +27,7 @@ const DebounceTime = 200;
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent implements OnDestroy {
+export class ResultsComponent extends StepComponent implements OnChanges, OnDestroy {
     private corpusSubject = new BehaviorSubject<string>(undefined);
     private componentsSubject = new BehaviorSubject<string[]>([]);
     private xpathSubject = new BehaviorSubject<string>(undefined);
@@ -68,6 +69,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     @Input()
+    public filterValues: FilterValues = {};
+
+    @Input()
     public retrieveContext = false;
 
     @Input()
@@ -75,6 +79,9 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     @Output()
     public xpathChange = new EventEmitter<string>();
+
+    @Output()
+    public changeFilterValues = new EventEmitter<FilterValues>();
 
     @Output()
     public changeRetrieveContext = new EventEmitter<boolean>();
@@ -98,7 +105,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public isFiltering = false;
 
     public filters: Filter[] = [];
-    public filterValues: { [field: string]: FilterValue } = {};
 
     public columns = [
         { field: 'number', header: '#', width: '5%' },
@@ -123,6 +129,16 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         ];
 
         this.onChangeValid = new EventEmitter();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        const filterValuesChange = changes['filterValues'];
+        if (filterValuesChange && (filterValuesChange.firstChange ||
+            filterValuesChange.previousValue !== filterValuesChange.currentValue)) {
+            const values = Object.values(this.filterValues);
+            this.filterValuesSubject.next(values);
+            this.isFiltering = values.length > 0;
+        }
     }
 
     ngOnDestroy() {
@@ -184,10 +200,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.filteredResults = this.filterHits(this.results);
     }
 
-    public filterChange(filterValues: { [field: string]: FilterValue }) {
-        this.filterValues = filterValues;
-        this.filterValuesSubject.next(Object.values(filterValues));
-        this.isFiltering = !!Object.keys(filterValues).length;
+    public filterChange(filterValues: FilterValues) {
+        this.changeFilterValues.next(filterValues);
     }
 
     public print() {
@@ -210,7 +224,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     public addFiltersXPath() {
-        this.customXPath = (this.xpath || this.customXPath) + '\n' +
+        this.customXPath = (this.xpath || this.customXPath).trimRight() + '\n' +
             this.resultsService.createMetadataFilterQuery(
                 Object.values(this.filterValues));
         this.filterChange({});

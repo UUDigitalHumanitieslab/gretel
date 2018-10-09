@@ -393,6 +393,8 @@ export type FilterValue =
     | FilterRangeValue<number, 'int'>
     | FilterMultipleValues<string, 'text'>;
 
+export interface FilterValues { [field: string]: FilterValue; }
+
 export interface FilterSingleValue {
     type: 'single';
     dataType: 'text';

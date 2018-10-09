@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterValue } from '../../services/_index';
+import { FilterValue, FilterValues } from '../../services/_index';
 import { FilterChangeEvent } from './filter/filter.component';
 
 export interface Filter {
@@ -21,10 +21,10 @@ export class FiltersComponent {
     public filters: Filter[];
 
     @Input()
-    public filterValues: { [field: string]: FilterValue } = {};
+    public filterValues: FilterValues = {};
 
     @Output()
-    public filterChange = new EventEmitter<{ [field: string]: FilterValue }>();
+    public filterChange = new EventEmitter<FilterValues>();
 
     public filterChanged(event: FilterChangeEvent) {
         if (event.selected) {

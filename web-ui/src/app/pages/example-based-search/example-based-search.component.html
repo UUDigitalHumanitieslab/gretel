@@ -13,11 +13,12 @@
             [subTreebanks]="globalState.selectedTreebanks.components" (mainTreebankChange)="updateSelectedMainTreebank($event)"
             (subTreebanksChange)="updateSelectedSubTreebanks($event)" #selectTreebanks></grt-select-treebanks>
         <grt-results *ngSwitchCase="4" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-            [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
-            (xpathChange)="updateXPath($event)" (changeRetrieveContext)="updateRetrieveContext($event)"
-            (onChangeValid)="setValid($event)" (prev)="prev()" (next)="next()" #results></grt-results>
+            [filterValues]="globalState.filterValues" [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext"
+            [xpath]="globalState.xpath" (xpathChange)="updateXPath($event)" (changeFilterValues)="updateFilterValues($event)"
+            (changeRetrieveContext)="updateRetrieveContext($event)" (onChangeValid)="setValid($event)" (prev)="prev()"
+            (next)="next()" #results></grt-results>
         <grt-analysis *ngSwitchCase="5" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-            [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
+            [xpath]="globalState.xpath" (filterResults)="filterResults($event, 4)" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
     </div>
     <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>
