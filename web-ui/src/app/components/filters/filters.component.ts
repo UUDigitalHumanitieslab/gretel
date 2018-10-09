@@ -20,10 +20,11 @@ export class FiltersComponent {
     @Input()
     public filters: Filter[];
 
-    @Output()
-    public filterChange = new EventEmitter<FilterValue[]>();
+    @Input()
+    public filterValues: { [field: string]: FilterValue } = {};
 
-    private selectedFilters: FilterValue[] = [];
+    @Output()
+    public filterChange = new EventEmitter<{ [field: string]: FilterValue }>();
 
     public filterChanged(event: FilterChangeEvent) {
         if (event.selected) {
@@ -34,18 +35,13 @@ export class FiltersComponent {
     }
 
     private addToSelectedFilters(filterValue: FilterValue) {
-        const location = this.selectedFilters.findIndex((el) => el.field === filterValue.field);
-        if (location === -1) {
-            this.selectedFilters.push(filterValue);
-        } else {
-            this.selectedFilters[location] = filterValue;
-            this.selectedFilters = this.selectedFilters.slice();
-        }
-        this.filterChange.emit(this.selectedFilters);
+        this.filterChange.emit(Object.assign({
+            [filterValue.field]: filterValue
+        }, this.filterValues));
     }
 
     private removeFromSelectedFilters(filterValue: FilterValue) {
-        this.selectedFilters = this.selectedFilters.filter((el) => el.field !== filterValue.field);
-        this.filterChange.emit(this.selectedFilters);
+        const { [filterValue.field]: _, ...remaining } = this.filterValues;
+        this.filterChange.emit(remaining);
     }
 }

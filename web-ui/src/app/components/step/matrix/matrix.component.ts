@@ -35,7 +35,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public isCustomXPath: boolean;
 
     @Output()
-    public onChangeValue = new EventEmitter<MatrixSettings>();
+    public changeValue = new EventEmitter<MatrixSettings>();
 
     public filename: string;
     public subTreeDisplay = 'inline';
@@ -116,7 +116,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     public emitChange(customXPath: string = null) {
-        this.onChangeValue.next({
+        this.changeValue.next({
             attributes: this.tokenValues.map(t => t.value),
             retrieveContext: this.retrieveContext,
             customXPath,

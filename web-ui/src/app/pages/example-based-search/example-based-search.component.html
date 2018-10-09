@@ -2,11 +2,11 @@
 <ng-container *ngIf="globalState.currentStep">
     <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
     <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
-        <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (onChangeValue)="updateSentence($event)"
-            [inputSentence]="globalState.inputSentence" (onNext)="next()" #sentenceInput></grt-sentence-input>
+        <grt-sentence-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (changeValue)="updateSentence($event)"
+            [inputSentence]="globalState.inputSentence" (next)="next()" #sentenceInput></grt-sentence-input>
         <grt-parse *ngSwitchCase="1" (onChangeValid)="setValid($event)" [sentence]="globalState.inputSentence" [xml]="globalState.exampleXml"
             #parse></grt-parse>
-        <grt-matrix *ngSwitchCase="2" (onChangeValid)="setValid($event)" (onChangeValue)="updateMatrix($event)"
+        <grt-matrix *ngSwitchCase="2" (onChangeValid)="setValid($event)" (changeValue)="updateMatrix($event)"
             [attributes]="globalState.attributes" [isCustomXPath]="globalState.isCustomXPath" [tokens]="globalState.tokens"
             [xpath]="globalState.xpath" [subTreeXml]="globalState.subTreeXml" #matrix></grt-matrix>
         <grt-select-treebanks *ngSwitchCase="3" (onChangeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus"
@@ -14,13 +14,13 @@
             (subTreebanksChange)="updateSelectedSubTreebanks($event)" #selectTreebanks></grt-select-treebanks>
         <grt-results *ngSwitchCase="4" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [inputSentence]="globalState.inputSentence" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
-            (xpathChange)="updateXPath($event)" (onChangeRetrieveContext)="updateRetrieveContext($event)"
-            (onChangeValid)="setValid($event)" (onPrev)="prev()" (onNext)="next()" #results></grt-results>
+            (xpathChange)="updateXPath($event)" (changeRetrieveContext)="updateRetrieveContext($event)"
+            (onChangeValid)="setValid($event)" (prev)="prev()" (next)="next()" #results></grt-results>
         <grt-analysis *ngSwitchCase="5" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [xpath]="globalState.xpath" (onChangeValid)="setValid($event)" #analysis></grt-analysis>
     </div>
     <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>
-    <grt-step-buttons *ngIf="globalState.currentStep.number > 0" (onPrev)="prev()" (onNext)="next()" [currentStep]="globalState.currentStep"
+    <grt-step-buttons *ngIf="globalState.currentStep.number > 0" (prev)="prev()" (next)="next()" [currentStep]="globalState.currentStep"
         [steps]="steps"></grt-step-buttons>
 </ng-container>

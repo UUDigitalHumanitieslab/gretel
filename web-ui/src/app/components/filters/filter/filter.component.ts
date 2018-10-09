@@ -1,26 +1,31 @@
-import {EventEmitter, Input, Output} from '@angular/core';
-import {Filter} from "../filters.component";
-import {FilterValue} from '../../../services/_index';
+import { EventEmitter, Input, Output } from '@angular/core';
+import { Filter } from '../filters.component';
+import { FilterValue } from '../../../services/_index';
 
 export type FilterChangeEvent = FilterValue & {
     selected: boolean
 };
 
 export abstract class FilterComponent {
-    private filterValue;
+    private filterDefinition;
+
+    @Input('filterValue') set filterValue(value: FilterValue) {
+        this.onFilterValueSet(value);
+    }
 
     @Input('filter') set filter(value: Filter) {
-        this.filterValue = value;
+        this.filterDefinition = value;
         if (value !== undefined) {
             this.onFilterSet(value);
         }
     }
 
-    get filter() {
-        return this.filterValue
-    };
+    @Output()
+    filterChange = new EventEmitter<FilterChangeEvent>();
 
-    @Output() onFilterChange = new EventEmitter<FilterChangeEvent>();
+    get filter() {
+        return this.filterDefinition;
+    }
 
     constructor() {
     }
@@ -29,12 +34,10 @@ export abstract class FilterComponent {
         this.updateFilterChange(e.target.checked);
     }
 
-    ngOnInit() {
-    }
-
     updateFilterChange(selected) {
         throw Error('Not implemented');
     }
 
     abstract onFilterSet(filter: Filter);
+    abstract onFilterValueSet(filterValue: FilterValue);
 }

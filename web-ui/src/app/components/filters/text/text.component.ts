@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from "../filter/filter.component";
+import { FilterComponent } from '../filter/filter.component';
 import { Filter } from '../filters.component';
+import { FilterValue } from '../../../services/_index';
 
 @Component({
     selector: 'grt-text',
@@ -22,14 +23,20 @@ export class TextComponent extends FilterComponent {
             }));
     }
 
-    filterChange(e) {
-        if (e.event.target.checked) {
-            this.addToValues(e.value);
+    onFilterValueSet(filterValue: FilterValue) {
+        if (filterValue && filterValue.type === 'multiple') {
+            this.values = filterValue.values;
+        }
+    }
+
+    onFilterChange(event: Event, value: string) {
+        if ((<HTMLInputElement>event.target).checked) {
+            this.addToValues(value);
         } else {
-            this.removeFromValues(e.value);
+            this.removeFromValues(value);
         }
 
-        this.onFilterChange.emit({
+        this.filterChange.emit({
             dataType: 'text',
             type: 'multiple',
             field: this.filter.field,

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { StepComponent } from "../step.component";
+import { StepComponent } from '../step.component';
 
 @Component({
     selector: 'grt-sentence-input',
@@ -8,10 +8,10 @@ import { StepComponent } from "../step.component";
 })
 export class SentenceInputComponent extends StepComponent {
     @Output()
-    public onChangeValue = new EventEmitter<string>();
+    public changeValue = new EventEmitter<string>();
 
     @Output()
-    public onNext = new EventEmitter();
+    public next = new EventEmitter();
 
     @Input()
     public inputSentence: string;
@@ -25,7 +25,7 @@ export class SentenceInputComponent extends StepComponent {
     }
 
     inputChanges(event) {
-        this.onChangeValue.emit(event.target.value);
+        this.changeValue.emit(event.target.value);
         this.updateValidity(event.target.value);
     }
 

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from "../filter/filter.component";
+import { FilterComponent } from '../filter/filter.component';
 import { Filter } from '../filters.component';
+import { FilterValue } from '../../../services/_index';
 
 @Component({
     selector: 'grt-dropdown',
@@ -14,8 +15,16 @@ export class DropdownComponent extends FilterComponent {
         this.selected = [];
     }
 
-    updateFilterChange(selected) {
-        this.onFilterChange.emit({
+    onFilterValueSet(filterValue: FilterValue) {
+        if (filterValue && filterValue.type === 'multiple') {
+            this.selected = filterValue.values;
+        } else {
+            this.selected = [];
+        }
+    }
+
+    updateFilterChange(selected: boolean) {
+        this.filterChange.emit({
             dataType: 'text',
             field: this.filter.field,
             type: 'multiple',

@@ -1,5 +1,5 @@
-///<reference path="pivottable.d.ts"/>
-///<reference types="jqueryui"/>
+/// <reference path="pivottable.d.ts"/>
+/// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -14,7 +14,6 @@ import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
-
 
 @Component({
     selector: 'grt-analysis',
@@ -329,10 +328,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             const element = $event.currentTarget,
                 rowFilters = this.getRowFilters(element),
                 columnFilters = this.getColumnFilters(element);
-
             // TODO: Add the routing to results page
 
         });
+
+        // TODO: pvtTotal
     }
 
     private getElementByClass(htmlCollection: HTMLCollection, className: string) {

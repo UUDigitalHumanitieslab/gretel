@@ -17,7 +17,7 @@ import {
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
-import { StepComponent } from "../step.component";
+import { StepComponent } from '../step.component';
 
 const DebounceTime = 200;
 
@@ -68,7 +68,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     @Input()
-    public retrieveContext: boolean = false;
+    public retrieveContext = false;
 
     @Input()
     public inputSentence: string = null;
@@ -77,15 +77,15 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public xpathChange = new EventEmitter<string>();
 
     @Output()
-    public onChangeRetrieveContext = new EventEmitter<boolean>();
+    public changeRetrieveContext = new EventEmitter<boolean>();
 
     @Output()
-    public onPrev = new EventEmitter();
+    public prev = new EventEmitter();
 
     @Output()
-    public onNext = new EventEmitter();
+    public next = new EventEmitter();
 
-    public loading: boolean = true;
+    public loading = true;
 
     public treeXml?: string;
     public treeXmlUrl?: string;
@@ -93,10 +93,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
-    public validXPath: boolean = true;
-    public isModifyingXPath: boolean = false;
+    public validXPath = true;
+    public isModifyingXPath = false;
+    public isFiltering = false;
 
     public filters: Filter[] = [];
+    public filterValues: { [field: string]: FilterValue } = {};
 
     public columns = [
         { field: 'number', header: '#', width: '5%' },
@@ -124,7 +126,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        for (let subscription of this.subscriptions) {
+        for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
     }
@@ -136,7 +138,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     async showTree(result: Hit) {
         this.treeXml = undefined;
         this.treeSentence = result.highlightedSentence;
-        let { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        const { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
         this.treeXml = treeXml;
         this.treeXmlUrl = url;
     }
@@ -160,7 +162,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     public getFileNames() {
         const allNames = new Set(this.filteredResults.map((result) => result.fileId));
-        return Array.from(allNames).sort()
+        return Array.from(allNames).sort();
     }
 
     public copyXPath() {
@@ -172,18 +174,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         }
     }
 
-    public hideComponents(components: string[] | undefined = undefined) {
+    public hideComponents(components?: string[]) {
         if (components !== undefined) {
             this.hiddenComponents = Object.assign({}, ...components.map(name => {
-                return { [name]: true }
+                return { [name]: true };
             }));
         }
 
         this.filteredResults = this.filterHits(this.results);
     }
 
-    public filterChange(filterValues: FilterValue[]) {
-        this.filterValuesSubject.next(filterValues);
+    public filterChange(filterValues: { [field: string]: FilterValue }) {
+        this.filterValues = filterValues;
+        this.filterValuesSubject.next(Object.values(filterValues));
+        this.isFiltering = !!Object.keys(filterValues).length;
     }
 
     public print() {
@@ -205,6 +209,15 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.isModifyingXPath = false;
     }
 
+    public addFiltersXPath() {
+        this.customXPath = (this.xpath || this.customXPath) + '\n' +
+            this.resultsService.createMetadataFilterQuery(
+                Object.values(this.filterValues));
+        this.filterChange({});
+
+        this.xpathChange.next(this.customXPath);
+    }
+
     public customXPathChanged(valueEvent: ValueEvent) {
         this.validXPath = !valueEvent.error;
         if (this.validXPath) {
@@ -213,7 +226,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     toggleContext() {
-        this.onChangeRetrieveContext.emit(!this.retrieveContext);
+        this.changeRetrieveContext.emit(!this.retrieveContext);
     }
 
     /**
@@ -248,27 +261,26 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     private liveFilters() {
         return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
             .subscribe(([metadata, counts]) => {
-                let filters: Filter[] = [];
-                for (let filter of metadata) {
-                    if (filter.show) {
-                        let options: string[] = [];
-                        if (filter.field in counts) {
-                            for (let key of Object.keys(counts[filter.field])) {
+                const filters: Filter[] = [];
+                for (const item of metadata) {
+                    if (item.show) {
+                        const options: string[] = [];
+                        if (item.field in counts) {
+                            for (const key of Object.keys(counts[item.field])) {
                                 // TODO: show the frequency (the data it right here now!)
                                 options.push(key);
                             }
                         }
                         filters.push({
-                            field: filter.field,
-                            dataType: filter.type,
-                            filterType: filter.facet,
-                            minValue: filter.minValue,
-                            maxValue: filter.maxValue,
+                            field: item.field,
+                            dataType: item.type,
+                            filterType: item.facet,
+                            minValue: item.minValue,
+                            maxValue: item.maxValue,
                             options
                         });
                     }
                 }
-
                 this.filters = filters;
             });
     }
