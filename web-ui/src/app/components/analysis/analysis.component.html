@@ -2,7 +2,7 @@
     <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to analyse its properties.</p>
 </div>
 <div class="columns">
-    <div class="column">
+    <div class="column" [ngClass]="{'is-half': treeXml}">
         <h2 class="subtitle">XPath</h2>
         <div class="content">
             <grt-xpath-viewer [value]="xpath" [variables]="variables"></grt-xpath-viewer>
