@@ -9,7 +9,7 @@ import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, ReconstructorService, XPathAttribute, XpathAttributes } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
 import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
@@ -275,7 +275,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return parseInt(name.replace(className, ''), 10);
     }
 
-
     /**
      * Gets the columns by name containing the head elements
      *
@@ -296,7 +295,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         }
         return columns;
     }
-
 
     private getRowElements(element: HTMLElement) {
         const rows = {},
@@ -336,7 +334,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
         });
     }
-
 
     private getElementByClass(htmlCollection: HTMLCollection, className: string) {
         const result: Element[] = [];
