@@ -13,8 +13,8 @@ export class DateComponent extends FilterComponent {
     maxValue: Date;
 
     onFilterSet(filter: Filter) {
-        this.minValue = filter.minValue as Date;
-        this.maxValue = filter.maxValue as Date;
+        this.minValue = this.minValue || filter.minValue as Date;
+        this.maxValue = this.maxValue || filter.maxValue as Date;
     }
 
     onFilterValueSet(filterValue: FilterValue) {

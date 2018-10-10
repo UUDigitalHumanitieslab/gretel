@@ -12,7 +12,9 @@ export class DropdownComponent extends FilterComponent {
     public selected: string[];
 
     onFilterSet(filter: Filter) {
-        this.selected = [];
+        if (!this.selected) {
+            this.selected = [];
+        }
     }
 
     onFilterValueSet(filterValue: FilterValue) {

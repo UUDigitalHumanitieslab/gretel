@@ -11,7 +11,7 @@ import { FilterValue } from '../../../services/_index';
 export class TextComponent extends FilterComponent {
     public options: string[] = [];
 
-    private values: string[] = [];
+    public values: { [value: string]: boolean } = {};
 
     onFilterSet(filter: Filter) {
         this.options = filter.options.sort((a, b) => a.localeCompare(
@@ -25,7 +25,9 @@ export class TextComponent extends FilterComponent {
 
     onFilterValueSet(filterValue: FilterValue) {
         if (filterValue && filterValue.type === 'multiple') {
-            this.values = filterValue.values;
+            this.values = filterValue.values.reduce(
+                (dict, val) => ({ [val]: true, ...dict }),
+                {});
         }
     }
 
@@ -36,22 +38,23 @@ export class TextComponent extends FilterComponent {
             this.removeFromValues(value);
         }
 
+        const values = Object.keys(this.values).filter(val => this.values[val]);
         this.filterChange.emit({
             dataType: 'text',
             type: 'multiple',
             field: this.filter.field,
-            selected: this.values.length > 0,
-            values: this.values,
+            selected: values.length > 0,
+            values: values,
         });
     }
 
     addToValues(value: string) {
-        if (this.values.indexOf(value) < 0) {
-            this.values.push(value);
+        if (!this.values[value]) {
+            this.values[value] = true;
         }
     }
 
     removeFromValues(value) {
-        this.values = this.values.filter((x) => x !== value);
+        this.values[value] = false;
     }
 }

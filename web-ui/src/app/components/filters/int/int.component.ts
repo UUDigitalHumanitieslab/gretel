@@ -11,10 +11,11 @@ import { FilterValue } from '../../../services/results.service';
 export class IntComponent extends FilterComponent {
     public value: number;
 
-    rangeValues: number[];
+    rangeValues: number[] = [0, 0];
 
     onFilterSet(filter: Filter) {
-        this.rangeValues = [filter.minValue as number || 0, filter.maxValue as number || 0];
+        this.rangeValues = [this.rangeValues[0] || filter.minValue as number || 0,
+        this.rangeValues[1] || filter.maxValue as number || 0];
     }
 
     onFilterValueSet(filterValue: FilterValue) {

@@ -276,6 +276,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return results;
     }
 
+    /**
+     * Gets filters for an extracted xpath query
+     * @param id The variable name representing part of the query and the attribute name
+     * @param value The attribute value
+     */
     private getFilterForQuery(id, value): FilterByXPath {
         const [variable, attribute] = id.split('.');
         const attrSelector = `[@${attribute}="${value}"]`;
@@ -400,8 +405,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 });
             });
         });
-
-        // TODO: pvtTotal
     }
 
     private getElementByClass(htmlCollection: HTMLCollection, className: string) {

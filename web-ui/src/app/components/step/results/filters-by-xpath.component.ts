@@ -1,5 +1,5 @@
 import { Input, Component, EventEmitter, Output } from '@angular/core';
-import { FilterByXPath, FilterValues } from '../../../services/_index';
+import { FilterByXPath } from '../../../services/_index';
 
 @Component({
     selector: 'grt-filters-by-xpath',
