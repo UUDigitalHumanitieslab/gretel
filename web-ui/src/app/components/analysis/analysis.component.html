@@ -25,7 +25,7 @@
                 </div>
             </div>
         </h2>
-        <grt-tree-visualizer [xml]="treeXml" [display]="treeDisplay" [fullScreenButton]="false" (onDisplayChange)="treeDisplay = $event"></grt-tree-visualizer>
+        <grt-tree-visualizer [xml]="treeXml" [display]="treeDisplay" [fullScreenButton]="false" (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
     </div>
 </div>
 <div class="modal is-active" *ngIf="selectedVariable">
