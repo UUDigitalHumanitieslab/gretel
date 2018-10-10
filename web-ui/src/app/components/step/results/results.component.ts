@@ -14,7 +14,8 @@ import {
     MetadataValueCounts,
     ResultsService,
     TreebankService,
-    FilterValues
+    FilterValues,
+    FilterByXPath
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
@@ -106,6 +107,11 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
 
     public filters: Filter[] = [];
 
+    /**
+     * Filters on node properties created in the analysis component
+     */
+    public filterXPaths: FilterByXPath[] = [];
+
     public columns = [
         { field: 'number', header: '#', width: '5%' },
         { field: 'fileId', header: 'ID', width: '20%' },
@@ -137,6 +143,8 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
             filterValuesChange.previousValue !== filterValuesChange.currentValue)) {
             const values = Object.values(this.filterValues);
             this.filterValuesSubject.next(values);
+            this.filterXPaths = values.filter(
+                (val): val is FilterByXPath => val.type === 'xpath');
             this.isFiltering = values.length > 0;
         }
     }
@@ -157,6 +165,11 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
         const { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
         this.treeXml = treeXml;
         this.treeXmlUrl = url;
+    }
+
+    public deleteFilter(filterValue: FilterValue) {
+        const { [filterValue.field]: _, ...updated } = this.filterValues;
+        this.filterChange(updated);
     }
 
     public downloadResults() {

@@ -204,6 +204,9 @@ export class ResultsService {
                     filterQueries.push(`[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and\n\t(${
                         filter.values.map((v) => `@value="${escape(v)}"`).join(' or\n\t')})]]`);
                     break;
+                case 'xpath':
+                    filterQueries.push(`[${filter.xpath}]`);
+                    break;
             }
         }
         return filterQueries.join('\n');
@@ -387,7 +390,8 @@ export interface Hit {
 }
 
 
-export type FilterValue =
+export type FilterValue = FilterByField | FilterByXPath;
+export type FilterByField =
     FilterSingleValue
     | FilterRangeValue<string, 'date'>
     | FilterRangeValue<number, 'int'>
@@ -415,6 +419,14 @@ export interface FilterMultipleValues<T, U> {
     dataType: U;
     values: Array<T>;
     field: string;
+}
+
+export interface FilterByXPath {
+    /// The variable name + attribute e.g. $node1.pt
+    field: string;
+    type: 'xpath';
+    label: string;
+    xpath: string;
 }
 
 export interface TreebankCount {

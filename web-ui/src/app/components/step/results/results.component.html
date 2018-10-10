@@ -58,7 +58,8 @@
                     <div class="level-item" *ngIf="isFiltering">
                         <div class="field">
                             <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters." (click)="addFiltersXPath()">
+                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters."
+                                    (click)="addFiltersXPath()">
                                     <span class="is-large">
                                         <i class="fas fa-plus"></i>
                                         <i class="fas fa-filter"></i>
@@ -161,6 +162,7 @@
         </div>
     </div>
 </div>
+<grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
     <div class="column is-one-third is-hidden-print">
         <div class="filter">

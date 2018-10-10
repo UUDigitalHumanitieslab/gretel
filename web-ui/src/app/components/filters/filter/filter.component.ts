@@ -1,15 +1,15 @@
 import { EventEmitter, Input, Output } from '@angular/core';
 import { Filter } from '../filters.component';
-import { FilterValue } from '../../../services/_index';
+import { FilterByField } from '../../../services/_index';
 
-export type FilterChangeEvent = FilterValue & {
+export type FilterChangeEvent = FilterByField & {
     selected: boolean
 };
 
 export abstract class FilterComponent {
     private filterDefinition;
 
-    @Input('filterValue') set filterValue(value: FilterValue) {
+    @Input('filterValue') set filterValue(value: FilterByField) {
         this.onFilterValueSet(value);
     }
 
@@ -39,5 +39,5 @@ export abstract class FilterComponent {
     }
 
     abstract onFilterSet(filter: Filter);
-    abstract onFilterValueSet(filterValue: FilterValue);
+    abstract onFilterValueSet(filterValue: FilterByField);
 }

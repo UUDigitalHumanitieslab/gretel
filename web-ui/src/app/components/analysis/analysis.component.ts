@@ -11,7 +11,7 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, FilterValues, FilterValue } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, FilterValues, FilterValue, FilterByXPath } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 
@@ -29,7 +29,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     private metadata: { [field: string]: TreebankMetadata };
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
-    public variables: PathVariable[];
+    public variables: { [name: string]: PathVariable };
     public treeXml: string;
     public treeDisplay = 'inline';
 
@@ -81,13 +81,14 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     private initialize() {
         // TODO: on change
-        this.variables = this.extractinatorService.extract(this.xpath);
-        this.treeXml = this.reconstructorService.construct(this.variables, this.xpath);
-
+        const variables = this.extractinatorService.extract(this.xpath);
+        this.treeXml = this.reconstructorService.construct(variables, this.xpath);
+        this.variables = variables
+            .reduce((dict, variable) => ({ ...dict, [variable.name]: variable }), {});
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.
-        if (this.variables.length > 0) {
-            const firstVariable = this.variables[this.variables.length > 1 ? 1 : 0];
+        if (variables.length > 0) {
+            const firstVariable = variables[variables.length > 1 ? 1 : 0];
             this.selectedVariablesSubject.next([{
                 attribute: 'pt',
                 axis: 'row',
@@ -183,7 +184,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             this.selectedVariable = {
                 attribute: values.find(v => v === 'pt') || values.find(v => v === 'cat') || values[0],
                 axis,
-                variable: this.variables.find(v => v.name === variableName)
+                variable: this.variables[variableName]
             };
         });
     }
@@ -195,7 +196,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 const [metadata, hits] = await Promise.all([
                     this.treebankService.getMetadata(this.corpus),
                     this.resultsService.promiseAllResults(
-                        this.xpath, this.corpus, this.components, false, true, [], this.variables, this.cancellationToken)
+                        this.xpath, this.corpus, this.components, false, true, [], Object.values(this.variables), this.cancellationToken)
                 ]);
                 this.metadata = metadata.reduce((dict, item) => {
                     dict[item.field] = item;
@@ -253,8 +254,8 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      */
     private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: string) {
         const results: FilterValues = {};
-        for (const field of Object.keys(elementGroups)) {
-            const elements = elementGroups[field],
+        for (const id of Object.keys(elementGroups)) {
+            const elements = elementGroups[id],
                 spans = elements.map(v => ({
                     value: v.innerHTML,
                     size: v[spanName]
@@ -268,12 +269,22 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     break;
                 }
             }
-            if (field[0] !== '$') {
-                results[field] = this.getFilterValue(field, value);
-            }
-            // TODO: $node
+            results[id] = id[0] !== '$'
+                ? this.getFilterValue(id, value)
+                : this.getFilterForQuery(id, value);
         }
         return results;
+    }
+
+    private getFilterForQuery(id, value): FilterByXPath {
+        const [variable, attribute] = id.split('.');
+        const attrSelector = `[@${attribute}="${value}"]`;
+        return {
+            field: id,
+            label: variable + attrSelector,
+            type: 'xpath',
+            xpath: this.variables[variable].path.replace('$node/', '') + attrSelector
+        };
     }
 
     private getFilterValue(field: string, value: string): FilterValue {

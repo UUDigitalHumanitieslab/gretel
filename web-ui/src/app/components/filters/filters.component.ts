@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterValue, FilterValues } from '../../services/_index';
+import { FilterByField, FilterValues } from '../../services/_index';
 import { FilterChangeEvent } from './filter/filter.component';
 
 export interface Filter {
@@ -34,13 +34,13 @@ export class FiltersComponent {
         }
     }
 
-    private addToSelectedFilters(filterValue: FilterValue) {
+    private addToSelectedFilters(filterValue: FilterByField) {
         this.filterChange.emit(Object.assign({
             [filterValue.field]: filterValue
         }, this.filterValues));
     }
 
-    private removeFromSelectedFilters(filterValue: FilterValue) {
+    private removeFromSelectedFilters(filterValue: FilterByField) {
         const { [filterValue.field]: _, ...remaining } = this.filterValues;
         this.filterChange.emit(remaining);
     }
