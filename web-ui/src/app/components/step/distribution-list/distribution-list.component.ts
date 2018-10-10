@@ -41,15 +41,17 @@ export class DistributionListComponent implements OnChanges {
         // check that we have all the mappings available
         if (changes.corpus && (changes.corpus.firstChange || changes.corpus.currentValue != changes.corpus.previousValue)) {
             redoCounts = true;
-            this.componentProperties = this.treebankService.getSubTreebanks(this.corpus)
-                .then(components => {
+            this.componentProperties = this.treebankService.getComponentGroups(this.corpus)
+                .then(componentGroups => {
                     let properties = {};
-                    for (let component of components) {
-                        properties[component.component] = {
-                            databaseId: component.databaseId,
-                            sentenceCount: component.sentenceCount
-                        };
-                    }
+                    for (let componentGroup of componentGroups.groups)
+                        for (let variant of componentGroups.variants) {
+                            let component = componentGroup.components[variant];
+                            properties[component.component] = {
+                                databaseId: component.databaseId,
+                                sentenceCount: component.sentenceCount
+                            };
+                        }
                     return properties;
                 });
         }

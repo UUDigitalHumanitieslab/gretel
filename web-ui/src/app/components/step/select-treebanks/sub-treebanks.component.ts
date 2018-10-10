@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, } from '@angular/core';
 
 import { TreebankService } from '../../../services/_index';
-import { SubTreebank } from '../../../treebank';
+import { SubTreebank, ComponentGroup, FuzzyNumber } from '../../../treebank';
 
 @Component({
     selector: 'grt-sub-treebanks',
@@ -15,9 +15,23 @@ export class SubTreebanksComponent implements OnChanges {
      * Only show if any sub-treebank has a description available.
      */
     public showDescription: boolean;
+    /**
+     * All sub-treebanks
+     */
     public subTreebanks: SubTreebank[];
+    /**
+     * Sub-treebanks grouped by their group name, each should then
+     * contain one or more of the variants.
+     */
+    public componentGroups: ComponentGroup[];
+    public variants: string[];
+
     public totalSentenceCount: string;
     public totalWordCount: string;
+    public totalSentenceCountByGroup: { [group: string]: string };
+    public totalWordCountByGroup: { [group: string]: string };
+    public totalSentenceCountByVariant: { [variant: string]: string };
+    public totalWordCountByVariant: { [variant: string]: string };
 
     @Input() treebankName: string;
 
@@ -35,13 +49,18 @@ export class SubTreebanksComponent implements OnChanges {
         }
     }
 
-    changeSelected(subtree: SubTreebank, event?: Event) {
+    changeSelected(group: ComponentGroup, selectedVariant: string = null, event?: Event) {
+        let newSelection: { [component: string]: boolean } = {};
+        for (let variant of (selectedVariant ? [selectedVariant] : Object.keys(group.components))) {
+            const variantComponent = group.components[variant];
+            if (!variantComponent.disabled) {
+                newSelection[variantComponent.component] = !this.selectedTreebanks[variantComponent.component]
+            }
+        }
         this.selectedTreebanks = Object.assign(
             {},
             this.selectedTreebanks,
-            {
-                [subtree.component]: !this.selectedTreebanks[subtree.component]
-            });
+            newSelection);
 
         if (event) {
             event.preventDefault();
@@ -51,20 +70,41 @@ export class SubTreebanksComponent implements OnChanges {
             this.subTreebanks.filter(t => this.selectedTreebanks[t.component]));
     }
 
-    changeAllSelected(event: Event) {
+    changeAllSelected(event: Event, variant: string = null) {
         event.preventDefault();
 
-        let check = !this.isAllChecked();
-        let selected: SubTreebanksComponent['selectedTreebanks'] = {};
-        for (let subtree of this.subTreebanks) {
-            selected[subtree.component] = check;
+        let check = !this.isAllChecked(variant);
+        let selected = Object.assign({}, this.selectedTreebanks);
+        if (variant) {
+            for (let componentGroups of this.componentGroups) {
+                let component = componentGroups.components[variant];
+                if (component && !component.disabled) {
+                    selected[component.component] = check;
+                }
+            }
+        } else {
+            for (let subtree of this.subTreebanks) {
+                selected[subtree.component] = check;
+            }
         }
         this.selectedTreebanks = selected;
 
         this.setSelected(check ? this.subTreebanks : []);
     }
 
-    isAllChecked() {
+    isAllChecked(variant: string = null) {
+        if (variant) {
+            if (!this.componentGroups) {
+                return false;
+            }
+            for (let componentGroups of this.componentGroups) {
+                let component = componentGroups.components[variant];
+                if (!component.disabled && !this.selectedTreebanks[component.component]) {
+                    return false;
+                }
+            }
+            return true;
+        }
         if (!this.subTreebanks) {
             return false;
         }
@@ -77,18 +117,48 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     private updateTotals(subTreebanks: SubTreebank[]) {
+        type FuzzyCounts = { [group: string]: FuzzyNumber };
         let totalSentenceCount = new FuzzyNumber(0),
-            totalWordCount = new FuzzyNumber(0);
+            totalWordCount = new FuzzyNumber(0),
+            totalSentenceCountByGroup: FuzzyCounts = {},
+            totalWordCountByGroup: FuzzyCounts = {},
+            totalSentenceCountByVariant: FuzzyCounts = {},
+            totalWordCountByVariant: FuzzyCounts = {};
 
+        for (let group of this.componentGroups) {
+            totalSentenceCountByGroup[group.key] = new FuzzyNumber(0);
+            totalWordCountByGroup[group.key] = new FuzzyNumber(0);
+        }
+        for (let variant of this.variants) {
+            totalSentenceCountByVariant[variant] = new FuzzyNumber(0);
+            totalWordCountByVariant[variant] = new FuzzyNumber(0);
+        }
         for (let subTreebank of subTreebanks) {
             totalSentenceCount.add(subTreebank.sentenceCount);
+            totalSentenceCountByGroup[subTreebank.group].add(subTreebank.sentenceCount);
+            totalSentenceCountByVariant[subTreebank.variant].add(subTreebank.sentenceCount);
+
             totalWordCount.add(subTreebank.wordCount);
+            totalWordCountByGroup[subTreebank.group].add(subTreebank.wordCount);
+            totalWordCountByVariant[subTreebank.variant].add(subTreebank.wordCount);
         }
 
         this.totalSentenceCount = totalSentenceCount.toString();
         this.totalWordCount = totalWordCount.toString();
+        function mapFuzzyCounts(counts: FuzzyCounts) {
+            let result: { [key: string]: string } = {};
+            for (let key of Object.keys(counts)) {
+                result[key] = counts[key].toString();
+            }
+            return result;
+        }
 
+        this.totalSentenceCountByGroup = mapFuzzyCounts(totalSentenceCountByGroup);
+        this.totalWordCountByGroup = mapFuzzyCounts(totalWordCountByGroup);
+        this.totalSentenceCountByVariant = mapFuzzyCounts(totalSentenceCountByVariant);
+        this.totalWordCountByVariant = mapFuzzyCounts(totalWordCountByVariant);
     }
+
     private setSelected(subTreebanks: SubTreebank[]) {
         this.updateTotals(subTreebanks);
         this.onSelect.emit(subTreebanks);
@@ -100,52 +170,29 @@ export class SubTreebanksComponent implements OnChanges {
      */
     private getSubTreebanks(treebankName: string) {
         this.loading = true;
-        this.treebankService.getSubTreebanks(treebankName).then((subTreebanks) => {
+        this.treebankService.getComponentGroups(treebankName).then((componentGroups) => {
             // To keep track whether we selected the given sub-part of the treebank.
-            this.subTreebanks = subTreebanks;
+            this.componentGroups = componentGroups.groups;
+            this.variants = componentGroups.variants;
+            this.subTreebanks = componentGroups.groups.reduce((subTreebanks, group) =>
+                subTreebanks.concat(componentGroups.variants.map(variant => group.components[variant])
+                    .filter(component => !component.disabled)), []);
+
             this.showDescription = false;
             let selectedTreebanks: SubTreebanksComponent['selectedTreebanks'] = {};
-            for (let subTreebank of subTreebanks) {
+
+            for (let subTreebank of this.subTreebanks) {
                 selectedTreebanks[subTreebank.component] = true;
-                if (subTreebank.description) {
+            }
+            for (let group of componentGroups.groups) {
+                if (group.description) {
                     this.showDescription = true;
                 }
             }
             this.selectedTreebanks = selectedTreebanks;
-            this.setSelected(subTreebanks);
+            this.setSelected(this.subTreebanks);
             this.loading = false;
         });
     }
 }
 
-class FuzzyNumber {
-    public value = 0;
-    public unknown = false;
-    constructor(value: number | '?') {
-        if (value == '?') {
-            this.unknown = true;
-        } else {
-            this.value = value;
-        }
-    }
-
-    public add(value: number | '?') {
-        if (value == '?') {
-            this.unknown = true;
-        } else {
-            this.value += value;
-        }
-    }
-
-    public toString() {
-        if (this.unknown) {
-            if (this.value == 0) {
-                return '?'
-            } else {
-                return '≥ ' + this.value;
-            }
-        } else {
-            return this.value.toString();
-        }
-    }
-}

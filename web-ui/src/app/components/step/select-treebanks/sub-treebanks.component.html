@@ -4,46 +4,93 @@
     <table class="table is-hoverable is-fullwidth">
         <thead>
             <tr (click)="changeAllSelected($event)">
-                <th>
+                <th [attr.colspan]="variants.length">
                     <label class="checkbox">
-                        <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)"> Component
+                        <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)">
+                        Component
                     </label>
                 </th>
                 <th *ngIf="showDescription">
                     Description
                 </th>
-                <th class="has-text-right">
-                    Sentences
+                <ng-container *ngFor="let variant of variants">
+                    <th class="has-text-right">
+                        Sentences
+                    </th>
+                    <th class="has-text-right">
+                        Words
+                    </th>
+                </ng-container>
+                <ng-container *ngIf="variants.length > 1">
+                    <!-- for the total -->
+                    <th class="has-text-right">
+                        Sentences
+                    </th>
+                    <th class="has-text-right">
+                        Words
+                    </th>
+                </ng-container>
+            </tr>
+            <tr *ngIf="variants.length > 1">
+                <th *ngFor="let variant of variants">
+                    <label class="checkbox">
+                        <input type="checkbox" [checked]="isAllChecked(variant)" (change)="changeAllSelected($event, variant)">
+                        {{variant}}
+                    </label>
                 </th>
-                <th class="has-text-right">
-                    Words
+                <th *ngIf="showDescription">
+                    &nbsp;
+                </th>
+                <th *ngFor="let variant of variants" colspan="2" class="has-text-centered">
+                    {{variant}}
+                </th>
+                <th colspan="2" class="has-text-centered">
+                    Total
                 </th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let subtree of subTreebanks" (click)="changeSelected(subtree)">
-                <td>
-                    <label class="checkbox">
-                        <input type="checkbox" (change)="changeSelected(subtree, $event)" [checked]="selectedTreebanks[subtree.component]"> {{subtree.title}}
+            <tr *ngFor="let group of componentGroups" (click)="changeSelected(group)">
+                <td *ngFor="let variant of variants">
+                    <label class="checkbox" [attr.disabled]="group.components[variant].disabled || null">
+                        <input type="checkbox" (change)="changeSelected(group, variant, $event)" [checked]="selectedTreebanks[group.components[variant].component]" [disabled]="group.components[variant].disabled">
+                        {{group.components[variant].component}}
                     </label>
                 </td>
                 <td *ngIf="showDescription">
-                    {{subtree.description}}
+                    {{group.description}}
                 </td>
-                <td class="is-number">
-                    {{subtree.sentenceCount | formatNumber}}
-                </td>
-                <td class="is-number">
-                    {{subtree.wordCount | formatNumber}}
-                </td>
+                <ng-container *ngFor="let variant of variants">
+                    <td class="is-number">
+                        {{group.components[variant].sentenceCount | formatNumber}}
+                    </td>
+                    <td class="is-number">
+                        {{group.components[variant].wordCount | formatNumber}}
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="variants.length > 1">
+                    <th class="is-number">
+                        {{totalSentenceCountByGroup[group.key] | formatNumber}}
+                    </th>
+                    <th class="is-number">
+                        {{totalWordCountByGroup[group.key] | formatNumber}}
+                    </th>
+                </ng-container>
             </tr>
         </tbody>
         <tfoot>
             <tr>
-                <td></td>
-                <td *ngIf="showDescription"></td>
-                <td class="is-number">{{totalSentenceCount | formatNumber}}</td>
-                <td class="is-number">{{totalWordCount | formatNumber}}</td>
+                <td [attr.colspan]="variants.length + (showDescription ? 1 : 0)">
+                    &nbsp;
+                </td>
+                <ng-container *ngFor="let variant of variants">
+                    <td class="is-number">{{totalSentenceCountByVariant[variant] | formatNumber}}</td>
+                    <td class="is-number">{{totalWordCountByVariant[variant] | formatNumber}}</td>
+                </ng-container>
+                <ng-container *ngIf="variants.length > 1">
+                    <th class="is-number">{{totalSentenceCount | formatNumber}}</th>
+                    <th class="is-number">{{totalWordCount | formatNumber}}</th>
+                </ng-container>
             </tr>
         </tfoot>
     </table>
