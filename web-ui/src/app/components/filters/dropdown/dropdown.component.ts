@@ -25,13 +25,13 @@ export class DropdownComponent extends FilterComponent {
         }
     }
 
-    updateFilterChange(selected: boolean) {
+    updateFilterChange() {
         this.filterChange.emit({
             dataType: 'text',
             field: this.filter.field,
             type: 'multiple',
-            selected: selected,
-            values: this.selected
+            selected: this.selected.length > 0,
+            values: this.selected.concat([])
         });
     }
 }

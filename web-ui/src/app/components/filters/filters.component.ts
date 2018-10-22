@@ -35,9 +35,9 @@ export class FiltersComponent {
     }
 
     private addToSelectedFilters(filterValue: FilterByField) {
-        this.filterChange.emit(Object.assign({
+        this.filterChange.emit(Object.assign({}, this.filterValues, {
             [filterValue.field]: filterValue
-        }, this.filterValues));
+        }));
     }
 
     private removeFromSelectedFilters(filterValue: FilterByField) {

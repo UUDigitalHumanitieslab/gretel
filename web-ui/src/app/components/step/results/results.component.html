@@ -104,15 +104,15 @@
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                 <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()"
-                        grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
+                    <a class="button" role="button" (click)="downloadResults()" grtBalloonLength="large"
+                        grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
                         <span class="icon is-large">
                             <i class="fas fa-download"></i>
                         </span>
                     </a>
                 </p>
                 <p class="control">
-                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="medium"
+                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
                         grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                         <span class="icon is-large">
                             <i class="fas fa-file-alt"></i>
@@ -123,9 +123,8 @@
         </div>
         <div class="level-item">
             <div class="field">
-                <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()"
-                        grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Print Results">
+                <p class="control" grtBalloonPosition="down" grtBalloon="Print Results" [grtBalloonVisible]="loading ? false : undefined">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
                         </span>
@@ -136,13 +135,13 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="toggleContext()">
-                    <a class="button is-warning" role="button" grtBalloonLength="medium" grtBalloonPosition="down"
+                    <a class="button is-warning" role="button" grtBalloonLength="large" grtBalloonPosition="down"
                         grtBalloon="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-slash"></i>
                         </span>
                     </a>
-                    <a class="button is-primary" role="button" grtBalloonLength="medium" grtBalloonPosition="down"
+                    <a class="button is-primary" role="button" grtBalloonLength="large" grtBalloonPosition="down"
                         grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-dots"></i>
