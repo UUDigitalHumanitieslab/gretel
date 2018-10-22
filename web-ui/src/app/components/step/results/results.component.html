@@ -1,61 +1,84 @@
 <div class="columns is-desktop">
     <!-- XPATH -->
-    <div class="column xpath">
+    <div class="column">
         <h2 class="subtitle">
             <div class="level">
-                <div class="level-item level-left">
+                <div class="level-left">
                     XPath
                 </div>
-                <div class="level-item level-right is-hidden-print">
-                    <div class="field has-addons">
-                        <ng-container *ngIf="isModifyingXPath">
+                <div class="level-right is-hidden-print">
+                    <div class="level-item">
+                        <div class="field has-addons">
+                            <ng-container *ngIf="isModifyingXPath">
+                                <p class="control">
+                                    <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null"
+                                        grtBalloonPosition="down" grtBalloon="Save query" (click)="updateXPath()">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                                <p class="control">
+                                    <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Reset query"
+                                        (click)="resetXPath()">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-undo"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                            </ng-container>
+                            <ng-container *ngIf="!isModifyingXPath">
+                                <p class="control">
+                                    <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Edit query"
+                                        (click)="editXPath()">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                                <p class="control">
+                                    <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Download query"
+                                        (click)="downloadXPath()">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-download"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                                <p class="control">
+                                    <a class="button" role="button" grtBalloonPosition="down-right" grtBalloon="Copy query to the clipboard"
+                                        (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-copy"></i>
+                                        </span>
+                                    </a>
+                                </p>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="level-item" *ngIf="isFiltering">
+                        <div class="field">
                             <p class="control">
-                                <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null" grtBalloonPosition="down" grtBalloon="Save query" (click)="updateXPath()">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-check"></i>
+                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters."
+                                    (click)="addFiltersXPath()">
+                                    <span class="is-large">
+                                        <i class="fas fa-plus"></i>
+                                        <i class="fas fa-filter"></i>
                                     </span>
                                 </a>
                             </p>
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Reset query" (click)="resetXPath()">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-undo"></i>
-                                    </span>
-                                </a>
-                            </p>
-                        </ng-container>
-                        <ng-container *ngIf="!isModifyingXPath">
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Edit query" (click)="editXPath()">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-edit"></i>
-                                    </span>
-                                </a>
-                            </p>
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Download query" (click)="downloadXPath()">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-download"></i>
-                                    </span>
-                                </a>
-                            </p>
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down-right" grtBalloon="Copy query to the clipboard" (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
-                                    <span class="icon is-large">
-                                        <i class="fas fa-copy"></i>
-                                    </span>
-                                </a>
-                            </p>
-                        </ng-container>
+                        </div>
                     </div>
                 </div>
             </div>
         </h2>
-        <div class="content" *ngIf="!isModifyingXPath">
-            <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
-            <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+        <div class="xpath">
+            <div class="content" *ngIf="!isModifyingXPath">
+                <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
+                <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+            </div>
+            <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)"
+                autofocus="true"></grt-xpath-editor>
         </div>
-        <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></grt-xpath-editor>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
@@ -72,7 +95,7 @@
         <div class="level-item">
             <div class="field">
                 <p class="control">
-                    <a class="button" role="button" (click)="onPrev.next()">
+                    <a class="button" role="button" (click)="prev.next()">
                         Previous
                     </a>
                 </p>
@@ -81,14 +104,16 @@
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                 <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()"
+                        grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
                         <span class="icon is-large">
                             <i class="fas fa-download"></i>
                         </span>
                     </a>
                 </p>
                 <p class="control">
-                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
+                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="medium"
+                        grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                         <span class="icon is-large">
                             <i class="fas fa-file-alt"></i>
                         </span>
@@ -99,7 +124,8 @@
         <div class="level-item">
             <div class="field">
                 <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Print Results">
+                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()"
+                        grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Print Results">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
                         </span>
@@ -110,12 +136,14 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="toggleContext()">
-                    <a class="button is-warning" role="button" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
+                    <a class="button is-warning" role="button" grtBalloonLength="medium" grtBalloonPosition="down"
+                        grtBalloon="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-slash"></i>
                         </span>
                     </a>
-                    <a class="button is-primary" role="button" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
+                    <a class="button is-primary" role="button" grtBalloonLength="medium" grtBalloonPosition="down"
+                        grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-dots"></i>
                         </span>
@@ -126,7 +154,7 @@
         <div class="level-item">
             <div class="field">
                 <p class="control">
-                    <a class="button is-primary" role="button" (click)="onNext.next()">
+                    <a class="button is-primary" role="button" (click)="next.next()">
                         Next
                     </a>
                 </p>
@@ -134,10 +162,11 @@
         </div>
     </div>
 </div>
+<grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
     <div class="column is-one-third is-hidden-print">
         <div class="filter">
-            <grt-filters [filters]="filters" (filterChange)="filterChange($event)"></grt-filters>
+            <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)"></grt-filters>
         </div>
     </div>
     <div class="column">
@@ -169,7 +198,8 @@
             </p-table>
         </ng-container>
         <ng-template #warning>
-            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
+            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another
+                treebank or other xpath-query</div>
         </ng-template>
     </div>
 </div>

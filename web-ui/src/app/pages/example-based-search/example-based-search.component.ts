@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
+import { Component, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
-    GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
-    MatrixStep, TreebankSelection, AnalysisStep, Step, GlobalState
-} from "../multi-step-page/steps";
-import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
-import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
+    GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
+    MatrixStep, TreebankSelection, AnalysisStep, Step
+} from '../multi-step-page/steps';
+import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
 import { AlpinoService } from '../../services/_index';
-import { ActivatedRoute, Router } from "@angular/router";
+
 @Component({
     selector: 'grt-example-based-search',
     templateUrl: './example-based-search.component.html',
@@ -20,6 +20,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         subTreeXml: undefined,
         selectedTreebanks: undefined,
         currentStep: undefined,
+        filterValues: {},
         valid: true,
         xpath: undefined,
         loading: false,
@@ -56,27 +57,27 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     initializeCrumbs() {
         this.crumbs = [
             {
-                name: "Example",
+                name: 'Example',
                 number: 0,
             },
             {
-                name: "Parse",
+                name: 'Parse',
                 number: 1,
             },
             {
-                name: "Matrix",
+                name: 'Matrix',
                 number: 2,
             },
             {
-                name: "Treebanks",
+                name: 'Treebanks',
                 number: 3,
             },
             {
-                name: "Results",
+                name: 'Results',
                 number: 4,
             },
             {
-                name: "Analysis",
+                name: 'Analysis',
                 number: 5,
             },
         ];
@@ -90,7 +91,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.selectTreebanksComponent,
             this.resultsComponent,
             this.analysisComponent
-        ]
+        ];
     }
 
     encodeGlobalState(state: GlobalStateExampleBased) {

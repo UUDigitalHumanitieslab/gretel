@@ -31,6 +31,7 @@ import {
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     protected defaultGlobalState: GlobalState = {
         currentStep: undefined,
+        filterValues: {},
         retrieveContext: false,
         selectedTreebanks: undefined,
         xpath: `//node[@cat="smain"
@@ -99,11 +100,11 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         return {
             step: queryParams.currentStep || 0 as number,
             state:
-                {
-                    selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-                    xpath: queryParams.xpath || undefined,
-                    retrieveContext: this.decodeBool(queryParams.retrieveContext)
-                }
+            {
+                selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                xpath: queryParams.xpath || undefined,
+                retrieveContext: this.decodeBool(queryParams.retrieveContext)
+            }
         }
     }
 
