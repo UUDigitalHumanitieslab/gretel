@@ -19,11 +19,6 @@ $alpinoServerMode = false;
 $alpinoServerAddress = '';
 $alpinoServerPort = 0;
 
-// === ALPINO SERVER  MODE ===
-// set to 1 when using alpino in server modus
-$alpinoServerMode = 1;
-$alpinoServerAddress = 'url port';
-
 // === CHANGE PATH TO ALPINO DIRECTORY === //
 // Only when $alpinoServerMode = false
 $alpinoDirectory = ROOT_PATH.'/parsers/Alpino';
@@ -380,11 +375,6 @@ $databaseGroups = array(
   'api' => array(
     'machine' => 'machine',
     'port' => 0000,
-    'fullName' => 'LASSY Small',
-    'version' => '1.1',
-    'production' => 'written',
-    'language' => 'Dutch',
-    'multioption' => true,
   ),
 );
 

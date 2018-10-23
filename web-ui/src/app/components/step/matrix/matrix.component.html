@@ -1,12 +1,15 @@
 <h2 class="subtitle">Matrix</h2>
 <div class="content">
     <p>
-        In the matrix below, you can indicate the relevant parts of the construction, i.e. the lexical items that should be included
+        In the matrix below, you can indicate the relevant parts of the construction, i.e. the lexical items that
+        should be included
         in the query, as well as their level of abstraction. Your selection is visualized by means of the
-        <em>query tree</em> at the bottom of this page. The syntactic information provided by the parse in the previous step
+        <em>query tree</em> at the bottom of this page. The syntactic information provided by the parse in the previous
+        step
         is automatically included.
     </p>
-    <p>The advanced options offer more possibilities to modify your search instruction. You can also modify the generated
+    <p>The advanced options offer more possibilities to modify your search instruction. You can also modify the
+        generated
         <em>XPath query</em>, which will be used to do the actual treebank search.
     </p>
 </div>
@@ -28,7 +31,8 @@
                         </label>
                     </th>
                     <td *ngFor="let token of indexedTokens">
-                        <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)" [disabled]="isCustomXPath">
+                        <input type="radio" [checked]="tokenValues[token.index] == option" (change)="setTokenPart(token.index, option)"
+                            [disabled]="isCustomXPath">
                     </td>
                 </tr>
             </ng-container>
@@ -39,14 +43,16 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox">
-                <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced" [disabled]="alwaysAdvanced || isCustomXPath"> Enable advanced options
+                <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced" [disabled]="alwaysAdvanced || isCustomXPath">
+                Enable advanced options
             </label>
         </div>
     </div>
     <div class="level-item">
         <div class="field">
             <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
-                <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()"> Respect word order
+                <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()"> Respect
+                word order
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Only search for patterns that have the same word order as your input example.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
@@ -56,7 +62,8 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox">
-                <input type="checkbox" name="retrieveContext" [(ngModel)]="retrieveContext" (change)="emitChange()"> Include context in results
+                <input type="checkbox" name="retrieveContext" [(ngModel)]="retrieveContext" (change)="emitChange()">
+                Include context in results
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="In the results, show the sentence before and after the matching sentence to provide a broader context.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
@@ -66,7 +73,8 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
-                <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()"> Ignore properties of the dominating node
+                <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()"> Ignore
+                properties of the dominating node
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
@@ -84,7 +92,8 @@
                 <div class="level-item level-right">
                     <div class="field">
                         <p class="control" *ngIf="!isCustomXPath">
-                            <a class="button" grtBalloonPosition="left" grtBalloon="Edit query. This will disable the matrix." (click)="editXPath()">
+                            <a class="button" grtBalloonPosition="left" grtBalloon="Edit query. This will disable the matrix."
+                                (click)="editXPath()">
                                 <span class="icon is-large">
                                     <i class="fas fa-edit"></i>
                                 </span>
@@ -104,7 +113,8 @@
         </h2>
         <grt-xpath-viewer *ngIf="!isCustomXPath" (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
         <p-message *ngIf="isCustomXPath && warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
-        <grt-xpath-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)" autofocus="true"></grt-xpath-editor>
+        <grt-xpath-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)"
+            autofocus="true"></grt-xpath-editor>
     </div>
     <div class="column">
         <h2 class="subtitle">
@@ -114,7 +124,8 @@
                 </div>
                 <div class="level-item level-right is-hidden-print">
                     <p class="control">
-                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" grtBalloonPosition="left" grtBalloon="Full screen display of the tree.">
+                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" grtBalloonPosition="left"
+                            grtBalloon="Full screen display of the tree.">
                             <span class="icon is-large">
                                 <i class="fas fa-expand"></i>
                             </span>
@@ -125,8 +136,8 @@
         </h2>
         <p *ngIf="!subTreeXml;else tree">Loading ...</p>
         <ng-template #tree>
-            <grt-tree-visualizer [filename]="filename" [xml]="subTreeXml" [display]="subTreeDisplay" [fullScreenButton]="false" [showMatrixDetails]="true"
-                (displayChange)="subTreeDisplay = $event"></grt-tree-visualizer>
+            <grt-tree-visualizer [filename]="filename" [xml]="subTreeXml" [display]="subTreeDisplay" [fullScreenButton]="false"
+                [showMatrixDetails]="true" (displayChange)="subTreeDisplay = $event"></grt-tree-visualizer>
         </ng-template>
     </div>
 </div>
