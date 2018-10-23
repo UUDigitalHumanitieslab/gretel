@@ -126,7 +126,7 @@
         <p *ngIf="!subTreeXml;else tree">Loading ...</p>
         <ng-template #tree>
             <grt-tree-visualizer [filename]="filename" [xml]="subTreeXml" [display]="subTreeDisplay" [fullScreenButton]="false" [showMatrixDetails]="true"
-                (onDisplayChange)="subTreeDisplay = $event"></grt-tree-visualizer>
+                (displayChange)="subTreeDisplay = $event"></grt-tree-visualizer>
         </ng-template>
     </div>
 </div>
