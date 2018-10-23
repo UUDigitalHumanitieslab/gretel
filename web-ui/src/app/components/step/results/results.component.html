@@ -55,11 +55,10 @@
                             </ng-container>
                         </div>
                     </div>
-                    <div class="level-item" *ngIf="isFiltering">
+                    <div class="level-item" *ngIf="activeFilterCount">
                         <div class="field">
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters."
-                                    (click)="addFiltersXPath()">
+                            <p class="control" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters.">
+                                <a class="button badge" [attr.data-badge]="activeFilterCount" role="button" (click)="addFiltersXPath()">
                                     <span class="is-large">
                                         <i class="fas fa-plus"></i>
                                         <i class="fas fa-filter"></i>

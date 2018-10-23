@@ -2,6 +2,9 @@
     <ng-container *ngIf="filter">
         <p class="panel-heading">
             {{filter.field}}
+            <span class="icon has-text-primary" *ngIf="filterValues[filter.field]">
+                <i class="fas fa-filter"></i>
+            </span>
         </p>
         <ng-container [ngSwitch]="filter.filterType">
             <grt-text *ngSwitchCase="'checkbox'" [filter]="filter" [filterValue]="filterValues[filter.field]" (filterChange)="filterChanged($event)"></grt-text>
