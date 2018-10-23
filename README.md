@@ -78,10 +78,8 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 
 ## Credits
 
-* [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/): concept and initial implementation;
-* [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
+* [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/) and [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
 * [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
-* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel): additional GrETEL 4 functionality and improvements;
-* [Gerson Foks](https://www.uu.nl/staff/GFoks): additional GrETEL 4 functionality and improvements;
+* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel), [Gerson Foks](https://www.uu.nl/staff/GFoks) and [Jelte van Boheemen](https://www.uu.nl/medewerkers/JvanBoheemen): additional GrETEL 4 functionality and improvements;
 * Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.

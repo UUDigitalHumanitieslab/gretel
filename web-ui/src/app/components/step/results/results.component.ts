@@ -298,6 +298,13 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
                                 options.push(key);
                             }
                         }
+
+                        if (item.facet === 'checkbox' && options.length > 8) {
+                            // use a dropdown instead of checkboxes when there
+                            // are too many options
+                            item.facet = 'dropdown';
+                        }
+
                         filters.push({
                             field: item.field,
                             dataType: item.type,

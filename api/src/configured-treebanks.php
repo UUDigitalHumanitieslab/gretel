@@ -33,15 +33,37 @@ function getConfiguredTreebanks()
                     $components[$component_name] = $component_description;
                 }
 
-                $title = array_key_exists('title', $settings) ? $settings['title'] : $corpus;
-                $description = array_key_exists('description', $settings) ? $settings['description'] : '';
+                $title = array_key_exists('fullName', $settings) ? $settings['fullName'] : $corpus;
+
+                if (array_key_exists('production', $settings)) {
+                    $description = $settings['production'];
+                } else {
+                    $description = '';
+                }
+                if (array_key_exists('language', $settings)) {
+                    $description .= ' '.$settings['language'];
+                }
+                if (array_key_exists('version', $settings)) {
+                    $description .= ' - version '.$settings['version'];
+                }
                 $metadata = array_key_exists('metadata', $settings) ? $settings['metadata'] : array();
-                $configured_treebanks[$corpus] = array(
+                $corpus_definition = array(
                     'title' => $title,
                     'description' => $description,
                     'components' => $components,
                     'metadata' => $metadata,
+                    'multioption' => $multioption,
                 );
+
+                if (array_key_exists('groups', $settings)) {
+                    $corpus_definition['groups'] = $settings['groups'];
+                }
+
+                if (array_key_exists('variants', $settings)) {
+                    $corpus_definition['variants'] = $settings['variants'];
+                }
+
+                $configured_treebanks[$corpus] = $corpus_definition;
             } else {
                 // TODO: this is a grinded database
             }
