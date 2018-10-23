@@ -197,10 +197,10 @@
         </ng-container>
         <ng-template #warning>
             <div *ngIf="!loading" class="notification is-warning">
-                <ng-container *ngIf="activeFilterCount">No results found, please try again with another treebank, other
-                    xpath-query or change the filters.</ng-container>
-                <ng-container *ngIf="activeFilterCount == 0">No results found, please try again with another treebank
-                    or other xpath-query.</ng-container>
+                <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
+                    with another treebank, other xpath-query or change the filters.</ng-container>
+                <ng-template #noActiveFilters>No results found, please try again with another treebank or other
+                    xpath-query.</ng-template>
             </div>
         </ng-template>
     </div>
