@@ -8,18 +8,20 @@
 @import "tv-buttons";
 @import "clearfix";
 
+%fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 :host ::ng-deep {
-    .tree-visualizer,
-    .tree-visualizer-fs {
+    .tv {
         box-sizing: border-box;
         color: $text_main;
         text-align: center;
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
 
         button {
             outline: 0;
@@ -27,111 +29,87 @@
         }
 
         .tv-error {
-            margin-top: 24px;
+            display: none;
             padding: 8px 16px;
             background: $error;
             color: white;
             text-align: center;
             text-shadow: 0 1px rgba(0, 0, 0, 0.32);
             line-height: 1.75;
-            display: inline-block;
 
             p {
                 margin: 0;
             }
         }
 
-        .tree {
-            overflow: auto;
+        .tv-content-wrapper {
+            width: 100%;
+            height: 100%;
+            background: #f7f7f7;
             display: flex;
-            box-sizing: content-box;
+            flex-direction: column;
+            border-radius: 4px;
+            overflow: hidden;
+            font-size: 12px;
+        }
 
-            + .tooltip {
-                position: fixed;
-                top: -100%;
-                left: 0;
-                z-index: 11;
-                padding: 12px;
-                border: 6px solid white;
-                background: darken(#F5F5F5, 2%);
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-                text-align: left;
+        .tv-toolbar-wrapper {
+            background: #f0f0f0;
+            padding: 12px;
+        }
 
-                > ul {
-                    padding: 0 8px;
-                    list-style: none;
-                    columns: 2;
-                    column-gap: 24px;
-                    column-rule: 1px solid $tree_branch;
+        .tv-sentence-wrapper {
+            display: none;
+            text-align: left;
+            margin-right: 24px;
+            border-bottom: 3px solid #ddd;
+            font-size: 14px;
 
-                    li {
-                        white-space: nowrap;
-                    }
-                }
-
-                &:after {
-                    position: absolute;
-                    bottom: -24px;
-                    left: 50%;
-                    margin-left: -24px;
-                    width: 0;
-                    height: 0;
-                    border: 12px solid;
-                    border-color: transparent transparent white white;
-                    box-shadow: -6px 6px 6px -2px rgba(0, 0, 0, 0.2);
-                    content: "";
-                    transform: rotate(-45deg);
-                    transform-origin: 0 0;
-                }
-
-                button {
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 30px;
-                    height: 30px;
-                    border: 0;
-                    border-radius: 50%;
-                    background: $error;
-                    color: white;
-                    text-align: center;
-                    font-size: 14px;
-                    line-height: 1;
-                    transition: transform 200ms;
-                    transform: translate(50%, -50%);
-
-                    &:hover {
-                        background: darken($error, 4%);
-                        transform: translate(50%, -50%) scale(1.23);
-                    }
-
-                    &:active {
-                        background: darken($error, 8%);
-                    }
-                }
+            &.has-sentence {
+                display: flex;
             }
+
+            /* Hackish way to perfectly align sentence and icon */
+            i::after {
+                content: '';
+                display: inline-block;
+                height: 100%;
+                vertical-align: middle;
+            }
+
+            i {
+                font-size: 148%;
+                color: #ddd;
+                margin-right: 0.48em;
+            }
+        }
+
+        .tv-tree {
+            display: flex;
+            overflow: auto;
+            align-items: center;
+            /* If we use 0% a minifer will cut off %, which leads to another effect */
+            flex: 1 0 0.00000001%;
 
             ol {
                 position: relative;
                 display: table;
                 padding-top: 1em;
 
-                ol:before {
+                ol::before {
                     position: absolute;
                     top: 0;
                     left: 50%;
                     width: 0;
                     height: 1em;
                     border-left: 1px solid $tree_branch;
-                    content: "";
+                    content: '';
                 }
             }
 
-            > ol {
-                padding-top: 0;
-
-                /* Center inside flexbox */
+            >ol {
                 margin: auto;
+                padding: 6em 1.26em 1.26em;
             }
 
             li {
@@ -142,35 +120,35 @@
                 vertical-align: top;
                 text-align: center;
 
-                &:after,
-                &:before {
+                &::after,
+                &::before {
                     position: absolute;
                     top: 0;
                     right: 50%;
                     width: 50%;
                     height: 1em;
                     border-top: 1px solid $tree_branch;
-                    content: "";
+                    content: '';
                 }
 
-                &:after {
+                &::after {
                     right: auto;
                     left: 50%;
                     border-left: 1px solid $tree_branch;
                 }
 
                 &.first-child {
-                    &:before {
+                    &::before {
                         border: 0 none;
                     }
                 }
 
                 &.last-child {
-                    &:before {
+                    &::before {
                         border-right: 1px solid $tree_branch;
                     }
 
-                    &:after {
+                    &::after {
                         border: 0 none;
                     }
                 }
@@ -178,47 +156,104 @@
                 &.only-child {
                     padding-top: 0;
 
-                    &:after,
-                    &:before {
+                    &::after,
+                    &::before {
                         display: none;
                     }
                 }
 
                 &.highlight {
-                    a, a.only-child {
-                        border-color: $tree_branch;
+
+                    a,
+                    a.only-child {
+                        border-color: transparent;
                         background: $tree_branch;
                         color: white;
-                        text-shadow: none;
 
                         &:hover {
-                            border-color: darken($tree_branch, 10%);
-                            background: darken($tree_branch, 10%);
-                            color: darken($text_main, 10%);
+                            background: $tree_highlight;
+                            color: white;
 
-                            &.hovered span:nth-child(2),
-                            &:hover span:nth-child(2) {
+                            span:nth-child(2) {
                                 color: darken($text_main, 10%);
                             }
                         }
                     }
                 }
 
+                &.excluded {
+
+                    &::after,
+                    &::before {
+                        border-top: 1px dotted red;
+                    }
+
+                    &::after {
+                        border-left: 1px dotted red;
+                    }
+
+                    &.first-child {
+                        &::before {
+                            border: 0 none;
+                        }
+                    }
+
+                    &.last-child {
+                        &::before {
+                            border-right: 1px dotted red;
+                        }
+
+                        &::after {
+                            border: 0 none;
+                        }
+                    }
+
+                    a {
+                        span {
+                            opacity: 0.36;
+                        }
+
+                        &::before {
+                            position: absolute;
+                            top: 0;
+                            top: 50%;
+                            left: 0;
+                            width: 100%;
+                            color: #cd2b2b;
+                            content: 'NOT';
+                            text-align: center;
+                            font-size: 120%;
+                            transition: transform 200ms;
+                            transform: translateY(-50%) scale(1);
+                        }
+
+                        &:hover {
+                            span {
+                                opacity: 1;
+                            }
+
+                            &::before {
+                                transform: translateY(-50%) scale(0);
+                                pointer-events: none;
+                            }
+                        }
+
+                        &.hovered {
+                            background-color: rgba(142, 127, 107, 0.36);
+                        }
+                    }
+                }
+
                 a {
+                    position: relative;
+                    z-index: 2;
                     display: inline-block;
                     padding: 0.5em 1em;
                     border: 1px solid $tree_branch;
-                    border-bottom: 2px solid lighten($tree_branch, 8%);
                     border-radius: 4em;
                     background: white;
                     color: $text_main;
                     text-decoration: none;
-                    position: relative;
-                    z-index: 2;
-
-                    &:hover {
-                        font-weight: normal;
-                    }
 
                     span:nth-child(2) {
                         color: $text_main;
@@ -226,49 +261,55 @@
                     }
 
                     &.hovered,
-                    &:hover,
-                    &:hover + ol li a {
-                        border: 1px solid $tree_highlight;
-                        border-bottom-width: 2px;
+                    &:hover {
+                        background: #ccc;
+
+                        +ol li a {
+                            background: #ccc;
+                        }
+
+                        +ol li.highlight a,
+                        +ol li.highlight a.only-child {
+                            background: $tree_highlight;
+                            color: white;
+                        }
+
+                        +ol li a span:nth-child(2),
+                        span:nth-child(2) {
+                            color: white;
+                        }
+                    }
+
+                    &.hovered {
+                        border-color: rgba(0, 0, 0, 0);
+                        background: $tree_hovered;
+                        color: #FFF !important;
+                    }
+
+                    &.hovered+ol li.highlight a span:nth-child(2),
+                    &:hover+ol li.highlight a span:nth-child(2) {
+                        color: darken($text_main, 10%);
+                    }
+
+                    &.hovered+ol li a.only-child,
+                    &:hover+ol li a.only-child {
+                        background: #ccc;
+                        color: white;
+                    }
+
+                    &.hovered+ol li.highlight a.only-child,
+                    &:hover+ol li.highlight a.only-child {
                         background: $tree_highlight;
                         color: white;
                     }
 
-                    &:hover + ol li.highlight a, &:hover + ol li.highlight a.only-child {
-                        border-color: darken($tree_branch, 10%);
-                        background: darken($tree_branch, 10%);
-                        color: darken($text_main, 10%);
-                        text-shadow: none;
-                    }
+                    &.hovered+ol,
+                    &:hover+ol {
 
-                    &.hovered span:nth-child(2),
-                    &:hover + ol li a span:nth-child(2),
-                    &:hover span:nth-child(2) {
-                        color: white;
-                    }
-
-                    &:hover + ol li.highlight a span:nth-child(2) {
-                        color: darken($text_main, 10%);
-                    }
-
-                    &:hover + ol li a.only-child {
-                        border: 1px solid darken($tree_highlight, 15%);
-                        border-bottom-width: 2px;
-                        background: darken($tree_highlight, 15%);
-                        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
-                    }
-
-                    &:hover + ol li.highlight a.only-child {
-                        border-color: darken($tree_branch, 5%);
-                        background: darken($tree_branch, 5%);
-                        text-shadow: none;
-                    }
-
-                    &:hover + ol {
-                        &:before,
-                        li:after,
-                        li:before,
-                        ol:before {
+                        &::before,
+                        li::after,
+                        li::before,
+                        ol::before {
                             border-color: lighten($tree_highlight, 10%);
                         }
                     }
@@ -277,13 +318,30 @@
                         color: $tree_highlight;
                         font-weight: bold;
 
-                        &.hovered,
-                        &:hover {
-                            border: 1px solid darken($tree_highlight, 12%);
-                            border-bottom-width: 2px;
-                            background: darken($tree_highlight, 12%);
-                            color: white;
-                            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+                        &:hover:not(.hovered) {
+                            span:first-child {
+                                color: #565656;
+                            }
+                        }
+                    }
+
+                    &.cs~.word em {
+                        cursor: help;
+
+                        &::before {
+                            margin-right: 0.36em;
+                            color: #222;
+                            content: '\f031';
+                            @extend %fa;
+                        }
+                    }
+
+                    &.ignored {
+                        opacity: 0.67;
+                        cursor: help;
+
+                        +ol::before {
+                            border-left: 1px dotted #ccc;
                         }
                     }
                 }
@@ -294,27 +352,104 @@
                 }
             }
         }
+
+        .tv-tooltip {
+            position: fixed;
+            top: -100%;
+            left: 0;
+            z-index: 11;
+            padding: 10px;
+            border: 5px solid white;
+            border-radius: 5px;
+            background: darken(#F5F5F5, 2%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            text-align: left;
+
+            .arrow {
+                position: relative;
+                top: 15px;
+                z-index:12;
+                box-sizing: border-box;
+                background: white;
+                box-shadow: 0px 3px 3px 0 rgba(0, 0, 0, 0.2);
+            
+                &::after {
+                    content: "";
+                    position: absolute;
+                    width: 0;
+                    height: 0;
+                    left: 50%;
+                    box-sizing: border-box;
+                    border: 12px solid black;
+                    border-color: transparent transparent white white;
+                    transform-origin: 0 0;
+                    transform: rotate(-45deg);
+                    box-shadow: -3px 3px 3px 0 rgba(0, 0, 0, 0.2);
+                }
+            }
+
+            >ul {
+                padding: 0 8px;
+                list-style: none;
+                columns: 2;
+                column-gap: 24px;
+                column-rule: 1px solid #ccc;
+
+                li {
+                    white-space: nowrap;
+                }
+            }
+
+            button {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 30px;
+                height: 30px;
+                border: 0 none;
+                border-radius: 50%;
+                background: #DF5F5F;
+                color: white;
+                text-align: center;
+                font-size: 14px;
+                line-height: 1;
+                transition: transform 200ms;
+                transform: translate(50%, -50%);
+
+                &:hover {
+                    background: darken(#DF5F5F, 4%);
+                    transform: translate(50%, -50%) scale(1.23);
+                }
+
+                &:active {
+                    background: darken(#DF5F5F, 8%);
+                }
+            }
+        }
     }
 
     .tree-visualizer {
-        .tree {
-            margin: 24px auto;
-            padding: 24px;
-            min-height: 240px;
-            border: 6px solid white;
-            background: darken(#F5F5F5, 2%);
-            font-size: 12px;
+        position: relative;
 
-            + .tooltip {
+        .tv-content-wrapper {
+            min-height: 240px;
+
+            .tv-tree {
+                padding: 24px;
+            }
+
+            .tv-tooltip {
                 z-index: 9;
             }
         }
 
         .tv-show-fs {
             display: block;
-            margin: 24px auto;
-
-            @extend %button;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            text-align: center;
+            margin-left: auto;
         }
     }
 
@@ -323,151 +458,125 @@
         top: 0;
         left: 0;
         z-index: 10;
-        padding: 72px 48px;
-        width: 100%;
-        height: 100%;
+        display: none;
+        padding: 24px;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
 
-        .sentence {
-            background: darken(#F5F5F5, 5%);
-            border-bottom: 1px solid $tree_branch;
-            padding: 12px;
-            line-height: 1.6;
-            width: 100vw;
+        .tv-sentence-wrapper {
+            font-size: 16px;
         }
 
-        .tree {
-            position: relative;
-            z-index: 11;
-            padding: 12px;
-            min-width: 480px;
-            min-height: 180px;
-            background: #F5F5F5;
+        .tv-content-wrapper {
+            font-size: 14px;
+        }
 
-            &.small {
-                overflow-y: scroll;
-
+        .tv-tree {
+            &.tv-small {
                 a {
                     transition: transform 150ms;
                     will-change: transform;
 
-                    &:hover, &.hovered {
-                        transform: scale(2);
+                    &.hovered,
+                    &:hover {
                         z-index: 3;
                         border-color: transparent !important;
+                        background: $tree_hovered;
+                        color: #FFF !important;
+                        transform: scale(2);
                     }
 
                     &.only-child {
-                        ~ span {
-                            transition: transform 150ms;
+                        transition: transform 150ms, margin-bottom 200ms;
+
+                        ~span {
+                            transition: transform 150ms, margin-top 200ms;
                         }
 
-                        &:hover, &.hovered {
+                        &.hovered,
+                        &:hover {
                             margin-bottom: 2em;
 
-                            ~ span {
-                                transform: scale(2);
-                                margin-top: 1.5em;
+                            ~span {
                                 z-index: 3;
+                                margin-top: 1.5em;
+                                transform: scale(2);
                             }
                         }
                     }
                 }
             }
 
-            &.x-small {
+            &.tv-x-small {
                 a {
-                    &:hover, &.hovered {
+
+                    &.hovered,
+                    &:hover {
                         transform: scale(3);
-                        text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
                     }
 
                     &.only-child {
-                        &:hover, &.hovered {
-                            margin-bottom: 5em;
-                            text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
 
-                            ~ span {
-                                transform: scale(3);
+                        &.hovered,
+                        &:hover {
+                            margin-bottom: 5em;
+
+                            ~span {
                                 margin-top: 3em;
+                                transform: scale(3);
                             }
                         }
                     }
                 }
             }
         }
+    }
 
-        .zoom-opts {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 9;
-            padding: 12px;
-            background: #F5F5F5;
-            opacity: 0.7;
-            transition: opacity 200ms;
-            will-change: opacity;
+    body {
+        &.tv-fs-open {
+            overflow-y: hidden;
 
-            @extend %clearfix;
-
-            &:hover {
-                z-index: 12;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-                opacity: 1;
+            .tree-visualizer-fs {
+                display: block;
             }
 
-            button {
-                position: relative;
-                float: left;
-                margin-right: 1px;
-                padding: 0;
-                width: 36px;
-                height: 36px;
+            &.tv-is-loading {
+                .tree-visualizer-fs {
 
-                @extend %button;
-
-                &.close {
-                    margin-right: 0;
-                    margin-left: 12px;
-                    width: 34px;
-                    height: 34px;
-                    border: 2px solid $error;
-                    border-radius: 50%;
-                    background: transparent;
-                    color: $error;
-                    text-shadow: none;
-                    line-height: 1;
-                    transition: transform 200ms;
-
-                    &:hover {
-                        background: $error;
-                        color: white;
-                        transform: scale(1.23);
-                    }
-
-                    &:active {
-                        top: auto;
-                        border: 2px solid darken($error, 8%);
-                        background: darken($error, 8%);
+                    .tv-tooltip,
+                    .tv-tree {
+                        display: none;
                     }
                 }
+            }
+        }
 
-                &.zoom-default {
-                    padding: 0 8px;
-                    width: auto;
-                    border-radius: 0;
+        &.tv-ns-open {
+            &.tv-is-loading {
+                .tree-visualizer {
+                    pointer-events: none;
+                    opacity: 0.34;
+                }
+            }
+        }
+
+        &.tv-fail {
+            .tv {
+                .tv-content-wrapper {
+                    display: none;
                 }
 
-                &:first-child {
-                    border-radius: 3px 0 0 3px;
+                .tv-error {
+                    display: inline-block;
                 }
+            }
+        }
 
-                &:nth-child(3) {
-                    border-radius: 0 3px 3px 0;
+        &.tv-success {
+            .tv {
+                .tv-error {
+                    display: none;
                 }
             }
         }

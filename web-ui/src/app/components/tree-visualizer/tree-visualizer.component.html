@@ -1,1 +1,114 @@
-<div #output></div>
+<div #output>
+    <div #inline class="tree-visualizer tv" *ngIf="display != 'fullscreen'">
+        <div class="tv-error">
+            <p></p>
+        </div>
+        <div class="tv-content-wrapper">
+            <div class="tv-toolbar-wrapper" *ngIf="fullScreenButton || sentence">
+                <div class="tv-sentence-wrapper">
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                    <span></span>
+                </div>
+                <button class="tv-show-fs" grtBalloonPosition="left" grtBalloon="Open the tree in full screen mode" type="button" *ngIf="fullScreenButton">
+                    <i class="fa fa-loaded fa-fw fa-arrows-alt"></i>
+                    <span class="sr-only">Open in fullscreen</span>
+                </button>
+            </div>
+            <div class="tv-tree">
+            </div>
+
+            <aside class="tv-tooltip" style="display: none">
+                <ul></ul>
+                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button"><i class="fa fa-loaded fa-fw fa-times"></i><span class="sr-only">Close</span></button>
+                <span class="arrow"></span>
+            </aside>
+            
+            
+        </div>
+    </div>
+    <div class="tree-visualizer-fs tv tv-fs">
+        <div class="tv-error">
+            <p></p>
+        </div>
+        <div class="tv-content-wrapper">
+            <div class="tv-toolbar-wrapper level">
+                <div class="tv-sentence-wrapper level-left">
+                    <i class="level-item fas fa-comment-dots" aria-hidden="true"></i>
+                    <span class="level-item"></span>
+                </div>
+                <div class="level-item">
+                    <nav class="tv-navigation-wrapper">
+                        <button class="tv-prev-tree" type="button" grtBalloonPosition="down" grtBalloon="Show previous tree">
+                            <i class="fa fa-loaded fa-fw fa-chevron-left" aria-hidden="true"></i>
+                            <span class="sr-only">Previous tree</span>
+                        </button>
+                        <button class="tv-next-tree" type="button" grtBalloonPosition="down" grtBalloon="Show next tree">
+                            <i class="fa fa-loaded fa-fw fa-chevron-right" aria-hidden="true"></i>
+                            <span class="sr-only">Next tree</span>
+                        </button>
+                    </nav>
+                </div>
+                <div class="tv-zoom-wrapper level-right">
+                    <div class="level-item">
+                        <div class="field">
+                            <p class="control">
+                                <a *ngIf="url;else downloadButton" class="button" [href]="url" target="_blank" grtBalloonPosition="down" grtBalloon="Show XML">
+                                    <span class="icon is-large">
+                                        <i class="fas fa-file-code" aria-hidden="true"></i>
+                                    </span>
+                                    <span>Show XML</span>
+                                </a>
+                                <ng-template #downloadButton>
+                                    <span class="button" (click)="downloadXml()" grtBalloonPosition="down" grtBalloon="Download XML" rel="button">
+                                        <span class="icon is-large">
+                                            <i class="fas fa-file-code" aria-hidden="true"></i>
+                                        </span>
+                                        <span>Download XML</span>
+                                    </span>
+                                </ng-template>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="level-item">
+                        <div class="field is-grouped">
+                            <div class="tv-zoom-opts field has-addons">
+                                <p class="control">
+                                    <button class="tv-zoom-out button" type="button">
+                                        <i class="fas fa-search-minus" aria-hidden="true"></i>
+                                        <span class="sr-only">Zoom out</span>
+                                    </button>
+                                </p>
+                                <p class="control">
+                                    <button class="tv-zoom-default button is-primary" type="button">Default</button>
+                                </p>
+                                <p class="control">
+                                    <button class="tv-zoom-in button" type="button">
+                                        <i class="fas fa-search-plus" aria-hidden="true"></i>
+                                        <span class="sr-only">Zoom in</span>
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="level-item">
+                        <div class="field">
+                            <p class="control">
+                                <button grtBalloonPosition="down-right" grtBalloon="Close fullscreen mode" type="button" class="tv-close-fs button is-danger">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tv-tree">
+            </div>
+            <aside class="tv-tooltip" style="display: none">
+                <ul></ul>
+                <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button"><i class="fa fa-loaded fa-fw fa-times"></i><span class="sr-only">Close</span></button>
+                <span class="arrow"></span>
+            </aside>
+            
+        </div>
+    </div>
+</div>
