@@ -1,5 +1,6 @@
-<div class="notification is-primary">
-    <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to analyse its properties.</p>
+<div class="notification is-primary" *ngIf="!isLoading">
+    <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to
+        analyse its properties.</p>
 </div>
 <div class="columns">
     <div class="column" [ngClass]="{'is-half': treeXml}">
@@ -16,7 +17,8 @@
                 </div>
                 <div class="level-item level-right is-hidden-print">
                     <p class="control">
-                        <a class="button" role="button" (click)="treeDisplay = 'both'" grtBalloonPosition="left" grtBalloon="Full screen display of the tree.">
+                        <a class="button" role="button" (click)="treeDisplay = 'both'" grtBalloonPosition="left"
+                            grtBalloon="Full screen display of the tree.">
                             <span class="icon is-large">
                                 <i class="fas fa-expand"></i>
                             </span>
@@ -56,4 +58,9 @@
     <button class="modal-close is-large" aria-label="close" (click)="cancelVariable()"></button>
 </div>
 <h1 class="title">Analysis Table</h1>
-<div class="analysis-component box" [ngClass]="{'is-loading': isLoading}"></div>
+<div class="box" [ngClass]="{'is-loading': isLoading}">
+    <div class="content" *ngIf="!isLoading">
+        <p>Click on a cell in the table to view those documents.</p>
+    </div>
+    <div class="analysis-component"></div>
+</div>

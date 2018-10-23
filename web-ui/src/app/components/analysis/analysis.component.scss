@@ -1,15 +1,4 @@
-/*! from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
-@keyframes spinAround {
-    from {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    to {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
-}
+@import '../../../colors';
 
 .btn-wrapper {
     button:not(:first-child) {
@@ -38,18 +27,29 @@
 }
 
 :host ::ng-deep {
-    .pvtUi, .pvtTriangle {
+
+    .pvtUi,
+    .pvtTriangle {
         // work-around from https://github.com/nicolaskruchten/pivottable/issues/865#issuecomment-361775178
         position: relative;
     }
 
-    .pvtVal {
+    .pvtVal:hover {
+        background: $link;
+        color: white;
         cursor: pointer;
+        transition: color ease 0.2s, background-color ease 0.2s;
     }
 
     .xpath {
+        // style the xpath display to mark the draggable nodes
+        .node-name {
+            background: rgba($primary, 0);
+            transition: background-color ease 1s;
+        }
+
         .ui-draggable {
-            background: #a8cd28;
+            background: $primary;
             color: white !important;
         }
 
