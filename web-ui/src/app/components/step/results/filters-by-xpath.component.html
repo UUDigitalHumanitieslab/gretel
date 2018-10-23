@@ -1,0 +1,11 @@
+<div class="field is-grouped is-grouped-multiline">
+    <div class="control" *ngFor="let filter of filters" [grtBalloon]="filter.xpath">
+        <div class="tags has-addons">
+            <span class="tag is-medium">
+                <grt-xpath-viewer [value]="filter.label" [paddingless]="true"></grt-xpath-viewer>
+                &nbsp;
+                <button class="delete" (click)="delete.next(filter)"></button>
+            </span>
+        </div>
+    </div>
+</div>

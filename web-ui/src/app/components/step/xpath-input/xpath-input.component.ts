@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { StepComponent } from "../step.component";
+import { StepComponent } from '../step.component';
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
 
 @Component({
@@ -25,10 +25,10 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
     public retrieveContext: boolean;
 
     @Output()
-    public onChangeValue = new EventEmitter<string>();
+    public changeValue = new EventEmitter<string>();
 
     @Output()
-    public onChangeRetrieveContext = new EventEmitter<boolean>();
+    public changeRetrieveContext = new EventEmitter<boolean>();
 
     constructor(macroService: MacroService,
         extractinatorService: ExtractinatorService,
@@ -41,15 +41,14 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
             try {
                 paths = extractinatorService.extract(value);
                 this.treeXml = reconstructorService.construct(paths, value);
-            }
-            catch (err) {
+            } catch (err) {
                 // probably some malformed input
-                console.debug(err)
+                console.error(err);
             }
         }));
     }
 
-    valid: boolean = false;
+    valid = false;
 
     updateValidity() {
         this.onChangeValid.emit(this.valid);
@@ -62,7 +61,7 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
     inputChanged(event: ValueEvent) {
         this.valid = !event.error;
         this.value = event.xpath;
-        this.onChangeValue.emit(this.value);
+        this.changeValue.emit(this.value);
         this.onChangeValid.emit(this.valid);
         this.valueSubject.next(this.value);
     }
@@ -72,6 +71,6 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
     }
 
     emitRetrieveContextChanged() {
-        this.onChangeRetrieveContext.emit(this.retrieveContext);
+        this.changeRetrieveContext.emit(this.retrieveContext);
     }
 }

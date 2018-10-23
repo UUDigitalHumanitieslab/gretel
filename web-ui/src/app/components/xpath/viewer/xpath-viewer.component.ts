@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange } from "@angular/core";
-import { ParserService, PathVariable, ExtractinatorService } from 'lassy-xpath/ng';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange } from '@angular/core';
+import { PathVariable, ExtractinatorService } from 'lassy-xpath/ng';
 @Component({
     selector: 'grt-xpath-viewer',
     templateUrl: './xpath-viewer.component.html',
@@ -11,16 +11,18 @@ export class XPathViewerComponent implements OnChanges, OnInit {
     @Input()
     public value: string;
     @Input()
-    public variables: PathVariable[];
+    public variables: { [name: string]: PathVariable };
+    @Input()
+    public paddingless = false;
 
     @Output()
-    public onPartClick = new EventEmitter<XPathPart>();
+    public partClick = new EventEmitter<XPathPart>();
 
-    constructor(private xpathParserService: ParserService, private extractinatorService: ExtractinatorService) {
+    constructor(private extractinatorService: ExtractinatorService) {
     }
 
     ngOnChanges(changes: TypedChanges) {
-        let isRelevantChange = (change: SimpleChange) => change && (change.firstChange || change.previousValue != change.currentValue);
+        const isRelevantChange = (change: SimpleChange) => change && (change.firstChange || change.previousValue !== change.currentValue);
         if (isRelevantChange(changes['value']) || isRelevantChange(changes['variables'])) {
             this.determineParts();
         }
@@ -32,14 +34,16 @@ export class XPathViewerComponent implements OnChanges, OnInit {
 
     private determineParts() {
         if (this.value) {
-            this.parts = this.extractinatorService.annotate(this.value, this.variables || []).map(a => {
-                return {
-                    classNames: a.token.type.replace('.', '-') + (a.variable ? ' path-variable' : ''),
-                    content: a.token.text,
-                    variable: a.variable,
-                    variableName: a.variable ? a.variable.name : null
-                }
-            });
+            this.parts = this.extractinatorService.annotate(
+                this.value,
+                Object.values(this.variables || {})).map(a => {
+                    return {
+                        classNames: a.token.type.replace('.', '-') + (a.variable ? ' path-variable' : ''),
+                        content: a.token.text,
+                        variable: a.variable,
+                        variableName: a.variable ? a.variable.name : null
+                    };
+                });
         } else {
             this.parts = [];
         }
@@ -48,6 +52,11 @@ export class XPathViewerComponent implements OnChanges, OnInit {
 
 type TypedChanges = {
     [propName in keyof XPathViewerComponent]: SimpleChange;
-}
+};
 
-export type XPathPart = { classNames: string, content: string, variable: PathVariable, variableName: string | null }
+export interface XPathPart {
+    classNames: string;
+    content: string;
+    variable: PathVariable;
+    variableName: string | null;
+}
