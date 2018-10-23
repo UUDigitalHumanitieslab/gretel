@@ -196,8 +196,12 @@
             </p-table>
         </ng-container>
         <ng-template #warning>
-            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another
-                treebank or other xpath-query</div>
+            <div *ngIf="!loading" class="notification is-warning">
+                <ng-container *ngIf="activeFilterCount">No results found, please try again with another treebank, other
+                    xpath-query or change the filters.</ng-container>
+                <ng-container *ngIf="activeFilterCount == 0">No results found, please try again with another treebank
+                    or other xpath-query.</ng-container>
+            </div>
         </ng-template>
     </div>
 </div>
