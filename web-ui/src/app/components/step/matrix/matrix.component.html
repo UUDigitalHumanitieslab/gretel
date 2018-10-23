@@ -42,7 +42,7 @@
 <div class="level">
     <div class="level-item">
         <div class="field">
-            <label class="checkbox">
+            <label class="checkbox" [attr.disabled]="alwaysAdvanced || isCustomXPath || null">
                 <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced" [disabled]="alwaysAdvanced || isCustomXPath">
                 Enable advanced options
             </label>
@@ -50,8 +50,8 @@
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
-                <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()"> Respect
+            <label class="checkbox" [attr.disabled]="isCustomXPath || null">
+                <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()" [disabled]="isCustomXPath"> Respect
                 word order
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Only search for patterns that have the same word order as your input example.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
@@ -72,8 +72,8 @@
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="checkbox" [attr.disabled]="isCustomXPath ? true : null">
-                <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()"> Ignore
+            <label class="checkbox" [attr.disabled]="isCustomXPath || null">
+                <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()" [disabled]="isCustomXPath"> Ignore
                 properties of the dominating node
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
