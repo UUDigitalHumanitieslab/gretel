@@ -428,7 +428,7 @@
                 height: 30px;
                 border: 0 none;
                 border-radius: 50%;
-                background: #DF5F5F;
+                background: $danger;
                 color: white;
                 text-align: center;
                 font-size: 14px;
@@ -437,12 +437,12 @@
                 transform: translate(50%, -50%);
 
                 &:hover {
-                    background: darken(#DF5F5F, 4%);
+                    background: darken($danger, 4%);
                     transform: translate(50%, -50%) scale(1.23);
                 }
 
                 &:active {
-                    background: darken(#DF5F5F, 8%);
+                    background: darken($danger, 8%);
                 }
             }
         }

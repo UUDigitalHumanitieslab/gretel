@@ -27,18 +27,15 @@ export class IntComponent extends FilterComponent {
         }
     }
 
-    onCheckBoxClicked(e) {
-        this.updateFilterChange(e.target.checked);
-    }
-
-    updateFilterChange(selected: boolean) {
+    updateFilterChange() {
+        const min = this.rangeValues[0], max = this.rangeValues[1];
         this.filterChange.emit({
             dataType: 'int',
             type: 'range',
             field: this.filter.field,
-            selected: selected,
-            min: this.rangeValues[0],
-            max: this.rangeValues[1]
+            selected: min > this.filter.minValue || max < this.filter.maxValue,
+            min,
+            max
         });
     }
 }

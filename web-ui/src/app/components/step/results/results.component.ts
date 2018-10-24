@@ -103,7 +103,7 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
     public customXPath: string;
     public validXPath = true;
     public isModifyingXPath = false;
-    public isFiltering = false;
+    public activeFilterCount = 0;
 
     public filters: Filter[] = [];
 
@@ -145,7 +145,7 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
             this.filterValuesSubject.next(values);
             this.filterXPaths = values.filter(
                 (val): val is FilterByXPath => val.type === 'xpath');
-            this.isFiltering = values.length > 0;
+            this.activeFilterCount = values.length;
         }
     }
 
