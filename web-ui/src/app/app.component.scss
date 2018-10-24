@@ -1,3 +1,7 @@
-.column{
-    background-color: white;
+@import '../colors';
+
+@media only screen and (min-width: $desktop) {
+    .main {
+        min-height: 70vh;
+    }
 }
