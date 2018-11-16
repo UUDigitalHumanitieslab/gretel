@@ -192,7 +192,9 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     $meta = 'let $meta := ($tree/metadata/meta)';
 
     $ids = 'let $ids := ($node//@id)';
-    $begins = 'let $begins := ($node//@begin)';
+    $begins = 'let $indexs := (distinct-values($node//@index))
+    let $indexed := ($tree//node[@index=$indexs])
+    let $begins := (($node | $indexed)//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
     if ($context) {
         if ($corpus == 'sonar' && !$needRegularSonar) {
