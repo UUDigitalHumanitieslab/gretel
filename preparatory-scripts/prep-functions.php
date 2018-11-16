@@ -149,8 +149,6 @@ function checkBfPattern($bf)
     global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
 
-    echo 'check??';
-    echo $id;
     $component = $components[0];
 
     // If bf-pattern == ALL, we're faster searching through regular version
