@@ -144,7 +144,7 @@ function cleanXpath($xpath, $trimSlash = true)
     return $xpath;
 }
 
-function checkBfPattern($bf, $sid)
+function checkBfPattern($bf)
 {
     global $cats, $components, $dbuser, $dbpwd,
     $continueConstraints, $databaseExists, $needRegularSonar;
@@ -172,6 +172,7 @@ function checkBfPattern($bf, $sid)
             $dbhost = $serverInfo['machine'];
             $dbport = $serverInfo['port'];
             $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+            $databases = array();
 
             foreach ($tempDatabases as $database) {
                 // db:exists returns a string 'false', still need to convert to bool
@@ -179,16 +180,18 @@ function checkBfPattern($bf, $sid)
 
                 if ($databaseExists != 'false') {
                     $databaseExists = true;
-                    $_SESSION[$sid]['startDatabases'][] = $database;
+                    $databases[] = $database;
                 }
             }
             $continueConstraints = $databaseExists ? true : false;
             $session->close();
+
+            return $databases;
         } catch (Exception $e) {
             error_log($e);
         }
     } else {
-        $_SESSION[$sid]['startDatabases'] = getRegularSonar($component);
+        return getRegularSonar($component);
         $needRegularSonar = true;
     }
 }

@@ -9,7 +9,7 @@ function getConfiguredTreebanks()
         if ($corpus != 'api') {
             if (array_key_exists('components', $settings)) {
                 // probably default settings, this doesn't work anyway
-                if ($settings['port'] == 0000) {
+                if (!array_key_exists('grinded', $settings) && $settings['port'] == 0000) {
                     continue;
                 }
                 $components = array();
@@ -47,6 +47,11 @@ function getConfiguredTreebanks()
                     $description .= ' - version '.$settings['version'];
                 }
                 $metadata = array_key_exists('metadata', $settings) ? $settings['metadata'] : array();
+                if (array_key_exists('multioption', $settings)) {
+                    $multioption = $settings['multioption'];
+                } else {
+                    $multioption = false;
+                }
                 $corpus_definition = array(
                     'title' => $title,
                     'description' => $description,

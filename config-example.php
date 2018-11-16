@@ -55,6 +55,7 @@ $matrixOptions = array(
 // === CHANGE MACHINE AND PORTS, AND USER AND PW BELOW (BaseX) === //
 $databaseGroups = array(
   'sonar' => array(
+    'grinded' => true,
     'REST' => array(
       'components' => array(
         'WRPEC', 'WRPEE', 'WRPEF', 'WRPEG', 'WRPEH', 'WRPEI',
@@ -68,27 +69,55 @@ $databaseGroups = array(
     'WRPEA' => array(
       'machine' => 'machine',
       'port' => 0000,
-      'sentences' => 4395094,
     ),
     'WRPEJ' => array(
       'machine' => 'machine',
       'port' => 0000,
-      'sentences' => 1354245,
     ),
     'WRPPB' => array(
       'machine' => 'machine',
       'port' => 0000,
-      'sentences' => 1709808,
     ),
     'WRPPG' => array(
       'machine' => 'suske',
       'port' => 0000,
-      'sentences' => 14973209,
     ),
     'WRPPH' => array(
       'machine' => 'machine',
       'port' => 0000,
-      'sentences' => 5475556,
+    ),
+    'components' => array(
+      'WRPEA', 'WRPEC', 'WRPEE', 'WRPEF', 'WRPEG', 'WRPEH',
+      'WRPEI', 'WRPEJ', 'WRPEK', 'WRPEL', 'WRPPB', 'WRPPC',
+      'WRPPD', 'WRPPE', 'WRPPF', 'WRPPG', 'WRPPH', 'WRPPI',
+      'WRPPJ', 'WRPPK', 'WRUEA', 'WRUED', 'WRUEE', 'WSUEA',
+      'WSUTB', ),
+    'component_descriptions' => array(
+      'WRPEA' => array('sentences' => 4395094, 'description' => 'Discussion lists'),
+      'WRPEC' => array('sentences' => 551119, 'description' => 'E-magazines'),
+      'WRPEE' => array('sentences' => 115, 'description' => 'Newsletters'),
+      'WRPEF' => array('sentences' => 18372, 'description' => 'Press releases'),
+      'WRPEG' => array('sentences' => 3925824, 'description' => 'Subtitles'),
+      'WRPEH' => array('sentences' => 40715, 'description' => 'Teletext pages'),
+      'WRPEI' => array('sentences' => 204998, 'description' => 'Websites'),
+      'WRPEJ' => array('sentences' => 1354245, 'description' => 'Wikipedia'),
+      'WRPEK' => array('sentences' => 8614, 'description' => 'Blogs'),
+      'WRPEL' => array('sentences' => 2636859, 'description' => 'Tweets', 'disabled' => true),
+      'WRPPB' => array('sentences' => 1709808, 'description' => 'Books'),
+      'WRPPC' => array('sentences' => 74897, 'description' => 'Brochures'),
+      'WRPPD' => array('sentences' => 2184, 'description' => 'Newsletters'),
+      'WRPPE' => array('sentences' => 19077, 'description' => 'Guides & manuals'),
+      'WRPPF' => array('sentences' => 650211, 'description' => 'Legal texts'),
+      'WRPPG' => array('sentences' => 14973209, 'description' => 'Newspapers'),
+      'WRPPH' => array('sentences' => 5475556, 'description' => 'Periodicals & magazines'),
+      'WRPPI' => array('sentences' => 387312, 'description' => 'Policy documents'),
+      'WRPPJ' => array('sentences' => 16935, 'description' => 'Proceedings'),
+      'WRPPK' => array('sentences' => 93507, 'description' => 'Reports'),
+      'WRUEA' => array('sentences' => 2387131, 'description' => 'Chats', 'disabled' => true),
+      'WRUED' => array('sentences' => 101116, 'description' => 'SMS', 'disabled' => true),
+      'WRUEE' => array('sentences' => 23488, 'description' => 'Written assignments'),
+      'WSUEA' => array('sentences' => 2163521, 'description' => 'Auto cues'),
+      'WSUTB' => array('sentences' => 44862, 'description' => 'Texts for the visually impaired'),
     ),
     'fullName' => 'SoNaR',
     'version' => '1.0',

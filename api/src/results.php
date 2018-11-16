@@ -6,9 +6,11 @@ require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
 require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
+$needRegularSonar = false;
+
 function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null)
 {
-    global $dbuser, $dbpwd, $flushLimit;
+    global $dbuser, $dbpwd, $needRegularSonar, $flushLimit;
 
     $already = array(); // TODO: unresolved Sonar behavior (see #81)
 
@@ -25,6 +27,11 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
 
     if ($remainingDatabases != null) {
         $databases = $remainingDatabases;
+    } elseif ($corpus == 'sonar') {
+        $bf = xpathToBreadthFirst($xpath);
+        // Get correct databases to start search with also sets
+        // $needRegularSonar
+        $databases = checkBfPattern($bf);
     } else {
         $databases = corpusToDatabase($components, $corpus);
     }
