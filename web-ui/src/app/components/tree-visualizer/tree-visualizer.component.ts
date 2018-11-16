@@ -129,7 +129,8 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
      */
     private showMetadata(data: any) {
         const result: Metadata[] = [];
-        if (data && data.alpino_ds && data.alpino_ds.metadata) {
+        if (data && data.alpino_ds && data.alpino_ds.metadata
+            && data.alpino_ds.metadata[0].meta) {
             for (const item of data.alpino_ds.metadata[0].meta.sort(function (a, b) {
                 return a.$.name.localeCompare(b.$.name);
             })) {
