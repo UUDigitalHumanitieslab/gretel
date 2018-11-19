@@ -6,11 +6,9 @@ require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
 require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
-$needRegularGrinded = false;
-
-function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null, $already = array())
+function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null, $already = null)
 {
-    global $dbuser, $dbpwd, $flushLimit;
+    global $dbuser, $dbpwd, $flushLimit, $needRegularGrinded;
 
     // connect to BaseX
     if (isGrinded($corpus)) {
@@ -29,6 +27,13 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
         $databases = corpusToDatabase($components, $corpus, $xpath);
     }
 
+    if ($already == null) {
+        $already = array();
+        foreach ($databases as $database) {
+            $already[$database] = 1;
+        }
+    }
+
     $results = getSentences($corpus, $databases, $components, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
     if ($results[7] * $flushLimit >= $searchLimit) {
         // clear the remaining databases to signal the search is done
@@ -36,6 +41,7 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
     }
     $session->close();
     $results[] = $already;
+    $results[] = $needRegularGrinded;
 
     return $results;
 }

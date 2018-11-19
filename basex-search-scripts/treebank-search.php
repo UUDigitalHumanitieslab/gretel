@@ -35,7 +35,6 @@ function includeAlreadyExists($include, &$already)
 function corpusToDatabase($components, $corpus, $xpath)
 {
     if (isGrinded($corpus)) {
-        // TODO: if grinded
         $bf = xpathToBreadthFirst($xpath);
         // Get correct databases to start search with also sets
         // $needRegularGrinded
@@ -204,8 +203,12 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     let $indexed := ($tree//node[@index=$indexs])
     let $begins := (($node | $indexed)//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
-    if ($context) {
-        if (isGrinded($corpus) && !$needRegularGrinded) {
+    if (isGrinded($corpus) && !$needRegularGrinded) {
+        // should have only one slash when grinding
+        $xpath = '/'.preg_replace('/^\/+/', '', $xpath);
+    }
+    if ($context && !$needRegularGrinded) {
+        if (isGrinded($corpus)) {
             $databases = $grindedComponents[0].'sentence2treebank';
 
             $text = 'let $text := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$1\')';
@@ -215,16 +218,8 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
             $previd = 'let $previd := concat($text, $prev)';
             $nextid = 'let $nextid := concat($text, $next)';
 
-            $prevs = 'let $prevs := (db:open("'.$databases.'")';
-            $nexts = 'let $nexts := (db:open("'.$databases.'")';
-
-            if (!isGrinded($corpus)) {
-                $prevs .= '//s[id=$previd]/sentence)';
-                $nexts .= '//s[id=$nextid]/sentence)';
-            } else {
-                $prevs .= '/sentence2treebank/sentence[@nr=$previd])';
-                $nexts .= '/sentence2treebank/sentence[@nr=$nextid])';
-            }
+            $prevs .= '/sentence2treebank/sentence[@nr=$previd])';
+            $nexts .= '/sentence2treebank/sentence[@nr=$nextid])';
 
             $return = ' return <match>{data($sentid)}||{data($prevs)} <em>{data($sentence)}</em> {data($nexts)}'
             .$returnTb.'||{string-join($ids, \'-\')}||{string-join($beginlist, \'-\')}||'.$variable_results.'</match>';
@@ -300,7 +295,7 @@ function highlightSentence($sentence, $beginlist, $tag)
 
 function getRegularGrinded($component)
 {
-    $databases = file("treebank-parts/$component.lst", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $databases = file(ROOT_PATH."/treebank-parts/$component.lst", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     return $databases;
 }

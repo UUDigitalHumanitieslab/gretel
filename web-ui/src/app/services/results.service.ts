@@ -68,7 +68,9 @@ export class ResultsService {
                 }
                 observer.complete();
             };
-            let already: SearchResults['already'] = {};
+            let already: SearchResults['already'] = null,
+                needRegularGrinded = false;
+
             while (!observer.closed) {
                 const results = await this.results(
                     xpath,
@@ -80,10 +82,13 @@ export class ResultsService {
                     metadataFilters,
                     variables,
                     remainingDatabases,
-                    already);
+                    already,
+                    needRegularGrinded);
 
                 if (results) {
                     already = results.already;
+                    needRegularGrinded = results.needRegularGrinded;
+
                     observer.next(results);
                     iteration = results.nextIteration;
                     remainingDatabases = results.remainingDatabases;
@@ -119,7 +124,8 @@ export class ResultsService {
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
         remainingDatabases: string[] | null = null,
-        already: SearchResults['already'] | null = null) {
+        already: SearchResults['already'] | null = null,
+        needRegularGrinded = false) {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl('results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
@@ -130,7 +136,8 @@ export class ResultsService {
                 isAnalysis,
                 variables,
                 remainingDatabases,
-                already
+                already,
+                needRegularGrinded
             }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
@@ -230,7 +237,8 @@ export class ResultsService {
             hits: await this.mapHits(results),
             nextIteration: results[7],
             remainingDatabases: results[8],
-            already: results[11]
+            already: results[11],
+            needRegularGrinded: results[12]
         };
     }
 
@@ -241,7 +249,7 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
-                databaseId: results[1][hitId] || results[9][hitId],
+                databaseId: (results[1] && results[1][hitId]) || results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
@@ -345,7 +353,7 @@ type ApiSearchResult = [
     // 0 plain text sentences containing the hit
     { [id: string]: string },
     // 1 tblist (used for Grinded corpora)
-    false,
+    false | { [id: string]: string },
     // 2 ids (dash-separated ids of the matched nodes)
     { [id: string]: string },
     // 3 begin positions (zero based)
@@ -365,7 +373,9 @@ type ApiSearchResult = [
     // 10 XQuery
     string,
     // 11 Already
-    SearchResults['already']
+    SearchResults['already'],
+    // 12 need regular grinded database
+    boolean
 ];
 
 export interface SearchResults {
@@ -382,6 +392,7 @@ export interface SearchResults {
      * Already queried included treebanks (for grinded databases)
      */
     already: { [id: string]: 1 };
+    needRegularGrinded: boolean;
 }
 
 export interface Hit {

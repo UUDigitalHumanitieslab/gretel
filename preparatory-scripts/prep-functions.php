@@ -3,6 +3,7 @@
 function xpathToBreadthFirst($xpath)
 {
     $bfresult;
+    $xpath = cleanXpath($xpath);
     // Divide XPath in top-most level, and the rest (its "descendants")
     if (preg_match("/^\/*node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
@@ -189,8 +190,9 @@ function checkBfPattern($corpus, $bf, $components)
             error_log($e);
         }
     } else {
-        return getRegularGrinded($component);
         $needRegularGrinded = true;
+
+        return getRegularGrinded($component);
     }
 }
 
