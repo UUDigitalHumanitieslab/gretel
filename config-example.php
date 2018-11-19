@@ -31,6 +31,7 @@ $resultsLimit = 500;
 $analysisLimit = 50000;
 $analysisFlushLimit = 500;
 
+// Used for Grinded search
 $cats = array('advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
     'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub', );
 

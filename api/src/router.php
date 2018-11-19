@@ -101,7 +101,12 @@ $router->map('POST', '/results', function () {
     } else {
         $searchLimit = $resultsLimit;
     }
-    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
+
+    if (isset($data['already'])) {
+        $already = $data['already'];
+    }
+
+    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases, $already);
 
     header('Content-Type: application/json');
     echo json_encode($results);

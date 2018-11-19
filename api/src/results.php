@@ -6,16 +6,14 @@ require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
 require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
-$needRegularSonar = false;
+$needRegularGrinded = false;
 
-function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null)
+function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null, $already = array())
 {
-    global $dbuser, $dbpwd, $needRegularSonar, $flushLimit;
-
-    $already = array(); // TODO: unresolved Sonar behavior (see #81)
+    global $dbuser, $dbpwd, $flushLimit;
 
     // connect to BaseX
-    if ($corpus == 'sonar') {
+    if (isGrinded($corpus)) {
         $serverInfo = getServerInfo($corpus, $components[0]);
     } else {
         $serverInfo = getServerInfo($corpus, false);
@@ -27,21 +25,17 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
 
     if ($remainingDatabases != null) {
         $databases = $remainingDatabases;
-    } elseif ($corpus == 'sonar') {
-        $bf = xpathToBreadthFirst($xpath);
-        // Get correct databases to start search with also sets
-        // $needRegularSonar
-        $databases = checkBfPattern($bf);
     } else {
-        $databases = corpusToDatabase($components, $corpus);
+        $databases = corpusToDatabase($components, $corpus, $xpath);
     }
 
-    $results = getSentences($corpus, $databases, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
+    $results = getSentences($corpus, $databases, $components, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
     if ($results[7] * $flushLimit >= $searchLimit) {
         // clear the remaining databases to signal the search is done
         $results[8] = array();
     }
     $session->close();
+    $results[] = $already;
 
     return $results;
 }

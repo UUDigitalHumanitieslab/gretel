@@ -144,10 +144,10 @@ function cleanXpath($xpath, $trimSlash = true)
     return $xpath;
 }
 
-function checkBfPattern($bf)
+function checkBfPattern($corpus, $bf, $components)
 {
-    global $cats, $components, $dbuser, $dbpwd,
-    $continueConstraints, $databaseExists, $needRegularSonar;
+    global $cats, $dbuser, $dbpwd,
+    $continueConstraints, $databaseExists, $needRegularGrinded;
 
     $component = $components[0];
 
@@ -165,7 +165,7 @@ function checkBfPattern($bf)
         }
 
         try {
-            $serverInfo = getServerInfo('sonar', $component);
+            $serverInfo = getServerInfo($corpus, $component);
 
             $dbhost = $serverInfo['machine'];
             $dbport = $serverInfo['port'];
@@ -189,8 +189,8 @@ function checkBfPattern($bf)
             error_log($e);
         }
     } else {
-        return getRegularSonar($component);
-        $needRegularSonar = true;
+        return getRegularGrinded($component);
+        $needRegularGrinded = true;
     }
 }
 

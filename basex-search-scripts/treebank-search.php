@@ -32,8 +32,16 @@ function includeAlreadyExists($include, &$already)
     }
 }
 
-function corpusToDatabase($components, $corpus)
+function corpusToDatabase($components, $corpus, $xpath)
 {
+    if (isGrinded($corpus)) {
+        // TODO: if grinded
+        $bf = xpathToBreadthFirst($xpath);
+        // Get correct databases to start search with also sets
+        // $needRegularGrinded
+        return checkBfPattern($corpus, $bf, $components);
+    }
+
     $databases = array();
 
     foreach ($components as $component) {
@@ -49,16 +57,16 @@ function corpusToDatabase($components, $corpus)
 /**
  * @param $variables An array with variables to return. Each element should contain name and path.
  */
-function getSentences($corpus, $databases, $already, $endPosIteration, $session, $sid, $searchLimit, $xpath, $context, $variables = null)
+function getSentences($corpus, $databases, $components, &$already, $endPosIteration, $session, $sid, $searchLimit, $xpath, $context, $variables = null)
 {
-    global $flushLimit, $needRegularSonar, $components;
+    global $flushLimit, $needRegularGrinded;
 
     $xquery = 'N/A';
     try {
         $matchesAmount = 0;
 
         while ($database = array_pop($databases)) {
-            if ($corpus == 'sonar' && !$needRegularSonar) {
+            if (isGrinded($corpus) && !$needRegularGrinded) {
                 getMoreIncludes($database, $databases, $already, $session);
             }
             while (1) {
@@ -66,7 +74,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                     ++$endPosIteration;
                 }
 
-                $xquery = createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $components, $context, $xpath, $variables);
+                $xquery = createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularGrinded, $corpus, $components, $context, $xpath, $variables);
                 $query = $session->query($xquery);
                 $result = $query->execute();
                 $query->close();
@@ -89,7 +97,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                     }
                     $match = str_replace('<match>', '', $match);
 
-                    if ($corpus == 'sonar') {
+                    if (isGrinded($corpus)) {
                         list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
                     } else {
                         list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
@@ -110,7 +118,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                         $metalist[$sentid] = $meta;
                         preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
                         $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
-                        if ($corpus == 'sonar') {
+                        if (isGrinded($corpus)) {
                             $tblist[$sentid] = $tb;
                         }
                         $sentenceDatabases[$sentid] = $database;
@@ -139,7 +147,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
                     session_write_close();
                 }
             }
-            if ($corpus !== 'sonar') {
+            if (!isGrinded($corpus)) {
                 $tblist = false;
             }
 
@@ -155,7 +163,7 @@ function getSentences($corpus, $databases, $already, $endPosIteration, $session,
     }
 }
 
-function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularSonar, $corpus, $sonarComponents, $context, $xpath, $variables)
+function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $needRegularGrinded, $corpus, $grindedComponents, $context, $xpath, $variables)
 {
     $variable_declarations = '';
     $variable_results = '';
@@ -173,12 +181,12 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     }
 
     $for = 'for $node in db:open("'.$database.'")/treebank';
-    if ($corpus == 'sonar' && !$needRegularSonar) {
+    if (isGrinded($corpus) && !$needRegularGrinded) {
         $for .= '/tree';
         $tree = 'let $tree := ($node/ancestor::tree)';
         $sentence = '
     return
-    for $sentence in (db:open("'.$sonarComponents[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
+    for $sentence in (db:open("'.$grindedComponents[0].'sentence2treebank")/sentence2treebank/sentence[@nr=$sentid])
         let $tb := ($sentence/@part)';
     } else {
         $tree = 'let $tree := ($node/ancestor::alpino_ds)';
@@ -186,8 +194,8 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     }
     $sentid = 'let $sentid := ($tree/@id)';
 
-    $regulartb = $needRegularSonar ? "let \$tb := '$database'" : '';
-    $returnTb = ($corpus == 'sonar') ? '||{data($tb)}' : '';
+    $regulartb = $needRegularGrinded ? "let \$tb := '$database'" : '';
+    $returnTb = (isGrinded($corpus)) ? '||{data($tb)}' : '';
 
     $meta = 'let $meta := ($tree/metadata/meta)';
 
@@ -197,8 +205,8 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
     let $begins := (($node | $indexed)//@begin)';
     $beginlist = 'let $beginlist := (distinct-values($begins))';
     if ($context) {
-        if ($corpus == 'sonar' && !$needRegularSonar) {
-            $databases = $component[0].'sentence2treebank';
+        if (isGrinded($corpus) && !$needRegularGrinded) {
+            $databases = $grindedComponents[0].'sentence2treebank';
 
             $text = 'let $text := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$1\')';
             $snr = 'let $snr := fn:replace($sentid[1], \'(.+?)(\d+)$\', \'$2\')';
@@ -210,7 +218,7 @@ function createXquery($database, $endPosIteration, $searchLimit, $flushLimit, $n
             $prevs = 'let $prevs := (db:open("'.$databases.'")';
             $nexts = 'let $nexts := (db:open("'.$databases.'")';
 
-            if ($corpus != 'sonar') {
+            if (!isGrinded($corpus)) {
                 $prevs .= '//s[id=$previd]/sentence)';
                 $nexts .= '//s[id=$nextid]/sentence)';
             } else {
@@ -290,7 +298,7 @@ function highlightSentence($sentence, $beginlist, $tag)
     return $hlsentence;
 }
 
-function getRegularSonar($component)
+function getRegularGrinded($component)
 {
     $databases = file("treebank-parts/$component.lst", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 

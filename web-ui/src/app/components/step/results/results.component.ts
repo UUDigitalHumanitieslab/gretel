@@ -162,7 +162,11 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
     async showTree(result: Hit) {
         this.treeXml = undefined;
         this.treeSentence = result.highlightedSentence;
-        const { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        const { url, treeXml } = await this.resultsService.highlightSentenceTree(
+            result.fileId,
+            this.corpus,
+            result.nodeIds,
+            result.databaseId);
         this.treeXml = treeXml;
         this.treeXmlUrl = url;
     }

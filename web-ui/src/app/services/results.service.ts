@@ -68,12 +68,22 @@ export class ResultsService {
                 }
                 observer.complete();
             };
-
+            let already: SearchResults['already'] = {};
             while (!observer.closed) {
                 const results = await this.results(
-                    xpath, corpus, components, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases);
+                    xpath,
+                    corpus,
+                    components,
+                    iteration,
+                    retrieveContext,
+                    isAnalysis,
+                    metadataFilters,
+                    variables,
+                    remainingDatabases,
+                    already);
 
                 if (results) {
+                    already = results.already;
                     observer.next(results);
                     iteration = results.nextIteration;
                     remainingDatabases = results.remainingDatabases;
@@ -108,7 +118,8 @@ export class ResultsService {
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null) {
+        remainingDatabases: string[] | null = null,
+        already: SearchResults['already'] | null = null) {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl('results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
@@ -118,7 +129,8 @@ export class ResultsService {
                 iteration,
                 isAnalysis,
                 variables,
-                remainingDatabases
+                remainingDatabases,
+                already
             }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
@@ -127,9 +139,10 @@ export class ResultsService {
         return false;
     }
 
-    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
+    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
         const url = await this.configurationService.getGretelUrl(
-            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
+            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}${
+            database ? `&db=${database}` : ''}`);
 
         const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
         return { url, treeXml };
@@ -216,7 +229,8 @@ export class ResultsService {
         return {
             hits: await this.mapHits(results),
             nextIteration: results[7],
-            remainingDatabases: results[8]
+            remainingDatabases: results[8],
+            already: results[11]
         };
     }
 
@@ -227,7 +241,7 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
-                databaseId: results[9][hitId],
+                databaseId: results[1][hitId] || results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
@@ -330,7 +344,7 @@ export class ResultsService {
 type ApiSearchResult = [
     // 0 plain text sentences containing the hit
     { [id: string]: string },
-    // 1 tblist (used for Sonar)
+    // 1 tblist (used for Grinded corpora)
     false,
     // 2 ids (dash-separated ids of the matched nodes)
     { [id: string]: string },
@@ -349,7 +363,9 @@ type ApiSearchResult = [
     // 9 database ID of each hit
     { [id: string]: string },
     // 10 XQuery
-    string
+    string,
+    // 11 Already
+    SearchResults['already']
 ];
 
 export interface SearchResults {
@@ -362,6 +378,10 @@ export interface SearchResults {
      * Databases remaining for doing a paged search
      */
     remainingDatabases: string[];
+    /**
+     * Already queried included treebanks (for grinded databases)
+     */
+    already: { [id: string]: 1 };
 }
 
 export interface Hit {
