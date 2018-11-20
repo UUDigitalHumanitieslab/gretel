@@ -87,4 +87,4 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 
 ## License
 
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [license.txt](license.txt) file for license rights and limitations.
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [LICENSE](LICENSE) file for license rights and limitations.
