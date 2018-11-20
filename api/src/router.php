@@ -106,7 +106,20 @@ $router->map('POST', '/results', function () {
         $already = $data['already'];
     }
     $needRegularGrinded = isset($data['needRegularGrinded']) && $data['needRegularGrinded'];
-    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases, $already);
+    $results = getResults(
+        $xpath,
+        $context,
+        $corpus,
+        $components,
+        $iteration,
+            isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
+            ? $data['searchLimit']
+            : $searchLimit,
+        $variables,
+        $remainingDatabases,
+        $already);
+
+    $results[] = $searchLimit;
 
     header('Content-Type: application/json');
     echo json_encode($results);

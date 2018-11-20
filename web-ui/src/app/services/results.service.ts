@@ -62,6 +62,7 @@ export class ResultsService {
         const observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
             let iteration = 0;
             let remainingDatabases: string[] | null = null;
+            let searchLimit: number | null = null;
             const completeObserver = () => {
                 if (complete) {
                     complete();
@@ -83,11 +84,13 @@ export class ResultsService {
                     variables,
                     remainingDatabases,
                     already,
-                    needRegularGrinded);
+                    needRegularGrinded,
+                    searchLimit);
 
                 if (results) {
                     already = results.already;
                     needRegularGrinded = results.needRegularGrinded;
+                    searchLimit = results.searchLimit;
 
                     observer.next(results);
                     iteration = results.nextIteration;
@@ -125,7 +128,8 @@ export class ResultsService {
         variables = this.defaultVariables,
         remainingDatabases: string[] | null = null,
         already: SearchResults['already'] | null = null,
-        needRegularGrinded = false) {
+        needRegularGrinded = false,
+        searchLimit: number | null = null): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl('results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
@@ -137,7 +141,8 @@ export class ResultsService {
                 variables,
                 remainingDatabases,
                 already,
-                needRegularGrinded
+                needRegularGrinded,
+                searchLimit
             }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
@@ -238,7 +243,8 @@ export class ResultsService {
             nextIteration: results[7],
             remainingDatabases: results[8],
             already: results[11],
-            needRegularGrinded: results[12]
+            needRegularGrinded: results[12],
+            searchLimit: results[13]
         };
     }
 
@@ -375,7 +381,9 @@ type ApiSearchResult = [
     // 11 Already
     SearchResults['already'],
     // 12 need regular grinded database
-    boolean
+    boolean,
+    // 13 search limit
+    number
 ];
 
 export interface SearchResults {
@@ -393,6 +401,7 @@ export interface SearchResults {
      */
     already: { [id: string]: 1 };
     needRegularGrinded: boolean;
+    searchLimit: number;
 }
 
 export interface Hit {
