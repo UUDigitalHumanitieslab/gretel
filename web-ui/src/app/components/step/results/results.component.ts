@@ -94,6 +94,7 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
     public next = new EventEmitter();
 
     public loading = true;
+    public loadingTree = false;
 
     public treeXml?: string;
     public treeXmlUrl?: string;
@@ -161,10 +162,16 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
      */
     async showTree(result: Hit) {
         this.treeXml = undefined;
+        this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
-        const { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
+        const { url, treeXml } = await this.resultsService.highlightSentenceTree(
+            result.fileId,
+            this.corpus,
+            result.nodeIds,
+            result.databaseId);
         this.treeXml = treeXml;
         this.treeXmlUrl = url;
+        this.loadingTree = false;
     }
 
     public deleteFilter(filterValue: FilterValue) {

@@ -2,19 +2,19 @@
 
 function getCounts($databases, $already, $session, $xpath, $corpus)
 {
-    global $needRegularSonar;
+    global $needRegularGrinded;
 
     $sum = 0;
     $counts = array();
 
     while ($database = array_pop($databases)) {
-        if ($corpus == 'sonar' && !$needRegularSonar) {
+        if (isGrinded($corpus) && !$needRegularGrinded) {
             getMoreIncludes($database, $databases, $already, $session);
         }
         $xquery = createXqueryCount($database, $xpath, $corpus);
         $query = $session->query($xquery);
 
-        if ($corpus == 'sonar') {
+        if (isGrinded($corpus)) {
             $sum += $query->execute();
         } else {
             $counts[$database] = $query->execute();
@@ -23,7 +23,7 @@ function getCounts($databases, $already, $session, $xpath, $corpus)
         $query->close();
     }
 
-    if ($corpus !== 'sonar') {
+    if (!isGrinded($corpus)) {
         $sum = array_sum($counts);
     }
 
@@ -52,9 +52,9 @@ function createCsvCounts($sum, $counts, $sid)
 
 function createXqueryCount($database, $xpath, $corpus)
 {
-    global $needRegularSonar;
+    global $needRegularGrinded;
     $for = 'count(for $node in db:open("'.$database.'")/treebank';
-    if ($corpus == 'sonar' && !$needRegularSonar) {
+    if (isGrinded($corpus) && !$needRegularGrinded) {
         $for .= '/tree';
     }
     $return = ' return $node)';

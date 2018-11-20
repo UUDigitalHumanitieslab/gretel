@@ -26,14 +26,14 @@ $corpus = $_SESSION[SID]['treebank'];
 $components = $_SESSION[SID]['subtreebank'];
 $already = $databases = $_SESSION[SID]['startDatabases'];
 
-if ($corpus == 'sonar') {
-    $needRegularSonar = $_SESSION[SID]['needRegularSonar'];
+if (isGrinded($corpus)) {
+    $needRegularGrinded = $_SESSION[SID]['needRegularGrinded'];
 }
 
 session_write_close();
 
 try {
-    if ($corpus == 'sonar') {
+    if (isGrinded($corpus)) {
         $serverInfo = getServerInfo($corpus, $components[0]);
     } else {
         $serverInfo = getServerInfo($corpus, false);
@@ -47,7 +47,7 @@ try {
 
     $session->close();
 
-    if ($corpus != 'sonar') {
+    if (!isGrinded($corpus)) {
         // Add a distribution to the list:
         // Instead of simply returning the amount of hits, return an array of
         // each database with the amounts of hits per database, and the total
