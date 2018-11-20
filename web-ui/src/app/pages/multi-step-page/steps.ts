@@ -77,8 +77,12 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
 
     async enterStep(state: GlobalStateExampleBased) {
         state.currentStep = this;
-        state.tokens = this.alpinoService.tokenize(state.inputSentence).split(' ');
-        state.attributes = state.tokens.map(() => 'pos'); // default value
+        const existingTokens = state.tokens.join(' ');
+        const tokenized = this.alpinoService.tokenize(state.inputSentence);
+        if (existingTokens !== tokenized) {
+            state.tokens = tokenized.split(' ');
+            state.attributes = state.tokens.map(() => 'pos'); // default value
+        }
         return this.updateMatrix(state);
     }
 
