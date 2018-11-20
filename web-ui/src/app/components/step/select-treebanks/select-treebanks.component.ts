@@ -58,7 +58,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnInit {
      */
     updateValidity() {
         this.valid = this.subTreebanks && this.subTreebanks.length && !!this.selectedTreebank;
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
     }
 
     getValidationMessage() {

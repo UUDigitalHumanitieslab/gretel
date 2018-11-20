@@ -74,7 +74,7 @@ $router->map('POST', '/treebank_counts', function () {
 });
 
 $router->map('POST', '/results', function () {
-    global $resultsLimit, $analysisLimit, $analysisFlushLimit, $flushLimit;
+    global $resultsLimit, $analysisLimit, $analysisFlushLimit, $flushLimit, $needRegularGrinded;
 
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -101,7 +101,25 @@ $router->map('POST', '/results', function () {
     } else {
         $searchLimit = $resultsLimit;
     }
-    $results = getResults($xpath, $context, $corpus, $components, $iteration, $searchLimit, $variables, $remainingDatabases);
+
+    if (isset($data['already'])) {
+        $already = $data['already'];
+    }
+    $needRegularGrinded = isset($data['needRegularGrinded']) && $data['needRegularGrinded'];
+    $results = getResults(
+        $xpath,
+        $context,
+        $corpus,
+        $components,
+        $iteration,
+            isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
+            ? $data['searchLimit']
+            : $searchLimit,
+        $variables,
+        $remainingDatabases,
+        $already);
+
+    $results[] = $searchLimit;
 
     header('Content-Type: application/json');
     echo json_encode($results);

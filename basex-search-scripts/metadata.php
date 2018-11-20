@@ -91,13 +91,13 @@ function get_metadata_counts($corpus, $components, $xpath)
 {
     global $dbuser, $dbpwd;
 
-    if ($corpus == 'sonar') {
+    if (isGrinded($corpus)) {
         $serverInfo = getServerInfo($corpus, $components[0]);
     } else {
         $serverInfo = getServerInfo($corpus, false);
     }
 
-    $databases = corpusToDatabase($components, $corpus);
+    $databases = corpusToDatabase($components, $corpus, $xpath);
 
     $dbhost = $serverInfo['machine'];
     $dbport = $serverInfo['port'];

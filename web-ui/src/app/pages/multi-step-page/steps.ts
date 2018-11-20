@@ -62,6 +62,7 @@ abstract class Step<T> {
 class SentenceInputStep<T extends GlobalState> extends Step<T> {
     async enterStep(state: T) {
         state.currentStep = this;
+        state.valid = state.inputSentence && state.inputSentence.length > 0;
         return state;
     }
 
@@ -125,6 +126,7 @@ class ParseStep extends Step<GlobalStateExampleBased> {
         const xml = await this.alpinoService.parseSentence(state.inputSentence);
         state.exampleXml = xml;
         state.loading = false;
+        state.valid = true;
         return state;
     }
 

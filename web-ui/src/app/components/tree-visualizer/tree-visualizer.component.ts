@@ -59,10 +59,14 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public url: string;
 
+    @Input()
+    public loading = false;
+
     @Output()
     public displayChange = new EventEmitter<TreeVisualizerDisplay>();
 
     public metadata: Metadata[] | undefined;
+    public showLoader: boolean;
 
     // jquery tree visualizer
     private instance: any;
@@ -81,12 +85,18 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
 
     ngOnChanges(changes: TypedChanges) {
         const element = $(this.output.nativeElement);
-        if (changes.xml && changes.xml.currentValue !== changes.xml.previousValue) {
-            this.visualize(element);
+        if (changes.loading && this.loading) {
+            this.showLoader = true;
         }
 
-        if (this.instance) {
-            this.updateVisibility();
+        if (!this.loading && this.xml) {
+            if (changes.xml && changes.xml.currentValue !== changes.xml.previousValue) {
+                this.visualize(element);
+            }
+
+            if (this.instance) {
+                this.updateVisibility();
+            }
         }
     }
 
@@ -127,6 +137,8 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         } else {
             this.instance.trigger('close-fullscreen');
         }
+
+        this.showLoader = false;
     }
 
     /**

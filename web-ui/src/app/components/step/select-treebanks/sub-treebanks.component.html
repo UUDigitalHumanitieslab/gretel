@@ -5,10 +5,11 @@
         <thead>
             <tr (click)="changeAllSelected($event)">
                 <th [attr.colspan]="variants.length">
-                    <label class="checkbox">
+                    <label class="checkbox" *ngIf="multiOption">
                         <input type="checkbox" [checked]="isAllChecked()" (change)="changeAllSelected($event)">
                         Component
                     </label>
+                    <span *ngIf="!multiOption">Component</span>
                 </th>
                 <th *ngIf="showDescription">
                     Description
@@ -17,7 +18,7 @@
                     <th class="has-text-right">
                         Sentences
                     </th>
-                    <th class="has-text-right">
+                    <th class="has-text-right" *ngIf="showWordCount">
                         Words
                     </th>
                 </ng-container>
@@ -26,7 +27,7 @@
                     <th class="has-text-right">
                         Sentences
                     </th>
-                    <th class="has-text-right">
+                    <th class="has-text-right" *ngIf="showWordCount">
                         Words
                     </th>
                 </ng-container>
@@ -52,8 +53,12 @@
         <tbody>
             <tr *ngFor="let group of componentGroups" (click)="changeSelected(group)">
                 <td *ngFor="let variant of variants">
-                    <label class="checkbox" [attr.disabled]="group.components[variant].disabled || null">
+                    <label *ngIf="multiOption" class="checkbox" [attr.disabled]="group.components[variant].disabled || null">
                         <input type="checkbox" (change)="changeSelected(group, variant, $event)" [checked]="selectedTreebanks[group.components[variant].component]" [disabled]="group.components[variant].disabled">
+                        {{group.components[variant].component}}
+                    </label>
+                    <label *ngIf="!multiOption" class="radio" [attr.disabled]="group.components[variant].disabled || null">
+                        <input type="radio" (change)="changeSelected(group, variant, $event)" [checked]="selectedTreebanks[group.components[variant].component]" [disabled]="group.components[variant].disabled">
                         {{group.components[variant].component}}
                     </label>
                 </td>
@@ -64,7 +69,7 @@
                     <td class="is-number">
                         {{group.components[variant].sentenceCount | formatNumber}}
                     </td>
-                    <td class="is-number">
+                    <td class="is-number" *ngIf="showWordCount">
                         {{group.components[variant].wordCount | formatNumber}}
                     </td>
                 </ng-container>
@@ -72,7 +77,7 @@
                     <th class="is-number">
                         {{totalSentenceCountByGroup[group.key] | formatNumber}}
                     </th>
-                    <th class="is-number">
+                    <th class="is-number" *ngIf="showWordCount">
                         {{totalWordCountByGroup[group.key] | formatNumber}}
                     </th>
                 </ng-container>
@@ -85,11 +90,11 @@
                 </td>
                 <ng-container *ngFor="let variant of variants">
                     <td class="is-number">{{totalSentenceCountByVariant[variant] | formatNumber}}</td>
-                    <td class="is-number">{{totalWordCountByVariant[variant] | formatNumber}}</td>
+                    <td class="is-number" *ngIf="showWordCount">{{totalWordCountByVariant[variant] | formatNumber}}</td>
                 </ng-container>
                 <ng-container *ngIf="variants.length > 1">
                     <th class="is-number">{{totalSentenceCount | formatNumber}}</th>
-                    <th class="is-number">{{totalWordCount | formatNumber}}</th>
+                    <th class="is-number" *ngIf="showWordCount">{{totalWordCount | formatNumber}}</th>
                 </ng-container>
             </tr>
         </tfoot>

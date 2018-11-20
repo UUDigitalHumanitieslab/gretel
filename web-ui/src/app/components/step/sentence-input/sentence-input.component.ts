@@ -30,7 +30,7 @@ export class SentenceInputComponent extends StepComponent {
     }
 
     public updateValidity(sentence = this.inputSentence) {
-        this.valid = sentence.trim().length != 0;
-        this.onChangeValid.emit(this.valid);
+        this.valid = sentence.trim().length !== 0;
+        this.changeValid.emit(this.valid);
     }
 }

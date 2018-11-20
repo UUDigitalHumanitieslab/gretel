@@ -42,7 +42,7 @@ require ROOT_PATH.'/basex-search-scripts/basex-client.php';
 
 try {
     $serverInfo;
-    if ($treebank == 'sonar') {
+    if (isGrinded($treebank)) {
         preg_match('/^([A-Z]{5})/', $db, $component);
         $serverInfo = getServerInfo($treebank, $component[0]);
         $queryPath = $db;

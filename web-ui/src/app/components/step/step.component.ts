@@ -6,14 +6,14 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 
 export abstract class StepComponent {
-    warning: boolean = false;
+    warning = false;
     valid = false;
 
     constructor() {
 
     }
 
-    @Output() onChangeValid = new EventEmitter<Boolean>();
+    @Output() changeValid = new EventEmitter<Boolean>();
 
     /**
      * Check if the input of the user is valid

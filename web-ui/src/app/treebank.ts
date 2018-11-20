@@ -52,6 +52,7 @@ export interface Treebank {
     uploaded?: Date | false;
     processed?: Date;
     isPublic?: boolean;
+    multiOption: boolean;
 }
 
 export interface ComponentGroup {
