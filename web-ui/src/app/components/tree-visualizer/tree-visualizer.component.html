@@ -127,7 +127,7 @@
                 <table class="table">
                     <tr *ngFor="let item of metadata">
                         <th>{{item.name}}</th>
-                        <td>{{item.value}}</td>
+                        <td [innerHTML]="item.value"></td>
                     </tr>
                 </table>
             </div>

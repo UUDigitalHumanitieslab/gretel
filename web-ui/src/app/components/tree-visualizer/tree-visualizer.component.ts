@@ -19,7 +19,13 @@ import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
 type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
-interface Metadata { name: string; value: string; }
+interface Metadata {
+    name: string;
+    /**
+     * This can contain xml entities, display using innerHTML
+     */
+    value: string;
+}
 
 @Component({
     selector: 'grt-tree-visualizer',
