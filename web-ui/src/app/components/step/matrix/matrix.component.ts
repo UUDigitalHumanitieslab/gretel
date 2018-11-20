@@ -148,7 +148,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     public updateValidity() {
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
     }
 
     public getValidationMessage() {

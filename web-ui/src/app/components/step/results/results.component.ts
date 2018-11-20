@@ -135,7 +135,7 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
             this.liveResults()
         ];
 
-        this.onChangeValid = new EventEmitter();
+        this.changeValid = new EventEmitter();
     }
 
     ngOnChanges(changes: SimpleChanges) {
