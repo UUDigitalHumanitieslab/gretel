@@ -153,6 +153,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         // reset parse/previous settings
         this.globalState.exampleXml = undefined;
         this.globalState.isCustomXPath = false;
+        this.globalState.attributes = undefined;
         this.updateGlobalState(this.globalState);
     }
 

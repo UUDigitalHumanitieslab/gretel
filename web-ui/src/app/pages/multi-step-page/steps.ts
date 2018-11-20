@@ -81,8 +81,12 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
         const tokenized = this.alpinoService.tokenize(state.inputSentence);
         if (existingTokens !== tokenized) {
             state.tokens = tokenized.split(' ');
-            state.attributes = state.tokens.map(() => 'pos'); // default value
         }
+        state.attributes = state.tokens.map((val, index) =>
+            state.attributes && state.attributes.length > index
+                ? state.attributes[index]
+                // default value
+                : 'pos');
         return this.updateMatrix(state);
     }
 
