@@ -134,8 +134,10 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     public customXPathChanged(valueEvent: ValueEvent) {
-        this.valid = !valueEvent.error;
-        this.emitChange(valueEvent.xpath);
+        this.valid = !valueEvent.error && !!valueEvent.xpath;
+        if (!!valueEvent.xpath) {
+            this.emitChange(valueEvent.xpath);
+        }
     }
 
     public editXPath() {
