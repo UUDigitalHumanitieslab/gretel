@@ -12,19 +12,19 @@
   <div class="results-ajax-wrapper" data-collapse-target="true">
     <p>Click on a sentence ID to view the tree structure. The part of the sentence matching your input structure is set in bold.</p>
     <?php
-    if ($corpus == 'sonar'):
+    if (isGrinded($corpus)):
         $component = $components[0];
-        if (!$needRegularSonar && isset($databaseGroups{$corpus}{$component}{'sentences'})):
-          $componentSize = $databaseGroups{$corpus}{$component}{'sentences'};
+        if (!$needRegularGrinded && isset($databaseGroups[$corpus][$component]['sentences'])):
+          $componentSize = $databaseGroups[$corpus][$component]['sentences'];
           if ($componentSize > 1000000):
           ?>
-        <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize);?></strong> sentences.
+        <p class="notice"><small><strong>Notice!</strong> You are querying a very large component, consisting of <strong><?php echo number_format($componentSize); ?></strong> sentences.
            <br>Searching through all of them can take a while!</small></p>
         <?php endif;
         endif;
-    endif;?>
-    <?php include ROOT_PATH."/front-end-includes/results-controls.php"; ?>
-    <?php require ROOT_PATH."/front-end-includes/results-table-wrapper.php"; ?>
+    endif; ?>
+    <?php include ROOT_PATH.'/front-end-includes/results-controls.php'; ?>
+    <?php require ROOT_PATH.'/front-end-includes/results-table-wrapper.php'; ?>
   </div>
 </section>
 
@@ -32,13 +32,13 @@
   <h2 data-collapse-btn="true">Download results</h2>
   <div class="flex-content" data-collapse-target="true">
       <div class="results-messages-wrapper">
-        <?php if ($corpus != 'sonar'): ?>
+        <?php if (!isGrinded($corpus)): ?>
         <h3>Download results</h3>
       <?php endif; ?>
         <div class="messages">
         </div>
       </div>
-      <?php if ($corpus != 'sonar'): ?>
+      <?php if (!isGrinded($corpus)): ?>
       <div class="distribution-wrapper">
       <h3>Distribution list</h3>
       <div class="table-wrapper">

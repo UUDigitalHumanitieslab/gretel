@@ -81,7 +81,7 @@
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
-        <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
+        <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (hidingComponents)="hideComponents($event)"></grt-distribution-list>
     </div>
 </div>
 <div class="level">
@@ -205,4 +205,4 @@
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" [loading]="loadingTree" *ngIf="loadingTree || treeXml"  display="fullscreen"></grt-tree-visualizer>

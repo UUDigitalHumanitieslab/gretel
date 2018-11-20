@@ -20,6 +20,6 @@
         </label>
     </div>
     <div *ngIf="treebank.name == selectedTreebank" class="box is-shadowless">
-        <grt-sub-treebanks [treebankName]="treebank.name" (onSelect)="updateSelected($event)"></grt-sub-treebanks>
+        <grt-sub-treebanks [treebankName]="treebank.name" (select)="updateSelected($event)"></grt-sub-treebanks>
     </div>
 </ng-container>
