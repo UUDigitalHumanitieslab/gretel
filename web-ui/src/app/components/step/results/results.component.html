@@ -205,4 +205,4 @@
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" [loading]="loadingTree" *ngIf="loadingTree || treeXml"  display="fullscreen"></grt-tree-visualizer>
