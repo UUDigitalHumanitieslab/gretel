@@ -7,6 +7,7 @@
         <grt-parse *ngSwitchCase="1" (changeValid)="setValid($event)" [sentence]="globalState.inputSentence" [xml]="globalState.exampleXml"
             #parse></grt-parse>
         <grt-matrix *ngSwitchCase="2" (changeValid)="setValid($event)" (changeValue)="updateMatrix($event)"
+            [retrieveContext]="globalState.retrieveContext" [respectOrder]="globalState.respectOrder" [ignoreTopNode]="globalState.ignoreTopNode"
             [attributes]="globalState.attributes" [isCustomXPath]="globalState.isCustomXPath" [tokens]="globalState.tokens"
             [xpath]="globalState.xpath" [subTreeXml]="globalState.subTreeXml" #matrix></grt-matrix>
         <grt-select-treebanks *ngSwitchCase="3" (changeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus"
