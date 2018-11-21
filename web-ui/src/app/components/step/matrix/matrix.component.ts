@@ -11,7 +11,13 @@ import { ValueEvent } from 'lassy-xpath/ng';
 export class MatrixComponent extends StepComponent implements OnInit {
     @Input('attributes')
     public set attributes(values: string[]) {
-        this.tokenValues = values.map(value => this.options.find(o => o.value === value));
+        this.tokenValues = values.map(value => {
+            const option = this.options.find(o => o.value === value);
+            if (option.advanced) {
+                this.showAdvanced = true;
+            }
+            return option;
+        });
     }
 
     public get attributes() {
@@ -33,6 +39,12 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public xpath: string;
     @Input()
     public isCustomXPath: boolean;
+    @Input()
+    public respectOrder;
+    @Input()
+    public retrieveContext;
+    @Input()
+    public ignoreTopNode;
 
     @Output()
     public changeValue = new EventEmitter<MatrixSettings>();
@@ -40,9 +52,6 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public filename: string;
     public subTreeDisplay = 'inline';
     public warning: boolean;
-    public respectOrder;
-    public retrieveContext;
-    public ignoreTopNode;
 
     public indexedTokens: { value: string, index: number }[];
     public showAdvanced: boolean;
@@ -121,21 +130,30 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.emitChange();
     }
 
-    public emitChange(customXPath: string = null) {
-        this.changeValue.next({
+    public emitChange(customXPath: string = null, settings: { [key: string]: boolean } = {}) {
+        if (customXPath == null) {
+            this.valid = true;
+        }
+        this.changeValue.next(Object.assign({
             attributes: this.tokenValues.map(t => t.value),
             retrieveContext: this.retrieveContext,
             customXPath,
             respectOrder: this.respectOrder,
             tokens: [...this.tokens],
             ignoreTopNode: this.ignoreTopNode
-        });
+        }, settings));
         this.updateValidity();
     }
 
+    public toggleSetting(key: 'retrieveContext' | 'respectOrder' | 'ignoreTopNode') {
+        this.emitChange(null, { [key]: !this[key] });
+    }
+
     public customXPathChanged(valueEvent: ValueEvent) {
-        this.valid = !valueEvent.error;
-        this.emitChange(valueEvent.xpath);
+        this.valid = !valueEvent.error && !!valueEvent.xpath;
+        if (!!valueEvent.xpath) {
+            this.emitChange(valueEvent.xpath);
+        }
     }
 
     public editXPath() {
@@ -148,7 +166,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     public updateValidity() {
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
     }
 
     public getValidationMessage() {

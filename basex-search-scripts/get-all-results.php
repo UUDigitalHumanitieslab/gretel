@@ -35,8 +35,8 @@ if (!isset($analysisLimit)) {
     $analysisLimit = $resultsLimit;
 }
 $searchLimit = isset($_POST['isAnalysis']) && $_POST['isAnalysis'] === 'true' ? $analysisLimit : $resultsLimit;
-if ($corpus == 'sonar') {
-    $needRegularSonar = $_SESSION[SID]['needRegularSonar'];
+if (isGrinded($corpus)) {
+    $needRegularGrinded = $_SESSION[SID]['needRegularGrinded'];
 }
 
 $xpath = $_SESSION[SID]['xpath'].$_SESSION[SID]['metadataFilter'];
@@ -73,7 +73,7 @@ if ($ebsxps == 'ebs') {
 }
 
 try {
-    if ($corpus == 'sonar') {
+    if (isGrinded($corpus)) {
         $serverInfo = getServerInfo($corpus, $components[0]);
     } else {
         $serverInfo = getServerInfo($corpus, false);
@@ -136,7 +136,7 @@ try {
             $transformQuotes = array('"' => '&quot;', "'" => '&apos;');
             $hlsentence = strtr($hlsentence, $transformQuotes);
 
-            if ($corpus == 'sonar') {
+            if (isGrinded($corpus)) {
                 // E.g. WRPEC0000019treebank
                 $databaseString = $tblist[$sid];
             }
@@ -158,7 +158,7 @@ try {
                 $componentsFromRegex = substr($componentsFromRegex[1], 1);
 
                 $componentsString = str_replace('-', '', $componentsFromRegex);
-            } elseif ($corpus == 'sonar') {
+            } elseif (isGrinded($corpus)) {
                 preg_match('/^([a-zA-Z]{2}(?:-[a-zA-Z]){3})/', $sidString, $componentsFromRegex);
                 $componentsString = str_replace('-', '', $componentsFromRegex[1]);
             }
@@ -187,7 +187,7 @@ try {
 
             fwrite($dlFh, "$corpus\t");
             fwrite($printFh, "<td>$corpus</td>");
-            if (!($corpus == 'sonar' && $addSentIds)) {
+            if (!(isGrinded($corpus) && $addSentIds)) {
                 fwrite($dlFh, "$componentsString\t");
                 fwrite($printFh, "<td>$componentsString</td>");
             }

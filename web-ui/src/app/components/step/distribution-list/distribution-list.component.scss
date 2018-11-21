@@ -1,0 +1,15 @@
+table.scroll {
+    tbody {
+        display: block;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    thead,
+    tfoot,
+    tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+}

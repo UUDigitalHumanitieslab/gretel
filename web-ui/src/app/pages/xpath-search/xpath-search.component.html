@@ -2,19 +2,19 @@
 <ng-container *ngIf="globalState.currentStep">
     <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
     <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
-        <grt-xpath-input *ngSwitchCase="0" (onChangeValid)="setValid($event)" (changeValue)="updateXPath($event, false)"
+        <grt-xpath-input *ngSwitchCase="0" (changeValid)="setValid($event)" (changeValue)="updateXPath($event, false)"
             (changeRetrieveContext)="updateRetrieveContext($event)" [retrieveContext]="globalState.retrieveContext"
             [value]="globalState.xpath" #xpathInput></grt-xpath-input>
-        <grt-select-treebanks *ngSwitchCase="1" (onChangeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus"
+        <grt-select-treebanks *ngSwitchCase="1" (changeValid)="setValid($event)" [mainTreebank]="globalState.selectedTreebanks.corpus"
             [subTreebanks]="globalState.selectedTreebanks.components" (mainTreebankChange)="updateSelectedMainTreebank($event)"
             (subTreebanksChange)="updateSelectedSubTreebanks($event)" #selectTreebanksComponentRef></grt-select-treebanks>
         <grt-results *ngSwitchCase="2" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
             [filterValues]="globalState.filterValues" [retrieveContext]="globalState.retrieveContext" [xpath]="globalState.xpath"
             (xpathChange)="updateXPath($event)" (changeFilterValues)="updateFilterValues($event)"
-            (changeRetrieveContext)="updateRetrieveContext($event, true)" (onChangeValid)="setValid($event)" (prev)="prev()"
+            (changeRetrieveContext)="updateRetrieveContext($event, true)" (changeValid)="setValid($event)" (prev)="prev()"
             (next)="next()" #resultsComponentRef></grt-results>
         <grt-analysis *ngSwitchCase="3" [corpus]="globalState.selectedTreebanks.corpus" [components]="globalState.selectedTreebanks.components"
-            [xpath]="globalState.xpath" (filterResults)="filterResults($event, 2)" (onChangeValid)="setValid($event)"></grt-analysis>
+            [xpath]="globalState.xpath" (filterResults)="filterResults($event, 2)" (changeValid)="setValid($event)"></grt-analysis>
     </div>
     <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>

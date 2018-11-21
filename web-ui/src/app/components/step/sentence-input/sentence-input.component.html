@@ -1,17 +1,16 @@
 <h2 class="subtitle">
     Example Sentence
 </h2>
-<p-message *ngIf="this.warning" severity="error" text="Please give a sentence"></p-message>
 <form (submit)="next.next()">
     <div class="columns">
         <div class="column is-half">
             <div class="field has-addons">
                 <div class="control is-expanded">
                     <input type="text" class="input" placeholder="Please give a sentence" [value]="inputSentence"
-                        (change)="inputChanges($event)" spellcheck="true" lang="nl">
+                        (keyup)="inputChanges($event)" spellcheck="true" lang="nl" [ngClass]="{'is-danger':warning}">
                 </div>
                 <div class="control">
-                    <button type="submit" class="button is-primary">Parse</button>
+                    <button type="submit" class="button" [ngClass]="{'is-danger':warning, 'is-primary': !warning}">Parse</button>
                 </div>
             </div>
         </div>

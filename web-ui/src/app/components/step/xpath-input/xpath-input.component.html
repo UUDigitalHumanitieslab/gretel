@@ -1,7 +1,6 @@
 <h2 class="subtitle">
     XPath Query
 </h2>
-<p-message *ngIf="this.warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
 <grt-xpath-editor width="100%" [value]="value" (onChange)="inputChanged($event)" autofocus="true"></grt-xpath-editor>
 <div class="field">
     <label class="checkbox">
@@ -9,7 +8,7 @@
         <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="In the results, show the sentence before and after the matching sentence to provide a broader context">
             <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
         </label>
-        
+
     </label>
 </div>
 <ng-container *ngIf="treeXml">
@@ -20,7 +19,7 @@
                 <label grtBalloonLength="medium" grtBalloonPosition="right" grtBalloon="This is a visualization of the entered query.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
-                
+
             </div>
             <div class="level-item level-right is-hidden-print">
                 <p class="control">

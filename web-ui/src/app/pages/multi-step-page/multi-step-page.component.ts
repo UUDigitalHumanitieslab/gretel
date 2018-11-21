@@ -190,7 +190,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.globalState.filterValues = filterValues;
     }
 
-    filterResults(values: { xpath: string, filterValues: FilterValues }, resultsStep) {
+    filterResults(values: { xpath: string, filterValues: FilterValues }, resultsStep: number) {
         // TODO: xpath
         this.globalState.filterValues = values.filterValues;
         this.goToStep(resultsStep, true);

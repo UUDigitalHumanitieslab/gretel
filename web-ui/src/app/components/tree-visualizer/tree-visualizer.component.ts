@@ -19,7 +19,13 @@ import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
 type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
-interface Metadata { name: string; value: string; }
+interface Metadata {
+    name: string;
+    /**
+     * This can contain xml entities, display using innerHTML
+     */
+    value: string;
+}
 
 @Component({
     selector: 'grt-tree-visualizer',
@@ -53,10 +59,14 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public url: string;
 
+    @Input()
+    public loading = false;
+
     @Output()
     public displayChange = new EventEmitter<TreeVisualizerDisplay>();
 
     public metadata: Metadata[] | undefined;
+    public showLoader: boolean;
 
     // jquery tree visualizer
     private instance: any;
@@ -75,12 +85,18 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
 
     ngOnChanges(changes: TypedChanges) {
         const element = $(this.output.nativeElement);
-        if (changes.xml && changes.xml.currentValue !== changes.xml.previousValue) {
-            this.visualize(element);
+        if (changes.loading && this.loading) {
+            this.showLoader = true;
         }
 
-        if (this.instance) {
-            this.updateVisibility();
+        if (!this.loading && this.xml) {
+            if (changes.xml && changes.xml.currentValue !== changes.xml.previousValue) {
+                this.visualize(element);
+            }
+
+            if (this.instance) {
+                this.updateVisibility();
+            }
         }
     }
 
@@ -121,6 +137,8 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
         } else {
             this.instance.trigger('close-fullscreen');
         }
+
+        this.showLoader = false;
     }
 
     /**
@@ -129,7 +147,8 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
      */
     private showMetadata(data: any) {
         const result: Metadata[] = [];
-        if (data && data.alpino_ds && data.alpino_ds.metadata) {
+        if (data && data.alpino_ds && data.alpino_ds.metadata
+            && data.alpino_ds.metadata[0].meta) {
             for (const item of data.alpino_ds.metadata[0].meta.sort(function (a, b) {
                 return a.$.name.localeCompare(b.$.name);
             })) {

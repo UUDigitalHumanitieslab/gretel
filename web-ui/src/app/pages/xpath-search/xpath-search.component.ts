@@ -98,14 +98,14 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     decodeGlobalState(queryParams) {
         return {
-            step: queryParams.currentStep || 0 as number,
+            step: parseInt(queryParams.currentStep || 0, 10),
             state:
             {
                 selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                 xpath: queryParams.xpath || undefined,
                 retrieveContext: this.decodeBool(queryParams.retrieveContext)
             }
-        }
+        };
     }
 
     /**

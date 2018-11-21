@@ -10,14 +10,14 @@ function getTreebankCounts($corpus, $components, $xpath)
 {
     global $dbuser, $dbpwd;
 
-    if ($corpus == 'sonar') {
+    if (isGrinded($corpus)) {
         $serverInfo = getServerInfo($corpus, $components[0]);
     } else {
         $serverInfo = getServerInfo($corpus, false);
     }
 
-    $already = array(); // TODO: unresolved Sonar behavior (see #81)
-    $databases = corpusToDatabase($components, $corpus);
+    $already = array();
+    $databases = corpusToDatabase($components, $corpus, $xpath);
 
     $dbhost = $serverInfo['machine'];
     $dbport = $serverInfo['port'];
@@ -26,6 +26,10 @@ function getTreebankCounts($corpus, $components, $xpath)
     list($sum, $counts) = getCounts($databases, $already, $session, $xpath, $corpus);
 
     $session->close();
+
+    if (isGrinded($corpus)) {
+        return array($components[0] => $sum);
+    }
 
     return $counts;
 }

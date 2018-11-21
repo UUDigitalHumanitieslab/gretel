@@ -107,7 +107,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
 
     decodeGlobalState(queryParams) {
         return {
-            step: queryParams.currentStep || 0 as number,
+            step: parseInt(queryParams.currentStep || 0, 10),
             state: {
                 selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                 xpath: queryParams.xpath || undefined,
@@ -153,13 +153,15 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         // reset parse/previous settings
         this.globalState.exampleXml = undefined;
         this.globalState.isCustomXPath = false;
+        this.globalState.attributes = undefined;
         this.updateGlobalState(this.globalState);
     }
 
-    updateMatrix(matrixSettings: MatrixSettings) {
+    async updateMatrix(matrixSettings: MatrixSettings) {
         this.globalState.retrieveContext = matrixSettings.retrieveContext;
         this.globalState.ignoreTopNode = matrixSettings.ignoreTopNode;
         this.globalState.respectOrder = matrixSettings.respectOrder;
+
         if (matrixSettings.customXPath) {
             this.globalState.isCustomXPath = true;
             this.globalState.xpath = matrixSettings.customXPath;
@@ -167,8 +169,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.globalState.isCustomXPath = false;
             this.globalState.tokens = matrixSettings.tokens;
             this.globalState.attributes = matrixSettings.attributes;
-            this.matrixStep.updateMatrix(this.globalState);
+            this.globalState = await this.matrixStep.updateMatrix(this.globalState);
         }
+        this.updateGlobalState(this.globalState);
     }
 
     updateRetrieveContext(retrieveContext: boolean) {
