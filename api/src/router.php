@@ -119,7 +119,10 @@ $router->map('POST', '/results', function () {
         $remainingDatabases,
         $already);
 
-    $results[] = $searchLimit;
+    if ($results['success']) {
+        // append the actual search limit from the configuration
+        $results['searchLimit'] = $searchLimit;
+    }
 
     header('Content-Type: application/json');
     echo json_encode($results);

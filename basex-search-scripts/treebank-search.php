@@ -150,10 +150,22 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
                 $tblist = false;
             }
 
-            return array($sentences, $tblist, $idlist, $beginlist, $xmllist, $metalist, $varList, $endPosIteration, $databases, $sentenceDatabases, $xquery);
+            return array(
+                success => true,
+                sentences => $sentences,
+                tblist => $tblist,
+                idlist => $idlist,
+                beginlist => $beginlist,
+                xmllist => $xmllist,
+                metalist => $metalist,
+                varlist => $varList,
+                endPosIteration => $endPosIteration,
+                databases => $databases,
+                sentenceDatabases => $sentenceDatabases,
+                xquery => $xquery, );
         } else {
             // in case there are no results to be found
-            return false;
+            return array(success => false, xquery => $xquery);
         }
     } catch (Exception $e) {
         // allow a developer to directly debug this query (log is truncated)
