@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { StepComponent } from '../step.component';
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
@@ -36,16 +36,18 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
         super();
 
         macroService.loadDefault();
-        this.subscriptions.push(this.valueSubject.pipe(debounceTime(500)).subscribe(value => {
-            let paths: PathVariable[] = null;
-            try {
-                paths = extractinatorService.extract(value);
-                this.treeXml = reconstructorService.construct(paths, value);
-            } catch (err) {
-                // probably some malformed input
-                console.error(err);
-            }
-        }));
+        this.subscriptions.push(this.valueSubject.pipe(
+            debounceTime(500),
+            distinctUntilChanged()).subscribe(value => {
+                let paths: PathVariable[] = null;
+                try {
+                    paths = extractinatorService.extract(value);
+                    this.treeXml = reconstructorService.construct(paths, value);
+                } catch (err) {
+                    // probably some malformed input
+                    console.error(err);
+                }
+            }));
     }
 
     valid = false;

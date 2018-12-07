@@ -4,9 +4,7 @@ import { Parser } from 'xml2js';
 
 @Injectable()
 export class XmlParseService {
-    private parser = new Parser({
-        strict: false
-    });
+    private parser = new Parser();
 
     parse(xml: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
