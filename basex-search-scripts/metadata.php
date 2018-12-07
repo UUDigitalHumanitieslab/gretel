@@ -3,22 +3,6 @@
 require_once 'treebank-search.php';
 
 /**
- * Retrieves metadata from the $_GET variable and adds it to the $_SESSION,
- * and clears unused metadata from the $_SESSION.
- */
-function retrieve_metadata()
-{
-    foreach ($_GET as $key => $value) {
-        $_SESSION['m-'.$key] = $value;
-    }
-    foreach ($_SESSION as $key => $value) {
-        if (substr($key, 0, 2) == 'm-' && !(in_array(substr($key, 2), array_keys($_GET)))) {
-            unset($_SESSION[$key]);
-        }
-    }
-}
-
-/**
  * Retrieves the metadata fields of the current corpus.
  *
  * @global string $corpus The current corpus
@@ -34,45 +18,6 @@ function get_metadata_fields()
     return array_map(function ($m) {
         return $m->field;
     }, $metadata);
-}
-
-/**
- * Builds the xQuery metadata filter.
- *
- * @return string The metadata filter
- */
-function get_metadata_filter($sid)
-{
-    $metadata_fields = get_metadata_fields();
-
-    // Compile the filter
-    $m_filter = '';
-    foreach ($_SESSION[$sid] as $key => $value) {
-        if (substr($key, 0, 2) != 'm-') {
-            continue;
-        }
-
-        $key = substr($key, 2);
-        if (in_array($key, $metadata_fields)) {
-            $values = explode('*', $value);
-
-            // Single values
-            if (count($values) == 1) {
-                $m_filter .= '[ancestor::alpino_ds/metadata/meta'
-                        .'[@name="'.$key.'" and '
-                        .'@value="'.$values[0].'"]] ';
-            }
-            // Ranged values
-            elseif (count($values) == 2) {
-                $m_filter .= '[ancestor::alpino_ds/metadata/meta'
-                        .'[@name="'.$key.'" and '
-                        .'@value>="'.$values[0].'" and '
-                        .'@value<="'.$values[1].'"]] ';
-            }
-        }
-    }
-
-    return $m_filter;
 }
 
 /**

@@ -196,49 +196,6 @@ function checkBfPattern($corpus, $bf, $components)
     }
 }
 
-function tokenize($sentence)
-{
-    // Add space before and after punctuation marks
-    $sentence = preg_replace('/([<>\.\,\:\;\?!\(\)\"])/', ' $1 ', $sentence);
-    // Deal wth ...
-    $sentence = preg_replace("/(\.\s+\.\s+\.)/", ' ... ', $sentence);
-    // Delete first and last space(s)
-    $sentence = preg_replace('/^\s*(.*?)\s*$/', '$1', $sentence);
-    // Change multiple spaces to single space
-    $sentence = preg_replace('/\s+/', ' ', $sentence);
-
-    return $sentence;
-}
-
-function modifyLemma($parse, $id)
-{
-    $parseLocation = ROOT_PATH."/tmp/$id-pt.xml";
-    $output = fopen($parseLocation, 'w');
-    // Read alpino parse
-    $xml = simpledom_load_string(file_get_contents($parse));
-    // Sort terminal nodes by 'begin' attribute
-    $pts = $xml->sortedXPath('//node[@begin and @postag]', '@begin');
-
-    foreach ($pts as $pt) {
-        if ($pt != 'let') {
-            $lemma = $pt->getAttribute('lemma');
-            // Remove _ from lemmas (for compounds) & remove _DIM from lemmas (for diminutives)
-            $lemma = preg_replace('/_(DIM)?/', '', $lemma);
-            // Add lemma
-            $pt->setAttribute('lemma', $lemma);
-        }
-    }
-
-    if ($xml->xpath('/treebank')) {
-        $tree = $xml->alpino_ds->asXML();
-    } else {
-        $tree = $xml->asXML();
-    }
-
-    fwrite($output, $tree);
-    fclose($output);
-}
-
 function applyCs($xpath)
 {
     if (strpos($xpath, '@caseinsensitive="yes"') !== false) {
@@ -259,15 +216,4 @@ function applyCs($xpath)
     }
 
     return $xpath;
-}
-
-function isSpam($string)
-{
-    $websiteRegex = '/(?:https?\:\/\/)?[a-zA-Z0-9-.+&@#%?=~_|!:,.;\/\\\]+(?:\.[a-zA-Z]{2,3}){1,2}(\/\S*)?/';
-
-    if (preg_match($websiteRegex, $string) || filter_var($string, FILTER_VALIDATE_EMAIL)) {
-        return true;
-    }
-
-    return false;
 }
