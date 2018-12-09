@@ -283,7 +283,9 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      */
     private getFilterForQuery(id, value): FilterByXPath {
         const [variable, attribute] = id.split('.');
-        const attrSelector = `@${attribute}="${value}"`;
+        const attrSelector = value === AnalysisService.placeholder
+            ? `@${attribute}="" OR NOT(@${attribute})`
+            : `@${attribute}="${value}"`;
         return {
             field: id,
             label: `${variable}[${attrSelector}]`,

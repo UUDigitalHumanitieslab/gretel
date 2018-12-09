@@ -7,7 +7,12 @@ import { Hit } from './results.service';
 
 @Injectable()
 export class AnalysisService {
-    private getRow(variables: { [name: string]: string[] }, metadataKeys: string[], result: Hit, placeholder: string): Row {
+    /**
+     * If a value is missing for a column, this value is used instead.
+     */
+    public static placeholder = '(none)';
+
+    private getRow(variables: { [name: string]: string[] }, metadataKeys: string[], result: Hit): Row {
         let metadataValues: { [name: string]: string } = {};
         for (let key of metadataKeys) {
             metadataValues[key] = result.metaValues[key];
@@ -18,7 +23,7 @@ export class AnalysisService {
             let node = result.variableValues[name];
             let values: { [attribute: string]: string } = {};
             for (let attribute of variables[name]) {
-                values[attribute] = node && node[attribute] ? node[attribute] : placeholder;
+                values[attribute] = node && node[attribute] || AnalysisService.placeholder;
             };
             nodeVariableValues[name] = values;
         }
@@ -54,14 +59,13 @@ export class AnalysisService {
      * @param searchResults The results to parse.
      * @param variables The variables and their properties to return, which should be present in the results.
      * @param metadataKeys The metadata keys to return, which should be present in the results.
-     * @param placeholder If a value is missing for a column, this value is used instead.
      * @returns The first row contains the column names, the preceding the associated values.
      */
-    public getFlatTable(searchResults: Hit[], variables: { [name: string]: string[] }, metadataKeys: string[], placeholder = '(none)'): string[][] {
+    public getFlatTable(searchResults: Hit[], variables: { [name: string]: string[] }, metadataKeys: string[]): string[][] {
         let rows: Row[] = [];
 
         for (let result of searchResults) {
-            let row = this.getRow(variables, metadataKeys, result, placeholder);
+            let row = this.getRow(variables, metadataKeys, result);
             rows.push(row);
         }
 
@@ -79,7 +83,7 @@ export class AnalysisService {
         for (let row of rows) {
             let line: string[] = [];
 
-            line.push(...metadataKeys.map(key => row.metadataValues[key] ? row.metadataValues[key] : placeholder));
+            line.push(...metadataKeys.map(key => row.metadataValues[key] || AnalysisService.placeholder));
             for (let name of Object.keys(variables)) {
                 line.push(...variables[name].map(attr => row.nodeVariableValues[name][attr]));
             }
