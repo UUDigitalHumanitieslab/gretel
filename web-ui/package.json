@@ -7,7 +7,7 @@
         "serve": "ng serve --proxy-config proxy.conf.json",
         "serve:poll": "ng serve --poll=2000 --host 0.0.0.0 --proxy-config proxy.conf.json",
         "build": "ng build --prod --base-href=/ng/ --output-path=../ng",
-        "test": "ng test --source-map=false",
+        "test": "ng test",
         "lint": "ng lint",
         "e2e": "ng e2e"
     },
@@ -41,7 +41,7 @@
         "hammerjs": "^2.0.8",
         "jquery": "^3.3.1",
         "jquery-ui": "^1.12.1",
-        "lassy-xpath": "^0.3.10",
+        "lassy-xpath": "^0.3.11",
         "lodash": "^4.17.10",
         "ngx-clipboard": "^10.0.0",
         "node-sass": "^4.9.2",

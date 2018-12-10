@@ -6,6 +6,7 @@ import { Observable, Observer } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
+import { PathVariable, Location } from 'lassy-xpath/ng';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -132,7 +133,7 @@ export class ResultsService {
         searchLimit: number | null = null): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult>(
             await this.configurationService.getApiUrl('results'), {
-                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                xpath: this.createFilteredQuery(xpath, metadataFilters),
                 retrieveContext,
                 corpus,
                 components,
@@ -163,7 +164,7 @@ export class ResultsService {
     async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
             await this.configurationService.getApiUrl('metadata_counts'), {
-                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                xpath: this.createFilteredQuery(xpath, metadataFilters),
                 corpus,
                 components,
             }, httpOptions).toPromise();
@@ -172,7 +173,7 @@ export class ResultsService {
     async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         const results = await this.http.post<{ [databaseId: string]: string }>(
             await this.configurationService.getApiUrl('treebank_counts'), {
-                xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
+                xpath: this.createFilteredQuery(xpath, metadataFilters),
                 corpus,
                 components,
             }, httpOptions).toPromise();
@@ -186,25 +187,28 @@ export class ResultsService {
     }
 
     /**
-     * Builds the XQuery metadata filter.
+     * Modifies an xpath query to query on filters.
      *
-     * @return string The metadata filter
+     * @param xpath Query to modify
+     * @return string The modified xpath
      */
-    public createMetadataFilterQuery(filters: FilterValue[]) {
+    public createFilteredQuery(xpath: string, filters: FilterValue[]) {
         function escape(value: string | number) {
             return value.toString()
                 .replace(/&/g, '&amp;')
                 .replace(/"/g, '&quot;');
         }
 
-        // Compile the filter
-        const filterQueries: string[] = [];
+        const modifiedXpath = (xpath || '').trimRight().split('\n').map(line => ({
+            line,
+            appends: [] as { position: number, text: string }[]
+        }));
+        const metadataFilters: string[] = [];
         for (const filter of filters) {
             switch (filter.type) {
                 case 'single':
                     // Single values
-                    filterQueries.push(
-                        `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`);
+                    metadataFilters.push(`\tmeta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]`);
                     break;
                 case 'range':
                     // Ranged values
@@ -220,21 +224,78 @@ export class ResultsService {
                         value = '@value';
                     }
 
-                    filterQueries.push(
-                        `[ancestor::alpino_ds/metadata/meta[@name="${
-                        escape(filter.field)}" and\n\t${value}>=${min} and ${value}<=${max}]]`);
+                    metadataFilters.push(`\tmeta[@name="${escape(filter.field)}" and\n\t\t${value}>=${min} and ${value}<=${max}]`);
                     break;
                 case 'multiple':
                     // Single values
-                    filterQueries.push(`[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and\n\t(${
-                        filter.values.map((v) => `@value="${escape(v)}"`).join(' or\n\t')})]]`);
+                    metadataFilters.push(
+                        `\tmeta[@name="${escape(filter.field)}" and
+\t\t(${filter.values.map((v) => `@value="${escape(v)}"`).join(' or\n\t\t ')})]`);
                     break;
                 case 'xpath':
-                    filterQueries.push(`[${filter.xpath}]`);
+                    const line = modifiedXpath[filter.location.line - 1];
+                    if (line && line.line.substring(filter.location.firstColumn, filter.location.lastColumn) === 'node') {
+                        line.appends.push({ position: filter.location.lastColumn, text: filter.attributeXpath });
+                    } else {
+                        modifiedXpath.push({
+                            line: `[${filter.contextXpath}${filter.attributeXpath}]`,
+                            appends: []
+                        });
+                    }
                     break;
             }
         }
-        return filterQueries.join('\n');
+
+        return modifiedXpath.map(line => {
+            let offset = 0;
+            const lineChars = line.line.split('');
+            for (const append of line.appends.sort(a => a.position)) {
+                lineChars.splice(append.position + offset, 0, ...append.text.split(''));
+                offset += append.text.length;
+            }
+            return lineChars.join('');
+        }).join('\n') + (!metadataFilters.length ? '' : `\n[ancestor::alpino_ds/metadata[\n${metadataFilters.join(' or\n')}]]`)
+            .replace(/\t/g, '    ');
+    }
+
+    /**
+     * Gets filters for an extracted xpath query
+     * @param variable The variable name of the node.
+     * @param attribute The attribute of that node to filter
+     * @param value The attribute value (or null for not filtering)
+     * @param value The available variables
+     */
+    public getFilterForQuery(
+        variable: string,
+        attribute: string,
+        value: string,
+        variables: { [name: string]: PathVariable }): FilterByXPath {
+        const attrSelector = value
+            ? `@${attribute}="${value}"`
+            : `@${attribute}="" or not(@${attribute})`;
+        return {
+            field: `${variable}.${attribute}`,
+            label: `${variable}[${attrSelector}]`,
+            type: 'xpath',
+            location: variables[variable].location,
+            contextXpath: this.resolveRootPath(variables, variable),
+            attributeXpath: `[${attrSelector}]`
+        };
+    }
+
+    private resolveRootPath(variables: { [name: string]: PathVariable }, variable: string) {
+        const path = variables[variable].path;
+        if (/^\*/.test(path)) {
+            return '';
+        }
+
+        const match = path.match(/(^\$node\d*)\//);
+        if (match) {
+            const parentVar = match[1];
+            const parentPath = this.resolveRootPath(variables, parentVar);
+
+            return (parentPath ? `${parentPath}/` : '') + path.substring(match[0].length);
+        }
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
@@ -484,7 +545,18 @@ export interface FilterByXPath {
     field: string;
     type: 'xpath';
     label: string;
-    xpath: string;
+    location: Location;
+    /**
+     * The predicate to add to the node to filter it.
+     */
+    attributeXpath: string;
+    /**
+     * Selector to add to the entire query to select the node
+     * being filtered on. This is necessary if the node cannot be
+     * modified in the main query. That can happen if that query has
+     * been changed by the user (in the results component).
+     */
+    contextXpath: string;
 }
 
 export interface TreebankCount {
