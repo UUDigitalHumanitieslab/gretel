@@ -152,9 +152,12 @@ export class ResultsService {
     }
 
     async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
-        const url = await this.configurationService.getGretelUrl(
-            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}${
-            database ? `&db=${database}` : ''}`);
+        const url = await this.configurationService.getApiUrl(
+            'tree', [
+                treebank,
+                sentenceId,
+                nodeIds.join('-')],
+            { ...(database && { db: database }) });
 
         const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
         return { url, treeXml };
@@ -295,7 +298,7 @@ export class ResultsService {
             }[]
         }
     }): Hit['metaValues'] {
-        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata || !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {});

@@ -71,11 +71,10 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 
 * The results that are flushed to the user at a time as well as the maximum results that will be fetched is stored in variables in `config.php`. Change `$flushLimit` and `$resultsLimit` to the values that you want.
 * Scripts are organised according to their function:
+  * `api/`: entry point for server calls from the front-end (through `api/src/router.php`).
   * `basex-search-scripts/`: scripts that are required to do the actual searching for results. However, the `basex-client.php` is sometimes needed in other cases as well to open up a BaseX session.
-  * `front-end-includes/`: files that are included or required by other scripts and that present content rather than execute functions are stored here (e.g. `head.php`, `footer.php`). Content that is shared between the example-based search and the XPath search can be found here as well §e.g. `results-shared-content.php`).
   * `preparatory-scripts/`: scripts that run functions on the input leading up to but not including the actual fetching of results. These scripts manipulate do things such as creating XPath, generating breadth-first patterns, parsing the input, and modifying input examples.
   * `functions.php`: contains general functions that are often required but that are not specific to any part of the process
-  * `helpers.php`: basic helper functions that return booleans.
 
 ## Credits
 

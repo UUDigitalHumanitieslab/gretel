@@ -35,22 +35,6 @@ $analysisFlushLimit = 500;
 $cats = array('advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
     'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub', );
 
-$matrixOptions = array(
-    array(
-        'word' => 'token',
-        'case sensitive' => 'cs',
-        'lemma' => 'lemma',
-    ),
-    array(
-      'word class' => 'pos',
-      'detailed word class' => 'postag',
-    ),
-    array(
-      'optional in search' => 'na',
-      'not in search' => 'not',
-    ),
-);
-
 // BaseX database variables
 // REST: all components with < 1mil databases
 // === CHANGE MACHINE AND PORTS, AND USER AND PW BELOW (BaseX) === //

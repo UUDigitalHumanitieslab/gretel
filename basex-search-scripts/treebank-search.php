@@ -137,15 +137,6 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
         }
 
         if (isset($sentences)) {
-            if ($endPosIteration !== 'all') {
-                if ($sid != null) {
-                    session_start();
-                    $_SESSION[$sid]['endPosIteration'] = $endPosIteration;
-                    $_SESSION[$sid]['flushDatabases'] = $databases;
-                    $_SESSION[$sid]['flushAlready'] = $already;
-                    session_write_close();
-                }
-            }
             if (!isGrinded($corpus)) {
                 $tblist = false;
             }
