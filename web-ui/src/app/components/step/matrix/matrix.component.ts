@@ -40,9 +40,9 @@ export class MatrixComponent extends StepComponent implements OnInit {
     public filename: string;
     public subTreeDisplay = 'inline';
     public warning: boolean;
-    public respectOrder;
-    public retrieveContext;
-    public ignoreTopNode;
+    public respectOrder: boolean;
+    public retrieveContext: boolean;
+    public ignoreTopNode: boolean;
 
     public indexedTokens: { value: string, index: number }[];
     public showAdvanced: boolean;

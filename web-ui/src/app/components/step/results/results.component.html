@@ -59,13 +59,81 @@
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
-        <grt-distribution-list [corpus]="corpus" [components]="components" [xpath]="xpath" (onHidingComponents)="hideComponents($event)"></grt-distribution-list>
+
+        <h2 class="subtitle">
+            <div class="level">
+                <div class="level-item level-left">
+                    Components
+                </div>
+                <div class="level-item level-right is-hidden-print">
+                    <div class="field">
+                        <p class="control">
+                            <a class="button" grtBalloonPosition="left" grtBalloon="Download distribution list (.csv)" [ngClass]="{'is-loading': loading}" (click)="downloadDistributionList()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </h2>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Hits</th>
+                    <th>All Sentences</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let provider of resultSummary | keyvalue">
+                    <ng-container *ngFor="let corpus of provider.value | keyvalue">
+                        <tr>
+                            <th>
+                                <label class="checkbox">
+                                    <input type="checkbox" [checked]="corpus.value.show" (change)="toggleCorpus(provider.key, corpus.key)" /> {{corpus.key}}
+                                </label>
+                            </th>
+                            <th>{{corpus.value.hits.length}}</th>
+                            <th>{{corpus.value.totalSentences}}</th>
+                        </tr>
+                        <ng-container *ngIf="corpus.value.show">
+                            <tr *ngFor="let component of corpus.value.components | keyvalue">
+                                <td>
+                                    <label class="checkbox">
+                                        <input type="checkbox" [checked]="component.value.show" (change)="toggleComponent(provider.key, corpus.key, component.key)" /> {{component.key}}
+                                    </label>
+                                </td>
+                                <td>{{component.value.hits}}</td>
+                                <td>{{component.value.sentences}}</td>
+                            </tr>
+                        </ng-container>
+                        <tr></tr> <!-- spacer row -->
+                    </ng-container>
+                </ng-container>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        <!--
+
+                            <label class="checkbox">
+                                <input type="checkbox" [checked]="totalSelected" (change)="toggleAllComponents(!totalSelected)" /> Total
+                            </label>
+                        -->
+                    </td>
+                    <td>{{totalHits}}</td>
+                    <td>{{totalSentences.toString()}}</td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
 <div class="level">
     <div class="level-left">
-        <h1 class="title">
-            Results: {{filteredResults.length}}
+        <h1 class="title" [ngClass]="{'is-loading': loading}">
+            Results: {{filteredResults.length}}<ng-container *ngIf="(totalHits - filteredResults.length) > 0"> ({{totalHits - filteredResults.length}} hidden)</ng-container>
         </h1>
     </div>
     <div class="level-right is-hidden-print">
@@ -80,22 +148,22 @@
         </div>
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
-                <p class="control">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
-                        <span class="icon is-large">
-                            <i class="fas fa-download"></i>
-                        </span>
-                    </a>
-                </p>
-                <p class="control">
-                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
-                        <span class="icon is-large">
-                            <i class="fas fa-file-alt"></i>
-                        </span>
-                    </a>
-                </p>
+                    <p class="control">
+                        <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
+                            <span class="icon is-large">
+                                <i class="fas fa-download"></i>
+                            </span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="medium" grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
+                            <span class="icon is-large">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
             </div>
-        </div>
         <div class="level-item">
             <div class="field">
                 <p class="control">
@@ -135,42 +203,42 @@
     </div>
 </div>
 <div class="columns">
-    <div class="column is-one-third is-hidden-print">
+    <div *ngIf="filters && filters.length" class="column is-one-third is-hidden-print">
         <div class="filter">
             <grt-filters [filters]="filters" (filterChange)="filterChange($event)"></grt-filters>
         </div>
     </div>
     <div class="column">
-        <ng-container *ngIf="filteredResults.length != 0; else warning">
-            <p-table [columns]="columns" [value]="filteredResults" [resizableColumns]="true" styleClass="bulma">
-                <ng-template pTemplate="colgroup" let-columns>
-                    <colgroup>
-                        <col *ngFor="let col of columns" [style.width]="col.width">
-                    </colgroup>
-                </ng-template>
-                <ng-template pTemplate="header" let-columns>
-                    <tr>
-                        <th *ngFor="let col of columns" pResizableColumn>
-                            {{col.header}}
-                        </th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                    <tr>
-                        <td *ngFor="let col of columns" class="ui-resizable-column">
-                            <div [ngSwitch]="col.field">
-                                <span *ngSwitchCase="'number'">{{i + 1}}</span>
-                                <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
-                                <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </ng-container>
+        <p-table *ngIf="filteredResults.length > 0 else warning" [columns]="columns" [value]="filteredResults" [resizableColumns]="true" styleClass="bulma">
+            <ng-template pTemplate="colgroup" let-columns>
+                <colgroup>
+                    <col *ngFor="let col of columns" [style.width]="col.width">
+                </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let col of columns" pResizableColumn>
+                        {{col.header}}
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
+                <tr>
+                    <td *ngFor="let col of columns" class="ui-resizable-column">
+                        <div [ngSwitch]="col.field">
+                            <span *ngSwitchCase="'number'">{{i + 1}}</span>
+                            <span *ngSwitchCase="'fileId'">{{rowData[col.field]}}</span>
+                            <!--<a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>-->
+                            <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
         <ng-template #warning>
             <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another treebank or other xpath-query</div>
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>

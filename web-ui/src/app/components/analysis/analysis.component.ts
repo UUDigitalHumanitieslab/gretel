@@ -2,7 +2,7 @@
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, filter, take } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -11,9 +11,12 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
+
+// TODO selected treebanks need to be reactive?
+// TODO use something other than the first results
 
 @Component({
     selector: 'grt-analysis',
@@ -25,8 +28,15 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     top: number;
     private $element: JQuery<HTMLElement>;
     private pivotUiOptions: PivotUiOptions;
-    private hits: Hit[];
-    private metadata: TreebankMetadata[];
+    private data: {
+        [provider: string]: {
+            [corpus: string]: {
+                metadata: TreebankMetadata[];
+                hits: Hit[];
+            }
+        }
+    };
+
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
     public variables: PathVariable[];
@@ -37,12 +47,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     public selectedVariable?: SelectedVariable;
 
     @Input()
-    public corpus: string;
-
-    @Input()
-    public components: string[];
-
-    @Input()
     public xpath: string;
 
     public attributes: { value: string, label: string }[];
@@ -50,20 +54,19 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
     private cancellationToken = new Subject<{}>();
 
-    constructor(private analysisService: AnalysisService,
+    constructor(
+        private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
-        private ngZone: NgZone) {
+        private ngZone: NgZone
+    ) {
     }
 
     ngOnInit() {
         this.$element = $('.analysis-component');
         this.initialize();
-        this.subscriptions = [
-            this.livePivot()
-        ];
     }
 
     ngOnDestroy() {
@@ -73,7 +76,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.cancellationToken.next();
     }
 
-    private initialize() {
+    private async initialize() {
         // TODO: on change
         this.variables = this.extractinatorService.extract(this.xpath);
         this.treeXml = this.reconstructorService.construct(this.variables, this.xpath);
@@ -117,6 +120,26 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         } else {
             this.selectedVariablesSubject.next([]);
         }
+
+        const treebankSelections = await this.treebankService.treebanks
+            .pipe(
+                map(v => mapTreebanksToSelectionSettings(v.state)),
+                take(1) // MUST BE DONE BEFORE .toPromise, as toPromise only resolves once the stream closes otherwise, which we never do
+            )
+            .toPromise();
+
+        this.data = {};
+        for (const {provider, corpus, components} of treebankSelections) {
+            if (!this.data[provider]) {this.data[provider] = {}}
+            this.data[provider][corpus] = {
+                hits: await this.resultsService.promiseAllResults(this.xpath, provider, corpus, components.map(c => c.server_id), false, true, [], this.variables, this.cancellationToken),
+                metadata: await this.treebankService.getMetadata(provider, corpus),
+            }
+        }
+
+        this.subscriptions = [
+            this.livePivot()
+        ];
     }
 
     private makeDraggable() {
@@ -131,7 +154,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     this.showVariableToAdd(ui.helper, 'row');
                 }
             },
-            helper: (event) => {
+            helper: (event: JQuery.Event) => {
                 let data = $(event.currentTarget).data();
                 let variable = data['variable'] || data['varname'];
                 return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');
@@ -158,6 +181,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     }
 
+    private getFirstData() {
+        return Object.values(Object.values(this.data)[0])[0]
+    }
+
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
         let variableName = helper.text().trim();
         let offset = $('.pvtRendererArea').offset();
@@ -167,7 +194,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         helper.remove();
 
         // only work with available attributes
-        let attributes = this.analysisService.getVariableAttributes(variableName, this.hits);
+        let attributes = this.analysisService.getVariableAttributes(variableName, this.getFirstData().hits);
 
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
@@ -180,18 +207,13 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             };
         });
     }
-
+    // TODO we use the first selected treebank
     private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
         this.isLoading = true;
         try {
-            if (!this.metadata || !this.hits) {
-                [this.metadata, this.hits] = await Promise.all([
-                    this.treebankService.getMetadata(this.corpus),
-                    this.resultsService.promiseAllResults(this.xpath, this.corpus, this.components, false, true, [], this.variables, this.cancellationToken)
-                ]);
-            }
 
-            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
+
+            this.pivot(element, this.getFirstData().metadata.map(m => m.field), this.getFirstData().hits, selectedVariables);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -208,7 +230,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 ? grouped[s.variable.name].push(s.attribute)
                 : grouped[s.variable.name] = [s.attribute];
             return grouped;
-        }, {});
+        }, {} as {[variableName: string]: string[]});
         let pivotData = this.analysisService.getFlatTable(
             hits,
             variables,

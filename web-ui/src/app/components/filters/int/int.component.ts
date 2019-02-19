@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from "../filter/filter.component";
+import { FilterComponent, FilterChangeEvent } from "../filter/filter.component";
 import { Filter } from '../filters.component';
 import { FilterRangeValue } from "../../../services/results.service";
 
@@ -15,10 +15,6 @@ export class IntComponent extends FilterComponent {
 
     onFilterSet(filter: Filter) {
         this.rangeValues = [filter.minValue as number || 0, filter.maxValue as number || 0];
-    }
-
-    onCheckBoxClicked(e) {
-        this.updateFilterChange(e.target.checked);
     }
 
     updateFilterChange(selected: boolean) {

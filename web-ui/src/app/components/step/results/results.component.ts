@@ -1,8 +1,7 @@
 import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { SafeHtml } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription } from 'rxjs';
-import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -13,11 +12,15 @@ import {
     Hit,
     MetadataValueCounts,
     ResultsService,
-    TreebankService
+    TreebankService,
+    mapTreebanksToSelectionSettings,
+    SearchResults,
+    ConfiguredTreebanks
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
-import { TreebankMetadata } from '../../../treebank';
+import { TreebankMetadata, Treebank } from '../../../treebank';
 import { StepComponent } from "../step.component";
+import { FuzzyNumber } from '../select-treebanks/sub-treebanks.component';
 
 const DebounceTime = 200;
 
@@ -27,51 +30,22 @@ const DebounceTime = 200;
     styleUrls: ['./results.component.scss']
 })
 export class ResultsComponent extends StepComponent implements OnDestroy {
-    private corpusSubject = new BehaviorSubject<string>(undefined);
-    private componentsSubject = new BehaviorSubject<string[]>([]);
     private xpathSubject = new BehaviorSubject<string>(undefined);
-    private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts>({});
+    private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts[]>([]);
     private metadataSubject = new BehaviorSubject<TreebankMetadata[]>([]);
     private filterValuesSubject = new BehaviorSubject<FilterValue[]>([]);
 
-    /**
-     * The components unchecked by the user, the sub-results of these components should be filtered out
-     */
-    private hiddenComponents: { [component: string]: true } = {};
-
-
-    @Input('corpus')
-    public set corpus(value: string) {
-        this.corpusSubject.next(value);
-    }
-
-    public get corpus() {
-        return this.corpusSubject.value;
-    }
-
-    @Input('components')
-    public set components(value: string[]) {
-        this.componentsSubject.next(value);
-    }
-
-    public get components() {
-        return this.componentsSubject.value;
-    }
-
     @Input('xpath')
-    public set xpath(value: string) {
-        this.xpathSubject.next(value);
-    }
-
-    public get xpath() {
-        return this.xpathSubject.value;
-    }
+    public set xpath(value: string) { this.xpathSubject.next(value); }
+    public get xpath(): string { return this.xpathSubject.value; }
 
     @Input()
     public retrieveContext: boolean = false;
 
     @Input()
     public inputSentence: string = null;
+
+    // ----------------
 
     @Output()
     public xpathChange = new EventEmitter<string>();
@@ -87,10 +61,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     public loading: boolean = true;
 
-    public treeXml?: string;
-    public treeXmlUrl?: string;
-    public treeSentence?: SafeHtml;
-    public filteredResults: Hit[] = [];
+    // public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
     public validXPath: boolean = true;
@@ -105,19 +76,27 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
-    private results: Hit[] = [];
     private subscriptions: Subscription[];
+
+    /** Full list of components in this corpus, used to display information about where hits originated */
+    /** How many hits have been found so far for each component, and has the component finished being searched yet */
+    private resultSummary: ResultSummary = {};
+    private totalSentences: FuzzyNumber = new FuzzyNumber('?');
+    private totalHits: 0;
+    private filteredResults: Hit[] = [];
 
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService) {
+        private treebankService: TreebankService,
+    ) {
         super();
+
         this.subscriptions = [
             this.liveMetadataCounts(),
-            this.liveMetadataProperties(),
-            this.liveFilters(),
-            this.liveResults()
+            // this.liveMetadataProperties(),
+            // this.liveFilters(),
+            this.liveResults(),
         ];
 
         this.onChangeValid = new EventEmitter();
@@ -129,20 +108,29 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         }
     }
 
-    /**
-     * Show a tree of the given xml file
-     * @param link to xml file
-     */
-    async showTree(result: Hit) {
-        this.treeXml = undefined;
-        this.treeSentence = result.highlightedSentence;
-        let { url, treeXml } = await this.resultsService.highlightSentenceTree(result.fileId, this.corpus, result.nodeIds);
-        this.treeXml = treeXml;
-        this.treeXmlUrl = url;
-    }
-
     public downloadResults() {
-        this.downloadService.downloadResults(this.corpus, this.components, this.xpath, this.results);
+
+        const r = [] as Array<{
+            xpath: string,
+            components: string[],
+            provider: string,
+            corpus: string,
+            hits: Hit[]
+        }>
+
+        Object.entries(this.resultSummary).forEach(([provider, treebanks]) => {
+            Object.entries(treebanks).forEach(([corpus, settings]) => {
+                r.push({
+                    components: Object.keys(settings.components),
+                    corpus,
+                    hits: settings.hits,
+                    provider,
+                    xpath: this.xpath
+                })
+            })
+        });
+
+        this.downloadService.downloadResults(r);
     }
 
     public downloadXPath() {
@@ -153,6 +141,32 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public downloadFilelist() {
         const fileNames = this.getFileNames();
         this.downloadService.downloadFilelist(fileNames, 'filelist');
+    }
+
+    public downloadDistributionList() {
+        let values = [] as Array<{
+            provider: string;
+            corpus: string;
+            component: string;
+            hits: number;
+            sentences: string;
+        }>;
+
+        Object.entries(this.resultSummary).forEach(([provider, banks]) =>
+            Object.entries(banks).forEach(([corpus, corpusData]) => {
+                Object.entries(corpusData.components).forEach(([component, componentData]) => {
+                    values.push({
+                        component,
+                        corpus,
+                        provider,
+                        hits: componentData.hits,
+                        sentences: ''+componentData.sentences
+                    })
+                })
+            })
+        )
+
+        this.downloadService.downloadDistributionList(values);
     }
 
     /**
@@ -172,14 +186,25 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         }
     }
 
-    public hideComponents(components: string[] | undefined = undefined) {
-        if (components !== undefined) {
-            this.hiddenComponents = Object.assign({}, ...components.map(name => {
-                return { [name]: true }
-            }));
-        }
+    public toggleCorpus(provider: string, corpus: string) {
+        const settings = this.resultSummary[provider][corpus];
+        settings.show = !settings.show;
+        this.filterHits();
+    }
 
-        this.filteredResults = this.filterHits(this.results);
+    public toggleComponent(provider: string, corpus: string, component: string) {
+        const settings = this.resultSummary[provider][corpus];
+        settings.components[component].show = !settings.components[component].show;
+        settings.allComponentsSelected = Object.values(settings.components).every(c => c.show);
+        this.filterHits();
+    }
+
+    public toggleAllComponents(provider: string, corpus: string) {
+        const settings = this.resultSummary[provider][corpus];
+
+        const show = settings.allComponentsSelected = !settings.allComponentsSelected;
+        Object.values(settings.components).forEach(c => c.show = show);
+        this.filterHits();
     }
 
     public filterChange(filterValues: FilterValue[]) {
@@ -221,95 +246,196 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     private liveMetadataCounts() {
         // TODO: handle when filters have been applied (part of #36)
-        return observableCombineLatest(this.xpathSubject, this.corpusSubject, this.componentsSubject).pipe(
-            filter((values) => values.every(value => value !== undefined)),
+        return observableCombineLatest(
+            this.xpathSubject,
+            this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state)))
+        )
+        .pipe(
+            filter((values) => values.every(value => value != null)),
             debounceTime(DebounceTime),
             distinctUntilChanged(),
-            switchMap(([corpus, components, xpath]) =>
-                this.resultsService.metadataCounts(corpus, components, xpath)))
-            .subscribe(counts => {
-                this.metadataValueCountsSubject.next(counts);
-            });
+            switchMap(([xpath, selectedTreebanks]) => Promise.all(
+                selectedTreebanks.map(tb =>
+                    this.resultsService.metadataCounts(xpath, tb.provider, tb.corpus, tb.components.map(c => c.server_id))
+                )
+            ))
+        )
+        .subscribe(counts => this.metadataValueCountsSubject.next(counts));
     }
 
     /**
      * Get the metadata for the current corpus
      */
-    private liveMetadataProperties() {
-        return this.corpusSubject.pipe(filter(corpus => corpus !== undefined),
-            distinctUntilChanged(),
-            switchMap(corpus => this.treebankService.getMetadata(corpus)))
-            .subscribe(metadata => this.metadataSubject.next(metadata));
-    }
+    // private liveMetadataProperties() {
+    //     return observableCombineLatest(
+    //         this.treebankService.treebanks.pipe(
+    //             map(mapTreebanksToSelectionSettings)
+    //         )
+    //     )
+    //     .pipe(
+    //         filter((values) => values.every(value => value != null)),
+    //         debounceTime(DebounceTime),
+    //         distinctUntilChanged(),
+    //         switchMap(selected => Promise.all(
+    //             selected.map(v => this.treebankService.getMetadata(v.provider, v.corpus, v.componentServerIds))
+    //         )
+    //     )
+    //     .subscribe(metadata => this.metadataSubject.next(metadata));
+    // }
 
     /**
      * Get the filters
      */
-    private liveFilters() {
-        return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
-            .subscribe(([metadata, counts]) => {
-                let filters: Filter[] = [];
-                for (let filter of metadata) {
-                    if (filter.show) {
-                        let options: string[] = [];
-                        if (filter.field in counts) {
-                            for (let key of Object.keys(counts[filter.field])) {
-                                // TODO: show the frequency (the data it right here now!)
-                                options.push(key);
-                            }
-                        }
-                        filters.push({
-                            field: filter.field,
-                            dataType: filter.type,
-                            filterType: filter.facet,
-                            minValue: filter.minValue,
-                            maxValue: filter.maxValue,
-                            options
-                        });
-                    }
-                }
+    // private liveFilters() {
+    //     return observableCombineLatest(
+    //         this.metadataValueCountsSubject
+    //     )
+    //     .subscribe(counts => {
+    //         let filters: Filter[] = [];
+    //         for (let filter of metadata) {
+    //             if (filter.show) {
+    //                 let options: string[] = [];
+    //                 if (filter.field in counts) { // TODO this line is profoundly broken
+    //                     for (let key of Object.keys(counts[filter.field])) {
+    //                         // TODO: show the frequency (the data it right here now!)
+    //                         options.push(key);
+    //                     }
+    //                 }
+    //                 filters.push({
+    //                     field: filter.field,
+    //                     dataType: filter.type,
+    //                     filterType: filter.facet,
+    //                     minValue: filter.minValue,
+    //                     maxValue: filter.maxValue,
+    //                     options
+    //                 });
+    //             }
+    //         }
 
-                this.filters = filters;
-            });
-    }
+    //         this.filters = filters;
+    //     });
+    // }
 
     /**
      * Get the results
      */
     private liveResults() {
-        return observableCombineLatest(this.corpusSubject, this.componentsSubject, this.xpathSubject, this.filterValuesSubject).pipe(
-            filter((values) => values.every(value => value !== undefined)),
+        return observableCombineLatest(
+            this.treebankService.treebanks.pipe(map(v => v.state)),
+            // observableCombineLatest(this.providerSubject, this.corpusSubject).pipe(
+            //     filter(values => values.every(v => v != null)),
+            //     distinctUntilChanged(),
+            //     switchMap(([provider, corpus]) => this.treebankService.getTreebank(provider, corpus))
+            // ),
+            // this.providerSubject,
+            // this.corpusSubject,
+            // this.componentsSubject,
+            this.xpathSubject,
+            this.filterValuesSubject
+        ).pipe(
+            filter((values) => values.every(value => value != null)),
             debounceTime(DebounceTime),
             distinctUntilChanged(),
-            switchMap(([corpus, components, xpath, filterValues]) => {
-                this.loading = true;
-                this.results = [];
+            switchMap(([treebanks, xpath, filterValues]) => {
+                const selectedTreebanks = mapTreebanksToSelectionSettings(treebanks);
+
                 this.filteredResults = [];
-                return this.resultsService.getAllResults(
-                    xpath,
-                    corpus,
-                    components,
-                    this.retrieveContext,
-                    false,
-                    filterValues,
-                    [],
-                    () => {
-                        this.loading = false;
-                    });
-            }),
-            tap(results => {
-                this.results.push(...results.hits);
-                this.filteredResults.push(...this.filterHits(results.hits));
-            }))
-            .subscribe();
+
+                this.loading = true;
+                this.totalSentences = new FuzzyNumber(0);
+                this.totalHits = 0;
+
+                this.resultSummary = {};
+                const $results = [] as Observable<{results: SearchResults, treebank: Treebank}>[];
+
+                selectedTreebanks.forEach(({provider, corpus, components}) => {
+                    const treebankData = treebanks[provider][corpus];
+                    const selectedComponents = treebankData.components.filter(c => c.selected);
+
+                    if (!this.resultSummary[provider]) { this.resultSummary[provider] = {}};
+                    this.resultSummary[provider][corpus] = {
+                        show: true,
+                        hits: [],
+                        // filteredHits: [],
+                        allComponentsSelected: true,
+                        // one entry per selected component
+                        totalSentences: selectedComponents.reduce((acc, c) => {acc.add(c.sentenceCount); return acc;}, new FuzzyNumber(0)).toString(),
+                        components: selectedComponents.reduce((acc, component) => {
+                            acc[component.id] = {
+                                show: true,
+                                hits: 0,
+                                sentences: component.sentenceCount
+                            }
+                            return acc;
+                        }, {} as ResultSummary[string][string]['components']),
+                    }
+
+                    $results.push(
+                        this.resultsService.getAllResults(
+                            xpath,
+                            provider,
+                            corpus,
+                            components.map(c => c.server_id),
+                            this.retrieveContext,
+                            false,
+                            filterValues,
+                            []
+                        )
+                        .pipe(map(results => ({
+                            results,
+                            treebank: treebankData.treebank,
+                        })))
+                    );
+
+                    selectedComponents.forEach(c => this.totalSentences.add(c.sentenceCount));
+                });
+
+                // merge the observables (one for each treebank) into a single stream
+                let combined = merge(...$results);
+                combined.subscribe(
+                    () => {},
+                    () => {},
+                    () => this.loading = false
+                );
+                return combined;
+            })
+        )
+        .subscribe(
+            ({results, treebank}) => {
+                const treebankResults = this.resultSummary[treebank.provider][treebank.name];
+                treebankResults.hits.push(...results.hits);
+                this.totalHits += results.hits.length;
+
+                results.hits.forEach(hit => {
+                    const resultComponent = treebankResults.components[hit.component];
+                    ++resultComponent.hits;
+                    if (treebankResults.show && resultComponent.show) {
+                        this.filteredResults.push(hit);
+                    }
+                })
+            },
+            // (error) => {
+            //     console.log('received error from results-service?', error);
+            // },
+            // () => {
+            //     console.log('received all results from results-service?');
+            //     this.loading = false;
+            // }
+        )
     }
 
     /**
      * Filter out the hits which are part of hidden components
      * @param hits
      */
-    private filterHits(hits: Hit[]) {
-        return hits.filter(hit => !this.hiddenComponents[hit.databaseId]);
+    private filterHits() {
+        const filteredResults: Hit[] = [];
+        Object.values(this.resultSummary).flatMap(v => Object.values(v))
+        .filter(tb => tb.show)
+        .forEach(tb => {
+            filteredResults.push(...tb.hits.filter(hit => tb.components[hit.component].show));
+        })
+        this.filteredResults = filteredResults;
     }
 
     getValidationMessage() {
@@ -317,5 +443,23 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     updateValidity() {
+    }
+}
+
+type ResultSummary = {
+    [provider: string]: {
+        [corpus: string]: {
+            show: boolean;
+            allComponentsSelected: boolean;
+            hits: Hit[];
+            totalSentences: string;
+            components: {
+                [componentId: string]: {
+                    hits: number;
+                    sentences: number|'?';
+                    show: boolean;
+                }
+            }
+        }
     }
 }

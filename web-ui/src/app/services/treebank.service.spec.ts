@@ -11,7 +11,7 @@ describe('TreebankService', () => {
 
     it('should be created', inject([TreebankService], async (service: TreebankService) => {
         expect(service).toBeTruthy();
-        let subTreebanks = await service.getSubTreebanks('test-treebank');
+        let subTreebanks = await service.getComponents('test-treebank');
         expect(subTreebanks.length).toEqual(2);
         expect(subTreebanks.map(s => s.databaseId)).toEqual(['test_database1', 'test_database2']);
         expect(subTreebanks.map(s => s.sentenceCount)).toEqual([250, 500]);

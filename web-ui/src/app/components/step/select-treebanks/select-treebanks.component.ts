@@ -1,63 +1,69 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, OnDestroy } from '@angular/core';
 import { StepComponent } from "../step.component";
-import { TreebankService } from "../../../services/treebank.service";
-import { Treebank, SubTreebank } from "../../../treebank";
+import { ConfigurationService } from "../../../services/configuration.service";
+import { TreebankService, ConfiguredTreebanks, mapToTreebankArray } from "../../../services/treebank.service";
+import { Treebank, TreebankComponent } from "../../../treebank";
+// import { SelectedTreebanksService, SelectedTreebanks } from '../../../services/selected-treebanks.service';
+import { filter, map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'grt-select-treebanks',
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })
-export class SelectTreebanksComponent extends StepComponent implements OnInit {
-    treebanks: Treebank[];
-    selectedTreebank: string;
-    loading: boolean = false;
-
-    @Input() subTreebanks: string[];
-
-    @Output() mainTreebankChange = new EventEmitter<string>();
-    @Output() subTreebanksChange = new EventEmitter<string[]>();
-
-    /**
-     * Gets the sub-treebanks whenever the main treebank is set
-     * @param treebank
-     */
-    @Input()
-    set mainTreebank(treebank: string) {
-        this.selectedTreebank = treebank;
-    }
+export class SelectTreebanksComponent extends StepComponent implements OnDestroy {
+    private treebanks: ConfiguredTreebanks[string][string][];
+    private readonly subscriptions: Subscription[];
 
     constructor(private treebankService: TreebankService) {
         super();
-        this.treebanks = [];
+
+        this.subscriptions = [
+            treebankService.treebanks.pipe(map(v => Object.values(v.state).flatMap(v => Object.values(v))))
+            .subscribe(treebanks => {
+                this.treebanks = treebanks;
+                this.updateValidity();
+            }),
+        ];
     }
 
-    valid: boolean;
+    // ngOnInit() {
+    //     // this.treebankService.getConfiguredTreebankArray()
+    //     // .then(treebanks => {
+    //     //     this.treebanks = treebanks;
+    //     //     this.updateValidity();
+    //     // })
 
-    ngOnInit() {
-        this.treebankService.getTreebanks().then((treebanks) => {
-            this.treebanks = treebanks;
-        })
+    //     // this.configurationService.getProviders()
+    //     // .then(providers => Promise.all(providers.map(p => this.treebankService.getTreebanks(p))))
+    //     // .then(treebanks => {
+    //     //     this.treebanks = treebanks.flat();
+    //     //     this.updateValidity();
+    //     // })
+    // }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(s => s.unsubscribe());
     }
 
-    treebankChange(treebank: Treebank) {
-        this.selectedTreebank = treebank.name;
-        this.mainTreebankChange.emit(this.selectedTreebank);
-        this.updateValidity();
+    toggleTreebank(provider: string, corpus: string) {
+        this.treebankService.toggleCorpus(provider, corpus);
     }
 
-    updateSelected(subTreebanks: SubTreebank[]) {
-        this.subTreebanks = subTreebanks.map(t => t.component);
-        this.mainTreebankChange.emit(this.selectedTreebank);
-        this.subTreebanksChange.emit(this.subTreebanks);
-        this.updateValidity()
-    }
-
-    /**
-     * Checks if there are treebanks selected
-     */
+    /** Checks if there are treebanks selected and notifies parent */
     updateValidity() {
-        this.valid = this.subTreebanks && this.subTreebanks.length && !!this.selectedTreebank;
+        if (!this.treebanks) {
+            this.valid = false;
+            return;
+        }
+
+        // treebank selected -> some component selected
+        this.valid = this.treebanks.some(({treebank, components}) =>
+            treebank.selected &&
+            components.some(component => component.selected)
+        );
+
         this.onChangeValid.emit(this.valid);
     }
 

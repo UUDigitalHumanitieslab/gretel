@@ -6,8 +6,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 
 export abstract class StepComponent {
-    warning: boolean = false;
-    valid = false;
+    protected warning: boolean = false;
+    protected valid = false;
 
     constructor() {
 
@@ -18,7 +18,7 @@ export abstract class StepComponent {
     /**
      * Check if the input of the user is valid
      */
-    public abstract updateValidity();
+    public abstract updateValidity(): void;
 
     /**
      * Gives an warning that helps the user to understand why the current input is not valid

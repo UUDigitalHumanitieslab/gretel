@@ -7,7 +7,7 @@ export type FilterChangeEvent = FilterValue & {
 };
 
 export abstract class FilterComponent {
-    private filterValue;
+    private filterValue: Filter;
 
     @Input('filter') set filter(value: Filter) {
         this.filterValue = value;
@@ -25,16 +25,12 @@ export abstract class FilterComponent {
     constructor() {
     }
 
-    onCheckBoxClicked(e) {
-        this.updateFilterChange(e.target.checked);
-    }
-
     ngOnInit() {
     }
 
-    updateFilterChange(selected) {
+    updateFilterChange(selected: boolean) {
         throw Error('Not implemented');
     }
 
-    abstract onFilterSet(filter: Filter);
+    abstract onFilterSet(filter: Filter): void;
 }

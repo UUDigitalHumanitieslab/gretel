@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { GlobalState, Step } from "./steps";
 import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from "./transitions";
+import { mapTreebanksToSelectionSettings } from '../../services/_index';
 
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
     public crumbs: Crumb[];
@@ -34,7 +35,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         this.subscriptions.forEach(s => s.unsubscribe());
     }
 
-    async ngOnInit() {
+    ngOnInit() {
         // Template Design Pattern
         this.initializeCrumbs();
         this.initializeSteps();
@@ -46,14 +47,16 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             this.route.queryParams.subscribe(params => {
                 let decoded = this.decodeGlobalState(params);
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
+                // if we don't set this, we might try to serialize the globalstate before the step has been entered (it happens asyncronously), causing an undefined access.
+                this.globalState.currentStep = this.steps[decoded.step];
                 this.goToStep(decoded.step, false);
             }));
     }
 
-    abstract initializeConfiguration();
-    abstract initializeCrumbs();
-    abstract initializeSteps();
-    abstract initializeComponents();
+    abstract initializeConfiguration(): void;
+    abstract initializeCrumbs(): void;
+    abstract initializeSteps(): void;
+    abstract initializeComponents(): void;
 
     /**
      * Returns the properties of the global state which are set in the URL.
@@ -65,7 +68,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             'currentStep': state.currentStep.number,
             // don't encode the default state
             'xpath': state.xpath != this.defaultGlobalState.xpath ? state.xpath : undefined,
-            'selectedTreebanks': state.selectedTreebanks && state.selectedTreebanks.corpus ? JSON.stringify(state.selectedTreebanks) : undefined,
+            'selectedTreebanks': state.selectedTreebanks.length > 0 ? JSON.stringify(state.selectedTreebanks) : undefined,
             'retrieveContext': this.encodeBool(state.retrieveContext)
         }
     }
@@ -118,10 +121,6 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         }
     }
 
-    /**
-     * Sets
-     * @param boolean
-     */
     setValid(valid: boolean) {
         this.globalState.valid = valid
     }
@@ -148,6 +147,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     updateUrl(writeState = true) {
         let state = this.encodeGlobalState(this.globalState);
+
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: state,
@@ -166,16 +166,6 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         }
 
         this.updateGlobalState(state, state.currentStep.number == stepNumber && updateUrl);
-    }
-
-    updateSelectedMainTreebank(mainTreebank: string) {
-        this.globalState.selectedTreebanks.corpus = mainTreebank;
-        this.updateUrl(false);
-    }
-
-    updateSelectedSubTreebanks(subTreebanks: string[]) {
-        this.globalState.selectedTreebanks.components = subTreebanks;
-        this.updateUrl(false);
     }
 
     protected decodeBool(param: string | undefined): boolean | undefined {

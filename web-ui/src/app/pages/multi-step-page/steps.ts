@@ -1,20 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { XPathModels } from "ts-xpath";
-import { TreebankService } from "../../services/treebank.service";
+import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
 import { ResultsService } from "../../services/results.service";
 import { AlpinoService } from "../../services/_index";
+import { filter, map, take } from 'rxjs/operators';
+
+
 /**
  * Contains all the steps that are used in the xpath search
  */
 
-
-/**
- * Info that needs to be in a treebank selection
- */
-interface TreebankSelection {
-    corpus: string
-    components: string[]
-}
 
 /**
  * All the information the xpath-search component should keep track of
@@ -25,12 +20,12 @@ interface GlobalState {
      * Include context in results (the preceding and following sentence)
      */
     retrieveContext: boolean,
-    selectedTreebanks: TreebankSelection;
     xpath: string;
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
     inputSentence?: string;
+    selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>;
 }
 
 interface GlobalStateExampleBased extends GlobalState {
@@ -197,7 +192,7 @@ class ResultStep<T extends GlobalState> extends Step<T>{
 }
 
 class SelectTreebankStep<T extends GlobalState> extends Step<T> {
-    constructor(public number: number) {
+    constructor(public number: number, protected treebankService: TreebankService) {
         super(number);
     }
 
@@ -208,14 +203,8 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
-        state.selectedTreebanks = {
-            corpus: state.selectedTreebanks ? state.selectedTreebanks.corpus : undefined,
-            components: state.selectedTreebanks ? state.selectedTreebanks.components : undefined
-        }
-        state.valid = state.selectedTreebanks.corpus !== undefined &&
-            state.selectedTreebanks.components !== undefined &&
-            state.selectedTreebanks.components.length > 0;
-
+        const selectedTreebanks = await this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state)), take(1)).toPromise()
+        state.valid = selectedTreebanks.length > 0;
         return state;
     }
 
@@ -225,7 +214,6 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
 }
 
 export {
-    TreebankSelection,
     GlobalState,
     GlobalStateExampleBased,
     Step,

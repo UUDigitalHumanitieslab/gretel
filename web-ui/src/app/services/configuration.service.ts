@@ -10,16 +10,16 @@ export class ConfigurationService {
         this.config = this.loadConfig();
     }
 
-    async getApiUrl(path: string): Promise<string> {
-        return (await this.config).apiUrl + path;
+    async getApiUrl(provider: string, path: 'treebank_counts'|'results'|'configured_treebanks'|'metadata_counts') {
+        return (await this.config).providers[provider] + path
     }
 
-    async getGretelUrl(path: string): Promise<string> {
-        return (await this.config).gretelUrl + path;
+    async getAlpinoUrl(path: string) {
+        return (await this.config).alpino + path;
     }
 
-    async getUploadApiUrl(path: string): Promise<string> {
-        return (await this.config).uploadUrl + path;
+    async getProviders() {
+        return Object.keys((await this.config).providers);
     }
 
     async loadConfig() {
@@ -28,7 +28,13 @@ export class ConfigurationService {
 }
 
 interface Config {
-    "apiUrl": string
-    "gretelUrl": string
-    "uploadUrl": string
+    providers: {
+        [key: string]: string
+    },
+    // TODO implement this functionality clientside
+    /**
+     * Alpino endpoint.
+     * This should not be the raw alpino in server-mode, but should implement as according to gretel4/api/router.php
+     */
+    alpino: string
 }

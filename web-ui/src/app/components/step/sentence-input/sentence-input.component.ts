@@ -24,9 +24,9 @@ export class SentenceInputComponent extends StepComponent {
         this.warning = true;
     }
 
-    inputChanges(event) {
-        this.onChangeValue.emit(event.target.value);
-        this.updateValidity(event.target.value);
+    inputChanges(event: Event) {
+        this.onChangeValue.emit((event.target as HTMLInputElement).value);
+        this.updateValidity((event.target as HTMLInputElement).value);
     }
 
     public updateValidity(sentence = this.inputSentence) {

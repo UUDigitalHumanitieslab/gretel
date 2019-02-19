@@ -16,18 +16,24 @@ export interface Treebank {
     uploaded?: Date | false;
     processed?: Date;
     isPublic?: boolean;
+    /** The backend this corpus resides in */
+    provider: string;
+    /* Is this treebank selected for searching */
+    selected: boolean;
 }
 
 /**
  * Component of a treebank.
  */
-export interface SubTreebank {
-    databaseId: string,
-    component: string,
+export interface TreebankComponent {
+    id: string,
+    /** Pass to the server as part of the "components" parameter */
+    server_id: string,
     title: string,
     description?: string,
     sentenceCount: number | '?',
     wordCount: number | '?'
+    selected: boolean;
 }
 
 export interface TreebankMetadata {

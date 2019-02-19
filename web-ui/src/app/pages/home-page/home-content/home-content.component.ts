@@ -8,11 +8,9 @@ import { ConfigurationService } from '../../../services/_index';
     styleUrls: ['./home-content.component.scss']
 })
 export class HomeContentComponent implements OnInit {
-    public uploadUrl: SafeHtml;
 
     constructor(private configurationService: ConfigurationService, private sanitizer: Sanitizer) { }
 
     async ngOnInit() {
-        this.uploadUrl = this.sanitizer.sanitize(SecurityContext.URL, await this.configurationService.getGretelUrl('../gretel-upload'));
     }
 }

@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { TreebankService } from "../../services/treebank.service";
+import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
 import { ResultsService } from "../../services/results.service";
 import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
 import {
@@ -13,11 +13,14 @@ import {
     XpathInputStep,
     ResultStep,
     SelectTreebankStep,
-    TreebankSelection,
 } from "../multi-step-page/steps";
 import {
     Transition, Transitions, IncreaseTransition, DecreaseTransition, JumpToStepTransition
 } from '../multi-step-page/transitions'
+import { map, filter } from 'rxjs/operators';
+import { XpathInputComponent } from '../../components/step/xpath-input/xpath-input.component';
+import { SelectTreebanksComponent } from '../../components/step/select-treebanks/select-treebanks.component';
+import { ResultsComponent } from '../../components/step/results/results.component';
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -32,7 +35,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     protected defaultGlobalState: GlobalState = {
         currentStep: undefined,
         retrieveContext: false,
-        selectedTreebanks: undefined,
+        selectedTreebanks: [],
         xpath: `//node[@cat="smain"
     and node[@rel="su" and @pt="vnw"]
     and node[@rel="hd" and @pt="ww"]
@@ -45,16 +48,25 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
 
     // All the components. used to call functions on.
     @ViewChild('xpathInput')
-    xpathInputComponent;
+    xpathInputComponent: XpathInputComponent;
     @ViewChild('selectTreebanksComponentRef')
-    selectTreebankComponent;
-    @ViewChild('hiddenForm')
-    form;
+    selectTreebankComponent: SelectTreebanksComponent;
     @ViewChild('resultsComponentRef')
-    resultComponent;
+    resultComponent: ResultsComponent;
 
     constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
         super(route, router);
+    }
+
+    ngOnInit() {
+        super.ngOnInit();
+        this.subscriptions.push(
+            this.treebankService.treebanks.pipe(
+                filter(v => v.origin !== 'url' && v.origin !== 'init'), // prevent infinite loops as we update the url whenever different banks are selected
+                map(v => mapTreebanksToSelectionSettings(v.state))
+            )
+            .subscribe(state => this.updateSelected(state))
+        );
     }
 
     initializeCrumbs() {
@@ -81,7 +93,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     initializeSteps() {
         this.steps = [
             new XpathInputStep(0),
-            new SelectTreebankStep(1),
+            new SelectTreebankStep(1, this.treebankService),
             new ResultStep(2),
             new AnalysisStep(3)
         ];
@@ -95,38 +107,32 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         ];
     }
 
-    decodeGlobalState(queryParams) {
-        return {
+    decodeGlobalState(queryParams: {[key: string]: any}) {
+        const globalState = {
             step: queryParams.currentStep || 0 as number,
-            state:
-                {
-                    selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-                    xpath: queryParams.xpath || undefined,
-                    retrieveContext: this.decodeBool(queryParams.retrieveContext)
-                }
+            state: {
+                // selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                xpath: queryParams.xpath || undefined,
+                retrieveContext: this.decodeBool(queryParams.retrieveContext)
+            }
         }
-    }
 
-    /**
-     * Sets
-     * @param boolean
-     */
-    setValid(valid: boolean) {
-        this.globalState.valid = valid;
-    }
-
-    updateRetrieveContext(retrieveContext: boolean) {
-        this.globalState.retrieveContext = retrieveContext;
-        this.updateUrl(false);
+        // this.treebankService.select(globalState.state.selectedTreebanks);
+        return globalState;
     }
 
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection
      */
-    updateSelected(selectedTreebanks: TreebankSelection, writeState = false) {
+    updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>) {
         this.globalState.selectedTreebanks = selectedTreebanks;
-        this.updateUrl(writeState);
+        this.updateGlobalState(this.globalState);
+    }
+
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.globalState.retrieveContext = retrieveContext;
+        this.updateUrl(false);
     }
 
     updateXPath(xpath: string, writeState: boolean) {

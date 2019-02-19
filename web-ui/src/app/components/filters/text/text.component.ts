@@ -22,8 +22,8 @@ export class TextComponent extends FilterComponent {
             }));
     }
 
-    filterChange(e) {
-        if (e.event.target.checked) {
+    filterChange(e: {event: Event, value: string}) {
+        if ((e.event.target as HTMLInputElement).checked) {
             this.addToValues(e.value);
         } else {
             this.removeFromValues(e.value);
@@ -44,7 +44,7 @@ export class TextComponent extends FilterComponent {
         }
     }
 
-    removeFromValues(value) {
+    removeFromValues(value: string) {
         this.values = this.values.filter((x) => x !== value);
     }
 }

@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Inject, LOCALE_ID, OnInit, OnDestroy, } from '@angular/core';
 
 import { TreebankService } from '../../../services/_index';
-import { SubTreebank } from '../../../treebank';
+import { TreebankComponent, Treebank } from '../../../treebank';
+// import { SelectedTreebanksService, SelectedTreebanks } from '../../../services/selected-treebanks.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     selector: 'grt-sub-treebanks',
@@ -9,116 +11,87 @@ import { SubTreebank } from '../../../treebank';
     styleUrls: ['./sub-treebanks.component.scss']
 })
 export class SubTreebanksComponent implements OnChanges {
-    public loading: boolean = true;
-    public selectedTreebanks: { [name: string]: boolean };
-    /**
-     * Only show if any sub-treebank has a description available.
-     */
-    public showDescription: boolean;
-    public subTreebanks: SubTreebank[];
-    public totalSentenceCount: string;
-    public totalWordCount: string;
+    // private components: TreebankComponent[];
+    // private selectedTreebanks: SelectedTreebanks;
 
-    @Input() treebankName: string;
+    // Caching variables
+    /** Only show if any subcomponent has a description available. */
+    private showDescription: boolean;
+    private totalSentenceCount: string;
+    private totalWordCount: string;
 
-    @Output() onSelect = new EventEmitter<SubTreebank[]>();
+    // private readonly subscriptions: Subscription[];
 
-    constructor(private treebankService: TreebankService) {
+    @Input() treebank: Treebank;
+    @Input() components: TreebankComponent[];
+
+    constructor(private treebankService: TreebankService, @Inject(LOCALE_ID) private locale: string) {
+        // this.subscriptions = [
+        //     this.selectedTreebanksService.selectedTreebanks.subscribe(state => {
+        //         this.selectedTreebanks = state;
+        //         this.updateTotals();
+        //     }),
+        // ]
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        let treebankNameChange = changes["treebankName"];
-        if (this.treebankName &&
-            treebankNameChange &&
-            (treebankNameChange.firstChange || treebankNameChange.currentValue != treebankNameChange.previousValue)) {
-            this.getSubTreebanks(this.treebankName);
+    // ngOnInit() {
+    //     this.updateComponents();
+    // }
+
+    // ngOnDestroy() {
+    //     this.subscriptions.forEach(s => s.unsubscribe());
+    // }
+
+    ngOnChanges(/*changes: SimpleChanges*/) {
+        this.updateTotals();
+    }
+
+    toggleComponent(componentId: string) {
+        this.treebankService.toggleComponent(this.treebank.provider, this.treebank.name, componentId);
+    }
+
+    toggleAllComponents() {
+        this.treebankService.selectAllComponents(this.treebank.provider, this.treebank.name, !this.allComponentsSelected());
+    }
+
+    allComponentsSelected() {
+        return this.components.every(c => c.selected);
+    }
+
+    // TODO use rx, cancel requests in progress?
+    // private updateComponents() {
+    //     this.treebankService.getComponents(this.provider, this.corpus)
+    //     .then(components => {
+    //         this.components = components;
+    //         this.showDescription = components.some(c => !!c.description);
+    //         this.updateTotals();
+    //     });
+    // }
+
+    private updateTotals() {
+        const totalSentenceCount = new FuzzyNumber(0);
+        const totalWordCount = new FuzzyNumber(0);
+
+        this.components.filter(c => c.selected)
+        .forEach(c => {
+            totalSentenceCount.add(c.sentenceCount);
+            totalWordCount.add(c.wordCount);
+        })
+
+        this.totalSentenceCount = totalSentenceCount.toString(this.locale);
+        this.totalWordCount = totalWordCount.toString(this.locale);
+        this.showDescription = this.components.some(c => !!c.description);
+    }
+
+    formatIfNumber(value: string|number) {
+        if (typeof value === 'string') {
+            return value;
         }
-    }
-
-    changeSelected(subtree: SubTreebank, event?: Event) {
-        this.selectedTreebanks = Object.assign(
-            {},
-            this.selectedTreebanks,
-            {
-                [subtree.component]: !this.selectedTreebanks[subtree.component]
-            });
-
-        if (event) {
-            event.preventDefault();
-        }
-
-        this.setSelected(
-            this.subTreebanks.filter(t => this.selectedTreebanks[t.component]));
-    }
-
-    changeAllSelected(event: Event) {
-        event.preventDefault();
-
-        let check = !this.isAllChecked();
-        let selected: SubTreebanksComponent['selectedTreebanks'] = {};
-        for (let subtree of this.subTreebanks) {
-            selected[subtree.component] = check;
-        }
-        this.selectedTreebanks = selected;
-
-        this.setSelected(check ? this.subTreebanks : []);
-    }
-
-    isAllChecked() {
-        if (!this.subTreebanks) {
-            return false;
-        }
-        for (let subtree of this.subTreebanks) {
-            if (!this.selectedTreebanks[subtree.component]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private updateTotals(subTreebanks: SubTreebank[]) {
-        let totalSentenceCount = new FuzzyNumber(0),
-            totalWordCount = new FuzzyNumber(0);
-
-        for (let subTreebank of subTreebanks) {
-            totalSentenceCount.add(subTreebank.sentenceCount);
-            totalWordCount.add(subTreebank.wordCount);
-        }
-
-        this.totalSentenceCount = totalSentenceCount.toString();
-        this.totalWordCount = totalWordCount.toString();
-
-    }
-    private setSelected(subTreebanks: SubTreebank[]) {
-        this.updateTotals(subTreebanks);
-        this.onSelect.emit(subTreebanks);
-    }
-
-    /**
-     * Gets the detailed info of a given treebank
-     * @param treebank
-     */
-    private getSubTreebanks(treebankName: string) {
-        this.loading = true;
-        this.treebankService.getSubTreebanks(treebankName).then((subTreebanks) => {
-            // To keep track whether we selected the given sub-part of the treebank.
-            this.subTreebanks = subTreebanks;
-            this.showDescription = false;
-            let selectedTreebanks: SubTreebanksComponent['selectedTreebanks'] = {};
-            for (let subTreebank of subTreebanks) {
-                selectedTreebanks[subTreebank.component] = true;
-                if (subTreebank.description) {
-                    this.showDescription = true;
-                }
-            }
-            this.selectedTreebanks = selectedTreebanks;
-            this.setSelected(subTreebanks);
-            this.loading = false;
-        });
+        return value.toLocaleString(this.locale);
     }
 }
 
-class FuzzyNumber {
+export class FuzzyNumber {
     public value = 0;
     public unknown = false;
     constructor(value: number | '?') {
@@ -137,15 +110,15 @@ class FuzzyNumber {
         }
     }
 
-    public toString() {
+    public toString(locale: string = navigator.language) {
         if (this.unknown) {
             if (this.value == 0) {
                 return '?'
             } else {
-                return '≥ ' + this.value;
+                return '≥ ' + this.value.toLocaleString(locale);
             }
         } else {
-            return this.value.toString();
+            return this.value.toLocaleString(locale);
         }
     }
 }

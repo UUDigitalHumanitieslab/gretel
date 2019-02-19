@@ -14,7 +14,7 @@ export class DropdownComponent extends FilterComponent {
         this.selected = [];
     }
 
-    updateFilterChange(selected) {
+    updateFilterChange(selected: boolean) {
         this.onFilterChange.emit({
             dataType: 'text',
             field: this.filter.field,

@@ -6,7 +6,7 @@ import { AlpinoService } from '../../../services/_index';
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent implements OnChanges {
+export class ParseComponent {
     @Input()
     public xml: string;
 
@@ -15,14 +15,6 @@ export class ParseComponent implements OnChanges {
 
     public display = 'inline';
 
-    public url: string
-
     constructor(private alpinoService: AlpinoService) {
-    }
-
-    async ngOnChanges(simpleChanges: SimpleChanges) {
-        if (simpleChanges['sentence']) {
-            this.url = await this.alpinoService.parseSentenceUrl(this.sentence);
-        }
     }
 }

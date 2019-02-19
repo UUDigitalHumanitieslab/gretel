@@ -1,5 +1,7 @@
 {
-    "apiUrl": "../api/src/router.php/",
-    "gretelUrl": "../",
-    "uploadUrl": "../../gretel-upload/index.php/api/"
+    "providers": {
+        "gretel": "http://192.168.33.10:80/api/src/router.php/",
+        "paqu": "http://192.168.33.10:81/api/gretel/"
+    },
+    "alpino": "http://192.168.33.10:80/api/src/router.php/"
 }

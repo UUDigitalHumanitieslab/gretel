@@ -56,20 +56,12 @@
                     <div class="level-item">
                         <div class="field">
                             <p class="control">
-                                <a *ngIf="url;else downloadButton" class="button" [href]="url" target="_blank" grtBalloonPosition="down" grtBalloon="Show XML">
+                                <span class="button" (click)="downloadXml()" grtBalloonPosition="down" grtBalloon="Download XML" rel="button">
                                     <span class="icon is-large">
                                         <i class="fas fa-file-code" aria-hidden="true"></i>
                                     </span>
-                                    <span>Show XML</span>
-                                </a>
-                                <ng-template #downloadButton>
-                                    <span class="button" (click)="downloadXml()" grtBalloonPosition="down" grtBalloon="Download XML" rel="button">
-                                        <span class="icon is-large">
-                                            <i class="fas fa-file-code" aria-hidden="true"></i>
-                                        </span>
-                                        <span>Download XML</span>
-                                    </span>
-                                </ng-template>
+                                    <span>Download XML</span>
+                                </span>
                             </p>
                         </div>
                     </div>

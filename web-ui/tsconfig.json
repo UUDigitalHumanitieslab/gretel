@@ -7,13 +7,17 @@
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        // "strictNullChecks": true,
+        "noImplicitAny": true,
         "target": "es5",
         "typeRoots": [
             "./node_modules/@types"
         ],
         "lib": [
             "es2017",
-            "dom"
+            "dom",
+            "esnext.array",
+            "es2018.promise"
         ],
         "paths": {
             "@angular/": [

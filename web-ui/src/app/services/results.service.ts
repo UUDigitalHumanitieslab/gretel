@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable, Observer } from "rxjs";
+import { Observable, Observer, ReplaySubject } from "rxjs";
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
@@ -23,66 +23,74 @@ export class ResultsService {
     }
 
     promiseAllResults(xpath: string,
+        provider: string,
         corpus: string,
-        components: string[],
+        componentIds: string[],
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        cancellationToken: Observable<{}> | null = null) {
+        cancellationToken: Observable<{}> | null = null
+    ): Promise<Hit[]> {
         return new Promise<Hit[]>((resolve, reject) => {
             let hits: Hit[] = [];
-            let subscription = this.getAllResults(xpath,
+            let subscription = this.getAllResults(
+                xpath,
+                provider,
                 corpus,
-                components,
+                componentIds,
                 retrieveContext,
                 isAnalysis,
                 metadataFilters,
-                variables,
-                () => resolve(hits))
-                .subscribe(results => hits.push(...results.hits));
-            cancellationToken.subscribe(() => {
-                subscription.unsubscribe();
-            });
+                variables
+            ).subscribe(
+                res => hits.push(...res.hits),
+                () => {},
+                () => resolve(hits)
+            );
+            // .subscribe(results => hits.push(...results.hits));
+            if (cancellationToken != null) {
+                cancellationToken.subscribe(() => {
+                    subscription.unsubscribe();
+                });
+            }
         });
     }
 
-    getAllResults(xpath: string,
+    getAllResults(
+        xpath: string,
+        provider: string,
         corpus: string,
-        components: string[],
+        componentIds: string[],
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables,
-        complete: () => void = undefined) {
-        let observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
-            let iteration = 0;
-            let remainingDatabases: string[] | null = null;
-            let completeObserver = () => {
-                if (complete) {
-                    complete();
+        variables = this.defaultVariables
+    ): Observable<SearchResults> {
+
+        const ob = new ReplaySubject<SearchResults>();
+
+        let iteration = 0;
+        let remainingDatabases: string[] | null = null;
+        (async () => {
+            while (true) {
+                const res = await this.results(xpath, provider, corpus, componentIds, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
+                if (!res) {
+                    return;
                 }
-                observer.complete();
-            }
 
-            while (!observer.closed) {
-                await this.results(xpath, corpus, components, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
-                    .then((res) => {
-                        if (res) {
-                            observer.next(res);
-                            iteration = res.nextIteration;
-                            remainingDatabases = res.remainingDatabases;
-                            if (remainingDatabases.length == 0) {
-                                completeObserver();
-                            }
-                        } else {
-                            completeObserver();
-                        }
-                    });
-            }
-        });
+                ob.next(res);
+                iteration = res.nextIteration;
+                remainingDatabases = res.remainingDatabases;
 
-        return observable;
+                if (!remainingDatabases || remainingDatabases.length === 0) {
+                    return;
+                }
+
+            }
+        })().finally(() => ob.complete());
+
+        return ob;
     }
 
     /**
@@ -96,7 +104,8 @@ export class ResultsService {
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
-    async results(xpath: string,
+    private async results(xpath: string,
+        provider: string,
         corpus: string,
         components: string[],
         iteration: number = 0,
@@ -104,9 +113,10 @@ export class ResultsService {
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null) {
+        remainingDatabases: string[] | null = null
+    ) {
         let results = await this.http.post<ApiSearchResult | false>(
-            await this.configurationService.getApiUrl('results'), {
+            await this.configurationService.getApiUrl(provider, 'results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
                 retrieveContext,
                 corpus,
@@ -123,26 +133,26 @@ export class ResultsService {
         return false;
     }
 
-    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
-        let url = await this.configurationService.getGretelUrl(
-            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
+    // async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
+    //     let url = await this.configurationService.getGretelUrl(
+    //         `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
 
-        let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return { url, treeXml };
-    }
+    //     let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+    //     return { url, treeXml };
+    // }
 
-    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+    async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
-            await this.configurationService.getApiUrl('metadata_counts'), {
+            await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
                 corpus,
                 components,
             }, httpOptions).toPromise();
     }
 
-    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+    async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         let results = await this.http.post<{ [databaseId: string]: string }>(
-            await this.configurationService.getApiUrl('treebank_counts'), {
+            await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
                 corpus,
                 components,
@@ -217,9 +227,9 @@ export class ResultsService {
             let metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
-                databaseId: results[9][hitId],
+                component: results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
-                component: hitId.replace(/\-.*/, '').toUpperCase(),
+                // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results[4][hitId],
@@ -248,7 +258,7 @@ export class ResultsService {
         return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
-        }, {});
+        }, {} as Hit['metaValues']);
     }
 
 
@@ -269,7 +279,7 @@ export class ResultsService {
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = variable.$;
             return values;
-        }, {});
+        }, {} as Hit['variableValues']);
     }
 
     private highlightSentence(sentence: string, nodeStarts: number[], tag: string) {
@@ -356,12 +366,13 @@ export interface SearchResults {
 }
 
 export interface Hit {
-    databaseId: string,
-    fileId: string,
-    /**
-     * This value is not very reliable, because it is based on the filename
-     */
+    /** Id of the component this hit originated from */
     component: string,
+    fileId: string,
+    // /**
+    //  * This value is not very reliable, because it is based on the filename
+    //  */
+    // component: string,
     sentence: string,
     highlightedSentence: SafeHtml,
     treeXml: string,
