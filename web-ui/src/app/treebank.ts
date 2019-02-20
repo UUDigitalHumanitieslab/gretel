@@ -1,3 +1,39 @@
+export class FuzzyNumber {
+    public value = 0;
+    public unknown = false;
+    constructor(value: number | '?') {
+        if (value == '?') {
+            this.unknown = true;
+        } else {
+            this.value = value;
+        }
+    }
+
+    /**
+     * Adds a value to this number and modifies this instance.
+     * @param value
+     */
+    public add(value: number | '?') {
+        if (value == '?') {
+            this.unknown = true;
+        } else {
+            this.value += value;
+        }
+    }
+
+    public toString() {
+        if (this.unknown) {
+            if (this.value == 0) {
+                return '?'
+            } else {
+                return '≥ ' + this.value;
+            }
+        } else {
+            return this.value.toString();
+        }
+    }
+}
+
 export interface Treebank {
     id?: number;
     name: string;
@@ -22,15 +58,25 @@ export interface Treebank {
     selected: boolean;
 }
 
+export interface ComponentGroup {
+    key: string,
+    components: { [variant: string]: TreebankComponent },
+    description?: string,
+    sentenceCount: FuzzyNumber,
+    wordCount: FuzzyNumber
+}
+
 /**
  * Component of a treebank.
  */
-export interface TreebankComponent {
+export interface SubTreebank {
+	/** The componentGroup */
+    group: string,
+    variant: string,
     id: string,
     /** Pass to the server as part of the "components" parameter */
     server_id: string,
     title: string,
-    description?: string,
     sentenceCount: number | '?',
     wordCount: number | '?'
     selected: boolean;
