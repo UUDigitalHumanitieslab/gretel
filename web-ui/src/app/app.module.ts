@@ -48,6 +48,7 @@ import {
 } from './services/_index';
 import { AnalysisComponent } from './components/analysis/analysis.component';
 import { TreeVisualizerComponent } from './components/tree-visualizer/tree-visualizer.component';
+import { ExternalTreeVisualizerComponent } from './components/tree-visualizer/external-tree-visualizer.component';
 import { XPathEditorComponent } from './components/xpath/editor/xpath-editor.component';
 import { XPathViewerComponent } from './components/xpath/viewer/xpath-viewer.component';
 import { FiltersModule } from './components/filters/filters.module';
@@ -85,6 +86,7 @@ export const declarations: any[] = [
     SubTreebanksComponent,
     DistributionListComponent,
     TreeVisualizerComponent,
+    ExternalTreeVisualizerComponent,
     ExampleBasedSearchComponent,
     SentenceInputComponent,
     StepButtonsComponent,
