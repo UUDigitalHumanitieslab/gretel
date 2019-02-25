@@ -244,9 +244,9 @@ export class ResultsComponent extends StepComponent implements OnChanges, OnDest
     }
 
     public addFiltersXPath() {
-        this.customXPath = (this.xpath || this.customXPath).trimRight() + '\n' +
-            this.resultsService.createMetadataFilterQuery(
-                Object.values(this.filterValues));
+        this.customXPath = this.resultsService.createFilteredQuery(
+            this.xpath || this.customXPath,
+            Object.values(this.filterValues));
         this.filterChange({});
 
         this.xpathChange.next(this.customXPath);
