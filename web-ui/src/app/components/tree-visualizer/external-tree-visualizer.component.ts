@@ -14,12 +14,9 @@ export class ExternalTreeVisualizerComponent implements OnInit {
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
-      this.xml = params['XML'];
+      this.xml = params['xml'];
       this.sentence = params['sent'];
-      if (!this.sentence) {
-        this.sentence = 'Unknown sentence';
-      }
-    })
+    });
   }
 
 }

@@ -28,7 +28,7 @@ const routes: Routes = [
     component: DocumentationComponent,
   },
   {
-    path: 'visualize_tree',
+    path: 'tree',
     component: ExternalTreeVisualizerComponent,
   },
   {
