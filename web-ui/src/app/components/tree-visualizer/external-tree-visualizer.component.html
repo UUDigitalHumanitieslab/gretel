@@ -1,0 +1,2 @@
+<grt-tree-visualizer *ngIf="xml" [display]="fullscreen" [sentence]="sentence || 'Unknown sentence'" [xml]="xml" (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
+<div *ngIf="!xml">No or invalid XML.</div>
