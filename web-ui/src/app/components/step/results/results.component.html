@@ -228,7 +228,7 @@
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
                             <span *ngSwitchCase="'fileId'">{{rowData[col.field]}}</span>
-                            <!--<a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>-->
+                            <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                             <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                         </div>
                     </td>
@@ -241,4 +241,4 @@
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer [sentence]="treeSentence" [xml]="treeXml" *ngIf="treeXml" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer *ngIf="treeXml" [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" display="fullscreen"></grt-tree-visualizer>

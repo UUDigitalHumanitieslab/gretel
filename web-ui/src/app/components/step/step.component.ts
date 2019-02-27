@@ -6,8 +6,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 
 export abstract class StepComponent {
-    protected warning: boolean = false;
-    protected valid = false;
+    public warning: boolean = false;
+    public valid = false;
 
     constructor() {
 

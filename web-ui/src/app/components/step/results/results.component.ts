@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
 import { filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
@@ -60,13 +61,17 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     public loading: boolean = true;
 
-    // public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
     public validXPath: boolean = true;
     public isModifyingXPath: boolean = false;
 
     public filters: Filter[] = [];
+
+    // tree stuff?
+    public treeXml?: string;
+    public treeXmlUrl?: string;
+    public treeSentence?: SafeHtml;
 
     public columns = [
         { field: 'number', header: '#', width: '5%' },
@@ -79,10 +84,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     /** Full list of components in this corpus, used to display information about where hits originated */
     /** How many hits have been found so far for each component, and has the component finished being searched yet */
-    private resultSummary: ResultSummary = {};
-    private totalSentences: FuzzyNumber = new FuzzyNumber('?');
-    private totalHits: 0;
-    private filteredResults: Hit[] = [];
+    public resultSummary: ResultSummary = {};
+    public totalSentences: FuzzyNumber = new FuzzyNumber('?');
+    public totalHits: 0;
+    public filteredResults: Hit[] = [];
 
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
@@ -105,6 +110,18 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         for (let subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
+    }
+
+    /**
+     * Show a tree of the given xml file
+     * @param link to xml file
+     */
+    async showTree(provider: string, bank: string, result: Hit) {
+        this.treeXml = undefined;
+        this.treeSentence = result.highlightedSentence;
+        const { url, treeXml } = await this.resultsService.highlightSentenceTree(provider, result.fileId, bank, result.nodeIds);
+        this.treeXml = treeXml;
+        this.treeXmlUrl = url;
     }
 
     public downloadResults() {

@@ -50,6 +50,9 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     @Input()
     public showMatrixDetails: boolean;
 
+    @Input()
+    public url: string;
+
     @Output()
     public displayChange = new EventEmitter<TreeVisualizerDisplay>();
 

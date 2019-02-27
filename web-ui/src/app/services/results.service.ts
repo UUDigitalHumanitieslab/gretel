@@ -133,13 +133,15 @@ export class ResultsService {
         return false;
     }
 
-    // async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[]) {
-    //     let url = await this.configurationService.getGretelUrl(
-    //         `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`);
+    async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
+        let url = await this.configurationService.getApiUrl(
+            provider,
+            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`
+        );
 
-    //     let treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-    //     return { url, treeXml };
-    // }
+        const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        return { url, treeXml };
+    }
 
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
