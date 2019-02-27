@@ -22,7 +22,7 @@
                 [checked]="treebank.treebank.selected"
                 (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.name)"
             > {{treebank.treebank.title}}
-            <ng-container *ngIf="treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
+            <ng-container *ngIf="treebank.treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
         </label>
 
     </div>
@@ -30,7 +30,8 @@
     <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
         <grt-sub-treebanks
             [treebank]="treebank.treebank"
-            [components]="treebank.components"
+            [componentGroups]="treebank.componentGroups"
+            [variants]="treebank.variants"
         ></grt-sub-treebanks>
     </div>
 </ng-container>

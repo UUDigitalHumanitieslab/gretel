@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from "./configuration.service";
-import { BehaviorSubject, ReplaySubject } from "rxjs";
-import { filter, take } from "rxjs/operators";
+import { ReplaySubject } from "rxjs";
+import { take } from "rxjs/operators";
 
 export type ConfiguredTreebanks = {
     [provider: string]: {
@@ -54,6 +54,36 @@ type ConfiguredTreebanksResponse = {
     }
 };
 
+type UploadedTreebankResponse = {
+    email: string,
+    id: string
+    processed: string,
+    public: "1" | "0",
+    title: string,
+    uploaded: string,
+    user_id: string
+}
+
+type UploadedTreebankMetadataResponse = {
+    id: string,
+    treebank_id: string,
+    field: string,
+    type: 'text' | 'int' | 'date',
+    facet: 'checkbox' | 'slider' | 'date_range',
+    min_value: string | null,
+    max_value: string | null,
+    show: '1' | '0'
+}
+
+// not quite sure what this is yet
+type UploadedTreebankShowResponse = {
+    basex_db: string,
+    nr_sentences: string,
+    nr_words: string,
+    slug: string,
+    title: string
+}
+
 @Injectable()
 export class TreebankService {
     private loading = true;
@@ -61,188 +91,150 @@ export class TreebankService {
     public treebanks = new ReplaySubject<{state: ConfiguredTreebanks, origin: 'init'|'url'|'user'}>(1);
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
-        this.configurationService.getProviders().then(providers => {
-            return Promise.all(providers.map(provider => this.configurationService
-                .getApiUrl(provider, 'configured_treebanks')
-                .then(url => this.http.get<ConfiguredTreebanksResponse>(url).toPromise())
-                .then(response => {
-                    // treebanks within this provider
-                    const result = {} as ConfiguredTreebanks[string];
+        (async () => {
+            const treebanks: ConfiguredTreebanks = {};
 
-                    Object.entries(response).map(([corpusName, treebank]) => {
-                       result[corpusName] = {
-                            treebank: {
-                                name: corpusName,
-                                title: treebank.title,
-                                description: treebank.description,
-                                uploaded: false,
-                                provider,
-                                selected: false,
-                            },
-                            metadata: treebank.metadata,
-                            components: Object.keys(treebank.components).map(key => {
-                                let component = treebank.components[key];
-                                return {
-                                    id: component.database_id,
-                                    server_id: key,
-                                    title: component.title,
-                                    description: component.description,
-                                    sentenceCount: component.sentences,
-                                    wordCount: component.words,
-                                    selected: true
+            const providers = await this.configurationService.getProviders();
+            for (const provider of providers) {
+                const url = await this.configurationService.getApiUrl(provider, 'configured_treebanks');
+                const response = await this.http.get<ConfiguredTreebanksResponse>(url).toPromise();
+
+                // treebanks within this provider
+                const providedBanks: ConfiguredTreebanks[string] = treebanks[provider] = {};
+                Object.entries(response).forEach(([corpusName, treebank]) => {
+                    providedBanks[corpusName] = {
+                        treebank: {
+                            name: corpusName,
+                            title: treebank.title,
+                            description: treebank.description,
+                            uploaded: false,
+                            provider,
+                            selected: false,
+                        },
+                        metadata: treebank.metadata,
+                        variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
+                        componentGroups: Object.keys(treebank.components).map<TreebankComponent>(key => {
+                            let component = treebank.components[key];
+                            return {
+                                id: component.database_id,
+                                selected: true,
+                                server_id: key,
+                                title: component.title,
+                                description: component.description,
+                                sentenceCount: component.sentences,
+                                wordCount: component.words,
+                                group: component.group || key,
+                                variant: component.variant || 'default'
+                            }
+                        }).reduce((groups, component) => {
+                            let group = groups.find(g => g.key === component.group);
+
+                            if (!group.description) {
+                                group.description = component.description;
+                            }
+
+                            group.components[component.variant] = component;
+                            group.sentenceCount.add(component.sentenceCount);
+                            group.wordCount.add(component.wordCount);
+
+                            return groups;
+                        }, Object.keys(treebank.groups ? treebank.groups : treebank.components).map<ComponentGroup>(key => ({
+                            components: {},
+                            description: treebank.groups &&
+                                treebank.groups[key] &&
+                                treebank.groups[key].description ||
+                                null,
+                            key: key,
+                            sentenceCount: new FuzzyNumber(0),
+                            wordCount: new FuzzyNumber(0)
+                        })))
+                    };
+                });
+            }
+
+            const uploadProvider = await this.configurationService.getUploadProvider()
+            const uploadedCorpora: ConfiguredTreebanks[string] = treebanks[uploadProvider] = (treebanks[uploadProvider] || {});
+            const uploadUrl = await this.configurationService.getUploadApiUrl('treebanks');
+            const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
+            response.forEach(async (item) => {
+                uploadedCorpora[item.id] = {
+                    treebank: {
+                        id: parseInt(item.id),
+                        name: item.title,
+                        title: item.title,
+                        userId: parseInt(item.user_id),
+                        email: item.email,
+                        uploaded: new Date(item.uploaded),
+                        processed: new Date(item.processed),
+                        isPublic: item.public == '1',
+                        description: item.title,
+                        // TODO this will never work, the provider needs to resolve to a regular endpoint
+                        provider: uploadProvider,
+                        selected: true,
+                    },
+                    variants: ['default'],
+                    componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.id)
+                        .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())
+                        .then(results =>
+                            results.map(subtree => {
+                                let server_id = subtree.slug.toUpperCase()
+                                const r: TreebankComponent = {
+                                    id: subtree.basex_db,
+                                    server_id,
+                                    group: server_id,
+                                    variant: 'default',
+                                    title: subtree.title,
+                                    sentenceCount: parseInt(subtree.nr_sentences),
+                                    wordCount: parseInt(subtree.nr_words),
+                                    selected: true,
+                                    description: '',
                                 }
-                            }),
-                        };
-                    });
 
-                    // return the part of the configuredTreebanks for this provider
-                    return {
-                        [provider]: result
-                    }
-                })
-            ))
-            .then((x: ConfiguredTreebanks[]) => { // merge them into one
-                const configuredTreebanks = {} as ConfiguredTreebanks;
-                x.forEach(y => Object.assign(configuredTreebanks, y))
+                                return r;
+                            })
+                            .map(component => ({
+                                key: component.server_id, // see group property in TreebankComponent created above
+                                components: { default: component },
+                                sentenceCount: new FuzzyNumber(component.sentenceCount),
+                                wordCount: new FuzzyNumber(component.wordCount)
+                            }))
+                        ),
+                    metadata: await this.configurationService.getUploadApiUrl('treebank/metadata/' + item.id)
+                        .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
+                        .then(response => response.map(item => {
+                            let metadata: TreebankMetadata = {
+                                field: item.field,
+                                type: item.type,
+                                facet: item.facet == 'date_range' ? 'range' : item.facet,
+                                show: item.show == '1'
+                            };
 
-                this.loading = false;
-                this.data = configuredTreebanks;
-                this.treebanks.next({state: configuredTreebanks, origin: 'init'});
-                return configuredTreebanks;
+                            if (['slider', 'range'].indexOf(metadata.facet) !== -1) {
+                                switch (metadata.type) {
+                                    case 'int':
+                                        metadata.minValue = parseInt(item.min_value);
+                                        metadata.maxValue = parseInt(item.max_value);
+                                        return metadata;
+                                    case 'date':
+                                        metadata.minValue = new Date(item.min_value);
+                                        metadata.maxValue = new Date(item.max_value);
+                                        return metadata;
+                                }
+                            }
+
+                            return metadata;
+                        })),
+                }
             })
-        })
+
+            this.data = treebanks;
+            this.treebanks.next({
+                state: treebanks,
+                origin: 'init'
+            });
+            this.loading = false;
+        })()
     }
-
-
-        return [];
-        // This is for user-uploaded corpora only, which are not supported for now.
-        // let data = await this.http.get<{
-        //     id: string,
-        //     treebank_id: string,
-        //     field: string,
-        //     type: 'text' | 'int' | 'date',
-        //     facet: 'checkbox' | 'slider' | 'date_range',
-        //     min_value: string | null,
-        //     max_value: string | null,
-        //     show: '1' | '0'
-        // }[]>(await this.configurationService.getUploadApiUrl('treebank/metadata/' + corpus)).toPromise();
-
-        // return data.map(item => {
-        //     let metadata: TreebankMetadata = {
-        //         field: item.field,
-        //         type: item.type,
-        //         facet: item.facet == 'date_range' ? 'range' : item.facet,
-        //         show: item.show == '1'
-        //     };
-        //     if (['slider', 'range'].indexOf(metadata.facet) !== -1) {
-        //         switch (metadata.type) {
-        //             case 'int':
-        //                 metadata.minValue = parseInt(item.min_value);
-        //                 metadata.maxValue = parseInt(item.max_value);
-        //                 return metadata;
-        //             case 'date':
-        //                 metadata.minValue = new Date(item.min_value);
-        //                 metadata.maxValue = new Date(item.max_value);
-        //                 return metadata;
-        //         }
-        //     }
-
-        //     return metadata;
-        // })
-    }
-
-    // TODO
-    // public async getComponentNamesFromIds(provider: string, corpus: string, componentIds: string[]): Promise<{id: string, server_id: string}[]> {
-    //     if (!provider || !corpus) {
-    //         debugger;
-    //         throw new Error('Cannot get null treebank')
-    //     }
-
-    //     const components = await this.getComponents(provider, corpus);
-    //     // TODO eliminate the n^2 loop over components
-    //     return componentIds.map(id => ({
-    //         id,
-    //         server_id: components.find(c => c.id === id).server_id
-    //     }));
-    // }
-
-    // public async getTreebank(provider: string, corpus: string): Promise<ConfiguredTreebanks[string][string]> {
-    //     if (!provider || !corpus) {
-    //         debugger;
-    //         throw new Error('Cannot get null treebank')
-    //     }
-
-    //     const treebank = (await this.getConfiguredTreebanks())[provider][corpus];
-    //     if (!treebank) {
-    //         debugger;
-    //         throw new Error(`Missing treebank ${provider}:${corpus}!`)
-    //     }
-    //     return treebank;
-    // }
-
-    // public async getTreebanks(provider: string): Promise<Treebank[]> {
-    //     if (!provider) {
-    //         throw new Error('Cannot get treebanks for null provider')
-    //     }
-
-    //     // NOTE: disabled retrieving uploaded treebanks, not available in paqu back-end
-    //     // Perhaps we need a flag per provider
-    //     let [configured/*, uploadedData*/] = await Promise.all([
-    //         this.getConfiguredTreebanks()/*,
-    //         this.http.get<{
-    //             email: string,
-    //             id: string
-    //             processed: string,
-    //             public: "1" | "0",
-    //             title: string,
-    //             uploaded, string,
-    //             user_id: string
-    //         }[]>(await this.configurationService.getUploadApiUrl("treebank")).toPromise()*/],
-    //     );
-
-    //     return Object.values(configured[provider]).map(c => c.treebank)/*.concat(
-    //         uploadedData.map(item => {
-    //             return {
-    //                 id: parseInt(item.id),
-    //                 name: item.title,
-    //                 title: item.title,
-    //                 userId: parseInt(item.user_id),
-    //                 email: item.email,
-    //                 uploaded: new Date(item.uploaded),
-    //                 processed: new Date(item.processed),
-    //                 isPublic: item.public == '1'
-    //             };
-    //         }))*/.sort((a, b) => a.title.localeCompare(b.title));
-    // }
-
-    // public async getComponents(provider: string, corpus: string): Promise<TreebankComponent[]> {
-    //     if (provider == null) {
-    //         debugger;
-    //     }
-
-    //     let configuredTreebank = (await this.getConfiguredTreebanks())[provider][corpus];
-    //     if (configuredTreebank) {
-    //         return configuredTreebank.components;
-    //     }
-
-    //     // This is for user-uploaded corpora only, which are not supported for now.
-    //     return [];
-    //     // let results = await this.http.get<{
-    //     //     basex_db: string,
-    //     //     nr_sentences: string,
-    //     //     nr_words: string,
-    //     //     slug: string,
-    //     //     title: string
-    //     // }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${corpus}`)).toPromise();
-    //     // return results.map(subtree => ({
-    //     //     databaseId: subtree.basex_db,
-    //     //     component: subtree.slug.toUpperCase(),
-    //     //     title: subtree.title,
-    //     //     sentenceCount: parseInt(subtree.nr_sentences),
-    //     //     wordCount: parseInt(subtree.nr_words)
-    //     // }));
-    // }
-
 
     // SELECTION
 
@@ -266,124 +258,54 @@ export class TreebankService {
         );
     }
 
-    selectComponents(provider: string, corpus: string, components: {componentId: string, selected: boolean}[]) {
+    toggleComponent(provider: string, corpus: string, componentId: string) {
         if (this.loading) {
             return;
         }
         const next = this.data;
-        components.forEach(componentToSelect => next[provider][corpus].components.find(c => componentToSelect.componentId === c.id)!.selected = componentToSelect.selected);
+        const tb = next[provider][corpus];
+        tb.componentGroups.flatMap((group: ComponentGroup) => Object.values(group.components))
+        .forEach(component => {
+            if (component.id === componentId) {
+                component.selected = !component.selected;
+            }
+        })
+
         this.treebanks.next({state: next, origin: 'user'});
     }
-/*
-    async getComponentGroups(provider: string, treebankName: string): Promise<{ variants: string[], groups: ComponentGroup[] }> {
-        let configuredTreebank = (await this.getConfiguredTreebanks())[treebankName];
-        if (configuredTreebank) {
-            return { variants: configuredTreebank.variants, groups: configuredTreebank.componentGroups };
-	    }	
 
-        let results = await this.http.get<{
-            basex_db: string,
-            nr_sentences: string,
-            nr_words: string,
-            slug: string,
-            title: string
-        }[]>(await this.configurationService.getUploadApiUrl(`treebank/show/${treebankName}`)).toPromise();
-        return {
-            variants: ['default'],
-            groups:
-                results.map(subtree => {
-                    let component = subtree.slug.toUpperCase()
-                    return {
-                        group: component,
-                        variant: 'default',
-                        databaseId: subtree.basex_db,
-                        component,
-                        title: subtree.title,
-                        sentenceCount: parseInt(subtree.nr_sentences),
-                        wordCount: parseInt(subtree.nr_words),
-                        disabled: false
-                    }
-                }).map(component => ({
-                    key: component.component,
-                    components: { default: component },
-                    sentenceCount: new FuzzyNumber(component.sentenceCount),
-                    wordCount: new FuzzyNumber(component.wordCount)
-                }))
-        };
+    selectAllComponents(provider: string, corpus: string, select: boolean) {
+        const next = this.data;
+        const tb = next[provider][corpus];
+        tb.componentGroups
+            .flatMap((group: ComponentGroup) => Object.values(group.components))
+            .forEach(component => component.selected = select);
+        tb.treebank.selected = select;
+
+        this.treebanks.next({state: next, origin: 'user'});
     }
 
-	public async getMetadata(corpus: string): Promise<TreebankMetadata[]> {
-        let configuredTreebank = (await this.getConfiguredTreebanks())[corpus];
-
-        if (configuredTreebank) {
-            return configuredTreebank.metadata;
+    selectComponents(provider: string, corpus: string, components: {componentId: string, selected: boolean}[]) {
+        if (this.loading) {
+            return;
         }
 
-        let data = await this.http.get<{
-            id: string,
-            treebank_id: string,
-            field: string,
-            type: 'text' | 'int' | 'date',
-            facet: 'checkbox' | 'slider' | 'date_range',
-            min_value: string | null,
-            max_value: string | null,
-            show: '1' | '0'
-        }[]>(await this.configurationService.getUploadApiUrl('treebank/metadata/' + corpus)).toPromise();
+        // TODO make the callee do this?
+        const selectionMap = components.reduce((map, c) => {
+            map[c.componentId] = c.selected;
+            return map;
+        }, {} as {[id: string]: boolean});
 
-        return data.map(item => {
-            let metadata: TreebankMetadata = {
-                field: item.field,
-                type: item.type,
-                facet: item.facet == 'date_range' ? 'range' : item.facet,
-                show: item.show == '1'
-            };
-            if (['slider', 'range'].indexOf(metadata.facet) !== -1) {
-                switch (metadata.type) {
-                    case 'int':
-                        metadata.minValue = parseInt(item.min_value);
-                        metadata.maxValue = parseInt(item.max_value);
-                        return metadata;
-                    case 'date':
-                        metadata.minValue = new Date(item.min_value);
-                        metadata.maxValue = new Date(item.max_value);
-                        return metadata;
-                }
-            }
-
-            return metadata;
+        const next = this.data;
+        const tb = next[provider][corpus];
+        tb.componentGroups.flatMap((group: ComponentGroup) => Object.values(group.components))
+        .forEach(component => {
+            if (selectionMap[component.id])
+                component.selected = selectionMap[component.id];
         })
+
+        this.treebanks.next({state: next, origin: 'user'});
     }
-
-    async getTreebanks(): Promise<Treebank[]> {
-        let [configured, uploadedData] = await Promise.all([
-            this.getConfiguredTreebanks(),
-            this.http.get<{
-                email: string,
-                id: string
-                processed: string,
-                public: "1" | "0",
-                title: string,
-                uploaded, string,
-                user_id: string
-            }[]>(await this.configurationService.getUploadApiUrl("treebank")).toPromise()],
-        );
-
-        return Object.values(configured).map(c => c.treebank).concat(
-            uploadedData.map(item => {
-                return {
-                    id: parseInt(item.id),
-                    name: item.title,
-                    title: item.title,
-                    userId: parseInt(item.user_id),
-                    email: item.email,
-                    uploaded: new Date(item.uploaded),
-                    processed: new Date(item.processed),
-                    isPublic: item.public == '1'
-                };
-            })).sort((a, b) => a.title.localeCompare(b.title));
-    }
-
-*/
 
     /** Apply all passed selections states, everything else is DESELECTED */
     async select(state?: ReturnType<typeof mapTreebanksToSelectionSettings>) {
@@ -395,19 +317,21 @@ export class TreebankService {
         // (this may be called when restoring state from url, prior to initialization)
         const {state: next} = await (this.treebanks.pipe(take(1)).toPromise());
 
+        /**
+         * Parent treebank selection state is inferred from the component selection state
+         * any component present in the new state (selected or not)? => parent bank must be selected or it wouldn't be mentioned at all.
+         * So first unselect all banks, then re-enable based on the components we encounter
+         */
         Object.values(next).flatMap(v => Object.values(v))
-        .forEach(bank => {
-            bank.treebank.selected = false;
-            // components of deselected treebanks are never present in state
-            // while they may still be present in the background
-            // they aren't serialized to the url
-            // so skip setting the components individually or they are cleared when the main bank is deselected
-            // bank.components.forEach(c => c.selected = false);
-        });
+        .forEach(bank => bank.treebank.selected = false);
+
         state.forEach(s => {
             const tb = next[s.provider][s.corpus];
             // select only those components in the state.components
-            tb.components.forEach(c => c.selected = s.components.find(sc => sc.id === c.id) != null)
+            const components = tb.componentGroups.flatMap(group => Object.values(group.components));
+            components.forEach(c => c.selected = s.components.find(sc => sc.id === c.id) != null)
+
+
             tb.treebank.selected = true;
         })
         this.treebanks.next({state: next, origin: 'url'});
@@ -415,13 +339,32 @@ export class TreebankService {
 }
 
 export function mapToTreebankArray(banks: ConfiguredTreebanks) {
-    return Object.entries(banks).map(([provider, treebanks]) => treebanks)
-    .flatMap(treebanks => Object.values(treebanks).map(v => v.treebank));
+    return Object.entries(banks)
+        .map(([provider, treebanks]) => treebanks)
+        .flatMap(treebanks =>
+            Object.values(treebanks)
+            .map(v => v.treebank)
+        );
 }
 
-export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks) {
+/**
+ * Get an array of all selected treebank components, grouped by their parent treebank
+ * @param treebanks
+ */
+export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks): Array<{
+    provider: string,
+    corpus: string,
+    components: Array<{
+        id: string,
+        server_id: string
+    }>
+}> {
     return Object.values(treebanks).flatMap(v => Object.values(v))
-    .filter(({treebank, components}) => treebank.selected && components.some(c => c.selected))
+    .map(treebankData => ({
+        treebank: treebankData.treebank,
+        components: treebankData.componentGroups.flatMap(group => Object.values(group.components))
+    }))
+    .filter(v => v.treebank.selected && v.components.some(c => c.selected))
     .map(({treebank, components}) => ({
         provider: treebank.provider,
         corpus: treebank.name,

@@ -1,8 +1,8 @@
 ///<reference path="pivottable.d.ts"/>
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { map, filter, take } from 'rxjs/operators';
+import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -11,7 +11,7 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings, mapToTreebankArray } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 
@@ -121,19 +121,19 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             this.selectedVariablesSubject.next([]);
         }
 
-        const treebankSelections = await this.treebankService.treebanks
-            .pipe(
-                map(v => mapTreebanksToSelectionSettings(v.state)),
-                take(1) // MUST BE DONE BEFORE .toPromise, as toPromise only resolves once the stream closes otherwise, which we never do
-            )
-            .toPromise();
+        const [treebankSelections, treebanks] = await combineLatest(
+            this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state))),
+            this.treebankService.treebanks.pipe(map(v => v.state))
+        )
+        .pipe(take(1))
+        .toPromise();
 
         this.data = {};
         for (const {provider, corpus, components} of treebankSelections) {
             if (!this.data[provider]) {this.data[provider] = {}}
             this.data[provider][corpus] = {
                 hits: await this.resultsService.promiseAllResults(this.xpath, provider, corpus, components.map(c => c.server_id), false, true, [], this.variables, this.cancellationToken),
-                metadata: await this.treebankService.getMetadata(provider, corpus),
+                metadata: treebanks[provider][corpus].metadata
             }
         }
 
@@ -154,7 +154,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     this.showVariableToAdd(ui.helper, 'row');
                 }
             },
-            helper: (event: JQuery.Event) => {
+            helper: (event: Event) => {
                 let data = $(event.currentTarget).data();
                 let variable = data['variable'] || data['varname'];
                 return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');

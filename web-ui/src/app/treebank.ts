@@ -21,15 +21,15 @@ export class FuzzyNumber {
         }
     }
 
-    public toString() {
+    public toString(locale?: string) {
         if (this.unknown) {
             if (this.value == 0) {
                 return '?'
             } else {
-                return '≥ ' + this.value;
+                return '≥ ' + locale ? this.value.toLocaleString(locale) : this.value.toString();
             }
         } else {
-            return this.value.toString();
+            return locale ? this.value.toLocaleString(locale) : this.value.toString();
         }
     }
 }
@@ -69,10 +69,12 @@ export interface ComponentGroup {
 /**
  * Component of a treebank.
  */
-export interface SubTreebank {
-	/** The componentGroup */
+export interface TreebankComponent {
+	/** The ComponentGroup */
     group: string,
+    /** The Variant */
     variant: string,
+    /** Friendly name of this component  */
     id: string,
     /** Pass to the server as part of the "components" parameter */
     server_id: string,
@@ -80,6 +82,7 @@ export interface SubTreebank {
     sentenceCount: number | '?',
     wordCount: number | '?'
     selected: boolean;
+    description: string;
 }
 
 export interface TreebankMetadata {

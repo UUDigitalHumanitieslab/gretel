@@ -61,10 +61,10 @@
             </td>
             <ng-container *ngFor="let variant of variants">
 		        <td class="is-number">
-		                    {{group.components[variant].sentenceCount | formatNumber}}
+                    {{group.components[variant].sentenceCount | formatNumber}}
 		        </td>
 		        <td class="is-number">
-		                    {{group.components[variant].wordCount | formatNumber}}
+                    {{group.components[variant].wordCount | formatNumber}}
 		        </td>
 	        </ng-container>
             <ng-container *ngIf="variants.length > 1">

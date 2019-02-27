@@ -18,9 +18,8 @@ import {
     ConfiguredTreebanks
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
-import { TreebankMetadata, Treebank } from '../../../treebank';
+import { TreebankMetadata, Treebank, FuzzyNumber } from '../../../treebank';
 import { StepComponent } from "../step.component";
-import { FuzzyNumber } from '../select-treebanks/sub-treebanks.component';
 
 const DebounceTime = 200;
 
@@ -350,7 +349,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
                 selectedTreebanks.forEach(({provider, corpus, components}) => {
                     const treebankData = treebanks[provider][corpus];
-                    const selectedComponents = treebankData.components.filter(c => c.selected);
+                    const selectedComponents = treebankData.componentGroups.flatMap(g => Object.values(g.components)).filter(c => c.selected);
 
                     if (!this.resultSummary[provider]) { this.resultSummary[provider] = {}};
                     this.resultSummary[provider][corpus] = {

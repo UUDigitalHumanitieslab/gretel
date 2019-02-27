@@ -1,6 +1,5 @@
 {
     "name": "web-ui",
-    "version": "0.0.0",
     "license": "MIT",
     "scripts": {
         "ng": "ng",
@@ -35,12 +34,14 @@
         "@types/xml2js": "^0.4.2",
         "balloon-css": "^0.5.0",
         "bulma": "^0.6.2",
+        "bulma-badge": "^2.0.0",
+        "bulma-pageloader": "^2.1.0",
         "core-js": "^2.5.7",
         "file-saver": "^1.3.8",
         "hammerjs": "^2.0.8",
         "jquery": "^3.3.1",
         "jquery-ui": "^1.12.1",
-        "lassy-xpath": "^0.3.4",
+        "lassy-xpath": "^0.3.10",
         "lodash": "^4.17.10",
         "ngx-clipboard": "^10.0.0",
         "node-sass": "^4.9.2",

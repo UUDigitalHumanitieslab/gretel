@@ -11,7 +11,16 @@ export class ConfigurationService {
     }
 
     async getApiUrl(provider: string, path: 'treebank_counts'|'results'|'configured_treebanks'|'metadata_counts') {
+        console.log(new Error(`getApiUrl with ${provider} ${path}`))
         return (await this.config).providers[provider] + path
+    }
+
+    async getUploadApiUrl(path: string) {
+        return (await this.config).uploadUrl + path;
+    }
+
+    async getUploadProvider() {
+        return (await this.config).uploadProvider;
     }
 
     async getAlpinoUrl(path: string) {
@@ -36,5 +45,9 @@ interface Config {
      * Alpino endpoint.
      * This should not be the raw alpino in server-mode, but should implement as according to gretel4/api/router.php
      */
-    alpino: string
+    alpino: string,
+    /** Uploading is not federated and only supports a single endpoint */
+    uploadUrl: string;
+    /** Uploading requires a provider to request results */
+    uploadProvider: string;
 }

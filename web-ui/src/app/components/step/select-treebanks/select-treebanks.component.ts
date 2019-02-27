@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepComponent implements OnDestroy {
-    private treebanks: ConfiguredTreebanks[string][string][];
+    public treebanks: ConfiguredTreebanks[string][string][];
     private readonly subscriptions: Subscription[];
 
     constructor(private treebankService: TreebankService) {
@@ -59,9 +59,9 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
         }
 
         // treebank selected -> some component selected
-        this.valid = this.treebanks.some(({treebank, components}) =>
+        this.valid = this.treebanks.some(({treebank, componentGroups}) =>
             treebank.selected &&
-            components.some(component => component.selected)
+            componentGroups.flatMap(g => Object.values(g.components)).some(component => component.selected)
         );
 
         this.onChangeValid.emit(this.valid);
