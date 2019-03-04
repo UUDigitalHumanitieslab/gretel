@@ -28,21 +28,6 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
         ];
     }
 
-    // ngOnInit() {
-    //     // this.treebankService.getConfiguredTreebankArray()
-    //     // .then(treebanks => {
-    //     //     this.treebanks = treebanks;
-    //     //     this.updateValidity();
-    //     // })
-
-    //     // this.configurationService.getProviders()
-    //     // .then(providers => Promise.all(providers.map(p => this.treebankService.getTreebanks(p))))
-    //     // .then(treebanks => {
-    //     //     this.treebanks = treebanks.flat();
-    //     //     this.updateValidity();
-    //     // })
-    // }
-
     ngOnDestroy() {
         this.subscriptions.forEach(s => s.unsubscribe());
     }

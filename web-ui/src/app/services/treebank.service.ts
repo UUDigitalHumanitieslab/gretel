@@ -117,14 +117,15 @@ export class TreebankService {
                             let component = treebank.components[key];
                             return {
                                 id: component.database_id,
-                                selected: true,
+                                selected: !component.disabled,
                                 server_id: key,
                                 title: component.title,
                                 description: component.description,
                                 sentenceCount: component.sentences,
                                 wordCount: component.words,
                                 group: component.group || key,
-                                variant: component.variant || 'default'
+                                variant: component.variant || 'default',
+                                disabled: component.disabled || false
                             }
                         }).reduce((groups, component) => {
                             let group = groups.find(g => g.key === component.group);
@@ -154,7 +155,7 @@ export class TreebankService {
 
             const uploadProvider = await this.configurationService.getUploadProvider()
             const uploadedCorpora: ConfiguredTreebanks[string] = treebanks[uploadProvider] = (treebanks[uploadProvider] || {});
-            const uploadUrl = await this.configurationService.getUploadApiUrl('treebanks');
+            const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
             const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
             response.forEach(async (item) => {
                 uploadedCorpora[item.id] = {
@@ -187,6 +188,7 @@ export class TreebankService {
                                     sentenceCount: parseInt(subtree.nr_sentences),
                                     wordCount: parseInt(subtree.nr_words),
                                     selected: true,
+                                    disabled: false,
                                     description: '',
                                 }
 
@@ -300,7 +302,7 @@ export class TreebankService {
         const tb = next[provider][corpus];
         tb.componentGroups.flatMap((group: ComponentGroup) => Object.values(group.components))
         .forEach(component => {
-            if (selectionMap[component.id])
+            if (selectionMap[component.id] != null)
                 component.selected = selectionMap[component.id];
         })
 

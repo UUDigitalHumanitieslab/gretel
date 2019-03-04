@@ -10,9 +10,10 @@ import { Observable, Subscription } from 'rxjs';
     styleUrls: ['./sub-treebanks.component.scss']
 })
 export class SubTreebanksComponent implements OnChanges {
-    /**
-     * Only show if any sub-treebank has a description available.
-     */
+    /** False after ngOnInit has run */
+    private loading = true;
+
+    /** Only show if any sub-treebank has a description available. */
     public showDescription: boolean;
     public totalSentenceCount: string;
     public totalWordCount: string;
@@ -28,76 +29,77 @@ export class SubTreebanksComponent implements OnChanges {
 
     @Output() onSelect = new EventEmitter<TreebankComponent[]>();
 
-    constructor(
-        private treebankService: TreebankService,
-        @Inject(LOCALE_ID) private locale: string
-    ) {
+    constructor(private treebankService: TreebankService) {
+    }
+
+    ngOnInit() {
         this.components = this.componentGroups.flatMap(g => Object.values(g.components));
         this.showDescription = this.components.some(c => !!c.description);
         this.updateTotals();
+        this.loading = false;
     }
 
-    ngOnChanges(/*changes: SimpleChanges*/) {
-        this.updateTotals();
-    }
-
-    toggleComponent(componentId: string) {
-        this.treebankService.toggleComponent(this.treebank.provider, this.treebank.name, componentId);
-    }
-
-    toggleAllComponents() {
-        this.treebankService.selectAllComponents(this.treebank.provider, this.treebank.name, !this.allComponentsSelected());
-    }
-
-    allComponentsSelected() {
-        return this.treebank.selected && this.components.every(c => c.selected);
-    }
-
-    isAllChecked(variant: string) {
-        return this.components.every(c => c.variant !== variant || c.selected);
-    }
-
-    changeAllSelected(event: Event, variant: string) {
-        event.preventDefault();
-        const check = !this.isAllChecked(variant);
-        this.treebankService.selectComponents(
-            this.treebank.provider,
-            this.treebank.name,
-            this.components
-                .filter(c => c.variant === variant)
-                .map(c => ({
-                    componentId: c.id,
-                    selected: check
-                }))
-        )
-    }
-
-    changeSelected(group: ComponentGroup, variant?: string, event?: Event) {
-        if (event) {
-            event.preventDefault();
+    ngOnChanges(changes: SimpleChanges) {
+        console.log('sub-treebank changes', changes)
+        if (!this.loading) {
+            this.updateTotals();
         }
+    }
+
+    isEveryComponentSelected(variant?: string) {
+        const eligible = variant ?
+            this.components.filter(c => !c.disabled && c.variant === variant) :
+            this.components.filter(c => !c.disabled);
+        return eligible.every(c => c.selected);
+    }
+
+    isTreebankSelected() {
+        return this.treebank.selected;
+    }
+
+    toggleVariant(variant?: string) {
+        console.log('toggle variant', variant)
+        const eligible = variant ?
+            this.components.filter(c => !c.disabled && c.variant === variant) :
+            this.components.filter(c => !c.disabled);
+
+        const isVariantSelected = eligible.every(c => c.selected);
+        this.treebankService.selectComponents(
+            this.treebank.provider,
+            this.treebank.name,
+            eligible.map(c => ({
+                componentId: c.id,
+                selected: !isVariantSelected
+            }))
+        );
+    }
+
+    toggleComponent(component: TreebankComponent) {
+        console.log('toggle component', component)
+        this.treebankService.selectComponents(
+            this.treebank.provider,
+            this.treebank.name,
+            [{
+                componentId: component.id,
+                selected: !component.selected
+            }]
+        );
+    }
+
+    toggleGroup(group: ComponentGroup) {
+        console.log('toggle group', group)
+        const components = Object.values(group.components);
+        const isGroupSelected = components.every(c => c.disabled || c.selected);
 
         this.treebankService.selectComponents(
             this.treebank.provider,
             this.treebank.name,
-            Object.values(group.components)
-                .filter(c => variant == null || c.variant === variant)
-                .map(c => ({
-                    componentId: c.id,
-                    selected: !c.selected
-                }))
-        )
+            components.map(c => ({
+                componentId: c.id,
+                selected: !isGroupSelected
+            }))
+        );
     }
-
-    // TODO use rx, cancel requests in progress?
-    // private updateComponents() {
-    //     this.treebankService.getComponents(this.provider, this.corpus)
-    //     .then(components => {
-    //         this.components = components;
-    //         this.showDescription = components.some(c => !!c.description);
-    //         this.updateTotals();
-    //     });
-    // }
 
     private updateTotals() {
         type FuzzyCounts = { [group: string]: FuzzyNumber };
@@ -126,12 +128,12 @@ export class SubTreebanksComponent implements OnChanges {
             totalWordCountByVariant[subTreebank.variant].add(subTreebank.wordCount);
         }
 
-        this.totalSentenceCount = totalSentenceCount.toString(this.locale);
-        this.totalWordCount = totalWordCount.toString(this.locale);
+        this.totalSentenceCount = totalSentenceCount.toLocaleString();
+        this.totalWordCount = totalWordCount.toLocaleString();
         function mapFuzzyCounts(counts: FuzzyCounts) {
             let result: { [key: string]: string } = {};
             for (let key of Object.keys(counts)) {
-                result[key] = counts[key].toString(this.locale);
+                result[key] = counts[key].toLocaleString();
             }
             return result;
         }

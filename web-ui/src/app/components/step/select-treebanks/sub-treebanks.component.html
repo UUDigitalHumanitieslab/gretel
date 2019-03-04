@@ -1,21 +1,28 @@
 <table class="table is-hoverable is-fullwidth">
     <thead>
         <tr>
-            <th>
+            <th [attr.colspan]="variants.length">
                 <label class="checkbox">
-                    <input type="checkbox" title="Select all" [checked]="allComponentsSelected()" (change)="toggleAllComponents()"> Component
+                    <input
+                        type="checkbox"
+                        title="Select all"
+
+                        [checked]="isEveryComponentSelected(undefined)"
+                        (change)="toggleVariant(undefined)"
+                    >
+                    Component
                 </label>
             </th>
             <th *ngIf="showDescription">
                 Description
             </th>
             <ng-container *ngFor="let variant of variants">
-		        <th class="has-text-right">
-		            Sentences
-		        </th>
-		        <th class="has-text-right">
-	                Words
-    	        </th>
+                <th class="has-text-right">
+                    Sentences
+                </th>
+                <th class="has-text-right">
+                    Words
+                </th>
             </ng-container>
             <ng-container *ngIf="variants.length > 1">
                 <!-- for the total -->
@@ -30,7 +37,11 @@
         <tr *ngIf="variants.length > 1">
             <th *ngFor="let variant of variants">
                 <label class="checkbox">
-                    <input type="checkbox" [checked]="isAllChecked(variant)" (change)="changeAllSelected($event, variant)">
+                    <input
+                        type="checkbox"
+                        [checked]="isEveryComponentSelected(variant)"
+                        (change)="toggleVariant(variant)"
+                    >
                     {{variant}}
                 </label>
             </th>
@@ -46,24 +57,30 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let group of componentGroups" (click)="changeSelected(group)">
+        <tr *ngFor="let group of componentGroups" (click)="toggleGroup(group)">
             <td *ngFor="let variant of variants">
-                <label class="checkbox" [attr.disabled]="group.components[variant].disabled || null">
-                    <input type="checkbox" (change)="changeSelected(group, variant, $event)" [checked]="selectedTreebanks[group.components[variant].component]" [disabled]="group.components[variant].disabled">
-                    {{group.components[variant].component}}
-		        </label>
+                <label class="checkbox" [attr.disabled]="group.components[variant].disabled || null" (click)="$event.stopPropagation()">
+                    <input
+                        type="checkbox"
+                        [disabled]="group.components[variant].disabled"
+                        [checked]="group.components[variant].selected"
+
+                        (change)="toggleComponent(group.components[variant])"
+                    >
+                    {{group.components[variant].title}}
+                </label>
             </td>
             <td *ngIf="showDescription">
-                    {{group.description}}
+                {{group.description}}
             </td>
             <ng-container *ngFor="let variant of variants">
-		        <td class="is-number">
+                <td class="is-number">
                     {{group.components[variant].sentenceCount | formatNumber}}
-		        </td>
-		        <td class="is-number">
+                </td>
+                <td class="is-number">
                     {{group.components[variant].wordCount | formatNumber}}
-		        </td>
-	        </ng-container>
+                </td>
+            </ng-container>
             <ng-container *ngIf="variants.length > 1">
                 <th class="is-number">
                     {{totalSentenceCountByGroup[group.key] | formatNumber}}

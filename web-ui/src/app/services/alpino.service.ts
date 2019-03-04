@@ -29,18 +29,14 @@ export class AlpinoService {
         }
     }
 
-    // async parseSentenceUrl(sentence: string) {
-    //     return this.configurationService.getAlpinoUrl('parse_sentence/' + this.escapeSlash(this.tokenize(sentence)));
-    // }
+    async parseSentenceUrl(sentence: string) {
+        return this.configurationService.getAlpinoUrl('parse_sentence/' + this.escapeSlash(this.tokenize(sentence)));
+    }
 
     async parseSentence(sentence: string) {
-        return this.http.post(
-            await this.configurationService.getAlpinoUrl('parse_sentence'),
-            sentence,
-            {
-                responseType: 'text',
-            }
-        ).toPromise();
+        return this.http.get(
+            await this.parseSentenceUrl(sentence),
+            { responseType: 'text' }).toPromise();
     }
 
     tokenize(sentence: string) {

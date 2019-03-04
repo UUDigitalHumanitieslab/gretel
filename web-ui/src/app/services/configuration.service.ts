@@ -11,7 +11,6 @@ export class ConfigurationService {
     }
 
     async getApiUrl(provider: string, path: string|'treebank_counts'|'results'|'configured_treebanks'|'metadata_counts') {
-        console.log(new Error(`getApiUrl with ${provider} ${path}`))
         return (await this.config).providers[provider] + path
     }
 

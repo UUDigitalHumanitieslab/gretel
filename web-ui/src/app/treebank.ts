@@ -21,15 +21,27 @@ export class FuzzyNumber {
         }
     }
 
-    public toString(locale?: string) {
+    public toString() {
         if (this.unknown) {
             if (this.value == 0) {
                 return '?'
             } else {
-                return '≥ ' + locale ? this.value.toLocaleString(locale) : this.value.toString();
+                return '≥ ' + this.value.toString();
             }
         } else {
-            return locale ? this.value.toLocaleString(locale) : this.value.toString();
+            return this.value.toString();
+        }
+    }
+
+    public toLocaleString() {
+        if (this.unknown) {
+            if (this.value == 0) {
+                return '?'
+            } else {
+                return '≥ ' + this.value.toLocaleString();
+            }
+        } else {
+            return this.value.toLocaleString();
         }
     }
 }
@@ -83,6 +95,7 @@ export interface TreebankComponent {
     wordCount: number | '?'
     selected: boolean;
     description: string;
+    disabled: boolean;
 }
 
 export interface TreebankMetadata {
