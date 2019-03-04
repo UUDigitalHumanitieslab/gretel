@@ -1,3 +1,4 @@
+import * as $ from 'jquery';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -133,14 +134,15 @@ export class ResultsService {
         return false;
     }
 
-    async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
-        let url = await this.configurationService.getApiUrl(
-            provider,
-            `front-end-includes/show-tree.php?sid=${sentenceId}&tb=${treebank}&id=${nodeIds.join('-')}`
-        );
+    highlightSentenceTree(sentenceXml: string, nodeIds: number[]) {
+        const selector = nodeIds.map(id => '#' + id).join(', ');
 
-        const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return { url, treeXml };
+        const tree = $($.parseXML(sentenceXml))
+            .find(selector)
+            .attr('highlight', 'yes')
+            .end();
+
+        return (new XMLSerializer()).serializeToString(tree.get(0));
     }
 
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {

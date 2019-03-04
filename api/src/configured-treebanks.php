@@ -47,6 +47,11 @@ function getConfiguredTreebanks()
                     $description .= ' - version '.$settings['version'];
                 }
                 $metadata = array_key_exists('metadata', $settings) ? $settings['metadata'] : array();
+                if (array_key_exists('multioption', $settings)) {
+                    $multioption = $settings['multioption'];
+                } else {
+                    $multioption = false;
+                }
                 $corpus_definition = array(
                     'title' => $title,
                     'description' => $description,

@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { SafeHtml } from '@angular/platform-browser';
+import { SafeHtml, SafeUrl, DomSanitizer } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
 import { filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
@@ -70,7 +70,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     // tree stuff?
     public treeXml?: string;
-    public treeXmlUrl?: string;
+    public treeXmlUrl?: SafeUrl;
     public treeSentence?: SafeHtml;
 
     public columns = [
@@ -93,6 +93,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
+        private sanitizer: DomSanitizer
     ) {
         super();
 
@@ -114,14 +115,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     /**
      * Show a tree of the given xml file
-     * @param link to xml file
      */
-    async showTree(provider: string, bank: string, result: Hit) {
-        this.treeXml = undefined;
+    showTree(result: Hit) {
         this.treeSentence = result.highlightedSentence;
-        const { url, treeXml } = await this.resultsService.highlightSentenceTree(provider, result.fileId, bank, result.nodeIds);
-        this.treeXml = treeXml;
-        this.treeXmlUrl = url;
+        this.treeXml = this.resultsService.highlightSentenceTree(result.treeXml, result.nodeIds);
     }
 
     public downloadResults() {
