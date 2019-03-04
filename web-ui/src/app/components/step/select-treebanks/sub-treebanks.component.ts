@@ -96,7 +96,7 @@ export class SubTreebanksComponent implements OnChanges {
             this.treebank.name,
             components.map(c => ({
                 componentId: c.id,
-                selected: !isGroupSelected
+                selected: !isGroupSelected && !c.disabled
             }))
         );
     }
