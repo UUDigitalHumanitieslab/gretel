@@ -54,7 +54,7 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
         this.onChangeValid.emit(this.valid);
     }
 
-    getValidationMessage() {
+    public getValidationMessage() {
         this.warning = true;
     }
 

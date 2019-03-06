@@ -52,7 +52,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
         this.onChangeValid.emit(this.valid);
     }
 
-    getValidationMessage() {
+    public getValidationMessage() {
         return 'Please select a treebank and the components.';
     }
 }

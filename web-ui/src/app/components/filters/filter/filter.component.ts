@@ -7,7 +7,7 @@ export type FilterChangeEvent = FilterByField & {
 };
 
 export abstract class FilterComponent {
-    private filterDefinition;
+    private filterDefinition: Filter;
 
     @Input('filterValue') set filterValue(value: FilterByField) {
         this.onFilterValueSet(value);
@@ -30,14 +30,14 @@ export abstract class FilterComponent {
     constructor() {
     }
 
-    onCheckBoxClicked(e) {
-        this.updateFilterChange(e.target.checked);
+    onCheckBoxClicked(e: Event) {
+        this.updateFilterChange((e.target as HTMLInputElement).checked);
     }
 
-    updateFilterChange(selected) {
+    updateFilterChange(selected: boolean) {
         throw Error('Not implemented');
     }
 
-    abstract onFilterSet(filter: Filter);
-    abstract onFilterValueSet(filterValue: FilterByField);
+    abstract onFilterSet(filter: Filter): void;
+    abstract onFilterValueSet(filterValue: FilterByField): void;
 }

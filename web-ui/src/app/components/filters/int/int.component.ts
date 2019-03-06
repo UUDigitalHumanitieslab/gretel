@@ -27,8 +27,8 @@ export class IntComponent extends FilterComponent {
         }
     }
 
-    onCheckBoxClicked(e) {
-        this.updateFilterChange(e.target.checked);
+    onCheckBoxClicked(e: Event) {
+        this.updateFilterChange((e.target as HTMLInputElement).checked);
     }
 
     updateFilterChange(selected: boolean) {

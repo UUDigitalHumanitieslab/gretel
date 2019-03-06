@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, Output, EventEmitter, OnChanges, SimpleChanges  } from '@angular/core';
 import { SafeHtml, SafeUrl, DomSanitizer } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription } from 'rxjs';
-import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
+import { tap, filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -344,7 +344,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     if (item.show) {
                         const options: string[] = [];
                         if (item.field in counts) {
-                            for (const key of Object.keys(counts[item.field])) {
+                        for (const key of Object.keys(counts[item.field as any])) { // string indexing an array
                                 // TODO: show the frequency (the data it right here now!)
                                 options.push(key);
                             }
@@ -492,7 +492,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.filteredResults = filteredResults;
     }
 
-    getValidationMessage() {
+    public getValidationMessage() {
         // Should never show warning
     }
 
