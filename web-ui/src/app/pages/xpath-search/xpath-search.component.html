@@ -9,8 +9,8 @@
             [value]="globalState.xpath"
 
             (onChangeValid)="setValid($event)"
-            (onChangeValue)="updateXPath($event, false)"
-            (onChangeRetrieveContext)="updateRetrieveContext($event)"
+            (changeValue)="updateXPath($event, false)"
+            (changeRetrieveContext)="updateRetrieveContext($event)"
 
             #xpathInput>
         </grt-xpath-input>
@@ -27,11 +27,11 @@
             [retrieveContext]="globalState.retrieveContext"
             [xpath]="globalState.xpath"
 
-            (xpathChange)="updateXPath($event)"
-            (onChangeRetrieveContext)="updateRetrieveContext($event, true)"
             (onChangeValid)="setValid($event)"
-            (onPrev)="prev()"
-            (onNext)="next()"
+            (xpathChange)="updateXPath($event)"
+            (changeRetrieveContext)="updateRetrieveContext($event, true)"
+            (prev)="prev()"
+            (next)="next()"
 
             #resultsComponentRef>
         </grt-results>
@@ -43,7 +43,7 @@
             (onChangeValid)="setValid($event)">
         </grt-analysis>
     </div>
-    <hr />
+    <br />
     <div *ngIf="warning" class="notification is-danger">{{warning}}</div>
-    <grt-step-buttons (onPrev)="prev()" (onNext)="next()" [currentStep]="globalState.currentStep" [steps]="steps"></grt-step-buttons>
+    <grt-step-buttons (prev)="prev()" (next)="next()" [currentStep]="globalState.currentStep" [steps]="steps"></grt-step-buttons>
 </ng-container>

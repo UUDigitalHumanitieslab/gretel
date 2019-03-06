@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable, Observer, ReplaySubject } from "rxjs";
+import { Observable, Observer, ReplaySubject } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
@@ -20,7 +20,11 @@ export class ResultsService {
     defaultMetadataFilters: FilterValue[] = [];
     defaultVariables: { name: string, path: string }[] = null;
 
-    constructor(private http: HttpClient, private sanitizer: DomSanitizer, private configurationService: ConfigurationService, private xmlParseService: XmlParseService) {
+    constructor(
+        private http: HttpClient,
+        private sanitizer: DomSanitizer,
+        private configurationService: ConfigurationService,
+        private xmlParseService: XmlParseService) {
     }
 
     promiseAllResults(xpath: string,
@@ -34,8 +38,8 @@ export class ResultsService {
         cancellationToken: Observable<{}> | null = null
     ): Promise<Hit[]> {
         return new Promise<Hit[]>((resolve, reject) => {
-            let hits: Hit[] = [];
-            let subscription = this.getAllResults(
+            const hits: Hit[] = [];
+            const subscription = this.getAllResults(
                 xpath,
                 provider,
                 corpus,
@@ -116,7 +120,7 @@ export class ResultsService {
         variables = this.defaultVariables,
         remainingDatabases: string[] | null = null
     ) {
-        let results = await this.http.post<ApiSearchResult | false>(
+        const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl(provider, 'results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
                 retrieveContext,
@@ -155,7 +159,7 @@ export class ResultsService {
     }
 
     async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        let results = await this.http.post<{ [databaseId: string]: string }>(
+        const results = await this.http.post<{ [databaseId: string]: string }>(
             await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
                 corpus,
@@ -165,7 +169,7 @@ export class ResultsService {
         return Object.keys(results).map(databaseId => {
             return {
                 databaseId,
-                count: parseInt(results[databaseId])
+                count: parseInt(results[databaseId], 10)
             } as TreebankCount;
         });
     }
@@ -175,7 +179,7 @@ export class ResultsService {
      *
      * @return string The metadata filter
      */
-    private createMetadataFilterQuery(filters: FilterValue[]) {
+    public createMetadataFilterQuery(filters: FilterValue[]) {
         function escape(value: string | number) {
             return value.toString()
                 .replace(/&/g, '&amp;')
@@ -183,37 +187,43 @@ export class ResultsService {
         }
 
         // Compile the filter
-        let filterQuery = '';
-        for (let filter of filters) {
+        const filterQueries: string[] = [];
+        for (const filter of filters) {
             switch (filter.type) {
                 case 'single':
                     // Single values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`;
+                    filterQueries.push(
+                        `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and @value="${escape(filter.value)}"]]`);
                     break;
                 case 'range':
                     // Ranged values
                     let min: string, max: string, value: string;
-                    if (filter.dataType == 'date') {
+                    if (filter.dataType === 'date') {
                         // gets number in the format YYYYMMDD e.g. 19870227
                         min = filter.min.replace(/-/g, '');
                         max = filter.max.replace(/-/g, '');
-                        value = "number(translate(@value,'-',''))";
+                        value = `number(translate(@value,'-',''))`;
                     } else {
                         min = escape(filter.min);
                         max = escape(filter.max);
                         value = '@value';
                     }
 
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and ${value}>=${min} and ${value}<=${max}]]`;
+                    filterQueries.push(
+                        `[ancestor::alpino_ds/metadata/meta[@name="${
+                        escape(filter.field)}" and\n\t${value}>=${min} and ${value}<=${max}]]`);
                     break;
                 case 'multiple':
                     // Single values
-                    filterQuery += `[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and (${
-                        filter.values.map((value) => `@value="${escape(value)}"`).join(' or ')})]]`;
+                    filterQueries.push(`[ancestor::alpino_ds/metadata/meta[@name="${escape(filter.field)}" and\n\t(${
+                        filter.values.map((v) => `@value="${escape(v)}"`).join(' or\n\t')})]]`);
+                    break;
+                case 'xpath':
+                    filterQueries.push(`[${filter.xpath}]`);
                     break;
             }
         }
-        return filterQuery;
+        return filterQueries.join('\n');
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
@@ -221,15 +231,15 @@ export class ResultsService {
             hits: await this.mapHits(results),
             nextIteration: results[7],
             remainingDatabases: results[8]
-        }
+        };
     }
 
     private mapHits(results: ApiSearchResult): Promise<Hit[]> {
         return Promise.all(Object.keys(results[0]).map(async hitId => {
-            let sentence = results[0][hitId];
-            let nodeStarts = results[3][hitId].split('-').map(x => parseInt(x));
-            let metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
-            let variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
+            const sentence = results[0][hitId];
+            const nodeStarts = results[3][hitId].split('-').map(x => parseInt(x, 10));
+            const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
+            const variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
                 component: results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
@@ -237,7 +247,7 @@ export class ResultsService {
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results[4][hitId],
-                nodeIds: results[2][hitId].split('-').map(x => parseInt(x)),
+                nodeIds: results[2][hitId].split('-').map(x => parseInt(x, 10)),
                 nodeStarts,
                 metaValues,
                 /**
@@ -265,7 +275,6 @@ export class ResultsService {
         }, {} as Hit['metaValues']);
     }
 
-
     private mapVariables(data: '' | {
         vars: {
             var: {
@@ -292,25 +301,25 @@ export class ResultsService {
 
         if (sentence.indexOf('<em>') >= 0) {
             // Showing the context of this hit
-            let $groups = /(.*<em>)(.*?)(<\/em>.*)/.exec(sentence);
+            const $groups = /(.*<em>)(.*?)(<\/em>.*)/.exec(sentence);
             sentence = $groups[2];
             prev = $groups[1];
             next = $groups[3];
         }
 
-        let words = sentence.split(' ');
+        const words = sentence.split(' ');
 
         // Instead of wrapping each individual word in a tag, merge sequences
         // of words in one <tag>...</tag>
         for (let i = 0; i < words.length; i++) {
-            let word = words[i];
+            const word = words[i];
             if (nodeStarts.indexOf(i) >= 0) {
                 let value = '';
-                if (nodeStarts.indexOf(i - 1) == -1) {
+                if (nodeStarts.indexOf(i - 1) === -1) {
                     value += `<${tag}>`;
                 }
                 value += words[i];
-                if (nodeStarts.indexOf(i + 1) == -1) {
+                if (nodeStarts.indexOf(i + 1) === -1) {
                     value += `</${tag}>`;
                 }
                 words[i] = value;
@@ -358,60 +367,63 @@ type ApiSearchResult = [
 ];
 
 export interface SearchResults {
-    hits: Hit[],
+    hits: Hit[];
     /**
      * Start iteration for retrieving the next results (in the first database in `remainingDatabases`)
      */
-    nextIteration: number,
+    nextIteration: number;
     /**
      * Databases remaining for doing a paged search
      */
-    remainingDatabases: string[]
+    remainingDatabases: string[];
 }
 
 export interface Hit {
     /** Id of the component this hit originated from */
-    component: string,
-    fileId: string,
+    component: string;
+    fileId: string;
     // /**
     //  * This value is not very reliable, because it is based on the filename
     //  */
-    // component: string,
-    sentence: string,
-    highlightedSentence: SafeHtml,
-    treeXml: string,
+    // component: string;
+    sentence: string;
+    highlightedSentence: SafeHtml;
+    treeXml: string;
     /**
      * The ids of the matching nodes
      */
-    nodeIds: number[],
+    nodeIds: number[];
     /**
      * The begin position of the matching nodes
      */
-    nodeStarts: number[],
-    metaValues: { [key: string]: string },
+    nodeStarts: number[];
+    metaValues: { [key: string]: string };
     /**
      * Contains the properties of the node matching the variable
      */
-    variableValues: { [variableName: string]: { [propertyKey: string]: string } },
+    variableValues: { [variableName: string]: { [propertyKey: string]: string } };
 }
 
 
-export type FilterValue =
+export type FilterValue = FilterByField | FilterByXPath;
+export type FilterByField =
     FilterSingleValue
     | FilterRangeValue<string, 'date'>
     | FilterRangeValue<number, 'int'>
     | FilterMultipleValues<string, 'text'>;
 
+export interface FilterValues { [field: string]: FilterValue; }
+
 export interface FilterSingleValue {
     type: 'single';
-    dataType: 'text',
+    dataType: 'text';
     field: string;
     value: string;
 }
 
 export interface FilterRangeValue<T, U> {
     type: 'range';
-    dataType: U,
+    dataType: U;
     field: string;
     min: T;
     max: T;
@@ -419,14 +431,22 @@ export interface FilterRangeValue<T, U> {
 
 export interface FilterMultipleValues<T, U> {
     type: 'multiple';
-    dataType: U,
+    dataType: U;
     values: Array<T>;
     field: string;
 }
 
-export type TreebankCount = {
-    databaseId: string,
-    count: number
+export interface FilterByXPath {
+    /// The variable name + attribute e.g. $node1.pt
+    field: string;
+    type: 'xpath';
+    label: string;
+    xpath: string;
 }
 
-export type MetadataValueCounts = { [key: string]: { [value: string]: number } }
+export interface TreebankCount {
+    databaseId: string;
+    count: number;
+}
+
+export interface MetadataValueCounts { [key: string]: { [value: string]: number }; }

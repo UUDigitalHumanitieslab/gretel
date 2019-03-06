@@ -1,5 +1,5 @@
 import { AfterViewChecked, AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router } from '@angular/router';
 
 import * as _ from 'lodash';
 
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
 import { GlobalState, Step } from "./steps";
 import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from "./transitions";
-import { mapTreebanksToSelectionSettings } from '../../services/_index';
+import { mapTreebanksToSelectionSettings, FilterValues } from '../../services/_index';
 
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
     public crumbs: Crumb[];
@@ -45,7 +45,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
         this.subscriptions.push(
             this.route.queryParams.subscribe(params => {
-                let decoded = this.decodeGlobalState(params);
+                const decoded = this.decodeGlobalState(params);
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
                 // if we don't set this, we might try to serialize the globalstate before the step has been entered (it happens asyncronously), causing an undefined access.
                 this.globalState.currentStep = this.steps[decoded.step];
@@ -62,7 +62,10 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      * Returns the properties of the global state which are set in the URL.
      * @param queryParams
      */
-    abstract decodeGlobalState(queryParams: { [key: string]: any }): { step: number, state: { [K in keyof GlobalState]?: GlobalState[K] | undefined } };
+    abstract decodeGlobalState(queryParams: { [key: string]: any }): {
+        step: number, state: { [K in keyof GlobalState]?: GlobalState[K] | undefined }
+    };
+
     encodeGlobalState(state: T): { [key: string]: any } {
         return {
             'currentStep': state.currentStep.number,
@@ -70,7 +73,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             'xpath': state.xpath != this.defaultGlobalState.xpath ? state.xpath : undefined,
             'selectedTreebanks': state.selectedTreebanks.length > 0 ? JSON.stringify(state.selectedTreebanks) : undefined,
             'retrieveContext': this.encodeBool(state.retrieveContext)
-        }
+        };
     }
 
     initializeGlobalState() {
@@ -78,7 +81,9 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     initializeTransitions() {
-        let transitions: Transition<T>[] = [new IncreaseTransition(this.configuration.steps), new DecreaseTransition(this.configuration.steps)];
+        const transitions: Transition<T>[] = [
+            new IncreaseTransition(this.configuration.steps),
+            new DecreaseTransition(this.configuration.steps)];
         for (const crumb of this.crumbs) {
             transitions.push(new JumpToStepTransition(this.steps, crumb.number));
         }
@@ -95,7 +100,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      */
     async prev() {
         this.isTransitioning = true;
-        let state = await this.transitions.fire('decrease', this.globalState);
+        const state = await this.transitions.fire('decrease', this.globalState);
         this.updateGlobalState(state);
     }
 
@@ -113,7 +118,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     async next() {
         if (this.globalState.valid) {
             this.isTransitioning = true;
-            let state = await this.transitions.fire('increase', this.globalState);
+            const state = await this.transitions.fire('increase', this.globalState);
             this.updateGlobalState(state);
             this.warning = false;
         } else {
@@ -122,14 +127,14 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     setValid(valid: boolean) {
-        this.globalState.valid = valid
+        this.globalState.valid = valid;
     }
 
     /**
      * Show the warning of the appropriate component.
      */
     showWarning(state: T) {
-        let component = this.components[state.currentStep.number];
+        const component = this.components[state.currentStep.number];
         if (component && component.getValidationMessage) {
             this.warning = component.getValidationMessage();
         } else {
@@ -139,15 +144,14 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     getStepFromNumber(n: number) {
         if (n) {
-            return this.steps[n]
+            return this.steps[n];
         } else {
-            return this.steps[0]
+            return this.steps[0];
         }
     }
 
     updateUrl(writeState = true) {
-        let state = this.encodeGlobalState(this.globalState);
-
+        const state = this.encodeGlobalState(this.globalState);
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: state,
@@ -158,20 +162,30 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     async goToStep(stepNumber: number, updateUrl = true) {
         this.isTransitioning = true;
-        let state = await this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState);
-        if (!state.valid && state.currentStep.number != stepNumber) {
+        const state = await this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState);
+        if (!state.valid && state.currentStep.number !== stepNumber) {
             this.showWarning(state);
         } else {
             this.warning = false;
         }
 
-        this.updateGlobalState(state, state.currentStep.number == stepNumber && updateUrl);
+        this.updateGlobalState(state, state.currentStep.number === stepNumber && updateUrl);
+    }
+
+    updateFilterValues(filterValues: FilterValues) {
+        this.globalState.filterValues = filterValues;
+    }
+
+    filterResults(values: { xpath: string, filterValues: FilterValues }, resultsStep) {
+        // TODO: xpath
+        this.globalState.filterValues = values.filterValues;
+        this.goToStep(resultsStep, true);
     }
 
     protected decodeBool(param: string | undefined): boolean | undefined {
-        if (param == '1') {
+        if (param === '1') {
             return true;
-        } else if (param == '0') {
+        } else if (param === '0') {
             return false;
         }
         return undefined;

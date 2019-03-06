@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { FilterComponent, FilterChangeEvent } from "../filter/filter.component";
+import { FilterComponent } from '../filter/filter.component';
 import { Filter } from '../filters.component';
-import { FilterRangeValue } from "../../../services/results.service";
+import { FilterValue } from '../../../services/results.service';
 
 @Component({
     selector: 'grt-int',
@@ -11,14 +11,28 @@ import { FilterRangeValue } from "../../../services/results.service";
 export class IntComponent extends FilterComponent {
     public value: number;
 
-    rangeValues: number[];
+    rangeValues: number[] = [0, 0];
 
     onFilterSet(filter: Filter) {
-        this.rangeValues = [filter.minValue as number || 0, filter.maxValue as number || 0];
+        this.rangeValues = [this.rangeValues[0] || filter.minValue as number || 0,
+        this.rangeValues[1] || filter.maxValue as number || 0];
+    }
+
+    onFilterValueSet(filterValue: FilterValue) {
+        if (filterValue && filterValue.type === 'range') {
+            this.rangeValues = [filterValue.min as number || 0, filterValue.max as number || 0];
+        } else if (this.filter) {
+            // revert to default
+            this.onFilterSet(this.filter);
+        }
+    }
+
+    onCheckBoxClicked(e) {
+        this.updateFilterChange(e.target.checked);
     }
 
     updateFilterChange(selected: boolean) {
-        this.onFilterChange.emit({
+        this.filterChange.emit({
             dataType: 'int',
             type: 'range',
             field: this.filter.field,
@@ -26,8 +40,5 @@ export class IntComponent extends FilterComponent {
             min: this.rangeValues[0],
             max: this.rangeValues[1]
         });
-
     }
-
-
 }

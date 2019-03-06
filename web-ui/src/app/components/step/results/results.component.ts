@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, Output, EventEmitter, OnChanges, SimpleChanges  } from '@angular/core';
 import { SafeHtml, SafeUrl, DomSanitizer } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
-import { filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription } from 'rxjs';
+import { tap, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -16,11 +16,13 @@ import {
     TreebankService,
     mapTreebanksToSelectionSettings,
     SearchResults,
-    ConfiguredTreebanks
+    ConfiguredTreebanks,
+    FilterValues,
+    FilterByXPath
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata, Treebank, FuzzyNumber } from '../../../treebank';
-import { StepComponent } from "../step.component";
+import { StepComponent } from '../step.component';
 
 const DebounceTime = 200;
 
@@ -40,33 +42,43 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     public get xpath(): string { return this.xpathSubject.value; }
 
     @Input()
-    public retrieveContext: boolean = false;
+    public filterValues: FilterValues = {};
+
+    @Input()
+    public retrieveContext = false;
 
     @Input()
     public inputSentence: string = null;
-
-    // ----------------
 
     @Output()
     public xpathChange = new EventEmitter<string>();
 
     @Output()
-    public onChangeRetrieveContext = new EventEmitter<boolean>();
+    public changeFilterValues = new EventEmitter<FilterValues>();
 
     @Output()
-    public onPrev = new EventEmitter();
+    public changeRetrieveContext = new EventEmitter<boolean>();
 
     @Output()
-    public onNext = new EventEmitter();
+    public prev = new EventEmitter();
 
-    public loading: boolean = true;
+    @Output()
+    public next = new EventEmitter();
+
+    public loading = true;
 
     public xpathCopied = false;
     public customXPath: string;
-    public validXPath: boolean = true;
-    public isModifyingXPath: boolean = false;
+    public validXPath = true;
+    public isModifyingXPath = false;
+    public isFiltering = false;
 
     public filters: Filter[] = [];
+
+    /**
+     * Filters on node properties created in the analysis component
+     */
+    public filterXPaths: FilterByXPath[] = [];
 
     // tree stuff?
     public treeXml?: string;
@@ -107,8 +119,20 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.onChangeValid = new EventEmitter();
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        const filterValuesChange = changes['filterValues'];
+        if (filterValuesChange && (filterValuesChange.firstChange ||
+            filterValuesChange.previousValue !== filterValuesChange.currentValue)) {
+            const values = Object.values(this.filterValues);
+            this.filterValuesSubject.next(values);
+            this.filterXPaths = values.filter(
+                (val): val is FilterByXPath => val.type === 'xpath');
+            this.isFiltering = values.length > 0;
+        }
+    }
+
     ngOnDestroy() {
-        for (let subscription of this.subscriptions) {
+        for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
     }
@@ -121,8 +145,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.treeXml = this.resultsService.highlightSentenceTree(result.treeXml, result.nodeIds);
     }
 
-    public downloadResults() {
+    public deleteFilter(filterValue: FilterValue) {
+        const { [filterValue.field]: _, ...updated } = this.filterValues;
+        this.filterChange(updated);
+    }
 
+    public downloadResults() {
         const r = [] as Array<{
             xpath: string,
             components: string[],
@@ -187,7 +215,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     public getFileNames() {
         const allNames = new Set(this.filteredResults.map((result) => result.fileId));
-        return Array.from(allNames).sort()
+        return Array.from(allNames).sort();
     }
 
     public copyXPath() {
@@ -220,8 +248,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.filterHits();
     }
 
-    public filterChange(filterValues: FilterValue[]) {
-        this.filterValuesSubject.next(filterValues);
+    public filterChange(filterValues: FilterValues) {
+        this.changeFilterValues.next(filterValues);
     }
 
     public print() {
@@ -243,6 +271,15 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
         this.isModifyingXPath = false;
     }
 
+    public addFiltersXPath() {
+        this.customXPath = (this.xpath || this.customXPath).trimRight() + '\n' +
+            this.resultsService.createMetadataFilterQuery(
+                Object.values(this.filterValues));
+        this.filterChange({});
+
+        this.xpathChange.next(this.customXPath);
+    }
+
     public customXPathChanged(valueEvent: ValueEvent) {
         this.validXPath = !valueEvent.error;
         if (this.validXPath) {
@@ -251,7 +288,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     toggleContext() {
-        this.onChangeRetrieveContext.emit(!this.retrieveContext);
+        this.changeRetrieveContext.emit(!this.retrieveContext);
     }
 
     /**
@@ -299,35 +336,39 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     /**
      * Get the filters
      */
-    // private liveFilters() {
-    //     return observableCombineLatest(
-    //         this.metadataValueCountsSubject
-    //     )
-    //     .subscribe(counts => {
-    //         let filters: Filter[] = [];
-    //         for (let filter of metadata) {
-    //             if (filter.show) {
-    //                 let options: string[] = [];
-    //                 if (filter.field in counts) { // TODO this line is profoundly broken
-    //                     for (let key of Object.keys(counts[filter.field])) {
-    //                         // TODO: show the frequency (the data it right here now!)
-    //                         options.push(key);
-    //                     }
-    //                 }
-    //                 filters.push({
-    //                     field: filter.field,
-    //                     dataType: filter.type,
-    //                     filterType: filter.facet,
-    //                     minValue: filter.minValue,
-    //                     maxValue: filter.maxValue,
-    //                     options
-    //                 });
-    //             }
-    //         }
+    private liveFilters() {
+        return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
+            .subscribe(([metadata, counts]) => {
+                const filters: Filter[] = [];
+                for (const item of metadata) {
+                    if (item.show) {
+                        const options: string[] = [];
+                        if (item.field in counts) {
+                            for (const key of Object.keys(counts[item.field])) {
+                                // TODO: show the frequency (the data it right here now!)
+                                options.push(key);
+                            }
+                        }
 
-    //         this.filters = filters;
-    //     });
-    // }
+                        if (item.facet === 'checkbox' && options.length > 8) {
+                            // use a dropdown instead of checkboxes when there
+                            // are too many options
+                            item.facet = 'dropdown';
+                        }
+
+                        filters.push({
+                            field: item.field,
+                            dataType: item.type,
+                            filterType: item.facet,
+                            minValue: item.minValue,
+                            maxValue: item.maxValue,
+                            options
+                        });
+                    }
+                }
+                this.filters = filters;
+            });
+    }
 
     /**
      * Get the results

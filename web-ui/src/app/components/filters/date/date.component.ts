@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from "../filter/filter.component";
+import { FilterComponent } from '../filter/filter.component';
 import { Filter } from '../filters.component';
+import { FilterValue } from '../../../services/_index';
 
 @Component({
     selector: 'grt-date',
@@ -12,29 +13,34 @@ export class DateComponent extends FilterComponent {
     maxValue: Date;
 
     onFilterSet(filter: Filter) {
-        this.minValue = filter.minValue as Date;
-        this.maxValue = filter.maxValue as Date;
+        this.minValue = this.minValue || filter.minValue as Date;
+        this.maxValue = this.maxValue || filter.maxValue as Date;
+    }
+
+    onFilterValueSet(filterValue: FilterValue) {
+        if (filterValue && filterValue.type === 'range') {
+            this.minValue = new Date(filterValue.min as string),
+                this.maxValue = new Date(filterValue.max as string);
+        } else if (this.filter) {
+            // default value
+            this.onFilterSet(this.filter);
+        }
     }
 
     updateFilterChange() {
-        function bound(min: any, value: Date, max: any) {
-            if (value < min) {
-                return min;
-            }
-            if (value > max) {
-                return max;
-            }
-
-            return value;
-        }
-
-        let min = bound(this.filter.minValue, this.minValue, this.filter.maxValue);
-        let max = bound(min, this.maxValue, this.filter.maxValue);
+        let min = this.bound(
+            this.filter.minValue as Date,
+            this.minValue,
+            this.filter.maxValue as Date);
+        const max = this.bound(
+            min,
+            this.maxValue,
+            this.filter.maxValue as Date);
         if (min > max) {
             min = max;
         }
 
-        this.onFilterChange.emit({
+        this.filterChange.emit({
             dataType: 'date',
             field: this.filter.field,
             selected: min > this.filter.minValue || max < this.filter.maxValue,
@@ -46,5 +52,16 @@ export class DateComponent extends FilterComponent {
 
     dateToString(date: Date) {
         return date.toISOString().split('T')[0];
+    }
+
+    private bound<T>(min: T, value: T, max: T) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+
+        return value;
     }
 }

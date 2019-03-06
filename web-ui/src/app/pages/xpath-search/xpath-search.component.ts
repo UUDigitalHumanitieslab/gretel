@@ -34,6 +34,7 @@ import { ResultsComponent } from '../../components/step/results/results.componen
 export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     protected defaultGlobalState: GlobalState = {
         currentStep: undefined,
+        filterValues: {},
         retrieveContext: false,
         selectedTreebanks: [],
         xpath: `//node[@cat="smain"

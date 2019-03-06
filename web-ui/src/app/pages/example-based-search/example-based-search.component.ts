@@ -25,6 +25,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         exampleXml: undefined,
         subTreeXml: undefined,
         currentStep: undefined,
+        filterValues: {},
         valid: true,
         xpath: undefined,
         loading: false,
@@ -74,27 +75,27 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     initializeCrumbs() {
         this.crumbs = [
             {
-                name: "Example",
+                name: 'Example',
                 number: 0,
             },
             {
-                name: "Parse",
+                name: 'Parse',
                 number: 1,
             },
             {
-                name: "Matrix",
+                name: 'Matrix',
                 number: 2,
             },
             {
-                name: "Treebanks",
+                name: 'Treebanks',
                 number: 3,
             },
             {
-                name: "Results",
+                name: 'Results',
                 number: 4,
             },
             {
-                name: "Analysis",
+                name: 'Analysis',
                 number: 5,
             },
         ];
@@ -108,7 +109,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.selectTreebanksComponent,
             this.resultsComponent,
             this.analysisComponent
-        ]
+        ];
     }
 
     encodeGlobalState(state: GlobalStateExampleBased) {

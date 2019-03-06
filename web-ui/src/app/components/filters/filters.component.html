@@ -4,10 +4,10 @@
             {{filter.field}}
         </p>
         <ng-container [ngSwitch]="filter.filterType">
-            <grt-text *ngSwitchCase="'checkbox'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-text>
-            <grt-int *ngSwitchCase="'slider'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-int>
-            <grt-date *ngSwitchCase="'range'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-date>
-            <grt-dropdown *ngSwitchCase="'dropdown'" [filter]="filter" (onFilterChange)="filterChanged($event)"></grt-dropdown>
+            <grt-text *ngSwitchCase="'checkbox'" [filter]="filter" [filterValue]="filterValues[filter.field]" (filterChange)="filterChanged($event)"></grt-text>
+            <grt-int *ngSwitchCase="'slider'" [filter]="filter" [filterValue]="filterValues[filter.field]" (filterChange)="filterChanged($event)"></grt-int>
+            <grt-date *ngSwitchCase="'range'" [filter]="filter" [filterValue]="filterValues[filter.field]" (filterChange)="filterChanged($event)"></grt-date>
+            <grt-dropdown *ngSwitchCase="'dropdown'" [filter]="filter" [filterValue]="filterValues[filter.field]" (filterChange)="filterChanged($event)"></grt-dropdown>
         </ng-container>
     </ng-container>
 </div>

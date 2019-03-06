@@ -2,14 +2,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { XPathModels } from "ts-xpath";
 import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
 import { ResultsService } from "../../services/results.service";
-import { AlpinoService } from "../../services/_index";
+import { AlpinoService, FilterValues } from "../../services/_index";
 import { filter, map, take } from 'rxjs/operators';
 
 
 /**
  * Contains all the steps that are used in the xpath search
  */
-
 
 /**
  * All the information the xpath-search component should keep track of
@@ -21,6 +20,7 @@ interface GlobalState {
      */
     retrieveContext: boolean,
     xpath: string;
+    filterValues: FilterValues;
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
@@ -29,19 +29,19 @@ interface GlobalState {
 }
 
 interface GlobalStateExampleBased extends GlobalState {
-    isCustomXPath: boolean,
-    exampleXml: string,
-    subTreeXml: string,
-    tokens: string[],
-    attributes: string[],
+    isCustomXPath: boolean;
+    exampleXml: string;
+    subTreeXml: string;
+    tokens: string[];
+    attributes: string[];
     /**
      * Ignores properties of the dominating node
      */
-    ignoreTopNode: boolean,
+    ignoreTopNode: boolean;
     /**
      * Respect word order
      */
-    respectOrder: boolean
+    respectOrder: boolean;
 }
 
 /**
@@ -69,13 +69,13 @@ class SentenceInputStep<T extends GlobalState> extends Step<T> {
 
 class MatrixStep extends Step<GlobalStateExampleBased> {
     constructor(number: number, private alpinoService: AlpinoService) {
-        super(number)
+        super(number);
     }
 
     async enterStep(state: GlobalStateExampleBased) {
         state.currentStep = this;
         state.tokens = this.alpinoService.tokenize(state.inputSentence).split(' ');
-        state.attributes = state.tokens.map(t => 'pos'); // default value
+        state.attributes = state.tokens.map(() => 'pos'); // default value
         return this.updateMatrix(state);
     }
 
@@ -86,7 +86,7 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
     async updateMatrix(state: GlobalStateExampleBased) {
         state.loading = true;
         if (!state.isCustomXPath) {
-            let generated = await this.alpinoService.generateXPath(
+            const generated = await this.alpinoService.generateXPath(
                 state.exampleXml,
                 state.tokens,
                 state.attributes,
@@ -111,7 +111,7 @@ class ParseStep extends Step<GlobalStateExampleBased> {
         state.loading = true;
         state.currentStep = this;
 
-        let xml = await this.alpinoService.parseSentence(state.inputSentence);
+        const xml = await this.alpinoService.parseSentence(state.inputSentence);
         state.exampleXml = xml;
         state.loading = false;
         return state;
@@ -138,7 +138,7 @@ class XpathInputStep<T extends GlobalState> extends Step<T> {
     }
 }
 
-class AnalysisStep<T extends GlobalState> extends Step<T>{
+class AnalysisStep<T extends GlobalState> extends Step<T> {
     constructor(number: number) {
         super(number);
     }
@@ -164,7 +164,7 @@ class AnalysisStep<T extends GlobalState> extends Step<T>{
     }
 }
 
-class ResultStep<T extends GlobalState> extends Step<T>{
+class ResultStep<T extends GlobalState> extends Step<T> {
     constructor(number: number) {
         super(number);
     }
