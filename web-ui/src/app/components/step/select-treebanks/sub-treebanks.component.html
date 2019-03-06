@@ -75,18 +75,18 @@
             </td>
             <ng-container *ngFor="let variant of variants">
                 <td class="is-number">
-                    {{group.components[variant].sentenceCount | formatNumber}}
+                    {{group.components[variant].sentenceCount}}
                 </td>
                 <td class="is-number">
-                    {{group.components[variant].wordCount | formatNumber}}
+                    {{group.components[variant].wordCount}}
                 </td>
             </ng-container>
             <ng-container *ngIf="variants.length > 1">
                 <th class="is-number">
-                    {{totalSentenceCountByGroup[group.key] | formatNumber}}
+                    {{totalSentenceCountByGroup[group.key]}}
                 </th>
                 <th class="is-number">
-                    {{totalWordCountByGroup[group.key] | formatNumber}}
+                    {{totalWordCountByGroup[group.key]}}
                 </th>
             </ng-container>
         </tr>
@@ -97,12 +97,12 @@
                 &nbsp;
             </td>
             <ng-container *ngFor="let variant of variants">
-                <td class="is-number">{{totalSentenceCountByVariant[variant] | formatNumber}}</td>
-                <td class="is-number">{{totalWordCountByVariant[variant] | formatNumber}}</td>
+                <td class="is-number">{{totalSentenceCountByVariant[variant]}}</td>
+                <td class="is-number">{{totalWordCountByVariant[variant]}}</td>
             </ng-container>
             <ng-container *ngIf="variants.length > 1">
-                <th class="is-number">{{totalSentenceCount | formatNumber}}</th>
-                <th class="is-number">{{totalWordCount | formatNumber}}</th>
+                <th class="is-number">{{totalSentenceCount}}</th>
+                <th class="is-number">{{totalWordCount}}</th>
             </ng-container>
         </tr>
     </tfoot>
