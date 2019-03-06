@@ -227,8 +227,14 @@
                     <td *ngFor="let col of columns" class="ui-resizable-column">
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
-                            <span *ngSwitchCase="'fileId'">{{rowData[col.field]}}</span>
-                            <a *ngSwitchCase="'fileId'" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+
+                            <ng-container *ngSwitchCase="'fileId'">
+                                <a *ngIf="rowData[col.field]; else fileIdButton" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                                <ng-template #fileIdButton>
+                                    <button type="button" class="button" (click)="showTree(rowData)">Show tree</button>
+                                </ng-template>
+                            </ng-container>
+
                             <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                         </div>
                     </td>
