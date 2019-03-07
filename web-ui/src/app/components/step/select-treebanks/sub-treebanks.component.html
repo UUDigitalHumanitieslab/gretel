@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th [attr.colspan]="variants.length">
-                <label class="checkbox" *ngIf="!multiOption">
+                <label class="checkbox" *ngIf="!treebank.multiOption">
                     <input
                         type="checkbox"
                         title="Select all"
@@ -12,7 +12,7 @@
                     >
                     Component
                 </label>
-                <span *ngIf="!multiOption">Component</span>
+                <span *ngIf="treebank.multiOption">Component</span>
             </th>
             <th *ngIf="showDescription">
                 Description
@@ -23,9 +23,9 @@
                 </th>
                 <th class="has-text-right" *ngIf="showWordCount">
                     Words
-                </th>            
-			</ng-container>
-	        <ng-container *ngIf="variants.length > 1">
+                </th>
+            </ng-container>
+            <ng-container *ngIf="variants.length > 1">
                 <!-- for the total -->
                 <th class="has-text-right">
                     Sentences
@@ -60,7 +60,7 @@
     <tbody>
         <tr *ngFor="let group of componentGroups" (click)="toggleGroup(group)">
             <td *ngFor="let variant of variants">
-                <label *ngIf="multioption" class="checkbox" [attr.disabled]="group.components[variant].disabled || null" (click)="$event.stopPropagation()">
+                <label *ngIf="treebank.multiOption" class="checkbox" [attr.disabled]="group.components[variant].disabled || null" (click)="$event.stopPropagation()">
                     <input
                         type="checkbox"
                         [disabled]="group.components[variant].disabled"
@@ -70,15 +70,15 @@
                     >
                     {{group.components[variant].title}}
                 </label>
-				<label *ngIf="!multiOption>
-                    <input 
-						type="radio" 
-						[disabled]="group.components[variant].disabled"
-						[checked]="selectedTreebanks[group.components[variant].component]" 
-					
+                <label *ngIf="!treebank.multiOption">
+                    <input
+                        type="radio"
+                        [disabled]="group.components[variant].disabled"
+                        [checked]="group.components[variant].selected"
+
                         (change)="toggleComponent(group.components[variant])"
-					>		
-				</label>
+                    >
+                </label>
             </td>
             <td *ngIf="showDescription">
                 {{group.description}}

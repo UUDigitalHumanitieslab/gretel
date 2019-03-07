@@ -124,7 +124,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     }
 
     decodeGlobalState(queryParams: {[key: string]: any}) {
-        return {
+        const globalState = {
             step: parseInt(queryParams.currentStep || 0, 10),
             state: {
                 selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,

@@ -136,8 +136,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         .pipe(take(1))
         .toPromise();
 
-        debugger;
-
         this.data = {};
         for (const {provider, corpus, components} of treebankSelections) {
             if (!this.data[provider]) {this.data[provider] = {}}
@@ -196,7 +194,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        debugger;
         const variableName = helper.text().trim();
         const offset = $('.pvtRendererArea').offset();
         this.top = offset.top;

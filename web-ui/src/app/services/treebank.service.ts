@@ -110,6 +110,7 @@ export class TreebankService {
                             uploaded: false,
                             provider,
                             selected: false,
+                            multiOption: treebank.multioption
                         },
                         metadata: treebank.metadata,
                         variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
@@ -170,11 +171,11 @@ export class TreebankService {
                         processed: new Date(item.processed),
                         isPublic: item.public == '1',
                         description: item.title,
+                        multiOption: true,
                         // TODO this will never work, the provider needs to resolve to a regular endpoint
                         provider: uploadProvider,
                         selected: true,
                     },
-					multiOption: (() => throw new Error('todo))(),
                     variants: ['default'],
                     componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.id)
                         .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())
