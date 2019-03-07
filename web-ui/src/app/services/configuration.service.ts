@@ -10,8 +10,13 @@ export class ConfigurationService {
         this.config = this.loadConfig();
     }
 
-    async getApiUrl(provider: string, path: string|'treebank_counts'|'results'|'configured_treebanks'|'metadata_counts') {
-        return (await this.config).providers[provider] + path
+    async getApiUrl(provider, path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
+        const queryStringEntries = Object.entries(queryString);
+        return (await this.config).providers[provider] + path +
+            (parts.length ? '/' + parts.join('/') : '') +
+            (queryStringEntries.length
+                ? queryStringEntries.map(([key, value], index) => `${index ? '&' : '?'}${key}=${value}`)
+                : '');
     }
 
     async getUploadApiUrl(path: string) {
@@ -30,7 +35,7 @@ export class ConfigurationService {
         return Object.keys((await this.config).providers);
     }
 
-    async loadConfig() {
+    private async loadConfig() {
         return this.httpClient.get<Config>(`assets/config/config.${environment.name}.json`).toPromise();
     }
 }

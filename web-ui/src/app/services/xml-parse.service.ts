@@ -13,7 +13,7 @@ export class XmlParseService {
                     return reject(error);
                 }
                 return resolve(data);
-            })
+            });
         });
     }
 }

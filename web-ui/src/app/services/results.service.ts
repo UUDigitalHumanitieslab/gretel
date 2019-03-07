@@ -279,30 +279,42 @@ export class ResultsService {
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
-        return {
-            hits: await this.mapHits(results),
-            nextIteration: results[7],
-            remainingDatabases: results[8],
-            already: results[11],
-            needRegularGrinded: results[12],
-            searchLimit: results[13]
-        };
+        return results.success ?
+            {
+                hits: await this.mapHits(results),
+                nextIteration: results.endPosIteration,
+                remainingDatabases: results.databases,
+                already: results.already,
+                needRegularGrinded: results.needRegularGrinded,
+                searchLimit: results.searchLimit
+            } : {
+                hits: [],
+                nextIteration: 0,
+                remainingDatabases: [],
+                already: {},
+                needRegularGrinded: false,
+                searchLimit: 0
+            };
     }
 
     private mapHits(results: ApiSearchResult): Promise<Hit[]> {
-        return Promise.all(Object.keys(results[0]).map(async hitId => {
-            const sentence = results[0][hitId];
-            const nodeStarts = results[3][hitId].split('-').map(x => parseInt(x, 10));
-            const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
-            const variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
+        if (!results.success) {
+            return Promise.resolve([]);
+        }
+
+        return Promise.all(Object.keys(results.sentences).map(async hitId => {
+            const sentence = results.sentences[hitId];
+            const nodeStarts = results.beginlist[hitId].split('-').map(x => parseInt(x, 10));
+            const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
+            const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
             return {
                 component: (results[1] && results[1][hitId]) || results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
-                treeXml: results[4][hitId],
-                nodeIds: results[2][hitId].split('-').map(x => parseInt(x, 10)),
+                treeXml: results.xmllist[hitId],
+                nodeIds: results.idlist[hitId].split('-').map(x => parseInt(x, 10)),
                 nodeStarts,
                 metaValues,
                 /**
@@ -324,7 +336,7 @@ export class ResultsService {
             }[]
         }
     }): Hit['metaValues'] {
-        return !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata || !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {} as Hit['metaValues']);
@@ -396,36 +408,42 @@ export class ResultsService {
  * the plain text sentences, they same keys are used for results[4] containing the xml of
  * each hit.
  */
-type ApiSearchResult = [
+type ApiSearchResult = {
+    success: true
     // 0 plain text sentences containing the hit
-    { [id: string]: string },
+    sentences: { [id: string]: string },
     // 1 tblist (used for Grinded corpora)
-    false | { [id: string]: string },
+    tblist: false | { [id: string]: string },
     // 2 ids (dash-separated ids of the matched nodes)
-    { [id: string]: string },
+    idlist: { [id: string]: string },
     // 3 begin positions (zero based)
-    { [id: string]: string },
+    beginlist: { [id: string]: string },
     // 4 xml structure of the hit itself, does not include the containing the sentence
-    { [id: string]: string },
+    xmllist: { [id: string]: string },
     // 5 meta list (xml structure containing the meta values)
-    { [id: string]: string },
+    metalist: { [id: string]: string },
     // 6 variable list (xml structure containing the variables)
-    { [id: string]: string },
+    varlist: { [id: string]: string },
     // 7 end pos iteration (used for retrieving the next results when scrolling/paging)
-    number,
+    endPosIteration: number,
     // 8 databases left to search (if this is empty, the search is done)
-    string[],
+    databases: string[],
     // 9 database ID of each hit
-    { [id: string]: string },
+    sentenceDatabases: { [id: string]: string },
     // 10 XQuery
-    string,
+    xquery: string,
     // 11 Already
-    SearchResults['already'],
+    already: SearchResults['already'],
     // 12 need regular grinded database
-    boolean,
+    needRegularGrinded: boolean,
     // 13 search limit
-    number
-];
+    searchLimit: number
+} | {
+    // no results
+    success: false,
+    // xquery
+    xquery: string
+};
 
 export interface SearchResults {
     hits: Hit[];

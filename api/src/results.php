@@ -35,13 +35,18 @@ function getResults($xpath, $context, $corpus, $components, $start, $searchLimit
     }
 
     $results = getSentences($corpus, $databases, $components, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
-    if ($results[7] * $flushLimit >= $searchLimit) {
-        // clear the remaining databases to signal the search is done
-        $results[8] = array();
-    }
     $session->close();
-    $results[] = $already;
-    $results[] = $needRegularGrinded;
+    $results['already'] = $already;
+    $results['needRegularGrinded'] = $needRegularGrinded;
+
+    if (!$results['success']) {
+        // no results, only contains false and xquery
+        return $results;
+    }
+    if ($results['endPos'] * $flushLimit >= $searchLimit) {
+        // clear the remaining databases to signal the search is done
+        $results['databases'] = array();
+    }
 
     return $results;
 }

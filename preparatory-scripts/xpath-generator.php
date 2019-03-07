@@ -1,7 +1,5 @@
 <?php
 
-// require ROOT_PATH."/helpers.php";
-// require ROOT_PATH."/functions.php";
 require ROOT_PATH.'/preparatory-scripts/prep-functions.php';
 
 /**
@@ -56,7 +54,6 @@ function generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order)
 
     if ($order) {
         $order = 'true';
-        $_SESSION[SID]['order'] = 'on';
     } else {
         $order = 'false';
     }

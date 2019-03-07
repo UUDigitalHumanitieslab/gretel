@@ -6,6 +6,7 @@ require '../../preparatory-scripts/alpino-parser.php';
 require '../../preparatory-scripts/xpath-generator.php';
 require './results.php';
 require './configured-treebanks.php';
+require './show-tree.php';
 require './treebank-counts.php';
 
 // Maybe change this?
@@ -47,6 +48,13 @@ $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
         http_response_code(500);
         die($e->getMessage());
     }
+});
+
+$router->map('GET', '/tree/[*:treebank]/[*:sentid]/[*:nodes]', function ($treebank, $sentid, $nodes) {
+    if (isset($_GET['db'])) {
+        $db = $_GET['db'];
+    }
+    showTree($sentid, $nodes, $treebank, $db);
 });
 
 $router->map('POST', '/metadata_counts', function () {
@@ -119,7 +127,10 @@ $router->map('POST', '/results', function () {
         $remainingDatabases,
         $already);
 
-    $results[] = $searchLimit;
+    if ($results['success']) {
+        // append the actual search limit from the configuration
+        $results['searchLimit'] = $searchLimit;
+    }
 
     header('Content-Type: application/json');
     echo json_encode($results);
