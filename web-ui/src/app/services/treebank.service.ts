@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from "./configuration.service";
@@ -12,8 +12,8 @@ export type ConfiguredTreebanks = {
 	        componentGroups: ComponentGroup[],
             metadata: TreebankMetadata[],
 	        variants: string[]
-        }
-    }
+        };
+    };
 };
 
 type ConfiguredTreebanksResponse = {
@@ -51,7 +51,7 @@ type ConfiguredTreebanksResponse = {
             maxValue?: number | Date,
         }[],
         'multioption': boolean
-    }
+    };
 };
 
 type UploadedTreebankResponse = {
@@ -147,7 +147,8 @@ export class TreebankService {
                                 null,
                             key: key,
                             sentenceCount: new FuzzyNumber(0),
-                            wordCount: new FuzzyNumber(0)
+                            wordCount: new FuzzyNumber(0),
+	                        multiOption: treebank.multioption
                         })))
                     };
                 });
@@ -173,6 +174,7 @@ export class TreebankService {
                         provider: uploadProvider,
                         selected: true,
                     },
+					multiOption: (() => throw new Error('todo))(),
                     variants: ['default'],
                     componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.id)
                         .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())

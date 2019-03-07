@@ -13,7 +13,7 @@ export abstract class StepComponent {
 
     }
 
-    @Output() onChangeValid = new EventEmitter<Boolean>();
+    @Output() changeValid = new EventEmitter<Boolean>();
 
     /**
      * Check if the input of the user is valid

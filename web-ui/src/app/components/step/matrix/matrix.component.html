@@ -51,7 +51,7 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox" [attr.disabled]="isCustomXPath || null">
-                <input type="checkbox" name="respectOrder" [(ngModel)]="respectOrder" (change)="emitChange()" [disabled]="isCustomXPath"> Respect
+                <input type="checkbox" name="respectOrder" [checked]="respectOrder" (click)="toggleSetting('respectOrder')" [disabled]="isCustomXPath"> Respect
                 word order
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Only search for patterns that have the same word order as your input example.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
@@ -62,7 +62,7 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox">
-                <input type="checkbox" name="retrieveContext" [(ngModel)]="retrieveContext" (change)="emitChange()">
+                <input type="checkbox" name="retrieveContext" [checked]="retrieveContext" (click)="toggleSetting('retrieveContext')">
                 Include context in results
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="In the results, show the sentence before and after the matching sentence to provide a broader context.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
     <div class="level-item">
         <div class="field">
             <label class="checkbox" [attr.disabled]="isCustomXPath || null">
-                <input type="checkbox" name="ignoreTopNode" [(ngModel)]="ignoreTopNode" (change)="emitChange()" [disabled]="isCustomXPath"> Ignore
+                <input type="checkbox" name="ignoreTopNode" [checked]="ignoreTopNode" (click)="toggleSetting('ignoreTopNode')" [disabled]="isCustomXPath"> Ignore
                 properties of the dominating node
                 <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses.">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
@@ -112,7 +112,7 @@
             </div>
         </h2>
         <grt-xpath-viewer *ngIf="!isCustomXPath" (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
-        <p-message *ngIf="isCustomXPath && warning" severity="error" text="Please make sure the xpath query is correct."></p-message>
+        <div class="notification is-danger" *ngIf="isCustomXPath && warning">Please make sure the xpath query is correct.</div>
         <grt-xpath-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)"
             autofocus="true"></grt-xpath-editor>
     </div>

@@ -118,8 +118,10 @@ export class ResultsService {
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null
-    ) {
+        remainingDatabases: string[] | null = null,
+        already: SearchResults['already'] | null = null,
+        needRegularGrinded = false,
+        searchLimit: number | null = null): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl(provider, 'results'), {
                 xpath: xpath + this.createMetadataFilterQuery(metadataFilters),
@@ -129,7 +131,10 @@ export class ResultsService {
                 iteration,
                 isAnalysis,
                 variables,
-                remainingDatabases
+                remainingDatabases,
+                already,
+                needRegularGrinded,
+                searchLimit
             }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
@@ -230,7 +235,10 @@ export class ResultsService {
         return {
             hits: await this.mapHits(results),
             nextIteration: results[7],
-            remainingDatabases: results[8]
+            remainingDatabases: results[8],
+            already: results[11],
+            needRegularGrinded: results[12],
+            searchLimit: results[13]
         };
     }
 
@@ -241,7 +249,7 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results[5][hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results[6][hitId]));
             return {
-                component: results[9][hitId],
+                component: (results[1] && results[1][hitId]) || results[9][hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
@@ -344,8 +352,8 @@ export class ResultsService {
 type ApiSearchResult = [
     // 0 plain text sentences containing the hit
     { [id: string]: string },
-    // 1 tblist (used for Sonar)
-    false,
+    // 1 tblist (used for Grinded corpora)
+    false | { [id: string]: string },
     // 2 ids (dash-separated ids of the matched nodes)
     { [id: string]: string },
     // 3 begin positions (zero based)
@@ -363,7 +371,13 @@ type ApiSearchResult = [
     // 9 database ID of each hit
     { [id: string]: string },
     // 10 XQuery
-    string
+    string,
+    // 11 Already
+    SearchResults['already'],
+    // 12 need regular grinded database
+    boolean,
+    // 13 search limit
+    number
 ];
 
 export interface SearchResults {
@@ -376,6 +390,12 @@ export interface SearchResults {
      * Databases remaining for doing a paged search
      */
     remainingDatabases: string[];
+    /**
+     * Already queried included treebanks (for grinded databases)
+     */
+    already: { [id: string]: 1 };
+    needRegularGrinded: boolean;
+    searchLimit: number;
 }
 
 export interface Hit {

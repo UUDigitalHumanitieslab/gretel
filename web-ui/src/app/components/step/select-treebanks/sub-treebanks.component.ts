@@ -15,6 +15,7 @@ export class SubTreebanksComponent implements OnChanges {
 
     /** Only show if any sub-treebank has a description available. */
     public showDescription: boolean;
+    public showWordCount: boolean;
     public totalSentenceCount: string;
     public totalWordCount: string;
     public totalSentenceCountByGroup: { [group: string]: string };
@@ -27,7 +28,7 @@ export class SubTreebanksComponent implements OnChanges {
     @Input() variants: ConfiguredTreebanks[string][string]['variants'];
     private components: TreebankComponent[];
 
-    @Output() onSelect = new EventEmitter<TreebankComponent[]>();
+    @Output() select = new EventEmitter<TreebankComponent[]>();
 
     constructor(private treebankService: TreebankService) {
     }
@@ -40,7 +41,6 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        console.log('sub-treebank changes', changes)
         if (!this.loading) {
             this.updateTotals();
         }
@@ -130,9 +130,10 @@ export class SubTreebanksComponent implements OnChanges {
 
         this.totalSentenceCount = totalSentenceCount.toLocaleString();
         this.totalWordCount = totalWordCount.toLocaleString();
-        function mapFuzzyCounts(counts: FuzzyCounts) {
-            let result: { [key: string]: string } = {};
-            for (let key of Object.keys(counts)) {
+        this.showWordCount = !totalWordCount.unknown || totalWordCount.value > 0;        
+		function mapFuzzyCounts(counts: FuzzyCounts) {
+            const result: { [key: string]: string } = {};
+            for (const key of Object.keys(counts)) {
                 result[key] = counts[key].toLocaleString();
             }
             return result;

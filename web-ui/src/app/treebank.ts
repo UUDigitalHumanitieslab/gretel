@@ -68,6 +68,7 @@ export interface Treebank {
     provider: string;
     /* Is this treebank selected for searching */
     selected: boolean;
+    multiOption: boolean;
 }
 
 export interface ComponentGroup {

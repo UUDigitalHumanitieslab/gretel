@@ -59,6 +59,7 @@ abstract class Step<T> {
 class SentenceInputStep<T extends GlobalState> extends Step<T> {
     async enterStep(state: T) {
         state.currentStep = this;
+        state.valid = state.inputSentence && state.inputSentence.length > 0;
         return state;
     }
 
@@ -74,8 +75,16 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
 
     async enterStep(state: GlobalStateExampleBased) {
         state.currentStep = this;
-        state.tokens = this.alpinoService.tokenize(state.inputSentence).split(' ');
-        state.attributes = state.tokens.map(() => 'pos'); // default value
+        const existingTokens = state.tokens.join(' ');
+        const tokenized = this.alpinoService.tokenize(state.inputSentence);
+        if (existingTokens !== tokenized) {
+            state.tokens = tokenized.split(' ');
+        }
+        state.attributes = state.tokens.map((val, index) =>
+            state.attributes && state.attributes.length > index
+                ? state.attributes[index]
+                // default value
+                : 'pos');
         return this.updateMatrix(state);
     }
 
@@ -114,6 +123,7 @@ class ParseStep extends Step<GlobalStateExampleBased> {
         const xml = await this.alpinoService.parseSentence(state.inputSentence);
         state.exampleXml = xml;
         state.loading = false;
+        state.valid = true;
         return state;
     }
 

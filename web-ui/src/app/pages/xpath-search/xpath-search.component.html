@@ -8,7 +8,7 @@
             [retrieveContext]="globalState.retrieveContext"
             [value]="globalState.xpath"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
             (changeValue)="updateXPath($event, false)"
             (changeRetrieveContext)="updateRetrieveContext($event)"
 
@@ -17,7 +17,7 @@
         <grt-select-treebanks
             *ngSwitchCase="1"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
 
             #selectTreebanksComponentRef>
         </grt-select-treebanks>
@@ -27,7 +27,7 @@
             [retrieveContext]="globalState.retrieveContext"
             [xpath]="globalState.xpath"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
             (xpathChange)="updateXPath($event)"
             (changeRetrieveContext)="updateRetrieveContext($event, true)"
             (prev)="prev()"
@@ -40,7 +40,7 @@
 
             [xpath]="globalState.xpath"
 
-            (onChangeValid)="setValid($event)">
+            (changeValid)="setValid($event)">
         </grt-analysis>
     </div>
     <br />

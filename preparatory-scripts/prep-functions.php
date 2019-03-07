@@ -3,6 +3,7 @@
 function xpathToBreadthFirst($xpath)
 {
     $bfresult;
+    $xpath = cleanXpath($xpath);
     // Divide XPath in top-most level, and the rest (its "descendants")
     if (preg_match("/^\/*node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
@@ -144,13 +145,11 @@ function cleanXpath($xpath, $trimSlash = true)
     return $xpath;
 }
 
-function checkBfPattern($bf, $sid)
+function checkBfPattern($corpus, $bf, $components)
 {
-    global $cats, $components, $dbuser, $dbpwd,
-    $continueConstraints, $databaseExists, $needRegularSonar;
+    global $cats, $dbuser, $dbpwd,
+    $continueConstraints, $databaseExists, $needRegularGrinded;
 
-    echo 'check??';
-    echo $id;
     $component = $components[0];
 
     // If bf-pattern == ALL, we're faster searching through regular version
@@ -167,11 +166,12 @@ function checkBfPattern($bf, $sid)
         }
 
         try {
-            $serverInfo = getServerInfo('sonar', $component);
+            $serverInfo = getServerInfo($corpus, $component);
 
             $dbhost = $serverInfo['machine'];
             $dbport = $serverInfo['port'];
             $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
+            $databases = array();
 
             foreach ($tempDatabases as $database) {
                 // db:exists returns a string 'false', still need to convert to bool
@@ -179,17 +179,20 @@ function checkBfPattern($bf, $sid)
 
                 if ($databaseExists != 'false') {
                     $databaseExists = true;
-                    $_SESSION[$sid]['startDatabases'][] = $database;
+                    $databases[] = $database;
                 }
             }
             $continueConstraints = $databaseExists ? true : false;
             $session->close();
+
+            return $databases;
         } catch (Exception $e) {
             error_log($e);
         }
     } else {
-        $_SESSION[$sid]['startDatabases'] = getRegularSonar($component);
-        $needRegularSonar = true;
+        $needRegularGrinded = true;
+
+        return getRegularGrinded($component);
     }
 }
 

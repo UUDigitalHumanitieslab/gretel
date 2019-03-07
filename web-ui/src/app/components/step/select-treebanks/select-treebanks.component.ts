@@ -49,7 +49,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
             componentGroups.flatMap(g => Object.values(g.components)).some(component => component.selected)
         );
 
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
     }
 
     public getValidationMessage() {

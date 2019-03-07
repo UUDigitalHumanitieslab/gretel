@@ -51,18 +51,21 @@ export class XpathInputComponent extends StepComponent implements OnChanges {
     valid = false;
 
     updateValidity() {
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
     }
 
-    public getValidationMessage() {
-        this.warning = true;
+    getValidationMessage() {
+        return 'Please make sure the xpath query is correct.';
     }
 
     inputChanged(event: ValueEvent) {
-        this.valid = !event.error;
+        this.valid = !event.error && !!event.xpath;
+        if (this.valid) {
+            this.warning = false;
+        }
         this.value = event.xpath;
         this.changeValue.emit(this.value);
-        this.onChangeValid.emit(this.valid);
+        this.changeValid.emit(this.valid);
         this.valueSubject.next(this.value);
     }
 

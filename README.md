@@ -6,7 +6,7 @@ This is currently under active development. The stable predecessor can be found 
 
 ## Info
 
-* v4.0.1 October 2018: GrETEL 4 release with many bugfixes and improvements.
+* v4.0.2 October 2018: GrETEL 4 release with many bugfixes and improvements.
 * v4.0.0 June 2018: First GrETEL 4 release with new interface.
 * v3.9.99 November 2017: GrETEL 4 currently under development!
 * v3.0.2 July 2017: Show error message if the BaseX server is down  
@@ -87,4 +87,4 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 
 ## License
 
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [license.txt](license.txt) file for license rights and limitations.
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [LICENSE](LICENSE) file for license rights and limitations.

@@ -7,7 +7,7 @@
 
             [inputSentence]="globalState.inputSentence"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
 			(changeValue)="updateSentence($event)"
             (next)="next()"
 
@@ -19,7 +19,7 @@
             [sentence]="globalState.inputSentence"
             [xml]="globalState.exampleXml"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
             #parse>
         </grt-parse>
         <grt-matrix
@@ -31,7 +31,7 @@
             [xpath]="globalState.xpath"
             [subTreeXml]="globalState.subTreeXml"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
             (changeValue)="updateMatrix($event)"
 
             #matrix>
@@ -39,7 +39,7 @@
         <grt-select-treebanks
             *ngSwitchCase="3"
 
-			(onChangeValid)="setValid($event)" 
+			(changeValid)="setValid($event)" 
 
             #selectTreebanks>
         </grt-select-treebanks>
@@ -50,7 +50,7 @@
             [xpath]="globalState.xpath"
             [inputSentence]="globalState.inputSentence"
 
-			(onChangeValid)="setValid($event)" 
+			(changeValid)="setValid($event)" 
             (xpathChange)="updateXPath($event)"
 			(changeRetrieveContext)="updateRetrieveContext($event)" 
         	(prev)="prev()"
@@ -63,7 +63,7 @@
 
             [xpath]="globalState.xpath"
 
-            (onChangeValid)="setValid($event)"
+            (changeValid)="setValid($event)"
 			(filterResults)="filterResults($event, 4)" 			
 
             #analysis>

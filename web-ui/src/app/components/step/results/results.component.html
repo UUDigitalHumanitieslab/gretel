@@ -229,7 +229,7 @@
 </div>
 <grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
-    <div *ngIf="filters && filters.length" class="column is-one-third is-hidden-print">
+    <div class="column is-one-third is-hidden-print" *ngIf="filters.length">
         <div class="filter">
             <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)"></grt-filters>
         </div>
