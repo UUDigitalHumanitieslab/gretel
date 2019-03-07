@@ -8,15 +8,23 @@ type ConfigurationServiceInterface = {
 };
 
 export class ConfigurationServiceMock implements ConfigurationServiceInterface {
-    async getApiUrl(path: string): Promise<string> {
+    public async getApiUrl(provider: string, path: string, parts?: string[], queryString?: {[key: string]: string}): Promise<string> {
         return '/gretel/api/src/router.php/' + path;
     }
 
-    async getGretelUrl(path: string): Promise<string> {
-        return '/gretel/' + path;
+    public async getUploadApiUrl(path: string): Promise<string> {
+        return '/gretel-upload/index.php/api/' + path;
     }
 
-    async getUploadApiUrl(path: string): Promise<string> {
-        return '/gretel-upload/index.php/api/' + path;
+    public async getUploadProvider(): Promise<string> {
+        return 'gretel';
+    }
+
+    public async getAlpinoUrl(): Promise<string> {
+        return '';
+    }
+
+    public async getProviders(): Promise<string[]> {
+        return [];
     }
 }

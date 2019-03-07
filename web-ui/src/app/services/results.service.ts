@@ -3,10 +3,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable, Observer, ReplaySubject } from 'rxjs';
+import { Observable, Observer, ReplaySubject, Subscriber, of } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
+import { publish, publishReplay, publishLast, refCount } from 'rxjs/operators';
+import { ObserversModule } from '@angular/cdk/observers';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -72,77 +74,52 @@ export class ResultsService {
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables
     ): Observable<SearchResults> {
-        const observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
-            let iteration = 0;
-            let remainingDatabases: string[] | null = null;
-            let searchLimit: number | null = null;
-            let already: SearchResults['already'] = null;
-            let needRegularGrinded = false;
+        const observable = new Observable<SearchResults>(observer => {
+            const worker = async () => {
+                let iteration = 0;
+                let remainingDatabases: string[] | null = null;
+                let searchLimit: number | null = null;
+                let already: SearchResults['already'] = null;
+                let needRegularGrinded = false;
 
-            while (!observer.closed) {
-                const results: SearchResults|false = await this.results(
-                    xpath,
-                    provider,
-                    corpus,
-                    componentIds,
-                    iteration,
-                    retrieveContext,
-                    isAnalysis,
-                    metadataFilters,
-                    variables,
-                    remainingDatabases,
-                    already,
-                    needRegularGrinded,
-                    searchLimit
-                );
+                debugger;
+                while (!observer.closed) {
+                    const results: SearchResults|false = await this.results(
+                        xpath,
+                        provider,
+                        corpus,
+                        componentIds,
+                        iteration,
+                        retrieveContext,
+                        isAnalysis,
+                        metadataFilters,
+                        variables,
+                        remainingDatabases,
+                        already,
+                        needRegularGrinded,
+                        searchLimit
+                    );
 
-                if (results) {
-                    already = results.already;
-                    needRegularGrinded = results.needRegularGrinded;
-                    searchLimit = results.searchLimit;
+                    if (results) {
+                        already = results.already;
+                        needRegularGrinded = results.needRegularGrinded;
+                        searchLimit = results.searchLimit;
 
-                    observer.next(results);
-                    iteration = results.nextIteration;
-                    remainingDatabases = results.remainingDatabases;
-                    if (remainingDatabases.length === 0) {
+                        observer.next(results);
+                        iteration = results.nextIteration;
+                        remainingDatabases = results.remainingDatabases;
+                        if (remainingDatabases.length === 0) {
+                            observer.complete();
+                        }
+                    } else {
                         observer.complete();
                     }
-                } else {
-                    observer.complete();
                 }
             }
+            worker();
         });
 
-        return observable;
-
-        // const ob = new ReplaySubject<SearchResults>();
-
-        // let iteration = 0;
-        // let remainingDatabases: string[] | null = null;
-        // let searchLimit: number | null = null;
-        // let already: SearchResults['already'] = null;
-        // let needRegularGrinded: false;
-        // (async () => {
-        //     while (true) {
-        //         const res = await this.results(xpath, provider, corpus, componentIds, iteration, retrieveContext, isAnalysis, metadataFilters, variables, remainingDatabases)
-        //         if (!res) {
-        //             return;
-        //         }
-
-        //         ob.next(res);
-        //         iteration = res.nextIteration;
-        //         remainingDatabases = res.remainingDatabases;
-        //         res.searchLimit;
-
-
-        //         if (!remainingDatabases || remainingDatabases.length === 0) {
-        //             return;
-        //         }
-
-        //     }
-        // })().finally(() => ob.complete());
-
-        // return ob;
+        return observable.pipe(publishReplay(1), refCount());
     }
 
     /**
@@ -308,7 +285,7 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
             return {
-                component: (results[1] && results[1][hitId]) || results[9][hitId],
+                component: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
                 // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,

@@ -10,7 +10,7 @@ export class ConfigurationService {
         this.config = this.loadConfig();
     }
 
-    async getApiUrl(provider, path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
+    async getApiUrl(provider: string, path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
         const queryStringEntries = Object.entries(queryString);
         return (await this.config).providers[provider] + path +
             (parts.length ? '/' + parts.join('/') : '') +
