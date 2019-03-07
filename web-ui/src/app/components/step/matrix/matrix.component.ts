@@ -11,7 +11,7 @@ import { ValueEvent } from 'lassy-xpath/ng';
 export class MatrixComponent extends StepComponent implements OnInit {
     @Input('attributes')
     public set attributes(values: string[]) {
-        this.tokenValues = values.map(value => this.options.find(o => o.value == value));
+        this.tokenValues = values.map(value => this.options.find(o => o.value === value));
     }
 
     public get attributes() {
@@ -19,9 +19,9 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     @Input('tokens')
-    public set tokens(value: string[]) {
-        this.indexedTokens = value.map((value, index) => { return { value, index } });
-        this.filename = value.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
+    public set tokens(values: string[]) {
+        this.indexedTokens = values.map((value, index) => ({ value, index }));
+        this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
     public get tokens() {
         return this.indexedTokens.map(t => t.value);
@@ -55,45 +55,51 @@ export class MatrixComponent extends StepComponent implements OnInit {
 
     public options: Part[] = [
         {
-            label: "Word",
-            description: "The exact word form (also known as token).",
-            value: "token",
+            label: 'Word',
+            description: 'The exact word form (also known as token).',
+            value: 'token',
             advanced: false
         },
         {
-            label: "Word (case-sensitive)",
-            description: "The word form must match exactly, including the casing.",
-            value: "cs",
+            label: 'Word (case-sensitive)',
+            description: 'The word form must match exactly, including the casing.',
+            value: 'cs',
             advanced: true
         },
         {
-            label: "Lemma",
-            description: "Word form that generalizes over inflected forms. For example: gaan is the lemma of ga, gaat, gaan, ging, gingen, and gegaan.",
-            value: "lemma",
+            label: 'Lemma',
+            description: `Word form that generalizes over inflected forms.
+            For example: gaan is the lemma of ga, gaat, gaan, ging, gingen, and gegaan.`,
+            value: 'lemma',
             advanced: false
         },
         {
-            label: "Word class",
-            description: "Short Dutch part-of-speech tag. The different tags are: n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun), vg (conjunction), bw (adverb), tw (numeral), vz (preposition), tsw (interjection), spec (special token), and let (punctuation).",
-            value: "pos",
+            label: 'Word class',
+            description: `Short Dutch part-of-speech tag.
+            The different tags are:
+            n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun),
+            vg (conjunction), bw (adverb), tw (numeral), vz (preposition),
+            tsw (interjection), spec (special token), and let (punctuation).`,
+            value: 'pos',
             advanced: false
         },
         {
-            label: "Detailed word class",
-            description: "Long part-of-speech tag. For example: N(soort,mv,basis), WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev).",
-            value: "postag",
+            label: 'Detailed word class',
+            description: 'Long part-of-speech tag. For example: N(soort,mv,basis), WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev).',
+            value: 'postag',
             advanced: true
         },
         {
-            label: "Optional",
-            description: "The word will be ignored in the search instruction. It may be included in the results, but it is not required that it is present.",
-            value: "na",
+            label: 'Optional',
+            description: `The word will be ignored in the search instruction.
+            It may be included in the results, but it is not required that it is present.`,
+            value: 'na',
             advanced: false
         },
         {
-            label: "Exclude",
-            description: "The word class and the dependency relation will be explicitly excluded from the results.",
-            value: "not",
+            label: 'Exclude',
+            description: 'The word class and the dependency relation will be explicitly excluded from the results.',
+            value: 'not',
             advanced: true
         }];
 
@@ -150,18 +156,18 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 }
 
-type Part = {
-    label: string,
-    description: string,
-    value: string,
-    advanced: boolean
+interface Part {
+    label: string;
+    description: string;
+    value: string;
+    advanced: boolean;
 }
 
-export type MatrixSettings = {
-    attributes: string[],
-    customXPath: string,
-    retrieveContext: boolean,
-    respectOrder: boolean,
-    tokens: string[],
-    ignoreTopNode: boolean
+export interface MatrixSettings {
+    attributes: string[];
+    customXPath: string;
+    retrieveContext: boolean;
+    respectOrder: boolean;
+    tokens: string[];
+    ignoreTopNode: boolean;
 }

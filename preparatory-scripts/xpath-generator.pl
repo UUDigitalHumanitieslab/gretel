@@ -149,8 +149,6 @@ sub ProcessTree {
                 return undef;
             }
         }
-        else {
-        }
     }
     return $xpath;
 }

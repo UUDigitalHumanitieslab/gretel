@@ -55,11 +55,10 @@
                             </ng-container>
                         </div>
                     </div>
-                    <div class="level-item" *ngIf="isFiltering">
+                    <div class="level-item" *ngIf="activeFilterCount">
                         <div class="field">
-                            <p class="control">
-                                <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters."
-                                    (click)="addFiltersXPath()">
+                            <p class="control" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters.">
+                                <a class="button badge" [attr.data-badge]="activeFilterCount" role="button" (click)="addFiltersXPath()">
                                     <span class="is-large">
                                         <i class="fas fa-plus"></i>
                                         <i class="fas fa-filter"></i>
@@ -82,7 +81,6 @@
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
-
         <h2 class="subtitle">
             <div class="level">
                 <div class="level-item level-left">
@@ -172,14 +170,16 @@
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                     <p class="control">
-                        <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="downloadResults()" grtBalloonLength="large" grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
+                    <a class="button" role="button" (click)="downloadResults()" grtBalloonLength="large"
+                        grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
                             <span class="icon is-large">
                                 <i class="fas fa-download"></i>
                             </span>
                         </a>
                     </p>
                     <p class="control">
-                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large" grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
+                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
+                        grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                             <span class="icon is-large">
                                 <i class="fas fa-file-alt"></i>
                             </span>
@@ -269,9 +269,13 @@
         </p-table>
 
         <ng-template #warning>
-            <div *ngIf="!loading" class="notification is-warning">No results found, please try again with another
-                treebank or other xpath-query</div>
+            <div *ngIf="!loading" class="notification is-warning">
+                <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
+                    with another treebank, other xpath-query or change the filters.</ng-container>
+                <ng-template #noActiveFilters>No results found, please try again with another treebank or other
+                    xpath-query.</ng-template>
+            </div>
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer *ngIf="treeXml" [sentence]="treeSentence" [xml]="treeXml" [url]="treeXmlUrl" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer *ngIf="treeXml" [sentence]="treeSentence" [xml]="treeXml" display="fullscreen"></grt-tree-visualizer>

@@ -9,7 +9,6 @@ before_install:
 node_js:
   - "node"
   - "8"
-  - "7"
   - "lts/*"
 cache:
   directories: node_modules
