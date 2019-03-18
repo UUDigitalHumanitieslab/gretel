@@ -82,7 +82,6 @@ export class ResultsService {
                 let already: SearchResults['already'] = null;
                 let needRegularGrinded = false;
 
-                debugger;
                 while (!observer.closed) {
                     const results: SearchResults|false = await this.results(
                         xpath,

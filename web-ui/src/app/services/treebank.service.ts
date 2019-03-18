@@ -160,9 +160,8 @@ export class TreebankService {
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
             const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
             response.forEach(async (item) => {
-                uploadedCorpora[item.id] = {
+                uploadedCorpora[item.title] = {
                     treebank: {
-                        id: parseInt(item.id),
                         name: item.title,
                         title: item.title,
                         userId: parseInt(item.user_id),
@@ -177,7 +176,7 @@ export class TreebankService {
                         selected: true,
                     },
                     variants: ['default'],
-                    componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.id)
+                    componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.title)
                         .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())
                         .then(results =>
                             results.map(subtree => {
@@ -204,7 +203,7 @@ export class TreebankService {
                                 wordCount: new FuzzyNumber(component.wordCount)
                             }))
                         ),
-                    metadata: await this.configurationService.getUploadApiUrl('treebank/metadata/' + item.id)
+                    metadata: await this.configurationService.getUploadApiUrl('treebank/metadata/' + item.title)
                         .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
                         .then(response => response.map(item => {
                             let metadata: TreebankMetadata = {
