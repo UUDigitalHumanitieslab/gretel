@@ -46,7 +46,7 @@ function corpusToDatabase($components, $corpus, $xpath)
     foreach ($components as $component) {
         $corpus = strtoupper($corpus);
         $component = strtoupper($component);
-        $component = $corpus.'_ID_'.$component;
+        $component = preg_replace('/[^a-zA-Z0-9_]/', '_',$corpus.'_ID_'.$component);
         $databases[] = $component;
     }
 
