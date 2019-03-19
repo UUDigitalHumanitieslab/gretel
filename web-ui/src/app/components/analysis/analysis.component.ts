@@ -305,15 +305,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      */
     private getFilterForQuery(id: string, value: string): FilterByXPath {
         const [variable, attribute] = id.split('.');
-        const attrSelector = `@${attribute}="${value}"`;
-        return {
-            field: id,
-            label: `${variable}[${attrSelector}]`,
-            type: 'xpath',
-            xpath: /^\*/.test(this.variables[variable].path)
-                ? attrSelector
-                : `${this.variables[variable].path.replace('$node/', '')}[${attrSelector}]`
-        };
+        return this.resultsService.getFilterForQuery(
+            variable,
+            attribute,
+            value === AnalysisService.placeholder
+                ? null
+                : value, this.variables);
     }
 
     private getFilterValue(field: string, value: string): FilterValue {
