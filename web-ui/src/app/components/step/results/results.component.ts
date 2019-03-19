@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, Output, EventEmitter, OnChanges, SimpleChanges  } from '@angular/core';
-import { SafeHtml, SafeUrl, DomSanitizer } from '@angular/platform-browser';
+import { Component, Input, OnDestroy, Output, EventEmitter, SimpleChanges  } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
-import { tap, filter, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
+import { filter, debounceTime, distinctUntilChanged, switchMap, map, reduce } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -16,14 +16,12 @@ import {
     TreebankService,
     mapTreebanksToSelectionSettings,
     SearchResults,
-    ConfiguredTreebanks,
     FilterValues,
     FilterByXPath
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata, Treebank, FuzzyNumber } from '../../../treebank';
 import { StepComponent } from '../step.component';
-
 const DebounceTime = 200;
 
 @Component({
@@ -34,7 +32,7 @@ const DebounceTime = 200;
 export class ResultsComponent extends StepComponent implements OnDestroy {
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts[]>([]);
-    private metadataSubject = new BehaviorSubject<TreebankMetadata[]>([]);
+    // private metadataSubject = new BehaviorSubject<TreebankMetadata[]>([]);
     private filterValuesSubject = new BehaviorSubject<FilterValue[]>([]);
 
     @Input('xpath')
@@ -50,14 +48,15 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     @Input()
     public inputSentence: string = null;
 
+
     @Output()
     public xpathChange = new EventEmitter<string>();
 
     @Output()
-    public changeFilterValues = new EventEmitter<FilterValues>();
+    public changeRetrieveContext = new EventEmitter<boolean>();
 
     @Output()
-    public changeRetrieveContext = new EventEmitter<boolean>();
+    public changeFilterValues = new EventEmitter<FilterValues>();
 
     @Output()
     public prev = new EventEmitter();
@@ -80,9 +79,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      */
     public filterXPaths: FilterByXPath[] = [];
 
-    // tree stuff?
+    // Xml tree displaying (of a result)
     public treeXml?: string;
-    public treeXmlUrl?: SafeUrl;
     public treeSentence?: SafeHtml;
 
     public columns = [
@@ -94,7 +92,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
     private subscriptions: Subscription[];
 
-    /** Full list of components in this corpus, used to display information about where hits originated */
     /** How many hits have been found so far for each component, and has the component finished being searched yet */
     public resultSummary: ResultSummary = {};
     public totalSentences: FuzzyNumber = new FuzzyNumber('?');
@@ -104,15 +101,14 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService,
-        private sanitizer: DomSanitizer
+        private treebankService: TreebankService
     ) {
         super();
 
         this.subscriptions = [
             this.liveMetadataCounts(),
             // this.liveMetadataProperties(),
-            // this.liveFilters(),
+            this.liveFilters(),
             this.liveResults(),
         ];
 
@@ -314,60 +310,53 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     /**
-     * Get the metadata for the current corpus
-     */
-    // private liveMetadataProperties() {
-    //     return observableCombineLatest(
-    //         this.treebankService.treebanks.pipe(
-    //             map(mapTreebanksToSelectionSettings)
-    //         )
-    //     )
-    //     .pipe(
-    //         filter((values) => values.every(value => value != null)),
-    //         debounceTime(DebounceTime),
-    //         distinctUntilChanged(),
-    //         switchMap(selected => Promise.all(
-    //             selected.map(v => this.treebankService.getMetadata(v.provider, v.corpus, v.componentServerIds))
-    //         )
-    //     )
-    //     .subscribe(metadata => this.metadataSubject.next(metadata));
-    // }
-
-    /**
      * Get the filters
      */
     private liveFilters() {
-        return observableCombineLatest(this.metadataSubject, this.metadataValueCountsSubject)
-            .subscribe(([metadata, counts]) => {
-                const filters: Filter[] = [];
-                for (const item of metadata) {
-                    if (item.show) {
-                        const options: string[] = [];
-                        if (item.field in counts) {
-                        for (const key of Object.keys(counts[item.field as any])) { // string indexing an array
-                                // TODO: show the frequency (the data it right here now!)
-                                options.push(key);
-                            }
-                        }
+        // wow this is a hack and a half
+        return observableCombineLatest(
+            this.treebankService.treebanks.pipe(
+                map(v =>
+                    Object.values(v.state)
+                    .flatMap(provider => Object.values(provider))
+                    .flatMap(bank => bank.metadata)
+                ),
+            ),
+            this.metadataValueCountsSubject.pipe(
+               map(v => v.reduce(Object.assign, {}) as MetadataValueCounts)
+            )
+        )
+        .subscribe(([metadata, counts]) => {
+            const filters: Filter[] = [];
 
-                        if (item.facet === 'checkbox' && options.length > 8) {
-                            // use a dropdown instead of checkboxes when there
-                            // are too many options
-                            item.facet = 'dropdown';
+            for (const item of metadata) {
+                if (item.show) {
+                    const options: string[] = [];
+                    if (item.field in counts) {
+                    for (const key of Object.keys(counts[item.field])) { // string indexing an array
+                            // TODO: show the frequency (the data it right here now!)
+                            options.push(key);
                         }
-
-                        filters.push({
-                            field: item.field,
-                            dataType: item.type,
-                            filterType: item.facet,
-                            minValue: item.minValue,
-                            maxValue: item.maxValue,
-                            options
-                        });
                     }
+
+                    if (item.facet === 'checkbox' && options.length > 8) {
+                        // use a dropdown instead of checkboxes when there
+                        // are too many options
+                        item.facet = 'dropdown';
+                    }
+
+                    filters.push({
+                        field: item.field,
+                        dataType: item.type,
+                        filterType: item.facet,
+                        minValue: item.minValue,
+                        maxValue: item.maxValue,
+                        options
+                    });
                 }
-                this.filters = filters;
-            });
+            }
+            this.filters = filters;
+        });
     }
 
     /**
@@ -376,14 +365,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     private liveResults() {
         return observableCombineLatest(
             this.treebankService.treebanks.pipe(map(v => v.state)),
-            // observableCombineLatest(this.providerSubject, this.corpusSubject).pipe(
-            //     filter(values => values.every(v => v != null)),
-            //     distinctUntilChanged(),
-            //     switchMap(([provider, corpus]) => this.treebankService.getTreebank(provider, corpus))
-            // ),
-            // this.providerSubject,
-            // this.corpusSubject,
-            // this.componentsSubject,
             this.xpathSubject,
             this.filterValuesSubject
         ).pipe(
@@ -445,6 +426,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                 });
 
                 // merge the observables (one for each treebank) into a single stream
+                // TODO: error handling
                 let combined = merge(...$results);
                 combined.subscribe(
                     () => {},

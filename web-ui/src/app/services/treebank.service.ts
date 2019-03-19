@@ -159,7 +159,8 @@ export class TreebankService {
             const uploadedCorpora: ConfiguredTreebanks[string] = treebanks[uploadProvider] = (treebanks[uploadProvider] || {});
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
             const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
-            response.forEach(async (item) => {
+
+            for (const item of response) {
                 uploadedCorpora[item.title] = {
                     treebank: {
                         name: item.title,
@@ -173,7 +174,7 @@ export class TreebankService {
                         multiOption: true,
                         // TODO this will never work, the provider needs to resolve to a regular endpoint
                         provider: uploadProvider,
-                        selected: true,
+                        selected: false,
                     },
                     variants: ['default'],
                     componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.title)
@@ -229,7 +230,7 @@ export class TreebankService {
                             return metadata;
                         })),
                 }
-            })
+            }
 
             this.data = treebanks;
             this.treebanks.next({
@@ -312,7 +313,7 @@ export class TreebankService {
     }
 
     /** Apply all passed selections states, everything else is DESELECTED */
-    async select(state?: ReturnType<typeof mapTreebanksToSelectionSettings>) {
+    async select(state?: ReturnType<typeof mapTreebanksToSelectionSettings>, origin: 'init'|'url'|'user' = 'url') {
         if (!state) {
             return;
         }

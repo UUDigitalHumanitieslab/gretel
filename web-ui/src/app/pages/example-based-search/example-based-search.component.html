@@ -39,20 +39,22 @@
         <grt-select-treebanks
             *ngSwitchCase="3"
 
-			(changeValid)="setValid($event)" 
+			(changeValid)="setValid($event)"
 
             #selectTreebanks>
         </grt-select-treebanks>
         <grt-results
             *ngSwitchCase="4"
 
+            [filterValues]="globalState.filterValues"
+            [inputSentence]="globalState.inputSentence"
             [retrieveContext]="globalState.retrieveContext"
             [xpath]="globalState.xpath"
-            [inputSentence]="globalState.inputSentence"
 
-			(changeValid)="setValid($event)" 
+			(changeValid)="setValid($event)"
             (xpathChange)="updateXPath($event)"
-			(changeRetrieveContext)="updateRetrieveContext($event)" 
+            (changeRetrieveContext)="updateRetrieveContext($event)"
+            (changeFilterValues)="updateFilterValues($event)"
         	(prev)="prev()"
 			(next)="next()"
 
@@ -64,7 +66,7 @@
             [xpath]="globalState.xpath"
 
             (changeValid)="setValid($event)"
-			(filterResults)="filterResults($event, 4)" 			
+			(filterResults)="filterResults($event, 4)"
 
             #analysis>
         </grt-analysis>

@@ -56,8 +56,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     @ViewChild('analysis')
     analysisComponent: AnalysisComponent;
 
-    constructor(private alpinoService: AlpinoService, private treebankService: TreebankService, route: ActivatedRoute, router: Router) {
-        super(route, router);
+    constructor(private alpinoService: AlpinoService, treebankService: TreebankService, route: ActivatedRoute, router: Router) {
+        super(route, router, treebankService);
     }
 
     ngOnInit() {
@@ -138,7 +138,6 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             }
         };
 
-        this.treebankService.select(globalState.state.selectedTreebanks);
         return globalState;
     }
 

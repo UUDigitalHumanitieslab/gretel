@@ -1,8 +1,8 @@
 ///<reference path="pivottable.d.ts"/>
 ///<reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
+import { map, take, tap, switchMap } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -28,14 +28,8 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     top: number;
     private $element: JQuery<HTMLElement>;
     private pivotUiOptions: PivotUiOptions;
-    private data: {
-        [provider: string]: {
-            [corpus: string]: {
-                metadata: TreebankMetadata[];
-                hits: Hit[];
-            }
-        }
-    };
+    private metadata: TreebankMetadata[] = [];
+    private hits: Hit[] = [];
 
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
@@ -57,7 +51,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     public attributes: { value: string, label: string }[];
 
-    private subscriptions: Subscription[];
+    private subscriptions: Subscription[] = [];
     private cancellationToken = new Subject<{}>();
 
     constructor(
@@ -83,7 +77,15 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private async initialize() {
-        const variables: PathVariable[] = this.extractinatorService.extract(this.xpath);
+
+        let variables: PathVariable[];
+        try {
+            variables = this.extractinatorService.extract(this.xpath);
+        } catch (e) {
+            variables = [];
+            console.warn('Error extracting variables from path', e, this.xpath);
+        }
+
         // TODO: on change
         this.variables = variables.reduce<{[name: string]: PathVariable}>((vs, v) => { vs[v.name] = v; return vs; }, {})
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
@@ -129,24 +131,35 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             this.selectedVariablesSubject.next([]);
         }
 
-        const [treebankSelections, treebanks] = await combineLatest(
-            this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state))),
-            this.treebankService.treebanks.pipe(map(v => v.state))
+        const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
+            map(v => ({
+                selected: mapTreebanksToSelectionSettings(v.state),
+                state: v.state
+            })),
+            switchMap(v => {
+                this.hits = [];
+                this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
+                // fetch all results for all selected components/treebanks
+                // and merge them into a single stream that's subscribed to.
+                return merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                    this.xpath,
+                    selection.provider,
+                    selection.corpus,
+                    selection.components.map(c => c.server_id),
+                    false,
+                    true,
+                    [],
+                    variables
+                )));
+            })
         )
-        .pipe(take(1))
-        .toPromise();
-
-        this.data = {};
-        for (const {provider, corpus, components} of treebankSelections) {
-            if (!this.data[provider]) {this.data[provider] = {}}
-            this.data[provider][corpus] = {
-                hits: await this.resultsService.promiseAllResults(this.xpath, provider, corpus, components.map(c => c.server_id), false, true, [], variables, this.cancellationToken),
-                metadata: treebanks[provider][corpus].metadata
-            }
-        }
+        .subscribe(v => {
+            this.hits.push(...v.hits);
+        })
 
         this.subscriptions = [
-            this.livePivot()
+            this.livePivot(),
+            subscriptionToTreebankSelection
         ];
     }
 
@@ -186,11 +199,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return this.selectedVariablesSubject.pipe(map((selectedVariables) => {
             this.show(this.$element, selectedVariables);
         })).subscribe();
-
-    }
-
-    private getFirstData() {
-        return Object.values(Object.values(this.data)[0])[0]
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
@@ -202,7 +210,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         helper.remove();
 
         // only work with available attributes
-        const attributes = this.analysisService.getVariableAttributes(variableName, this.getFirstData().hits);
+        const attributes = this.analysisService.getVariableAttributes(variableName, this.hits);
 
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
@@ -215,11 +223,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
             };
         });
     }
-    // TODO we use the first selected treebank
+
     private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
         this.isLoading = true;
         try {
-            this.pivot(element, this.getFirstData().metadata.map(m => m.field), this.getFirstData().hits, selectedVariables);
+            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -309,7 +317,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getFilterValue(field: string, value: string): FilterValue {
-        const metadata = this.getFirstData().metadata.find(f => f.field === field)!;
+        const metadata = this.metadata.find(f => f.field === field)!;
         switch (metadata.facet) {
             case 'checkbox':
             case 'dropdown':

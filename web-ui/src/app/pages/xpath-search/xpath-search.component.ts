@@ -55,8 +55,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     @ViewChild('resultsComponentRef')
     resultComponent: ResultsComponent;
 
-    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
-        super(route, router);
+    constructor(private http: HttpClient, treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
+        super(route, router, treebankService);
     }
 
     ngOnInit() {

@@ -58,7 +58,6 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleVariant(variant?: string) {
-        console.log('toggle variant', variant)
         const eligible = variant ?
             this.components.filter(c => !c.disabled && c.variant === variant) :
             this.components.filter(c => !c.disabled);
@@ -75,7 +74,6 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleComponent(component: TreebankComponent) {
-        console.log('toggle component', component)
         this.treebankService.selectComponents(
             this.treebank.provider,
             this.treebank.name,
@@ -87,7 +85,6 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleGroup(group: ComponentGroup) {
-        console.log('toggle group', group)
         const components = Object.values(group.components);
         const isGroupSelected = components.every(c => c.disabled || c.selected);
 
@@ -130,7 +127,7 @@ export class SubTreebanksComponent implements OnChanges {
 
         this.totalSentenceCount = totalSentenceCount.toLocaleString();
         this.totalWordCount = totalWordCount.toLocaleString();
-        this.showWordCount = !totalWordCount.unknown || totalWordCount.value > 0;        
+        this.showWordCount = !totalWordCount.unknown || totalWordCount.value > 0;
 		function mapFuzzyCounts(counts: FuzzyCounts) {
             const result: { [key: string]: string } = {};
             for (const key of Object.keys(counts)) {

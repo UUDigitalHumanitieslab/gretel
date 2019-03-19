@@ -70,7 +70,7 @@
                     >
                     {{group.components[variant].title}}
                 </label>
-                <label *ngIf="!treebank.multiOption">
+                <label *ngIf="!treebank.multiOption" [attr.disabled]="group.components[variant].disabled || null" (click)="$event.stopPropagation()">
                     <input
                         type="radio"
                         [disabled]="group.components[variant].disabled"
@@ -78,6 +78,7 @@
 
                         (change)="toggleComponent(group.components[variant])"
                     >
+                    {{group.components[variant].title}}
                 </label>
             </td>
             <td *ngIf="showDescription">

@@ -1,10 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { XPathModels } from "ts-xpath";
 import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
-import { ResultsService } from "../../services/results.service";
 import { AlpinoService, FilterValues } from "../../services/_index";
-import { filter, map, take } from 'rxjs/operators';
-
+import { map, take } from 'rxjs/operators';
 
 /**
  * Contains all the steps that are used in the xpath search
