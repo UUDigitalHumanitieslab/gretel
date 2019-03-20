@@ -37,10 +37,14 @@
         </tr>
         <tr *ngIf="variants.length > 1">
             <th *ngFor="let variant of variants">
-                <label class="checkbox">
+                <label
+                    class="checkbox"
+                    [attr.disabled]="!treebank.multiOption || null"
+                >
                     <input
                         type="checkbox"
                         [checked]="isEveryComponentSelected(variant)"
+                        [disabled]="!treebank.multiOption || null"
                         (change)="toggleVariant(variant)"
                     >
                     {{variant}}

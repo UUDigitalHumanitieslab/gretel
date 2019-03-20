@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationModule } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from "./configuration.service";
 import { ReplaySubject } from "rxjs";
-import { take } from "rxjs/operators";
+import { take, map } from "rxjs/operators";
 
 export type ConfiguredTreebanks = {
     [provider: string]: {
@@ -172,7 +172,6 @@ export class TreebankService {
                         isPublic: item.public == '1',
                         description: item.title,
                         multiOption: true,
-                        // TODO this will never work, the provider needs to resolve to a regular endpoint
                         provider: uploadProvider,
                         selected: false,
                     },
@@ -263,6 +262,7 @@ export class TreebankService {
         );
     }
 
+    /** Toggle a specific component, other components are untouched, unless corpus.multiOption is false, in which case they are unselected */
     toggleComponent(provider: string, corpus: string, componentId: string) {
         if (this.loading) {
             return;
@@ -273,15 +273,22 @@ export class TreebankService {
         .forEach(component => {
             if (component.id === componentId) {
                 component.selected = !component.selected;
+            } else if (!tb.treebank.multiOption) {
+                component.selected = false;
             }
         })
 
         this.treebanks.next({state: next, origin: 'user'});
     }
 
+    /** Only if corpus.multiOption */
     selectAllComponents(provider: string, corpus: string, select: boolean) {
         const next = this.data;
         const tb = next[provider][corpus];
+        if (!tb.treebank.multiOption) {
+            return;
+        }
+
         tb.componentGroups
             .flatMap((group: ComponentGroup) => Object.values(group.components))
             .forEach(component => component.selected = select);
@@ -290,7 +297,11 @@ export class TreebankService {
         this.treebanks.next({state: next, origin: 'user'});
     }
 
-    selectComponents(provider: string, corpus: string, components: {componentId: string, selected: boolean}[]) {
+    /**
+     * Change selection on the provided components,
+     * other components are not changed, unless !corpus.multiOption
+     */
+    selectComponents(provider: string, corpus: string, components: Array<{componentId: string, selected: boolean}>) {
         if (this.loading) {
             return;
         }
@@ -303,10 +314,17 @@ export class TreebankService {
 
         const next = this.data;
         const tb = next[provider][corpus];
-        tb.componentGroups.flatMap((group: ComponentGroup) => Object.values(group.components))
+        let hasSelected = false;
+
+        tb.componentGroups
+        .flatMap((group: ComponentGroup) => Object.values(group.components))
         .forEach(component => {
-            if (selectionMap[component.id] != null)
+            if (selectionMap[component.id] && (tb.treebank.multiOption || !hasSelected)) {
                 component.selected = selectionMap[component.id];
+                hasSelected = component.selected;
+            } else if (!tb.treebank.multiOption) {
+                component.selected = false;
+            }
         })
 
         this.treebanks.next({state: next, origin: 'user'});
@@ -334,10 +352,13 @@ export class TreebankService {
             const tb = next[s.provider][s.corpus];
             // select only those components in the state.components
             const components = tb.componentGroups.flatMap(group => Object.values(group.components));
-            components.forEach(c => c.selected = s.components.find(sc => sc.id === c.id) != null)
+            let hasSelected = false;
+            components.forEach(c => {
+                c.selected = (tb.treebank.multiOption || !hasSelected) && s.components.find(sc => sc.id === c.id) != null;
+                hasSelected = hasSelected || c.selected;
+            });
 
-
-            tb.treebank.selected = true;
+            tb.treebank.selected = hasSelected;
         })
         this.treebanks.next({state: next, origin: 'url'});
     }

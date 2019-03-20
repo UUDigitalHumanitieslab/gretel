@@ -20,7 +20,6 @@ import { DocumentationComponent } from './pages/documentation/documentation.comp
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
-import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';

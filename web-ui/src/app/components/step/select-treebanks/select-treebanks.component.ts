@@ -1,10 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { StepComponent } from "../step.component";
-import { ConfigurationService } from "../../../services/configuration.service";
 import { TreebankService, ConfiguredTreebanks, mapToTreebankArray } from "../../../services/treebank.service";
-import { Treebank, TreebankComponent } from "../../../treebank";
-// import { SelectedTreebanksService, SelectedTreebanks } from '../../../services/selected-treebanks.service';
-import { filter, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
 @Component({

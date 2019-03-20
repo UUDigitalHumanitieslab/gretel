@@ -16,7 +16,6 @@ import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 
 // TODO selected treebanks need to be reactive?
-// TODO use something other than the first results
 
 @Component({
     selector: 'grt-analysis',

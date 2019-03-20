@@ -58,6 +58,10 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleVariant(variant?: string) {
+        if (!this.treebank.multiOption) {
+            return;
+        }
+
         const eligible = variant ?
             this.components.filter(c => !c.disabled && c.variant === variant) :
             this.components.filter(c => !c.disabled);

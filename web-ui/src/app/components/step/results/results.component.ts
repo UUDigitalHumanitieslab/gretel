@@ -313,7 +313,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
      * Get the filters
      */
     private liveFilters() {
-        // wow this is a hack and a half
+        // Join all known metadadata
         return observableCombineLatest(
             this.treebankService.treebanks.pipe(
                 map(v =>

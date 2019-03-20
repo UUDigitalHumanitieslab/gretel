@@ -44,7 +44,6 @@ interface Config {
     providers: {
         [key: string]: string
     },
-    // TODO implement this functionality clientside
     /**
      * Alpino endpoint.
      * This should not be the raw alpino in server-mode, but should implement as according to gretel4/api/router.php

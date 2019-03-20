@@ -300,7 +300,7 @@ export class ResultsService {
         };
     }
 
-    private resolveRootPath(variables: { [name: string]: PathVariable }, variable: string) {
+    private resolveRootPath(variables: { [name: string]: PathVariable }, variable: string): string {
         const path = variables[variable].path;
         if (/^\*/.test(path)) {
             return '';
