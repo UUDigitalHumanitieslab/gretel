@@ -87,10 +87,9 @@ export interface TreebankComponent {
     group: string,
     /** The Variant */
     variant: string,
-    /** Friendly name of this component  */
+    /** Serverside id  */
     id: string,
-    /** Pass to the server as part of the "components" parameter */
-    server_id: string,
+    /** Friendly name */
     title: string,
     sentenceCount: number | '?',
     wordCount: number | '?'

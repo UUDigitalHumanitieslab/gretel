@@ -144,7 +144,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     this.xpath,
                     selection.provider,
                     selection.corpus,
-                    selection.components.map(c => c.server_id),
+                    selection.components,
                     false,
                     true,
                     [],

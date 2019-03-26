@@ -19,23 +19,25 @@ function getConfiguredTreebanks()
             }
             $components = array();
 
-            foreach ($settings['components'] as $component_name) {
+            // NOTE: the configs are keyed by the component's title, we generate the id internally.
+            foreach ($settings['components'] as $component_title) {
+                $component_id = $grinded ? $component_title : strtoupper($corpus).'_ID_'.strtoupper($component_title);
                 $component_description = array(
-                        'database_id' => $grinded ? $component_name : strtoupper($corpus).'_ID_'.strtoupper($component_name),
-                        'title' => $component_name,
-                        'description' => '',
-                        'sentences' => '?',
-                        'words' => '?',
-                    );
+                    'id' => $component_id,
+                    'title' => $component_title,
+                    'description' => '',
+                    'sentences' => '?',
+                    'words' => '?',
+                );
 
                 if (array_key_exists('component_descriptions', $settings)) {
                     $component_descriptions = $settings['component_descriptions'];
-                    if (array_key_exists($component_name, $component_descriptions)) {
-                        $component_description = array_merge($component_description, $component_descriptions[$component_name]);
+                    if (array_key_exists($component_title, $component_descriptions)) {
+                        $component_description = array_merge($component_description, $component_descriptions[$component_title]);
                     }
                 }
 
-                $components[$component_name] = $component_description;
+                $components[$component_id] = $component_description;
             }
 
             $title = array_key_exists('fullName', $settings) ? $settings['fullName'] : $corpus;
@@ -58,12 +60,12 @@ function getConfiguredTreebanks()
                 $multioption = false;
             }
             $corpus_definition = array(
-                    'title' => $title,
-                    'description' => $description,
-                    'components' => $components,
-                    'metadata' => $metadata,
-                    'multioption' => $multioption,
-                );
+                'title' => $title,
+                'description' => $description,
+                'components' => $components,
+                'metadata' => $metadata,
+                'multioption' => $multioption,
+            );
 
             if (array_key_exists('groups', $settings)) {
                 $corpus_definition['groups'] = $settings['groups'];

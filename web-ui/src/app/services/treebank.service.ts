@@ -20,10 +20,10 @@ type ConfiguredTreebanksResponse = {
     [treebank: string]: {
         'components': {
             [component: string]: {
-                'database_id': string,
+                'id': string,
+                'title': string,
                 'description': string,
                 'sentences': number | '?',
-                'title': string,
                 'words': number | '?',
                 'group'?: string,
                 'variant'?: string,
@@ -50,7 +50,7 @@ type ConfiguredTreebanksResponse = {
             minValue?: number | Date,
             maxValue?: number | Date,
         }[],
-        'multioption': boolean
+        'multioption'?: boolean
     };
 };
 
@@ -110,25 +110,21 @@ export class TreebankService {
                             uploaded: false,
                             provider,
                             selected: false,
-                            multiOption: treebank.multioption
+                            multiOption: !!treebank.multioption
                         },
                         metadata: treebank.metadata,
                         variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
-                        componentGroups: Object.keys(treebank.components).map<TreebankComponent>(key => {
-                            let component = treebank.components[key];
-                            return {
-                                id: component.database_id,
-                                selected: !component.disabled,
-                                server_id: key,
-                                title: component.title,
-                                description: component.description,
-                                sentenceCount: component.sentences,
-                                wordCount: component.words,
-                                group: component.group || key,
-                                variant: component.variant || 'default',
-                                disabled: component.disabled || false
-                            }
-                        }).reduce((groups, component) => {
+                        componentGroups: Object.values(treebank.components).map<TreebankComponent>(component => ({
+                            id: component.id,
+                            selected: !component.disabled,
+                            title: component.title,
+                            description: component.description,
+                            sentenceCount: component.sentences,
+                            wordCount: component.words,
+                            group: component.group || component.id,
+                            variant: component.variant || 'default',
+                            disabled: component.disabled || false
+                        })).reduce((groups, component) => {
                             let group = groups.find(g => g.key === component.group);
 
                             if (!group.description) {
@@ -146,10 +142,10 @@ export class TreebankService {
                                 treebank.groups[key] &&
                                 treebank.groups[key].description ||
                                 null,
-                            key: key,
+                            key,
                             sentenceCount: new FuzzyNumber(0),
                             wordCount: new FuzzyNumber(0),
-	                        multiOption: treebank.multioption
+	                        multiOption: !!treebank.multioption
                         })))
                     };
                 });
@@ -180,11 +176,9 @@ export class TreebankService {
                         .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())
                         .then(results =>
                             results.map(subtree => {
-                                let server_id = subtree.slug.toUpperCase()
                                 const r: TreebankComponent = {
                                     id: subtree.basex_db,
-                                    server_id,
-                                    group: server_id,
+                                    group: subtree.basex_db,
                                     variant: 'default',
                                     title: subtree.title,
                                     sentenceCount: parseInt(subtree.nr_sentences),
@@ -197,7 +191,7 @@ export class TreebankService {
                                 return r;
                             })
                             .map(component => ({
-                                key: component.server_id, // see group property in TreebankComponent created above
+                                key: component.id, // see group property in TreebankComponent created above
                                 components: { default: component },
                                 sentenceCount: new FuzzyNumber(component.sentenceCount),
                                 wordCount: new FuzzyNumber(component.wordCount)
@@ -348,13 +342,13 @@ export class TreebankService {
         Object.values(next).flatMap(v => Object.values(v))
         .forEach(bank => bank.treebank.selected = false);
 
-        state.forEach(s => {
-            const tb = next[s.provider][s.corpus];
+        state.forEach(selection => {
+            const tb = next[selection.provider][selection.corpus];
             // select only those components in the state.components
             const components = tb.componentGroups.flatMap(group => Object.values(group.components));
             let hasSelected = false;
             components.forEach(c => {
-                c.selected = (tb.treebank.multiOption || !hasSelected) && s.components.find(sc => sc.id === c.id) != null;
+                c.selected = (tb.treebank.multiOption || !hasSelected) && selection.components.includes(c.id);
                 hasSelected = hasSelected || c.selected;
             });
 
@@ -380,10 +374,7 @@ export function mapToTreebankArray(banks: ConfiguredTreebanks) {
 export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks): Array<{
     provider: string,
     corpus: string,
-    components: Array<{
-        id: string,
-        server_id: string
-    }>
+    components: string[]
 }> {
     return Object.values(treebanks).flatMap(v => Object.values(v))
     .map(treebankData => ({
@@ -394,6 +385,6 @@ export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks):
     .map(({treebank, components}) => ({
         provider: treebank.provider,
         corpus: treebank.name,
-        components: components.filter(c => c.selected).map(({id, server_id}) => ({id, server_id}))
+        components: components.filter(c => c.selected).map(c => c.id)
     }))
 }

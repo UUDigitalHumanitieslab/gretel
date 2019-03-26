@@ -302,7 +302,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
             distinctUntilChanged(),
             switchMap(([xpath, selectedTreebanks]) => Promise.all(
                 selectedTreebanks.map(tb =>
-                    this.resultsService.metadataCounts(xpath, tb.provider, tb.corpus, tb.components.map(c => c.server_id))
+                    this.resultsService.metadataCounts(xpath, tb.provider, tb.corpus, tb.components)
                 )
             ))
         )
@@ -410,7 +410,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                             xpath,
                             provider,
                             corpus,
-                            components.map(c => c.server_id),
+                            components,
                             this.retrieveContext,
                             false,
                             filterValues,
