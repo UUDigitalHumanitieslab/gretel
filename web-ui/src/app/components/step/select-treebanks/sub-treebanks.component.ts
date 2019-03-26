@@ -89,6 +89,10 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleGroup(group: ComponentGroup) {
+        if (!this.treebank.multiOption) {
+            return;
+        }
+
         const components = Object.values(group.components);
         const isGroupSelected = components.every(c => c.disabled || c.selected);
 

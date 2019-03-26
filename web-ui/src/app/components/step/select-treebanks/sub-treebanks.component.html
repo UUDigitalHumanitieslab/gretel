@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th [attr.colspan]="variants.length">
-                <label class="checkbox" *ngIf="!treebank.multiOption">
+                <label class="checkbox" *ngIf="treebank.multiOption">
                     <input
                         type="checkbox"
                         title="Select all"
@@ -12,7 +12,7 @@
                     >
                     Component
                 </label>
-                <span *ngIf="treebank.multiOption">Component</span>
+                <span *ngIf="!treebank.multiOption">Component</span>
             </th>
             <th *ngIf="showDescription">
                 Description
