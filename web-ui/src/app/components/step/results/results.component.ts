@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, Output, EventEmitter, SimpleChanges  } from '@angular/core';
+import { Component, Input, OnDestroy, Output, EventEmitter, SimpleChanges, OnChanges  } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
@@ -29,10 +29,9 @@ const DebounceTime = 200;
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent implements OnDestroy {
+export class ResultsComponent extends StepComponent implements OnDestroy, OnChanges {
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts[]>([]);
-    // private metadataSubject = new BehaviorSubject<TreebankMetadata[]>([]);
     private filterValuesSubject = new BehaviorSubject<FilterValue[]>([]);
 
     @Input('xpath')
@@ -107,7 +106,6 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
         this.subscriptions = [
             this.liveMetadataCounts(),
-            // this.liveMetadataProperties(),
             this.liveFilters(),
             this.liveResults(),
         ];
@@ -153,7 +151,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
             provider: string,
             corpus: string,
             hits: Hit[]
-        }>
+        }>;
 
         Object.entries(this.resultSummary).forEach(([provider, treebanks]) => {
             Object.entries(treebanks).forEach(([corpus, settings]) => {
@@ -163,8 +161,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     hits: settings.hits,
                     provider,
                     xpath: this.xpath
-                })
-            })
+                });
+            });
         });
 
         this.downloadService.downloadResults(r);
@@ -181,7 +179,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
     }
 
     public downloadDistributionList() {
-        let values = [] as Array<{
+        const values = [] as Array<{
             provider: string;
             corpus: string;
             component: string;
@@ -197,11 +195,11 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                         corpus,
                         provider,
                         hits: componentData.hits,
-                        sentences: ''+componentData.sentences
-                    })
-                })
+                        sentences: '' + componentData.sentences
+                    });
+                });
             })
-        )
+        );
 
         this.downloadService.downloadDistributionList(values);
     }
@@ -333,7 +331,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                 if (item.show) {
                     const options: string[] = [];
                     if (item.field in counts) {
-                    for (const key of Object.keys(counts[item.field])) { // string indexing an array
+                    for (const key of Object.keys(counts[item.field])) {
                             // TODO: show the frequency (the data it right here now!)
                             options.push(key);
                         }
@@ -385,25 +383,34 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
 
                 selectedTreebanks.forEach(({provider, corpus, components}) => {
                     const treebankData = treebanks[provider][corpus];
-                    const selectedComponents = treebankData.componentGroups.flatMap(g => Object.values(g.components)).filter(c => c.selected);
+                    const selectedComponents = treebankData.componentGroups
+                        .flatMap(g => Object.values(g.components))
+                        .filter(c => c.selected);
 
-                    if (!this.resultSummary[provider]) { this.resultSummary[provider] = {}};
+                    if (!this.resultSummary[provider]) {
+                        this.resultSummary[provider] = {};
+                    }
                     this.resultSummary[provider][corpus] = {
                         show: true,
                         hits: [],
-                        // filteredHits: [],
                         allComponentsSelected: true,
                         // one entry per selected component
-                        totalSentences: selectedComponents.reduce((acc, c) => {acc.add(c.sentenceCount); return acc;}, new FuzzyNumber(0)).toString(),
+                        totalSentences: selectedComponents
+                            .reduce((acc, c) => {
+                                acc.add(c.sentenceCount);
+                                return acc;
+                            }, new FuzzyNumber(0))
+                            .toString(),
+
                         components: selectedComponents.reduce((acc, component) => {
                             acc[component.id] = {
                                 show: true,
                                 hits: 0,
                                 sentences: component.sentenceCount
-                            }
+                            };
                             return acc;
                         }, {} as ResultSummary[string][string]['components']),
-                    }
+                    };
 
                     $results.push(
                         this.resultsService.getAllResults(
@@ -448,7 +455,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
                     if (treebankResults.show && resultComponent.show) {
                         this.filteredResults.push(hit);
                     }
-                })
+                });
             },
             // (error) => {
             //     console.log('received error from results-service?', error);
@@ -457,7 +464,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy {
             //     console.log('received all results from results-service?');
             //     this.loading = false;
             // }
-        )
+        );
     }
 
     /**
@@ -498,4 +505,5 @@ type ResultSummary = {
             }
         }
     }
-}
+};
+

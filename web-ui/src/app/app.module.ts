@@ -103,10 +103,10 @@ export const imports: any[] = [
     FiltersModule,
     FormsModule,
     HttpClientModule,
+    LassyXPathModule,
     MessageModule,
     MessagesModule,
     NgSelectModule,
-    LassyXPathModule,
     RouterModule,
     TableModule,
 ];

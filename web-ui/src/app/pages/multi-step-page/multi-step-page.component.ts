@@ -5,9 +5,9 @@ import * as _ from 'lodash';
 
 import { Subscription } from 'rxjs';
 
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { GlobalState, Step } from "./steps";
-import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from "./transitions";
+import { Crumb } from '../../components/breadcrumb-bar/breadcrumb-bar.component';
+import { GlobalState, Step } from './steps';
+import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from './transitions';
 import { FilterValues, TreebankService } from '../../services/_index';
 
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
@@ -47,9 +47,11 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             this.route.queryParams.subscribe(params => {
                 const decoded = this.decodeGlobalState(params);
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
-                // if we don't set this, we might try to serialize the globalstate before the step has been entered (it happens asyncronously), causing an undefined access.
+                // if we don't set this, we might try to serialize the globalstate before
+                // the step has been entered (it happens asyncronously), causing an undefined access.
                 this.globalState.currentStep = this.steps[decoded.step];
-                // This also needs to be pushed in to the service to force an update on all components (important to restore state from url on first page render)
+                // This also needs to be pushed in to the service to force an update on
+                // all components (important to restore state from url on first page render)
                 this.treebankService.select(this.globalState.selectedTreebanks, 'url');
 
                 this.goToStep(decoded.step, false);
@@ -73,7 +75,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         return {
             'currentStep': state.currentStep.number,
             // don't encode the default state
-            'xpath': state.xpath != this.defaultGlobalState.xpath ? state.xpath : undefined,
+            'xpath': state.xpath !== this.defaultGlobalState.xpath ? state.xpath : undefined,
             'selectedTreebanks': state.selectedTreebanks.length > 0 ? JSON.stringify(state.selectedTreebanks) : undefined,
             'retrieveContext': this.encodeBool(state.retrieveContext)
         };
