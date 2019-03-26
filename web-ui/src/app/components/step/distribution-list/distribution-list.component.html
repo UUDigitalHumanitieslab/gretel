@@ -1,0 +1,51 @@
+<h2 class="subtitle">
+    <div class="level">
+        <div class="level-item level-left">
+            Components
+        </div>
+        <div class="level-item level-right is-hidden-print">
+            <div class="field">
+                <p class="control" [grtBalloonVisible]="loading ? false : undefined" grtBalloonPosition="left"
+                    grtBalloon="Download distribution list (.csv)">
+                    <a class="button" [ngClass]="{'is-loading': loading}" (click)="download()">
+                        <span class="icon is-large">
+                            <i class="fas fa-download"></i>
+                        </span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</h2>
+<table class="table is-fullwidth" *ngIf="counts" [ngClass]="{'scroll':counts.length > 5}">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th class="has-text-right">Hits</th>
+            <th class="has-text-right">All Sentences</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let count of counts">
+            <th>
+                <label class="checkbox">
+                    <input type="checkbox" [checked]="count.selected" (change)="toggleComponent(count)" />
+                    {{count.component}}
+                </label>
+            </th>
+            <td class="has-text-right">{{count.hits | formatNumber}}</td>
+            <td class="has-text-right">{{count.sentences | formatNumber}}</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>
+                <label class="checkbox">
+                    <input type="checkbox" [checked]="totalSelected" (change)="toggleAllComponents()" /> Total
+                </label>
+            </th>
+            <td class="has-text-right">{{totalHits | formatNumber}}</td>
+            <td class="has-text-right">{{totalSentences | formatNumber}}</td>
+        </tr>
+    </tfoot>
+</table>
