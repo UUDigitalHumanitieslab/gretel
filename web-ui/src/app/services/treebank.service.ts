@@ -1,17 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, ApplicationModule } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
-import { ConfigurationService } from "./configuration.service";
-import { ReplaySubject } from "rxjs";
-import { take, map } from "rxjs/operators";
+import { ConfigurationService } from './configuration.service';
+import { ReplaySubject } from 'rxjs';
+import { take, map } from 'rxjs/operators';
 
 export type ConfiguredTreebanks = {
     [provider: string]: {
         [corpus: string]: {
-        	treebank: Treebank,
-	        componentGroups: ComponentGroup[],
-            metadata: TreebankMetadata[],
-	        variants: string[]
+            treebank: Treebank;
+            componentGroups: ComponentGroup[];
+            metadata: TreebankMetadata[];
+            variants: string[];
         };
     };
 };
@@ -58,11 +58,11 @@ type UploadedTreebankResponse = {
     email: string,
     id: string
     processed: string,
-    public: "1" | "0",
+    public: '1'|'0',
     title: string,
     uploaded: string,
     user_id: string
-}
+};
 
 type UploadedTreebankMetadataResponse = {
     id: string,
@@ -73,7 +73,7 @@ type UploadedTreebankMetadataResponse = {
     min_value: string | null,
     max_value: string | null,
     show: '1' | '0'
-}
+};
 
 // not quite sure what this is yet
 type UploadedTreebankShowResponse = {
@@ -82,7 +82,7 @@ type UploadedTreebankShowResponse = {
     nr_words: string,
     slug: string,
     title: string
-}
+};
 
 @Injectable()
 export class TreebankService {
@@ -145,7 +145,7 @@ export class TreebankService {
                             key,
                             sentenceCount: new FuzzyNumber(0),
                             wordCount: new FuzzyNumber(0),
-	                        multiOption: !!treebank.multioption
+                            multiOption: !!treebank.multioption
                         })))
                     };
                 });
@@ -161,7 +161,7 @@ export class TreebankService {
                     treebank: {
                         name: item.title,
                         title: item.title,
-                        userId: parseInt(item.user_id),
+                        userId: parseInt(item.user_id, 10),
                         email: item.email,
                         uploaded: new Date(item.uploaded),
                         processed: new Date(item.processed),
@@ -181,8 +181,8 @@ export class TreebankService {
                                     group: subtree.basex_db,
                                     variant: 'default',
                                     title: subtree.title,
-                                    sentenceCount: parseInt(subtree.nr_sentences),
-                                    wordCount: parseInt(subtree.nr_words),
+                                    sentenceCount: parseInt(subtree.nr_sentences, 10),
+                                    wordCount: parseInt(subtree.nr_words, 10),
                                     selected: true,
                                     disabled: false,
                                     description: '',
@@ -367,15 +367,17 @@ export function mapToTreebankArray(banks: ConfiguredTreebanks) {
         );
 }
 
+export type SelectedTreebanks = Array<{
+    provider: string,
+    corpus: string,
+    components: string[]
+}>;
+
 /**
  * Get an array of all selected treebank components, grouped by their parent treebank
  * @param treebanks
  */
-export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks): Array<{
-    provider: string,
-    corpus: string,
-    components: string[]
-}> {
+export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks): SelectedTreebanks {
     return Object.values(treebanks).flatMap(v => Object.values(v))
     .map(treebankData => ({
         treebank: treebankData.treebank,
@@ -386,5 +388,5 @@ export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks):
         provider: treebank.provider,
         corpus: treebank.name,
         components: components.filter(c => c.selected).map(c => c.id)
-    }))
+    }));
 }
