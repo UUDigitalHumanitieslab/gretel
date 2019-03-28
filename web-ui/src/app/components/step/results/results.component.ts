@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, Output, EventEmitter, SimpleChanges, OnChanges  } from '@angular/core';
+import { Component, Input, OnDestroy, Output, EventEmitter, OnInit } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, merge, BehaviorSubject, Subscription, Observable } from 'rxjs';
-import { filter, debounceTime, distinctUntilChanged, switchMap, map, reduce } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, zip } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, share, tap, shareReplay } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -15,47 +15,71 @@ import {
     ResultsService,
     TreebankService,
     mapTreebanksToSelectionSettings,
-    SearchResults,
     FilterValues,
-    FilterByXPath
+    FilterByXPath,
+    SelectedTreebanks
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
-import { TreebankMetadata, Treebank, FuzzyNumber } from '../../../treebank';
+import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
+import { NotificationKind } from 'rxjs/internal/Notification';
+
 const DebounceTime = 200;
+
+type ResultsInfo = {
+    [provider: string]: {
+        [corpus: string]: {
+            hidden: boolean;
+            loading: boolean;
+            hits: Hit[];
+            error?: Error;
+            hiddenComponents: {
+                [componentId: string]: boolean
+            }
+        }
+    }
+};
 
 @Component({
     selector: 'grt-results',
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent implements OnDestroy, OnChanges {
+export class ResultsComponent extends StepComponent implements OnInit, OnDestroy {
     private xpathSubject = new BehaviorSubject<string>(undefined);
-    private metadataValueCountsSubject = new BehaviorSubject<MetadataValueCounts[]>([]);
-    private filterValuesSubject = new BehaviorSubject<FilterValue[]>([]);
+    private filterValuesSubject = new BehaviorSubject<FilterValues>({});
+
+    /** The hits and their visibility status */
+    private info: ResultsInfo = {};
+    public hiddenHits = 0;
+    public filteredResults: Hit[] = [];
 
     @Input('xpath')
     public set xpath(value: string) { this.xpathSubject.next(value); }
     public get xpath(): string { return this.xpathSubject.value; }
+    @Output()
+    public changeXpath = new EventEmitter<string>();
 
-    @Input()
-    public filterValues: FilterValues = {};
+    @Input('filterValues')
+    public set filterValues(v: FilterValues) {
+        const values = Object.values(v);
+        this.filterValuesSubject.next(v);
+        this.filterXPaths = values.filter((val): val is FilterByXPath => val.type === 'xpath');
+        this.activeFilterCount = values.length;
+    }
+    public get filterValues(): FilterValues { return this.filterValuesSubject.value; }
+    @Output()
+    public changeFilterValues = new EventEmitter<FilterValues>();
+
 
     @Input()
     public retrieveContext = false;
-
-    @Input()
-    public inputSentence: string = null;
-
-
-    @Output()
-    public xpathChange = new EventEmitter<string>();
-
     @Output()
     public changeRetrieveContext = new EventEmitter<boolean>();
 
-    @Output()
-    public changeFilterValues = new EventEmitter<FilterValues>();
+
+    @Input()
+    public inputSentence: string = null;
 
     @Output()
     public prev = new EventEmitter();
@@ -65,6 +89,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
 
     public loading = true;
 
+    // public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
     public validXPath = true;
@@ -89,13 +114,8 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
+    // private results: Hit[] = [];
     private subscriptions: Subscription[];
-
-    /** How many hits have been found so far for each component, and has the component finished being searched yet */
-    public resultSummary: ResultSummary = {};
-    public totalSentences: FuzzyNumber = new FuzzyNumber('?');
-    public totalHits: 0;
-    public filteredResults: Hit[] = [];
 
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
@@ -103,26 +123,100 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         private treebankService: TreebankService
     ) {
         super();
-
-        this.subscriptions = [
-            this.liveMetadataCounts(),
-            this.liveFilters(),
-            this.liveResults(),
-        ];
-
         this.changeValid = new EventEmitter();
+
+
+
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        const filterValuesChange = changes['filterValues'];
-        if (filterValuesChange && (filterValuesChange.firstChange ||
-            filterValuesChange.previousValue !== filterValuesChange.currentValue)) {
-            const values = Object.values(this.filterValues);
-            this.filterValuesSubject.next(values);
-            this.filterXPaths = values.filter(
-                (val): val is FilterByXPath => val.type === 'xpath');
-            this.activeFilterCount = values.length;
-        }
+    ngOnInit() {
+        // intermediate streams
+        const treebankSelections$ = this.treebankService.treebanks.pipe(
+            map(v => mapTreebanksToSelectionSettings(v.state)),
+            shareReplay(1), // this stream is used as input in multiple others, no need to re-run it for every subscription.
+        );
+        const filterValues$ = this.filterValuesSubject.pipe(
+            map(v => Object.values(v)),
+            shareReplay(1),
+        );
+        const metadataProperties$ = this.createMetadataPropertiesStream();
+        const metadataCounts$ = this.createMetadataCountsStream(treebankSelections$, this.xpathSubject, filterValues$);
+
+        // subscribed streams
+        const metadataFilters$ = this.createMetadataFiltersStream(metadataProperties$, metadataCounts$);
+        const results$ = this.createResultsStream(treebankSelections$, this.xpathSubject, filterValues$);
+
+        this.subscriptions = [
+            metadataFilters$.subscribe(filters => this.filters = filters),
+
+            // When different treebanks are selected, clear our results and make entries for the new banks
+            treebankSelections$.subscribe(selections => {
+                const newInfo = selections.reduce((info, s) => {
+                    const oldCorpusInfo = this.info[s.provider] ? this.info[s.provider][s.corpus] : undefined;
+
+                    const p = info[s.provider] = info[s.provider] || {};
+                    p[s.corpus] = {
+                        loading: true,
+                        hidden: oldCorpusInfo ? oldCorpusInfo.hidden : false,
+                        hits: [],
+                        // Add all searched components immediately, so the info can be used in downloadResults()
+                        hiddenComponents: s.components.reduce((hidden, comp) => {
+                            hidden[comp] = !!(oldCorpusInfo && oldCorpusInfo.hiddenComponents[comp]);
+                            return hidden;
+                        }, {} as {[componentId: string]: boolean}),
+                    };
+                    return info;
+                }, {} as ResultsInfo);
+                this.info = newInfo;
+            }),
+
+            results$.subscribe(r => {
+                console.log(r);
+
+                if (typeof r === 'string') {
+                    switch (r) {
+                        case 'start': {
+                            // info reset on selected treebanks changing (see below).
+                            this.loading = true;
+                            this.filteredResults = [];
+                            this.hiddenHits = 0;
+                            break;
+                        }
+                        case 'finish': {
+                            this.loading = false;
+                            break;
+                        }
+                    }
+                } else {
+                    switch (r.result.kind) {
+                        case NotificationKind.COMPLETE: {
+                            // treebank has finished loading
+                            const i = this.info[r.provider][r.corpus];
+                            i.loading = false;
+                            break;
+                        }
+                        case NotificationKind.ERROR: {
+                            // treebank has errored out!
+                            const i = this.info[r.provider][r.corpus];
+                            i.loading = false;
+                            i.error = r.result.error;
+                            break;
+                        }
+                        case NotificationKind.NEXT: {
+                            // some new hits!
+                            const i = this.info[r.provider][r.corpus];
+                            i.hits.push(...r.result.value.hits);
+                            if (!i.hidden) {
+                                const filtered = i.hidden ? [] : r.result.value.hits.filter(h => !i.hiddenComponents[h.component]);
+                                this.filteredResults.push(...filtered);
+                                this.hiddenHits += filtered.length - r.result.value.hits.length;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }),
+        ];
     }
 
     ngOnDestroy() {
@@ -131,6 +225,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         }
     }
 
+    // TODO: treeXml is not always a complete sentence
     /**
      * Show a tree of the given xml file
      */
@@ -153,10 +248,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
             hits: Hit[]
         }>;
 
-        Object.entries(this.resultSummary).forEach(([provider, treebanks]) => {
+        Object.entries(this.info).forEach(([provider, treebanks]) => {
             Object.entries(treebanks).forEach(([corpus, settings]) => {
                 r.push({
-                    components: Object.keys(settings.components),
+                    components: Object.keys(settings.hiddenComponents),
                     corpus,
                     hits: settings.hits,
                     provider,
@@ -178,38 +273,16 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         this.downloadService.downloadFilelist(fileNames, 'filelist');
     }
 
-    public downloadDistributionList() {
-        const values = [] as Array<{
-            provider: string;
-            corpus: string;
-            component: string;
-            hits: number;
-            sentences: string;
-        }>;
-
-        Object.entries(this.resultSummary).forEach(([provider, banks]) =>
-            Object.entries(banks).forEach(([corpus, corpusData]) => {
-                Object.entries(corpusData.components).forEach(([component, componentData]) => {
-                    values.push({
-                        component,
-                        corpus,
-                        provider,
-                        hits: componentData.hits,
-                        sentences: '' + componentData.sentences
-                    });
-                });
-            })
-        );
-
-        this.downloadService.downloadDistributionList(values);
-    }
-
     /**
      * Returns the unique file names from the filtered results sorted on name.
      */
     public getFileNames() {
-        const allNames = new Set(this.filteredResults.map((result) => result.fileId));
-        return Array.from(allNames).sort();
+        return Object.values(this.info)
+        .flatMap(provider => Object.values(provider))
+        .filter(c => !c.hidden) // filter hidden banks
+        .flatMap(c => c.hits.filter(h => !c.hiddenComponents[h.component])) // extract hits, filter hidden components
+        .map(c => c.fileId) // extract names
+        .sort();
     }
 
     public copyXPath() {
@@ -221,24 +294,12 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         }
     }
 
-    public toggleCorpus(provider: string, corpus: string) {
-        const settings = this.resultSummary[provider][corpus];
-        settings.show = !settings.show;
-        this.filterHits();
-    }
-
-    public toggleComponent(provider: string, corpus: string, component: string) {
-        const settings = this.resultSummary[provider][corpus];
-        settings.components[component].show = !settings.components[component].show;
-        settings.allComponentsSelected = Object.values(settings.components).every(c => c.show);
-        this.filterHits();
-    }
-
-    public toggleAllComponents(provider: string, corpus: string) {
-        const settings = this.resultSummary[provider][corpus];
-
-        const show = settings.allComponentsSelected = !settings.allComponentsSelected;
-        Object.values(settings.components).forEach(c => c.show = show);
+    public hideComponents({provider, corpus, components}: {provider: string, corpus: string, components: string[]}) {
+        const c = this.info[provider][corpus];
+        Object.keys(c.hiddenComponents).forEach(comp => {
+            c.hiddenComponents[comp] = false;
+        });
+        components.forEach(comp => c.hiddenComponents[comp] = true);
         this.filterHits();
     }
 
@@ -256,7 +317,7 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
 
     public updateXPath() {
         if (this.validXPath) {
-            this.xpathChange.next(this.customXPath);
+            this.changeXpath.next(this.customXPath);
             this.isModifyingXPath = false;
         }
     }
@@ -271,10 +332,10 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
             Object.values(this.filterValues));
         this.filterChange({});
 
-        this.xpathChange.next(this.customXPath);
+        this.changeXpath.next(this.customXPath);
     }
 
-    public customXPathChanged(valueEvent: ValueEvent) {
+    public changeCustomXpath(valueEvent: ValueEvent) {
         this.validXPath = !valueEvent.error;
         if (this.validXPath) {
             this.customXPath = valueEvent.xpath;
@@ -285,200 +346,196 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
         this.changeRetrieveContext.emit(!this.retrieveContext);
     }
 
-    /**
-     * Get the counts for the metadata
-     */
-    private liveMetadataCounts() {
-        // TODO: handle when filters have been applied (part of #36)
-        return observableCombineLatest(
-            this.xpathSubject,
-            this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state)))
-        )
-        .pipe(
-            filter((values) => values.every(value => value != null)),
-            debounceTime(DebounceTime),
-            distinctUntilChanged(),
-            switchMap(([xpath, selectedTreebanks]) => Promise.all(
-                selectedTreebanks.map(tb =>
-                    this.resultsService.metadataCounts(xpath, tb.provider, tb.corpus, tb.components)
-                )
-            ))
-        )
-        .subscribe(counts => this.metadataValueCountsSubject.next(counts));
+    // ----
+
+    /** Extracts metadata fields from the selected treebanks */
+    private createMetadataPropertiesStream(): Observable<TreebankMetadata[]> {
+        return this.treebankService.treebanks.pipe(
+            map(v => v.state),
+            map(providers => {
+                return Object.values(providers)
+                .flatMap(banks => Object.values(banks))
+                .filter(bank => bank.treebank.selected)
+                .flatMap(bank => bank.metadata);
+            })
+        );
     }
 
-    /**
-     * Get the filters
-     */
-    private liveFilters() {
-        // Join all known metadadata
+    /** Retrieves metadata counts based on selected banks and filters */
+    private createMetadataCountsStream(
+        banksInput: Observable<SelectedTreebanks>,
+        xpathInput: Observable<string>,
+        filterValueInput: Observable<FilterValue[]>
+    ): Observable<MetadataValueCounts> {
         return observableCombineLatest(
-            this.treebankService.treebanks.pipe(
-                map(v =>
-                    Object.values(v.state)
-                    .flatMap(provider => Object.values(provider))
-                    .flatMap(bank => bank.metadata)
-                ),
-            ),
-            this.metadataValueCountsSubject.pipe(
-               map(v => v.reduce(Object.assign, {}) as MetadataValueCounts)
-            )
+            banksInput,
+            xpathInput,
+            filterValueInput
         )
-        .subscribe(([metadata, counts]) => {
-            const filters: Filter[] = [];
+        .pipe(
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([banks, xpath, filterValues]) =>
+                // TODO: change to stream-based approach, so we can cancel http requests?
+                // TODO: error handling, just ignore that metadata?
+                // would need to check if requests are actually cancelled in the angular http service
 
-            for (const item of metadata) {
-                if (item.show) {
+                // get counts for all selected
+                Promise.all(banks.map(({provider, corpus, components}) =>
+                    this.resultsService.metadataCounts(
+                        xpath,
+                        provider,
+                        corpus,
+                        components,
+                        filterValues
+                    ))
+                )
+                // deep merge all results into a single object
+                .then((c: MetadataValueCounts[]) => {
+                    return c.reduce<MetadataValueCounts>((counts, cur) => {
+                        Object.keys(cur)
+                        .forEach(fieldName => {
+                            const field = counts[fieldName] = counts[fieldName] || {};
+                            Object.entries(cur[fieldName])
+                            .forEach(([metadataValue, valueCount]) => {
+                                field[metadataValue] = (field[metadataValue] || 0) + valueCount;
+                            });
+                        });
+
+                        return counts;
+                    }, {});
+                })
+            ),
+        );
+    }
+
+    /** Transforms metadata fields along with their values into filter definitions */
+    private createMetadataFiltersStream(
+        metadataFieldsInput: Observable<TreebankMetadata[]>,
+        metadataValuesInput: Observable<MetadataValueCounts>,
+    ): Observable<Filter[]> {
+        // zip instead of combinelatest,
+        // as a change in fields is always paired with a change in values,
+        // and we should only process them together
+        return zip(
+            metadataFieldsInput,
+            metadataValuesInput
+        )
+        .pipe(
+            distinctUntilChanged(),
+            map(([fields, counts]) => {
+                return fields
+                .filter(field => field.show)
+                .map<Filter>(item => {
                     const options: string[] = [];
                     if (item.field in counts) {
-                    for (const key of Object.keys(counts[item.field])) {
+                        for (const key of Object.keys(counts[item.field])) {
                             // TODO: show the frequency (the data it right here now!)
                             options.push(key);
                         }
                     }
 
+                    // use a dropdown instead of checkboxes when there
+                    // are too many options
                     if (item.facet === 'checkbox' && options.length > 8) {
-                        // use a dropdown instead of checkboxes when there
-                        // are too many options
                         item.facet = 'dropdown';
                     }
 
-                    filters.push({
+                    return {
                         field: item.field,
                         dataType: item.type,
                         filterType: item.facet,
                         minValue: item.minValue,
                         maxValue: item.maxValue,
                         options
-                    });
-                }
-            }
-            this.filters = filters;
-        });
-    }
-
-    /**
-     * Get the results
-     */
-    private liveResults() {
-        return observableCombineLatest(
-            this.treebankService.treebanks.pipe(map(v => v.state)),
-            this.xpathSubject,
-            this.filterValuesSubject
-        ).pipe(
-            filter((values) => values.every(value => value != null)),
-            debounceTime(DebounceTime),
-            distinctUntilChanged(),
-            switchMap(([treebanks, xpath, filterValues]) => {
-                const selectedTreebanks = mapTreebanksToSelectionSettings(treebanks);
-
-                this.filteredResults = [];
-
-                this.loading = true;
-                this.totalSentences = new FuzzyNumber(0);
-                this.totalHits = 0;
-
-                this.resultSummary = {};
-                const $results = [] as Observable<{results: SearchResults, treebank: Treebank}>[];
-
-                selectedTreebanks.forEach(({provider, corpus, components}) => {
-                    const treebankData = treebanks[provider][corpus];
-                    const selectedComponents = treebankData.componentGroups
-                        .flatMap(g => Object.values(g.components))
-                        .filter(c => c.selected);
-
-                    if (!this.resultSummary[provider]) {
-                        this.resultSummary[provider] = {};
-                    }
-                    this.resultSummary[provider][corpus] = {
-                        show: true,
-                        hits: [],
-                        allComponentsSelected: true,
-                        // one entry per selected component
-                        totalSentences: selectedComponents
-                            .reduce((acc, c) => {
-                                acc.add(c.sentenceCount);
-                                return acc;
-                            }, new FuzzyNumber(0))
-                            .toString(),
-
-                        components: selectedComponents.reduce((acc, component) => {
-                            acc[component.id] = {
-                                show: true,
-                                hits: 0,
-                                sentences: component.sentenceCount
-                            };
-                            return acc;
-                        }, {} as ResultSummary[string][string]['components']),
                     };
-
-                    $results.push(
-                        this.resultsService.getAllResults(
-                            xpath,
-                            provider,
-                            corpus,
-                            components,
-                            this.retrieveContext,
-                            false,
-                            filterValues,
-                            []
-                        )
-                        .pipe(map(results => ({
-                            results,
-                            treebank: treebankData.treebank,
-                        })))
-                    );
-
-                    selectedComponents.forEach(c => this.totalSentences.add(c.sentenceCount));
                 });
-
-                // merge the observables (one for each treebank) into a single stream
-                // TODO: error handling
-                let combined = merge(...$results);
-                combined.subscribe(
-                    () => {},
-                    () => {},
-                    () => this.loading = false
-                );
-                return combined;
             })
-        )
-        .subscribe(
-            ({results, treebank}) => {
-                const treebankResults = this.resultSummary[treebank.provider][treebank.name];
-                treebankResults.hits.push(...results.hits);
-                this.totalHits += results.hits.length;
-
-                results.hits.forEach(hit => {
-                    const resultComponent = treebankResults.components[hit.component];
-                    ++resultComponent.hits;
-                    if (treebankResults.show && resultComponent.show) {
-                        this.filteredResults.push(hit);
-                    }
-                });
-            },
-            // (error) => {
-            //     console.log('received error from results-service?', error);
-            // },
-            // () => {
-            //     console.log('received all results from results-service?');
-            //     this.loading = false;
-            // }
         );
     }
 
     /**
-     * Filter out the hits which are part of hidden components
-     * @param hits
+     * Gets up-to-date results for all selected treebanks
+     *
+     * Three types of values are emitted:
+     *  'start': indicates a search/new result set is being started
+     *  'finish': all treebanks finished searching
+     *  @type {Notification} either a set of results, a finished message, or an error message within a selected treebank
+     */
+    private createResultsStream(
+        selectedTreebanksInput: Observable<SelectedTreebanks>,
+        xpathInput: Observable<string>,
+        filterValueInput: Observable<FilterValue[]>
+    ) {
+        return observableCombineLatest(
+            selectedTreebanksInput,
+            xpathInput,
+            filterValueInput
+        ).pipe(
+            filter((values) => values.every(value => value != null)),
+            debounceTime(DebounceTime),
+            distinctUntilChanged(),
+            switchMap(([selectedTreebanks, xpath, filterValues]) => {
+                // create a request for each treebank
+                const resultStreams = selectedTreebanks.map(({provider, corpus, components}) => {
+                    // create the basic request, without error handling
+                    const base = this.resultsService.getAllResults(
+                        xpath,
+                        provider,
+                        corpus,
+                        components,
+                        this.retrieveContext,
+                        false,
+                        filterValues,
+                        []
+                    );
+
+                    // transform results, errors and finished notifications for this request into regular next() messages
+                    // and pass along the provider/corpus info with returned status messages and results
+                    // why materialize? otherwise if one request errors out, the merge(...) below also
+                    // stops listening to all other running requests.
+                    // and this way we can show the user all error messages instead of only the first.
+                    return base.pipe(
+                        materialize(),
+                        map(result => ({
+                            result,
+                            provider,
+                            corpus
+                        })
+                    ));
+                });
+
+                // join all results, and wrap the entire sequence in a start and end message so
+                // we know what's happening and can update spinners etc.
+                return merge(...resultStreams).pipe(
+                    startWith('start'),
+                    endWith('finish')
+                );
+            }),
+        );
+    }
+
+    /**
+     * Filter out the hits which are part of hidden components or banks and update the hiddenHits counter
      */
     private filterHits() {
-        const filteredResults: Hit[] = [];
-        Object.values(this.resultSummary).flatMap(v => Object.values(v))
-        .filter(tb => tb.show)
-        .forEach(tb => {
-            filteredResults.push(...tb.hits.filter(hit => tb.components[hit.component].show));
-        })
-        this.filteredResults = filteredResults;
+        this.hiddenHits = 0;
+        this.filteredResults =
+            Object.values(this.info)
+            .flatMap(provider => Object.values(provider))
+            .filter(corpus => {
+                debugger;
+                if (corpus.hidden) {
+                    this.hiddenHits += corpus.hits.length;
+                }
+                return !corpus.hidden;
+            })
+            .flatMap(q => {
+                const filtered = q.hits.filter(h => !q.hiddenComponents[h.component]);
+                debugger;
+                this.hiddenHits += q.hits.length - filtered.length;
+                return filtered;
+            });
     }
 
     public getValidationMessage() {
@@ -488,22 +545,3 @@ export class ResultsComponent extends StepComponent implements OnDestroy, OnChan
     updateValidity() {
     }
 }
-
-type ResultSummary = {
-    [provider: string]: {
-        [corpus: string]: {
-            show: boolean;
-            allComponentsSelected: boolean;
-            hits: Hit[];
-            totalSentences: string;
-            components: {
-                [componentId: string]: {
-                    hits: number;
-                    sentences: number|'?';
-                    show: boolean;
-                }
-            }
-        }
-    }
-};
-

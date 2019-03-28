@@ -75,86 +75,19 @@
                 <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
                 <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
             </div>
-            <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="customXPathChanged($event)"
+            <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="changeCustomXpath($event)"
                 autofocus="true"></grt-xpath-editor>
         </div>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
-        <h2 class="subtitle">
-            <div class="level">
-                <div class="level-item level-left">
-                    Components
-                </div>
-                <div class="level-item level-right is-hidden-print">
-                    <div class="field">
-                        <p class="control">
-                            <a class="button" grtBalloonPosition="left" grtBalloon="Download distribution list (.csv)" [ngClass]="{'is-loading': loading}" (click)="downloadDistributionList()">
-                                <span class="icon is-large">
-                                    <i class="fas fa-download"></i>
-                                </span>
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </h2>
-        <table class="table is-fullwidth">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Hits</th>
-                    <th>All Sentences</th>
-                </tr>
-            </thead>
-            <tbody>
-                <ng-container *ngFor="let provider of resultSummary | keyvalue">
-                    <ng-container *ngFor="let corpus of provider.value | keyvalue">
-                        <tr>
-                            <th>
-                                <label class="checkbox">
-                                    <input type="checkbox" [checked]="corpus.value.show" (change)="toggleCorpus(provider.key, corpus.key)" /> {{corpus.key}}
-                                </label>
-                            </th>
-                            <th>{{corpus.value.hits.length}}</th>
-                            <th>{{corpus.value.totalSentences}}</th>
-                        </tr>
-                        <ng-container *ngIf="corpus.value.show">
-                            <tr *ngFor="let component of corpus.value.components | keyvalue">
-                                <td>
-                                    <label class="checkbox">
-                                        <input type="checkbox" [checked]="component.value.show" (change)="toggleComponent(provider.key, corpus.key, component.key)" /> {{component.key}}
-                                    </label>
-                                </td>
-                                <td>{{component.value.hits}}</td>
-                                <td>{{component.value.sentences}}</td>
-                            </tr>
-                        </ng-container>
-                        <tr></tr> <!-- spacer row -->
-                    </ng-container>
-                </ng-container>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>
-                        <!--
-
-                            <label class="checkbox">
-                                <input type="checkbox" [checked]="totalSelected" (change)="toggleAllComponents(!totalSelected)" /> Total
-                            </label>
-                        -->
-                    </td>
-                    <td>{{totalHits}}</td>
-                    <td>{{totalSentences.toString()}}</td>
-                </tr>
-            </tfoot>
-        </table>
+        <grt-distribution-list [xpath]="xpath" (hidingComponents)="hideComponents($event)"></grt-distribution-list>
     </div>
 </div>
 <div class="level">
     <div class="level-left">
         <h1 class="title" [ngClass]="{'is-loading': loading}">
-            Results: {{filteredResults.length}}<ng-container *ngIf="(totalHits - filteredResults.length) > 0"> ({{totalHits - filteredResults.length}} hidden)</ng-container>
+            Results: {{filteredResults.length}}<ng-container *ngIf="hiddenHits > 0"> ({{hiddenHits}} hidden)</ng-container>
         </h1>
     </div>
     <div class="level-right is-hidden-print">
@@ -269,7 +202,7 @@
         </p-table>
 
         <ng-template #warning>
-            <div *ngIf="!loading" class="notification is-warning">
+            <div *ngIf="!loading && hiddenHits === 0" class="notification is-warning">
                 <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
                     with another treebank, other xpath-query or change the filters.</ng-container>
                 <ng-template #noActiveFilters>No results found, please try again with another treebank or other
