@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, ApplicationModule } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, from } from 'rxjs';
 import { take, map } from 'rxjs/operators';
 
 export type ConfiguredTreebanks = {
@@ -125,7 +125,7 @@ export class TreebankService {
                             variant: component.variant || 'default',
                             disabled: component.disabled || false
                         })).reduce((groups, component) => {
-                            let group = groups.find(g => g.key === component.group);
+                            const group = groups.find(g => g.key === component.group);
 
                             if (!group.description) {
                                 group.description = component.description;
@@ -203,8 +203,8 @@ export class TreebankService {
                             let metadata: TreebankMetadata = {
                                 field: item.field,
                                 type: item.type,
-                                facet: item.facet == 'date_range' ? 'range' : item.facet,
-                                show: item.show == '1'
+                                facet: item.facet === 'date_range' ? 'range' : item.facet,
+                                show: item.show === '1'
                             };
 
                             if (['slider', 'range'].indexOf(metadata.facet) !== -1) {
@@ -222,7 +222,7 @@ export class TreebankService {
 
                             return metadata;
                         })),
-                }
+                };
             }
 
             this.data = treebanks;
@@ -231,7 +231,7 @@ export class TreebankService {
                 origin: 'init'
             });
             this.loading = false;
-        })()
+        })();
     }
 
     // SELECTION
@@ -256,7 +256,10 @@ export class TreebankService {
         );
     }
 
-    /** Toggle a specific component, other components are untouched, unless corpus.multiOption is false, in which case they are unselected */
+    /**
+     * Toggle a specific component, other components are untouched, unless corpus.multiOption is false,
+     * in which case they are unselected
+     */
     toggleComponent(provider: string, corpus: string, componentId: string) {
         if (this.loading) {
             return;
@@ -270,7 +273,7 @@ export class TreebankService {
             } else if (!tb.treebank.multiOption) {
                 component.selected = false;
             }
-        })
+        });
 
         this.treebanks.next({state: next, origin: 'user'});
     }
@@ -319,7 +322,7 @@ export class TreebankService {
             } else if (!tb.treebank.multiOption) {
                 component.selected = false;
             }
-        })
+        });
 
         this.treebanks.next({state: next, origin: 'user'});
     }
@@ -353,7 +356,7 @@ export class TreebankService {
             });
 
             tb.treebank.selected = hasSelected;
-        })
+        });
         this.treebanks.next({state: next, origin: 'url'});
     }
 }
