@@ -167,16 +167,19 @@ export class ResultsService {
         return false;
     }
 
-    highlightSentenceTree(sentenceXml: string, nodeIds: number[]) {
-        const selector = nodeIds.map(id => '#' + id).join(', ');
+    async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
+        const url = await this.configurationService.getApiUrl(
+            provider,
+            'tree', [
+                treebank,
+                sentenceId,
+                nodeIds.join('-')],
+            { ...(database && { db: database }) });
 
-        const tree = $($.parseXML(sentenceXml))
-            .find(selector)
-            .attr('highlight', 'yes')
-            .end();
-
-        return (new XMLSerializer()).serializeToString(tree.get(0));
+        const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
+        return { url, treeXml };
     }
+
 
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(

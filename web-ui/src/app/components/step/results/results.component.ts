@@ -26,12 +26,17 @@ import { NotificationKind } from 'rxjs/internal/Notification';
 
 const DebounceTime = 200;
 
+type HitWithOrigin = Hit&{
+    provider: string;
+    corpus: string;
+};
+
 type ResultsInfo = {
     [provider: string]: {
         [corpus: string]: {
             hidden: boolean;
             loading: boolean;
-            hits: Hit[];
+            hits: HitWithOrigin[];
             error?: Error;
             hiddenComponents: {
                 [componentId: string]: boolean
@@ -89,7 +94,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
 
     public loading = true;
 
-    // public filteredResults: Hit[] = [];
     public xpathCopied = false;
     public customXPath: string;
     public validXPath = true;
@@ -105,6 +109,8 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
 
     // Xml tree displaying (of a result)
     public treeXml?: string;
+    public loadingTree = false;
+    public treeXmlUrl?: string;
     public treeSentence?: SafeHtml;
 
     public columns = [
@@ -114,7 +120,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
-    // private results: Hit[] = [];
     private subscriptions: Subscription[];
 
     constructor(private downloadService: DownloadService,
@@ -124,9 +129,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     ) {
         super();
         this.changeValid = new EventEmitter();
-
-
-
     }
 
     ngOnInit() {
@@ -225,13 +227,21 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         }
     }
 
-    // TODO: treeXml is not always a complete sentence
-    /**
-     * Show a tree of the given xml file
-     */
-    showTree(result: Hit) {
+    /** Show a tree of the given xml file, needs to contact the server as the result might not contain the entire tree */
+    async showTree(result: HitWithOrigin) {
+        this.treeXml = undefined;
+        this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
-        this.treeXml = this.resultsService.highlightSentenceTree(result.treeXml, result.nodeIds);
+        const { url, treeXml } = await this.resultsService.highlightSentenceTree(
+            result.provider,
+            result.fileId,
+            result.corpus,
+            result.nodeIds,
+            result.component
+        );
+        this.treeXml = treeXml;
+        this.treeXmlUrl = url;
+        this.loadingTree = false;
     }
 
     public deleteFilter(filterValue: FilterValue) {
@@ -388,7 +398,9 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
                         corpus,
                         components,
                         filterValues
-                    ))
+                    ).catch((e: Error): MetadataValueCounts => {
+                        return {};
+                    }))
                 )
                 // deep merge all results into a single object
                 .then((c: MetadataValueCounts[]) => {
@@ -496,12 +508,21 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
                     // stops listening to all other running requests.
                     // and this way we can show the user all error messages instead of only the first.
                     return base.pipe(
+                        // expand hits with the corpus and provider (so the template knows this info, as it only has the hit object in context)
+                        map(result => ({
+                            ...result,
+                            hits: result.hits.map(h => ({
+                                ...h,
+                                provider,
+                                corpus
+                            }))
+                        })),
                         materialize(),
                         map(result => ({
                             result,
                             provider,
                             corpus
-                        })
+                        }),
                     ));
                 });
 

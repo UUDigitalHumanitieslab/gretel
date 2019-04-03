@@ -211,4 +211,11 @@
         </ng-template>
     </div>
 </div>
-<grt-tree-visualizer *ngIf="treeXml" [sentence]="treeSentence" [xml]="treeXml" display="fullscreen"></grt-tree-visualizer>
+<grt-tree-visualizer *ngIf="loadingTree || treeXml"
+    display="fullscreen"
+
+    [sentence]="treeSentence"
+    [xml]="treeXml"
+    [url]="treeXmlUrl"
+    [loading]="loadingTree"
+></grt-tree-visualizer>
