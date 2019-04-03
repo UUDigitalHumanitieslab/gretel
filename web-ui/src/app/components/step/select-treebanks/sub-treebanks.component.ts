@@ -89,7 +89,7 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     toggleGroup(group: ComponentGroup) {
-        if (!this.treebank.multiOption) {
+        if (!this.treebank.multiOption && this.variants.length > 1) {
             return;
         }
 
