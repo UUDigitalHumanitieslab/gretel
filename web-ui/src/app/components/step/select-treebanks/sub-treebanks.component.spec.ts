@@ -14,7 +14,14 @@ describe('SubTreebanksComponents', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(SubTreebanksComponent);
         component = fixture.componentInstance;
-        component.corpus = 'test-treebank';
+        component.treebank = {
+            multiOption: false,
+            name: 'test-treebank',
+            provider: 'test-provider',
+            selected: true
+        };
+        component.componentGroups = [];
+        component.variants = [];
         fixture.detectChanges();
     });
 

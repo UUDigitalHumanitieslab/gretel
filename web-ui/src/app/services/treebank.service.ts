@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, ApplicationModule } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
-import { ReplaySubject, from } from 'rxjs';
-import { take, map } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-export type ConfiguredTreebanks = {
+export interface ConfiguredTreebanks {
     [provider: string]: {
         [corpus: string]: {
             treebank: Treebank;
@@ -14,9 +14,9 @@ export type ConfiguredTreebanks = {
             variants: string[];
         };
     };
-};
+}
 
-type ConfiguredTreebanksResponse = {
+interface ConfiguredTreebanksResponse {
     [treebank: string]: {
         'components': {
             [component: string]: {
@@ -52,37 +52,37 @@ type ConfiguredTreebanksResponse = {
         }[],
         'multioption'?: boolean
     };
-};
+}
 
-type UploadedTreebankResponse = {
-    email: string,
-    id: string
-    processed: string,
-    public: '1'|'0',
-    title: string,
-    uploaded: string,
-    user_id: string
-};
+export interface UploadedTreebankResponse {
+    email: string;
+    id: string;
+    processed: string;
+    public: '1'|'0';
+    title: string;
+    uploaded: string;
+    user_id: string;
+}
 
-type UploadedTreebankMetadataResponse = {
-    id: string,
-    treebank_id: string,
-    field: string,
-    type: 'text' | 'int' | 'date',
-    facet: 'checkbox' | 'slider' | 'date_range',
-    min_value: string | null,
-    max_value: string | null,
-    show: '1' | '0'
-};
+interface UploadedTreebankMetadataResponse {
+    id: string;
+    treebank_id: string;
+    field: string;
+    type: 'text' | 'int' | 'date';
+    facet: 'checkbox' | 'slider' | 'date_range';
+    min_value: string | null;
+    max_value: string | null;
+    show: '1' | '0';
+}
 
 // not quite sure what this is yet
-type UploadedTreebankShowResponse = {
-    basex_db: string,
-    nr_sentences: string,
-    nr_words: string,
-    slug: string,
-    title: string
-};
+interface UploadedTreebankShowResponse {
+    basex_db: string;
+    nr_sentences: string;
+    nr_words: string;
+    slug: string;
+    title: string;
+}
 
 @Injectable()
 export class TreebankService {
@@ -151,7 +151,7 @@ export class TreebankService {
                 });
             }
 
-            const uploadProvider = await this.configurationService.getUploadProvider()
+            const uploadProvider = await this.configurationService.getUploadProvider();
             const uploadedCorpora: ConfiguredTreebanks[string] = treebanks[uploadProvider] = (treebanks[uploadProvider] || {});
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
             const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
@@ -165,7 +165,7 @@ export class TreebankService {
                         email: item.email,
                         uploaded: new Date(item.uploaded),
                         processed: new Date(item.processed),
-                        isPublic: item.public == '1',
+                        isPublic: item.public === '1',
                         description: item.title,
                         multiOption: true,
                         provider: uploadProvider,
@@ -186,7 +186,7 @@ export class TreebankService {
                                     selected: true,
                                     disabled: false,
                                     description: '',
-                                }
+                                };
 
                                 return r;
                             })
@@ -200,7 +200,7 @@ export class TreebankService {
                     metadata: await this.configurationService.getUploadApiUrl('treebank/metadata/' + item.title)
                         .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
                         .then(response => response.map(item => {
-                            let metadata: TreebankMetadata = {
+                            const metadata: TreebankMetadata = {
                                 field: item.field,
                                 type: item.type,
                                 facet: item.facet === 'date_range' ? 'range' : item.facet,
@@ -210,8 +210,8 @@ export class TreebankService {
                             if (['slider', 'range'].indexOf(metadata.facet) !== -1) {
                                 switch (metadata.type) {
                                     case 'int':
-                                        metadata.minValue = parseInt(item.min_value);
-                                        metadata.maxValue = parseInt(item.max_value);
+                                        metadata.minValue = parseInt(item.min_value, 10);
+                                        metadata.maxValue = parseInt(item.max_value, 10);
                                         return metadata;
                                     case 'date':
                                         metadata.minValue = new Date(item.min_value);

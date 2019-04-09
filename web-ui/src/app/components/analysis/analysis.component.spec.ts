@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { commonTestBed } from "../../common-test-bed";
-import { AnalysisComponent } from "./analysis.component";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { commonTestBed } from '../../common-test-bed';
+import { AnalysisComponent } from './analysis.component';
 
 describe('Analysis component', () => {
     let component: AnalysisComponent;
@@ -10,7 +10,6 @@ describe('Analysis component', () => {
         await commonTestBed().testingModule.compileComponents();
         fixture = TestBed.createComponent(AnalysisComponent);
         component = fixture.componentInstance;
-        component.corpus = 'test-treebank';
         fixture.detectChanges();
     });
 

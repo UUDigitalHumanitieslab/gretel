@@ -1,15 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Inject, LOCALE_ID, OnInit, OnDestroy, } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import { TreebankService, ConfiguredTreebanks } from '../../../services/_index';
 import { TreebankComponent, ComponentGroup, FuzzyNumber, Treebank } from '../../../treebank';
-import { Observable, Subscription } from 'rxjs';
 
 @Component({
     selector: 'grt-sub-treebanks',
     templateUrl: './sub-treebanks.component.html',
     styleUrls: ['./sub-treebanks.component.scss']
 })
-export class SubTreebanksComponent implements OnChanges {
+export class SubTreebanksComponent implements OnChanges, OnInit {
     /** False after ngOnInit has run */
     private loading = true;
 
@@ -107,7 +106,7 @@ export class SubTreebanksComponent implements OnChanges {
     }
 
     private updateTotals() {
-        type FuzzyCounts = { [group: string]: FuzzyNumber };
+        interface FuzzyCounts { [group: string]: FuzzyNumber; }
         const totalSentenceCount = new FuzzyNumber(0);
         const totalWordCount = new FuzzyNumber(0);
         const totalSentenceCountByGroup: FuzzyCounts = {};
@@ -122,7 +121,7 @@ export class SubTreebanksComponent implements OnChanges {
         for (const variant of this.variants) {
             totalSentenceCountByVariant[variant] = new FuzzyNumber(0);
             totalWordCountByVariant[variant] = new FuzzyNumber(0);
-    	}
+        }
         for (const subTreebank of this.components) {
             totalSentenceCount.add(subTreebank.sentenceCount);
             totalSentenceCountByGroup[subTreebank.group].add(subTreebank.sentenceCount);
@@ -136,7 +135,8 @@ export class SubTreebanksComponent implements OnChanges {
         this.totalSentenceCount = totalSentenceCount.toLocaleString();
         this.totalWordCount = totalWordCount.toLocaleString();
         this.showWordCount = !totalWordCount.unknown || totalWordCount.value > 0;
-		function mapFuzzyCounts(counts: FuzzyCounts) {
+
+        function mapFuzzyCounts(counts: FuzzyCounts) {
             const result: { [key: string]: string } = {};
             for (const key of Object.keys(counts)) {
                 result[key] = counts[key].toLocaleString();
