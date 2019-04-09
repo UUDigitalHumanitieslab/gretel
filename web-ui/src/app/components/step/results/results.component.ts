@@ -173,8 +173,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             }),
 
             results$.subscribe(r => {
-                console.log(r);
-
                 if (typeof r === 'string') {
                     switch (r) {
                         case 'start': {
@@ -545,7 +543,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             Object.values(this.info)
             .flatMap(provider => Object.values(provider))
             .filter(corpus => {
-                debugger;
                 if (corpus.hidden) {
                     this.hiddenHits += corpus.hits.length;
                 }
@@ -553,7 +550,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             })
             .flatMap(q => {
                 const filtered = q.hits.filter(h => !q.hiddenComponents[h.component]);
-                debugger;
                 this.hiddenHits += q.hits.length - filtered.length;
                 return filtered;
             });
