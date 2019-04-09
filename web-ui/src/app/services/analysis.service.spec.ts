@@ -9,8 +9,7 @@ describe("Analysis Service", () => {
     it('Works', () => {
         let result = analysisService.getFlatTable(
             [{
-                component: 'TEST',
-                databaseId: 'TEST_ID',
+                component: 'TEST_ID',
                 fileId: 'Test-1.xml',
                 sentence: 'Hallo lieve mensen dit is een testzin .',
                 highlightedSentence: '<strong>Hallo lieve mensen dit is een testzin .</strong>',
@@ -74,8 +73,8 @@ describe("Analysis Service", () => {
             fileId: 'Test-1.xml',
             sentence: 'Lorem ipsum',
             highlightedSentence: 'Lorem ipsum',
-            nodeIds: [],
-            nodeStarts: [],
+            nodeIds: [] as number[],
+            nodeStarts: [] as number[],
             metaValues: { 'meta1': 'hallo' },
             treeXml: generateNodeXml(count),
             variableValues: { '$node1': { lemma: 'test', pos: 'test' } }

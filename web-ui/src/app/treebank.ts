@@ -2,7 +2,7 @@ export class FuzzyNumber {
     public value = 0;
     public unknown = false;
     constructor(value: number | '?') {
-        if (value == '?') {
+        if (value === '?') {
             this.unknown = true;
         } else {
             this.value = value;
@@ -23,13 +23,25 @@ export class FuzzyNumber {
 
     public toString() {
         if (this.unknown) {
-            if (this.value == 0) {
-                return '?'
+            if (this.value === 0) {
+                return '?';
             } else {
-                return '≥ ' + this.value;
+                return '≥ ' + this.value.toString();
             }
         } else {
             return this.value.toString();
+        }
+    }
+
+    public toLocaleString() {
+        if (this.unknown) {
+            if (this.value === 0) {
+                return '?';
+            } else {
+                return '≥ ' + this.value.toLocaleString();
+            }
+        } else {
+            return this.value.toLocaleString();
         }
     }
 }
@@ -52,36 +64,45 @@ export interface Treebank {
     uploaded?: Date | false;
     processed?: Date;
     isPublic?: boolean;
+    /** The backend this corpus resides in */
+    provider: string;
+    /* Is this treebank selected for searching */
+    selected: boolean;
     multiOption: boolean;
 }
 
 export interface ComponentGroup {
-    key: string,
-    components: { [variant: string]: SubTreebank },
-    description?: string,
-    sentenceCount: FuzzyNumber,
-    wordCount: FuzzyNumber
+    key: string;
+    components: { [variant: string]: TreebankComponent };
+    description?: string;
+    sentenceCount: FuzzyNumber;
+    wordCount: FuzzyNumber;
 }
 
 /**
  * Component of a treebank.
  */
-export interface SubTreebank {
-    group: string,
-    variant: string,
-    databaseId: string,
-    component: string,
-    title: string,
-    sentenceCount: number | '?',
-    wordCount: number | '?',
-    disabled: boolean
+export interface TreebankComponent {
+    /** The ComponentGroup */
+    group: string;
+    /** The Variant */
+    variant: string;
+    /** Serverside id  */
+    id: string;
+    /** Friendly name */
+    title: string;
+    sentenceCount: number | '?';
+    wordCount: number | '?';
+    selected: boolean;
+    description: string;
+    disabled: boolean;
 }
 
 export interface TreebankMetadata {
-    field: string,
-    type: 'text' | 'int' | 'date',
-    facet: 'checkbox' | 'slider' | 'range' | 'dropdown',
-    show: boolean,
-    minValue?: number | Date,
-    maxValue?: number | Date
+    field: string;
+    type: 'text' | 'int' | 'date';
+    facet: 'checkbox' | 'slider' | 'range' | 'dropdown';
+    show: boolean;
+    minValue?: number | Date;
+    maxValue?: number | Date;
 }

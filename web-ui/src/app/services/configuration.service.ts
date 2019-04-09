@@ -10,21 +10,29 @@ export class ConfigurationService {
         this.config = this.loadConfig();
     }
 
-    async getApiUrl(path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
+    async getApiUrl(provider: string, path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
         const queryStringEntries = Object.entries(queryString);
-        return (await this.config).apiUrl + path +
+        return (await this.config).providers[provider] + path +
             (parts.length ? '/' + parts.join('/') : '') +
             (queryStringEntries.length
                 ? queryStringEntries.map(([key, value], index) => `${index ? '&' : '?'}${key}=${value}`)
                 : '');
     }
 
-    async getGretelUrl(path: string): Promise<string> {
-        return (await this.config).gretelUrl + path;
+    async getUploadApiUrl(path: string) {
+        return (await this.config).uploadUrl + path;
     }
 
-    async getUploadApiUrl(path: string): Promise<string> {
-        return (await this.config).uploadUrl + path;
+    async getUploadProvider() {
+        return (await this.config).uploadProvider;
+    }
+
+    async getAlpinoUrl(path: string) {
+        return (await this.config).alpino + path;
+    }
+
+    async getProviders() {
+        return Object.keys((await this.config).providers);
     }
 
     private async loadConfig() {
@@ -33,7 +41,16 @@ export class ConfigurationService {
 }
 
 interface Config {
-    'apiUrl': string;
-    'gretelUrl': string;
-    'uploadUrl': string;
+    providers: {
+        [key: string]: string
+    },
+    /**
+     * Alpino endpoint.
+     * This should not be the raw alpino in server-mode, but should implement as according to gretel4/api/router.php
+     */
+    alpino: string,
+    /** Uploading is not federated and only supports a single endpoint */
+    uploadUrl: string;
+    /** Uploading requires a provider to request results */
+    uploadProvider: string;
 }

@@ -8,7 +8,7 @@ export class AlpinoService {
     generateXPathUrl: Promise<string>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient, private parserService: ParserService) {
-        this.generateXPathUrl = configurationService.getApiUrl('generate_xpath');
+        this.generateXPathUrl = configurationService.getAlpinoUrl('generate_xpath');
     }
 
     async generateXPath(xml: string, tokens: string[], attributes: string[], ignoreTopNode: boolean, respectOrder: boolean) {
@@ -30,7 +30,7 @@ export class AlpinoService {
     }
 
     async parseSentenceUrl(sentence: string) {
-        return this.configurationService.getApiUrl('parse_sentence/' + this.escapeSlash(this.tokenize(sentence)));
+        return this.configurationService.getAlpinoUrl('parse_sentence/' + this.escapeSlash(this.tokenize(sentence)));
     }
 
     async parseSentence(sentence: string) {

@@ -12,14 +12,27 @@
         counts.
     </p>
 </div>
+<ng-container *ngIf="!!treebanks">
 <ng-container *ngFor="let treebank of treebanks">
-    <div class="field">
-        <label class="radio">
-            <input type="radio" name="Treebank" [(ngModel)]="selectedTreebank" [value]="treebank.name" (click)="treebankChange(treebank)">
-            {{treebank.title}}<ng-container *ngIf="treebank.description">: <em>{{treebank.description}}</em></ng-container>
+    <div class="field" >
+        <label class="checkbox">
+            <input
+                type="checkbox"
+                [value]="treebank.treebank.name"
+                [checked]="treebank.treebank.selected"
+                (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.name)"
+            > {{treebank.treebank.title}}
+            <ng-container *ngIf="treebank.treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
         </label>
+
     </div>
-    <div *ngIf="treebank.name == selectedTreebank" class="box is-shadowless">
-        <grt-sub-treebanks [treebankName]="treebank.name" (select)="updateSelected($event)"></grt-sub-treebanks>
+    <!-- todo spinner when loading -->
+    <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
+        <grt-sub-treebanks
+            [treebank]="treebank.treebank"
+            [componentGroups]="treebank.componentGroups"
+            [variants]="treebank.variants"
+        ></grt-sub-treebanks>
     </div>
+</ng-container>
 </ng-container>

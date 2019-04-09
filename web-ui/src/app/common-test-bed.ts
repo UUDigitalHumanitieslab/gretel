@@ -44,48 +44,12 @@ export function commonTestBed() {
     httpClientMock.setData('get', '/gretel/api/src/router.php/configured_treebanks', () => {
         return {}
     });
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank',
-        [{
-            "id": "42",
-            "title": "test-treebank",
-            "user_id": "24",
-            "email": "test@test.nl",
-            "uploaded": "2017-09-01 14:18:41",
-            "processed": "2017-09-01 14:21:32",
-            "public": "1"
-        }]);
 
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/metadata/test-treebank',
-        [{
-            id: 'test_database1',
-            treebank_id: 'test_database1',
-            field: 'test_field1',
-            type: 'text',
-            facet: 'checkbox',
-            min_value: null,
-            max_value: null,
-            show: '1'
-        }]);
-
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/show/test-treebank', [{
-        basex_db: 'test_database1',
-        nr_sentences: '250',
-        nr_words: '500',
-        slug: 'TestSlug1',
-        title: 'TestTitle1'
-    }, {
-        basex_db: 'test_database2',
-        nr_sentences: '500',
-        nr_words: '750',
-        slug: 'TestSlug2',
-        title: 'TestTitle2'
-    }]);
-
-    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body) => {
+    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body: any) => {
         return { 'TEST_DATABASE1_COMPONENT1': '42' }
     });
 
-    httpClientMock.setData('post', '/gretel/api/src/router.php/results', (body) => {
+    httpClientMock.setData('post', '/gretel/api/src/router.php/results', (body: any) => {
         return false;
     });
 

@@ -14,6 +14,7 @@ function alpino_server($sentence)
 {
     global $alpinoServerAddress;
     global $alpinoServerPort;
+    $xml = "";
 
     $fs = fsockopen($alpinoServerAddress, $alpinoServerPort, $errno, $errstr);
     if (!$fs) {

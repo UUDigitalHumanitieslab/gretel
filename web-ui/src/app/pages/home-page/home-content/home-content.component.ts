@@ -13,6 +13,6 @@ export class HomeContentComponent implements OnInit {
     constructor(private configurationService: ConfigurationService, private sanitizer: Sanitizer) { }
 
     async ngOnInit() {
-        this.uploadUrl = this.sanitizer.sanitize(SecurityContext.URL, await this.configurationService.getGretelUrl('../gretel-upload'));
+        this.uploadUrl = this.sanitizer.sanitize(SecurityContext.URL, await this.configurationService.getUploadApiUrl('../../'));
     }
 }

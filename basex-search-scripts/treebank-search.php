@@ -41,16 +41,7 @@ function corpusToDatabase($components, $corpus, $xpath)
         return checkBfPattern($corpus, $bf, $components);
     }
 
-    $databases = array();
-
-    foreach ($components as $component) {
-        $corpus = strtoupper($corpus);
-        $component = strtoupper($component);
-        $component = $corpus.'_ID_'.$component;
-        $databases[] = $component;
-    }
-
-    return $databases;
+    return $components;
 }
 
 /**

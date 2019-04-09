@@ -43,7 +43,7 @@ export const
         DateComponent,
         DropdownComponent
     ],
-    providers = [];
+    providers: any[] = [];
 
 @NgModule({
     imports,

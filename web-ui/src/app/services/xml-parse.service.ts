@@ -8,7 +8,7 @@ export class XmlParseService {
 
     parse(xml: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            this.parser.parseString(xml, (error, data) => {
+            this.parser.parseString(xml, (error?: Error, data?: any) => {
                 if (error) {
                     return reject(error);
                 }

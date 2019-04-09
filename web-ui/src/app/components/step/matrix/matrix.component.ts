@@ -40,11 +40,11 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Input()
     public isCustomXPath: boolean;
     @Input()
-    public respectOrder;
+    public respectOrder: boolean;
     @Input()
-    public retrieveContext;
+    public retrieveContext: boolean;
     @Input()
-    public ignoreTopNode;
+    public ignoreTopNode: boolean;
 
     @Output()
     public changeValue = new EventEmitter<MatrixSettings>();
@@ -149,7 +149,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.emitChange(null, { [key]: !this[key] });
     }
 
-    public customXPathChanged(valueEvent: ValueEvent) {
+    public changeCustomXpath(valueEvent: ValueEvent) {
         this.valid = !valueEvent.error && !!valueEvent.xpath;
         if (!!valueEvent.xpath) {
             this.emitChange(valueEvent.xpath);

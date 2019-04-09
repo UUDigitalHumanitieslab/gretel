@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Inject, LOCALE_ID, OnInit, OnDestroy, } from '@angular/core';
 
-import { TreebankService } from '../../../services/_index';
-import { SubTreebank, ComponentGroup, FuzzyNumber } from '../../../treebank';
+import { TreebankService, ConfiguredTreebanks } from '../../../services/_index';
+import { TreebankComponent, ComponentGroup, FuzzyNumber, Treebank } from '../../../treebank';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     selector: 'grt-sub-treebanks',
@@ -9,26 +10,12 @@ import { SubTreebank, ComponentGroup, FuzzyNumber } from '../../../treebank';
     styleUrls: ['./sub-treebanks.component.scss']
 })
 export class SubTreebanksComponent implements OnChanges {
-    public loading = true;
-    public selectedTreebanks: { [name: string]: boolean };
-    /**
-     * Only show if any sub-treebank has a description available.
-     */
+    /** False after ngOnInit has run */
+    private loading = true;
+
+    /** Only show if any sub-treebank has a description available. */
     public showDescription: boolean;
     public showWordCount: boolean;
-
-    /**
-     * All sub-treebanks
-     */
-    public subTreebanks: SubTreebank[];
-    /**
-     * Sub-treebanks grouped by their group name, each should then
-     * contain one or more of the variants.
-     */
-    public componentGroups: ComponentGroup[];
-    public variants: string[];
-    public multiOption: boolean;
-
     public totalSentenceCount: string;
     public totalWordCount: string;
     public totalSentenceCountByGroup: { [group: string]: string };
@@ -36,108 +23,97 @@ export class SubTreebanksComponent implements OnChanges {
     public totalSentenceCountByVariant: { [variant: string]: string };
     public totalWordCountByVariant: { [variant: string]: string };
 
-    @Input() treebankName: string;
+    @Input() treebank: Treebank;
+    @Input() componentGroups: ConfiguredTreebanks[string][string]['componentGroups'];
+    @Input() variants: ConfiguredTreebanks[string][string]['variants'];
+    private components: TreebankComponent[];
 
-    @Output() select = new EventEmitter<SubTreebank[]>();
+    @Output() select = new EventEmitter<TreebankComponent[]>();
 
     constructor(private treebankService: TreebankService) {
     }
 
+    ngOnInit() {
+        this.components = this.componentGroups.flatMap(g => Object.values(g.components));
+        this.showDescription = this.components.some(c => !!c.description);
+        this.updateTotals();
+        this.loading = false;
+    }
+
     ngOnChanges(changes: SimpleChanges) {
-        const treebankNameChange = changes['treebankName'];
-        if (this.treebankName &&
-            treebankNameChange &&
-            (treebankNameChange.firstChange || treebankNameChange.currentValue !== treebankNameChange.previousValue)) {
-            this.getSubTreebanks(this.treebankName);
+        if (!this.loading) {
+            this.updateTotals();
         }
     }
 
-    changeSelected(group: ComponentGroup, selectedVariant: string = null, event?: Event) {
-        if (event) {
-            event.preventDefault();
-        }
-
-        const newSelection: { [component: string]: boolean } = {};
-        for (const variant of (selectedVariant ? [selectedVariant] : Object.keys(group.components))) {
-            const variantComponent = group.components[variant];
-            if (!variantComponent.disabled) {
-                newSelection[variantComponent.component] = !this.multiOption || !this.selectedTreebanks[variantComponent.component];
-            }
-        }
-
-        if (!this.multiOption) {
-            if (Object.keys(newSelection).length) {
-                this.selectedTreebanks = Object.assign(
-                    {},
-                    newSelection);
-            }
-        } else {
-            this.selectedTreebanks = Object.assign(
-                {},
-                this.selectedTreebanks,
-                newSelection);
-        }
-
-        this.setSelected(
-            this.subTreebanks.filter(t => this.selectedTreebanks[t.component]));
+    isEveryComponentSelected(variant?: string) {
+        const eligible = variant ?
+            this.components.filter(c => !c.disabled && c.variant === variant) :
+            this.components.filter(c => !c.disabled);
+        return eligible.every(c => c.selected);
     }
 
-    changeAllSelected(event: Event, variant: string = null) {
-        event.preventDefault();
-
-        if (!this.multiOption) { return; }
-
-        const check = !this.isAllChecked(variant);
-        const selected = Object.assign({}, this.selectedTreebanks);
-        if (variant) {
-            for (const componentGroups of this.componentGroups) {
-                const component = componentGroups.components[variant];
-                if (component && !component.disabled) {
-                    selected[component.component] = check;
-                }
-            }
-        } else {
-            for (const subtree of this.subTreebanks) {
-                selected[subtree.component] = check;
-            }
-        }
-        this.selectedTreebanks = selected;
-
-        this.setSelected(check ? this.subTreebanks : []);
+    isTreebankSelected() {
+        return this.treebank.selected;
     }
 
-    isAllChecked(variant: string = null) {
-        if (variant) {
-            if (!this.componentGroups) {
-                return false;
-            }
-            for (const componentGroups of this.componentGroups) {
-                const component = componentGroups.components[variant];
-                if (!component.disabled && !this.selectedTreebanks[component.component]) {
-                    return false;
-                }
-            }
-            return true;
+    toggleVariant(variant?: string) {
+        if (!this.treebank.multiOption) {
+            return;
         }
-        if (!this.subTreebanks) {
-            return false;
-        }
-        for (const subtree of this.subTreebanks) {
-            if (!this.selectedTreebanks[subtree.component]) {
-                return false;
-            }
-        }
-        return true;
+
+        const eligible = variant ?
+            this.components.filter(c => !c.disabled && c.variant === variant) :
+            this.components.filter(c => !c.disabled);
+
+        const isVariantSelected = eligible.every(c => c.selected);
+        this.treebankService.selectComponents(
+            this.treebank.provider,
+            this.treebank.name,
+            eligible.map(c => ({
+                componentId: c.id,
+                selected: !isVariantSelected
+            }))
+        );
     }
 
-    private updateTotals(subTreebanks: SubTreebank[]) {
-        interface FuzzyCounts { [group: string]: FuzzyNumber; }
-        const totalSentenceCount = new FuzzyNumber(0),
-            totalWordCount = new FuzzyNumber(0),
-            totalSentenceCountByGroup: FuzzyCounts = {},
-            totalWordCountByGroup: FuzzyCounts = {},
-            totalSentenceCountByVariant: FuzzyCounts = {},
-            totalWordCountByVariant: FuzzyCounts = {};
+    toggleComponent(component: TreebankComponent) {
+        this.treebankService.selectComponents(
+            this.treebank.provider,
+            this.treebank.name,
+            [{
+                componentId: component.id,
+                selected: !component.selected
+            }]
+        );
+    }
+
+    toggleGroup(group: ComponentGroup) {
+        if (!this.treebank.multiOption && this.variants.length > 1) {
+            return;
+        }
+
+        const components = Object.values(group.components);
+        const isGroupSelected = components.every(c => c.disabled || c.selected);
+
+        this.treebankService.selectComponents(
+            this.treebank.provider,
+            this.treebank.name,
+            components.map(c => ({
+                componentId: c.id,
+                selected: !isGroupSelected && !c.disabled
+            }))
+        );
+    }
+
+    private updateTotals() {
+        type FuzzyCounts = { [group: string]: FuzzyNumber };
+        const totalSentenceCount = new FuzzyNumber(0);
+        const totalWordCount = new FuzzyNumber(0);
+        const totalSentenceCountByGroup: FuzzyCounts = {};
+        const totalWordCountByGroup: FuzzyCounts = {};
+        const totalSentenceCountByVariant: FuzzyCounts = {};
+        const totalWordCountByVariant: FuzzyCounts = {};
 
         for (const group of this.componentGroups) {
             totalSentenceCountByGroup[group.key] = new FuzzyNumber(0);
@@ -146,8 +122,8 @@ export class SubTreebanksComponent implements OnChanges {
         for (const variant of this.variants) {
             totalSentenceCountByVariant[variant] = new FuzzyNumber(0);
             totalWordCountByVariant[variant] = new FuzzyNumber(0);
-        }
-        for (const subTreebank of subTreebanks) {
+    	}
+        for (const subTreebank of this.components) {
             totalSentenceCount.add(subTreebank.sentenceCount);
             totalSentenceCountByGroup[subTreebank.group].add(subTreebank.sentenceCount);
             totalSentenceCountByVariant[subTreebank.variant].add(subTreebank.sentenceCount);
@@ -157,14 +133,13 @@ export class SubTreebanksComponent implements OnChanges {
             totalWordCountByVariant[subTreebank.variant].add(subTreebank.wordCount);
         }
 
-        this.totalSentenceCount = totalSentenceCount.toString();
-        this.totalWordCount = totalWordCount.toString();
+        this.totalSentenceCount = totalSentenceCount.toLocaleString();
+        this.totalWordCount = totalWordCount.toLocaleString();
         this.showWordCount = !totalWordCount.unknown || totalWordCount.value > 0;
-
-        function mapFuzzyCounts(counts: FuzzyCounts) {
+		function mapFuzzyCounts(counts: FuzzyCounts) {
             const result: { [key: string]: string } = {};
             for (const key of Object.keys(counts)) {
-                result[key] = counts[key].toString();
+                result[key] = counts[key].toLocaleString();
             }
             return result;
         }
@@ -173,47 +148,6 @@ export class SubTreebanksComponent implements OnChanges {
         this.totalWordCountByGroup = mapFuzzyCounts(totalWordCountByGroup);
         this.totalSentenceCountByVariant = mapFuzzyCounts(totalSentenceCountByVariant);
         this.totalWordCountByVariant = mapFuzzyCounts(totalWordCountByVariant);
-    }
-
-    private setSelected(subTreebanks: SubTreebank[]) {
-        this.updateTotals(subTreebanks);
-        this.select.emit(subTreebanks);
-    }
-
-    /**
-     * Gets the detailed info of a given treebank
-     * @param treebank
-     */
-    private getSubTreebanks(treebankName: string) {
-        this.loading = true;
-        this.treebankService.getComponentGroups(treebankName).then((componentGroups) => {
-            this.multiOption = componentGroups.multiOption;
-            // To keep track whether we selected the given sub-part of the treebank.
-            this.componentGroups = componentGroups.groups;
-            this.variants = componentGroups.variants;
-            this.subTreebanks = componentGroups.groups.reduce((subTreebanks, group) =>
-                subTreebanks.concat(componentGroups.variants.map(variant => group.components[variant])
-                    .filter(component => !component.disabled)), []);
-
-            this.showDescription = false;
-            const selectedTreebanks: SubTreebanksComponent['selectedTreebanks'] = {};
-            for (const subTreebank of this.subTreebanks) {
-                selectedTreebanks[subTreebank.component] = this.multiOption;
-            }
-            if (!this.multiOption) {
-                // select the first treebank
-                selectedTreebanks[this.subTreebanks[0].component] = true;
-            }
-
-            for (const group of componentGroups.groups) {
-                if (group.description) {
-                    this.showDescription = true;
-                }
-            }
-            this.selectedTreebanks = selectedTreebanks;
-            this.setSelected(this.subTreebanks.filter(treebank => selectedTreebanks[treebank.component]));
-            this.loading = false;
-        });
     }
 }
 

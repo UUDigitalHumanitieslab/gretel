@@ -9,33 +9,35 @@ export class DownloadService {
     }
 
     public downloadDistributionList(counts: {
+        provider: string,
+        corpus: string,
         component: string,
         hits: number,
-        sentences: number
+        sentences: string
     }[]) {
-        let rows = [this.formatCsvRow(['Component', 'Hits', 'All Sentences'])];
+        let rows = [this.formatCsvRow(['Provider', 'Treebank', 'Component', 'Hits', 'All Sentences'])];
         for (let count of counts) {
-            rows.push(this.formatCsvRow([count.component, count.hits, count.sentences]));
+            rows.push(this.formatCsvRow([count.provider, count.corpus, count.component, count.hits, count.sentences]));
         }
 
         this.downloadRows('gretel-distribution.csv', 'text/csv', rows);
     }
 
-    public downloadResults(corpus: string, components: string[], xpath: string, hits: Hit[]) {
+    public downloadResults(results: {corpus: string, components: string[], xpath: string, hits: Hit[]}[]) {
         let rows: string[] = [];
-        rows.push(
-            `Corpus: ${corpus}
+        results.forEach(({corpus, components, xpath, hits}) => {
+            rows.push(
+`Corpus: ${corpus}
 Components: ${components.join('-')}
 XPath: ${xpath.replace(/\n/g, '\t')}
 Date: ${new Date()}
-
-`        );
-
-        for (let i = 0; i < hits.length; i++) {
-            let hit = hits[i];
-            rows.push(`${i + 1}\t${hit.fileId}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}
 `);
-        }
+
+                for (let i = 0; i < hits.length; i++) {
+                    let hit = hits[i];
+                    rows.push(`${i + 1}\t${hit.fileId}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}`);
+                }
+        })
 
         this.downloadRows('gretel-results.txt', 'text/plain', rows);
     }

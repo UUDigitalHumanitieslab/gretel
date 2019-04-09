@@ -1,5 +1,21 @@
-.is-loading {
-    width: 50px;
+.title.is-loading {
+    /*! adapted from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
+    &:after {
+        animation: spinAround 500ms infinite linear;
+        border: 3px solid #96846c;
+        border-radius: 290486px;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        content: "";
+        display: inline-block;
+        height: 1em;
+        margin-left: 15px;
+        // position: relative;
+        vertical-align: bottom;
+        width: 1em;
+        // left: calc(50% - (1em / 2));
+        // top: calc(50px - (1em / 2));
+    }
 }
 
 a:hover {

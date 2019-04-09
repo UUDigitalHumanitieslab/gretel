@@ -54,7 +54,7 @@ export class TextComponent extends FilterComponent {
         }
     }
 
-    removeFromValues(value) {
+    removeFromValues(value: string) {
         this.values[value] = false;
     }
 }

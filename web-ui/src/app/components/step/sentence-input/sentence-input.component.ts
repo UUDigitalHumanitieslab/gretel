@@ -20,13 +20,13 @@ export class SentenceInputComponent extends StepComponent {
         super();
     }
 
-    getValidationMessage() {
+    public getValidationMessage() {
         this.warning = true;
     }
 
-    inputChanges(event) {
-        this.changeValue.emit(event.target.value);
-        this.updateValidity(event.target.value);
+    inputChanges(event: Event) {
+        this.changeValue.emit((event.target as HTMLInputElement).value);
+        this.updateValidity((event.target as HTMLInputElement).value);
     }
 
     public updateValidity(sentence = this.inputSentence) {

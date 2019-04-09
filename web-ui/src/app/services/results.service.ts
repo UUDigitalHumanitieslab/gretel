@@ -1,11 +1,14 @@
+import * as $ from 'jquery';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, ReplaySubject, Subscriber, of } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
+import { publish, publishReplay, publishLast, refCount } from 'rxjs/operators';
+import { ObserversModule } from '@angular/cdk/observers';
 import { PathVariable, Location } from 'lassy-xpath/ng';
 
 const httpOptions = {
@@ -28,84 +31,95 @@ export class ResultsService {
     }
 
     promiseAllResults(xpath: string,
+        provider: string,
         corpus: string,
-        components: string[],
+        componentIds: string[],
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        cancellationToken: Observable<{}> | null = null) {
+        cancellationToken: Observable<{}> | null = null
+    ): Promise<Hit[]> {
         return new Promise<Hit[]>((resolve, reject) => {
             const hits: Hit[] = [];
-            const subscription = this.getAllResults(xpath,
+            const subscription = this.getAllResults(
+                xpath,
+                provider,
                 corpus,
-                components,
+                componentIds,
                 retrieveContext,
                 isAnalysis,
                 metadataFilters,
-                variables,
-                () => resolve(hits))
-                .subscribe(results => hits.push(...results.hits));
-            cancellationToken.subscribe(() => {
-                subscription.unsubscribe();
-            });
+                variables
+            ).subscribe(
+                res => hits.push(...res.hits),
+                () => {},
+                () => resolve(hits)
+            );
+            // .subscribe(results => hits.push(...results.hits));
+            if (cancellationToken != null) {
+                cancellationToken.subscribe(() => {
+                    subscription.unsubscribe();
+                });
+            }
         });
     }
 
-    getAllResults(xpath: string,
+    getAllResults(
+        xpath: string,
+        provider: string,
         corpus: string,
-        components: string[],
+        componentIds: string[],
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables,
-        complete?: () => void) {
-        const observable: Observable<SearchResults> = Observable.create(async (observer: Observer<SearchResults>) => {
-            let iteration = 0;
-            let remainingDatabases: string[] | null = null;
-            let searchLimit: number | null = null;
-            const completeObserver = () => {
-                if (complete) {
-                    complete();
-                }
-                observer.complete();
-            };
-            let already: SearchResults['already'] = null,
-                needRegularGrinded = false;
+        variables = this.defaultVariables
+    ): Observable<SearchResults> {
+        const observable = new Observable<SearchResults>(observer => {
+            const worker = async () => {
+                let iteration = 0;
+                let remainingDatabases: string[] | null = null;
+                let searchLimit: number | null = null;
+                let already: SearchResults['already'] = null;
+                let needRegularGrinded = false;
 
-            while (!observer.closed) {
-                const results = await this.results(
-                    xpath,
-                    corpus,
-                    components,
-                    iteration,
-                    retrieveContext,
-                    isAnalysis,
-                    metadataFilters,
-                    variables,
-                    remainingDatabases,
-                    already,
-                    needRegularGrinded,
-                    searchLimit);
+                while (!observer.closed) {
+                    const results: SearchResults|false = await this.results(
+                        xpath,
+                        provider,
+                        corpus,
+                        componentIds,
+                        iteration,
+                        retrieveContext,
+                        isAnalysis,
+                        metadataFilters,
+                        variables,
+                        remainingDatabases,
+                        already,
+                        needRegularGrinded,
+                        searchLimit
+                    );
 
-                if (results) {
-                    already = results.already;
-                    needRegularGrinded = results.needRegularGrinded;
-                    searchLimit = results.searchLimit;
+                    if (results) {
+                        already = results.already;
+                        needRegularGrinded = results.needRegularGrinded;
+                        searchLimit = results.searchLimit;
 
-                    observer.next(results);
-                    iteration = results.nextIteration;
-                    remainingDatabases = results.remainingDatabases;
-                    if (remainingDatabases.length === 0) {
-                        completeObserver();
+                        observer.next(results);
+                        iteration = results.nextIteration;
+                        remainingDatabases = results.remainingDatabases;
+                        if (remainingDatabases.length === 0) {
+                            observer.complete();
+                        }
+                    } else {
+                        observer.complete();
                     }
-                } else {
-                    completeObserver();
                 }
             }
+            worker();
         });
 
-        return observable;
+        return observable.pipe(publishReplay(1), refCount());
     }
 
     /**
@@ -119,7 +133,8 @@ export class ResultsService {
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
-    async results(xpath: string,
+    private async results(xpath: string,
+        provider: string,
         corpus: string,
         components: string[],
         iteration: number = 0,
@@ -131,8 +146,8 @@ export class ResultsService {
         already: SearchResults['already'] | null = null,
         needRegularGrinded = false,
         searchLimit: number | null = null): Promise<SearchResults | false> {
-        const results = await this.http.post<ApiSearchResult>(
-            await this.configurationService.getApiUrl('results'), {
+        const results = await this.http.post<ApiSearchResult | false>(
+            await this.configurationService.getApiUrl(provider, 'results'), {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
                 retrieveContext,
                 corpus,
@@ -152,8 +167,9 @@ export class ResultsService {
         return false;
     }
 
-    async highlightSentenceTree(sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
+    async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
         const url = await this.configurationService.getApiUrl(
+            provider,
             'tree', [
                 treebank,
                 sentenceId,
@@ -164,18 +180,19 @@ export class ResultsService {
         return { url, treeXml };
     }
 
-    async metadataCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+
+    async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
-            await this.configurationService.getApiUrl('metadata_counts'), {
+            await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
                 corpus,
                 components,
             }, httpOptions).toPromise();
     }
 
-    async treebankCounts(xpath: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
+    async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         const results = await this.http.post<{ [databaseId: string]: string }>(
-            await this.configurationService.getApiUrl('treebank_counts'), {
+            await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
                 corpus,
                 components,
@@ -286,7 +303,7 @@ export class ResultsService {
         };
     }
 
-    private resolveRootPath(variables: { [name: string]: PathVariable }, variable: string) {
+    private resolveRootPath(variables: { [name: string]: PathVariable }, variable: string): string {
         const path = variables[variable].path;
         if (/^\*/.test(path)) {
             return '';
@@ -331,9 +348,9 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
             return {
-                databaseId: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
+                component: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
-                component: hitId.replace(/\-.*/, '').toUpperCase(),
+                // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results.xmllist[hitId],
@@ -362,7 +379,7 @@ export class ResultsService {
         return !data.metadata || !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
-        }, {});
+        }, {} as Hit['metaValues']);
     }
 
     private mapVariables(data: '' | {
@@ -382,7 +399,7 @@ export class ResultsService {
         return data.vars.var.reduce((values, variable) => {
             values[variable.$.name] = variable.$;
             return values;
-        }, {});
+        }, {} as Hit['variableValues']);
     }
 
     private highlightSentence(sentence: string, nodeStarts: number[], tag: string) {
@@ -487,12 +504,13 @@ export interface SearchResults {
 }
 
 export interface Hit {
-    databaseId: string;
-    fileId: string;
-    /**
-     * This value is not very reliable, because it is based on the filename
-     */
+    /** Id of the component this hit originated from */
     component: string;
+    fileId: string;
+    // /**
+    //  * This value is not very reliable, because it is based on the filename
+    //  */
+    // component: string;
     sentence: string;
     highlightedSentence: SafeHtml;
     treeXml: string;

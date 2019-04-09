@@ -1,8 +1,8 @@
-/// <reference path="pivottable.d.ts"/>
-/// <reference types="jqueryui"/>
-import { Component, Input, OnDestroy, OnInit, NgZone, EventEmitter, Output } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+///<reference path="pivottable.d.ts"/>
+///<reference types="jqueryui"/>
+import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
+import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
+import { map, take, tap, switchMap } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -11,9 +11,11 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, FilterValues, FilterValue, FilterByXPath } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings, mapToTreebankArray, FilterValues, FilterByXPath, FilterValue } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
+
+// TODO selected treebanks need to be reactive?
 
 @Component({
     selector: 'grt-analysis',
@@ -25,22 +27,17 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     top: number;
     private $element: JQuery<HTMLElement>;
     private pivotUiOptions: PivotUiOptions;
-    private hits: Hit[];
-    private metadata: { [field: string]: TreebankMetadata };
+    private metadata: TreebankMetadata[] = [];
+    private hits: Hit[] = [];
+
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
-    public variables: { [name: string]: PathVariable };
+    public variables: { [name: string]: PathVariable; };
     public treeXml: string;
     public treeDisplay = 'inline';
 
     public isLoading = true;
     public selectedVariable?: SelectedVariable;
-
-    @Input()
-    public corpus: string;
-
-    @Input()
-    public components: string[];
 
     @Input()
     public xpath: string;
@@ -53,23 +50,22 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     public attributes: { value: string, label: string }[];
 
-    private subscriptions: Subscription[];
+    private subscriptions: Subscription[] = [];
     private cancellationToken = new Subject<{}>();
 
-    constructor(private analysisService: AnalysisService,
+    constructor(
+        private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
-        private ngZone: NgZone) {
+        private ngZone: NgZone
+    ) {
     }
 
     ngOnInit() {
         this.$element = $('.analysis-component');
         this.initialize();
-        this.subscriptions = [
-            this.livePivot()
-        ];
     }
 
     ngOnDestroy() {
@@ -79,16 +75,24 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.cancellationToken.next();
     }
 
-    private initialize() {
+    private async initialize() {
+
+        let variables: PathVariable[];
+        try {
+            variables = this.extractinatorService.extract(this.xpath);
+        } catch (e) {
+            variables = [];
+            console.warn('Error extracting variables from path', e, this.xpath);
+        }
+
         // TODO: on change
-        const variables = this.extractinatorService.extract(this.xpath);
+        this.variables = variables.reduce<{[name: string]: PathVariable}>((vs, v) => { vs[v.name] = v; return vs; }, {})
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
-        this.variables = variables
-            .reduce((dict, variable) => ({ ...dict, [variable.name]: variable }), {});
+
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.
         if (variables.length > 0) {
-            const firstVariable = variables[variables.length > 1 ? 1 : 0];
+            let firstVariable = variables[variables.length > 1 ? 1 : 0];
             this.selectedVariablesSubject.next([{
                 attribute: 'pt',
                 axis: 'row',
@@ -99,10 +103,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 variable: firstVariable
             }]);
 
-            const utils = $.pivotUtilities,
-                heatmap = utils.renderers['Heatmap'],
-                renderers = $.extend($.pivotUtilities.renderers,
-                    { 'File export': (new FileExportRenderer()).render });
+            let utils = $.pivotUtilities;
+            let heatmap = utils.renderers["Heatmap"];
+            let renderers = $.extend($.pivotUtilities.renderers,
+                { 'File export': (new FileExportRenderer()).render });
 
             this.pivotUiOptions = {
                 aggregators: {
@@ -125,6 +129,37 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         } else {
             this.selectedVariablesSubject.next([]);
         }
+
+        const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
+            map(v => ({
+                selected: mapTreebanksToSelectionSettings(v.state),
+                state: v.state
+            })),
+            switchMap(v => {
+                this.hits = [];
+                this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
+                // fetch all results for all selected components/treebanks
+                // and merge them into a single stream that's subscribed to.
+                return merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                    this.xpath,
+                    selection.provider,
+                    selection.corpus,
+                    selection.components,
+                    false,
+                    true,
+                    [],
+                    variables
+                )));
+            })
+        )
+        .subscribe(v => {
+            this.hits.push(...v.hits);
+        })
+
+        this.subscriptions = [
+            this.livePivot(),
+            subscriptionToTreebankSelection
+        ];
     }
 
     private makeDraggable() {
@@ -139,9 +174,9 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     this.showVariableToAdd(ui.helper, 'row');
                 }
             },
-            helper: (event) => {
-                const data = $(event.currentTarget).data(),
-                    variable = data['variable'] || data['varname'];
+            helper: (event: Event) => {
+                const data = $(event.currentTarget).data();
+                const variable = data['variable'] || data['varname'];
                 return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');
             },
             revert: true
@@ -163,12 +198,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return this.selectedVariablesSubject.pipe(map((selectedVariables) => {
             this.show(this.$element, selectedVariables);
         })).subscribe();
-
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        const variableName = helper.text().trim(),
-            offset = $('.pvtRendererArea').offset();
+        const variableName = helper.text().trim();
+        const offset = $('.pvtRendererArea').offset();
         this.top = offset.top;
         this.left = offset.left;
 
@@ -192,20 +226,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
         this.isLoading = true;
         try {
-            if (!this.metadata || !this.hits) {
-                const [metadata, hits] = await Promise.all([
-                    this.treebankService.getMetadata(this.corpus),
-                    this.resultsService.promiseAllResults(
-                        this.xpath, this.corpus, this.components, false, true, [], Object.values(this.variables), this.cancellationToken)
-                ]);
-                this.metadata = metadata.reduce((dict, item) => {
-                    dict[item.field] = item;
-                    return dict;
-                }, {});
-                this.hits = hits;
-            }
-
-            this.pivot(element, Object.keys(this.metadata), this.hits, selectedVariables);
+            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
@@ -222,7 +243,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 ? grouped[s.variable.name].push(s.attribute)
                 : grouped[s.variable.name] = [s.attribute];
             return grouped;
-        }, {});
+        }, {} as {[variableName: string]: string[]});
         const pivotData = this.analysisService.getFlatTable(
             hits,
             variables,
@@ -252,13 +273,13 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      * @param spanName
      * @returns {{}}
      */
-    private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: string) {
+    private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: 'colSpan'|'rowSpan') {
         const results: FilterValues = {};
         for (const id of Object.keys(elementGroups)) {
             const elements = elementGroups[id],
                 spans = elements.map(v => ({
                     value: v.innerHTML,
-                    size: v[spanName]
+                    size: (v as HTMLTableCellElement)[spanName]
                 }));
             let value = '',
                 total = 0;
@@ -276,7 +297,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return results;
     }
 
-    private getFilterForQuery(id: string, value: string) {
+    /**
+     * Gets filters for an extracted xpath query
+     * @param id The variable name representing part of the query and the attribute name
+     * @param value The attribute value
+     */
+    private getFilterForQuery(id: string, value: string): FilterByXPath {
         const [variable, attribute] = id.split('.');
         return this.resultsService.getFilterForQuery(
             variable,
@@ -287,7 +313,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getFilterValue(field: string, value: string): FilterValue {
-        const metadata = this.metadata[field];
+        const metadata = this.metadata.find(f => f.field === field)!;
         switch (metadata.facet) {
             case 'checkbox':
             case 'dropdown':
@@ -357,15 +383,15 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getRowElements(element: HTMLElement) {
-        const rows = {},
-            // First get the titles
-            head = element.parentElement.parentElement.parentElement.childNodes[0],
-            body = element.parentElement.parentElement.parentElement.childNodes[1],
-            // Only use the last row.
-            headRows = Array.from(head.childNodes)[head.childNodes.length - 1],
-            bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1),
-            titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML),
-            filters = {};
+        const rows = {};
+        // First get the titles
+        const head = element.parentElement.parentElement.parentElement.childNodes[0];
+        const body = element.parentElement.parentElement.parentElement.childNodes[1];
+        // Only use the last row
+        const headRows = Array.from(head.childNodes)[head.childNodes.length - 1];
+        const bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1);
+        const titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML);
+        const filters: {[title: string]: Element[]} = {};
         for (const title of titles) {
             filters[title] = [];
         }
