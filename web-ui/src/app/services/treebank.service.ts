@@ -311,17 +311,31 @@ export class TreebankService {
 
         const next = this.data;
         const tb = next[provider][corpus];
-        let hasSelected = false;
+
+        let hasMarked = false;
+        const willMark = components.some(c => c.selected);
 
         tb.componentGroups
         .flatMap((group: ComponentGroup) => Object.values(group.components))
         .forEach(component => {
-            if (selectionMap[component.id] && (tb.treebank.multiOption || !hasSelected)) {
-                component.selected = selectionMap[component.id];
-                hasSelected = component.selected;
-            } else if (!tb.treebank.multiOption) {
-                component.selected = false;
+            const newState: boolean|undefined = selectionMap[component.id];
+            if (tb.treebank.multiOption) {
+                component.selected = newState != null ? newState : component.selected;
+                return;
             }
+
+            if (component.selected) {
+                // only way this can stay selected is:
+                // - it's the first selected component passed in
+                // - there's no selected component passed in, and this is the first component we find that was already selected
+                component.selected = (newState && !hasMarked) || !willMark;
+            } else {
+                // only way component can become selected is:
+                // - it's the first selected component component passed in
+                component.selected = newState && !hasMarked;
+            }
+
+            hasMarked = hasMarked || component.selected;
         });
 
         this.treebanks.next({state: next, origin: 'user'});
@@ -357,7 +371,7 @@ export class TreebankService {
 
             tb.treebank.selected = hasSelected;
         });
-        this.treebanks.next({state: next, origin: 'url'});
+        this.treebanks.next({state: next, origin});
     }
 }
 

@@ -37,7 +37,7 @@
         </tr>
         <tr *ngIf="variants.length > 1">
             <th *ngFor="let variant of variants">
-                <label
+                <label *ngIf="treebank.multiOption"
                     class="checkbox"
                     [attr.disabled]="!treebank.multiOption || null"
                 >
@@ -49,6 +49,7 @@
                     >
                     {{variant}}
                 </label>
+                <label *ngIf="!treebank.multiOption">{{variant}}</label>
             </th>
             <th *ngIf="showDescription">
                 &nbsp;
