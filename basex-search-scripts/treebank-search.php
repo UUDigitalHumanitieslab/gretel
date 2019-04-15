@@ -110,8 +110,10 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
                         $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
                         if (isGrinded($corpus)) {
                             $tblist[$sentid] = $tb;
+                            $sentenceDatabases[$sentid] = $components[0];
+                        } else {
+                            $sentenceDatabases[$sentid] = $database;
                         }
-                        $sentenceDatabases[$sentid] = $database;
                     }
                 }
                 if ($endPosIteration === 'all') {
