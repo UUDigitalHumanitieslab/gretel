@@ -97,109 +97,115 @@ export class TreebankService {
             const providers = await this.configurationService.getProviders();
             for (const provider of providers) {
                 const url = await this.configurationService.getApiUrl(provider, 'configured_treebanks');
-                const response = await this.http.get<ConfiguredTreebanksResponse>(url).toPromise();
 
-                // treebanks within this provider
-                const providedBanks: ConfiguredTreebanks[string] = treebanks[provider] = {};
-                Object.entries(response).forEach(([corpusName, treebank]) => {
-                    providedBanks[corpusName] = {
-                        treebank: {
-                            name: corpusName,
-                            title: treebank.title,
-                            description: treebank.description,
-                            uploaded: false,
-                            provider,
-                            selected: false,
-                            multiOption: !!treebank.multioption
-                        },
-                        metadata: treebank.metadata,
-                        variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
-                        componentGroups: Object.values(treebank.components).map<TreebankComponent>(component => ({
-                            id: component.id,
-                            selected: !component.disabled,
-                            title: component.title,
-                            description: component.description,
-                            sentenceCount: component.sentences,
-                            wordCount: component.words,
-                            group: component.group || component.id,
-                            variant: component.variant || 'default',
-                            disabled: component.disabled || false
-                        })).reduce((groups, component) => {
-                            const group = groups.find(g => g.key === component.group);
+                try {
+                    const response = await this.http.get<ConfiguredTreebanksResponse>(url).toPromise();
 
-                            if (!group.description) {
-                                group.description = component.description;
-                            }
+                    // treebanks within this provider
+                    const providedBanks: ConfiguredTreebanks[string] = treebanks[provider] = {};
+                    Object.entries(response).forEach(([corpusName, treebank]) => {
+                        providedBanks[corpusName] = {
+                            treebank: {
+                                name: corpusName,
+                                title: treebank.title,
+                                description: treebank.description,
+                                uploaded: false,
+                                provider,
+                                selected: false,
+                                multiOption: !!treebank.multioption
+                            },
+                            metadata: treebank.metadata,
+                            variants: treebank.variants ? Object.keys(treebank.variants) : ['default'],
+                            componentGroups: Object.values(treebank.components).map<TreebankComponent>(component => ({
+                                id: component.id,
+                                selected: !component.disabled,
+                                title: component.title,
+                                description: component.description,
+                                sentenceCount: component.sentences,
+                                wordCount: component.words,
+                                group: component.group || component.id,
+                                variant: component.variant || 'default',
+                                disabled: component.disabled || false
+                            })).reduce((groups, component) => {
+                                const group = groups.find(g => g.key === component.group);
 
-                            group.components[component.variant] = component;
-                            group.sentenceCount.add(component.sentenceCount);
-                            group.wordCount.add(component.wordCount);
+                                if (!group.description) {
+                                    group.description = component.description;
+                                }
 
-                            return groups;
-                        }, Object.keys(treebank.groups ? treebank.groups : treebank.components).map<ComponentGroup>(key => ({
-                            components: {},
-                            description: treebank.groups &&
-                                treebank.groups[key] &&
-                                treebank.groups[key].description ||
-                                null,
-                            key,
-                            sentenceCount: new FuzzyNumber(0),
-                            wordCount: new FuzzyNumber(0),
-                            multiOption: !!treebank.multioption
-                        })))
-                    };
-                });
+                                group.components[component.variant] = component;
+                                group.sentenceCount.add(component.sentenceCount);
+                                group.wordCount.add(component.wordCount);
+
+                                return groups;
+                            }, Object.keys(treebank.groups ? treebank.groups : treebank.components).map<ComponentGroup>(key => ({
+                                components: {},
+                                description: treebank.groups &&
+                                    treebank.groups[key] &&
+                                    treebank.groups[key].description ||
+                                    null,
+                                key,
+                                sentenceCount: new FuzzyNumber(0),
+                                wordCount: new FuzzyNumber(0),
+                                multiOption: !!treebank.multioption
+                            })))
+                        };
+                    });
+                } catch (error) {
+                    console.warn(`Could not get treebanks from backend ${provider}: ${error.message}`);
+                }
             }
 
             const uploadProvider = await this.configurationService.getUploadProvider();
             const uploadedCorpora: ConfiguredTreebanks[string] = treebanks[uploadProvider] = (treebanks[uploadProvider] || {});
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
-            const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
 
-            for (const item of response) {
-                uploadedCorpora[item.title] = {
-                    treebank: {
-                        name: item.title,
-                        title: item.title,
-                        userId: parseInt(item.user_id, 10),
-                        email: item.email,
-                        uploaded: new Date(item.uploaded),
-                        processed: new Date(item.processed),
-                        isPublic: item.public === '1',
-                        description: item.title,
-                        multiOption: true,
-                        provider: uploadProvider,
-                        selected: false,
-                    },
-                    variants: ['default'],
-                    componentGroups: await this.configurationService.getUploadApiUrl('treebank/show/' + item.title)
-                        .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise())
-                        .then(results =>
-                            results.map(subtree => {
-                                const r: TreebankComponent = {
-                                    id: subtree.basex_db,
-                                    group: subtree.basex_db,
-                                    variant: 'default',
-                                    title: subtree.title,
-                                    sentenceCount: parseInt(subtree.nr_sentences, 10),
-                                    wordCount: parseInt(subtree.nr_words, 10),
-                                    selected: true,
-                                    disabled: false,
-                                    description: '',
-                                };
+            try {
+                const response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
 
-                                return r;
-                            })
-                            .map(component => ({
-                                key: component.id, // see group property in TreebankComponent created above
-                                components: { default: component },
-                                sentenceCount: new FuzzyNumber(component.sentenceCount),
-                                wordCount: new FuzzyNumber(component.wordCount)
-                            }))
-                        ),
-                    metadata: await this.configurationService.getUploadApiUrl('treebank/metadata/' + item.title)
-                        .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
-                        .then(response => response.map(item => {
+                for (const item of response) { try {
+                    const components = await
+                        this.configurationService.getUploadApiUrl('treebank/show/' + item.title)
+                        .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise());
+                    const metadata = await
+                        this.configurationService.getUploadApiUrl('treebank/metadata/' + item.title)
+                        .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise());
+
+                    uploadedCorpora[item.title] = {
+                        treebank: {
+                            name: item.title,
+                            title: item.title,
+                            userId: parseInt(item.user_id, 10),
+                            email: item.email,
+                            uploaded: new Date(item.uploaded),
+                            processed: new Date(item.processed),
+                            isPublic: item.public === '1',
+                            description: item.title,
+                            multiOption: true,
+                            provider: uploadProvider,
+                            selected: false,
+                        },
+                        variants: ['default'],
+
+                        componentGroups: components.map(subtree => ({
+                            id: subtree.basex_db,
+                            group: subtree.basex_db,
+                            variant: 'default',
+                            title: subtree.title,
+                            sentenceCount: parseInt(subtree.nr_sentences, 10),
+                            wordCount: parseInt(subtree.nr_words, 10),
+                            selected: true,
+                            disabled: false,
+                            description: '',
+                        }))
+                        .map(component => ({
+                            key: component.id, // see group property in TreebankComponent created above
+                            components: { default: component },
+                            sentenceCount: new FuzzyNumber(component.sentenceCount),
+                            wordCount: new FuzzyNumber(component.wordCount)
+                        })),
+
+                        metadata: metadata.map(item => {
                             const metadata: TreebankMetadata = {
                                 field: item.field,
                                 type: item.type,
@@ -219,10 +225,13 @@ export class TreebankService {
                                         return metadata;
                                 }
                             }
-
-                            return metadata;
-                        })),
-                };
+                        })
+                    };
+                } catch (error) {
+                    console.warn(`Could not fetch metadata or components for uploaded corpus ${item.title}: ${error.message}`);
+                } }
+            } catch (error) {
+                console.warn(`Could not fetch uploaded corporaL: ${error.message}`);
             }
 
             this.data = treebanks;

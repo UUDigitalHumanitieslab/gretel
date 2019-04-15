@@ -17,8 +17,8 @@
             *ngSwitchCase="1"
 
             [sentence]="globalState.inputSentence"
-            [xml]="globalState.exampleXml"
 
+            (changeXml)="updateXml($event)"
             (changeValid)="setValid($event)"
             #parse>
         </grt-parse>
