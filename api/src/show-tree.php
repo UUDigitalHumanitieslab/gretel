@@ -20,7 +20,7 @@ function showTree($sentid, $nodes, $treebank, $db)
 {
     global $dbuser, $dbpwd;
     header('Content-type: text/xml');
-    header('Access-Control-Allow-Origin: http://localhost:4200');
+    header('Access-Control-Allow-Origin: *');
     set_time_limit(0);
 
     try {

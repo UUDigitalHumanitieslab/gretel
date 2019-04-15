@@ -17,6 +17,12 @@ $base = explode('/router.php/', $_SERVER['REQUEST_URI'])[0].'/router.php';
 $router = new AltoRouter();
 $router->setBasePath($base);
 
+$router->map('OPTIONS', '@.*', function() {
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
+    header("Access-Control-Allow-Headers: Content-Type"); // allow all mime-types for content-type
+    return;
+});
+
 $router->map('GET', '/configured_treebanks', function () {
     header('Content-Type: application/json');
     echo json_encode(getConfiguredTreebanks());
