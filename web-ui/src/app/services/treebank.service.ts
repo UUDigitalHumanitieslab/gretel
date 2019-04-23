@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
 import { BehaviorSubject, Observable, ReplaySubject, merge } from 'rxjs';
-import { take, filter } from 'rxjs/operators';
+import { take, filter, flatMap, catchError, tap } from 'rxjs/operators';
 
 
 export interface TreebankInfo {
@@ -21,7 +21,7 @@ export interface ConfiguredTreebanks {
     };
 }
 
-interface ConfiguredTreebanksResponse {
+export interface ConfiguredTreebanksResponse {
     [treebank: string]: {
         components: {
             [component: string]: {
@@ -36,12 +36,12 @@ interface ConfiguredTreebanksResponse {
             }
         },
         groups?: {
-            [component: string]: {
+            [group: string]: {
                 description: string
             }
         },
         variants?: {
-            [component: string]: {
+            [variant: string]: {
                 display: string
             }
         },
@@ -255,21 +255,19 @@ export class TreebankService {
             const uploadProvider = await this.configurationService.getUploadProvider();
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
 
-            let response: UploadedTreebankResponse[];
-            try {
-                response = await this.http.get<UploadedTreebankResponse[]>(uploadUrl).toPromise();
-            } catch (error) {
-                ob.next({
+            this.http.get<UploadedTreebankResponse[]>(uploadUrl)
+            .pipe(
+                // unpack array
+                flatMap(r => r),
+                // gather the rest of the data and unpack promise
+                flatMap(r => this.getUploadedTreebank(uploadProvider, r)),
+                // catch errors (either from initial get, or the above async mapping operation)
+                catchError((error: HttpErrorResponse) => ([{
                     provider: uploadProvider,
                     error
-                });
-                ob.complete();
-                return;
-            }
-
-            const completeDataRequests = response.map(bank => this.getUploadedTreebank(uploadProvider, bank));
-            completeDataRequests.forEach(p => p.then(r => ob.next(r)));
-            Promise.all(completeDataRequests).then(() => ob.complete());
+                }]))
+            )
+            .subscribe(ob);
         })();
 
         return ob;

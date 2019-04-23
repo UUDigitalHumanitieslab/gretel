@@ -16,12 +16,25 @@ describe('SubTreebanksComponents', () => {
         component = fixture.componentInstance;
         component.treebank = {
             multiOption: false,
-            name: 'test-treebank',
+            displayName: 'test-treebank',
             provider: 'test-provider',
-            selected: true
+            selected: true,
+            id: 'test-treebank',
+            isPublic: true
         };
-        component.componentGroups = [];
-        component.variants = [];
+        component.componentGroups = undefined;
+        component.variants = undefined;
+        component.components = {
+            'test-component': {
+               description: '',
+                disabled: false,
+                id: 'test-component',
+                selected: true,
+                title: 'test-component',
+                sentenceCount: 0,
+                wordCount: 0
+            }
+        };
         fixture.detectChanges();
     });
 
