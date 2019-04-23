@@ -41,11 +41,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
         }
 
         // treebank selected -> some component selected
-        this.valid = this.treebanks.some(({treebank, componentGroups}) =>
-            treebank.selected &&
-            componentGroups.flatMap(g => Object.values(g.components)).some(component => component.selected)
-        );
-
+        this.valid = this.treebanks.some(({treebank, components}) => treebank.selected && Object.values(components).some(c => c.selected));
         this.changeValid.emit(this.valid);
     }
 

@@ -23,9 +23,9 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
     public totalWordCountByVariant: { [variant: string]: string };
 
     @Input() treebank: Treebank;
+    @Input() components: ConfiguredTreebanks[string][string]['components'];
     @Input() componentGroups: ConfiguredTreebanks[string][string]['componentGroups'];
     @Input() variants: ConfiguredTreebanks[string][string]['variants'];
-    private components: TreebankComponent[];
 
     @Output() select = new EventEmitter<TreebankComponent[]>();
 
@@ -33,8 +33,7 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
     }
 
     ngOnInit() {
-        this.components = this.componentGroups.flatMap(g => Object.values(g.components));
-        this.showDescription = this.components.some(c => !!c.description);
+        this.showDescription = Object.values(this.components).some(c => !!c.description);
         this.updateTotals();
         this.loading = false;
     }
@@ -47,8 +46,9 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
 
     isEveryComponentSelected(variant?: string) {
         const eligible = variant ?
-            this.components.filter(c => !c.disabled && c.variant === variant) :
-            this.components.filter(c => !c.disabled);
+            this.componentGroups.map(g => this.components[g.components[variant]]) :
+            Object.values(this.components)
+
         return eligible.every(c => c.selected);
     }
 
@@ -57,33 +57,22 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
     }
 
     toggleVariant(variant?: string) {
+        if (variant) {
+            this.treebankService.toggleVariant(this.treebank.provider, this.treebank.id, variant);
+        } else {
+            this.treebankService.toggleComponents(this.treebank.provider, this.treebank.id);
+        }
+
         if (!this.treebank.multiOption) {
             return;
         }
-
-        const eligible = variant ?
-            this.components.filter(c => !c.disabled && c.variant === variant) :
-            this.components.filter(c => !c.disabled);
-
-        const isVariantSelected = eligible.every(c => c.selected);
-        this.treebankService.selectComponents(
-            this.treebank.provider,
-            this.treebank.name,
-            eligible.map(c => ({
-                componentId: c.id,
-                selected: !isVariantSelected
-            }))
-        );
     }
 
     toggleComponent(component: TreebankComponent) {
-        this.treebankService.selectComponents(
+        this.treebankService.toggleComponent(
             this.treebank.provider,
-            this.treebank.name,
-            [{
-                componentId: component.id,
-                selected: !component.selected
-            }]
+            this.treebank.id,
+            component.id
         );
     }
 
@@ -92,16 +81,10 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
             return;
         }
 
-        const components = Object.values(group.components);
-        const isGroupSelected = components.every(c => c.disabled || c.selected);
-
-        this.treebankService.selectComponents(
+        this.treebankService.toggleComponentGroup(
             this.treebank.provider,
-            this.treebank.name,
-            components.map(c => ({
-                componentId: c.id,
-                selected: !isGroupSelected && !c.disabled
-            }))
+            this.treebank.id,
+            group.key
         );
     }
 
@@ -114,22 +97,27 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
         const totalSentenceCountByVariant: FuzzyCounts = {};
         const totalWordCountByVariant: FuzzyCounts = {};
 
-        for (const group of this.componentGroups) {
-            totalSentenceCountByGroup[group.key] = new FuzzyNumber(0);
-            totalWordCountByGroup[group.key] = new FuzzyNumber(0);
+        if (this.variants && this.componentGroups) {
+            for (const group of this.componentGroups) {
+                totalSentenceCountByGroup[group.key] = new FuzzyNumber(0);
+                totalWordCountByGroup[group.key] = new FuzzyNumber(0);
+            }
+            for (const variant of this.variants) {
+                totalSentenceCountByVariant[variant] = new FuzzyNumber(0);
+                totalWordCountByVariant[variant] = new FuzzyNumber(0);
+            }
         }
-        for (const variant of this.variants) {
-            totalSentenceCountByVariant[variant] = new FuzzyNumber(0);
-            totalWordCountByVariant[variant] = new FuzzyNumber(0);
-        }
-        for (const subTreebank of this.components) {
+        for (const subTreebank of Object.values(this.components)) {
             totalSentenceCount.add(subTreebank.sentenceCount);
-            totalSentenceCountByGroup[subTreebank.group].add(subTreebank.sentenceCount);
-            totalSentenceCountByVariant[subTreebank.variant].add(subTreebank.sentenceCount);
-
             totalWordCount.add(subTreebank.wordCount);
-            totalWordCountByGroup[subTreebank.group].add(subTreebank.wordCount);
-            totalWordCountByVariant[subTreebank.variant].add(subTreebank.wordCount);
+
+            if (this.variants && this.componentGroups) {
+                totalSentenceCountByGroup[subTreebank.group].add(subTreebank.sentenceCount);
+                totalSentenceCountByVariant[subTreebank.variant].add(subTreebank.sentenceCount);
+
+                totalWordCountByGroup[subTreebank.group].add(subTreebank.wordCount);
+                totalWordCountByVariant[subTreebank.variant].add(subTreebank.wordCount);
+            }
         }
 
         this.totalSentenceCount = totalSentenceCount.toLocaleString();

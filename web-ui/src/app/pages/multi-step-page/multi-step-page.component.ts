@@ -52,7 +52,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
                 this.globalState.currentStep = this.steps[decoded.step];
                 // This also needs to be pushed in to the service to force an update on
                 // all components (important to restore state from url on first page render)
-                this.treebankService.select(this.globalState.selectedTreebanks, 'url');
+                this.treebankService.initSelections(this.globalState.selectedTreebanks);
 
                 this.goToStep(decoded.step, false);
             }));

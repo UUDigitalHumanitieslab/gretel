@@ -18,10 +18,10 @@
         <label class="checkbox">
             <input
                 type="checkbox"
-                [value]="treebank.treebank.name"
+                [value]="treebank.treebank.id"
                 [checked]="treebank.treebank.selected"
-                (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.name)"
-            > {{treebank.treebank.title}}
+                (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.id)"
+            > {{treebank.treebank.displayName}}
             <ng-container *ngIf="treebank.treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
         </label>
 
@@ -30,6 +30,7 @@
     <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
         <grt-sub-treebanks
             [treebank]="treebank.treebank"
+            [components]="treebank.components"
             [componentGroups]="treebank.componentGroups"
             [variants]="treebank.variants"
         ></grt-sub-treebanks>
