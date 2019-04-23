@@ -230,7 +230,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         this.treeXml = undefined;
         this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
-        const { url, treeXml } = await this.resultsService.highlightSentenceTree(
+        const treeXml = await this.resultsService.highlightSentenceTree(
             result.provider,
             result.fileId,
             result.corpus,
@@ -238,7 +238,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             result.component
         );
         this.treeXml = treeXml;
-        this.treeXmlUrl = url;
+        // this.treeXmlUrl = url;
         this.loadingTree = false;
     }
 

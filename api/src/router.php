@@ -56,11 +56,11 @@ $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
     }
 });
 
-$router->map('GET', '/tree/[*:treebank]/[*:sentid]/[*:nodes]', function ($treebank, $sentid, $nodes) {
+$router->map('GET', '/tree/[*:treebank]/[*:sentid]', function ($treebank, $sentid) {
     if (isset($_GET['db'])) {
         $db = $_GET['db'];
     }
-    showTree($sentid, $nodes, $treebank, $db);
+    showTree($sentid, $treebank, $db);
 });
 
 $router->map('POST', '/metadata_counts', function () {

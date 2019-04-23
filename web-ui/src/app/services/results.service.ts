@@ -167,19 +167,32 @@ export class ResultsService {
         return false;
     }
 
+    /** Retrieves the full sentence tree and adds a "highlight=yes" attribute to all nodes with ID, and their descendants. */
     async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
         const url = await this.configurationService.getApiUrl(
             provider,
-            'tree', [
-                treebank,
-                sentenceId,
-                nodeIds.join('-')],
+            'tree',
+            [treebank, sentenceId],
             { ...(database && { db: database }) });
 
         const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return { url, treeXml };
+        return this.highlightSentenceNodes(treeXml, nodeIds);
     }
 
+    /** adds a "highlight=yes" attribute to all nodes with ID, and their descendants. */
+    public highlightSentenceNodes(treeXml: string, nodeIds: Array<string|number>): string {
+        const doc = $.parseXML(treeXml);
+        const highlightNodes = Array.from(doc.querySelectorAll(nodeIds.map(id => `node[id="${id}"]`).join(',')));
+        const highlightDescendants = highlightNodes
+            .filter(n => n.hasAttribute('index'))
+            .flatMap(n => Array.from(n.querySelectorAll(`node[index="${n.getAttribute('index')}"]`)));
+
+        for (const node of [...highlightNodes, ...highlightDescendants]) {
+            node.setAttribute('highlight', 'yes');
+        }
+
+        return new XMLSerializer().serializeToString(doc);
+    }
 
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
