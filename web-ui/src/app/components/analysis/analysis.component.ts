@@ -11,7 +11,7 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings, mapToTreebankArray, FilterValues, FilterByXPath, FilterValue } from '../../services/_index';
+import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings, FilterValues, FilterByXPath, FilterValue } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 

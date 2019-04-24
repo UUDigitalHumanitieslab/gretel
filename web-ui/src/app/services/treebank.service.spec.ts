@@ -16,13 +16,9 @@ describe('TreebankService', () => {
         expect(service).toBeTruthy();
 
         // does this await completion of the stream?
-        return service.loading
-        .pipe(
-            filter(loading => !loading),
-            flatMap(() => service.treebanks),
-            map(banks => banks.state['test-provider']['test-treebank']),
-            take(1)
-        ).subscribe(info => {
+        return service.finishedLoading.then(() => {
+            const info = service.treebanks.value.state['test-provider']['test-treebank'];
+
             expect(info.variants).toEqual(['v1', 'v2']);
             expect(info.componentGroups.length).toBe(1);
             expect(info.componentGroups[0].key).toBe('test-group');
@@ -45,8 +41,7 @@ describe('TreebankService', () => {
 
             expect(Object.values(info.components).length).toEqual(2);
             expect(Object.values(info.components).map(s => s.id)).toEqual(['test-component1', 'test-component2']);
-            expect(Object.values(info.components).map(s => s.sentenceCount)).toEqual([100, 200]);
+            expect(Object.values(info.components).map(s => s.wordCount)).toEqual([100, 200]);
         });
-
     }));
 });

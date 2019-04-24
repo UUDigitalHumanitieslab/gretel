@@ -2,8 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
-import { BehaviorSubject, Observable, ReplaySubject, merge } from 'rxjs';
-import { take, filter, flatMap, catchError, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, ReplaySubject, merge, of, from, zip } from 'rxjs';
+import { flatMap, catchError, shareReplay } from 'rxjs/operators';
 
 
 export interface TreebankInfo {
@@ -212,32 +212,38 @@ function makeTreebankInfo(provider: string, corpusId: string, bank: ConfiguredTr
 
 @Injectable()
 export class TreebankService {
-    public treebanks = new BehaviorSubject<{state: ConfiguredTreebanks, origin: 'init'|'url'|'user'}>({ state: {}, origin: 'init'});
-    public loading = new ReplaySubject<boolean>(1);
+    public readonly treebanks = new BehaviorSubject<{
+        state: ConfiguredTreebanks,
+        origin: 'init'|'url'|'user'}
+    >({ state: {}, origin: 'init'});
+
+    /**
+     * Completes when all providers have been queried.
+     * Some treebanks may become available before this happens.
+     */
+    public readonly finishedLoading: Promise<void>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
-        this.loading.next(true);
+        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay());
 
-        merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks())
-        .subscribe(
-            ({provider, result, error}) => {
-                if (error) { console.warn(error.message); }
-                if (result) {
-                    this.treebanks.next({
-                        origin: 'init',
-                        state: {
-                            ...this.treebanks.value.state,
-                            [provider]: {
-                                ...this.treebanks.value.state[provider],
-                                [result.treebank.id]: result
-                            }
+        allTreebanks$.subscribe(({provider, result, error}) => {
+            if (error) { console.warn(error.message); }
+            if (result) {
+                this.treebanks.next({
+                    origin: 'init',
+                    state: {
+                        ...this.treebanks.value.state,
+                        [provider]: {
+                            ...this.treebanks.value.state[provider],
+                            [result.treebank.id]: result
                         }
-                    });
-                }
-            },
-            error => { /* Should never happen */ },
-            () => this.loading.next(false)
-        );
+                    }
+                });
+            }
+        });
+
+        // toPromise() resolves only when the underlying stream completes. Attach an empty then() to hide the last emitted value.
+        this.finishedLoading = allTreebanks$.toPromise().then(() => {});
     }
 
     private getUploadedTreebanks(): Observable<{
@@ -262,10 +268,10 @@ export class TreebankService {
                 // gather the rest of the data and unpack promise
                 flatMap(r => this.getUploadedTreebank(uploadProvider, r)),
                 // catch errors (either from initial get, or the above async mapping operation)
-                catchError((error: HttpErrorResponse) => ([{
+                catchError((error: HttpErrorResponse) => of({
                     provider: uploadProvider,
                     error
-                }]))
+                }))
             )
             .subscribe(ob);
         })();
@@ -315,37 +321,19 @@ export class TreebankService {
         result?: TreebankInfo;
         error?: HttpErrorResponse;
     }> {
-        const ob = new ReplaySubject<{
-            provider: string;
-            result?: TreebankInfo;
-            error?: HttpErrorResponse;
-        }>();
-
-        (async () => {
-            const providers = await this.configurationService.getProviders();
-
-            const urls = await Promise.all(providers.map(async (provider) => ({
-                provider,
-                url: await this.configurationService.getApiUrl(provider, 'configured_treebanks')
-            })));
-
-            // Stop using await here, so requests run in parallel
-            // store the requests so we know when they're all done and can close the stream
-            const requests = urls.map(({provider, url}) => this.getConfiguredTreebanks(provider, url));
-
-            // Push resulting banks into the observable, unpacking them into separate events
-            requests.forEach(req => req.then(({provider, result, error}) => {
-                if (result) {
-                    result.forEach(tb => ob.next({provider, result: tb}));
-                } else {
-                    ob.next({provider, error});
-                }
-            }));
-            // And close when all requests finished
-            Promise.all(requests).then(() => ob.complete());
-        })();
-
-        return ob;
+        return from(this.configurationService.getProviders()).pipe(
+            // unpack providers array
+            flatMap(providers => providers),
+            // get url for provider (wrap provider in array or zip will unpack the string into characters)
+            flatMap(provider => zip([provider], this.configurationService.getApiUrl(provider, 'configured_treebanks'))),
+            // get treebanks for provider
+            flatMap(([provider, url]) => this.getConfiguredTreebanks(provider, url)),
+            // unpack multiple treebank results into distinct messages
+            flatMap(info => info.result ?
+                info.result.map(tb => ({provider: info.provider, result: tb})) : // success, unpack
+                [{provider: info.provider, error: info.error}] // failure, pass on error, (could cast and return info but this is clearer)
+            ),
+        );
     }
 
     private async getConfiguredTreebanks(provider: string, url: string): Promise<{
@@ -373,16 +361,14 @@ export class TreebankService {
     // -------------------------------------
 
     /**
-     * Waits until all treebanks are loaded, then applies the selection settings
+     * Waits until all treebanks are loaded, then applies the selection settings.
+     * Any treebank passed in is selected, any component passed in is selected, everything else is deselected.
+     * If the treebank is not multiOption, only the first provided component will be selected.
      * @param sel selections
      */
     public initSelections(sel: TreebankSelection[]) {
         // await initialization
-        this.loading.pipe(
-            filter(loading => !loading),
-            take(1)
-        )
-        .subscribe(() => {
+        this.finishedLoading.then(() => {
             const state = this.treebanks.value.state;
 
             sel.filter(s => state[s.provider] && state[s.provider][s.corpus])
@@ -390,7 +376,7 @@ export class TreebankService {
                 const corpusInfo = state[s.provider][s.corpus];
                 const components = corpusInfo.treebank.multiOption
                     ? s.components
-                    : s.components.filter((id, i) => i === 0);
+                    : s.components.slice(0, 1);
 
                 Object.values(corpusInfo.components)
                 .forEach(component => component.selected = components.includes(component.id));
@@ -425,7 +411,7 @@ export class TreebankService {
     /**
      * Set the selected state for this component, or toggle it if no new state is provided.
      * Other components are untouched, unless the bank does not support multiOption.
-     * If components are selected after toggling, the bank itself is also deselected.
+     * If no components are selected after toggling, the bank itself is also deselected.
      *
      * @param provider
      * @param corpus
@@ -449,8 +435,6 @@ export class TreebankService {
 
             anySelected = anySelected || c.selected;
         });
-
-        console.log(provider, corpus, componentId, selected);
 
         tb.treebank.selected = anySelected;
         this.treebanks.next({state: next, origin: 'user'});
