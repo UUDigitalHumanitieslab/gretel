@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
 import { BehaviorSubject, Observable, ReplaySubject, merge, of, from, zip } from 'rxjs';
-import { flatMap, catchError, shareReplay } from 'rxjs/operators';
+import { flatMap, catchError, shareReplay, delay } from 'rxjs/operators';
 
 
 export interface TreebankInfo {
@@ -224,7 +224,7 @@ export class TreebankService {
     public readonly finishedLoading: Promise<void>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
-        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay());
+        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
 
         allTreebanks$.subscribe(({provider, result, error}) => {
             if (error) { console.warn(error.message); }

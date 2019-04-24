@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { StepComponent } from "../step.component";
-import { TreebankService, ConfiguredTreebanks, mapToTreebankArray } from "../../../services/treebank.service";
+import { StepComponent } from '../step.component';
+import { TreebankService, TreebankInfo } from '../../../services/treebank.service';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -10,7 +10,8 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepComponent implements OnDestroy {
-    public treebanks: ConfiguredTreebanks[string][string][];
+    public treebanks: TreebankInfo[] = [];
+    public loading = true;
     private readonly subscriptions: Subscription[];
 
     constructor(private treebankService: TreebankService) {
@@ -23,6 +24,7 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
                 this.updateValidity();
             }),
         ];
+        treebankService.finishedLoading.then(() => this.loading = false);
     }
 
     ngOnDestroy() {
@@ -35,11 +37,6 @@ export class SelectTreebanksComponent extends StepComponent implements OnDestroy
 
     /** Checks if there are treebanks selected and notifies parent */
     updateValidity() {
-        if (!this.treebanks) {
-            this.valid = false;
-            return;
-        }
-
         // treebank selected -> some component selected
         this.valid = this.treebanks.some(({treebank, components}) => treebank.selected && Object.values(components).some(c => c.selected));
         this.changeValid.emit(this.valid);

@@ -12,7 +12,11 @@
         counts.
     </p>
 </div>
-<ng-container *ngIf="!!treebanks">
+
+<h1 class="title" [ngClass]="{'is-loading': loading}">
+    Select treebanks
+</h1>
+
 <ng-container *ngFor="let treebank of treebanks">
     <div class="field" >
         <label class="checkbox">
@@ -26,7 +30,6 @@
         </label>
 
     </div>
-    <!-- todo spinner when loading -->
     <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
         <grt-sub-treebanks
             [treebank]="treebank.treebank"
@@ -35,5 +38,4 @@
             [variants]="treebank.variants"
         ></grt-sub-treebanks>
     </div>
-</ng-container>
 </ng-container>
