@@ -118,7 +118,7 @@
 
     <tfoot>
         <tr>
-            <td [attr.colspan]="(variants ? variants.length : 0) + (showDescription ? 1 : 0)">
+            <td [attr.colspan]="(variants ? variants.length : 1) + (showDescription ? 1 : 0)">
                 &nbsp;
             </td>
             <ng-container *ngFor="let variant of (variants || [])">
