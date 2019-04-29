@@ -44,7 +44,7 @@
     "lassy-xpath": "^0.3.11",
     "lodash": "^4.17.11",
     "ngx-clipboard": "^12.0.0-beta.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.12.0",
     "pivottable": "^2.20.0",
     "primeng": "^7.0.5",
     "rxjs": "^6.4.0",
