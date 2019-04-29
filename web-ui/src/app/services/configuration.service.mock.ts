@@ -17,7 +17,7 @@ export class ConfigurationServiceMock implements ConfigurationServiceInterface {
     }
 
     public async getUploadProvider(): Promise<string> {
-        return 'gretel';
+        return 'test-provider';
     }
 
     public async getAlpinoUrl(): Promise<string> {
@@ -25,6 +25,6 @@ export class ConfigurationServiceMock implements ConfigurationServiceInterface {
     }
 
     public async getProviders(): Promise<string[]> {
-        return [];
+        return ['test-provider'];
     }
 }

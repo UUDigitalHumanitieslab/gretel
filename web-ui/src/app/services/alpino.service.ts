@@ -12,7 +12,7 @@ export class AlpinoService {
     }
 
     async generateXPath(xml: string, tokens: string[], attributes: string[], ignoreTopNode: boolean, respectOrder: boolean) {
-        let result = await this.http.post<{
+        const result = await this.http.post<{
             xpath: string,
             subTree: string
         }>(await this.generateXPathUrl, {
@@ -26,7 +26,7 @@ export class AlpinoService {
         return {
             xpath: this.parserService.format(result.xpath),
             subTree: result.subTree
-        }
+        };
     }
 
     async parseSentenceUrl(sentence: string) {

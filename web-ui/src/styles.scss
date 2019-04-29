@@ -41,3 +41,42 @@ $pageloader-opacity: 0.6;
         opacity: 1;
     }
 }
+
+.is-loading {
+    /*! adapted from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
+
+    &:after {
+        animation: spinAround 500ms infinite linear;
+        border: 3px solid #96846c;
+        border-radius: 100%;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        content: "";
+
+        height: 1em;
+        width: 1em;
+    }
+
+    // Resolves to h1.is-loading
+    @at-root h1#{&},
+    h2#{&},
+    h3#{&},
+    h4#{&},
+    h5#{&},
+    h6#{&},
+    span#{&} {
+        &:after {
+            display: inline-block;
+            margin-left: 0.4em;
+            vertical-align: bottom;
+        }
+    }
+
+    @at-root &.box {
+        position: relative;
+        display: block;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}

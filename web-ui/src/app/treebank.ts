@@ -47,33 +47,35 @@ export class FuzzyNumber {
 }
 
 export interface Treebank {
-    id?: number;
-    name: string;
+    /** The backend this corpus resides in */
+    provider: string;
+    /** Id of this treebank */
+    id: string;
     /**
      * The user-friendly title to use, uploaded treebanks have the same
      * value here as the treebank's name.
      */
-    title?: string;
+    displayName: string;
     description?: string;
+    /** Can the user search in multiple components simultaneously for this treebank */
+    multiOption: boolean;
+    /** Might be false for user-uploaded corpora */
+    isPublic: boolean;
+
+    // The following options only exist for user-uploaded treebanks
     userId?: number;
     email?: string;
-    /**
-     * When this has been uploaded, or false if this treebank is
-     * specified in the configuration.
-     */
-    uploaded?: Date | false;
+    /** When this has been uploaded */
+    uploaded?: Date;
     processed?: Date;
-    isPublic?: boolean;
-    /** The backend this corpus resides in */
-    provider: string;
-    /* Is this treebank selected for searching */
+
+    /* Is this treebank selected for searching, this is a bit of clientside state */
     selected: boolean;
-    multiOption: boolean;
 }
 
 export interface ComponentGroup {
     key: string;
-    components: { [variant: string]: TreebankComponent };
+    components: { [variant: string]: string };
     description?: string;
     sentenceCount: FuzzyNumber;
     wordCount: FuzzyNumber;
@@ -83,10 +85,6 @@ export interface ComponentGroup {
  * Component of a treebank.
  */
 export interface TreebankComponent {
-    /** The ComponentGroup */
-    group: string;
-    /** The Variant */
-    variant: string;
     /** Serverside id  */
     id: string;
     /** Friendly name */
@@ -96,6 +94,11 @@ export interface TreebankComponent {
     selected: boolean;
     description: string;
     disabled: boolean;
+
+    /** The ComponentGroup */
+    group?: string;
+    /** The Variant */
+    variant?: string;
 }
 
 export interface TreebankMetadata {

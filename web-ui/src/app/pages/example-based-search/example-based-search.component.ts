@@ -65,7 +65,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.subscriptions.push(
             this.treebankService.treebanks
             .pipe(
-                filter(v => v.origin !== 'url' && v.origin !== 'init'), // prevent infinite loops as we update the url whenever different banks are selected
+                // prevent infinite loops as we update the url whenever different banks are selected
+                filter(v => v.origin !== 'url' && v.origin !== 'init'),
                 map(v => mapTreebanksToSelectionSettings(v.state))
             )
             .subscribe(state => this.updateSelected(state))
@@ -176,6 +177,10 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.globalState.isCustomXPath = false;
         this.globalState.attributes = undefined;
         this.updateGlobalState(this.globalState);
+    }
+
+    updateXml(xml: string) {
+        this.globalState.exampleXml = xml;
     }
 
     async updateMatrix(matrixSettings: MatrixSettings) {

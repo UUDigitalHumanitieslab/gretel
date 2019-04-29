@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, Output, EventEmitter, OnInit } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, zip } from 'rxjs';
-import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, share, tap, shareReplay } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, zip, combineLatest } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, share, tap, shareReplay, debounce } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -134,14 +134,18 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     ngOnInit() {
         // intermediate streams
         const treebankSelections$ = this.treebankService.treebanks.pipe(
+            debounceTime(1000),
             map(v => mapTreebanksToSelectionSettings(v.state)),
             shareReplay(1), // this stream is used as input in multiple others, no need to re-run it for every subscription.
         );
-        const filterValues$ = this.filterValuesSubject.pipe(
+        const filterValues$ = this.filterValuesSubject.pipe( // the user-selected values
+            debounceTime(1000),
             map(v => Object.values(v)),
             shareReplay(1),
         );
+        // the metadata properties for the selected treebanks
         const metadataProperties$ = this.createMetadataPropertiesStream();
+        // the values for the properties
         const metadataCounts$ = this.createMetadataCountsStream(treebankSelections$, this.xpathSubject, filterValues$);
 
         // subscribed streams
@@ -230,7 +234,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         this.treeXml = undefined;
         this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
-        const { url, treeXml } = await this.resultsService.highlightSentenceTree(
+        const treeXml = await this.resultsService.highlightSentenceTree(
             result.provider,
             result.fileId,
             result.corpus,
@@ -238,7 +242,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             result.component
         );
         this.treeXml = treeXml;
-        this.treeXmlUrl = url;
+        // this.treeXmlUrl = url;
         this.loadingTree = false;
     }
 
@@ -424,15 +428,12 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         metadataFieldsInput: Observable<TreebankMetadata[]>,
         metadataValuesInput: Observable<MetadataValueCounts>,
     ): Observable<Filter[]> {
-        // zip instead of combinelatest,
-        // as a change in fields is always paired with a change in values,
-        // and we should only process them together
-        return zip(
+        return combineLatest(
             metadataFieldsInput,
             metadataValuesInput
         )
         .pipe(
-            distinctUntilChanged(),
+            debounceTime(100), // lots of values bouncing around during initialization
             map(([fields, counts]) => {
                 return fields
                 .filter(field => field.show)

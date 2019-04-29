@@ -115,11 +115,7 @@ class ParseStep extends Step<GlobalStateExampleBased> {
     async enterStep(state: GlobalStateExampleBased) {
         state.loading = true;
         state.currentStep = this;
-
-        const xml = await this.alpinoService.parseSentence(state.inputSentence);
-        state.exampleXml = xml;
-        state.loading = false;
-        state.valid = true;
+        state.valid = false;
         return state;
     }
 

@@ -75,8 +75,8 @@ export class DistributionListComponent implements OnInit, OnDestroy {
                     this.state[bank.provider] ||
                     {};
 
-                const b = p[bank.name] =
-                    p[bank.name] || {
+                const b = p[bank.id] =
+                    p[bank.id] || {
                         components: {},
                         error: undefined,
                         hidden: false,
@@ -108,16 +108,16 @@ export class DistributionListComponent implements OnInit, OnDestroy {
         const addTotals = (bank: Treebank, t: Notification<TreebankCount[]>) => {
             switch (t.kind) {
                 case NotificationKind.COMPLETE: {
-                    this.state[bank.provider][bank.name].loading = false;
+                    this.state[bank.provider][bank.id].loading = false;
                     return;
                 }
                 case NotificationKind.ERROR: {
-                    this.state[bank.provider][bank.name].error = t.error;
-                    this.state[bank.provider][bank.name].loading = false;
+                    this.state[bank.provider][bank.id].error = t.error;
+                    this.state[bank.provider][bank.id].loading = false;
                     return;
                 }
                 case NotificationKind.NEXT: {
-                    const b = this.state[bank.provider][bank.name];
+                    const b = this.state[bank.provider][bank.id];
                     t.value.forEach(v => {
                         b.components[v.databaseId].hits = v.count;
                         b.hits = (b.hits || 0) + v.count;
@@ -167,9 +167,7 @@ export class DistributionListComponent implements OnInit, OnDestroy {
 
                 return banks.map(bank => ({
                     bank: bank.treebank,
-                    components: bank.componentGroups
-                        .flatMap(group => Object.values(group.components))
-                        .filter(c => c.selected && !c.disabled)
+                    components: Object.values(bank.components).filter(c => c.selected && !c.disabled)
                 }));
             })
         );
@@ -187,11 +185,11 @@ export class DistributionListComponent implements OnInit, OnDestroy {
             switchMap(([banks, xpath]) => {
                 // create a request for each bank
                 const requests = banks.map(({bank, components}) =>
-                    // turn resposnse promise into stream again
+                    // turn response promise into stream again
                     from(this.resultsService.treebankCounts(
                         xpath,
                         bank.provider,
-                        bank.name,
+                        bank.id,
                         components.map(c => c.id),
                     ))
                     .pipe(
