@@ -124,7 +124,7 @@ function makeComponent(comp: ConfiguredTreebanksResponse[string]['components'][s
         description: comp.description,
         disabled: !!comp.disabled,
         id: comp.id,
-        selected: true,
+        selected: !comp.disabled,
         sentenceCount: comp.sentences,
         title: comp.title,
         wordCount: comp.words,

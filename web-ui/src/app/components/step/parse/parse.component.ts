@@ -1,5 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, EventEmitter, Output, OnInit } from '@angular/core';
-import { AlpinoService } from '../../../services/_index';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { StepComponent } from '../step.component';
 
 @Component({
@@ -7,44 +6,21 @@ import { StepComponent } from '../step.component';
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent extends StepComponent implements OnInit {
+export class ParseComponent extends StepComponent {
+    @Input() public loading = true;
     @Input() public sentence: string;
+    @Input() public xml: string;
     @Output() public changeXml = new EventEmitter<string>();
 
     public display = 'inline';
-    public loading = true;
-    public xml: string;
     public validationMessage?: string;
 
-    constructor(private alpinoService: AlpinoService) {
+    constructor() {
         super();
     }
 
-    ngOnInit() {
-        const self = this;
-        self.loading = true;
-        this.alpinoService.parseSentence(this.sentence)
-        .then(xml => {
-            self.xml = xml;
-            self.valid = true;
-            self.warning = false;
-            self.validationMessage = undefined;
-        })
-        .catch(e => {
-            self.xml = undefined;
-            self.valid = false;
-            self.warning = true;
-            self.validationMessage = `Error parsing sentence: ${e.message}`;
-        })
-        .finally(() => {
-            self.loading = false;
-            self.updateValidity();
-            self.changeXml.emit(self.xml);
-        });
-    }
-
-    public getValidationMessage(): string|void {
-        return undefined; // we display our own error
+    public getValidationMessage(): string | void {
+        this.validationMessage = `Error parsing sentence: ${this.sentence}`; // we display our own error
     }
 
     public updateValidity() {

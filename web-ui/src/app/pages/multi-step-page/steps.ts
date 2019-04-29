@@ -1,5 +1,5 @@
-import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
-import { AlpinoService, FilterValues } from "../../services/_index";
+import { TreebankService, mapTreebanksToSelectionSettings } from '../../services/treebank.service';
+import { AlpinoService, FilterValues } from '../../services/_index';
 import { map, take } from 'rxjs/operators';
 
 /**
@@ -14,7 +14,7 @@ interface GlobalState {
     /**
      * Include context in results (the preceding and following sentence)
      */
-    retrieveContext: boolean,
+    retrieveContext: boolean;
     xpath: string;
     filterValues: FilterValues;
     valid: boolean;
@@ -116,6 +116,19 @@ class ParseStep extends Step<GlobalStateExampleBased> {
         state.loading = true;
         state.currentStep = this;
         state.valid = false;
+
+        await this.alpinoService.parseSentence(state.inputSentence)
+            .then(xml => {
+                state.exampleXml = xml;
+                state.valid = true;
+            })
+            .catch(e => {
+                state.exampleXml = undefined;
+            })
+            .finally(() => {
+                state.loading = false;
+            });
+
         return state;
     }
 
@@ -205,7 +218,9 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
-        const selectedTreebanks = await this.treebankService.treebanks.pipe(map(v => mapTreebanksToSelectionSettings(v.state)), take(1)).toPromise()
+        const selectedTreebanks = await this.treebankService.treebanks.pipe(
+            map(v => mapTreebanksToSelectionSettings(v.state)),
+            take(1)).toPromise();
         state.valid = selectedTreebanks.length > 0;
         return state;
     }

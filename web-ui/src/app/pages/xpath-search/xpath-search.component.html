@@ -1,6 +1,6 @@
 <grt-body-header>XPath Search</grt-body-header>
 <ng-container *ngIf="globalState.currentStep">
-    <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number"></grt-breadcrumb-bar>
+    <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState.currentStep.number" (jump)="goToStep($event)"></grt-breadcrumb-bar>
     <div [ngSwitch]="globalState.currentStep.number" [ngClass]="{'is-loading':isTransitioning}">
         <grt-xpath-input
             *ngSwitchCase="0"

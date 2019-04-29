@@ -1,5 +1,5 @@
 <nav class="breadcrumb is-hidden-print" aria-label="breadcrumbs">
     <li *ngFor="let crumb of crumbs " class="no-hover" [ngClass]="{'is-active': crumb.number == currentCrumb}">
-        <a [routerLink] [queryParams]="{currentStep: crumb.number}" queryParamsHandling="merge">{{crumb.name}}</a>
+        <a (click)="jump.next(crumb.number)">{{crumb.name}}</a>
     </li>
 </nav>

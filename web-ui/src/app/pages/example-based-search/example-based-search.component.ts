@@ -179,10 +179,6 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         this.updateGlobalState(this.globalState);
     }
 
-    updateXml(xml: string) {
-        this.globalState.exampleXml = xml;
-    }
-
     async updateMatrix(matrixSettings: MatrixSettings) {
         this.globalState.retrieveContext = matrixSettings.retrieveContext;
         this.globalState.ignoreTopNode = matrixSettings.ignoreTopNode;

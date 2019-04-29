@@ -1,22 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Router } from "@angular/router";
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { TreebankService, mapTreebanksToSelectionSettings } from "../../services/treebank.service";
-import { ResultsService } from "../../services/results.service";
-import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
+import { TreebankService, mapTreebanksToSelectionSettings } from '../../services/treebank.service';
+import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
 import {
     AnalysisStep,
     GlobalState,
-    Step,
     XpathInputStep,
     ResultStep,
     SelectTreebankStep,
-} from "../multi-step-page/steps";
-import {
-    Transition, Transitions, IncreaseTransition, DecreaseTransition, JumpToStepTransition
-} from '../multi-step-page/transitions'
+} from '../multi-step-page/steps';
 import { map, filter } from 'rxjs/operators';
 import { XpathInputComponent } from '../../components/step/xpath-input/xpath-input.component';
 import { SelectTreebanksComponent } from '../../components/step/select-treebanks/select-treebanks.component';
@@ -31,7 +24,7 @@ import { ResultsComponent } from '../../components/step/results/results.componen
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
+export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> implements OnInit {
     protected defaultGlobalState: GlobalState = {
         currentStep: undefined,
         filterValues: {},
@@ -55,7 +48,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     @ViewChild('resultsComponentRef')
     resultComponent: ResultsComponent;
 
-    constructor(private http: HttpClient, treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
+    constructor(treebankService: TreebankService, route: ActivatedRoute, router: Router) {
         super(route, router, treebankService);
     }
 
@@ -63,7 +56,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         super.ngOnInit();
         this.subscriptions.push(
             this.treebankService.treebanks.pipe(
-                filter(v => v.origin !== 'url' && v.origin !== 'init'), // prevent infinite loops as we update the url whenever different banks are selected
+                // prevent infinite loops as we update the url whenever different banks are selected
+                filter(v => v.origin !== 'url' && v.origin !== 'init'),
                 map(v => mapTreebanksToSelectionSettings(v.state))
             )
             .subscribe(state => this.updateSelected(state))
@@ -73,19 +67,19 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
     initializeCrumbs() {
         this.crumbs = [
             {
-                name: "XPath",
+                name: 'XPath',
                 number: 0,
             },
             {
-                name: "Treebanks",
+                name: 'Treebanks',
                 number: 1,
             },
             {
-                name: "Results",
+                name: 'Results',
                 number: 2,
             },
             {
-                name: "Analysis",
+                name: 'Analysis',
                 number: 3,
             },
         ];
@@ -108,15 +102,15 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         ];
     }
 
-    decodeGlobalState(queryParams: {[key: string]: any}) {
+    decodeGlobalState(queryParams: { [key: string]: any }) {
         const globalState = {
-            step: queryParams.currentStep || 0 as number,
+            step: parseInt(queryParams.currentStep || '0', 10),
             state: {
                 // selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                 xpath: queryParams.xpath || undefined,
                 retrieveContext: this.decodeBool(queryParams.retrieveContext)
             }
-        }
+        };
 
         // this.treebankService.select(globalState.state.selectedTreebanks);
         return globalState;

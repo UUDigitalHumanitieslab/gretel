@@ -47,9 +47,9 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
     isEveryComponentSelected(variant?: string) {
         const eligible = variant ?
             this.componentGroups.map(g => this.components[g.components[variant]]) :
-            Object.values(this.components)
+            Object.values(this.components);
 
-        return eligible.every(c => c.selected);
+        return eligible.every(c => c.selected || c.disabled);
     }
 
     isTreebankSelected() {

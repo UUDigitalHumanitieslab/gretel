@@ -154,6 +154,7 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
     } catch (Exception $e) {
         // allow a developer to directly debug this query (log is truncated)
         echo $xquery;
+        http_response_code(500);
         die;
     }
 }

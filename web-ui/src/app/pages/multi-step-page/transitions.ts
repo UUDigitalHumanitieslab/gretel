@@ -30,12 +30,11 @@ class Transitions<T extends GlobalState> {
      * @returns {Promise<T>} containing a new state.
      */
     async fire(name: string, state: T): Promise<T> {
-        let index = this.transitions.findIndex(transition => transition.name == name);
-        let transition = this.transitions[index];
-        if (transition != undefined) {
+        const transition = this.transitions.find(t => t.name === name);
+        if (transition !== undefined) {
             return transition.fire(state);
         } else {
-            throw Error(`Could not find transition with name: ${name}`)
+            throw Error(`Could not find transition with name: ${name}`);
         }
     }
 }
@@ -47,7 +46,7 @@ class DecreaseTransition<T extends GlobalState> implements Transition<T> {
     name = 'decrease';
     constructor(private steps: Step<T>[]) { }
     async fire(state: T) {
-        if (state.currentStep.number == 0) {
+        if (state.currentStep.number === 0) {
             return state;
         } else {
             state.currentStep.leaveStep(state);
@@ -63,7 +62,7 @@ class IncreaseTransition<T extends GlobalState> implements Transition<T> {
     name = 'increase';
     constructor(private steps: Step<T>[]) { }
     async fire(state: T) {
-        if (state.currentStep.number == this.steps.length) {
+        if (state.currentStep.number === this.steps.length) {
             return state;
         } else {
             state.currentStep.leaveStep(state);
@@ -72,10 +71,10 @@ class IncreaseTransition<T extends GlobalState> implements Transition<T> {
     }
 }
 
-class JumpToStepTransition<T extends GlobalState> implements Transition<T>{
+class JumpToStepTransition<T extends GlobalState> implements Transition<T> {
     name = 'jumpTo';
     constructor(private steps: Step<T>[], private number: number) {
-        this.name = `jumpTo_${this.number}`
+        this.name = `jumpTo_${this.number}`;
     }
 
     async fire(state: T) {
@@ -109,4 +108,4 @@ export {
     IncreaseTransition,
     DecreaseTransition,
     JumpToStepTransition,
-}
+};
