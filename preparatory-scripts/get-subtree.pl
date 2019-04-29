@@ -50,7 +50,7 @@ $subtree = &cut_unary($subtree);
 if ($options) {
     my $top = $subtree;
     $top->del_att(rel);
-    if ( $options eq 'relcat' ) {
+    if ( $options eq 'relcat' && $top->{'att'}->{'cat'} ) {
         $top->set_att( 'cat' => ' ' );
     }
 }
