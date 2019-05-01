@@ -379,7 +379,7 @@ export class TreebankService {
                     : s.components.slice(0, 1);
 
                 Object.values(corpusInfo.components)
-                .forEach(component => component.selected = components.includes(component.id));
+                .forEach(component => component.selected = !component.disabled && components.includes(component.id));
                 corpusInfo.treebank.selected = true;
             });
 

@@ -74,8 +74,8 @@
             </td>
 
             <td *ngIf="showDescription">{{c.value.description}}</td>
-            <td class="is-number">{{c.value.sentenceCount}}</td>
-            <td class="is-number" *ngIf="showWordCount">{{c.value.wordCount}}</td>
+            <td class="is-number">{{c.value.sentenceCount.toLocaleString()}}</td>
+            <td class="is-number" *ngIf="showWordCount">{{c.value.wordCount.toLocaleString()}}</td>
         </tr>
     </tbody>
     <ng-template #withGroups><tbody>
@@ -101,10 +101,10 @@
             </td>
             <ng-container *ngFor="let variant of variants">
                 <td class="is-number">
-                    {{components[group.components[variant]].sentenceCount}}
+                    {{components[group.components[variant]].sentenceCount.toLocaleString()}}
                 </td>
                 <td class="is-number" *ngIf="showWordCount">
-                    {{components[group.components[variant]].wordCount}}
+                    {{components[group.components[variant]].wordCount.toLocaleString()}}
                 </td>
             </ng-container>
             <th class="is-number">

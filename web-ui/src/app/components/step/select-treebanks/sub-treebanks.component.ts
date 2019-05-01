@@ -107,7 +107,7 @@ export class SubTreebanksComponent implements OnChanges, OnInit {
                 totalWordCountByVariant[variant] = new FuzzyNumber(0);
             }
         }
-        for (const subTreebank of Object.values(this.components)) {
+        for (const subTreebank of Object.values(this.components).filter(s => !s.disabled)) {
             totalSentenceCount.add(subTreebank.sentenceCount);
             totalWordCount.add(subTreebank.wordCount);
 
