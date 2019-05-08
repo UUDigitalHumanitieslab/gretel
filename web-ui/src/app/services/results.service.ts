@@ -115,7 +115,7 @@ export class ResultsService {
                         observer.complete();
                     }
                 }
-            }
+            };
             worker();
         });
 

@@ -63,7 +63,6 @@ export class XPathViewerComponent implements OnChanges, OnInit {
                     }
                 }
             }
-            console.log(lines);
             this.lines = lines;
         } else {
             this.lines = [];
