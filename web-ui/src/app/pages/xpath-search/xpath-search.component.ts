@@ -106,13 +106,12 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         const globalState = {
             step: parseInt(queryParams.currentStep || '0', 10),
             state: {
-                // selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                 xpath: queryParams.xpath || undefined,
                 retrieveContext: this.decodeBool(queryParams.retrieveContext)
             }
         };
 
-        // this.treebankService.select(globalState.state.selectedTreebanks);
         return globalState;
     }
 
