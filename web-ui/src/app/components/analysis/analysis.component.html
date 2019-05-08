@@ -61,8 +61,8 @@
     <button class="modal-close is-large" aria-label="close" (click)="cancelVariable()"></button>
 </div>
 <div class="level">
-    <div class="level-left" [ngClass]="{'is-loading': isLoading}">
-        <h1 class="title">Analysis Table</h1>&nbsp;
+    <div class="level-left">
+        <h1 class="title" [ngClass]="{'is-loading': isLoading}">Analysis Table</h1>&nbsp;
     </div>
     <div class="level-right">
         <div class="level-item" *ngIf="renderCount < hitsCount && !selectedVariable"
