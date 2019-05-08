@@ -24,23 +24,29 @@
         <grt-results
             *ngSwitchCase="2"
 
+            [filterValues]="globalState.filterValues"
+            [inputSentence]="globalState.inputSentence"
             [retrieveContext]="globalState.retrieveContext"
             [xpath]="globalState.xpath"
 
             (changeValid)="setValid($event)"
             (changeXpath)="updateXPath($event)"
-            (changeRetrieveContext)="updateRetrieveContext($event, true)"
+            (changeRetrieveContext)="updateRetrieveContext($event)"
+            (changeFilterValues)="updateFilterValues($event)"
             (prev)="prev()"
             (next)="next()"
 
-            #resultsComponentRef>
+            #results>
         </grt-results>
         <grt-analysis
             *ngSwitchCase="3"
 
             [xpath]="globalState.xpath"
 
-            (changeValid)="setValid($event)">
+            (changeValid)="setValid($event)"
+            (filterResults)="filterResults($event, 4)"
+
+            #analysis>
         </grt-analysis>
     </div>
     <br />

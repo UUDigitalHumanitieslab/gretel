@@ -27,20 +27,24 @@ export class BalloonDirective implements OnChanges {
 
     ngOnChanges() {
         const element: HTMLElement = this.el.nativeElement;
-        if (this.visible) {
-            element.setAttribute('data-balloon-visible', '');
-        } else {
-            element.removeAttribute('data-balloon-visible');
-        }
-
-        if (this.visible === false) {
+        if (!this.text) {
             element.removeAttribute('data-balloon');
-            element.removeAttribute('data-balloon-pos');
-            element.removeAttribute('data-balloon-length');
         } else {
-            element.setAttribute('data-balloon', this.text);
-            element.setAttribute('data-balloon-pos', this.position);
-            element.setAttribute('data-balloon-length', this.length);
+            if (this.visible) {
+                element.setAttribute('data-balloon-visible', '');
+            } else {
+                element.removeAttribute('data-balloon-visible');
+            }
+
+            if (this.visible === false) {
+                element.removeAttribute('data-balloon');
+                element.removeAttribute('data-balloon-pos');
+                element.removeAttribute('data-balloon-length');
+            } else {
+                element.setAttribute('data-balloon', this.text);
+                element.setAttribute('data-balloon-pos', this.position);
+                element.setAttribute('data-balloon-length', this.length);
+            }
         }
     }
 }

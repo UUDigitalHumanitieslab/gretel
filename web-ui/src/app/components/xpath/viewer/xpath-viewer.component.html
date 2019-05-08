@@ -1,1 +1,7 @@
-<pre class="xpath is-print-paddingless" [ngClass]="{'is-paddingless': paddingless}"><span *ngFor="let part of parts" class="{{part.classNames}}" (click)="partClick.emit(part)" [attr.data-variable]="part.variableName">{{part.content}}</span></pre>
+<pre class="xpath is-print-paddingless" [ngClass]="{'is-paddingless': paddingless}"><span *ngFor="let line of lines"
+    class="line"><span
+        *ngFor="let part of line"
+        class="{{part.classNames}}"
+        (click)="partClick.emit(part)"
+        [attr.data-variable]="part.variableName"
+        [attr.title]="!!part.description ? part.description : undefined">{{part.content}}</span></span></pre>

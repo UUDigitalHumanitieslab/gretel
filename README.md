@@ -6,6 +6,7 @@ This is currently under active development. The stable predecessor can be found 
 
 ## Info
 
+* v4.1.0 February 2019: Fixed support for GrInded corpora, [many more fixes](https://github.com/UUDigitalHumanitieslab/gretel/compare/v4.0.2...v4.1.0), feature complete replacement of version 3.
 * v4.0.2 October 2018: GrETEL 4 release with many bugfixes and improvements.
 * v4.0.0 June 2018: First GrETEL 4 release with new interface.
 * v3.9.99 November 2017: GrETEL 4 currently under development!
@@ -82,7 +83,8 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
 * [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
 * [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel), [Gerson Foks](https://www.uu.nl/staff/GFoks) and [Jelte van Boheemen](https://www.uu.nl/medewerkers/JvanBoheemen): additional GrETEL 4 functionality and improvements;
-* Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.
+* [Koen Mertens](https://github.com/KCMertens): federated search at [Instituut voor de Nederlandse taal](https://ivdnt.org).
+* Colleagues at the [Centre for Computational Linguistics at KU Leuven](http://www.arts.kuleuven.be/ling/ccl), and [Utrecht University Digital Humanities Lab](https://dig.hum.uu.nl) for their feedback.
 
 ## License
 

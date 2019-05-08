@@ -287,7 +287,7 @@ export class ResultsService {
                 offset += append.text.length;
             }
             return lineChars.join('');
-        }).join('\n') + (!metadataFilters.length ? '' : `\n[ancestor::alpino_ds/metadata[\n${metadataFilters.join(' or\n')}]]`)
+        }).join('\n') + (!metadataFilters.length ? '' : `\n[ancestor::alpino_ds/metadata[\n${metadataFilters.join(' and\n')}]]`)
             .replace(/\t/g, '    ');
     }
 
