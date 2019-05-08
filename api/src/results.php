@@ -1,4 +1,5 @@
 <?php
+ini_set('memory_limit', '2G'); // BRING IT ON!
 
 require_once ROOT_PATH.'/functions.php';
 
