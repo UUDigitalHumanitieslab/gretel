@@ -1,8 +1,8 @@
-///<reference path="pivottable.d.ts"/>
-///<reference types="jqueryui"/>
+/// <reference path="pivottable.d.ts"/>
+/// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
-import { map, take, tap, switchMap } from 'rxjs/operators';
+import { map, switchMap, first } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -11,7 +11,16 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, mapTreebanksToSelectionSettings, FilterValues, FilterByXPath, FilterValue } from '../../services/_index';
+import {
+    AnalysisService,
+    ResultsService,
+    TreebankService,
+    Hit,
+    mapTreebanksToSelectionSettings,
+    FilterValues,
+    FilterByXPath,
+    FilterValue
+} from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
 
@@ -26,10 +35,13 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;
+    private $table: JQuery<HTMLElement> | undefined;
+    private $draggable: any | undefined;
+
     private pivotUiOptions: PivotUiOptions;
     private metadata: TreebankMetadata[] = [];
-    private hits: Hit[] = [];
 
+    private hitsSubject = new BehaviorSubject<Hit[]>([]);
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
     public variables: { [name: string]: PathVariable; };
@@ -37,7 +49,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     public treeDisplay = 'inline';
 
     public isLoading = true;
+
+    public renderCount = 0;
+    public hitsCount = 0;
+
     public selectedVariable?: SelectedVariable;
+    public showMoreSubject = new BehaviorSubject<number>(0);
 
     @Input()
     public xpath: string;
@@ -75,8 +92,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.cancellationToken.next();
     }
 
-    private async initialize() {
+    showMore() {
+        this.showMoreSubject.next(this.showMoreSubject.value + 1);
+    }
 
+    private async initialize() {
         let variables: PathVariable[];
         try {
             variables = this.extractinatorService.extract(this.xpath);
@@ -86,49 +106,8 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         }
 
         // TODO: on change
-        this.variables = variables.reduce<{[name: string]: PathVariable}>((vs, v) => { vs[v.name] = v; return vs; }, {})
+        this.variables = variables.reduce<{ [name: string]: PathVariable }>((vs, v) => { vs[v.name] = v; return vs; }, {});
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
-
-        // Show a default pivot using the first node variable's lemma property against the POS property.
-        // This way the user will get to see some useable values to help clarify the interface.
-        if (variables.length > 0) {
-            let firstVariable = variables[variables.length > 1 ? 1 : 0];
-            this.selectedVariablesSubject.next([{
-                attribute: 'pt',
-                axis: 'row',
-                variable: firstVariable
-            }, {
-                attribute: 'lemma',
-                axis: 'col',
-                variable: firstVariable
-            }]);
-
-            let utils = $.pivotUtilities;
-            let heatmap = utils.renderers["Heatmap"];
-            let renderers = $.extend($.pivotUtilities.renderers,
-                { 'File export': (new FileExportRenderer()).render });
-
-            this.pivotUiOptions = {
-                aggregators: {
-                    'Count': utils.aggregators['Count'],
-                    'Count Unique Values': utils.aggregators['Count Unique Values'],
-                    'Count as Fraction of Columns': utils.aggregators['Count as Fraction of Columns'],
-                    'Count as Fraction of Total': utils.aggregators['Count as Fraction of Total'],
-                    'First': utils.aggregators['First'],
-                    'Last': utils.aggregators['Last']
-                },
-                rows: [firstVariable.name + '.pt'],
-                cols: [firstVariable.name + '.lemma'],
-                renderer: heatmap,
-                renderers,
-                onRefresh: (data) => {
-                    this.pivotUiOptions = data;
-                    this.addTableClickEvent();
-                }
-            };
-        } else {
-            this.selectedVariablesSubject.next([]);
-        }
 
         const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
             map(v => ({
@@ -136,11 +115,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 state: v.state
             })),
             switchMap(v => {
-                this.hits = [];
+                this.isLoading = true;
+                this.hitsSubject.next([]);
                 this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
                 // fetch all results for all selected components/treebanks
                 // and merge them into a single stream that's subscribed to.
-                return merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                const merged = merge(...v.selected.map(selection => this.resultsService.getAllResults(
                     this.xpath,
                     selection.provider,
                     selection.corpus,
@@ -150,19 +130,38 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                     [],
                     variables
                 )));
-            })
-        )
-        .subscribe(v => {
-            this.hits.push(...v.hits);
-        })
+
+                merged.toPromise().then(() => {
+                    this.isLoading = false;
+                });
+
+                return merged;
+            }))
+            .subscribe(searchResults => {
+                const hits = [...this.hitsSubject.value, ...searchResults.hits];
+                this.hitsCount = hits.length;
+                this.hitsSubject.next(hits);
+            });
+
+        // wait for the first hits to arrive to actually show a pivot table
+        const firstHits = this.hitsSubject.pipe(first(hits => hits.length > 0))
+            .subscribe(() => {
+                this.defaultPivot();
+                this.subscriptions.push(this.livePivot());
+                firstHits.unsubscribe();
+            });
 
         this.subscriptions = [
-            this.livePivot(),
-            subscriptionToTreebankSelection
+            subscriptionToTreebankSelection,
+            firstHits
         ];
     }
 
     private makeDraggable() {
+        if (this.$draggable) {
+            this.$draggable.destroy();
+        }
+
         $('.path-variable,.tree-visualizer li[data-varname]').draggable({
             appendTo: 'body',
             connectToSortable: '.pvtHorizList,.pvtRows',
@@ -194,10 +193,55 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.selectedVariable = undefined;
     }
 
+    private defaultPivot() {
+        // Show a default pivot using the first node variable's lemma property against the POS property.
+        // This way the user will get to see some useable values to help clarify the interface.
+        const variables = Object.keys(this.variables).map(key => this.variables[key]);
+        if (variables.length > 0) {
+            const firstVariable = variables[variables.length > 1 ? 1 : 0];
+            this.selectedVariablesSubject.next([{
+                attribute: 'pt',
+                axis: 'row',
+                variable: firstVariable
+            }, {
+                attribute: 'lemma',
+                axis: 'col',
+                variable: firstVariable
+            }]);
+
+            const utils = $.pivotUtilities;
+            const heatmap = utils.renderers['Heatmap'];
+            const renderers = $.extend($.pivotUtilities.renderers,
+                { 'File export': (new FileExportRenderer()).render });
+
+            this.pivotUiOptions = {
+                aggregators: {
+                    'Count': utils.aggregators['Count'],
+                    'Count Unique Values': utils.aggregators['Count Unique Values'],
+                    'Count as Fraction of Columns': utils.aggregators['Count as Fraction of Columns'],
+                    'Count as Fraction of Total': utils.aggregators['Count as Fraction of Total'],
+                    'First': utils.aggregators['First'],
+                    'Last': utils.aggregators['Last']
+                },
+                rows: [firstVariable.name + '.pt'],
+                cols: [firstVariable.name + '.lemma'],
+                renderer: heatmap,
+                renderers,
+                onRefresh: (data) => {
+                    this.pivotUiOptions = data;
+                    this.addTableClickEvent();
+                }
+            };
+        } else {
+            this.selectedVariablesSubject.next([]);
+        }
+    }
+
     private livePivot() {
-        return this.selectedVariablesSubject.pipe(map((selectedVariables) => {
-            this.show(this.$element, selectedVariables);
-        })).subscribe();
+        return combineLatest(this.selectedVariablesSubject, this.showMoreSubject).subscribe(
+            ([selectedVariables, _]) => {
+                this.show(selectedVariables, this.hitsSubject.value);
+            });
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
@@ -209,7 +253,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         helper.remove();
 
         // only work with available attributes
-        const attributes = this.analysisService.getVariableAttributes(variableName, this.hits);
+        const attributes = this.analysisService.getVariableAttributes(variableName, this.hitsSubject.value);
 
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
@@ -223,36 +267,39 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         });
     }
 
-    private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
-        this.isLoading = true;
+    private async show(selectedVariables: SelectedVariable[], hits: Hit[]) {
         try {
-            this.pivot(element, this.metadata.map(m => m.field), this.hits, selectedVariables);
+            this.pivot(this.metadata.map(m => m.field), hits, selectedVariables);
+            this.makeDraggable();
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
         }
-
-        this.makeDraggable();
-
-        this.isLoading = false;
     }
 
-    private pivot(element: JQuery, metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
+    private pivot(metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
         const variables = selectedVariables.reduce((grouped, s) => {
             grouped[s.variable.name]
                 ? grouped[s.variable.name].push(s.attribute)
                 : grouped[s.variable.name] = [s.attribute];
             return grouped;
-        }, {} as {[variableName: string]: string[]});
+        }, {} as { [variableName: string]: string[] });
+        this.renderCount = hits.length;
         const pivotData = this.analysisService.getFlatTable(
             hits,
             variables,
             metadataKeys);
-        element.empty();
-        const table = $('<div>');
-        element.append(table);
-        table.pivotUI(pivotData, this.pivotUiOptions);
-        $('.pvtUi').addClass('table is-bordered');
+        if (!this.$table) {
+            this.$element.empty();
+            this.$table = $('<div>');
+            this.$element.append(this.$table);
+            this.$table.pivotUI(pivotData, this.pivotUiOptions);
+            $('.pvtUi').addClass('table is-bordered');
+            return true;
+        } else {
+            this.$table.pivotUI(pivotData);
+            return false;
+        }
     }
 
 
@@ -271,9 +318,11 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      * @param elementGroups
      * @param index
      * @param spanName
-     * @returns {{}}
      */
-    private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: 'colSpan'|'rowSpan') {
+    private getValueFromFilters(
+        elementGroups: { [name: string]: Element[] },
+        index: number,
+        spanName: 'colSpan' | 'rowSpan'): FilterValues {
         const results: FilterValues = {};
         for (const id of Object.keys(elementGroups)) {
             const elements = elementGroups[id],
@@ -313,7 +362,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getFilterValue(field: string, value: string): FilterValue {
-        const metadata = this.metadata.find(f => f.field === field)!;
+        const metadata = this.metadata.find(f => f.field === field);
         switch (metadata.facet) {
             case 'checkbox':
             case 'dropdown':
@@ -383,7 +432,6 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getRowElements(element: HTMLElement) {
-        const rows = {};
         // First get the titles
         const head = element.parentElement.parentElement.parentElement.childNodes[0];
         const body = element.parentElement.parentElement.parentElement.childNodes[1];
@@ -391,7 +439,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         const headRows = Array.from(head.childNodes)[head.childNodes.length - 1];
         const bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1);
         const titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML);
-        const filters: {[title: string]: Element[]} = {};
+        const filters: { [title: string]: Element[] } = {};
         for (const title of titles) {
             filters[title] = [];
         }

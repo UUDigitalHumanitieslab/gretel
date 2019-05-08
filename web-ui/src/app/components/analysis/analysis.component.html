@@ -1,4 +1,4 @@
-<div class="notification is-primary" *ngIf="!isLoading">
+<div class="notification is-primary" *ngIf="renderCount">
     <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to
         analyse its properties.</p>
 </div>
@@ -27,7 +27,8 @@
                 </div>
             </div>
         </h2>
-        <grt-tree-visualizer [xml]="treeXml" [display]="treeDisplay" [fullScreenButton]="false" (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
+        <grt-tree-visualizer [xml]="treeXml" [display]="treeDisplay" [fullScreenButton]="false"
+            (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
     </div>
 </div>
 <div class="modal is-active" *ngIf="selectedVariable">
@@ -42,7 +43,9 @@
             <br />
             <div class="field">
                 <ng-select [(ngModel)]="selectedVariable.attribute" required="true">
-                    <ng-option *ngFor="let attribute of attributes" [value]="attribute.value">{{attribute.label}}</ng-option>
+                    <ng-option *ngFor="let attribute of attributes" [value]="attribute.value">
+                        {{attribute.label}}
+                    </ng-option>
                 </ng-select>
             </div>
             <div class="buttons is-right">
@@ -57,10 +60,23 @@
     </div>
     <button class="modal-close is-large" aria-label="close" (click)="cancelVariable()"></button>
 </div>
-<h1 class="title">Analysis Table</h1>
-<div class="box" [ngClass]="{'is-loading': isLoading}">
-    <div class="content" *ngIf="!isLoading">
-        <p>Click on a cell in the table to view those documents.</p>
+<div class="level">
+    <div class="level-left" [ngClass]="{'is-loading': isLoading}">
+        <h1 class="title">Analysis Table</h1>&nbsp;
+    </div>
+    <div class="level-right">
+        <div class="level-item" *ngIf="renderCount < hitsCount && !selectedVariable"
+            grtBalloon="More data is ready to be shown in the table">
+            <a class="button has-badge-rounded" [ngClass]="{'has-badge-warning': isLoading}" role="button"
+                (click)="showMore()" [attr.data-badge]="hitsCount - renderCount">
+                Show More Data
+            </a>
+        </div>
+    </div>
+</div>
+<div class="box">
+    <div class="content">
+        <p *ngIf="renderCount">Click on a cell in the table to view those documents.</p>
     </div>
     <div class="analysis-component"></div>
 </div>

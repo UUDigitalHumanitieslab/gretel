@@ -6,10 +6,6 @@
     }
 }
 
-.is-loading {
-    min-height: 100px;
-}
-
 :host ::ng-deep {
 
     .pvtUi,
@@ -45,7 +41,7 @@
 }
 
 .analysis-component {
-    overflow: auto;
+    overflow: visible;
 }
 
 .modal-content {

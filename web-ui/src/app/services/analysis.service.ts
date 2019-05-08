@@ -46,10 +46,10 @@ export class AnalysisService {
         }
 
         return _.sortBy(Object.keys(availableAttrs)).map((attr) => {
-            const description = XPathAttributes[attr].description;
+            const attribute = XPathAttributes[attr];
             return {
                 value: attr,
-                label: description ? `${attr} (${description})` : attr
+                label: attribute && attribute.description ? `${attr} (${attribute.description})` : attr
             };
         });
     }
