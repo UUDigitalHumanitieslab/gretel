@@ -113,7 +113,6 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     // Xml tree displaying (of a result)
     public treeXml?: string;
     public loadingTree = false;
-    public treeXmlUrl?: string;
     public treeSentence?: SafeHtml;
 
     public columns = [
@@ -237,15 +236,24 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         this.treeXml = undefined;
         this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
-        const treeXml = await this.resultsService.highlightSentenceTree(
-            result.provider,
-            result.fileId,
-            result.corpus,
-            result.nodeIds,
-            result.component
-        );
-        this.treeXml = treeXml;
-        // this.treeXmlUrl = url;
+
+        try {
+            const treeXml = await this.resultsService.highlightSentenceTree(
+                result.provider,
+                result.fileId,
+                result.corpus,
+                result.nodeIds,
+                result.component
+            );
+            this.treeXml = treeXml;
+        } catch (e) {
+            this.treeSentence = undefined;
+            this.treeXml = undefined;
+            this.loadingTree = false;
+
+            console.warn(`Error retrieving tree in ${result.provider}:${result.corpus}:${result.component}:${result.fileId}`);
+        }
+
         this.loadingTree = false;
     }
 
