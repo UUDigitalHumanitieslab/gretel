@@ -19,19 +19,20 @@ import {
     mapTreebanksToSelectionSettings,
     FilterValues,
     FilterByXPath,
-    FilterValue
+    FilterValue,
+    StateService
 } from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
-
-// TODO selected treebanks need to be reactive?
+import { StepComponent } from '../step/step.component';
+import { GlobalState, StepType } from '../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-analysis',
     templateUrl: './analysis.component.html',
     styleUrls: ['./analysis.component.scss']
 })
-export class AnalysisComponent implements OnInit, OnDestroy {
+export class AnalysisComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;
@@ -43,6 +44,8 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     private hitsSubject = new BehaviorSubject<Hit[]>([]);
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
+
+    public stepType = StepType.Analysis;
 
     public variables: { [name: string]: PathVariable; };
     public treeXml: string;
@@ -76,8 +79,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
-        private ngZone: NgZone
+        private ngZone: NgZone,
+        stateService: StateService<GlobalState>
     ) {
+        super(stateService);
     }
 
     ngOnInit() {
@@ -94,6 +99,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     showMore() {
         this.showMoreSubject.next(this.showMoreSubject.value + 1);
+    }
+
+    getWarningMessage() {
+    }
+
+    updateValidity() {
     }
 
     private async initialize() {

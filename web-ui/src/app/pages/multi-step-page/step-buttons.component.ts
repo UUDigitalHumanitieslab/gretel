@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { GlobalState, Step } from './steps';
 
 @Component({
     selector: 'grt-step-buttons',
@@ -7,10 +6,10 @@ import { GlobalState, Step } from './steps';
 })
 export class StepButtonsComponent {
     @Input()
-    public currentStep: Step<GlobalState>;
+    public currentStep: number;
 
     @Input()
-    public steps: Step<GlobalState>[];
+    public steps: number;
 
     @Output()
     public prev = new EventEmitter();

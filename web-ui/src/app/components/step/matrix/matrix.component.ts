@@ -1,14 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AlpinoService } from '../../../services/_index';
+import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
 import { ValueEvent } from 'lassy-xpath/ng';
+import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent implements OnInit {
+export class MatrixComponent extends StepComponent<GlobalState> implements OnInit {
+    public stepType = StepType.Matrix;
+
     @Input('attributes')
     public set attributes(values: string[]) {
         this.tokenValues = values.map(value => {
@@ -112,8 +115,8 @@ export class MatrixComponent extends StepComponent implements OnInit {
             advanced: true
         }];
 
-    constructor(private alpinoService: AlpinoService) {
-        super();
+    constructor(stateService: StateService<GlobalState>) {
+        super(stateService);
     }
 
     ngOnInit() {
@@ -169,7 +172,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.changeValid.emit(this.valid);
     }
 
-    public getValidationMessage() {
+    public getWarningMessage() {
         this.warning = true;
     }
 }
