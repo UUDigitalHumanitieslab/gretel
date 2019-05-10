@@ -103,7 +103,7 @@
         <div class="level-item" *ngIf="!loading">
             <div class="field has-addons">
                     <p class="control">
-                    <a class="button" role="button" (click)="downloadResults()" grtBalloonLength="large"
+                        <a class="button" role="button" (click)="downloadResults()" grtBalloonLength="large"
                         grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
                             <span class="icon is-large">
                                 <i class="fas fa-download"></i>
@@ -111,7 +111,7 @@
                         </a>
                     </p>
                     <p class="control">
-                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
+                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
                         grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                             <span class="icon is-large">
                                 <i class="fas fa-file-alt"></i>
@@ -209,6 +209,15 @@
                     xpath-query.</ng-template>
             </div>
         </ng-template>
+
+        <ng-container *ngFor="let p of info | keyvalue">
+            <ng-container *ngFor="let b of p.value | keyvalue">
+                <div *ngIf="b.value.error" class="notification is-warning">
+                    Error retrieving results for {{b.key}}: <br>
+                    {{b.value.error.error}}
+                </div>
+            </ng-container>
+        </ng-container>
     </div>
 </div>
 <grt-tree-visualizer *ngIf="loadingTree || treeXml"
