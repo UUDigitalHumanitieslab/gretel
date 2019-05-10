@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, Output, EventEmitter, OnInit } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 
-import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, zip, combineLatest } from 'rxjs';
-import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, share, tap, shareReplay, debounce } from 'rxjs/operators';
+import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, combineLatest } from 'rxjs';
+import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, shareReplay, flatMap, take } from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -17,18 +17,21 @@ import {
     mapTreebanksToSelectionSettings,
     FilterValues,
     FilterByXPath,
-    SelectedTreebanks
+    SelectedTreebanks,
+    SearchResults,
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
 import { NotificationKind } from 'rxjs/internal/Notification';
+import { HttpErrorResponse } from '@angular/common/http';
 
 const DebounceTime = 200;
 
 type HitWithOrigin = Hit&{
     provider: string;
     corpus: string;
+    componentDisplayName: string;
 };
 
 type ResultsInfo = {
@@ -37,7 +40,7 @@ type ResultsInfo = {
             hidden: boolean;
             loading: boolean;
             hits: HitWithOrigin[];
-            error?: Error;
+            error?: HttpErrorResponse;
             hiddenComponents: {
                 [componentId: string]: boolean
             }
@@ -55,7 +58,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
 
     /** The hits and their visibility status */
-    private info: ResultsInfo = {};
+    public info: ResultsInfo = {};
     public hiddenHits = 0;
     public filteredResults: Hit[] = [];
 
@@ -116,7 +119,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     public columns = [
         { field: 'number', header: '#', width: '5%' },
         { field: 'fileId', header: 'ID', width: '20%' },
-        { field: 'component', header: 'Component', width: '20%' },
+        { field: 'componentDisplayName', header: 'Component', width: '20%' },
         { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
     ];
 
@@ -501,35 +504,46 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
                         []
                     );
 
-                    // transform results, errors and finished notifications for this request into regular next() messages
-                    // and pass along the provider/corpus info with returned status messages and results
-                    // why materialize? otherwise if one request errors out, the merge(...) below also
-                    // stops listening to all other running requests.
-                    // and this way we can show the user all error messages instead of only the first.
                     return base.pipe(
-                        // expand hits with the corpus and provider (so the template knows this info, as it only has the hit object in context)
-                        map(result => ({
-                            ...result,
-                            hits: result.hits.map(h => ({
-                                ...h,
-                                provider,
-                                corpus
-                            }))
-                        })),
+                        // expand hits with the corpus and provider
+                        // (so we can use this later in the interface)
+                        // This mapping is skipped if the query returns an error
+                        flatMap(async (result: SearchResults) => {
+                            const treebank = (await this.treebankService.treebanks.pipe(take(1)).toPromise()).state[provider][corpus];
+                            return {
+                                ...result,
+                                hits: result.hits.map(hit => ({
+                                    ...hit,
+                                    provider,
+                                    corpus,
+                                    componentDisplayName: treebank.components[hit.component].title
+                                }))
+                            };
+                        }),
+
+                        // (This will run even if base receives an error)
+                        // Capture errors and send them on as a regular events
+                        // This is required because this only one stream in a set of multiple result streams
+                        // that will eventually be merged together
+                        // and we don't want that merged stream to abort when one of them throws an error
                         materialize(),
+
+                        // We've already attached the provider and corpus to the results,
+                        // but if an error happens, or we're done requesting results,
+                        // that message doesn't contain that info yet, so attach it
                         map(result => ({
                             result,
                             provider,
                             corpus
-                        }),
-                    ));
+                        })),
+                    );
                 });
 
                 // join all results, and wrap the entire sequence in a start and end message so
                 // we know what's happening and can update spinners etc.
                 return merge(...resultStreams).pipe(
                     startWith('start'),
-                    endWith('finish')
+                    endWith('finish'),
                 );
             }),
         );

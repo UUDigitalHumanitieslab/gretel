@@ -1,14 +1,13 @@
 import * as $ from 'jquery';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { Observable, Observer, ReplaySubject, Subscriber, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
 import { XmlParseService } from './xml-parse.service';
-import { publish, publishReplay, publishLast, refCount } from 'rxjs/operators';
-import { ObserversModule } from '@angular/cdk/observers';
+import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath/ng';
 
 const httpOptions = {
@@ -30,7 +29,9 @@ export class ResultsService {
         private xmlParseService: XmlParseService) {
     }
 
-    promiseAllResults(xpath: string,
+    /** On error the returned promise rejects with @type {HttpErrorResponse} */
+    promiseAllResults(
+        xpath: string,
         provider: string,
         corpus: string,
         componentIds: string[],
@@ -52,11 +53,11 @@ export class ResultsService {
                 metadataFilters,
                 variables
             ).subscribe(
-                res => hits.push(...res.hits),
-                () => {},
+                (res: SearchResults) => hits.push(...res.hits),
+                (e: HttpErrorResponse) => reject(e),
                 () => resolve(hits)
             );
-            // .subscribe(results => hits.push(...results.hits));
+
             if (cancellationToken != null) {
                 cancellationToken.subscribe(() => {
                     subscription.unsubscribe();
@@ -65,6 +66,7 @@ export class ResultsService {
         });
     }
 
+    /** On error the returned stream error has type @type {HttpErrorResponse} */
     getAllResults(
         xpath: string,
         provider: string,
@@ -84,35 +86,46 @@ export class ResultsService {
                 let needRegularGrinded = false;
 
                 while (!observer.closed) {
-                    const results: SearchResults|false = await this.results(
-                        xpath,
-                        provider,
-                        corpus,
-                        componentIds,
-                        iteration,
-                        retrieveContext,
-                        isAnalysis,
-                        metadataFilters,
-                        variables,
-                        remainingDatabases,
-                        already,
-                        needRegularGrinded,
-                        searchLimit
-                    );
+                    let results: SearchResults|false|null = null;
+                    let error: HttpErrorResponse|null = null;
 
-                    if (results) {
-                        already = results.already;
-                        needRegularGrinded = results.needRegularGrinded;
-                        searchLimit = results.searchLimit;
+                    try {
+                        results = await this.results(
+                            xpath,
+                            provider,
+                            corpus,
+                            componentIds,
+                            iteration,
+                            retrieveContext,
+                            isAnalysis,
+                            metadataFilters,
+                            variables,
+                            remainingDatabases,
+                            already,
+                            needRegularGrinded,
+                            searchLimit
+                        );
+                    } catch (e) {
+                        error = e;
+                    }
 
-                        observer.next(results);
-                        iteration = results.nextIteration;
-                        remainingDatabases = results.remainingDatabases;
-                        if (remainingDatabases.length === 0) {
+                    if (!observer.closed) {
+                        if (results != null && results !== false) {
+                            already = results.already;
+                            needRegularGrinded = results.needRegularGrinded;
+                            searchLimit = results.searchLimit;
+
+                            observer.next(results);
+                            iteration = results.nextIteration;
+                            remainingDatabases = results.remainingDatabases;
+                            if (remainingDatabases.length === 0) {
+                                observer.complete();
+                            }
+                        } else if (error != null) {
+                            observer.error(error);
+                        } else {
                             observer.complete();
                         }
-                    } else {
-                        observer.complete();
                     }
                 }
             };
@@ -124,6 +137,8 @@ export class ResultsService {
 
     /**
      * Queries the treebank and returns the matching hits.
+     * On error the returned promise rejects with @type {HttpErrorResponse}
+     *
      * @param xpath Specification of the pattern to match
      * @param corpus Identifier of the corpus
      * @param components Identifiers of the sub-treebanks
@@ -133,7 +148,8 @@ export class ResultsService {
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
      */
-    private async results(xpath: string,
+    private async results(
+        xpath: string,
         provider: string,
         corpus: string,
         components: string[],
@@ -145,7 +161,8 @@ export class ResultsService {
         remainingDatabases: string[] | null = null,
         already: SearchResults['already'] | null = null,
         needRegularGrinded = false,
-        searchLimit: number | null = null): Promise<SearchResults | false> {
+        searchLimit: number | null = null
+    ): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl(provider, 'results'), {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
@@ -167,7 +184,11 @@ export class ResultsService {
         return false;
     }
 
-    /** Retrieves the full sentence tree and adds a "highlight=yes" attribute to all nodes with ID, and their descendants. */
+    /**
+     * Retrieves the full sentence tree and adds a "highlight=yes" attribute to all nodes with ID, and their descendants.
+     *
+     * On error the returned promise rejects with @type {HttpErrorResponse}
+     */
     async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
         const url = await this.configurationService.getApiUrl(
             provider,
@@ -194,6 +215,7 @@ export class ResultsService {
         return new XMLSerializer().serializeToString(doc);
     }
 
+    /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
             await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
@@ -203,6 +225,7 @@ export class ResultsService {
             }, httpOptions).toPromise();
     }
 
+    /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         const results = await this.http.post<{ [databaseId: string]: string }>(
             await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
