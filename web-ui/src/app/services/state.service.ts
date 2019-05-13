@@ -2,14 +2,23 @@ import { Injectable } from '@angular/core';
 import { GlobalState, Step } from '../pages/multi-step-page/steps';
 import { StepComponent } from '../components/step/step.component';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { first } from 'rxjs/operators';
+
+class ExternalPromise<T> {
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason: any) => void;
+
+    promise = new Promise<T>((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+    });
+}
 
 /**
  * A transition is used to determine the next step to go to, given the global state and the event that is triggered
  */
 class SharedInstance<T extends GlobalState> {
-    steps: Step<T>[];
-    currentStep$ = new BehaviorSubject<undefined | StepComponent<T>>(undefined);
+    private steps: Step<T>[];
+    private currentStepComponent = new ExternalPromise<StepComponent<T>>();
     isTransitioning$ = new BehaviorSubject<boolean>(false);
     warning$ = new BehaviorSubject<string | false>(false);
 
@@ -19,11 +28,10 @@ class SharedInstance<T extends GlobalState> {
     }
 
     subscribe(stepComponent: StepComponent<T>) {
-        this.currentStep$.next(stepComponent);
+        this.currentStepComponent.resolve(stepComponent);
     }
 
     dispose() {
-        this.currentStep$.unsubscribe();
         this.isTransitioning$.unsubscribe();
         this.warning$.unsubscribe();
     }
@@ -35,7 +43,7 @@ class SharedInstance<T extends GlobalState> {
         state.connectionError = false;
         this.isTransitioning$.next(true);
         this.warning$.next(false);
-        this.currentStep$.next(undefined);
+        this.currentStepComponent = new ExternalPromise();
         return this.jumpState(state, state.currentStep.number - 1);
     }
 
@@ -47,7 +55,7 @@ class SharedInstance<T extends GlobalState> {
             state.connectionError = false;
             this.isTransitioning$.next(true);
             this.warning$.next(false);
-            this.currentStep$.next(undefined);
+            this.currentStepComponent = new ExternalPromise();
             state = await this.jumpState(state, state.currentStep.number + 1);
             if (state.connectionError) {
                 // the initial state may be invalid (e.g. nothing has been selected yet)
@@ -65,7 +73,7 @@ class SharedInstance<T extends GlobalState> {
 
     async jump(state: T, stepNumber: number) {
         this.isTransitioning$.next(true);
-        this.currentStep$.next(undefined);
+        this.currentStepComponent = new ExternalPromise();
         state = await this.jumpState(state, stepNumber);
 
         if (state.connectionError || (!state.valid && state.currentStep.number !== stepNumber)) {
@@ -117,9 +125,10 @@ class SharedInstance<T extends GlobalState> {
 
     private async showWarning(stepNumber: number) {
         const targetStep = this.steps[stepNumber];
-        const currentStep = await this.currentStep$.pipe(
-            first(component => component && component.stepType === targetStep.type)).toPromise();
-        this.warning$.next(currentStep.getWarningMessage() || false);
+        const currentStep = await this.currentStepComponent.promise;
+        if (currentStep.stepType === targetStep.type) {
+            this.warning$.next(currentStep.getWarningMessage() || false);
+        }
     }
 }
 
