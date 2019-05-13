@@ -43,8 +43,8 @@ class SharedInstance<T extends GlobalState> {
      * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
     async next(state: T): Promise<T | false> {
-        state.connectionError = false;
         if (state.valid) {
+            state.connectionError = false;
             this.isTransitioning$.next(true);
             this.warning$.next(false);
             this.currentStep$.next(undefined);
@@ -64,7 +64,6 @@ class SharedInstance<T extends GlobalState> {
     }
 
     async jump(state: T, stepNumber: number) {
-        state.connectionError = false;
         this.isTransitioning$.next(true);
         this.currentStep$.next(undefined);
         state = await this.jumpState(state, stepNumber);
@@ -91,23 +90,25 @@ class SharedInstance<T extends GlobalState> {
 
         if (state.currentStep.number === stepNumber ||
             stepNumber < 0 ||
-            stepNumber === this.steps.length - 1) {
+            stepNumber > this.steps.length - 1) {
             // no or invalid jump
             return state;
         }
 
         // don't modify the original state
-        // (otherwise the interface might display the intermediate components)
+        // (otherwise the interface might display the intermediate state)
         state = Object.assign({}, state);
 
         if (state.currentStep.number > stepNumber) {
             // jumping backwards is always fine
             state.currentStep.leaveStep(state);
+            state.connectionError = false;
             return this.steps[stepNumber].enterStep(state);
         }
 
         while (state.currentStep.number < stepNumber && state.valid) {
             state.currentStep.leaveStep(state);
+            state.connectionError = false;
             state = await this.steps[state.currentStep.number + 1].enterStep(state);
         }
 
@@ -127,6 +128,13 @@ class SharedInstance<T extends GlobalState> {
  */
 @Injectable({ providedIn: 'root' })
 export class StateService<T extends GlobalState> {
+    /**
+     * Use a shared instance for the duration of going through the steps
+     * (example based or xpath based search). When going to another
+     * multi-step page it should be cleared to make sure no deferred
+     * actions popup on that page. E.g. a warning message or jump
+     * could be fired after a server call is completed.
+     */
     private static instance: SharedInstance<any>;
     private get instance() { return StateService.instance; }
     private set instance(value) { StateService.instance = value; }
@@ -134,6 +142,10 @@ export class StateService<T extends GlobalState> {
     isTransitioning$: Observable<boolean>;
     warning$: Observable<string | false>;
 
+    /**
+     * This is called on entry of the multi-step page
+     * @param steps The steps of this page.
+     */
     init(steps: Step<T>[]) {
         this.dispose();
         this.instance = new SharedInstance<T>(steps);
@@ -141,6 +153,11 @@ export class StateService<T extends GlobalState> {
         this.warning$ = this.instance.warning$.asObservable();
     }
 
+    /**
+     * Subscribes a step component once it has been rendered and is ready to
+     * receive information e.g. warning messages.
+     * @param component The component showing the step state.
+     */
     subscribe(component: StepComponent<T>) {
         this.instance.subscribe(component);
     }
@@ -163,6 +180,9 @@ export class StateService<T extends GlobalState> {
         return this.instance.jump(state, stepNumber);
     }
 
+    /**
+     * Disposes the shared instance when leaving the multi-step page.
+     */
     dispose() {
         if (this.instance) {
             this.instance.dispose();
