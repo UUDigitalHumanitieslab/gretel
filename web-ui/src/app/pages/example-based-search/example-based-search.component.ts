@@ -33,7 +33,6 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         selectedTreebanks: [],
     };
 
-    sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
     steps: Step<GlobalStateExampleBased>[];
 
@@ -77,10 +76,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
 
     initializeSteps(): { step: Step<GlobalStateExampleBased>, name: string }[] {
         this.matrixStep = new MatrixStep(2, this.alpinoService);
-        this.sentenceInputStep = new SentenceInputStep(0);
         return [{
             name: 'Example',
-            step: this.sentenceInputStep
+            step: new SentenceInputStep(0)
         },
         {
             name: 'Parse',
