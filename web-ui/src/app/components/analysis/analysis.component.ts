@@ -102,9 +102,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     }
 
     getWarningMessage() {
-    }
-
-    updateValidity() {
+        // Should never show warning
     }
 
     private async initialize() {

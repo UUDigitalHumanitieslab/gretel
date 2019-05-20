@@ -39,8 +39,10 @@ export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBa
         this.treebankService.toggleCorpus(provider, corpus);
     }
 
-    /** Checks if there are treebanks selected and notifies parent */
-    updateValidity() {
+    /**
+     * Checks if there are treebanks selected and notifies parent
+     */
+    private updateValidity() {
         // treebank selected -> some component selected
         this.valid = this.treebanks.some(
             ({ treebank, components }) => treebank.selected && Object.values(components).some(c => c.selected));

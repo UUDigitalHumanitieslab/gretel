@@ -597,7 +597,4 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     public getWarningMessage() {
         // Should never show warning
     }
-
-    updateValidity() {
-    }
 }

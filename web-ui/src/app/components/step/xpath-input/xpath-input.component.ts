@@ -57,10 +57,6 @@ export class XpathInputComponent extends StepComponent<GlobalState> implements O
 
     valid = false;
 
-    updateValidity() {
-        this.changeValid.emit(this.valid);
-    }
-
     getWarningMessage() {
         return 'Please make sure the xpath query is correct.';
     }

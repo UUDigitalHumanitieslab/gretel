@@ -168,7 +168,7 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
         this.emitChange();
     }
 
-    public updateValidity() {
+    private updateValidity() {
         this.changeValid.emit(this.valid);
     }
 

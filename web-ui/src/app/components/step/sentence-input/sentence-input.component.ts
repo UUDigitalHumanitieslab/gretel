@@ -34,7 +34,7 @@ export class SentenceInputComponent extends StepComponent<GlobalStateExampleBase
         this.updateValidity((event.target as HTMLInputElement).value);
     }
 
-    public updateValidity(sentence = this.inputSentence) {
+    private updateValidity(sentence = this.inputSentence) {
         this.valid = sentence.trim().length !== 0;
         if (this.valid) {
             this.warning = false;

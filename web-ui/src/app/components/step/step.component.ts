@@ -18,11 +18,6 @@ export abstract class StepComponent<T extends GlobalState> implements OnInit {
     @Output() changeValid = new EventEmitter<Boolean>();
 
     /**
-     * Check if the input of the user is valid
-     */
-    public abstract updateValidity(): void;
-
-    /**
      * Gives an warning that helps the user to understand why the current input is not valid
      *
      * @returns a message explaining the situation, or nothing when the component will show

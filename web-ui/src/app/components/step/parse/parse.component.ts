@@ -25,8 +25,4 @@ export class ParseComponent extends StepComponent<GlobalStateExampleBased> {
     public getWarningMessage(): string | void {
         this.warning = `Error parsing sentence: ${this.sentence}`; // we display our own error
     }
-
-    public updateValidity() {
-        this.changeValid.emit(this.valid);
-    }
 }
