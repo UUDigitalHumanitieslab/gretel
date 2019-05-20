@@ -1,12 +1,17 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StepComponent } from '../step.component';
+import { StateService } from '../../../services/_index';
+import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-sentence-input',
     templateUrl: './sentence-input.component.html',
     styleUrls: ['./sentence-input.component.scss']
 })
-export class SentenceInputComponent extends StepComponent {
+export class SentenceInputComponent extends StepComponent<GlobalStateExampleBased> {
+    public stepType = StepType.SentenceInput;
+    public warning = false;
+
     @Output()
     public changeValue = new EventEmitter<string>();
 
@@ -16,11 +21,11 @@ export class SentenceInputComponent extends StepComponent {
     @Input()
     public inputSentence: string;
 
-    constructor() {
-        super();
+    constructor(stateService: StateService<GlobalStateExampleBased>) {
+        super(stateService);
     }
 
-    public getValidationMessage() {
+    public getWarningMessage() {
         this.warning = true;
     }
 
@@ -29,7 +34,7 @@ export class SentenceInputComponent extends StepComponent {
         this.updateValidity((event.target as HTMLInputElement).value);
     }
 
-    public updateValidity(sentence = this.inputSentence) {
+    private updateValidity(sentence = this.inputSentence) {
         this.valid = sentence.trim().length !== 0;
         if (this.valid) {
             this.warning = false;

@@ -17,6 +17,7 @@ interface GlobalState {
     retrieveContext: boolean;
     xpath: string;
     filterValues: FilterValues;
+    connectionError: boolean;
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
@@ -40,6 +41,16 @@ interface GlobalStateExampleBased extends GlobalState {
     respectOrder: boolean;
 }
 
+enum StepType {
+    SentenceInput,
+    Matrix,
+    Parse,
+    XpathInput,
+    Analysis,
+    Results,
+    SelectTreebanks
+}
+
 /**
  * A step has a number and a function that performs the necessary actions when entering a step
  */
@@ -47,12 +58,16 @@ abstract class Step<T> {
     constructor(public number: number) {
     }
 
+    abstract type: StepType;
+
     // Makes sure the step is entered correctly
     abstract enterStep(state: T): Promise<T>;
     abstract leaveStep(state: T): T;
 }
 
 class SentenceInputStep<T extends GlobalState> extends Step<T> {
+    type = StepType.SentenceInput;
+
     async enterStep(state: T) {
         state.currentStep = this;
         state.valid = state.inputSentence && state.inputSentence.length > 0;
@@ -65,6 +80,8 @@ class SentenceInputStep<T extends GlobalState> extends Step<T> {
 }
 
 class MatrixStep extends Step<GlobalStateExampleBased> {
+    type = StepType.Matrix;
+
     constructor(number: number, private alpinoService: AlpinoService) {
         super(number);
     }
@@ -108,6 +125,8 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
 }
 
 class ParseStep extends Step<GlobalStateExampleBased> {
+    type = StepType.Parse;
+
     constructor(number: number, private alpinoService: AlpinoService) {
         super(number);
     }
@@ -123,7 +142,9 @@ class ParseStep extends Step<GlobalStateExampleBased> {
                 state.valid = true;
             })
             .catch(e => {
+                state.connectionError = true;
                 state.exampleXml = undefined;
+                console.error(e);
             })
             .finally(() => {
                 state.loading = false;
@@ -138,6 +159,8 @@ class ParseStep extends Step<GlobalStateExampleBased> {
 }
 
 class XpathInputStep<T extends GlobalState> extends Step<T> {
+    type = StepType.XpathInput;
+
     constructor(number: number) {
         super(number);
     }
@@ -154,6 +177,8 @@ class XpathInputStep<T extends GlobalState> extends Step<T> {
 }
 
 class AnalysisStep<T extends GlobalState> extends Step<T> {
+    type = StepType.Analysis;
+
     constructor(number: number) {
         super(number);
     }
@@ -179,7 +204,9 @@ class AnalysisStep<T extends GlobalState> extends Step<T> {
     }
 }
 
-class ResultStep<T extends GlobalState> extends Step<T> {
+class ResultsStep<T extends GlobalState> extends Step<T> {
+    type = StepType.Results;
+
     constructor(number: number) {
         super(number);
     }
@@ -207,6 +234,8 @@ class ResultStep<T extends GlobalState> extends Step<T> {
 }
 
 class SelectTreebankStep<T extends GlobalState> extends Step<T> {
+    type = StepType.SelectTreebanks;
+
     constructor(public number: number, protected treebankService: TreebankService) {
         super(number);
     }
@@ -234,10 +263,11 @@ export {
     GlobalState,
     GlobalStateExampleBased,
     Step,
+    StepType,
     AnalysisStep,
     XpathInputStep,
     SelectTreebankStep,
-    ResultStep,
+    ResultsStep,
     SentenceInputStep,
     ParseStep,
     MatrixStep

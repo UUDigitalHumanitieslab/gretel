@@ -11,12 +11,14 @@ import { routes } from './app-routing/routes';
 
 import { ClipboardServiceMock } from './mocks/clipboard.service.mock';
 
-import { ConfigurationService, UploadedTreebankResponse, ConfiguredTreebanksResponse } from './services/_index';
+import { ConfigurationService, UploadedTreebankResponse, ConfiguredTreebanksResponse, StateService } from './services/_index';
 import { HttpClientMock } from './mocks/http-client.mock';
 import { ConfigurationServiceMock } from './services/configuration.service.mock';
 
 export function commonTestBed() {
     const httpClientMock = new HttpClientMock();
+    const stateService = new StateService<any>();
+    stateService.init([]);
 
     const filteredImports = imports.filter(value => !(value in [AppRoutingModule, ClipboardModule, HttpClientModule]));
     filteredImports.push(
@@ -36,6 +38,9 @@ export function commonTestBed() {
         }, {
             provide: HttpClient,
             useValue: httpClientMock
+        }, {
+            provide: StateService,
+            useValue: stateService
         });
 
     // common mock data

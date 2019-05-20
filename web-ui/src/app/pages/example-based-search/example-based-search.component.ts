@@ -1,20 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { MatrixSettings, MatrixComponent } from '../../components/step/matrix/matrix.component';
+import { Component } from '@angular/core';
+import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
-    GlobalStateExampleBased, XpathInputStep, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
-    MatrixStep, AnalysisStep, Step, GlobalState
-} from "../multi-step-page/steps";
-import { DecreaseTransition, IncreaseTransition, Transitions } from "../multi-step-page/transitions";
-import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
-import { AlpinoService, TreebankService, mapTreebanksToSelectionSettings } from '../../services/_index';
-import { ActivatedRoute, Router } from "@angular/router";
-import { filter, map } from 'rxjs/operators';
-import { SentenceInputComponent } from '../../components/step/sentence-input/sentence-input.component';
-import { ParseComponent } from '../../components/step/parse/parse.component';
-import { SelectTreebanksComponent } from '../../components/step/select-treebanks/select-treebanks.component';
-import { ResultsComponent } from '../../components/step/results/results.component';
-import { AnalysisComponent } from '../../components/analysis/analysis.component';
+    GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultsStep,
+    MatrixStep, AnalysisStep, Step
+} from '../multi-step-page/steps';
+import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
+import { AlpinoService, TreebankService, mapTreebanksToSelectionSettings, StateService } from '../../services/_index';
+import { ActivatedRoute, Router } from '@angular/router';
+
 @Component({
     selector: 'grt-example-based-search',
     templateUrl: './example-based-search.component.html',
@@ -24,6 +17,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     protected defaultGlobalState: GlobalStateExampleBased = {
         exampleXml: undefined,
         subTreeXml: undefined,
+        connectionError: false,
         currentStep: undefined,
         filterValues: {},
         valid: true,
@@ -39,78 +33,16 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         selectedTreebanks: [],
     };
 
-    sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
     steps: Step<GlobalStateExampleBased>[];
 
-    @ViewChild('sentenceInput')
-    sentenceInputComponent: SentenceInputComponent;
-    @ViewChild('parse')
-    parseComponent: ParseComponent;
-    @ViewChild('matrix')
-    matrixComponent: MatrixComponent;
-    @ViewChild('selectTreebanks')
-    selectTreebanksComponent: SelectTreebanksComponent;
-    @ViewChild('results')
-    resultsComponent: ResultsComponent;
-    @ViewChild('analysis')
-    analysisComponent: AnalysisComponent;
-
-    constructor(private alpinoService: AlpinoService, treebankService: TreebankService, route: ActivatedRoute, router: Router) {
-        super(route, router, treebankService);
-    }
-
-    ngOnInit() {
-        super.ngOnInit();
-        this.subscriptions.push(
-            this.treebankService.treebanks
-            .pipe(
-                // prevent infinite loops as we update the url whenever different banks are selected
-                filter(v => v.origin !== 'url' && v.origin !== 'init'),
-                map(v => mapTreebanksToSelectionSettings(v.state))
-            )
-            .subscribe(state => this.updateSelected(state))
-        );
-    }
-
-    initializeCrumbs() {
-        this.crumbs = [
-            {
-                name: 'Example',
-                number: 0,
-            },
-            {
-                name: 'Parse',
-                number: 1,
-            },
-            {
-                name: 'Matrix',
-                number: 2,
-            },
-            {
-                name: 'Treebanks',
-                number: 3,
-            },
-            {
-                name: 'Results',
-                number: 4,
-            },
-            {
-                name: 'Analysis',
-                number: 5,
-            },
-        ];
-    }
-
-    initializeComponents() {
-        this.components = [
-            this.sentenceInputComponent,
-            this.parseComponent,
-            this.matrixComponent,
-            this.selectTreebanksComponent,
-            this.resultsComponent,
-            this.analysisComponent
-        ];
+    constructor(
+        private alpinoService: AlpinoService,
+        treebankService: TreebankService,
+        stateService: StateService<GlobalStateExampleBased>,
+        route: ActivatedRoute,
+        router: Router) {
+        super(route, router, treebankService, stateService);
     }
 
     encodeGlobalState(state: GlobalStateExampleBased) {
@@ -124,7 +56,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             });
     }
 
-    decodeGlobalState(queryParams: {[key: string]: any}) {
+    decodeGlobalState(queryParams: { [key: string]: any }) {
         const globalState = {
             step: parseInt(queryParams.currentStep || 0, 10),
             state: {
@@ -142,23 +74,32 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         return globalState;
     }
 
-    initializeSteps() {
+    initializeSteps(): { step: Step<GlobalStateExampleBased>, name: string }[] {
         this.matrixStep = new MatrixStep(2, this.alpinoService);
-        this.sentenceInputStep = new SentenceInputStep(0);
-        this.steps = [
-            this.sentenceInputStep,
-            new ParseStep(1, this.alpinoService),
-            this.matrixStep,
-            new SelectTreebankStep(3, this.treebankService),
-            new ResultStep(4),
-            new AnalysisStep(5)
-        ];
-    }
-
-    initializeConfiguration() {
-        this.configuration = {
-            steps: this.steps
-        };
+        return [{
+            name: 'Example',
+            step: new SentenceInputStep(0)
+        },
+        {
+            name: 'Parse',
+            step: new ParseStep(1, this.alpinoService)
+        },
+        {
+            name: 'Matrix',
+            step: this.matrixStep
+        },
+        {
+            name: 'Treebanks',
+            step: new SelectTreebankStep(3, this.treebankService)
+        },
+        {
+            name: 'Results',
+            step: new ResultsStep(4)
+        },
+        {
+            name: 'Analysis',
+            step: new AnalysisStep(5)
+        }];
     }
 
     /**

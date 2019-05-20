@@ -17,9 +17,9 @@ $base = explode('/router.php/', $_SERVER['REQUEST_URI'])[0].'/router.php';
 $router = new AltoRouter();
 $router->setBasePath($base);
 
-$router->map('OPTIONS', '@.*', function() {
-    header("Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE");
-    header("Access-Control-Allow-Headers: Content-Type"); // allow all mime-types for content-type
+$router->map('OPTIONS', '@.*', function () {
+    header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE');
+    header('Access-Control-Allow-Headers: Content-Type'); // allow all mime-types for content-type
     return;
 });
 
@@ -118,6 +118,8 @@ $router->map('POST', '/results', function () {
 
     if (isset($data['already'])) {
         $already = $data['already'];
+    } else {
+        $already = null;
     }
     $needRegularGrinded = isset($data['needRegularGrinded']) && $data['needRegularGrinded'];
     $results = getResults(

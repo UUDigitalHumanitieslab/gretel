@@ -1,8 +1,21 @@
 import { Component, Input, OnDestroy, Output, EventEmitter, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, combineLatest } from 'rxjs';
-import { filter, debounceTime, distinctUntilChanged, switchMap, map, startWith, materialize, endWith, shareReplay, flatMap, take } from 'rxjs/operators';
+import {
+    filter,
+    debounceTime,
+    distinctUntilChanged,
+    switchMap,
+    map,
+    startWith,
+    materialize,
+    endWith,
+    shareReplay,
+    flatMap,
+    take
+} from 'rxjs/operators';
 
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
@@ -19,22 +32,23 @@ import {
     FilterByXPath,
     SelectedTreebanks,
     SearchResults,
+    StateService
 } from '../../../services/_index';
 import { Filter } from '../../filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
 import { NotificationKind } from 'rxjs/internal/Notification';
-import { HttpErrorResponse } from '@angular/common/http';
+import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 
 const DebounceTime = 200;
 
-type HitWithOrigin = Hit&{
+type HitWithOrigin = Hit & {
     provider: string;
     corpus: string;
     componentDisplayName: string;
 };
 
-type ResultsInfo = {
+interface ResultsInfo {
     [provider: string]: {
         [corpus: string]: {
             hidden: boolean;
@@ -45,15 +59,15 @@ type ResultsInfo = {
                 [componentId: string]: boolean
             }
         }
-    }
-};
+    };
+}
 
 @Component({
     selector: 'grt-results',
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent implements OnInit, OnDestroy {
+export class ResultsComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
 
@@ -61,6 +75,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     public info: ResultsInfo = {};
     public hiddenHits = 0;
     public filteredResults: Hit[] = [];
+    public stepType = StepType.Results;
 
     @Input('xpath')
     public set xpath(value: string) { this.xpathSubject.next(value); }
@@ -127,9 +142,10 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService
+        private treebankService: TreebankService,
+        stateService: StateService<GlobalState>
     ) {
-        super();
+        super(stateService);
         this.changeValid = new EventEmitter();
     }
 
@@ -171,7 +187,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
                         hiddenComponents: s.components.reduce((hidden, comp) => {
                             hidden[comp] = !!(oldCorpusInfo && oldCorpusInfo.hiddenComponents[comp]);
                             return hidden;
-                        }, {} as {[componentId: string]: boolean}),
+                        }, {} as { [componentId: string]: boolean }),
                     };
                     return info;
                 }, {} as ResultsInfo);
@@ -301,11 +317,11 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
      */
     public getFileNames() {
         return Object.values(this.info)
-        .flatMap(provider => Object.values(provider))
-        .filter(c => !c.hidden) // filter hidden banks
-        .flatMap(c => c.hits.filter(h => !c.hiddenComponents[h.component])) // extract hits, filter hidden components
-        .map(c => c.fileId) // extract names
-        .sort();
+            .flatMap(provider => Object.values(provider))
+            .filter(c => !c.hidden) // filter hidden banks
+            .flatMap(c => c.hits.filter(h => !c.hiddenComponents[h.component])) // extract hits, filter hidden components
+            .map(c => c.fileId) // extract names
+            .sort();
     }
 
     public copyXPath() {
@@ -317,7 +333,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         }
     }
 
-    public hideComponents({provider, corpus, components}: {provider: string, corpus: string, components: string[]}) {
+    public hideComponents({ provider, corpus, components }: { provider: string, corpus: string, components: string[] }) {
         const c = this.info[provider][corpus];
         Object.keys(c.hiddenComponents).forEach(comp => {
             c.hiddenComponents[comp] = false;
@@ -377,9 +393,9 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             map(v => v.state),
             map(providers => {
                 return Object.values(providers)
-                .flatMap(banks => Object.values(banks))
-                .filter(bank => bank.treebank.selected)
-                .flatMap(bank => bank.metadata);
+                    .flatMap(banks => Object.values(banks))
+                    .filter(bank => bank.treebank.selected)
+                    .flatMap(bank => bank.metadata);
             })
         );
     }
@@ -395,43 +411,43 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             xpathInput,
             filterValueInput
         )
-        .pipe(
-            debounceTime(DebounceTime),
-            distinctUntilChanged(),
-            switchMap(([banks, xpath, filterValues]) =>
-                // TODO: change to stream-based approach, so we can cancel http requests?
-                // TODO: error handling, just ignore that metadata?
-                // would need to check if requests are actually cancelled in the angular http service
+            .pipe(
+                debounceTime(DebounceTime),
+                distinctUntilChanged(),
+                switchMap(([banks, xpath, filterValues]) =>
+                    // TODO: change to stream-based approach, so we can cancel http requests?
+                    // TODO: error handling, just ignore that metadata?
+                    // would need to check if requests are actually cancelled in the angular http service
 
-                // get counts for all selected
-                Promise.all(banks.map(({provider, corpus, components}) =>
-                    this.resultsService.metadataCounts(
-                        xpath,
-                        provider,
-                        corpus,
-                        components,
-                        filterValues
-                    ).catch((e: Error): MetadataValueCounts => {
-                        return {};
-                    }))
-                )
-                // deep merge all results into a single object
-                .then((c: MetadataValueCounts[]) => {
-                    return c.reduce<MetadataValueCounts>((counts, cur) => {
-                        Object.keys(cur)
-                        .forEach(fieldName => {
-                            const field = counts[fieldName] = counts[fieldName] || {};
-                            Object.entries(cur[fieldName])
-                            .forEach(([metadataValue, valueCount]) => {
-                                field[metadataValue] = (field[metadataValue] || 0) + valueCount;
-                            });
-                        });
+                    // get counts for all selected
+                    Promise.all(banks.map(({ provider, corpus, components }) =>
+                        this.resultsService.metadataCounts(
+                            xpath,
+                            provider,
+                            corpus,
+                            components,
+                            filterValues
+                        ).catch((): MetadataValueCounts => {
+                            return {};
+                        }))
+                    )
+                        // deep merge all results into a single object
+                        .then((c: MetadataValueCounts[]) => {
+                            return c.reduce<MetadataValueCounts>((counts, cur) => {
+                                Object.keys(cur)
+                                    .forEach(fieldName => {
+                                        const field = counts[fieldName] = counts[fieldName] || {};
+                                        Object.entries(cur[fieldName])
+                                            .forEach(([metadataValue, valueCount]) => {
+                                                field[metadataValue] = (field[metadataValue] || 0) + valueCount;
+                                            });
+                                    });
 
-                        return counts;
-                    }, {});
-                })
-            ),
-        );
+                                return counts;
+                            }, {});
+                        })
+                ),
+            );
     }
 
     /** Transforms metadata fields along with their values into filter definitions */
@@ -443,37 +459,37 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             metadataFieldsInput,
             metadataValuesInput
         )
-        .pipe(
-            debounceTime(100), // lots of values bouncing around during initialization
-            map(([fields, counts]) => {
-                return fields
-                .filter(field => field.show)
-                .map<Filter>(item => {
-                    const options: string[] = [];
-                    if (item.field in counts) {
-                        for (const key of Object.keys(counts[item.field])) {
-                            // TODO: show the frequency (the data it right here now!)
-                            options.push(key);
-                        }
-                    }
+            .pipe(
+                debounceTime(100), // lots of values bouncing around during initialization
+                map(([fields, counts]) => {
+                    return fields
+                        .filter(field => field.show)
+                        .map<Filter>(item => {
+                            const options: string[] = [];
+                            if (item.field in counts) {
+                                for (const key of Object.keys(counts[item.field])) {
+                                    // TODO: show the frequency (the data it right here now!)
+                                    options.push(key);
+                                }
+                            }
 
-                    // use a dropdown instead of checkboxes when there
-                    // are too many options
-                    if (item.facet === 'checkbox' && options.length > 8) {
-                        item.facet = 'dropdown';
-                    }
+                            // use a dropdown instead of checkboxes when there
+                            // are too many options
+                            if (item.facet === 'checkbox' && options.length > 8) {
+                                item.facet = 'dropdown';
+                            }
 
-                    return {
-                        field: item.field,
-                        dataType: item.type,
-                        filterType: item.facet,
-                        minValue: item.minValue,
-                        maxValue: item.maxValue,
-                        options
-                    };
-                });
-            })
-        );
+                            return {
+                                field: item.field,
+                                dataType: item.type,
+                                filterType: item.facet,
+                                minValue: item.minValue,
+                                maxValue: item.maxValue,
+                                options
+                            };
+                        });
+                })
+            );
     }
 
     /**
@@ -499,7 +515,7 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
             distinctUntilChanged(),
             switchMap(([selectedTreebanks, xpath, filterValues]) => {
                 // create a request for each treebank
-                const resultStreams = selectedTreebanks.map(({provider, corpus, components}) => {
+                const resultStreams = selectedTreebanks.map(({ provider, corpus, components }) => {
                     // create the basic request, without error handling
                     const base = this.resultsService.getAllResults(
                         xpath,
@@ -564,24 +580,21 @@ export class ResultsComponent extends StepComponent implements OnInit, OnDestroy
         this.hiddenHits = 0;
         this.filteredResults =
             Object.values(this.info)
-            .flatMap(provider => Object.values(provider))
-            .filter(corpus => {
-                if (corpus.hidden) {
-                    this.hiddenHits += corpus.hits.length;
-                }
-                return !corpus.hidden;
-            })
-            .flatMap(q => {
-                const filtered = q.hits.filter(h => !q.hiddenComponents[h.component]);
-                this.hiddenHits += q.hits.length - filtered.length;
-                return filtered;
-            });
+                .flatMap(provider => Object.values(provider))
+                .filter(corpus => {
+                    if (corpus.hidden) {
+                        this.hiddenHits += corpus.hits.length;
+                    }
+                    return !corpus.hidden;
+                })
+                .flatMap(q => {
+                    const filtered = q.hits.filter(h => !q.hiddenComponents[h.component]);
+                    this.hiddenHits += q.hits.length - filtered.length;
+                    return filtered;
+                });
     }
 
-    public getValidationMessage() {
+    public getWarningMessage() {
         // Should never show warning
-    }
-
-    updateValidity() {
     }
 }
