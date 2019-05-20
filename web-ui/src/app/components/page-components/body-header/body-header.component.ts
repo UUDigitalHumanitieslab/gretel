@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { TitleService } from '../../../services/title.service';
 
 @Component({
     selector: 'grt-body-header',
@@ -8,9 +9,10 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 export class BodyHeaderComponent implements OnInit {
     @ViewChild('title')
     set title(v: ElementRef<HTMLHeadingElement>) {
-        document.title = `${v.nativeElement.innerText} - GrETEL 4`;
+        this.titleService.set('title', v.nativeElement.innerText);
     }
-    constructor() { }
+
+    constructor(private titleService: TitleService) { }
 
     ngOnInit() {
     }

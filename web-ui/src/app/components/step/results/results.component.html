@@ -86,7 +86,7 @@
 </div>
 <div class="level">
     <div class="level-left">
-        <h1 class="title" [ngClass]="{'is-loading': loading}">
+        <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
             Results: {{filteredResults.length}}<ng-container *ngIf="hiddenHits > 0"> ({{hiddenHits}} hidden)</ng-container>
         </h1>
     </div>

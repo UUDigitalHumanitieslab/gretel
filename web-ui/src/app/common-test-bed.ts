@@ -1,6 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { ClipboardModule, ClipboardService } from 'ngx-clipboard';
@@ -41,6 +42,9 @@ export function commonTestBed() {
         }, {
             provide: StateService,
             useValue: stateService
+        }, {
+            provide: Title,
+            useClass: Title
         });
 
     // common mock data

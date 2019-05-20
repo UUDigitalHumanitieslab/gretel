@@ -111,6 +111,7 @@ class SharedInstance<T extends GlobalState> {
             // jumping backwards is always fine
             state.currentStep.leaveStep(state);
             state.connectionError = false;
+            state.valid = true;
             return this.steps[stepNumber].enterStep(state);
         }
 

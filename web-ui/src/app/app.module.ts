@@ -36,6 +36,7 @@ import { HeaderComponent } from './components/page-components/header/header.comp
 import { Header3Component } from './components/page-components/header-3/header-3.component';
 import { GretelWebsiteLinkComponent } from './components/page-components/gretel-website-link/gretel-website-link.component';
 import { BalloonDirective } from './balloon.directive';
+import { SubtitleDirective } from './subtitle.directive';
 
 import {
     AlpinoService,
@@ -90,6 +91,7 @@ export const declarations: any[] = [
     SelectTreebanksComponent,
     SentenceInputComponent,
     StepButtonsComponent,
+    SubtitleDirective,
     SubTreebanksComponent,
     TreeVisualizerComponent,
     XPathEditorComponent,
