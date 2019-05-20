@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
+
 import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
 import { ValueEvent } from 'lassy-xpath/ng';
@@ -115,7 +117,9 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
             advanced: true
         }];
 
-    constructor(stateService: StateService<GlobalState>) {
+    private originalXPath: string;
+
+    constructor(stateService: StateService<GlobalState>, private confirmationService: ConfirmationService) {
         super(stateService);
     }
 
@@ -160,12 +164,23 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
     }
 
     public editXPath() {
+        this.originalXPath = this.xpath;
         this.emitChange(this.xpath);
     }
 
     public resetXPath() {
-        this.valid = true;
-        this.emitChange();
+        const reset = () => {
+            this.valid = true;
+            this.emitChange();
+        };
+        if (this.xpath === this.originalXPath) {
+            reset();
+        } else {
+            this.confirmationService.confirm({
+                message: 'Are you sure you want to reset your custom XPath query?',
+                accept: reset
+            });
+        }
     }
 
     private updateValidity() {

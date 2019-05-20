@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
@@ -101,6 +103,7 @@ export const imports: any[] = [
     BrowserModule,
     BrowserAnimationsModule,
     ClipboardModule,
+    ConfirmDialogModule,
     DialogModule,
     FiltersModule,
     FormsModule,
@@ -117,6 +120,7 @@ export const providers: any[] = [
     AlpinoService,
     AnalysisService,
     ConfigurationService,
+    ConfirmationService,
     DownloadService,
     LinkService,
     ResultsService,

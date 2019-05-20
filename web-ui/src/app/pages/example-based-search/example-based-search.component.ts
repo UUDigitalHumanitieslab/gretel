@@ -7,6 +7,7 @@ import {
 import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
 import { AlpinoService, TreebankService, mapTreebanksToSelectionSettings, StateService } from '../../services/_index';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
 
 @Component({
     selector: 'grt-example-based-search',
@@ -38,6 +39,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
 
     constructor(
         private alpinoService: AlpinoService,
+        private extractinatorService: ExtractinatorService,
+        private reconstructorService: ReconstructorService,
         treebankService: TreebankService,
         stateService: StateService<GlobalStateExampleBased>,
         route: ActivatedRoute,
@@ -75,7 +78,11 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     }
 
     initializeSteps(): { step: Step<GlobalStateExampleBased>, name: string }[] {
-        this.matrixStep = new MatrixStep(2, this.alpinoService);
+        this.matrixStep = new MatrixStep(
+            2,
+            this.alpinoService,
+            this.extractinatorService,
+            this.reconstructorService);
         return [{
             name: 'Example',
             step: new SentenceInputStep(0)
@@ -132,8 +139,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.globalState.isCustomXPath = false;
             this.globalState.tokens = matrixSettings.tokens;
             this.globalState.attributes = matrixSettings.attributes;
-            this.globalState = await this.matrixStep.updateMatrix(this.globalState);
         }
+        this.globalState = await this.matrixStep.updateMatrix(this.globalState);
         this.updateGlobalState(this.globalState);
     }
 

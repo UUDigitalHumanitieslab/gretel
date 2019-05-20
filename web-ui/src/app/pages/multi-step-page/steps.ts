@@ -1,6 +1,7 @@
 import { TreebankService, mapTreebanksToSelectionSettings } from '../../services/treebank.service';
 import { AlpinoService, FilterValues } from '../../services/_index';
 import { map, take } from 'rxjs/operators';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
 
 /**
  * Contains all the steps that are used in the xpath search
@@ -82,7 +83,10 @@ class SentenceInputStep<T extends GlobalState> extends Step<T> {
 class MatrixStep extends Step<GlobalStateExampleBased> {
     type = StepType.Matrix;
 
-    constructor(number: number, private alpinoService: AlpinoService) {
+    constructor(number: number,
+        private alpinoService: AlpinoService,
+        private extractinatorService: ExtractinatorService,
+        private reconstructorService: ReconstructorService) {
         super(number);
     }
 
@@ -117,8 +121,14 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
             state.subTreeXml = generated.subTree;
             state.xpath = generated.xpath;
             state.valid = true;
+        } else {
+            try {
+                const paths = this.extractinatorService.extract(state.xpath);
+                state.subTreeXml = this.reconstructorService.construct(paths, state.xpath);
+            } catch (error) {
+                state.valid = false;
+            }
         }
-        // TODO: validate custom XPATH!
         state.loading = false;
         return state;
     }
