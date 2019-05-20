@@ -3,10 +3,11 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "npm run serve & npm run test",
+    "start": "npm run build-pre && npm run serve & npm run test",
     "serve": "ng serve --proxy-config proxy.conf.json",
     "serve:poll": "ng serve --poll=2000 --host 0.0.0.0 --proxy-config proxy.conf.json",
-    "build": "ng build --prod --base-href=/ng/ --output-path=../ng",
+    "build": "npm run build-pre && ng build --prod --base-href=/ng/ --output-path=../ng",
+    "build-pre": "node ./build/build-pre.js",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

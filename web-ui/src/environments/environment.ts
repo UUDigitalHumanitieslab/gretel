@@ -3,8 +3,10 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 import 'zone.js/dist/zone-error';
+import { version } from './version';
 
 export const environment = {
     name: 'dev',
-    production: false
+    production: false,
+    version
 };
