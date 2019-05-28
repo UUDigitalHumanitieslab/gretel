@@ -42,6 +42,7 @@
     "hammerjs": "^2.0.8",
     "jquery": "^3.4.1",
     "jquery-ui": "^1.12.1",
+    "jszip": "github:deliangyang/jszip#master",
     "lassy-xpath": "^0.4.0",
     "lodash": "^4.17.11",
     "ngx-clipboard": "^12.0.0-beta.1",
