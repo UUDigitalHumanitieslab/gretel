@@ -48,17 +48,17 @@ import {
     TreebankService,
     XmlParseService
 } from './services/_index';
-import { AnalysisComponent } from './components/analysis/analysis.component';
+import { AnalysisComponent } from './components/step/analysis/analysis.component';
 import { TreeVisualizerComponent } from './components/tree-visualizer/tree-visualizer.component';
 import { ExternalTreeVisualizerComponent } from './components/tree-visualizer/external-tree-visualizer.component';
 import { XPathEditorComponent } from './components/xpath/editor/xpath-editor.component';
 import { XPathViewerComponent } from './components/xpath/viewer/xpath-viewer.component';
-import { FiltersModule } from './components/filters/filters.module';
+import { FiltersModule } from './modules/filters/filters.module';
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
-import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
+import { DistributionListComponent } from './components/step/results/distribution-list.component';
 import { RouterModule } from '@angular/router';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';

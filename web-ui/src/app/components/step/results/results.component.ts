@@ -34,7 +34,7 @@ import {
     SearchResults,
     StateService
 } from '../../../services/_index';
-import { Filter } from '../../filters/filters.component';
+import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
 import { NotificationKind } from 'rxjs/internal/Notification';

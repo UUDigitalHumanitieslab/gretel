@@ -21,11 +21,11 @@ import {
     FilterByXPath,
     FilterValue,
     StateService
-} from '../../services/_index';
+} from '../../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
-import { TreebankMetadata } from '../../treebank';
-import { StepComponent } from '../step/step.component';
-import { GlobalState, StepType } from '../../pages/multi-step-page/steps';
+import { TreebankMetadata } from '../../../treebank';
+import { StepComponent } from '../step.component';
+import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-analysis',

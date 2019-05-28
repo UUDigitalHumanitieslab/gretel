@@ -1,14 +1,9 @@
-import { Component, Input, Output, SimpleChange, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { DownloadService, ResultsService, TreebankService, TreebankCount } from '../../../services/_index';
 import { Observable, BehaviorSubject, merge, from, Subscription, combineLatest, Notification } from 'rxjs';
 import { map, switchMap, materialize, startWith, endWith } from 'rxjs/operators';
 import { Treebank, TreebankComponent, FuzzyNumber } from '../../../treebank';
 import { NotificationKind } from 'rxjs/internal/Notification';
-
-
-type ComponentInfo = {
-
-};
 
 @Component({
     selector: 'grt-distribution-list',
@@ -266,8 +261,8 @@ export class DistributionListComponent implements OnInit, OnDestroy {
                     corpus: name,
                     components: bank.hidden ? Object.keys(bank.components) :
                         Object.entries(bank.components)
-                        .filter(([id, comp]) => comp.hidden)
-                        .map(([id, comp]) => id)
+                        .filter(([, comp]) => comp.hidden)
+                        .map(([id]) => id)
                 });
             });
         });
