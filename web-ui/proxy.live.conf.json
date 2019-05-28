@@ -1,0 +1,10 @@
+{
+    "/gretel/": {
+        "target": "http://gretel.hum.uu.nl/gretel4/",
+        "pathRewrite": {
+            "^/gretel": ""
+        }
+    },
+    "/gretel-upload/": "http://gretel.hum.uu.nl/",
+    "secure": false
+}
