@@ -1,23 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ActivatedRoute, Router } from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { Crumb } from "../../components/breadcrumb-bar/breadcrumb-bar.component";
-import { TreebankService } from "../../services/treebank.service";
-import { ResultsService } from "../../services/results.service";
-import { MultiStepPageComponent } from "../multi-step-page/multi-step-page.component";
+import { StateService, TreebankService, mapTreebanksToSelectionSettings } from '../../services/_index';
+import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
 import {
     AnalysisStep,
     GlobalState,
-    Step,
     XpathInputStep,
-    ResultStep,
+    ResultsStep,
     SelectTreebankStep,
-    TreebankSelection,
-} from "../multi-step-page/steps";
-import {
-    Transition, Transitions, IncreaseTransition, DecreaseTransition, JumpToStepTransition
-} from '../multi-step-page/transitions'
+    Step,
+} from '../multi-step-page/steps';
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -28,12 +21,13 @@ import {
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
+export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> implements OnInit {
     protected defaultGlobalState: GlobalState = {
+        connectionError: false,
         currentStep: undefined,
         filterValues: {},
         retrieveContext: false,
-        selectedTreebanks: undefined,
+        selectedTreebanks: [],
         xpath: `//node[@cat="smain"
     and node[@rel="su" and @pt="vnw"]
     and node[@rel="hd" and @pt="ww"]
@@ -44,76 +38,46 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         loading: false
     };
 
-    // All the components. used to call functions on.
-    @ViewChild('xpathInput')
-    xpathInputComponent;
-    @ViewChild('selectTreebanksComponentRef')
-    selectTreebankComponent;
-    @ViewChild('hiddenForm')
-    form;
-    @ViewChild('resultsComponentRef')
-    resultComponent;
-
-    constructor(private http: HttpClient, private treebankService: TreebankService, private resultsService: ResultsService, route: ActivatedRoute, router: Router) {
-        super(route, router);
+    constructor(treebankService: TreebankService, stateService: StateService<GlobalState>, route: ActivatedRoute, router: Router) {
+        super(route, router, treebankService, stateService);
     }
 
-    initializeCrumbs() {
-        this.crumbs = [
-            {
-                name: "XPath",
-                number: 0,
-            },
-            {
-                name: "Treebanks",
-                number: 1,
-            },
-            {
-                name: "Results",
-                number: 2,
-            },
-            {
-                name: "Analysis",
-                number: 3,
-            },
-        ];
+    initializeSteps(): { step: Step<GlobalState>, name: string }[] {
+        return [{
+            step: new XpathInputStep(0),
+            name: 'XPath'
+        }, {
+            step: new SelectTreebankStep(1, this.treebankService),
+            name: 'Treebanks'
+        }, {
+            step: new ResultsStep(2),
+            name: 'Results'
+        }, {
+            step: new AnalysisStep(3),
+            name: 'Analysis'
+        }];
     }
 
-    initializeSteps() {
-        this.steps = [
-            new XpathInputStep(0),
-            new SelectTreebankStep(1),
-            new ResultStep(2),
-            new AnalysisStep(3)
-        ];
-    }
-
-    initializeComponents() {
-        this.components = [
-            this.xpathInputComponent,
-            this.selectTreebankComponent,
-            this.resultComponent
-        ];
-    }
-
-    decodeGlobalState(queryParams) {
-        return {
-            step: parseInt(queryParams.currentStep || 0, 10),
-            state:
-            {
+    decodeGlobalState(queryParams: { [key: string]: any }) {
+        const globalState = {
+            step: parseInt(queryParams.currentStep || '0', 10),
+            state: {
                 selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
                 xpath: queryParams.xpath || undefined,
                 retrieveContext: this.decodeBool(queryParams.retrieveContext)
             }
         };
+
+        return globalState;
     }
 
     /**
-     * Sets
-     * @param boolean
+     * Updates the selected treebanks with the given selection
+     * @param selectedTreebanks the new treebank selection
      */
-    setValid(valid: boolean) {
-        this.globalState.valid = valid;
+    updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>) {
+        this.globalState.selectedTreebanks = selectedTreebanks;
+        this.updateGlobalState(this.globalState);
     }
 
     updateRetrieveContext(retrieveContext: boolean) {
@@ -121,23 +85,8 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> {
         this.updateUrl(false);
     }
 
-    /**
-     * Updates the selected treebanks with the given selection
-     * @param selectedTreebanks the new treebank selection
-     */
-    updateSelected(selectedTreebanks: TreebankSelection, writeState = false) {
-        this.globalState.selectedTreebanks = selectedTreebanks;
-        this.updateUrl(writeState);
-    }
-
     updateXPath(xpath: string, writeState: boolean) {
         this.globalState.xpath = xpath;
         this.updateUrl(writeState);
-    }
-
-    initializeConfiguration() {
-        this.configuration = {
-            steps: this.steps
-        };
     }
 }

@@ -6,7 +6,7 @@ import { PathVariable, ExtractinatorService } from 'lassy-xpath/ng';
     styleUrls: ['./xpath-viewer.component.scss']
 })
 export class XPathViewerComponent implements OnChanges, OnInit {
-    public parts: XPathPart[];
+    public lines: XPathPart[][];
 
     @Input()
     public value: string;
@@ -34,18 +34,38 @@ export class XPathViewerComponent implements OnChanges, OnInit {
 
     private determineParts() {
         if (this.value) {
-            this.parts = this.extractinatorService.annotate(
+            const parts = this.extractinatorService.annotate(
                 this.value,
                 Object.values(this.variables || {})).map(a => {
                     return {
                         classNames: a.token.type.replace('.', '-') + (a.variable ? ' path-variable' : ''),
                         content: a.token.text,
+                        description: a.description,
                         variable: a.variable,
                         variableName: a.variable ? a.variable.name : null
                     };
                 });
+            const lines: XPathPart[][] = [[]];
+            for (const part of parts) {
+                const partLines = part.content.split('\n');
+                let currentLine = lines[lines.length - 1];
+
+                if (partLines.length === 1) {
+                    currentLine.push(part);
+                } else {
+                    for (let i = 0; i < partLines.length; i++) {
+                        if (i > 0) {
+                            lines.push(currentLine = []);
+                        }
+                        currentLine.push(Object.assign({}, part, {
+                            content: partLines[i] + ((i < partLines.length - 1) ? '\n' : '')
+                        }));
+                    }
+                }
+            }
+            this.lines = lines;
         } else {
-            this.parts = [];
+            this.lines = [];
         }
     }
 }
@@ -57,6 +77,7 @@ type TypedChanges = {
 export interface XPathPart {
     classNames: string;
     content: string;
+    description: string | null;
     variable: PathVariable;
     variableName: string | null;
 }

@@ -1,14 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AlpinoService } from '../../../services/_index';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
+
+import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
 import { ValueEvent } from 'lassy-xpath/ng';
+import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent implements OnInit {
+export class MatrixComponent extends StepComponent<GlobalState> {
+    public stepType = StepType.Matrix;
+
     @Input('attributes')
     public set attributes(values: string[]) {
         this.tokenValues = values.map(value => {
@@ -40,11 +45,11 @@ export class MatrixComponent extends StepComponent implements OnInit {
     @Input()
     public isCustomXPath: boolean;
     @Input()
-    public respectOrder;
+    public respectOrder: boolean;
     @Input()
-    public retrieveContext;
+    public retrieveContext: boolean;
     @Input()
-    public ignoreTopNode;
+    public ignoreTopNode: boolean;
 
     @Output()
     public changeValue = new EventEmitter<MatrixSettings>();
@@ -112,11 +117,10 @@ export class MatrixComponent extends StepComponent implements OnInit {
             advanced: true
         }];
 
-    constructor(private alpinoService: AlpinoService) {
-        super();
-    }
+    private originalXPath: string;
 
-    ngOnInit() {
+    constructor(stateService: StateService<GlobalState>, private confirmationService: ConfirmationService) {
+        super(stateService);
     }
 
     public setTokenPart(tokenIndex: number, part: Part) {
@@ -149,7 +153,7 @@ export class MatrixComponent extends StepComponent implements OnInit {
         this.emitChange(null, { [key]: !this[key] });
     }
 
-    public customXPathChanged(valueEvent: ValueEvent) {
+    public changeCustomXpath(valueEvent: ValueEvent) {
         this.valid = !valueEvent.error && !!valueEvent.xpath;
         if (!!valueEvent.xpath) {
             this.emitChange(valueEvent.xpath);
@@ -157,19 +161,30 @@ export class MatrixComponent extends StepComponent implements OnInit {
     }
 
     public editXPath() {
+        this.originalXPath = this.xpath;
         this.emitChange(this.xpath);
     }
 
     public resetXPath() {
-        this.valid = true;
-        this.emitChange();
+        const reset = () => {
+            this.valid = true;
+            this.emitChange();
+        };
+        if (this.xpath === this.originalXPath) {
+            reset();
+        } else {
+            this.confirmationService.confirm({
+                message: 'Are you sure you want to reset your custom XPath query?',
+                accept: reset
+            });
+        }
     }
 
-    public updateValidity() {
+    private updateValidity() {
         this.changeValid.emit(this.valid);
     }
 
-    public getValidationMessage() {
+    public getWarningMessage() {
         this.warning = true;
     }
 }

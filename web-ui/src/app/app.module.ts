@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
@@ -20,7 +22,6 @@ import { DocumentationComponent } from './pages/documentation/documentation.comp
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
-import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';
@@ -35,6 +36,7 @@ import { HeaderComponent } from './components/page-components/header/header.comp
 import { Header3Component } from './components/page-components/header-3/header-3.component';
 import { GretelWebsiteLinkComponent } from './components/page-components/gretel-website-link/gretel-website-link.component';
 import { BalloonDirective } from './balloon.directive';
+import { SubtitleDirective } from './subtitle.directive';
 
 import {
     AlpinoService,
@@ -56,72 +58,76 @@ import { ExampleBasedSearchComponent } from './pages/example-based-search/exampl
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
+import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
 import { RouterModule } from '@angular/router';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
 
 export const declarations: any[] = [
-    AppComponent,
-    AnalysisComponent,
-    BalloonDirective,
-    FiltersByXPathComponent,
-    HomePageComponent,
-    HeaderComponent,
-    NavigationComponent,
-    BodyHeaderComponent,
-    FooterComponent,
-    HomeContentComponent,
     AdressComponent,
-    PaperCiteComponent,
-    DocumentationComponent,
-    GretelWebsiteLinkComponent,
-    DocumentationContentComponent,
-    FormatNumberPipe,
-    XpathSearchComponent,
-    Header3Component,
-    XpathInputComponent,
+    AnalysisComponent,
+    AppComponent,
+    BalloonDirective,
+    BodyHeaderComponent,
     BreadcrumbBarComponent,
-    SelectTreebanksComponent,
-    ResultsComponent,
-    SubTreebanksComponent,
     DistributionListComponent,
-    TreeVisualizerComponent,
-    ExternalTreeVisualizerComponent,
+    DocumentationComponent,
+    DocumentationContentComponent,
     ExampleBasedSearchComponent,
+    ExternalTreeVisualizerComponent,
+    FiltersByXPathComponent,
+    FooterComponent,
+    FormatNumberPipe,
+    GretelWebsiteLinkComponent,
+    Header3Component,
+    HeaderComponent,
+    HomeContentComponent,
+    HomePageComponent,
+    MatrixComponent,
+    NavigationComponent,
+    PaperCiteComponent,
+    ParseComponent,
+    ResultsComponent,
+    SelectTreebanksComponent,
     SentenceInputComponent,
     StepButtonsComponent,
-    ParseComponent,
-    MatrixComponent,
+    SubtitleDirective,
+    SubTreebanksComponent,
+    TreeVisualizerComponent,
     XPathEditorComponent,
-    XPathViewerComponent];
+    XpathInputComponent,
+    XpathSearchComponent,
+    XPathViewerComponent
+];
 
 export const imports: any[] = [
+    AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
+    ClipboardModule,
+    ConfirmDialogModule,
+    DialogModule,
     FiltersModule,
     FormsModule,
     HttpClientModule,
-    AppRoutingModule,
-    RouterModule,
-    TableModule,
-    FormsModule,
     LassyXPathModule,
-    DialogModule,
     MessageModule,
     MessagesModule,
     NgSelectModule,
-    ClipboardModule,
+    RouterModule,
+    TableModule,
 ];
 
 export const providers: any[] = [
     AlpinoService,
     AnalysisService,
+    ConfigurationService,
+    ConfirmationService,
+    DownloadService,
     LinkService,
     ResultsService,
-    XmlParseService,
     TreebankService,
-    ConfigurationService,
-    DownloadService,
+    XmlParseService,
 ];
 
 @NgModule({

@@ -3,22 +3,19 @@
  * It is used to give a outline of how a step in a multi-step process should look
  * This component is used as parent for the steps in the xpath-search page
  */
-import { Component, EventEmitter, Output } from '@angular/core';
+import { EventEmitter, Output, OnInit } from '@angular/core';
+import { StateService } from '../../services/_index';
+import { StepType, GlobalState } from '../../pages/multi-step-page/steps';
 
-export abstract class StepComponent {
-    warning = false;
-    valid = false;
+export abstract class StepComponent<T extends GlobalState> implements OnInit {
+    public abstract stepType: StepType;
 
-    constructor() {
+    public valid = false;
 
+    constructor(private stateService: StateService<T>) {
     }
 
     @Output() changeValid = new EventEmitter<Boolean>();
-
-    /**
-     * Check if the input of the user is valid
-     */
-    public abstract updateValidity();
 
     /**
      * Gives an warning that helps the user to understand why the current input is not valid
@@ -26,5 +23,9 @@ export abstract class StepComponent {
      * @returns a message explaining the situation, or nothing when the component will show
      * the feedback itself.
      */
-    public abstract getValidationMessage(): string | void;
+    public abstract getWarningMessage(): string | void;
+
+    ngOnInit() {
+        this.stateService.subscribe(this);
+    }
 }

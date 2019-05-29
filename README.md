@@ -83,7 +83,8 @@ The [Angular 6](https://angular.io) front-end can be found under `web-ui` and ru
 * [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
 * [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
 * [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel), [Gerson Foks](https://www.uu.nl/staff/GFoks) and [Jelte van Boheemen](https://www.uu.nl/medewerkers/JvanBoheemen): additional GrETEL 4 functionality and improvements;
-* Colleagues at the Centre for Computational Linguistics at KU Leuven, and Utrecht University Digital Humanities Lab for their feedback.
+* [Koen Mertens](https://github.com/KCMertens): federated search at [Instituut voor de Nederlandse taal](https://ivdnt.org).
+* Colleagues at the [Centre for Computational Linguistics at KU Leuven](http://www.arts.kuleuven.be/ling/ccl), and [Utrecht University Digital Humanities Lab](https://dig.hum.uu.nl) for their feedback.
 
 ## License
 

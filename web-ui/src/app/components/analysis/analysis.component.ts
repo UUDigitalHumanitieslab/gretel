@@ -1,8 +1,8 @@
 /// <reference path="pivottable.d.ts"/>
 /// <reference types="jqueryui"/>
-import { Component, Input, OnDestroy, OnInit, NgZone, EventEmitter, Output } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
+import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
+import { map, switchMap, first } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -11,36 +11,53 @@ import 'pivottable';
 
 import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
-import { AnalysisService, ResultsService, TreebankService, Hit, FilterValues, FilterValue, FilterByXPath } from '../../services/_index';
+import {
+    AnalysisService,
+    ResultsService,
+    TreebankService,
+    Hit,
+    mapTreebanksToSelectionSettings,
+    FilterValues,
+    FilterByXPath,
+    FilterValue,
+    StateService
+} from '../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../treebank';
+import { StepComponent } from '../step/step.component';
+import { GlobalState, StepType } from '../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-analysis',
     templateUrl: './analysis.component.html',
     styleUrls: ['./analysis.component.scss']
 })
-export class AnalysisComponent implements OnInit, OnDestroy {
+export class AnalysisComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;
+    private $table: JQuery<HTMLElement> | undefined;
+    private $draggable: any | undefined;
+
     private pivotUiOptions: PivotUiOptions;
-    private hits: Hit[];
-    private metadata: { [field: string]: TreebankMetadata };
+    private metadata: TreebankMetadata[] = [];
+
+    private hitsSubject = new BehaviorSubject<Hit[]>([]);
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
-    public variables: { [name: string]: PathVariable };
+    public stepType = StepType.Analysis;
+
+    public variables: { [name: string]: PathVariable; };
     public treeXml: string;
     public treeDisplay = 'inline';
 
     public isLoading = true;
+
+    public renderCount = 0;
+    public hitsCount = 0;
+
     public selectedVariable?: SelectedVariable;
-
-    @Input()
-    public corpus: string;
-
-    @Input()
-    public components: string[];
+    public showMoreSubject = new BehaviorSubject<number>(0);
 
     @Input()
     public xpath: string;
@@ -53,23 +70,24 @@ export class AnalysisComponent implements OnInit, OnDestroy {
 
     public attributes: { value: string, label: string }[];
 
-    private subscriptions: Subscription[];
+    private subscriptions: Subscription[] = [];
     private cancellationToken = new Subject<{}>();
 
-    constructor(private analysisService: AnalysisService,
+    constructor(
+        private analysisService: AnalysisService,
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankService: TreebankService,
-        private ngZone: NgZone) {
+        private ngZone: NgZone,
+        stateService: StateService<GlobalState>
+    ) {
+        super(stateService);
     }
 
     ngOnInit() {
         this.$element = $('.analysis-component');
         this.initialize();
-        this.subscriptions = [
-            this.livePivot()
-        ];
     }
 
     ngOnDestroy() {
@@ -79,14 +97,115 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         this.cancellationToken.next();
     }
 
-    private initialize() {
+    showMore() {
+        this.showMoreSubject.next(this.showMoreSubject.value + 1);
+    }
+
+    getWarningMessage() {
+        // Should never show warning
+    }
+
+    private async initialize() {
+        let variables: PathVariable[];
+        try {
+            variables = this.extractinatorService.extract(this.xpath);
+        } catch (e) {
+            variables = [];
+            console.warn('Error extracting variables from path', e, this.xpath);
+        }
+
         // TODO: on change
-        const variables = this.extractinatorService.extract(this.xpath);
+        this.variables = variables.reduce<{ [name: string]: PathVariable }>((vs, v) => { vs[v.name] = v; return vs; }, {});
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
-        this.variables = variables
-            .reduce((dict, variable) => ({ ...dict, [variable.name]: variable }), {});
+
+        const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
+            map(v => ({
+                selected: mapTreebanksToSelectionSettings(v.state),
+                state: v.state
+            })),
+            switchMap(v => {
+                this.isLoading = true;
+                this.hitsSubject.next([]);
+                this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
+                // fetch all results for all selected components/treebanks
+                // and merge them into a single stream that's subscribed to.
+                const merged = merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                    this.xpath,
+                    selection.provider,
+                    selection.corpus,
+                    selection.components,
+                    false,
+                    true,
+                    [],
+                    variables
+                )));
+
+                merged.toPromise().then(() => {
+                    this.isLoading = false;
+                });
+
+                return merged;
+            }))
+            .subscribe(searchResults => {
+                const hits = [...this.hitsSubject.value, ...searchResults.hits];
+                this.hitsCount = hits.length;
+                this.hitsSubject.next(hits);
+            });
+
+        // wait for the first hits to arrive to actually show a pivot table
+        const firstHits = this.hitsSubject.pipe(first(hits => hits.length > 0))
+            .subscribe(() => {
+                this.defaultPivot();
+                this.subscriptions.push(this.livePivot());
+                firstHits.unsubscribe();
+            });
+
+        this.subscriptions = [
+            subscriptionToTreebankSelection,
+            firstHits
+        ];
+    }
+
+    private makeDraggable() {
+        if (this.$draggable) {
+            this.$draggable.destroy();
+        }
+
+        $('.path-variable,.tree-visualizer li[data-varname]').draggable({
+            appendTo: 'body',
+            connectToSortable: '.pvtHorizList,.pvtRows',
+            stop: (event, ui) => {
+                if ($('.pvtHorizList').find(ui.helper).length) {
+                    this.showVariableToAdd(ui.helper, 'col');
+                }
+                if ($('.pvtRows').find(ui.helper).length) {
+                    this.showVariableToAdd(ui.helper, 'row');
+                }
+            },
+            helper: (event: Event) => {
+                const data = $(event.currentTarget).data();
+                const variable = data['variable'] || data['varname'];
+                return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');
+            },
+            revert: true
+        });
+    }
+
+    public cancelVariable() {
+        this.selectedVariable = undefined;
+    }
+
+    public async addVariable() {
+        this.pivotUiOptions[this.selectedVariable.axis === 'row' ? 'rows' : 'cols']
+            .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
+        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([this.selectedVariable]));
+        this.selectedVariable = undefined;
+    }
+
+    private defaultPivot() {
         // Show a default pivot using the first node variable's lemma property against the POS property.
         // This way the user will get to see some useable values to help clarify the interface.
+        const variables = Object.keys(this.variables).map(key => this.variables[key]);
         if (variables.length > 0) {
             const firstVariable = variables[variables.length > 1 ? 1 : 0];
             this.selectedVariablesSubject.next([{
@@ -99,10 +218,10 @@ export class AnalysisComponent implements OnInit, OnDestroy {
                 variable: firstVariable
             }]);
 
-            const utils = $.pivotUtilities,
-                heatmap = utils.renderers['Heatmap'],
-                renderers = $.extend($.pivotUtilities.renderers,
-                    { 'File export': (new FileExportRenderer()).render });
+            const utils = $.pivotUtilities;
+            const heatmap = utils.renderers['Heatmap'];
+            const renderers = $.extend($.pivotUtilities.renderers,
+                { 'File export': (new FileExportRenderer()).render });
 
             this.pivotUiOptions = {
                 aggregators: {
@@ -127,55 +246,23 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         }
     }
 
-    private makeDraggable() {
-        $('.path-variable,.tree-visualizer li[data-varname]').draggable({
-            appendTo: 'body',
-            connectToSortable: '.pvtHorizList,.pvtRows',
-            stop: (event, ui) => {
-                if ($('.pvtHorizList').find(ui.helper).length) {
-                    this.showVariableToAdd(ui.helper, 'col');
-                }
-                if ($('.pvtRows').find(ui.helper).length) {
-                    this.showVariableToAdd(ui.helper, 'row');
-                }
-            },
-            helper: (event) => {
-                const data = $(event.currentTarget).data(),
-                    variable = data['variable'] || data['varname'];
-                return $(`<li class="tag">${variable}</li>`).css('cursor', 'move');
-            },
-            revert: true
-        });
-    }
-
-    public cancelVariable() {
-        this.selectedVariable = undefined;
-    }
-
-    public async addVariable() {
-        this.pivotUiOptions[this.selectedVariable.axis === 'row' ? 'rows' : 'cols']
-            .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
-        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([this.selectedVariable]));
-        this.selectedVariable = undefined;
-    }
-
     private livePivot() {
-        return this.selectedVariablesSubject.pipe(map((selectedVariables) => {
-            this.show(this.$element, selectedVariables);
-        })).subscribe();
-
+        return combineLatest(this.selectedVariablesSubject, this.showMoreSubject).subscribe(
+            ([selectedVariables, _]) => {
+                this.show(selectedVariables, this.hitsSubject.value);
+            });
     }
 
     private showVariableToAdd(helper: JQuery<HTMLElement>, axis: 'row' | 'col') {
-        const variableName = helper.text().trim(),
-            offset = $('.pvtRendererArea').offset();
+        const variableName = helper.text().trim();
+        const offset = $('.pvtRendererArea').offset();
         this.top = offset.top;
         this.left = offset.left;
 
         helper.remove();
 
         // only work with available attributes
-        const attributes = this.analysisService.getVariableAttributes(variableName, this.hits);
+        const attributes = this.analysisService.getVariableAttributes(variableName, this.hitsSubject.value);
 
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
@@ -189,49 +276,39 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         });
     }
 
-    private async show(element: JQuery<HTMLElement>, selectedVariables: SelectedVariable[]) {
-        this.isLoading = true;
+    private async show(selectedVariables: SelectedVariable[], hits: Hit[]) {
         try {
-            if (!this.metadata || !this.hits) {
-                const [metadata, hits] = await Promise.all([
-                    this.treebankService.getMetadata(this.corpus),
-                    this.resultsService.promiseAllResults(
-                        this.xpath, this.corpus, this.components, false, true, [], Object.values(this.variables), this.cancellationToken)
-                ]);
-                this.metadata = metadata.reduce((dict, item) => {
-                    dict[item.field] = item;
-                    return dict;
-                }, {});
-                this.hits = hits;
-            }
-
-            this.pivot(element, Object.keys(this.metadata), this.hits, selectedVariables);
+            this.pivot(this.metadata.map(m => m.field), hits, selectedVariables);
+            this.makeDraggable();
         } catch (error) {
             // TODO: improved error notification
             console.error(error);
         }
-
-        this.makeDraggable();
-
-        this.isLoading = false;
     }
 
-    private pivot(element: JQuery, metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
+    private pivot(metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
         const variables = selectedVariables.reduce((grouped, s) => {
             grouped[s.variable.name]
                 ? grouped[s.variable.name].push(s.attribute)
                 : grouped[s.variable.name] = [s.attribute];
             return grouped;
-        }, {});
+        }, {} as { [variableName: string]: string[] });
+        this.renderCount = hits.length;
         const pivotData = this.analysisService.getFlatTable(
             hits,
             variables,
             metadataKeys);
-        element.empty();
-        const table = $('<div>');
-        element.append(table);
-        table.pivotUI(pivotData, this.pivotUiOptions);
-        $('.pvtUi').addClass('table is-bordered');
+        if (!this.$table) {
+            this.$element.empty();
+            this.$table = $('<div>');
+            this.$element.append(this.$table);
+            this.$table.pivotUI(pivotData, this.pivotUiOptions);
+            $('.pvtUi').addClass('table is-bordered');
+            return true;
+        } else {
+            this.$table.pivotUI(pivotData);
+            return false;
+        }
     }
 
 
@@ -250,15 +327,17 @@ export class AnalysisComponent implements OnInit, OnDestroy {
      * @param elementGroups
      * @param index
      * @param spanName
-     * @returns {{}}
      */
-    private getValueFromFilters(elementGroups: { [name: string]: Element[] }, index: number, spanName: string) {
+    private getValueFromFilters(
+        elementGroups: { [name: string]: Element[] },
+        index: number,
+        spanName: 'colSpan' | 'rowSpan'): FilterValues {
         const results: FilterValues = {};
         for (const id of Object.keys(elementGroups)) {
             const elements = elementGroups[id],
                 spans = elements.map(v => ({
                     value: v.innerHTML,
-                    size: v[spanName]
+                    size: (v as HTMLTableCellElement)[spanName]
                 }));
             let value = '',
                 total = 0;
@@ -276,7 +355,12 @@ export class AnalysisComponent implements OnInit, OnDestroy {
         return results;
     }
 
-    private getFilterForQuery(id: string, value: string) {
+    /**
+     * Gets filters for an extracted xpath query
+     * @param id The variable name representing part of the query and the attribute name
+     * @param value The attribute value
+     */
+    private getFilterForQuery(id: string, value: string): FilterByXPath {
         const [variable, attribute] = id.split('.');
         return this.resultsService.getFilterForQuery(
             variable,
@@ -287,7 +371,7 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getFilterValue(field: string, value: string): FilterValue {
-        const metadata = this.metadata[field];
+        const metadata = this.metadata.find(f => f.field === field);
         switch (metadata.facet) {
             case 'checkbox':
             case 'dropdown':
@@ -357,15 +441,14 @@ export class AnalysisComponent implements OnInit, OnDestroy {
     }
 
     private getRowElements(element: HTMLElement) {
-        const rows = {},
-            // First get the titles
-            head = element.parentElement.parentElement.parentElement.childNodes[0],
-            body = element.parentElement.parentElement.parentElement.childNodes[1],
-            // Only use the last row.
-            headRows = Array.from(head.childNodes)[head.childNodes.length - 1],
-            bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1),
-            titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML),
-            filters = {};
+        // First get the titles
+        const head = element.parentElement.parentElement.parentElement.childNodes[0];
+        const body = element.parentElement.parentElement.parentElement.childNodes[1];
+        // Only use the last row
+        const headRows = Array.from(head.childNodes)[head.childNodes.length - 1];
+        const bodyRows = Array.from(body.childNodes).slice(0, body.childNodes.length - 1);
+        const titles = Array.from(headRows.childNodes).slice(0, headRows.childNodes.length - 1).map((e: HTMLElement) => e.innerHTML);
+        const filters: { [title: string]: Element[] } = {};
         for (const title of titles) {
             filters[title] = [];
         }

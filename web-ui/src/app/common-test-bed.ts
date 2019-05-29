@@ -1,30 +1,31 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Directive, Input } from '@angular/core';
-import { TestModuleMetadata, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
+import { TestBed } from '@angular/core/testing';
+import { Title } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { ClipboardModule, ClipboardService } from 'ngx-clipboard';
 
-import { declarations, imports, providers, AppModule } from './app.module';
+import { declarations, imports, providers } from './app.module';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { routes } from './app-routing/routes';
 
 import { ClipboardServiceMock } from './mocks/clipboard.service.mock';
 
-import { ConfigurationService } from './services/_index';
+import { ConfigurationService, UploadedTreebankResponse, ConfiguredTreebanksResponse, StateService } from './services/_index';
 import { HttpClientMock } from './mocks/http-client.mock';
 import { ConfigurationServiceMock } from './services/configuration.service.mock';
 
 export function commonTestBed() {
-    let httpClientMock = new HttpClientMock();
+    const httpClientMock = new HttpClientMock();
+    const stateService = new StateService<any>();
+    stateService.init([]);
 
-    let filteredImports = imports.filter(value => !(value in [AppRoutingModule, ClipboardModule, HttpClientModule]));
+    const filteredImports = imports.filter(value => !(value in [AppRoutingModule, ClipboardModule, HttpClientModule]));
     filteredImports.push(
         RouterTestingModule.withRoutes(routes));
 
-    let filteredProviders = providers.filter(provider => provider != ConfigurationService);
+    const filteredProviders = providers.filter(provider => provider !== ConfigurationService);
     filteredProviders.push(
         {
             provide: APP_BASE_HREF,
@@ -38,54 +39,62 @@ export function commonTestBed() {
         }, {
             provide: HttpClient,
             useValue: httpClientMock
+        }, {
+            provide: StateService,
+            useValue: stateService
+        }, {
+            provide: Title,
+            useClass: Title
         });
 
     // common mock data
-    httpClientMock.setData('get', '/gretel/api/src/router.php/configured_treebanks', () => {
-        return {}
+    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank', [] as UploadedTreebankResponse[]);
+
+    httpClientMock.setData('get', '/gretel/api/src/router.php/configured_treebanks', {
+        'test-treebank': {
+            title: 'test title',
+            metadata: [],
+            description: 'test treebank',
+            variants: {
+                'v1': { display: 'v1' },
+                'v2': { display: 'v2' }
+            },
+            groups: {
+                'test-group': {
+                    description: 'test group description'
+                }
+            },
+            components: {
+                'test-component1': {
+                    description: '',
+                    // Omitted on purpose
+                    // disabled: false,
+                    group: 'test-group',
+                    id: 'test-component1',
+                    sentences: 10,
+                    words: 100,
+                    title: '',
+                    variant: 'v1',
+                },
+                'test-component2': {
+                    id: 'test-component2',
+                    title: '',
+                    description: '',
+                    sentences: 20,
+                    words: 200,
+                    group: 'test-group',
+                    variant: 'v2',
+                    disabled: true
+                }
+            }
+        }
+    } as ConfiguredTreebanksResponse);
+
+    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body: any) => {
+        return { 'TEST_DATABASE1_COMPONENT1': '42' };
     });
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank',
-        [{
-            "id": "42",
-            "title": "test-treebank",
-            "user_id": "24",
-            "email": "test@test.nl",
-            "uploaded": "2017-09-01 14:18:41",
-            "processed": "2017-09-01 14:21:32",
-            "public": "1"
-        }]);
 
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/metadata/test-treebank',
-        [{
-            id: 'test_database1',
-            treebank_id: 'test_database1',
-            field: 'test_field1',
-            type: 'text',
-            facet: 'checkbox',
-            min_value: null,
-            max_value: null,
-            show: '1'
-        }]);
-
-    httpClientMock.setData('get', '/gretel-upload/index.php/api/treebank/show/test-treebank', [{
-        basex_db: 'test_database1',
-        nr_sentences: '250',
-        nr_words: '500',
-        slug: 'TestSlug1',
-        title: 'TestTitle1'
-    }, {
-        basex_db: 'test_database2',
-        nr_sentences: '500',
-        nr_words: '750',
-        slug: 'TestSlug2',
-        title: 'TestTitle2'
-    }]);
-
-    httpClientMock.setData('post', '/gretel/api/src/router.php/treebank_counts', (body) => {
-        return { 'TEST_DATABASE1_COMPONENT1': '42' }
-    });
-
-    httpClientMock.setData('post', '/gretel/api/src/router.php/results', (body) => {
+    httpClientMock.setData('post', '/gretel/api/src/router.php/results', (body: any) => {
         return false;
     });
 

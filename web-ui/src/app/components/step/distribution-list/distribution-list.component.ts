@@ -1,153 +1,276 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from '@angular/core';
-import { DownloadService, ResultsService, TreebankCount, TreebankService } from '../../../services/_index';
+import { Component, Input, Output, SimpleChange, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { DownloadService, ResultsService, TreebankService, TreebankCount } from '../../../services/_index';
+import { Observable, BehaviorSubject, merge, from, Subscription, combineLatest, Notification } from 'rxjs';
+import { map, switchMap, materialize, startWith, endWith } from 'rxjs/operators';
+import { Treebank, TreebankComponent, FuzzyNumber } from '../../../treebank';
+import { NotificationKind } from 'rxjs/internal/Notification';
+
+
+type ComponentInfo = {
+
+};
 
 @Component({
     selector: 'grt-distribution-list',
     templateUrl: './distribution-list.component.html',
     styleUrls: ['./distribution-list.component.scss']
 })
-export class DistributionListComponent implements OnChanges {
+export class DistributionListComponent implements OnInit, OnDestroy {
     @Input()
-    public corpus: string;
-
-    @Input()
-    public components: string[];
-
-    @Input()
-    public xpath: string;
+    public set xpath(v: string) { this.xpathSubject.next(v); }
+    public get xpath(): string { return this.xpathSubject.value; }
+    private xpathSubject = new BehaviorSubject<string>('');
 
     @Output()
-    public hidingComponents = new EventEmitter<string[]>();
+    public hidingComponents = new EventEmitter<{
+        provider: string,
+        corpus: string,
+        components: string[]
+    }>();
 
-    public totalSelected = true;
     public loading = true;
-    public counts: Count[];
-    public totalHits: number;
-    public totalSentences: number;
 
-    private componentProperties: Promise<{ [name: string]: { databaseId: string, sentenceCount: number } }> = Promise.resolve({});
+    public state: {
+        [provider: string]: {
+            [corpus: string]: {
+                hidden: boolean;
+                sentenceCount: string;
+                hits?: number;
+                error?: Error;
+                loading: boolean;
+                components: {
+                    [componentId: string]: {
+                        title: string;
+                        hidden: boolean;
+                        sentenceCount: string;
+                        hits?: number;
+                    };
+                };
+            };
+        };
+    } = {};
+    public totalHits = 0;
+    public totalSentences = '?';
 
-    constructor(private downloadService: DownloadService,
+    private subscriptions: Subscription[] = [];
+
+    constructor(
+        private downloadService: DownloadService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService) {
+        private treebankService: TreebankService
+    ) {
     }
 
-    public async ngOnChanges(changes: TypedChanges) {
-        if (this.corpus === undefined || this.xpath === undefined || this.components === undefined) {
-            return;
-        }
-        let redoCounts = false;
+    ngOnInit() {
+        const components$ = this.createComponentsStream();
+        const totals$ = this.createTotalsStream(components$, this.xpathSubject);
+        const combined$ = combineLatest(components$, totals$);
 
-        // check that we have all the mappings available
-        if (changes.corpus && (changes.corpus.firstChange || changes.corpus.currentValue !== changes.corpus.previousValue)) {
-            redoCounts = true;
-            this.componentProperties = this.treebankService.getComponentGroups(this.corpus)
-                .then(componentGroups => {
-                    const properties = {};
-                    for (const componentGroup of componentGroups.groups) {
-                        for (const variant of componentGroups.variants) {
-                            const component = componentGroup.components[variant];
-                            properties[component.component] = {
-                                databaseId: component.databaseId,
-                                sentenceCount: component.sentenceCount
-                            };
-                        }
-                    }
-                    return properties;
+        const recreateState = (entries: Array<{bank: Treebank, components: TreebankComponent[]}>) => {
+            this.state = {};
+            const totalSentenceCount = new FuzzyNumber(0);
+
+            entries.forEach(({bank, components}) => {
+                const p = this.state[bank.provider] =
+                    this.state[bank.provider] ||
+                    {};
+
+                const b = p[bank.id] =
+                    p[bank.id] || {
+                        components: {},
+                        error: undefined,
+                        hidden: false,
+                        loading: true,
+                        hits: undefined,
+                        sentenceCount: components
+                            .reduce((count, comp) => {
+                                count.add(comp.sentenceCount);
+                                return count;
+                            }, new FuzzyNumber(0))
+                            .toLocaleString()
+                    };
+
+                components.forEach(c => {
+                    b.components[c.id] = {
+                        hidden: false,
+                        hits: undefined,
+                        sentenceCount: c.sentenceCount.toLocaleString(),
+                        title: c.title
+                    };
+
+                    totalSentenceCount.add(c.sentenceCount);
                 });
-        }
-
-        if (changes.xpath && (changes.xpath.firstChange || changes.xpath.currentValue !== changes.xpath.previousValue)) {
-            redoCounts = true;
-        }
-
-        if (!redoCounts) {
-            // check that the components have changed
-            redoCounts = changes.components &&
-                (changes.components.firstChange || changes.components.currentValue !== changes.components.previousValue);
-        }
-
-        if (redoCounts) {
-            // the selected components could change before the promise is resolved
-            this.loading = true;
-            const components: string[] = [].concat(this.components);
-            const [componentProperties, treebankCounts] = await Promise.all([
-                this.componentProperties, this.resultsService.treebankCounts(this.xpath, this.corpus, components)
-            ]);
-            let totalHits = 0;
-            let totalSentences = 0;
-
-            // combine the properties of the components (total number of sentences) with the number of hits
-            // in the associated databases
-            const counts = components.map(component => {
-                const hits = treebankCounts.find(c => c.databaseId === componentProperties[component].databaseId).count;
-                const sentences = componentProperties[component].sentenceCount;
-                totalHits += hits;
-                totalSentences += sentences;
-                return {
-                    component,
-                    databaseId: componentProperties[component].databaseId,
-                    hits,
-                    selected: true,
-                    sentences
-                };
             });
 
-            // Restore the selection made by the user (if any), assume the list of components is the same
-            // and has the same order. Allows for differences.
-            if (this.counts !== undefined) {
-                for (let i = 0; i < counts.length; i++) {
-                    const count = counts[i];
-                    for (let j = i; j < this.counts.length + i; j++) {
-                        const existingCount = this.counts[j % this.counts.length];
-                        if (count.databaseId === existingCount.databaseId) {
-                            count.selected = existingCount.selected;
-                        }
-                    }
+            this.totalSentences = totalSentenceCount.toLocaleString();
+        };
+
+        const addTotals = (bank: Treebank, t: Notification<TreebankCount[]>) => {
+            switch (t.kind) {
+                case NotificationKind.COMPLETE: {
+                    this.state[bank.provider][bank.id].loading = false;
+                    return;
+                }
+                case NotificationKind.ERROR: {
+                    this.state[bank.provider][bank.id].error = t.error;
+                    this.state[bank.provider][bank.id].loading = false;
+                    return;
+                }
+                case NotificationKind.NEXT: {
+                    const b = this.state[bank.provider][bank.id];
+                    t.value.forEach(v => {
+                        b.components[v.databaseId].hits = v.count;
+                        b.hits = (b.hits || 0) + v.count;
+                        this.totalHits += v.count;
+                    });
                 }
             }
+        };
 
-            this.counts = counts;
-            this.totalHits = totalHits;
-            this.totalSentences = totalSentences;
-
-            this.loading = false;
-        }
+        this.subscriptions = [
+            combined$.subscribe(([components, totals]) => {
+                if (typeof totals === 'string') {
+                    switch (totals) {
+                        case 'start': {
+                            recreateState(components);
+                            this.totalHits = 0;
+                            this.loading = true;
+                            break;
+                        }
+                        case 'finish': {
+                            this.loading = false;
+                        }
+                    }
+                } else {
+                    addTotals(totals.bank, totals.result);
+                }
+            })
+        ];
     }
 
-    public toggleComponent(count: Count) {
-        count.selected = !count.selected;
-        if (!count.selected) {
-            this.totalSelected = false;
-        } else if (this.counts.find(x => !x.selected) === undefined) {
-            this.totalSelected = true;
-        }
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
+    }
+
+    /** Return a more easily usable set of all selected treebanks/components */
+    private createComponentsStream(): Observable<Array<{
+        bank: Treebank,
+        components: TreebankComponent[]
+    }>> {
+        return this.treebankService.treebanks.pipe(
+            map(treebanks => {
+                const providers = Object.values(treebanks.state);
+                const banks = providers
+                    .flatMap(p => Object.values(p))
+                    .filter(b => b.treebank.selected);
+
+                return banks.map(bank => ({
+                    bank: bank.treebank,
+                    components: Object.values(bank.components).filter(c => c.selected && !c.disabled)
+                }));
+            })
+        );
+    }
+
+    private createTotalsStream(
+        componentsInput: Observable<Array<{bank: Treebank, components: TreebankComponent[]}>>,
+        xpathInput: Observable<string>
+    ) {
+        return combineLatest(
+            componentsInput,
+            xpathInput
+        )
+        .pipe(
+            switchMap(([banks, xpath]) => {
+                // create a request for each bank
+                const requests = banks.map(({bank, components}) =>
+                    // turn response promise into stream again
+                    from(this.resultsService.treebankCounts(
+                        xpath,
+                        bank.provider,
+                        bank.id,
+                        components.map(c => c.id),
+                    ))
+                    .pipe(
+                        // transform errors for this bank into normal notification
+                        // to prevent merged stream from dying if one bank fails
+                        materialize(),
+                        // results don't include the origin bank, so re-attach the bank so we know where they originated
+                        map(result => ({
+                            result,
+                            bank
+                        }))
+                    )
+                );
+
+                return merge(...requests).pipe(
+                    startWith('start'),
+                    endWith('finish')
+                );
+            })
+        );
+    }
+
+    public toggleComponent(provider: string, corpus: string, componentId: string, hidden: boolean) {
+        const c = this.state[provider][corpus];
+        c.components[componentId].hidden = hidden;
+        c.hidden = Object.values(c.components).every(comp => comp.hidden);
+
         this.emitHiddenComponents();
     }
 
-    public toggleAllComponents() {
-        this.totalSelected = !this.totalSelected;
-        for (const count of this.counts) {
-            count.selected = this.totalSelected;
-        }
+    public toggleAllComponents(provider: string, corpus: string, hidden: boolean) {
+        const c = this.state[provider][corpus];
+        Object.values(c.components).forEach(comp => comp.hidden = hidden);
+        c.hidden = hidden;
+
         this.emitHiddenComponents();
     }
 
     public download() {
-        this.downloadService.downloadDistributionList(this.counts);
+        // ugly - extract state type
+        let _: (InstanceType<typeof DistributionListComponent>)['state'][string][string]['components'][string];
+
+        function makeCounts(provider: string, corpus: string, comps: Array<typeof _>) {
+            return comps.map(c => ({
+                provider,
+                corpus,
+                component: c.title,
+                hits: c.hits,
+                sentences: c.sentenceCount
+            }));
+        }
+
+        const counts =
+            Object.entries(this.state).flatMap(([provider, banks]) =>
+                Object.entries(banks).flatMap(([corpus, info]) =>
+                    makeCounts(
+                        provider,
+                        corpus,
+                        Object.values(info.components)
+                    )
+                )
+            );
+
+        this.downloadService.downloadDistributionList(counts);
     }
 
     private emitHiddenComponents() {
-        this.hidingComponents.emit(this.counts.filter(c => !c.selected).map(c => c.databaseId));
+        Object.entries(this.state)
+        .forEach(([provider, banks]) => {
+            Object.entries(banks)
+            .forEach(([name, bank]) => {
+                this.hidingComponents.emit({
+                    provider,
+                    corpus: name,
+                    components: bank.hidden ? Object.keys(bank.components) :
+                        Object.entries(bank.components)
+                        .filter(([id, comp]) => comp.hidden)
+                        .map(([id, comp]) => id)
+                });
+            });
+        });
     }
 }
-type TypedChanges = {
-    [propName in keyof DistributionListComponent]: SimpleChange;
-};
-interface Count {
-    component: string;
-    databaseId: string;
-    hits: number;
-    selected: boolean;
-    sentences: number;
-}
+

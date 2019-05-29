@@ -41,16 +41,7 @@ function corpusToDatabase($components, $corpus, $xpath)
         return checkBfPattern($corpus, $bf, $components);
     }
 
-    $databases = array();
-
-    foreach ($components as $component) {
-        $corpus = strtoupper($corpus);
-        $component = strtoupper($component);
-        $component = $corpus.'_ID_'.$component;
-        $databases[] = $component;
-    }
-
-    return $databases;
+    return $components;
 }
 
 /**
@@ -119,8 +110,10 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
                         $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
                         if (isGrinded($corpus)) {
                             $tblist[$sentid] = $tb;
+                            $sentenceDatabases[$sentid] = $components[0];
+                        } else {
+                            $sentenceDatabases[$sentid] = $database;
                         }
-                        $sentenceDatabases[$sentid] = $database;
                     }
                 }
                 if ($endPosIteration === 'all') {
@@ -161,6 +154,7 @@ function getSentences($corpus, $databases, $components, &$already, $endPosIterat
     } catch (Exception $e) {
         // allow a developer to directly debug this query (log is truncated)
         echo $xquery;
+        http_response_code(500);
         die;
     }
 }

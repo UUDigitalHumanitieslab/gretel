@@ -1,13 +1,13 @@
-import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-
+import { Component } from '@angular/core';
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
-    GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultStep,
-    MatrixStep, TreebankSelection, AnalysisStep, Step
+    GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultsStep,
+    MatrixStep, AnalysisStep, Step
 } from '../multi-step-page/steps';
 import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
-import { AlpinoService } from '../../services/_index';
+import { AlpinoService, TreebankService, mapTreebanksToSelectionSettings, StateService } from '../../services/_index';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
 
 @Component({
     selector: 'grt-example-based-search',
@@ -18,7 +18,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     protected defaultGlobalState: GlobalStateExampleBased = {
         exampleXml: undefined,
         subTreeXml: undefined,
-        selectedTreebanks: undefined,
+        connectionError: false,
         currentStep: undefined,
         filterValues: {},
         valid: true,
@@ -30,68 +30,22 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         tokens: [],
         retrieveContext: false,
         respectOrder: false,
-        ignoreTopNode: false
+        ignoreTopNode: false,
+        selectedTreebanks: [],
     };
 
-    sentenceInputStep: SentenceInputStep<GlobalStateExampleBased>;
     matrixStep: MatrixStep;
     steps: Step<GlobalStateExampleBased>[];
 
-    @ViewChild('sentenceInput')
-    sentenceInputComponent;
-    @ViewChild('parse')
-    parseComponent;
-    @ViewChild('matrix')
-    matrixComponent;
-    @ViewChild('selectTreebanks')
-    selectTreebanksComponent;
-    @ViewChild('results')
-    resultsComponent;
-    @ViewChild('analysis')
-    analysisComponent;
-
-    constructor(private alpinoService: AlpinoService, route: ActivatedRoute, router: Router) {
-        super(route, router);
-    }
-
-    initializeCrumbs() {
-        this.crumbs = [
-            {
-                name: 'Example',
-                number: 0,
-            },
-            {
-                name: 'Parse',
-                number: 1,
-            },
-            {
-                name: 'Matrix',
-                number: 2,
-            },
-            {
-                name: 'Treebanks',
-                number: 3,
-            },
-            {
-                name: 'Results',
-                number: 4,
-            },
-            {
-                name: 'Analysis',
-                number: 5,
-            },
-        ];
-    }
-
-    initializeComponents() {
-        this.components = [
-            this.sentenceInputComponent,
-            this.parseComponent,
-            this.matrixComponent,
-            this.selectTreebanksComponent,
-            this.resultsComponent,
-            this.analysisComponent
-        ];
+    constructor(
+        private alpinoService: AlpinoService,
+        private extractinatorService: ExtractinatorService,
+        private reconstructorService: ReconstructorService,
+        treebankService: TreebankService,
+        stateService: StateService<GlobalStateExampleBased>,
+        route: ActivatedRoute,
+        router: Router) {
+        super(route, router, treebankService, stateService);
     }
 
     encodeGlobalState(state: GlobalStateExampleBased) {
@@ -105,8 +59,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             });
     }
 
-    decodeGlobalState(queryParams) {
-        return {
+    decodeGlobalState(queryParams: { [key: string]: any }) {
+        const globalState = {
             step: parseInt(queryParams.currentStep || 0, 10),
             state: {
                 selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
@@ -119,33 +73,49 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
                 ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
             }
         };
+
+        return globalState;
     }
 
-    initializeSteps() {
-        this.matrixStep = new MatrixStep(2, this.alpinoService);
-        this.sentenceInputStep = new SentenceInputStep(0);
-        this.steps = [
-            this.sentenceInputStep,
-            new ParseStep(1, this.alpinoService),
-            this.matrixStep,
-            new SelectTreebankStep(3),
-            new ResultStep(4),
-            new AnalysisStep(5)
-        ];
-    }
-
-    initializeConfiguration() {
-        this.configuration = {
-            steps: this.steps
-        };
+    initializeSteps(): { step: Step<GlobalStateExampleBased>, name: string }[] {
+        this.matrixStep = new MatrixStep(
+            2,
+            this.alpinoService,
+            this.extractinatorService,
+            this.reconstructorService);
+        return [{
+            name: 'Example',
+            step: new SentenceInputStep(0)
+        },
+        {
+            name: 'Parse',
+            step: new ParseStep(1, this.alpinoService)
+        },
+        {
+            name: 'Matrix',
+            step: this.matrixStep
+        },
+        {
+            name: 'Treebanks',
+            step: new SelectTreebankStep(3, this.treebankService)
+        },
+        {
+            name: 'Results',
+            step: new ResultsStep(4)
+        },
+        {
+            name: 'Analysis',
+            step: new AnalysisStep(5)
+        }];
     }
 
     /**
      * Updates the selected treebanks with the given selection
      * @param selectedTreebanks the new treebank selection
      */
-    updateSelected(selectedTreebanks: TreebankSelection) {
+    updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>) {
         this.globalState.selectedTreebanks = selectedTreebanks;
+        this.updateGlobalState(this.globalState);
     }
 
     updateSentence(sentence: string) {
@@ -169,8 +139,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
             this.globalState.isCustomXPath = false;
             this.globalState.tokens = matrixSettings.tokens;
             this.globalState.attributes = matrixSettings.attributes;
-            this.globalState = await this.matrixStep.updateMatrix(this.globalState);
         }
+        this.globalState = await this.matrixStep.updateMatrix(this.globalState);
         this.updateGlobalState(this.globalState);
     }
 

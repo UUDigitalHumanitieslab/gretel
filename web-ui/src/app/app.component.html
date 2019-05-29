@@ -9,5 +9,21 @@
 
 <grt-footer></grt-footer>
 
-
-<div id="popup-wrapper"></div>
+<p-confirmDialog #cd header="Confirmation">
+    <p-footer>
+        <div class="buttons is-right has-addons">
+            <button class="button is-primary" (click)="cd.accept()">
+                <span class="icon">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span>Yes</span>
+            </button>
+            <button class="button" (click)="cd.reject()">
+                <span class="icon">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>No</span>
+            </button>
+        </div>
+    </p-footer>
+</p-confirmDialog>

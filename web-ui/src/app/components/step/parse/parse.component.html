@@ -10,7 +10,7 @@
 </div>
 <h2 class="subtitle">
     <div class="level">
-        <div class="level-item level-left">
+        <div class="level-item level-left" grtSubtitle>
             Parsed Tree
         </div>
         <div class="level-item level-right is-hidden-print">
@@ -24,12 +24,13 @@
         </div>
     </div>
 </h2>
-<p *ngIf="!xml;else tree">Loading ...</p>
-<ng-template #tree>
-    <grt-tree-visualizer [xml]="xml" [url]="url" [display]="display" [fullScreenButton]="false" (displayChange)="display = $event"></grt-tree-visualizer>
+<p *ngIf="loading">Loading ...</p>
+<ng-container *ngIf="xml">
+    <grt-tree-visualizer [xml]="xml" [display]="display" [fullScreenButton]="false" (onDisplayChange)="display = $event"></grt-tree-visualizer>
     <div class="content">
         <em>
             Your input sentence was: &ldquo;{{sentence}}&rdquo;
         </em>
     </div>
-</ng-template>
+</ng-container>
+<div *ngIf="warning" class="notification is-danger break-word">{{warning}}</div>

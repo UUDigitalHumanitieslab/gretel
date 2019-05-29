@@ -1,30 +1,45 @@
 @import "../../../../colors";
 
+@mixin element-color($color) {
+    color: $color;
+    text-decoration-color: rgba($color, 0.6);
+}
+
 .xpath {
     // don't make a long query ruin the interface
-    overflow: auto;
+    overflow: auto; // visible???
 
     .path {
-        color: $xpath-path;
+        @include element-color($xpath-path);
     }
 
-    :not(.attribute-sigil) + .node-name,
+    :not(.attribute-sigil)+.node-name,
     .function-name {
-        color: $xpath-name;
+        @include element-color($xpath-name);
         font-weight: bold;
     }
 
     .attribute-sigil,
-    .attribute-sigil + .node-name {
-        color: $xpath-attribute;
+    .attribute-sigil+.node-name {
+        @include element-color($xpath-attribute);
     }
 
     .operator {
-        color: $xpath-operator;
+        @include element-color($xpath-operator);
     }
 
     .string-delimiter,
     .string-value {
-        color: $xpath-string;
+        @include element-color($xpath-string);
+    }
+
+    .line {
+        display: block;
+
+        &:hover [title] {
+            cursor: help;
+            text-decoration-line: underline;
+            text-decoration-style: dashed;
+        }
     }
 }

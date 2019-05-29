@@ -1,28 +1,28 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AlpinoService } from '../../../services/_index';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { StepComponent } from '../step.component';
+import { StateService } from '../../../services/_index';
+import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-parse',
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent implements OnChanges {
-    @Input()
-    public xml: string;
-
-    @Input('sentence')
-    public sentence: string;
+export class ParseComponent extends StepComponent<GlobalStateExampleBased> {
+    @Input() public loading = true;
+    @Input() public sentence: string;
+    @Input() public xml: string;
+    @Output() public changeXml = new EventEmitter<string>();
 
     public display = 'inline';
+    public stepType = StepType.Parse;
+    public warning?: string;
 
-    public url: string
-
-    constructor(private alpinoService: AlpinoService) {
+    constructor(stateService: StateService<GlobalStateExampleBased>) {
+        super(stateService);
     }
 
-    async ngOnChanges(simpleChanges: SimpleChanges) {
-        if (simpleChanges['sentence']) {
-            this.url = await this.alpinoService.parseSentenceUrl(this.sentence);
-        }
+    public getWarningMessage(): string | void {
+        this.warning = `Error parsing sentence: ${this.sentence}`; // we display our own error
     }
 }

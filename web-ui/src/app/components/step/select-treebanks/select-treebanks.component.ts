@@ -1,67 +1,55 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { StepComponent } from "../step.component";
-import { TreebankService } from "../../../services/treebank.service";
-import { Treebank, SubTreebank } from "../../../treebank";
+import { Component, OnDestroy } from '@angular/core';
+import { StepComponent } from '../step.component';
+import { TreebankService, TreebankInfo } from '../../../services/treebank.service';
+import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { StateService } from '../../../services/_index';
+import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-select-treebanks',
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })
-export class SelectTreebanksComponent extends StepComponent implements OnInit {
-    treebanks: Treebank[];
-    selectedTreebank: string;
-    loading: boolean = false;
+export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBased> implements OnDestroy {
+    public treebanks: TreebankInfo[] = [];
+    public loading = true;
+    public stepType = StepType.SelectTreebanks;
 
-    @Input() subTreebanks: string[];
+    private readonly subscriptions: Subscription[];
 
-    @Output() mainTreebankChange = new EventEmitter<string>();
-    @Output() subTreebanksChange = new EventEmitter<string[]>();
+    constructor(private treebankService: TreebankService, stateService: StateService<GlobalStateExampleBased>) {
+        super(stateService);
 
-    /**
-     * Gets the sub-treebanks whenever the main treebank is set
-     * @param treebank
-     */
-    @Input()
-    set mainTreebank(treebank: string) {
-        this.selectedTreebank = treebank;
+        this.subscriptions = [
+            treebankService.treebanks.pipe(map(v => Object.values(v.state).flatMap(v => Object.values(v))))
+                .subscribe(treebanks => {
+                    this.treebanks = treebanks;
+                    this.updateValidity();
+                }),
+        ];
+        treebankService.finishedLoading.then(() => this.loading = false);
     }
 
-    constructor(private treebankService: TreebankService) {
-        super();
-        this.treebanks = [];
+    ngOnDestroy() {
+        this.subscriptions.forEach(s => s.unsubscribe());
     }
 
-    valid: boolean;
-
-    ngOnInit() {
-        this.treebankService.getTreebanks().then((treebanks) => {
-            this.treebanks = treebanks;
-        })
-    }
-
-    treebankChange(treebank: Treebank) {
-        this.selectedTreebank = treebank.name;
-        this.mainTreebankChange.emit(this.selectedTreebank);
-        this.updateValidity();
-    }
-
-    updateSelected(subTreebanks: SubTreebank[]) {
-        this.subTreebanks = subTreebanks.map(t => t.component);
-        this.mainTreebankChange.emit(this.selectedTreebank);
-        this.subTreebanksChange.emit(this.subTreebanks);
-        this.updateValidity()
+    toggleTreebank(provider: string, corpus: string) {
+        this.treebankService.toggleCorpus(provider, corpus);
     }
 
     /**
-     * Checks if there are treebanks selected
+     * Checks if there are treebanks selected and notifies parent
      */
-    updateValidity() {
-        this.valid = this.subTreebanks && this.subTreebanks.length && !!this.selectedTreebank;
+    private updateValidity() {
+        // treebank selected -> some component selected
+        this.valid = this.treebanks.some(
+            ({ treebank, components }) => treebank.selected && Object.values(components).some(c => c.selected));
         this.changeValid.emit(this.valid);
     }
 
-    getValidationMessage() {
+    public getWarningMessage() {
         return 'Please select a treebank and the components.';
     }
 }

@@ -1,4 +1,4 @@
-<div class="buttons is-right is-hidden-print">
-    <button class="button" *ngIf="currentStep.number !=0 " (click)="prev.next()">Previous</button>
-    <button class="button is-primary" *ngIf="currentStep.number + 1 < steps.length" (click)="next.next()">Next</button>
+<div class="buttons is-right is-hidden-print" *ngIf="currentStep >= 0">
+    <button class="button" *ngIf="currentStep !=0 " (click)="prev.next()">Previous</button>
+    <button class="button is-primary" *ngIf="currentStep + 1 < steps" (click)="next.next()">Next</button>
 </div>

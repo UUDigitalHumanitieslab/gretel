@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { XpathAttributes } from 'lassy-xpath/ng';
+import { XPathAttributes } from 'lassy-xpath/ng';
 import * as _ from 'lodash';
 
 import { Hit } from './results.service';
@@ -13,18 +13,18 @@ export class AnalysisService {
     public static placeholder = '(none)';
 
     private getRow(variables: { [name: string]: string[] }, metadataKeys: string[], result: Hit): Row {
-        let metadataValues: { [name: string]: string } = {};
-        for (let key of metadataKeys) {
+        const metadataValues: { [name: string]: string } = {};
+        for (const key of metadataKeys) {
             metadataValues[key] = result.metaValues[key];
         }
 
-        let nodeVariableValues: { [name: string]: NodeProperties } = {};
-        for (let name of Object.keys(variables)) {
-            let node = result.variableValues[name];
-            let values: { [attribute: string]: string } = {};
-            for (let attribute of variables[name]) {
+        const nodeVariableValues: { [name: string]: NodeProperties } = {};
+        for (const name of Object.keys(variables)) {
+            const node = result.variableValues[name];
+            const values: { [attribute: string]: string } = {};
+            for (const attribute of variables[name]) {
                 values[attribute] = node && node[attribute] || AnalysisService.placeholder;
-            };
+            }
             nodeVariableValues[name] = values;
         }
 
@@ -37,20 +37,20 @@ export class AnalysisService {
      * @param hits The results to search.
      */
     public getVariableAttributes(variableName: string, hits: Hit[]) {
-        let availableAttrs: { [key: string]: true } = {};
-        for (let hit of hits) {
-            let values = Object.keys(hit.variableValues[variableName]).filter(a => a != 'name');
-            for (let value of values) {
+        const availableAttrs: { [key: string]: true } = {};
+        for (const hit of hits) {
+            const values = Object.keys(hit.variableValues[variableName]).filter(a => a !== 'name');
+            for (const value of values) {
                 availableAttrs[value] = true;
             }
-        };
+        }
 
         return _.sortBy(Object.keys(availableAttrs)).map((attr) => {
-            let description = XpathAttributes[attr].description;
+            const attribute = XPathAttributes[attr];
             return {
                 value: attr,
-                label: description ? `${attr} (${description})` : attr
-            }
+                label: attribute && attribute.description ? `${attr} (${attribute.description})` : attr
+            };
         });
     }
 
@@ -62,44 +62,44 @@ export class AnalysisService {
      * @returns The first row contains the column names, the preceding the associated values.
      */
     public getFlatTable(searchResults: Hit[], variables: { [name: string]: string[] }, metadataKeys: string[]): string[][] {
-        let rows: Row[] = [];
+        const rows: Row[] = [];
 
-        for (let result of searchResults) {
-            let row = this.getRow(variables, metadataKeys, result);
+        for (const result of searchResults) {
+            const row = this.getRow(variables, metadataKeys, result);
             rows.push(row);
         }
 
-        let columnNames: string[] = [];
+        const columnNames: string[] = [];
         columnNames.push(...metadataKeys);
 
         // remove the starting $ variable identifier
-        for (let name of Object.keys(variables)) {
+        for (const name of Object.keys(variables)) {
             columnNames.push(...variables[name].map(attr => `${name}.${attr}`));
         }
 
         // first row contains the column names
-        let results = [columnNames];
+        const results = [columnNames];
 
-        for (let row of rows) {
-            let line: string[] = [];
+        for (const row of rows) {
+            const line: string[] = [];
 
             line.push(...metadataKeys.map(key => row.metadataValues[key] || AnalysisService.placeholder));
-            for (let name of Object.keys(variables)) {
+            for (const name of Object.keys(variables)) {
                 line.push(...variables[name].map(attr => row.nodeVariableValues[name][attr]));
             }
 
             results.push(line);
-        };
+        }
 
         return results;
     }
 }
 
-export type NodeProperties = {
-    [property: string]: string
-};
+export interface NodeProperties {
+    [property: string]: string;
+}
 
-export type Row = {
-    metadataValues: { [name: string]: string },
-    nodeVariableValues: { [name: string]: NodeProperties }
-};
+export interface Row {
+    metadataValues: { [name: string]: string };
+    nodeVariableValues: { [name: string]: NodeProperties };
+}

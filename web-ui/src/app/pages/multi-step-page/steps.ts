@@ -1,17 +1,11 @@
+import { TreebankService, mapTreebanksToSelectionSettings } from '../../services/treebank.service';
 import { AlpinoService, FilterValues } from '../../services/_index';
+import { map, take } from 'rxjs/operators';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
 
 /**
  * Contains all the steps that are used in the xpath search
  */
-
-
-/**
- * Info that needs to be in a treebank selection
- */
-interface TreebankSelection {
-    corpus: string;
-    components: string[];
-}
 
 /**
  * All the information the xpath-search component should keep track of
@@ -22,13 +16,14 @@ interface GlobalState {
      * Include context in results (the preceding and following sentence)
      */
     retrieveContext: boolean;
-    selectedTreebanks: TreebankSelection;
     xpath: string;
     filterValues: FilterValues;
+    connectionError: boolean;
     valid: boolean;
     // Question: should this even be in this state?
     loading: boolean;
     inputSentence?: string;
+    selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>;
 }
 
 interface GlobalStateExampleBased extends GlobalState {
@@ -47,6 +42,16 @@ interface GlobalStateExampleBased extends GlobalState {
     respectOrder: boolean;
 }
 
+enum StepType {
+    SentenceInput,
+    Matrix,
+    Parse,
+    XpathInput,
+    Analysis,
+    Results,
+    SelectTreebanks
+}
+
 /**
  * A step has a number and a function that performs the necessary actions when entering a step
  */
@@ -54,12 +59,16 @@ abstract class Step<T> {
     constructor(public number: number) {
     }
 
+    abstract type: StepType;
+
     // Makes sure the step is entered correctly
     abstract enterStep(state: T): Promise<T>;
     abstract leaveStep(state: T): T;
 }
 
 class SentenceInputStep<T extends GlobalState> extends Step<T> {
+    type = StepType.SentenceInput;
+
     async enterStep(state: T) {
         state.currentStep = this;
         state.valid = state.inputSentence && state.inputSentence.length > 0;
@@ -72,7 +81,12 @@ class SentenceInputStep<T extends GlobalState> extends Step<T> {
 }
 
 class MatrixStep extends Step<GlobalStateExampleBased> {
-    constructor(number: number, private alpinoService: AlpinoService) {
+    type = StepType.Matrix;
+
+    constructor(number: number,
+        private alpinoService: AlpinoService,
+        private extractinatorService: ExtractinatorService,
+        private reconstructorService: ReconstructorService) {
         super(number);
     }
 
@@ -107,14 +121,22 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
             state.subTreeXml = generated.subTree;
             state.xpath = generated.xpath;
             state.valid = true;
+        } else {
+            try {
+                const paths = this.extractinatorService.extract(state.xpath);
+                state.subTreeXml = this.reconstructorService.construct(paths, state.xpath);
+            } catch (error) {
+                state.valid = false;
+            }
         }
-        // TODO: validate custom XPATH!
         state.loading = false;
         return state;
     }
 }
 
 class ParseStep extends Step<GlobalStateExampleBased> {
+    type = StepType.Parse;
+
     constructor(number: number, private alpinoService: AlpinoService) {
         super(number);
     }
@@ -122,11 +144,22 @@ class ParseStep extends Step<GlobalStateExampleBased> {
     async enterStep(state: GlobalStateExampleBased) {
         state.loading = true;
         state.currentStep = this;
+        state.valid = false;
 
-        const xml = await this.alpinoService.parseSentence(state.inputSentence);
-        state.exampleXml = xml;
-        state.loading = false;
-        state.valid = true;
+        await this.alpinoService.parseSentence(state.inputSentence)
+            .then(xml => {
+                state.exampleXml = xml;
+                state.valid = true;
+            })
+            .catch(e => {
+                state.connectionError = true;
+                state.exampleXml = undefined;
+                console.error(e);
+            })
+            .finally(() => {
+                state.loading = false;
+            });
+
         return state;
     }
 
@@ -136,6 +169,8 @@ class ParseStep extends Step<GlobalStateExampleBased> {
 }
 
 class XpathInputStep<T extends GlobalState> extends Step<T> {
+    type = StepType.XpathInput;
+
     constructor(number: number) {
         super(number);
     }
@@ -152,6 +187,8 @@ class XpathInputStep<T extends GlobalState> extends Step<T> {
 }
 
 class AnalysisStep<T extends GlobalState> extends Step<T> {
+    type = StepType.Analysis;
+
     constructor(number: number) {
         super(number);
     }
@@ -177,7 +214,9 @@ class AnalysisStep<T extends GlobalState> extends Step<T> {
     }
 }
 
-class ResultStep<T extends GlobalState> extends Step<T> {
+class ResultsStep<T extends GlobalState> extends Step<T> {
+    type = StepType.Results;
+
     constructor(number: number) {
         super(number);
     }
@@ -205,7 +244,9 @@ class ResultStep<T extends GlobalState> extends Step<T> {
 }
 
 class SelectTreebankStep<T extends GlobalState> extends Step<T> {
-    constructor(public number: number) {
+    type = StepType.SelectTreebanks;
+
+    constructor(public number: number, protected treebankService: TreebankService) {
         super(number);
     }
 
@@ -216,14 +257,11 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
-        state.selectedTreebanks = {
-            corpus: state.selectedTreebanks ? state.selectedTreebanks.corpus : undefined,
-            components: state.selectedTreebanks ? state.selectedTreebanks.components : undefined
-        };
-        state.valid = state.selectedTreebanks.corpus !== undefined &&
-            state.selectedTreebanks.components !== undefined &&
-            state.selectedTreebanks.components.length > 0;
-
+        await this.treebankService.finishedLoading;
+        const selectedTreebanks = await this.treebankService.treebanks.pipe(
+            map(v => mapTreebanksToSelectionSettings(v.state)),
+            take(1)).toPromise();
+        state.valid = selectedTreebanks.length > 0;
         return state;
     }
 
@@ -233,14 +271,14 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
 }
 
 export {
-    TreebankSelection,
     GlobalState,
     GlobalStateExampleBased,
     Step,
+    StepType,
     AnalysisStep,
     XpathInputStep,
     SelectTreebankStep,
-    ResultStep,
+    ResultsStep,
     SentenceInputStep,
     ParseStep,
     MatrixStep

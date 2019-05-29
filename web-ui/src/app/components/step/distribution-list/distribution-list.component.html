@@ -1,12 +1,11 @@
-<h2 class="subtitle">
+ <h2 class="subtitle">
     <div class="level">
         <div class="level-item level-left">
             Components
         </div>
         <div class="level-item level-right is-hidden-print">
             <div class="field">
-                <p class="control" [grtBalloonVisible]="loading ? false : undefined" grtBalloonPosition="left"
-                    grtBalloon="Download distribution list (.csv)">
+                <p class="control" grtBalloonPosition="left" grtBalloon="Download distribution list (.csv)">
                     <a class="button" [ngClass]="{'is-loading': loading}" (click)="download()">
                         <span class="icon is-large">
                             <i class="fas fa-download"></i>
@@ -17,35 +16,54 @@
         </div>
     </div>
 </h2>
-<table class="table is-fullwidth" *ngIf="counts" [ngClass]="{'scroll':counts.length > 5}">
+<table class="table is-fullwidth scroll">
     <thead>
         <tr>
             <th>Name</th>
-            <th class="has-text-right">Hits</th>
-            <th class="has-text-right">All Sentences</th>
+            <th>Hits</th>
+            <th>All Sentences</th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let count of counts">
-            <th>
-                <label class="checkbox">
-                    <input type="checkbox" [checked]="count.selected" (change)="toggleComponent(count)" />
-                    {{count.component}}
-                </label>
-            </th>
-            <td class="has-text-right">{{count.hits | formatNumber}}</td>
-            <td class="has-text-right">{{count.sentences | formatNumber}}</td>
-        </tr>
+        <ng-container *ngFor="let provider of state | keyvalue">
+            <ng-container *ngFor="let corpus of provider.value | keyvalue">
+                <tr>
+                    <th>
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                [checked]="!corpus.value.hidden"
+                                (change)="toggleAllComponents(provider.key, corpus.key, !corpus.value.hidden)"
+                            /> {{corpus.key}}
+                        </label>
+                    </th>
+                    <th>{{corpus.value.hits != null ? corpus.value.hits : 'loading...'}}</th>
+                    <th>{{corpus.value.sentenceCount}}</th>
+                </tr>
+                <ng-container *ngIf="!corpus.value.hidden">
+                    <tr *ngFor="let component of corpus.value.components | keyvalue">
+                        <td>
+                            <label class="checkbox">
+                                <input
+                                    type="checkbox"
+                                    [checked]="!component.value.hidden"
+                                    (change)="toggleComponent(provider.key, corpus.key, component.key, !component.value.hidden)"
+                                /> {{component.value.title}}
+                            </label>
+                        </td>
+                        <td>{{component.value.hits != null ? component.value.hits : 'loading...'}}</td>
+                        <td>{{component.value.sentenceCount}}</td>
+                    </tr>
+                </ng-container>
+                <tr></tr>
+            </ng-container>
+        </ng-container>
     </tbody>
     <tfoot>
         <tr>
-            <th>
-                <label class="checkbox">
-                    <input type="checkbox" [checked]="totalSelected" (change)="toggleAllComponents()" /> Total
-                </label>
-            </th>
-            <td class="has-text-right">{{totalHits | formatNumber}}</td>
-            <td class="has-text-right">{{totalSentences | formatNumber}}</td>
+            <td></td>
+            <td>{{totalHits.toLocaleString()}}</td>
+            <td>{{totalSentences}}</td>
         </tr>
     </tfoot>
 </table>

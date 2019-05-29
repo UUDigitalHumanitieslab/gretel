@@ -1,6 +1,3 @@
-<h2 class="subtitle">
-    Select a Treebank
-</h2>
 <div class="content">
     <p>
         Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get
@@ -12,14 +9,30 @@
         counts.
     </p>
 </div>
+
+<h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
+    Select Treebanks
+</h1>
+
 <ng-container *ngFor="let treebank of treebanks">
-    <div class="field">
-        <label class="radio">
-            <input type="radio" name="Treebank" [(ngModel)]="selectedTreebank" [value]="treebank.name" (click)="treebankChange(treebank)">
-            {{treebank.title}}<ng-container *ngIf="treebank.description">: <em>{{treebank.description}}</em></ng-container>
+    <div class="field" >
+        <label class="checkbox">
+            <input
+                type="checkbox"
+                [value]="treebank.treebank.id"
+                [checked]="treebank.treebank.selected"
+                (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.id)"
+            > {{treebank.treebank.displayName}}
+            <ng-container *ngIf="treebank.treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
         </label>
+
     </div>
-    <div *ngIf="treebank.name == selectedTreebank" class="box is-shadowless">
-        <grt-sub-treebanks [treebankName]="treebank.name" (select)="updateSelected($event)"></grt-sub-treebanks>
+    <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
+        <grt-sub-treebanks
+            [treebank]="treebank.treebank"
+            [components]="treebank.components"
+            [componentGroups]="treebank.componentGroups"
+            [variants]="treebank.variants"
+        ></grt-sub-treebanks>
     </div>
 </ng-container>

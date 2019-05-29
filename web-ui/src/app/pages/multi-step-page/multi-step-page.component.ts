@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import * as _ from 'lodash';
@@ -7,10 +7,10 @@ import { Subscription } from 'rxjs';
 
 import { Crumb } from '../../components/breadcrumb-bar/breadcrumb-bar.component';
 import { GlobalState, Step } from './steps';
-import { DecreaseTransition, IncreaseTransition, JumpToStepTransition, Transition, Transitions } from './transitions';
-import { FilterValues } from '../../services/_index';
+import { FilterValues, TreebankService, StateService, mapTreebanksToSelectionSettings } from '../../services/_index';
+import { filter, map } from 'rxjs/operators';
 
-export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit, AfterViewChecked {
+export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit {
     public crumbs: Crumb[];
     public globalState: T;
     public warning: string | false;
@@ -21,40 +21,68 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     protected abstract defaultGlobalState: T;
 
-    protected configuration: { steps: Step<T>[] };
-    protected components: any[];
     protected steps: Step<T>[];
-    protected subscriptions: Subscription[] = [];
+    protected subscriptions: Subscription[];
 
-    private transitions: Transitions<T>;
 
-    constructor(private route: ActivatedRoute, private router: Router) {
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        public treebankService: TreebankService,
+        public stateService: StateService<T>) {
     }
 
     ngOnDestroy() {
+        // prevent navigation from deferred events
+        this.router = undefined;
         this.subscriptions.forEach(s => s.unsubscribe());
+        this.stateService.dispose();
     }
 
     async ngOnInit() {
         // Template Design Pattern
-        this.initializeCrumbs();
-        this.initializeSteps();
-        this.initializeConfiguration();
-        this.initializeGlobalState();
-        this.initializeTransitions();
+        const steps = this.initializeSteps();
+
+        this.crumbs = steps.map((step, number) => ({
+            name: step.name,
+            number
+        }));
+        this.steps = steps.map(step => step.step);
+
+        const initialState = await this.initializeGlobalState();
+
+        this.stateService.init(this.steps);
+        this.subscriptions = [
+            this.stateService.isTransitioning$.subscribe(t => this.isTransitioning = t),
+            this.stateService.warning$.subscribe(w => this.warning = w)
+        ];
 
         this.subscriptions.push(
             this.route.queryParams.subscribe(params => {
                 const decoded = this.decodeGlobalState(params);
+                if (!this.globalState) {
+                    this.globalState = initialState;
+                }
+
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
+
+                if (this.globalState.selectedTreebanks.length) {
+                    // This also needs to be pushed in to the service to force an update on
+                    // all components (important to restore state from url on first page render)
+                    this.treebankService.initSelections(this.globalState.selectedTreebanks);
+                }
+
                 this.goToStep(decoded.step, false);
             }));
+
+        this.subscriptions.push(
+            this.treebankService.treebanks.pipe(
+                map(v => mapTreebanksToSelectionSettings(v.state))
+            ).subscribe(state => this.updateSelected(state))
+        );
     }
 
-    abstract initializeConfiguration();
-    abstract initializeCrumbs();
-    abstract initializeSteps();
-    abstract initializeComponents();
+    abstract initializeSteps(): { step: Step<T>, name: string }[];
 
     /**
      * Returns the properties of the global state which are set in the URL.
@@ -66,41 +94,26 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
     encodeGlobalState(state: T): { [key: string]: any } {
         return {
-            'currentStep': state.currentStep.number,
+            'currentStep': state.currentStep && state.currentStep.number || 0,
             // don't encode the default state
             'xpath': state.xpath !== this.defaultGlobalState.xpath ? state.xpath : undefined,
-            'selectedTreebanks': state.selectedTreebanks && state.selectedTreebanks.corpus
-                ? JSON.stringify(state.selectedTreebanks)
-                : undefined,
+            'selectedTreebanks': state.selectedTreebanks.length > 0 ? JSON.stringify(state.selectedTreebanks) : undefined,
             'retrieveContext': this.encodeBool(state.retrieveContext)
         };
     }
 
-    initializeGlobalState() {
-        this.globalState = Object.assign({}, this.defaultGlobalState);
-    }
-
-    initializeTransitions() {
-        const transitions: Transition<T>[] = [
-            new IncreaseTransition(this.configuration.steps),
-            new DecreaseTransition(this.configuration.steps)];
-        for (const crumb of this.crumbs) {
-            transitions.push(new JumpToStepTransition(this.steps, crumb.number));
-        }
-
-        this.transitions = new Transitions(transitions);
-    }
-
-    ngAfterViewChecked() {
-        this.initializeComponents();
+    private async initializeGlobalState() {
+        // Always start at the first step, if it is restored from the query
+        // this is done using a jump to make sure all the variables are
+        // retrieved again during the state transitions.
+        return await this.steps[0].enterStep(Object.assign({}, this.defaultGlobalState));
     }
 
     /**
      * Go back one step
      */
     async prev() {
-        this.isTransitioning = true;
-        const state = await this.transitions.fire('decrease', this.globalState);
+        const state = await this.stateService.prev(this.globalState);
         this.updateGlobalState(state);
     }
 
@@ -113,45 +126,23 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     /**
+     * Updates the selected treebanks with the given selection
+     * @param selectedTreebanks the new treebank selection
+     */
+    abstract updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>): void;
+
+    /**
      * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
     async next() {
-        if (this.globalState.valid) {
-            this.isTransitioning = true;
-            const state = await this.transitions.fire('increase', this.globalState);
+        const state = await this.stateService.next(this.globalState);
+        if (state) {
             this.updateGlobalState(state);
-            this.warning = false;
-        } else {
-            this.showWarning(this.globalState);
         }
     }
 
-    /**
-     * Sets
-     * @param boolean
-     */
     setValid(valid: boolean) {
         this.globalState.valid = valid;
-    }
-
-    /**
-     * Show the warning of the appropriate component.
-     */
-    showWarning(state: T) {
-        const component = this.components[state.currentStep.number];
-        if (component && component.getValidationMessage) {
-            this.warning = component.getValidationMessage();
-        } else {
-            this.warning = 'Please check your input and retry.';
-        }
-    }
-
-    getStepFromNumber(n: number) {
-        if (n) {
-            return this.steps[n];
-        } else {
-            return this.steps[0];
-        }
     }
 
     updateUrl(writeState = true) {
@@ -165,25 +156,8 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     async goToStep(stepNumber: number, updateUrl = true) {
-        this.isTransitioning = true;
-        const state = await this.transitions.fire(`jumpTo_${stepNumber}`, this.globalState);
-        if (!state.valid && state.currentStep.number !== stepNumber) {
-            this.showWarning(state);
-        } else {
-            this.warning = false;
-        }
-
+        const state = await this.stateService.jump(this.globalState, stepNumber);
         this.updateGlobalState(state, state.currentStep.number === stepNumber && updateUrl);
-    }
-
-    updateSelectedMainTreebank(mainTreebank: string) {
-        this.globalState.selectedTreebanks.corpus = mainTreebank;
-        this.updateUrl(false);
-    }
-
-    updateSelectedSubTreebanks(subTreebanks: string[]) {
-        this.globalState.selectedTreebanks.components = subTreebanks;
-        this.updateUrl(false);
     }
 
     updateFilterValues(filterValues: FilterValues) {
