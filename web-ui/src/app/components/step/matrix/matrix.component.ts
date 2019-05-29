@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 
 import { StateService } from '../../../services/_index';
@@ -11,7 +11,7 @@ import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent<GlobalState> implements OnInit {
+export class MatrixComponent extends StepComponent<GlobalState> {
     public stepType = StepType.Matrix;
 
     @Input('attributes')
@@ -121,9 +121,6 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
 
     constructor(stateService: StateService<GlobalState>, private confirmationService: ConfirmationService) {
         super(stateService);
-    }
-
-    ngOnInit() {
     }
 
     public setTokenPart(tokenIndex: number, part: Part) {

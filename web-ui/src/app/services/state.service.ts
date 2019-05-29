@@ -6,9 +6,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 class ExternalPromise<T> {
     resolve: (value: T | PromiseLike<T>) => void;
     reject: (reason: any) => void;
+    resolved: boolean;
 
     promise = new Promise<T>((resolve, reject) => {
-        this.resolve = resolve;
+        this.resolve = (value: T) => {
+            this.resolved = true;
+            resolve(value);
+        };
         this.reject = reject;
     });
 }
@@ -28,6 +32,11 @@ class SharedInstance<T extends GlobalState> {
     }
 
     subscribe(stepComponent: StepComponent<T>) {
+        if (this.currentStepComponent.resolved) {
+            // already resolved, this can happen on load (the first step is already rendered)
+            this.currentStepComponent = new ExternalPromise();
+        }
+
         this.currentStepComponent.resolve(stepComponent);
     }
 
@@ -43,7 +52,6 @@ class SharedInstance<T extends GlobalState> {
         state.connectionError = false;
         this.isTransitioning$.next(true);
         this.warning$.next(false);
-        this.currentStepComponent = new ExternalPromise();
         return this.jumpState(state, state.currentStep.number - 1);
     }
 
@@ -55,7 +63,6 @@ class SharedInstance<T extends GlobalState> {
             state.connectionError = false;
             this.isTransitioning$.next(true);
             this.warning$.next(false);
-            this.currentStepComponent = new ExternalPromise();
             state = await this.jumpState(state, state.currentStep.number + 1);
             if (state.connectionError) {
                 // the initial state may be invalid (e.g. nothing has been selected yet)
@@ -73,7 +80,6 @@ class SharedInstance<T extends GlobalState> {
 
     async jump(state: T, stepNumber: number) {
         this.isTransitioning$.next(true);
-        this.currentStepComponent = new ExternalPromise();
         state = await this.jumpState(state, stepNumber);
 
         if (state.connectionError || (!state.valid && state.currentStep.number !== stepNumber)) {
@@ -86,11 +92,25 @@ class SharedInstance<T extends GlobalState> {
     }
 
     /**
-     * Transition the state and creates the new state.
+     * Transition the state, creates the new state and marks that a new
+     * step component should be rendered.
      * @param state: the current state.
      * @param stepNumber: the index of the step to jump to.
      */
     private async jumpState(state: T, stepNumber: number) {
+        const { newState, newComponent } = await this.jumpNewState(state, stepNumber);
+        if (newComponent) {
+            this.currentStepComponent = new ExternalPromise();
+        }
+        return newState;
+    }
+
+    /**
+     * Transition the state and creates the new state.
+     * @param state: the current state.
+     * @param stepNumber: the index of the step to jump to.
+     */
+    private async jumpNewState(state: T, stepNumber: number) {
         if (!state.currentStep) {
             // no step yet, start at the first one
             state = await this.steps[0].enterStep(state);
@@ -100,28 +120,29 @@ class SharedInstance<T extends GlobalState> {
             stepNumber < 0 ||
             stepNumber > this.steps.length - 1) {
             // no or invalid jump
-            return state;
+            return { newState: state, newComponent: false };
         }
 
         // don't modify the original state
         // (otherwise the interface might display the intermediate state)
-        state = Object.assign({}, state);
+        let newState = Object.assign({}, state);
 
-        if (state.currentStep.number > stepNumber) {
+        if (newState.currentStep.number > stepNumber) {
             // jumping backwards is always fine
-            state.currentStep.leaveStep(state);
-            state.connectionError = false;
-            state.valid = true;
-            return this.steps[stepNumber].enterStep(state);
+            newState.currentStep.leaveStep(newState);
+            newState.connectionError = false;
+            newState.valid = true;
+            return { newState: await this.steps[stepNumber].enterStep(newState), newComponent: true };
+        }
+        let newComponent = false;
+        while (newState.currentStep.number < stepNumber && newState.valid) {
+            newState.currentStep.leaveStep(newState);
+            newState.connectionError = false;
+            newState = await this.steps[newState.currentStep.number + 1].enterStep(newState);
+            newComponent = true;
         }
 
-        while (state.currentStep.number < stepNumber && state.valid) {
-            state.currentStep.leaveStep(state);
-            state.connectionError = false;
-            state = await this.steps[state.currentStep.number + 1].enterStep(state);
-        }
-
-        return state;
+        return { newState, newComponent };
     }
 
     private async showWarning(stepNumber: number) {
