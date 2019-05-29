@@ -257,6 +257,7 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
+        await this.treebankService.finishedLoading;
         const selectedTreebanks = await this.treebankService.treebanks.pipe(
             map(v => mapTreebanksToSelectionSettings(v.state)),
             take(1)).toPromise();
