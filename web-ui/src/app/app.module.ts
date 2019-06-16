@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -10,6 +11,7 @@ import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
 import { LassyXPathModule } from 'lassy-xpath/ng';
 import { ClipboardModule } from 'ngx-clipboard';
@@ -59,9 +61,9 @@ import { SentenceInputComponent } from './components/step/sentence-input/sentenc
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { DistributionListComponent } from './components/step/results/distribution-list.component';
-import { RouterModule } from '@angular/router';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
+import { DownloadResultsComponent } from './components/step/results/download-results.component';
 
 export const declarations: any[] = [
     AdressComponent,
@@ -73,6 +75,7 @@ export const declarations: any[] = [
     DistributionListComponent,
     DocumentationComponent,
     DocumentationContentComponent,
+    DownloadResultsComponent,
     ExampleBasedSearchComponent,
     ExternalTreeVisualizerComponent,
     FiltersByXPathComponent,
@@ -114,6 +117,7 @@ export const imports: any[] = [
     MessageModule,
     MessagesModule,
     NgSelectModule,
+    OverlayPanelModule,
     RouterModule,
     TableModule,
 ];
@@ -134,7 +138,7 @@ export const providers: any[] = [
     declarations,
     imports,
     providers,
-    bootstrap: [AppComponent],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

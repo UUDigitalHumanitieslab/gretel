@@ -11,8 +11,9 @@
                         <div class="field has-addons">
                             <ng-container *ngIf="isModifyingXPath">
                                 <p class="control">
-                                    <a class="button is-primary" role="button" [attr.disabled]="!validXPath ? true : null"
-                                        grtBalloonPosition="down" grtBalloon="Save query" (click)="updateXPath()">
+                                    <a class="button is-primary" role="button"
+                                        [attr.disabled]="!validXPath ? true : null" grtBalloonPosition="down"
+                                        grtBalloon="Save query" (click)="updateXPath()">
                                         <span class="icon is-large">
                                             <i class="fas fa-check"></i>
                                         </span>
@@ -37,16 +38,17 @@
                                     </a>
                                 </p>
                                 <p class="control">
-                                    <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Download query"
-                                        (click)="downloadXPath()">
+                                    <a class="button" role="button" grtBalloonPosition="down"
+                                        grtBalloon="Download query" (click)="downloadXPath()">
                                         <span class="icon is-large">
                                             <i class="fas fa-download"></i>
                                         </span>
                                     </a>
                                 </p>
                                 <p class="control">
-                                    <a class="button" role="button" grtBalloonPosition="down-right" grtBalloon="Copy query to the clipboard"
-                                        (click)="copyXPath()" [ngClass]="{'is-success': xpathCopied }">
+                                    <a class="button" role="button" grtBalloonPosition="down-right"
+                                        grtBalloon="Copy query to the clipboard" (click)="copyXPath()"
+                                        [ngClass]="{'is-success': xpathCopied }">
                                         <span class="icon is-large">
                                             <i class="fas fa-copy"></i>
                                         </span>
@@ -57,8 +59,10 @@
                     </div>
                     <div class="level-item" *ngIf="activeFilterCount">
                         <div class="field">
-                            <p class="control" grtBalloonPosition="down" grtBalloon="Modify the XPath to include the specified filters.">
-                                <a class="button has-badge-rounded" [attr.data-badge]="activeFilterCount" role="button" (click)="addFiltersXPath()">
+                            <p class="control" grtBalloonPosition="down"
+                                grtBalloon="Modify the XPath to include the specified filters.">
+                                <a class="button has-badge-rounded" [attr.data-badge]="activeFilterCount" role="button"
+                                    (click)="addFiltersXPath()">
                                     <span class="is-large">
                                         <i class="fas fa-plus"></i>
                                         <i class="fas fa-filter"></i>
@@ -75,8 +79,8 @@
                 <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
                 <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
             </div>
-            <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath" (onChange)="changeCustomXpath($event)"
-                autofocus="true"></grt-xpath-editor>
+            <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath"
+                (onChange)="changeCustomXpath($event)" autofocus="true"></grt-xpath-editor>
         </div>
     </div>
     <!-- DISTRIBUTION LIST -->
@@ -87,7 +91,8 @@
 <div class="level">
     <div class="level-left">
         <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
-            Results: {{filteredResults.length}}<ng-container *ngIf="hiddenHits > 0"> ({{hiddenHits}} hidden)</ng-container>
+            Results: {{filteredResults.length}}<ng-container *ngIf="hiddenHits > 0"> ({{hiddenHits}} hidden)
+            </ng-container>
         </h1>
     </div>
     <div class="level-right is-hidden-print">
@@ -100,29 +105,25 @@
                 </p>
             </div>
         </div>
-        <div class="level-item" *ngIf="!loading">
+        <div class="level-item">
             <div class="field has-addons">
-                    <p class="control">
-                        <a class="button" role="button" (click)="downloadResults()" grtBalloonLength="large"
-                        grtBalloonPosition="down" grtBalloon="Download the results as a .csv-file">
-                            <span class="icon is-large">
-                                <i class="fas fa-download"></i>
-                            </span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
+                <p class="control">
+                    <grt-download-results></grt-download-results>
+                </p>
+                <p class="control" *ngIf="!loading">
+                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
                         grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
-                            <span class="icon is-large">
-                                <i class="fas fa-file-alt"></i>
-                            </span>
-                        </a>
-                    </p>
-                </div>
+                        <span class="icon is-large">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+                    </a>
+                </p>
             </div>
+        </div>
         <div class="level-item">
             <div class="field">
-                <p class="control" grtBalloonPosition="down" grtBalloon="Print Results" [grtBalloonVisible]="loading ? false : undefined">
+                <p class="control" grtBalloonPosition="down" grtBalloon="Print Results"
+                    [grtBalloonVisible]="loading ? false : undefined">
                     <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
                         <span class="icon is-large">
                             <i class="fas fa-print"></i>
@@ -135,7 +136,8 @@
             <div class="field">
                 <p class="control" (click)="toggleContext()">
                     <a class="button is-warning" role="button" grtBalloonLength="large" grtBalloonPosition="down"
-                        grtBalloon="Click to show the sentences directly before and after the hits." *ngIf="!retrieveContext">
+                        grtBalloon="Click to show the sentences directly before and after the hits."
+                        *ngIf="!retrieveContext">
                         <span class="icon is-large">
                             <i class="fas fa-comment-slash"></i>
                         </span>
@@ -164,11 +166,13 @@
 <div class="columns">
     <div class="column is-one-third is-hidden-print" *ngIf="filters.length">
         <div class="filter">
-            <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)"></grt-filters>
+            <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)">
+            </grt-filters>
         </div>
     </div>
     <div class="column">
-        <p-table *ngIf="filteredResults.length > 0 else warning" [columns]="columns" [value]="filteredResults" [resizableColumns]="true" styleClass="bulma">
+        <p-table *ngIf="filteredResults.length > 0 else warning" [columns]="columns" [value]="filteredResults"
+            [resizableColumns]="true" styleClass="bulma">
             <ng-template pTemplate="colgroup" let-columns>
                 <colgroup>
                     <col *ngFor="let col of columns" [style.width]="col.width">
@@ -188,7 +192,8 @@
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
 
                             <ng-container *ngSwitchCase="'fileId'">
-                                <a *ngIf="rowData[col.field]; else fileIdButton" (click)="showTree(rowData)">{{rowData[col.field]}}</a>
+                                <a *ngIf="rowData[col.field]; else fileIdButton"
+                                    (click)="showTree(rowData)">{{rowData[col.field]}}</a>
                                 <ng-template #fileIdButton>
                                     <button type="button" class="button" (click)="showTree(rowData)">Show tree</button>
                                 </ng-template>
@@ -220,11 +225,5 @@
         </ng-container>
     </div>
 </div>
-<grt-tree-visualizer *ngIf="loadingTree || treeXml"
-    display="fullscreen"
-
-    [sentence]="treeSentence"
-    [xml]="treeXml"
-    [url]="treeXmlUrl"
-    [loading]="loadingTree"
-></grt-tree-visualizer>
+<grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
+    [url]="treeXmlUrl" [loading]="loadingTree"></grt-tree-visualizer>

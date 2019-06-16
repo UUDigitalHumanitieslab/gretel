@@ -1,0 +1,19 @@
+<a class="button" role="button" (click)="toggle($event)" grtBalloonLength="large" grtBalloonPosition="down"
+    grtBalloon="Download the results as a .csv-file" [grtBalloonVisible]="visible ? false : undefined">
+    <span class="icon is-large">
+        <i class="fas fa-download"></i>
+    </span>
+</a>
+<p-overlayPanel appendTo="body" [dismissable]="false" [showCloseIcon]="true">
+    <form (submit)="downloadResults()">
+        <div class="field">
+            <label class="checkbox">
+                <input type="checkbox">
+                Include Node Properties
+            </label>
+        </div>
+        <div class="field">
+            <button class="button" type="submit">Download</button>
+        </div>
+    </form>
+</p-overlayPanel>
