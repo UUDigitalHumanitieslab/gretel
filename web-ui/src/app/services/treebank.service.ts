@@ -1,9 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
+import { BehaviorSubject, Observable, ReplaySubject, merge, of, from, zip } from 'rxjs';
+import { flatMap, catchError, shareReplay, delay, map } from 'rxjs/operators';
+
 import { Treebank, TreebankComponent, TreebankMetadata, ComponentGroup, FuzzyNumber } from '../treebank';
 import { ConfigurationService } from './configuration.service';
-import { BehaviorSubject, Observable, ReplaySubject, merge, of, from, zip } from 'rxjs';
-import { flatMap, catchError, shareReplay, delay } from 'rxjs/operators';
 
 
 export interface TreebankInfo {
@@ -63,7 +65,7 @@ export interface UploadedTreebankResponse {
     email: string;
     id: string;
     processed: string;
-    public: '1'|'0';
+    public: '1' | '0';
     title: string;
     uploaded: string;
     user_id: string;
@@ -182,7 +184,7 @@ function makeComponentGroup(id: string, description: string, components: Treeban
     const compsInGroup = components.filter(c => c.group === id && !!c.variant);
 
     return {
-        components: compsInGroup.reduce<{[variant: string]: string}>((items, comp) => {
+        components: compsInGroup.reduce<{ [variant: string]: string }>((items, comp) => {
             items[comp.variant] = comp.id;
             return items;
         }, {}),
@@ -196,10 +198,10 @@ function makeComponentGroup(id: string, description: string, components: Treeban
 function makeTreebankInfo(provider: string, corpusId: string, bank: ConfiguredTreebanksResponse[string]): TreebankInfo {
     const treebank = makeTreebank(provider, corpusId, bank);
     const components: TreebankComponent[] = Object.values(bank.components).map(makeComponent);
-    const componentGroups: ComponentGroup[]|undefined = bank.groups
+    const componentGroups: ComponentGroup[] | undefined = bank.groups
         ? Object.entries(bank.groups).map(([id, group]) => makeComponentGroup(id, group.description, components))
         : undefined;
-    const variants: string[]|undefined = bank.variants ? Object.keys(bank.variants) : undefined;
+    const variants: string[] | undefined = bank.variants ? Object.keys(bank.variants) : undefined;
 
     return {
         treebank,
@@ -214,19 +216,28 @@ function makeTreebankInfo(provider: string, corpusId: string, bank: ConfiguredTr
 export class TreebankService {
     public readonly treebanks = new BehaviorSubject<{
         state: ConfiguredTreebanks,
-        origin: 'init'|'url'|'user'}
-    >({ state: {}, origin: 'init'});
+        origin: 'init' | 'url' | 'user'
+    }
+    >({ state: {}, origin: 'init' });
 
     /**
      * Completes when all providers have been queried.
      * Some treebanks may become available before this happens.
      */
-    public readonly finishedLoading: Promise<void>;
+    public get finishedLoading(): Promise<void> {
+        if (this.treebanksLoader) { return this.treebanksLoader; }
+        return this.treebanksLoader = this.loadAll();
+    }
+
+    private treebanksLoader: Promise<void>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
+    }
+
+    private async loadAll() {
         const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
 
-        allTreebanks$.subscribe(({provider, result, error}) => {
+        allTreebanks$.subscribe(({ provider, result, error }) => {
             if (error) { console.warn(error.message); }
             if (result) {
                 this.treebanks.next({
@@ -242,8 +253,8 @@ export class TreebankService {
             }
         });
 
-        // toPromise() resolves only when the underlying stream completes. Attach an empty then() to hide the last emitted value.
-        this.finishedLoading = allTreebanks$.toPromise().then(() => {});
+        // toPromise() resolves only when the underlying stream completes.
+        await allTreebanks$.toPromise();
     }
 
     private getUploadedTreebanks(): Observable<{
@@ -262,18 +273,18 @@ export class TreebankService {
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
 
             this.http.get<UploadedTreebankResponse[]>(uploadUrl)
-            .pipe(
-                // unpack array
-                flatMap(r => r),
-                // gather the rest of the data and unpack promise
-                flatMap(r => this.getUploadedTreebank(uploadProvider, r)),
-                // catch errors (either from initial get, or the above async mapping operation)
-                catchError((error: HttpErrorResponse) => of({
-                    provider: uploadProvider,
-                    error
-                }))
-            )
-            .subscribe(ob);
+                .pipe(
+                    // unpack array
+                    flatMap(r => r),
+                    // gather the rest of the data and unpack promise
+                    flatMap(r => this.getUploadedTreebank(uploadProvider, r)),
+                    // catch errors (either from initial get, or the above async mapping operation)
+                    catchError((error: HttpErrorResponse) => of({
+                        provider: uploadProvider,
+                        error
+                    }))
+                )
+                .subscribe(ob);
         })();
 
         return ob;
@@ -286,30 +297,30 @@ export class TreebankService {
     }> {
         return Promise.all([
             this.configurationService.getUploadApiUrl('treebank/show/' + bank.title)
-            .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise()),
+                .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise()),
 
             this.configurationService.getUploadApiUrl('treebank/metadata/' + bank.title)
-            .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
+                .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise())
         ])
-        .then(
-            ([uploadedComponents, uploadedMetadata]) => {
-                const components: TreebankComponent[] = uploadedComponents.map(makeUploadedComponent);
-                return {
+            .then(
+                ([uploadedComponents, uploadedMetadata]) => {
+                    const components: TreebankComponent[] = uploadedComponents.map(makeUploadedComponent);
+                    return {
+                        provider,
+                        result: {
+                            componentGroups: undefined,
+                            components: components.reduce<TreebankInfo['components']>((cs, c) => { cs[c.id] = c; return cs; }, {}),
+                            metadata: uploadedMetadata.map(makeUploadedMetadata),
+                            treebank: makeUploadedTreebank(provider, bank),
+                            variants: undefined
+                        }
+                    };
+                },
+                ((error: HttpErrorResponse) => ({
                     provider,
-                    result: {
-                        componentGroups: undefined,
-                        components: components.reduce<TreebankInfo['components']>((cs, c) => { cs[c.id] = c; return cs; }, {}),
-                        metadata: uploadedMetadata.map(makeUploadedMetadata),
-                        treebank: makeUploadedTreebank(provider, bank),
-                        variants: undefined
-                    }
-                };
-            },
-            ((error: HttpErrorResponse) => ({
-                provider,
-                error
-            }))
-        );
+                    error
+                }))
+            );
     }
 
     /**
@@ -330,8 +341,8 @@ export class TreebankService {
             flatMap(([provider, url]) => this.getConfiguredTreebanks(provider, url)),
             // unpack multiple treebank results into distinct messages
             flatMap(info => info.result ?
-                info.result.map(tb => ({provider: info.provider, result: tb})) : // success, unpack
-                [{provider: info.provider, error: info.error}] // failure, pass on error, (could cast and return info but this is clearer)
+                info.result.map(tb => ({ provider: info.provider, result: tb })) : // success, unpack
+                [{ provider: info.provider, error: info.error }] // failure, pass on error, (could cast and return info but this is clearer)
             ),
         );
     }
@@ -342,17 +353,17 @@ export class TreebankService {
         error?: HttpErrorResponse
     }> {
         return this.http.get<ConfiguredTreebanksResponse>(url).toPromise()
-        .then(r => Object.entries(r).map(([id, bank]) => makeTreebankInfo(provider, id, bank)))
-        .then(
-            (result: TreebankInfo[]) => ({
-                provider,
-                result
-            }),
-            (error: HttpErrorResponse) => ({
-                provider,
-                error
-            })
-        );
+            .then(r => Object.entries(r).map(([id, bank]) => makeTreebankInfo(provider, id, bank)))
+            .then(
+                (result: TreebankInfo[]) => ({
+                    provider,
+                    result
+                }),
+                (error: HttpErrorResponse) => ({
+                    provider,
+                    error
+                })
+            );
     }
 
 
@@ -372,16 +383,16 @@ export class TreebankService {
             const state = this.treebanks.value.state;
 
             sel.filter(s => state[s.provider] && state[s.provider][s.corpus])
-            .forEach(s => {
-                const corpusInfo = state[s.provider][s.corpus];
-                const components = corpusInfo.treebank.multiOption
-                    ? s.components
-                    : s.components.slice(0, 1);
+                .forEach(s => {
+                    const corpusInfo = state[s.provider][s.corpus];
+                    const components = corpusInfo.treebank.multiOption
+                        ? s.components
+                        : s.components.slice(0, 1);
 
-                Object.values(corpusInfo.components)
-                .forEach(component => component.selected = !component.disabled && components.includes(component.id));
-                corpusInfo.treebank.selected = true;
-            });
+                    Object.values(corpusInfo.components)
+                        .forEach(component => component.selected = !component.disabled && components.includes(component.id));
+                    corpusInfo.treebank.selected = true;
+                });
 
             this.treebanks.next({
                 origin: 'init',
@@ -405,7 +416,7 @@ export class TreebankService {
         }
 
         tb.treebank.selected = selected != null ? selected : !tb.treebank.selected;
-        this.treebanks.next({state: next, origin: 'user'});
+        this.treebanks.next({ state: next, origin: 'user' });
     }
 
     /**
@@ -437,7 +448,7 @@ export class TreebankService {
         });
 
         tb.treebank.selected = anySelected;
-        this.treebanks.next({state: next, origin: 'user'});
+        this.treebanks.next({ state: next, origin: 'user' });
     }
 
     toggleComponents(provider: string, corpus: string, selected?: boolean) {
@@ -455,7 +466,7 @@ export class TreebankService {
         }
 
         tb.treebank.selected = selected;
-        this.treebanks.next({state: next, origin: 'user'});
+        this.treebanks.next({ state: next, origin: 'user' });
     }
 
     /**
@@ -485,7 +496,7 @@ export class TreebankService {
         }
 
         tb.treebank.selected = Object.values(tb.components).some(c => c.selected);
-        this.treebanks.next({state: next, origin: 'user'});
+        this.treebanks.next({ state: next, origin: 'user' });
     }
 
     toggleVariant(provider: string, corpus: string, variant: string, selected?: boolean) {
@@ -504,7 +515,7 @@ export class TreebankService {
         }
 
         tb.treebank.selected = Object.values(tb.components).some(c => c.selected);
-        this.treebanks.next({state: next, origin: 'user'});
+        this.treebanks.next({ state: next, origin: 'user' });
     }
 }
 
@@ -513,7 +524,7 @@ export function mapToTreebankArray(banks: ConfiguredTreebanks) {
         .map(([provider, treebanks]) => treebanks)
         .flatMap(treebanks =>
             Object.values(treebanks)
-            .map(v => v.treebank)
+                .map(v => v.treebank)
         );
 }
 
@@ -529,10 +540,10 @@ export type SelectedTreebanks = Array<{
  */
 export function mapTreebanksToSelectionSettings(treebanks: ConfiguredTreebanks): SelectedTreebanks {
     return Object.values(treebanks).flatMap(v => Object.values(v))
-    .filter(v => v.treebank.selected && Object.values(v.components).some(c => c.selected))
-    .map(({treebank, components}) => ({
-        provider: treebank.provider,
-        corpus: treebank.id,
-        components: Object.values(components).filter(c => c.selected).map(c => c.id)
-    }));
+        .filter(v => v.treebank.selected && Object.values(v.components).some(c => c.selected))
+        .map(({ treebank, components }) => ({
+            provider: treebank.provider,
+            corpus: treebank.id,
+            components: Object.values(components).filter(c => c.selected).map(c => c.id)
+        }));
 }

@@ -66,17 +66,17 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
 
                 Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
 
-                // This also needs to be pushed in to the service to force an update on
-                // all components (important to restore state from url on first page render)
-                this.treebankService.initSelections(this.globalState.selectedTreebanks);
+                if (this.globalState.selectedTreebanks.length) {
+                    // This also needs to be pushed in to the service to force an update on
+                    // all components (important to restore state from url on first page render)
+                    this.treebankService.initSelections(this.globalState.selectedTreebanks);
+                }
 
                 this.goToStep(decoded.step, false);
             }));
 
         this.subscriptions.push(
             this.treebankService.treebanks.pipe(
-                // prevent infinite loops as we update the url whenever different banks are selected
-                filter(v => v.origin !== 'url' && v.origin !== 'init'),
                 map(v => mapTreebanksToSelectionSettings(v.state))
             ).subscribe(state => this.updateSelected(state))
         );
