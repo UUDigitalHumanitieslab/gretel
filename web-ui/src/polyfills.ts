@@ -64,3 +64,6 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// flatMap support in Edge
+import 'array-flat-polyfill';
