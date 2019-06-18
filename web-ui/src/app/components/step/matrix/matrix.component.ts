@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 
 import { StateService } from '../../../services/_index';
@@ -11,7 +11,7 @@ import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent<GlobalState> {
+export class MatrixComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
     public stepType = StepType.Matrix;
 
     @Input('attributes')
@@ -186,6 +186,14 @@ export class MatrixComponent extends StepComponent<GlobalState> {
 
     public getWarningMessage() {
         this.warning = true;
+    }
+
+    ngOnInit() {
+        super.ngOnInit();
+    }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
     }
 }
 

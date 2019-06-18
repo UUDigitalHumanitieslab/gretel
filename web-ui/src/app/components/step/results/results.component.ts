@@ -150,6 +150,8 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     }
 
     ngOnInit() {
+        super.ngOnInit();
+
         // intermediate streams
         const treebankSelections$ = this.treebankService.treebanks.pipe(
             debounceTime(1000),
@@ -242,6 +244,8 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     }
 
     ngOnDestroy() {
+        super.ngOnDestroy();
+
         for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
@@ -278,7 +282,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         this.filterChange(updated);
     }
 
-    public downloadResults() {
+    public downloadResults(includeNodeProperties: boolean) {
         const r = [] as Array<{
             xpath: string,
             components: string[],

@@ -10,15 +10,17 @@ import { Subscription } from 'rxjs';
 })
 export class DownloadResultsComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
-    visible = false;
 
     @ViewChild(OverlayPanel)
     overlayPanel: OverlayPanel;
 
+    visible = false;
+    includeNodeProperties = false;
+
     constructor(private resultsComponent: ResultsComponent) { }
 
     downloadResults() {
-        this.resultsComponent.downloadResults();
+        this.resultsComponent.downloadResults(this.includeNodeProperties);
     }
 
     toggle($event: any) {

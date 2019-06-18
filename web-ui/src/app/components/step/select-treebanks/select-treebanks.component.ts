@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { StepComponent } from '../step.component';
 import { TreebankService, TreebankInfo } from '../../../services/treebank.service';
 import { map } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-pag
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })
-export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBased> implements OnDestroy {
+export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
     public treebanks: TreebankInfo[] = [];
     public loading = true;
     public stepType = StepType.SelectTreebanks;
@@ -31,7 +31,12 @@ export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBa
         treebankService.finishedLoading.then(() => this.loading = false);
     }
 
+    ngOnInit() {
+        super.ngOnInit();
+    }
+
     ngOnDestroy() {
+        super.ngOnDestroy();
         this.subscriptions.forEach(s => s.unsubscribe());
     }
 

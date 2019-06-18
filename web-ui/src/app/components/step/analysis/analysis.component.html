@@ -1,4 +1,5 @@
-<div class="notification is-primary" *ngIf="renderCount">
+<div class="notification is-primary explanation" *ngIf="renderCount && showExplanation">
+    <button class="delete" (click)="showExplanation = false"></button>
     <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to
         analyse its properties.</p>
 </div>

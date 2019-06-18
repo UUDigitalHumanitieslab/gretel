@@ -58,6 +58,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
 
     public selectedVariable?: SelectedVariable;
     public showMoreSubject = new BehaviorSubject<number>(0);
+    public showExplanation = true;
 
     @Input()
     public xpath: string;
@@ -86,11 +87,13 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     }
 
     ngOnInit() {
+        super.ngOnInit();
         this.$element = $('.analysis-component');
         this.initialize();
     }
 
     ngOnDestroy() {
+        super.ngOnDestroy();
         for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
