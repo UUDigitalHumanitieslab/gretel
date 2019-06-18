@@ -90,7 +90,8 @@ Date: ${new Date()}
     }
 
     private formatCsvRow(...data: any[]) {
-        return data.join(',') + '\n';
+        return data.map(cell => `${cell}`)
+            .map(cell => /[,\n"]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell).join(',') + '\n';
     }
 
     private blob(fileType: 'text/csv' | 'text/plain', rows: string[]) {
