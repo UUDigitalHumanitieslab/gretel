@@ -1,82 +1,59 @@
 <?php
 
+require_once('../../treebanks/treebanks.php');
+
 function getConfiguredTreebanks()
 {
-    global $databaseGroups;
+    global $treebanks;
     $configured_treebanks = array();
 
-    foreach ($databaseGroups as $corpus => $settings) {
-        if ($corpus == 'api') {
-            continue;
+    /** @var TreebankInfo $treebanks */
+    foreach ($treebanks as $treebank) {
+        $corpus_definition = array(
+            'title' => $treebank->name,
+            'description' =>
+                ($treebank->production).
+                ($treebank->language ? ' '.$treebank->language : '').
+                ($treebank->version ? ' - version '.$treebank->version : ''),
+            'multioption' => $treebank->multioption,
+            'metadata' => $treebank->metadata ?? array(),   // send out an empty array if not configured
+            'components' => array(),                         // filled below
+        );
+
+        // Omit these from the response if they're not configured
+        if (!empty($treebank->variants) && !empty($treebank->groups)) {
+            $variants = array();
+            $groups = array();
+
+            foreach ($treebank->variants as $variantId => $variantInfo) {
+                $variants[$variantId] = array('display' => $variantInfo['displayname']);
+            }
+            foreach($treebank->groups as $groupId => $groupInfo) {
+                $groups[$groupId] = array('description' => $groupInfo['description']);
+            }
+
+            $corpus_definition['variants'] = $variants;
+            $corpus_definition['groups'] = $groups;
         }
 
-        if (array_key_exists('components', $settings)) {
-            $grinded = isGrinded($corpus);
-
-            // probably default settings, this doesn't work anyway
-            if (!$grinded && $settings['port'] == 0000) {
-                continue;
-            }
-            $components = array();
-
-            // NOTE: the configs are keyed by the component's title, we generate the id internally.
-            foreach ($settings['components'] as $component_title) {
-                $component_id = $grinded ? $component_title : strtoupper($corpus).'_ID_'.strtoupper($component_title);
-                $component_description = array(
-                    'id' => $component_id,
-                    'title' => $component_title,
-                    'description' => '',
-                    'sentences' => '?',
-                    'words' => '?',
-                );
-
-                if (array_key_exists('component_descriptions', $settings)) {
-                    $component_descriptions = $settings['component_descriptions'];
-                    if (array_key_exists($component_title, $component_descriptions)) {
-                        $component_description = array_merge($component_description, $component_descriptions[$component_title]);
-                    }
-                }
-
-                $components[$component_id] = $component_description;
-            }
-
-            $title = array_key_exists('fullName', $settings) ? $settings['fullName'] : $corpus;
-
-            if (array_key_exists('production', $settings)) {
-                $description = $settings['production'];
-            } else {
-                $description = '';
-            }
-            if (array_key_exists('language', $settings)) {
-                $description .= ' '.$settings['language'];
-            }
-            if (array_key_exists('version', $settings)) {
-                $description .= ' - version '.$settings['version'];
-            }
-            $metadata = array_key_exists('metadata', $settings) ? $settings['metadata'] : array();
-            if (array_key_exists('multioption', $settings)) {
-                $multioption = $settings['multioption'];
-            } else {
-                $multioption = false;
-            }
-            $corpus_definition = array(
-                'title' => $title,
-                'description' => $description,
-                'components' => $components,
-                'metadata' => $metadata,
-                'multioption' => $multioption,
+        // Map the components - don't expose internal info
+        foreach($treebank->components as $componentInfo) {
+            $component = array(
+                'id' => $componentInfo->name,
+                'title' => $componentInfo->displayname,
+                'description' => $componentInfo->description,
+                'sentences' => $componentInfo->sentences ?: '?', // replace 0 by '?'
+                'words' => $componentInfo->words ?: '?',
+                'disabled' => $componentInfo->disabled
             );
 
-            if (array_key_exists('groups', $settings)) {
-                $corpus_definition['groups'] = $settings['groups'];
-            }
-
-            if (array_key_exists('variants', $settings)) {
-                $corpus_definition['variants'] = $settings['variants'];
-            }
-
-            $configured_treebanks[$corpus] = $corpus_definition;
+            // Only define these if they're configured (non-null, etc)
+            if ($componentInfo->group) $component['group'] = $componentInfo->group;
+            if ($componentInfo->variant) $component['variant'] = $componentInfo->variant;
+            $corpus_definition['components'][$componentInfo->name] = $component;
         }
+
+        $configured_treebanks[$treebank->name] = $corpus_definition;
     }
 
     return $configured_treebanks;

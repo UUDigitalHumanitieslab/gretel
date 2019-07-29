@@ -58,9 +58,9 @@ $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
 
 $router->map('GET', '/tree/[*:treebank]/[*:sentid]', function ($treebank, $sentid) {
     if (isset($_GET['db'])) {
-        $db = $_GET['db'];
+        $component = $_GET['db'];
     }
-    showTree($sentid, $treebank, $db);
+    showTree($sentid, $treebank, $component);
 });
 
 $router->map('POST', '/metadata_counts', function () {
@@ -89,55 +89,72 @@ $router->map('POST', '/treebank_counts', function () {
 
 $router->map('POST', '/results', function () {
     global $resultsLimit, $analysisLimit, $analysisFlushLimit, $flushLimit, $needRegularGrinded;
+    isset($analysisLimit) or $analysisLimit = $resultsLimit;
 
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
-    $xpath = $data['xpath'];
-    $context = $data['retrieveContext'];
-    $corpus = $data['corpus'];
-    $components = $data['components'];
-    if (isset($data['variables'])) {
-        $variables = $data['variables'];
-    } else {
-        $variables = null;
-    }
-    $iteration = $data['iteration'];
-    $remainingDatabases = $data['remainingDatabases'];
 
-    if (!isset($analysisLimit)) {
-        $analysisLimit = $resultsLimit;
-    }
-    if (isset($data['isAnalysis']) && $data['isAnalysis']) {
-        $searchLimit = $analysisLimit;
-        if (isset($analysisFlushLimit)) {
-            $flushLimit = $analysisFlushLimit;
-        }
-    } else {
-        $searchLimit = $resultsLimit;
-    }
+    /** @var string $xpath*/            $xpath = $data['xpath'];
+    /** @var boolean $context */        $context = $data['retrieveContext'];
+    /** @var string $corpus */          $corpus = $data['corpus'];
+    /** @var int $iteration */          $iteration = $data['iteration'];
+    /** @var array|null $variables */   $variables = $data['variables'];
 
-    if (isset($data['already'])) {
-        $already = $data['already'];
-    } else {
-        $already = null;
-    }
-    $needRegularGrinded = isset($data['needRegularGrinded']) && $data['needRegularGrinded'];
+    // The (remaining) components of this corpus to search
+    // Only the first component is actually searched in this request.
+    /** @var string[] $components */
+    $components = $data['remainingComponents'];
+    // The (remaining) databases to search for this component.
+    // If this is null, retrieves all relevant databases for the component.
+    // (Either grind databases, or smaller parts of the component as defined in one of the .lst files in /treebank-parts)
+    // If neither is set, the component's name is assumed to also be the name of the database
+    // (usually ${corpus}_ID_${component})
+    // It is pingponged with the client so we can keep track where we are in the searching.
+    /** @var string[]|null $databases */
+    $databases = $data['remainingDatabases'] ?? getDatabases($corpus, $components[0], $xpath);
+
+    // Some xpaths are faster on the plain data even in grinded corpora
+    // This variable indicates that this is one of those edge cases.
+    // If it is true, use the normal process of searching, even for grinded databases.
+    // The $already and $databases variables will follow the normal conventions.
+    // ($databases will contain the component names, and $already will be null).
+    // (may already have been set true in getDatabases when this is a grinded corpus).
+    $needRegularGrinded = $needRegularGrinded || !!$data['needRegularGrinded'];
+
+    $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
+    $searchLimit = $data['isAnalysis'] ? $analysisLimit : $resultsLimit;
+
+    // We only search one component at a time.
     $results = getResults(
         $xpath,
         $context,
         $corpus,
-        $components,
+        $components[0],
+        $databases,
         $iteration,
             isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
             ? $data['searchLimit']
             : $searchLimit,
-        $variables,
-        $remainingDatabases,
-        $already);
+        $variables
+    );
 
     if ($results['success']) {
         // append the actual search limit from the configuration
         $results['searchLimit'] = $searchLimit;
+        // If done with current components (remainingDatabases finished)
+        // Remove it from the list and get the databases for the next components
+        if (!$results['remainingDatabases']) {
+            array_shift($components);
+            $results['remainingDatabases'] = $components[0] ? getDatabases($corpus, $components[0], $xpath) : array();
+        }
+        $results['remainingComponents'] = $components;
+
+        $results['needRegularGrinded'] = $needRegularGrinded;
+        if ($results['endPosIteration'] * $flushLimit >= $searchLimit) {
+            // clear the remaining databases to signal the search of this component is done
+            $results['remainingDatabases'] = array();
+            $results['remainingComponents'] = array();
+        }
     }
 
     header('Content-Type: application/json');

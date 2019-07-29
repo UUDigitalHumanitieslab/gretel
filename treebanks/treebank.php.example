@@ -1,0 +1,60 @@
+<?php
+
+$tb = new TreebankInfo('example', array(
+    // The components in this treebank
+    // The ID refers to the basex database that contains this component's information
+    // Disabled components are not required to actually exist on disk and can use a dummy id
+    new TreebankComponent('EXAMPLE_COMPONENT_ID', 'example display name', 100, 500,  null, 'A', 'A', false, null, null),
+));
+
+// Optional: DisplayName for this bank - defaults to the id
+$tb->setdisplayname('Example Treebank');
+// Optional: Version (used in description)
+$tb->setversion('1.0');
+// Optional: Language and origin information (used in description)
+$tb->setproduction('spoken');
+$tb->setlanguage('Dutch');
+
+ // Optional: Allow searching multiple components simultaneously, defaults to true
+$tb->setmultioption(true);
+// Optional: Mark this treebank as grinded - defaults to false
+// For grinded corpora, every component exists as a regular database, like in a non-grinded treebank,
+// but also has a "grinded" version consisting of many hundreds of small databases
+// These databases are retrieved through the sentence2treebank database prefixed with the ID of the requested component
+// (e.g. EXAMPLE_COMPONENT_ID_sentence2treebank)
+$tb->setgrinded(false);
+
+// Optional: BaseX Server information, this can be overridden per component, defaults to localhost:1984
+$tb->setmachine('localhost');
+$tb->setport('1984');
+$tb->setusername('admin');
+$tb->setpassword('admin');
+
+// Optional: extra info relating to groups
+$tb->setgroups(array(
+    // Individual entries are optional too
+    'A' => array(
+        'description' => 'This is the description for group a',
+    ),
+));
+
+// Optional: extra info relating to variants
+$tb.setvariants(array(
+    // Individual entries are optional too
+    'A' => array(
+        'displayname' => 'variant A'
+    ),
+));
+
+// Optional: available metadata fields
+$tb->setmetadata(array(
+    array(
+        'field'     => 'field name',
+        'type'      => 'text',      // text, int, date
+        'facet'     => 'dropdown',  // checkbox, slider, range, dropdown
+        'show'      => true,
+        // 'minValue'  => 1, // number or date
+        // 'maxValue'  => 10, // number or date
+    ),
+    // etc.
+));
