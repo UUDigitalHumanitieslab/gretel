@@ -34,7 +34,7 @@ function get_metadata_counts($corpus, $components, $xpath)
 
     foreach($components as $component) {
         $databases = getDatabases($corpus, $component, $xpath);
-        $serverInfo = getServerInfo($corpus, $components[0]);
+        $serverInfo = getServerInfo($corpus, $component);
         $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
 
         $result = array();
