@@ -25,7 +25,7 @@
         [xpath]="globalState.xpath"
 
         (changeValid)="setValid($event)"
-        (changeXpath)="updateXPath($event)"
+        (changeXpath)="updateXPath($event, 'history')"
         (changeRetrieveContext)="updateRetrieveContext($event)"
         (changeFilterValues)="updateFilterValues($event)"
         (prev)="prev()"

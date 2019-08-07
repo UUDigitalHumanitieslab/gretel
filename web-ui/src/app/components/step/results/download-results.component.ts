@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { ResultsComponent } from './results.component';
-import { OverlayPanel } from 'primeng/primeng';
+import { OverlayPanel } from 'primeng/overlaypanel';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
 export class DownloadResultsComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
-    @ViewChild(OverlayPanel)
+    @ViewChild(OverlayPanel, { static: true })
     overlayPanel: OverlayPanel;
 
     visible = false;

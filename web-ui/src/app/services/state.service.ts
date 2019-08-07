@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { GlobalState, Step } from '../pages/multi-step-page/steps';
 import { StepComponent } from '../components/step/step.component';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -25,9 +26,16 @@ class SharedInstance<T extends GlobalState> {
     private currentStepComponent = new ExternalPromise<StepComponent<T>>();
     isTransitioning$ = new BehaviorSubject<boolean>(false);
     warning$ = new BehaviorSubject<string | false>(false);
+    state$: BehaviorSubject<T & {
+        /**
+         * Don't emit an updated URL
+         */
+        emit: EmitType
+    }>;
 
-    constructor(steps: Step<T>[]) {
+    constructor(state: T, steps: Step<T>[]) {
         this.steps = steps;
+        this.state$ = new BehaviorSubject({ ...state, emit: false });
         this.isTransitioning$.next(false);
     }
 
@@ -48,8 +56,8 @@ class SharedInstance<T extends GlobalState> {
     /**
      * Go back one step
      */
-    async prev(state: T): Promise<T> {
-        state.connectionError = false;
+    async prev(): Promise<T> {
+        const state = this.setState({ connectionError: false });
         this.isTransitioning$.next(true);
         this.warning$.next(false);
         return this.jumpState(state, state.currentStep.number - 1);
@@ -58,9 +66,10 @@ class SharedInstance<T extends GlobalState> {
     /**
      * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
-    async next(state: T): Promise<T | false> {
+    async next(): Promise<T | false> {
+        let state = this.state$.value;
         if (state.valid) {
-            state.connectionError = false;
+            state = this.setState({ connectionError: false });
             this.isTransitioning$.next(true);
             this.warning$.next(false);
             state = await this.jumpState(state, state.currentStep.number + 1);
@@ -78,9 +87,9 @@ class SharedInstance<T extends GlobalState> {
         }
     }
 
-    async jump(state: T, stepNumber: number) {
+    async jump(stepNumber: number, emit: EmitType = 'history') {
         this.isTransitioning$.next(true);
-        state = await this.jumpState(state, stepNumber);
+        const state = await this.jumpState(this.state$.value, stepNumber, emit);
 
         if (state.connectionError || (!state.valid && state.currentStep.number !== stepNumber)) {
             this.showWarning(state.currentStep.number);
@@ -97,12 +106,13 @@ class SharedInstance<T extends GlobalState> {
      * @param state: the current state.
      * @param stepNumber: the index of the step to jump to.
      */
-    private async jumpState(state: T, stepNumber: number) {
+    private async jumpState(state: T, stepNumber: number, emit: EmitType = 'history') {
         const { newState, newComponent } = await this.jumpNewState(state, stepNumber);
         if (newComponent) {
             this.currentStepComponent = new ExternalPromise();
         }
-        return newState;
+        this.isTransitioning$.next(false);
+        return this.setState(newState, emit);
     }
 
     /**
@@ -152,7 +162,26 @@ class SharedInstance<T extends GlobalState> {
             this.warning$.next(currentStep.getWarningMessage() || false);
         }
     }
+
+    setState(values: { [K in keyof GlobalState]?: GlobalState[K] }, emit: EmitType = false) {
+        const nextState = {
+            ...this.state$.value,
+            ...values,
+            emit
+        };
+        this.state$.next(nextState);
+        return nextState;
+    }
+
+    updateState(update: (state: T) => void): T {
+        const nextState = { ...this.state$.value, emit: 'in-place' as EmitType };
+        update(nextState);
+        this.state$.next(nextState);
+        return nextState;
+    }
 }
+
+export type EmitType = false | 'in-place' | 'history';
 
 /**
  * For jumps
@@ -170,6 +199,13 @@ export class StateService<T extends GlobalState> {
     private get instance() { return StateService.instance; }
     private set instance(value) { StateService.instance = value; }
 
+    state$: Observable<T &
+    {
+        /**
+         * Emit changes to URL and should the browser history be affected?
+         */
+        emit: EmitType
+    }>;
     isTransitioning$: Observable<boolean>;
     warning$: Observable<string | false>;
 
@@ -177,9 +213,10 @@ export class StateService<T extends GlobalState> {
      * This is called on entry of the multi-step page
      * @param steps The steps of this page.
      */
-    init(steps: Step<T>[]) {
+    init(initialState: T, steps: Step<T>[]) {
         this.dispose();
-        this.instance = new SharedInstance<T>(steps);
+        this.instance = new SharedInstance<T>(initialState, steps);
+        this.state$ = this.instance.state$.asObservable();
         this.isTransitioning$ = this.instance.isTransitioning$.asObservable();
         this.warning$ = this.instance.warning$.asObservable();
     }
@@ -196,19 +233,27 @@ export class StateService<T extends GlobalState> {
     /**
      * Transition that decreases the current step number (if possible)
      */
-    prev(state: T): Promise<T> {
-        return this.instance.prev(state);
+    prev(): Promise<T> {
+        return this.instance.prev();
     }
 
     /**
      * Transition that increases the current step number (if possible)
      */
-    next(state: T): Promise<T> {
-        return this.instance.next(state);
+    next(): Promise<T> {
+        return this.instance.next();
     }
 
-    jump(state: T, stepNumber: number): Promise<T> {
-        return this.instance.jump(state, stepNumber);
+    jump(stepNumber: number, emit: EmitType = 'history'): Promise<T> {
+        return this.instance.jump(stepNumber, emit);
+    }
+
+    setState(values: { [K in keyof T]?: T[K] }, emit: EmitType = 'in-place') {
+        return this.instance.setState(values, emit);
+    }
+
+    updateState(update: (state: T) => void): T {
+        return this.instance.updateState(update);
     }
 
     /**

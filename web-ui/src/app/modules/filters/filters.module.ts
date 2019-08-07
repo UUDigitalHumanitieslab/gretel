@@ -14,11 +14,11 @@ import { TextComponent } from './text/text.component';
 import { IntComponent } from './int/int.component';
 import { DateComponent } from './date/date.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
-import {
-    MatFormFieldModule, MatInputModule, MatNativeDateModule, MatOptionModule,
-    MatSelectModule
-} from '@angular/material';
-import { CheckboxModule } from 'primeng/primeng';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { CheckboxModule } from 'primeng/checkbox';
 import { SliderModule } from 'primeng/slider';
 
 export const

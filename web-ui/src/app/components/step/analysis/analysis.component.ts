@@ -14,9 +14,8 @@ import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-
 import {
     AnalysisService,
     ResultsService,
-    TreebankService,
+    TreebankSelectionService,
     Hit,
-    mapTreebanksToSelectionSettings,
     FilterValues,
     FilterByXPath,
     FilterValue,
@@ -79,7 +78,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService,
+        private treebankSelectionService: TreebankSelectionService,
         private ngZone: NgZone,
         stateService: StateService<GlobalState>
     ) {
@@ -121,33 +120,34 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         this.variables = variables.reduce<{ [name: string]: PathVariable }>((vs, v) => { vs[v.name] = v; return vs; }, {});
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
 
-        const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
-            map(v => ({
-                selected: mapTreebanksToSelectionSettings(v.state),
-                state: v.state
-            })),
-            switchMap(v => {
+        const subscriptionToTreebankSelection = this.treebankSelectionService.state$.pipe(
+            switchMap(selection => {
                 this.isLoading = true;
                 this.hitsSubject.next([]);
-                this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
+                const loadMetadata = Promise.all(
+                    selection.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()))
+                    .then(metadata => {
+                        this.metadata = metadata.flatMap(x => x);
+                    });
+
                 // fetch all results for all selected components/treebanks
                 // and merge them into a single stream that's subscribed to.
-                const merged = merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                const searchResults = merge(...selection.corpora.map(corpus => this.resultsService.getAllResults(
                     this.xpath,
-                    selection.provider,
-                    selection.corpus,
-                    selection.components,
+                    corpus.provider,
+                    corpus.corpus.name,
+                    corpus.corpus.components,
                     false,
                     true,
                     [],
                     variables
                 )));
 
-                merged.toPromise().then(() => {
+                Promise.all([loadMetadata, searchResults.toPromise()]).then(() => {
                     this.isLoading = false;
                 });
 
-                return merged;
+                return searchResults;
             }))
             .subscribe(searchResults => {
                 const hits = [...this.hitsSubject.value, ...searchResults.hits];

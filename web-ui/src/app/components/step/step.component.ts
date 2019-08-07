@@ -6,13 +6,15 @@
 import { EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { StateService } from '../../services/_index';
 import { StepType, GlobalState } from '../../pages/multi-step-page/steps';
+import { Observable } from 'rxjs';
 
 export abstract class StepComponent<T extends GlobalState> implements OnInit, OnDestroy {
     public abstract stepType: StepType;
-
     public valid = false;
+    protected state$: Observable<T>;
 
     constructor(private stateService: StateService<T>) {
+        this.state$ = this.stateService.state$;
     }
 
     @Output() changeValid = new EventEmitter<Boolean>();

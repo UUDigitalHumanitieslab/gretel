@@ -33,9 +33,9 @@ interface Metadata {
     styleUrls: ['./tree-visualizer.component.scss']
 })
 export class TreeVisualizerComponent implements OnChanges, OnInit {
-    @ViewChild('output', { read: ElementRef })
+    @ViewChild('output', { static: true, read: ElementRef })
     public output: ElementRef;
-    @ViewChild('inline', { read: ElementRef })
+    @ViewChild('inline', { static: false, read: ElementRef })
     public inlineRef: ElementRef;
 
     @Input()

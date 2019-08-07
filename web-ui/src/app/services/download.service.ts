@@ -2,7 +2,7 @@ import { Injectable, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { Hit } from './results.service';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 
 @Injectable()
 export class DownloadService {
