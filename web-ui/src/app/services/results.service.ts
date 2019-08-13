@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
-import { XmlParseService } from './xml-parse.service';
+import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath/ng';
 
@@ -26,7 +26,7 @@ export class ResultsService {
         private http: HttpClient,
         private sanitizer: DomSanitizer,
         private configurationService: ConfigurationService,
-        private xmlParseService: XmlParseService) {
+        private xmlParseService: ParseService) {
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */

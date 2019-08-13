@@ -1,7 +1,7 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
-import { ResultsComponent } from './results.component';
-import { OverlayPanel } from 'primeng/overlaypanel';
+import { Component, ViewChild, OnInit, OnDestroy, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { ResultsComponent } from './results.component';
 
 @Component({
     selector: 'grt-download-results',
@@ -13,6 +13,9 @@ export class DownloadResultsComponent implements OnInit, OnDestroy {
 
     @ViewChild(OverlayPanel, { static: true })
     overlayPanel: OverlayPanel;
+
+    @Input()
+    loading = false;
 
     visible = false;
     includeNodeProperties = false;

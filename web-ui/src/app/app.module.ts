@@ -48,7 +48,7 @@ import {
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService
+    ParseService
 } from './services/_index';
 import { AnalysisComponent } from './components/step/analysis/analysis.component';
 import { TreeVisualizerComponent } from './components/tree-visualizer/tree-visualizer.component';
@@ -131,7 +131,7 @@ export const providers: any[] = [
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService,
+    ParseService,
 ];
 
 @NgModule({

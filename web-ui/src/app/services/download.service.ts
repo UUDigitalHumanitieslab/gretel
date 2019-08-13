@@ -3,6 +3,11 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { Hit } from './results.service';
 import JSZip from 'jszip';
+import { PathVariable } from 'lassy-xpath/ng';
+
+// Separator for variable values, this shouldn't be the name of
+// either the variable name or node property
+const KEY_SEPARATOR = '.';
 
 @Injectable()
 export class DownloadService {
@@ -24,7 +29,9 @@ export class DownloadService {
         this.downloadRows('gretel-distribution.csv', 'text/csv', rows);
     }
 
-    public async downloadResults(results: { corpus: string, components: string[], xpath: string, hits: Hit[] }[]) {
+    public async downloadResults(
+        results: { corpus: string, components: string[], xpath: string, hits: Hit[] }[],
+        variables?: PathVariable[]) {
         const zip = new JSZip();
         const corporaNames: string[] = [];
         results.forEach(({ corpus, components, xpath, hits }) => {
@@ -32,23 +39,61 @@ export class DownloadService {
                 `${corpus}.meta.txt`,
                 this.blob(
                     'text/plain',
-                    [`Corpus: ${corpus}
-Components: ${components.join('-')}
-XPath: ${xpath.replace(/\n/g, '\t')}
-Date: ${new Date()}
-`]));
+                    [`Corpus:\n\t${corpus}
+Components:\n\t${components.join('-')}
+XPath:\n\t${xpath.split('\n').join('\n\t')}
+Date:\n\t${new Date()}
+${this.variablesMetaText(variables)}`]));
             corporaNames.push(corpus);
 
-            const rows: string[] = [this.formatCsvRow('#', 'ID', 'Corpus', 'Component', 'Sentence')];
+            let variableColumns: string[] = [];
+            const variableColumnPositions: { [key: string]: number } = {};
+
+            if (variables) {
+                // determine the columns
+                const variableProperties = new Set<string>();
+                for (const hit of hits) {
+                    for (const [variable, properties] of Object.entries(hit.variableValues)) {
+                        for (const property of Object.keys(properties)) {
+                            const key = `${variable}${KEY_SEPARATOR}${property}`;
+                            variableProperties.add(key);
+                        }
+                    }
+                }
+
+                variableColumns = [...variableProperties.values()].sort();
+                for (let i = 0; i < variableColumns.length; i++) {
+                    variableColumnPositions[variableColumns[i]] = i;
+                }
+            }
+
+            const rows: string[] = [this.formatCsvRow(
+                '#',
+                'ID',
+                'Corpus',
+                'Component',
+                'Sentence',
+                ...variableColumns)];
 
             for (let i = 0; i < hits.length; i++) {
                 const hit = hits[i];
+                const variableCells = variableColumns.map(_ => '');
+                if (variables) {
+                    for (const [variable, properties] of Object.entries(hit.variableValues)) {
+                        for (const [property, value] of Object.entries(properties)) {
+                            const key = `${variable}${KEY_SEPARATOR}${property}`;
+                            variableCells[variableColumnPositions[key]] = value;
+                        }
+                    }
+                }
+
                 rows.push(this.formatCsvRow(
                     i + 1,
                     hit.fileId,
                     corpus,
                     hit.component,
-                    this.highlightSentence(hit.highlightedSentence)));
+                    this.highlightSentence(hit.highlightedSentence),
+                    ...variableCells));
             }
 
             zip.file(`${corpus}.csv`, this.blob('text/csv', rows));
@@ -100,5 +145,11 @@ Date: ${new Date()}
 
     private downloadRows(filename: string, fileType: 'text/csv' | 'text/plain', rows: string[]) {
         saveAs(this.blob(fileType, rows), filename);
+    }
+
+    private variablesMetaText(variables?: PathVariable[]) {
+        return variables ?
+            `Variables:\n${variables.map(value => `\t${value.name}:\n\t\t${value.path}`).join('\n')}\n`
+            : '';
     }
 }

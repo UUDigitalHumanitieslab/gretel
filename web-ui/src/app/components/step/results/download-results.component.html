@@ -16,7 +16,7 @@
             </label>
         </div>
         <div class="field">
-            <button class="button" type="submit">Download</button>
+            <button class="button" type="submit" [ngClass]="{'is-loading': loading}">Download</button>
         </div>
     </form>
 </p-overlayPanel>

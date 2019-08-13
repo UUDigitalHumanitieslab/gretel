@@ -28,7 +28,8 @@ import {
     ResultsService,
     ResultsStreamService,
     StateService,
-    TreebankSelectionService
+    TreebankSelectionService,
+    ParseService
 } from '../../../services/_index';
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
@@ -64,6 +65,7 @@ interface ResultsInfo {
     styleUrls: ['./results.component.scss']
 })
 export class ResultsComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+    private treebankSelection: TreebankSelection;
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
 
@@ -107,6 +109,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     public next = new EventEmitter();
 
     public loading = true;
+    public loadingDownload = false;
 
     public xpathCopied = false;
     public customXPath: string;
@@ -140,6 +143,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         private resultsService: ResultsService,
         private resultsStreamService: ResultsStreamService,
         private treebankSelectionService: TreebankSelectionService,
+        private parseService: ParseService,
         stateService: StateService<GlobalState>
     ) {
         super(stateService);
@@ -169,6 +173,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         const results$ = this.createResultsStream(treebankSelections$, this.xpathSubject, filterValues$);
 
         this.subscriptions = [
+            treebankSelections$.subscribe(treebankSelection => this.treebankSelection = treebankSelection),
             metadataFilters$.subscribe(filters => this.filters = filters),
 
             results$.subscribe(r => {
@@ -270,28 +275,38 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         this.filterChange(updated);
     }
 
-    public downloadResults(includeNodeProperties: boolean) {
-        const r = [] as Array<{
-            xpath: string,
-            components: string[],
-            provider: string,
-            corpus: string,
-            hits: Hit[]
-        }>;
+    public async downloadResults(includeNodeProperties: boolean) {
+        const filterValues = Object.values(this.filterValuesSubject.value);
+        const variables = includeNodeProperties
+            ? this.parseService.extractVariables(this.xpath).variables
+            : undefined;
 
-        Object.entries(this.info).forEach(([provider, treebanks]) => {
-            Object.entries(treebanks).forEach(([corpus, settings]) => {
-                r.push({
-                    components: Object.keys(settings.hiddenComponents),
-                    corpus,
-                    hits: settings.hits,
-                    provider,
-                    xpath: this.xpath
-                });
-            });
-        });
+        this.loadingDownload = true;
+        const results = await Promise.all(
+            this.treebankSelection.corpora.map(corpus =>
+                this.resultsService.promiseAllResults(
+                    this.xpath,
+                    corpus.provider,
+                    corpus.corpus.name,
+                    corpus.corpus.components,
+                    this.retrieveContext,
+                    false,
+                    filterValues,
+                    variables).then(hits => ({
+                        corpus: corpus,
+                        hits
+                    }))));
 
-        this.downloadService.downloadResults(r);
+        const r = results.flatMap(corpusHits => ({
+            xpath: this.xpath,
+            components: corpusHits.corpus.corpus.components,
+            provider: corpusHits.corpus.provider,
+            corpus: corpusHits.corpus.corpus.name,
+            hits: corpusHits.hits
+        }));
+
+        await this.downloadService.downloadResults(r, variables);
+        this.loadingDownload = false;
     }
 
     public downloadXPath() {

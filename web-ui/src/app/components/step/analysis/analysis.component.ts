@@ -2,14 +2,14 @@
 /// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
-import { map, switchMap, first } from 'rxjs/operators';
+import { switchMap, first } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
+import { PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
 import {
     AnalysisService,
@@ -19,7 +19,8 @@ import {
     FilterValues,
     FilterByXPath,
     FilterValue,
-    StateService
+    StateService,
+    ParseService
 } from '../../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../../treebank';
@@ -75,10 +76,10 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
 
     constructor(
         private analysisService: AnalysisService,
-        private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
         private treebankSelectionService: TreebankSelectionService,
+        private parseService: ParseService,
         private ngZone: NgZone,
         stateService: StateService<GlobalState>
     ) {
@@ -108,16 +109,9 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     }
 
     private async initialize() {
-        let variables: PathVariable[];
-        try {
-            variables = this.extractinatorService.extract(this.xpath);
-        } catch (e) {
-            variables = [];
-            console.warn('Error extracting variables from path', e, this.xpath);
-        }
-
         // TODO: on change
-        this.variables = variables.reduce<{ [name: string]: PathVariable }>((vs, v) => { vs[v.name] = v; return vs; }, {});
+        const { variables, lookup } = this.parseService.extractVariables(this.xpath);
+        this.variables = lookup;
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
 
         const subscriptionToTreebankSelection = this.treebankSelectionService.state$.pipe(

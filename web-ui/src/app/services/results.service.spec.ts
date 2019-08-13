@@ -1,12 +1,12 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 
-import { Location } from 'lassy-xpath/ng';
+import { Location, ExtractinatorService } from 'lassy-xpath/ng';
 
 import { ResultsService } from './results.service';
 import { HttpClientMock } from '../mocks/http-client.mock';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ConfigurationService, XmlParseService } from './_index';
+import { ConfigurationService, ParseService } from './_index';
 import { ConfigurationServiceMock } from './configuration.service.mock';
 
 describe('ResultsService', () => {
@@ -17,7 +17,8 @@ describe('ResultsService', () => {
                 { provide: HttpClient, useValue: new HttpClientMock() },
                 DomSanitizer,
                 { provide: ConfigurationService, useValue: new ConfigurationServiceMock },
-                XmlParseService
+                ParseService,
+                ExtractinatorService
             ]
         });
     });

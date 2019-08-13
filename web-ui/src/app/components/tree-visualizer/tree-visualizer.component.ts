@@ -14,7 +14,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 import * as $ from 'jquery';
 
-import { DownloadService, XmlParseService } from '../../services/_index';
+import { DownloadService, ParseService } from '../../services/_index';
 import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
@@ -71,7 +71,7 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     // jquery tree visualizer
     private instance: any;
 
-    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private xmlParseService: XmlParseService) {
+    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private xmlParseService: ParseService) {
     }
 
     ngOnInit() {

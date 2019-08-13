@@ -10,4 +10,4 @@ export * from './state.service';
 export * from './title.service';
 export * from './treebank.service';
 export * from './treebank-selection.service';
-export * from './xml-parse.service';
+export * from './parse.service';
