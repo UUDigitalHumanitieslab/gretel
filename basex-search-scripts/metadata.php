@@ -24,62 +24,52 @@ function get_metadata_fields()
  * Retrieves the metadata counts for the current corpus and XPath query.
  *
  * @param string $corpus
- * @param array  $components
+ * @param string[] $components
  * @param string $xpath
- *
- * @global string $dbuser
- * @global string $dbpwd
  *
  * @return array Metadata per subcorpus
  */
 function get_metadata_counts($corpus, $components, $xpath)
 {
-    global $dbuser, $dbpwd;
 
-    if (isGrinded($corpus)) {
-        $serverInfo = getServerInfo($corpus, $components[0]);
-    } else {
-        $serverInfo = getServerInfo($corpus, false);
-    }
+    foreach($components as $component) {
+        $databases = getDatabases($corpus, $component, $xpath);
+        $serverInfo = getServerInfo($corpus, $component);
+        $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
 
-    $databases = corpusToDatabase($components, $corpus, $xpath);
+        $result = array();
+        foreach ($databases as $database) {
+            $xquery = '{
+                for $n
+                in (
+                    for $node
+                    in db:open("'.$database.'")'.$xpath.'
+                    return $node/ancestor::alpino_ds/metadata/meta)
+                let $k := $n/@name
+                let $t := $n/@type
+                group by $k, $t
+                order by $k, $t
 
-    $dbhost = $serverInfo['machine'];
-    $dbport = $serverInfo['port'];
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-    $result = array();
-    foreach ($databases as $database) {
-        $xquery = '{
-            for $n
-            in (
-                for $node
-                in db:open("'.$database.'")'.$xpath.'
-                return $node/ancestor::alpino_ds/metadata/meta)
-            let $k := $n/@name
-            let $t := $n/@type
-            group by $k, $t
-            order by $k, $t
-
-            return element meta {
-                attribute name {$k},
-                attribute type {$t},
-                for $m in $n
-                let $v := $m/@value
-                group by $v
-                return element count { 
-                    attribute value {$v}, count($m)
+                return element meta {
+                    attribute name {$k},
+                    attribute type {$t},
+                    for $m in $n
+                    let $v := $m/@value
+                    group by $v
+                    return element count {
+                        attribute value {$v}, count($m)
+                    }
                 }
-            }
-        }';
+            }';
 
-        $m_query = '<metadata>'.$xquery.'</metadata>';
+            $m_query = '<metadata>'.$xquery.'</metadata>';
 
-        $query = $session->query($m_query);
-        $result[$database] = $query->execute();
-        $query->close();
+            $query = $session->query($m_query);
+            $result[$component] = $query->execute();
+            $query->close();
+        }
+        $session->close();
     }
-    $session->close();
 
     // Combine the XMLs into an array with total counts over all databases
     $totals = array();

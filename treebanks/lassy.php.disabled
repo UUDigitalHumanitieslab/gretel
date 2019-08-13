@@ -1,0 +1,28 @@
+<?php
+
+$tb = new TreebankInfo('lassy', array(
+    //                     database         displayname     sents   words   description
+    //  description
+    //  group   variant disable     server  port    user    pass
+    new TreebankComponent('LASSY_ID_DPC',   'DPC',          11716,  193029, 'Dutch Parallel Corpus'),
+    new TreebankComponent('LASSY_ID_WIKI',  'Wikipedia',    7341,   83360,  'Dutch Wikipedia pages'),
+    new TreebankComponent('LASSY_ID_WRPE',  'WR-P-E',       14420,  232631,
+        'E-magazines, newsletters, teletext pages, web sites, Wikipedia'
+    ),
+    new TreebankComponent('LASSY_ID_WRPP',  'WR-P-P',       17691,  281424,
+        'Books, brochures, guides and manuals, '.
+        'legal texts, newspapers, periodicals and magazines, '.
+        'policy documents, proceedings, reports, surveys'
+    ),
+
+    new TreebankComponent('LASSY_ID_WSU',   'WS-U',         14032,  184611,
+    'Auto cues, news scripts, text for the visually impaired'
+    )
+));
+
+$tb->setdisplayname('LASSY Small');
+$tb->setversion('1.1');
+$tb->setproduction('writte');
+$tb->setlanguage('Dutch');
+
+registerTreebank($tb);

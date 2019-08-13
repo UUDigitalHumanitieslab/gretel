@@ -7,46 +7,29 @@ require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 require_once ROOT_PATH.'/basex-search-scripts/metadata.php';
 require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
 
-function getResults($xpath, $context, $corpus, $components, $start, $searchLimit, $variables = null, $remainingDatabases = null, $already = null)
+/**
+ * @param string $xpath
+ * @param boolean $context retrieve preceding and following sentences?
+ * @param string $corpus treebank to search
+ * @param string $component the component we're searching
+ * @param string[] $databases list of databases that remain to be searched in this component.
+ * @param int $start pagination info, hits to skip in current database
+ * @param int $searchLimit
+ * @param array $variables
+ * @return void
+ */
+function getResults($xpath, $context, $corpus, $component, $databases, $start, $searchLimit, $variables = null)
 {
-    global $dbuser, $dbpwd, $flushLimit, $needRegularGrinded;
-
     // connect to BaseX
-    if (isGrinded($corpus)) {
-        $serverInfo = getServerInfo($corpus, $components[0]);
-    } else {
-        $serverInfo = getServerInfo($corpus, false);
-    }
+    $serverInfo = getServerInfo($corpus, $component);
+    $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
 
-    $dbhost = $serverInfo['machine'];
-    $dbport = $serverInfo['port'];
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-    if ($remainingDatabases != null) {
-        $databases = $remainingDatabases;
-    } else {
-        $databases = corpusToDatabase($components, $corpus, $xpath);
-    }
-
-    if ($already == null) {
-        $already = array();
-        foreach ($databases as $database) {
-            $already[$database] = 1;
-        }
-    }
-
-    $results = getSentences($corpus, $databases, $components, $already, $start, $session, null, $searchLimit, $xpath, $context, $variables);
+    $results = getSentences($corpus, $component, $databases, $start, $session, $searchLimit, $xpath, $context, $variables);
     $session->close();
-    $results['already'] = $already;
-    $results['needRegularGrinded'] = $needRegularGrinded;
 
     if (!$results['success']) {
-        // no results, only contains false and xquery
+        // no results, only contains false success state and the xquery (for debugging)
         return $results;
-    }
-    if ($results['endPos'] * $flushLimit >= $searchLimit) {
-        // clear the remaining databases to signal the search is done
-        $results['databases'] = array();
     }
 
     return $results;

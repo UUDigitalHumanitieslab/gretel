@@ -80,9 +80,10 @@ export class ResultsService {
         const observable = new Observable<SearchResults>(observer => {
             const worker = async () => {
                 let iteration = 0;
+                let remainingComponents: string[] = componentIds;
                 let remainingDatabases: string[] | null = null;
+
                 let searchLimit: number | null = null;
-                let already: SearchResults['already'] = null;
                 let needRegularGrinded = false;
 
                 while (!observer.closed) {
@@ -94,14 +95,13 @@ export class ResultsService {
                             xpath,
                             provider,
                             corpus,
-                            componentIds,
+                            remainingComponents,
+                            remainingDatabases,
                             iteration,
                             retrieveContext,
                             isAnalysis,
                             metadataFilters,
                             variables,
-                            remainingDatabases,
-                            already,
                             needRegularGrinded,
                             searchLimit
                         );
@@ -110,15 +110,16 @@ export class ResultsService {
                     }
 
                     if (!observer.closed) {
-                        if (results != null && results !== false) {
-                            already = results.already;
+                        if (results) {
+                            observer.next(results);
+
                             needRegularGrinded = results.needRegularGrinded;
                             searchLimit = results.searchLimit;
-
-                            observer.next(results);
                             iteration = results.nextIteration;
+                            remainingComponents = results.remainingComponents;
                             remainingDatabases = results.remainingDatabases;
-                            if (remainingDatabases.length === 0) {
+
+                            if (remainingDatabases.length === 0 && remainingComponents.length === 0) {
                                 observer.complete();
                             }
                         } else if (error != null) {
@@ -140,26 +141,32 @@ export class ResultsService {
      * On error the returned promise rejects with @type {HttpErrorResponse}
      *
      * @param xpath Specification of the pattern to match
+     * @param provider Backend server to query
      * @param corpus Identifier of the corpus
-     * @param components Identifiers of the sub-treebanks
+     * @param remainingComponents Identifiers of the sub-treebanks to search
+     * @param remainingDatabases
+     * Identifiers of the databases within the current sub-treebank (components[0]) left to search. All dbs searched when null
      * @param iteration Zero-based iteration number of the results
      * @param retrieveContext Get the sentence before and after the hit
      * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
+     * @param needRegularGrinded search mode (filled in from server)
+     * @param searchLimit filled in on server when null
      */
     private async results(
         xpath: string,
         provider: string,
         corpus: string,
-        components: string[],
+        remainingComponents: string[],
+        remainingDatabases: string[] | null = null,
+
         iteration: number = 0,
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-        remainingDatabases: string[] | null = null,
-        already: SearchResults['already'] | null = null,
+
         needRegularGrinded = false,
         searchLimit: number | null = null
     ): Promise<SearchResults | false> {
@@ -168,12 +175,11 @@ export class ResultsService {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
                 retrieveContext,
                 corpus,
-                components,
+                remainingComponents,
+                remainingDatabases,
                 iteration,
                 isAnalysis,
                 variables,
-                remainingDatabases,
-                already,
                 needRegularGrinded,
                 searchLimit
             }, httpOptions).toPromise();
@@ -227,17 +233,17 @@ export class ResultsService {
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
-        const results = await this.http.post<{ [databaseId: string]: string }>(
+        const results = await this.http.post<{ [componentId: string]: string }>(
             await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
                 xpath: this.createFilteredQuery(xpath, metadataFilters),
                 corpus,
                 components,
             }, httpOptions).toPromise();
 
-        return Object.keys(results).map(databaseId => {
+        return Object.keys(results).map(componentId => {
             return {
-                databaseId,
-                count: parseInt(results[databaseId], 10)
+                componentId: componentId,
+                count: parseInt(results[componentId], 10)
             } as TreebankCount;
         });
     }
@@ -359,15 +365,15 @@ export class ResultsService {
             {
                 hits: await this.mapHits(results),
                 nextIteration: results.endPosIteration,
-                remainingDatabases: results.databases,
-                already: results.already,
+                remainingComponents: results.remainingComponents,
+                remainingDatabases: results.remainingDatabases,
                 needRegularGrinded: results.needRegularGrinded,
                 searchLimit: results.searchLimit
             } : {
                 hits: [],
                 nextIteration: 0,
                 remainingDatabases: [],
-                already: {},
+                remainingComponents: [],
                 needRegularGrinded: false,
                 searchLimit: 0
             };
@@ -486,33 +492,33 @@ export class ResultsService {
  */
 type ApiSearchResult = {
     success: true
-    // 0 plain text sentences containing the hit
+    /** Plain text sentences containing the hit */
     sentences: { [id: string]: string },
-    // 1 tblist (used for Grinded corpora)
+    /** Origin of the sentence (used for Grinded corpora) */
     tblist: false | { [id: string]: string },
-    // 2 ids (dash-separated ids of the matched nodes)
+    /** Node ids (dash-separated ids of the matched nodes) */
     idlist: { [id: string]: string },
-    // 3 begin positions (zero based)
+    /** Begin positions of the hits (zero based) (node id of first matched node in sentence) */
     beginlist: { [id: string]: string },
-    // 4 xml structure of the hit itself, does not include the containing the sentence
+    /** XML structure of the hit itself, (only the matched portion of the sentence tree, does not include the complete sentence) */
     xmllist: { [id: string]: string },
-    // 5 meta list (xml structure containing the meta values)
+    /** Meta list (xml structure containing the meta values for the sentence) */
     metalist: { [id: string]: string },
-    // 6 variable list (xml structure containing the variables)
+    /** Variable list (xml structure containing the variables), empty unless variables were requested */
     varlist: { [id: string]: string },
-    // 7 end pos iteration (used for retrieving the next results when scrolling/paging)
+    /** End pos iteration (used for retrieving the next results when scrolling/paging) - basically page number for next result set */
     endPosIteration: number,
-    // 8 databases left to search (if this is empty, the search is done)
-    databases: string[],
-    // 9 database ID of each hit
+    /** Components left to search */
+    remainingComponents: string[],
+    /** Databases left to search for this component (if this is empty, the search is done) */
+    remainingDatabases: string[],
+    /** Component ID where each hit originated */
     sentenceDatabases: { [id: string]: string },
-    // 10 XQuery
+    /** The XQuery used to retrieve the results */
     xquery: string,
-    // 11 Already
-    already: SearchResults['already'],
-    // 12 need regular grinded database
+    /** For grinded corpora only - the search mode used */
     needRegularGrinded: boolean,
-    // 13 search limit
+    /** Search limit */
     searchLimit: number
 } | {
     // no results
@@ -523,18 +529,12 @@ type ApiSearchResult = {
 
 export interface SearchResults {
     hits: Hit[];
-    /**
-     * Start iteration for retrieving the next results (in the first database in `remainingDatabases`)
-     */
+    /** Start iteration for retrieving the next results (in the first component in `remainingComponents`) */
     nextIteration: number;
-    /**
-     * Databases remaining for doing a paged search
-     */
+    /** Components remaining to be searched (for doing a paged search) */
+    remainingComponents: string[];
+    /** Databases remaining in current component (for doing a paged search) */
     remainingDatabases: string[];
-    /**
-     * Already queried included treebanks (for grinded databases)
-     */
-    already: { [id: string]: 1 };
     needRegularGrinded: boolean;
     searchLimit: number;
 }
@@ -617,7 +617,7 @@ export interface FilterByXPath {
 }
 
 export interface TreebankCount {
-    databaseId: string;
+    componentId: string;
     count: number;
 }
 

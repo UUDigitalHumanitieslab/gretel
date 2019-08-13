@@ -5,11 +5,6 @@ import { map, switchMap, materialize, startWith, endWith } from 'rxjs/operators'
 import { Treebank, TreebankComponent, FuzzyNumber } from '../../../treebank';
 import { NotificationKind } from 'rxjs/internal/Notification';
 
-
-type ComponentInfo = {
-
-};
-
 @Component({
     selector: 'grt-distribution-list',
     templateUrl: './distribution-list.component.html',
@@ -119,7 +114,7 @@ export class DistributionListComponent implements OnInit, OnDestroy {
                 case NotificationKind.NEXT: {
                     const b = this.state[bank.provider][bank.id];
                     t.value.forEach(v => {
-                        b.components[v.databaseId].hits = v.count;
+                        b.components[v.componentId].hits = v.count;
                         b.hits = (b.hits || 0) + v.count;
                         this.totalHits += v.count;
                     });

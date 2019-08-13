@@ -503,7 +503,7 @@ export class TreebankService {
         const next = this.treebanks.value.state;
         const tb = next[provider] && next[provider][corpus] ? next[provider][corpus] : undefined;
 
-        if (!tb || !(tb.variants && tb.variants.includes(variant))) {
+        if (!tb || !(tb.variants && tb.variants.length)) {
             return;
         }
 

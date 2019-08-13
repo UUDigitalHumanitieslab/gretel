@@ -8,28 +8,16 @@ require_once ROOT_PATH.'/basex-search-scripts/treebank-count.php';
 
 function getTreebankCounts($corpus, $components, $xpath)
 {
-    global $dbuser, $dbpwd;
+    $serverInfo = getServerInfo($corpus, $components[0]);
+    $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
 
-    if (isGrinded($corpus)) {
-        $serverInfo = getServerInfo($corpus, $components[0]);
-    } else {
-        $serverInfo = getServerInfo($corpus, false);
+    $counts = array();
+    foreach($components as $component) {
+        $databases = getDatabases($corpus, $component, $xpath);
+        $counts[$component] = getCounts($corpus, $databases, $session, $xpath);
     }
-
-    $already = array();
-    $databases = corpusToDatabase($components, $corpus, $xpath);
-
-    $dbhost = $serverInfo['machine'];
-    $dbport = $serverInfo['port'];
-    $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-
-    list($sum, $counts) = getCounts($databases, $already, $session, $xpath, $corpus);
 
     $session->close();
-
-    if (isGrinded($corpus)) {
-        return array($components[0] => $sum);
-    }
 
     return $counts;
 }

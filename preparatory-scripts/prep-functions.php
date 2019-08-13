@@ -1,13 +1,12 @@
 <?php
 
-function xpathToBreadthFirst($xpath)
-{
-    $bfresult;
+function xpathToBreadthFirst($xpath) {
+    $bfresult = '';
     $xpath = cleanXpath($xpath);
     // Divide XPath in top-most level, and the rest (its "descendants")
     if (preg_match("/^\/*node\[([^\[]*?)((?:node\[|count\().*)\]$/", $xpath, $items)) {
         list(, $topattrs, $descendants) = $items;
-        $topcat;
+        $topcat = '';
         // Find category of top node
         if ($topattrs && preg_match_all("/\@cat=\"([^\"]+)\"/", $topattrs, $toppattrsArray)) {
             // If we are dealing with more than one topcat, use ALL instead
@@ -130,8 +129,7 @@ function xpathToBreadthFirst($xpath)
     return $bfresult;
 }
 
-function cleanXpath($xpath, $trimSlash = true)
-{
+function cleanXpath($xpath, $trimSlash = true) {
     // Clean up XPath and original XPath
     $trans = array("='" => '="', "' " => '" ', "']" => '"]', "\r" => ' ', "\n" => ' ', "\t" => ' ');
 
@@ -145,59 +143,7 @@ function cleanXpath($xpath, $trimSlash = true)
     return $xpath;
 }
 
-function checkBfPattern($corpus, $bf, $components)
-{
-    global $cats, $dbuser, $dbpwd,
-    $continueConstraints, $databaseExists, $needRegularGrinded;
-
-    $component = $components[0];
-
-    // If bf-pattern == ALL, we're faster searching through regular version
-    if ($bf && $bf != 'ALL') {
-        $tempDatabases = array();
-        // If is substring (eg. ALLnp%det)
-        if (strpos($bf, 'ALL') !== false) {
-            foreach ($cats as $cat) {
-                $bfcopy = $component.str_replace('ALL', $cat, $bf);
-                $tempDatabases[] = $bfcopy;
-            }
-        } else {
-            $tempDatabases[] = $component.$bf;
-        }
-
-        try {
-            $serverInfo = getServerInfo($corpus, $component);
-
-            $dbhost = $serverInfo['machine'];
-            $dbport = $serverInfo['port'];
-            $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-            $databases = array();
-
-            foreach ($tempDatabases as $database) {
-                // db:exists returns a string 'false', still need to convert to bool
-                $databaseExists = $session->query("db:exists('$database')")->execute();
-
-                if ($databaseExists != 'false') {
-                    $databaseExists = true;
-                    $databases[] = $database;
-                }
-            }
-            $continueConstraints = $databaseExists ? true : false;
-            $session->close();
-
-            return $databases;
-        } catch (Exception $e) {
-            error_log($e);
-        }
-    } else {
-        $needRegularGrinded = true;
-
-        return getRegularGrinded($component);
-    }
-}
-
-function applyCs($xpath)
-{
+function applyCs($xpath) {
     if (strpos($xpath, '@caseinsensitive="yes"') !== false) {
         preg_match_all("/(?<=node\[).*?(?=node\[|\])/", $xpath, $matches);
         foreach ($matches[0] as $match) {
@@ -217,3 +163,4 @@ function applyCs($xpath)
 
     return $xpath;
 }
+

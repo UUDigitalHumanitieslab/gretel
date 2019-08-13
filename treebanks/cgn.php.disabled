@@ -1,0 +1,62 @@
+<?php
+
+$tb = new TreebankInfo('cgn', array(
+    new TreebankComponent('CGN_ID_NA',    'NA',     50239,  302828, null,       'A',    'NL'),
+    new TreebankComponent('CGN_ID_VA',    'VA',     22881,  147418, null,       'A',    'VL'),
+    new TreebankComponent('CGN_ID_NB',    'NB',     2484,   25724,  null,       'B',    'NL'),
+    new TreebankComponent('CGN_ID_VB',    'VB',     4289,   34158,  null,       'B',    'VL'),
+    new TreebankComponent('CGN_ID_NC',    'NC',     11649,  70084,  null,       'C',    'NL'),
+    new TreebankComponent('CGN_ID_VC',    'VC',     3142,   19984,  null,       'C',    'VL'),
+    new TreebankComponent('CGN_ID_ND',    'ND',     0,      0,      null,       'D',    'NL',   true),
+    new TreebankComponent('CGN_ID_VD',    'VD',     929,    6309,   null,       'D',    'VL'),
+    new TreebankComponent('CGN_ID_NE',    'NE',     3123,   25524,  null,       'E',    'NL'),
+    new TreebankComponent('CGN_ID_VE',    'VE',     0,      0,      null,       'E',    'VL',   true),
+    new TreebankComponent('CGN_ID_NF',    'NF',     6290,   75167,  null,       'F',    'NL'),
+    new TreebankComponent('CGN_ID_VF',    'VF',     2617,   25122,  null,       'F',    'VL'),
+    new TreebankComponent('CGN_ID_NG',    'NG',     1166,   25125,  null,       'G',    'NL'),
+    new TreebankComponent('CGN_ID_VG',    'VG',     543,    9009,   null,       'G',    'VL'),
+    new TreebankComponent('CGN_ID_NH',    'NH',     3064,   26004,  null,       'H',    'NL'),
+    new TreebankComponent('CGN_ID_VH',    'VH',     1395,   10116,  null,       'H',    'VL'),
+    new TreebankComponent('CGN_ID_VI',    'VI',     1026,   10147,  null,       'I',    'VL'),
+    new TreebankComponent('CGN_ID_NI',    'NI',     2251,   25002,  null,       'I',    'NL'),
+    new TreebankComponent('CGN_ID_VJ',    'VJ',     536,    7686,   null,       'J',    'VL'),
+    new TreebankComponent('CGN_ID_NJ',    'NJ',     2259,   25084,  null,       'J',    'NL'),
+    new TreebankComponent('CGN_ID_NK',    'NK',     1923,   25353,  null,       'K',    'NL'),
+    new TreebankComponent('CGN_ID_VK',    'VK',     558,    7306,   null,       'K',    'VL'),
+    new TreebankComponent('CGN_ID_NL',    'NL',     1857,   25082,  null,       'L',    'NL'),
+    new TreebankComponent('CGN_ID_VL',    'VL',     601,    7431,   null,       'L',    'VL'),
+    new TreebankComponent('CGN_ID_NM',    'NM',     444,    5190,   null,       'M',    'NL'),
+    new TreebankComponent('CGN_ID_VM',    'VM',     107,    1894,   null,       'M',    'VL'),
+    new TreebankComponent('CGN_ID_NN',    'NN',     593,    14921,  null,       'N',    'NL'),
+    new TreebankComponent('CGN_ID_VN',    'VN',     701,    8159,   null,       'N',    'VL'),
+    new TreebankComponent('CGN_ID_NO',    'NO',     0,      0,      null,       'O',    'NL',   true),
+    new TreebankComponent('CGN_ID_VO',    'VO',     3256,   44144,  null,       'O',    'VL')
+));
+
+$tb->setdisplayname('Corpus Gesproken Nederlands');
+$tb->setversion('2.0.1');
+$tb->setproduction('spoken');
+$tb->setlanguage('Dutch');
+$tb->setgroups(array(
+    'A' => array('description' => "Spontaneous conversations ('face-to-face')"),
+    'B' => array('description' => 'Interviews with teachers of Dutch'),
+    'C' => array('description' => 'Telephone conversations (recorded via a switchboard)'),
+    'D' => array('description' => 'Telephone conversations (recorded on MD)'),
+    'E' => array('description' => 'Simulated business negotiations'),
+    'F' => array('description' => 'Interviews/discussions/debates (broadcast)'),
+    'G' => array('description' => '(Political) discussions/debates/meetings (non-broadcast)'),
+    'H' => array('description' => 'Lessons recorded in the classroom'),
+    'I' => array('description' => 'Live (sports) commentaries (broadcast)'),
+    'J' => array('description' => 'Newsreports (broadcast)'),
+    'K' => array('description' => 'News (broadcast)'),
+    'L' => array('description' => 'Commentaries/columns/reviews (broadcast)'),
+    'M' => array('description' => 'Ceremonious speeches/sermons'),
+    'N' => array('description' => 'Lectures/seminars'),
+    'O' => array('description' => 'Read speech')
+));
+$tb->setvariants(array(
+    'NL' => array('displayname' => 'NL-displayname-test'),
+    'VL' => array('displayname' => 'VL')
+));
+
+registerTreebank($tb);
