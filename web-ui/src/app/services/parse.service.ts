@@ -10,7 +10,7 @@ export class ParseService {
     constructor(private extractinatorService: ExtractinatorService) {
     }
 
-    parse(xml: string): Promise<any> {
+    parseXml(xml: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.parser.parseString(xml, (error?: Error, data?: any) => {
                 if (error) {

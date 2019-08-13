@@ -26,7 +26,7 @@ export class ResultsService {
         private http: HttpClient,
         private sanitizer: DomSanitizer,
         private configurationService: ConfigurationService,
-        private xmlParseService: ParseService) {
+        private parseService: ParseService) {
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
@@ -387,8 +387,8 @@ export class ResultsService {
         return Promise.all(Object.keys(results.sentences).map(async hitId => {
             const sentence = results.sentences[hitId];
             const nodeStarts = results.beginlist[hitId].split('-').map(x => parseInt(x, 10));
-            const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
-            const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
+            const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${results.metalist[hitId]}</metadata>`));
+            const variableValues = this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
             return {
                 component: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),

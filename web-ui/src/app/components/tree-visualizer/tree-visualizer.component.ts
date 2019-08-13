@@ -71,7 +71,7 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     // jquery tree visualizer
     private instance: any;
 
-    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private xmlParseService: ParseService) {
+    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private parseService: ParseService) {
     }
 
     ngOnInit() {
@@ -116,7 +116,7 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
                 showMatrixDetails: this.showMatrixDetails
             });
 
-            this.xmlParseService.parse(this.xml).then((data) => {
+            this.parseService.parseXml(this.xml).then((data) => {
                 this.showMetadata(data);
             });
             this.updateVisibility();
