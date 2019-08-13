@@ -1,0 +1,39 @@
+<?php
+
+$tb = new TreebankInfo('sonar', array(
+    //                    ID                Displayname Sentences   Words   Description                 Group   Variant Disabled    Host        Port
+    new TreebankComponent('SONAR_ID_WRPEA', 'WRPEA',    4395094,    '?',    'Discussion lists',         null,   null,   false,      null,       null),
+    new TreebankComponent('SONAR_ID_WRPEC', 'WRPEC',    551119,     '?',    'E-magazines'),
+    new TreebankComponent('SONAR_ID_WRPEE', 'WRPEE',    115,        '?',    'Newsletters'),
+    new TreebankComponent('SONAR_ID_WRPEF', 'WRPEF',    18372,      '?',    'Press releases'),
+    new TreebankComponent('SONAR_ID_WRPEG', 'WRPEG',    3925824,    '?',    'Subtitles'),
+    new TreebankComponent('SONAR_ID_WRPEH', 'WRPEH',    40715,      '?',    'Teletext pages'),
+    new TreebankComponent('SONAR_ID_WRPEI', 'WRPEI',    204998,     '?',    'Websites'),
+    new TreebankComponent('SONAR_ID_WRPEJ', 'WRPEJ',    1354245,    '?',    'Wikipedia',                null,   null,   false,      null,       null),
+    new TreebankComponent('SONAR_ID_WRPEK', 'WRPEK',    8614,       '?',    'Blogs'),
+    new TreebankComponent('SONAR_ID_WRPEL', 'WRPEL',    2636859,    '?',    'Tweets',                   null,   null,   true),
+    new TreebankComponent('SONAR_ID_WRPPB', 'WRPPB',    1709808,    '?',    'Books',                    null,   null,   false,      null,       null),
+    new TreebankComponent('SONAR_ID_WRPPC', 'WRPPC',    74897,      '?',    'Brochures'),
+    new TreebankComponent('SONAR_ID_WRPPD', 'WRPPD',    2184,       '?',    'Newsletters'),
+    new TreebankComponent('SONAR_ID_WRPPE', 'WRPPE',    19077,      '?',    'Guides & manuals'),
+    new TreebankComponent('SONAR_ID_WRPPF', 'WRPPF',    650211,     '?',    'Legal texts'),
+    new TreebankComponent('SONAR_ID_WRPPG', 'WRPPG',    14973209,   '?',    'Newspapers',               null,   null,   false,      null,       null),
+    new TreebankComponent('SONAR_ID_WRPPH', 'WRPPH',    5475556,    '?',    'Periodicals & magazines',  null,   null,   false,      null,       null),
+    new TreebankComponent('SONAR_ID_WRPPI', 'WRPPI',    387312,     '?',    'Policy documents'),
+    new TreebankComponent('SONAR_ID_WRPPJ', 'WRPPJ',    16935,      '?',    'Proceedings'),
+    new TreebankComponent('SONAR_ID_WRPPK', 'WRPPK',    93507,      '?',    'Reports'),
+    new TreebankComponent('SONAR_ID_WRUEA', 'WRUEA',    2387131,    '?',    'Chats',                    null,   null,   true),
+    new TreebankComponent('SONAR_ID_WRUED', 'WRUED',    101116,     '?',    'SMS', 'disabled',          null,   null,   true),
+    new TreebankComponent('SONAR_ID_WRUEE', 'WRUEE',    23488,      '?',    'Written assignments'),
+    new TreebankComponent('SONAR_ID_WSUEA', 'WSUEA',    2163521,    '?',    'Auto cues'),
+    new TreebankComponent('SONAR_ID_WSUTB', 'WSUTB',    44862,      '?',    'Texts for the visually impaired')
+));
+
+$tb->setdisplayname('SoNaR');
+$tb->setversion('1.0');
+$tb->setproduction('written');
+$tb->setlanguage('Dutch');
+$tb->setmultioption(false);
+$tb->setgrinded(true);
+
+registerTreebank($tb);

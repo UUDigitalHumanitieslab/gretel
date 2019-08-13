@@ -104,7 +104,7 @@ export class SubTreebanksComponent implements OnChanges, OnDestroy {
     }
 
     toggleGroup(group: ComponentGroup) {
-        if (!this.treebank.multiOption && this.variants.length > 1) {
+        if (!this.treebank.multiOption && (this.variants && this.variants.length > 1)) {
             return;
         }
 

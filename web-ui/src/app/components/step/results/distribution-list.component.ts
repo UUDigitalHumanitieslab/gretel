@@ -145,7 +145,7 @@ export class DistributionListComponent implements OnInit, OnDestroy {
             case NotificationKind.NEXT: {
                 const b = this.state[bank.provider][bank.id];
                 t.value.forEach(v => {
-                    b.components[v.databaseId].hits = v.count;
+                    b.components[v.componentId].hits = v.count;
                     b.hits = (b.hits || 0) + v.count;
                     this.totalHits += v.count;
                 });

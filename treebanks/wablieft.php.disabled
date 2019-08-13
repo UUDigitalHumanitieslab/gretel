@@ -1,0 +1,10 @@
+<?php
+
+$tb = new TreebankInfo('wablieft', array(new TreebankComponent('GRIND', 'Wablieft')));
+$tb->setdisplayname('Wablieft Corpus');
+$tb->setversion('1.0');
+$tb->setproduction('written');
+$tb->setlanguage('Dutch');
+$tb->setgrinded('true');
+
+registerTreebank($tb);

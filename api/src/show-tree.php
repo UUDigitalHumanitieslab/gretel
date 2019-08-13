@@ -15,32 +15,20 @@
  */
 require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 
-function showTree($sentid, $treebank, $db)
+function showTree($sentid, $treebank, $component)
 {
-    global $dbuser, $dbpwd;
     header('Content-type: text/xml');
     header('Access-Control-Allow-Origin: *');
     set_time_limit(0);
 
     try {
-        $serverInfo;
-        if (isGrinded($treebank)) {
-            preg_match('/^([A-Z]{5})/', $db, $component);
-            $serverInfo = getServerInfo($treebank, $component[0]);
-            $queryPath = $db;
-        } else {
-            $serverInfo = getServerInfo($treebank, false);
-            $queryPath = strtoupper($treebank);
-            $queryPath .= '_ID';
-        }
+        $xquery = 'db:open("'.$component.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
 
-        $dbhost = $serverInfo['machine'];
-        $dbport = $serverInfo['port'];
-        $session = new Session($dbhost, $dbport, $dbuser, $dbpwd);
-        $xquery = 'db:open("'.$queryPath.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
+        $serverInfo = getServerInfo($treebank, $component);
+        $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
         $query = $session->query($xquery);
-        $xml = $query->execute();
 
+        $xml = $query->execute();
         echo $xml;
     } catch (Exception $e) {
         http_response_code(500);
