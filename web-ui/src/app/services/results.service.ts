@@ -195,11 +195,18 @@ export class ResultsService {
      *
      * On error the returned promise rejects with @type {HttpErrorResponse}
      */
-    async highlightSentenceTree(provider: string, sentenceId: string, treebank: string, nodeIds: number[], database: string = null) {
+    async highlightSentenceTree(
+        provider: string,
+        treebank: string,
+        component: string,
+        database: string,
+        sentenceId: string,
+        nodeIds: number[],
+    ) {
         const url = await this.configurationService.getApiUrl(
             provider,
             'tree',
-            [treebank, sentenceId],
+            [treebank, component, sentenceId],
             { ...(database && { db: database }) });
 
         const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
@@ -390,9 +397,9 @@ export class ResultsService {
             const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
             const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
             return {
-                component: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
+                component: results.sentenceDatabases[hitId],
+                database: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
                 fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
-                // component: hitId.replace(/\-.*/, '').toUpperCase(),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results.xmllist[hitId],
@@ -542,26 +549,24 @@ export interface SearchResults {
 export interface Hit {
     /** Id of the component this hit originated from */
     component: string;
+    /**
+     * Id of the database this hit originated from.
+     * Usually identical to the component, but may differ in large treebanks - dbs and components are many-to-1.
+     * Used to request the full sentence xml
+     */
+    database: string;
     fileId: string;
-    // /**
-    //  * This value is not very reliable, because it is based on the filename
-    //  */
-    // component: string;
+    /** The basic sentence this hit was found in, extracted from its xml. */
     sentence: string;
     highlightedSentence: SafeHtml;
+    /* The XML of the matched portion of the sentence, does not always contain the full xml! */
     treeXml: string;
-    /**
-     * The ids of the matching nodes
-     */
+    /** The ids of the matching nodes */
     nodeIds: number[];
-    /**
-     * The begin position of the matching nodes
-     */
+    /** The begin position of the matching nodes */
     nodeStarts: number[];
     metaValues: { [key: string]: string };
-    /**
-     * Contains the properties of the node matching the variable
-     */
+    /** Contains the properties of the node matching the variable */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } };
 }
 

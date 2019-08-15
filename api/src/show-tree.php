@@ -15,17 +15,17 @@
  */
 require_once ROOT_PATH.'/basex-search-scripts/basex-client.php';
 
-function showTree($sentid, $treebank, $component)
+function showTree($sentid, $treebank, $component, $database)
 {
     header('Content-type: text/xml');
     header('Access-Control-Allow-Origin: *');
     set_time_limit(0);
 
     try {
-        $xquery = 'db:open("'.$component.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
-
         $serverInfo = getServerInfo($treebank, $component);
         $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
+
+        $xquery = 'db:open("'.$database.'")/treebank/alpino_ds[@id="'.$sentid.'"]';
         $query = $session->query($xquery);
 
         $xml = $query->execute();
