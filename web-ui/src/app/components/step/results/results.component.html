@@ -212,9 +212,9 @@
 
         <ng-container *ngFor="let p of info | keyvalue">
             <ng-container *ngFor="let b of p.value | keyvalue">
-                <div *ngIf="b.value.error" class="notification is-warning">
+                <div *ngIf="b.value.error" class="notification is-danger">
                     Error retrieving results for {{b.key}}: <br>
-                    {{b.value.error.error}}
+                    {{b.value.error.message}}
                 </div>
             </ng-container>
         </ng-container>
