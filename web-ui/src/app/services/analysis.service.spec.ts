@@ -1,15 +1,16 @@
 import { AnalysisService } from './analysis.service';
 
-describe("Analysis Service", () => {
+describe('Analysis Service', () => {
     let analysisService: AnalysisService;
     beforeEach(() => {
         analysisService = new AnalysisService();
     });
 
     it('Works', () => {
-        let result = analysisService.getFlatTable(
+        const result = analysisService.getFlatTable(
             [{
                 component: 'TEST_ID',
+                database: 'TEST_ID',
                 fileId: 'Test-1.xml',
                 sentence: 'Hallo lieve mensen dit is een testzin .',
                 highlightedSentence: '<strong>Hallo lieve mensen dit is een testzin .</strong>',
@@ -38,7 +39,7 @@ describe("Analysis Service", () => {
   </node>`,
                 variableValues: { '$node1': { lemma: undefined, pos: undefined } }
             }],
-            {'$node1':['pos','lemma']},
+            {'$node1': ['pos', 'lemma']},
             ['meta1']);
         expect(result).toEqual([
             ['meta1', '$node1.pos', '$node1.lemma'],
@@ -47,14 +48,14 @@ describe("Analysis Service", () => {
     });
 
     it('Deals with differing sentence lengths', () => {
-        let result = analysisService.getFlatTable(
+        const result = analysisService.getFlatTable(
             [
                 generateResult(3),
                 generateResult(3),
                 generateResult(4),
                 generateResult(1)
             ],
-            {'$node1':['pos','lemma']},
+            {'$node1': ['pos', 'lemma']},
             ['meta1'],
         );
         expect(result).toEqual([
@@ -69,7 +70,7 @@ describe("Analysis Service", () => {
     function generateResult(count: number) {
         return {
             component: 'TEST',
-            databaseId: 'TEST_ID',
+            database: 'TEST_ID',
             fileId: 'Test-1.xml',
             sentence: 'Lorem ipsum',
             highlightedSentence: 'Lorem ipsum',
@@ -78,10 +79,10 @@ describe("Analysis Service", () => {
             metaValues: { 'meta1': 'hallo' },
             treeXml: generateNodeXml(count),
             variableValues: { '$node1': { lemma: 'test', pos: 'test' } }
-        }
+        };
     }
 
     function generateNodeXml(count: number) {
-        return `<node>${new Array(count + 1).join('<node lemma="word" pos="verb" />')}</node>`
+        return `<node>${new Array(count + 1).join('<node lemma="word" pos="verb" />')}</node>`;
     }
 });
