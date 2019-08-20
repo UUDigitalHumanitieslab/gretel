@@ -22,7 +22,7 @@ $tb = new TreebankInfo('lassy', array(
 
 $tb->setdisplayname('LASSY Small');
 $tb->setversion('1.1');
-$tb->setproduction('writte');
+$tb->setproduction('written');
 $tb->setlanguage('Dutch');
 
 registerTreebank($tb);

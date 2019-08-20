@@ -253,10 +253,11 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         try {
             const treeXml = await this.resultsService.highlightSentenceTree(
                 result.provider,
-                result.fileId,
                 result.corpus.name,
+                result.component,
+                result.database,
+                result.fileId,
                 result.nodeIds,
-                result.component
             );
             this.treeXml = treeXml;
         } catch (e) {
