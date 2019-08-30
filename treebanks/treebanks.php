@@ -56,8 +56,8 @@ class TreebankComponent
     public function __construct($name, $displayname = null, $sentences = 0, $words = 0, $description = null, $group = null, $variant = null, $disabled = false, $machine = null, $port = null, $username = null, $password = null)
     {
         $this->name = $name;
-        $this->displayname = $displayname ? $displayname : $name;
-        $this->description = $description ? $description : ($displayname ? $displayname : $name);
+        $this->displayname = isset($displayname) ? $displayname : $name;
+        $this->description = isset($description) ? $description : (isset($displayname) ? $displayname : $name);
         $this->sentences = $sentences;
         $this->words = $words;
         $this->sentences = $sentences;
@@ -402,15 +402,15 @@ class TreebankInfo
             }
 
             $allVariants[$v] = 1;
-            $allGroups[$g] = $allGroups[$g] ? $allGroups[$g] : array();
+            $allGroups[$g] = isset($allGroups[$g]) ? $allGroups[$g] : array();
             $allGroups[$g][$v] = $compId;
         }
 
         // Validate all groups contain all variants
         // Also initialize missing group and variant displaynames/descriptions
         if ($hasGroups) {
-            $groups = $this->groups ? $this->groups : array();
-            $variants = $this->variants ? $this->variants : array();
+            $groups = isset($this->groups) ? $this->groups : array();
+            $variants = isset($this->variants) ? $this->variants : array();
 
             foreach ($allGroups as $groupId => $componentsByVariant) {
                 foreach ($allVariants as $variantId => $_) {
@@ -420,12 +420,12 @@ class TreebankInfo
                 }
 
                 // Create an entry for this group if it doesn't exist yet
-                $groups[$groupId] = $groups[$groupId] ? $groups[$groupId] : array('description' => '');
+                $groups[$groupId] = isset($groups[$groupId]) ? $groups[$groupId] : array('description' => '');
             }
 
             // Create entries for any missing variants
             foreach ($allVariants as $variantId => $_) {
-                $variants[$variantId] = $variants[$variantId] ? $variants[$variantId] : array('displayname' => $variantId);
+                $variants[$variantId] = isset($variants[$variantId]) ? $variants[$variantId] : array('displayname' => $variantId);
             }
 
             $this->groups = $groups;

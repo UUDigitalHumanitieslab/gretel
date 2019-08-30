@@ -113,7 +113,7 @@ $router->map('POST', '/results', function () {
     // (usually ${corpus}_ID_${component})
     // It is pingponged with the client so we can keep track where we are in the searching.
     /** @var string[]|null $databases */
-    $databases = $data['remainingDatabases'] ? $data['remainingDatabases'] : getDatabases($corpus, $components[0], $xpath);
+    $databases = isset($data['remainingDatabases']) ? $data['remainingDatabases'] : getDatabases($corpus, $components[0], $xpath);
 
     // Some xpaths are faster on the plain data even in grinded corpora
     // This variable indicates that this is one of those edge cases.
@@ -147,7 +147,7 @@ $router->map('POST', '/results', function () {
         // Remove it from the list and get the databases for the next components
         if (!$results['remainingDatabases']) {
             array_shift($components);
-            $results['remainingDatabases'] = $components && $components[0] ? getDatabases($corpus, $components[0], $xpath) : array();
+            $results['remainingDatabases'] = isset($components[0]) ? getDatabases($corpus, $components[0], $xpath) : array();
         }
         $results['remainingComponents'] = $components;
 
