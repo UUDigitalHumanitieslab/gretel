@@ -12,7 +12,13 @@ export class ConfigurationService {
 
     async getApiUrl(provider: string, path: string, parts: string[] = [], queryString: { [key: string]: string } = {}): Promise<string> {
         const queryStringEntries = Object.entries(queryString);
-        return (await this.config).providers[provider] + path +
+        const config = await this.config;
+        const providerUrl = config.providers[provider];
+        if (!providerUrl) {
+            console.error(`Could not find URL for provider ${provider} configuration`);
+            console.log([provider, path, parts, queryString, config]);
+        }
+        return providerUrl + path +
             (parts.length ? '/' + parts.join('/') : '') +
             (queryStringEntries.length
                 ? queryStringEntries.map(([key, value], index) => `${index ? '&' : '?'}${key}=${value}`)
