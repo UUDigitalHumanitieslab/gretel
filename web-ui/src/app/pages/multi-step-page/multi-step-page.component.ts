@@ -1,5 +1,5 @@
 import { OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 
 import * as _ from 'lodash';
 
@@ -7,8 +7,7 @@ import { Subscription } from 'rxjs';
 
 import { Crumb } from '../../components/breadcrumb-bar/breadcrumb-bar.component';
 import { GlobalState, Step } from './steps';
-import { FilterValues, TreebankService, StateService, mapTreebanksToSelectionSettings } from '../../services/_index';
-import { filter, map } from 'rxjs/operators';
+import { FilterValues, TreebankService, StateService } from '../../services/_index';
 
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit {
     public crumbs: Crumb[];
@@ -49,37 +48,23 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
         }));
         this.steps = steps.map(step => step.step);
 
-        const initialState = await this.initializeGlobalState();
+        const initialState = await this.getInitialState();
+        this.stateService.init(initialState, this.steps);
+        this.setStateFromParams(this.route.snapshot.queryParams);
 
-        this.stateService.init(this.steps);
         this.subscriptions = [
+            this.route.queryParams.subscribe(params => {
+                this.setStateFromParams(params);
+            }),
+            this.stateService.state$.subscribe(state => {
+                this.globalState = state;
+                if (state.emit) {
+                    this.updateUrl(state, state.emit === 'history');
+                }
+            }),
             this.stateService.isTransitioning$.subscribe(t => this.isTransitioning = t),
             this.stateService.warning$.subscribe(w => this.warning = w)
         ];
-
-        this.subscriptions.push(
-            this.route.queryParams.subscribe(params => {
-                const decoded = this.decodeGlobalState(params);
-                if (!this.globalState) {
-                    this.globalState = initialState;
-                }
-
-                Object.assign(this.globalState, _.pickBy(decoded.state, (item) => item !== undefined));
-
-                if (this.globalState.selectedTreebanks.length) {
-                    // This also needs to be pushed in to the service to force an update on
-                    // all components (important to restore state from url on first page render)
-                    this.treebankService.initSelections(this.globalState.selectedTreebanks);
-                }
-
-                this.goToStep(decoded.step, false);
-            }));
-
-        this.subscriptions.push(
-            this.treebankService.treebanks.pipe(
-                map(v => mapTreebanksToSelectionSettings(v.state))
-            ).subscribe(state => this.updateSelected(state))
-        );
     }
 
     abstract initializeSteps(): { step: Step<T>, name: string }[];
@@ -93,71 +78,59 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     };
 
     encodeGlobalState(state: T): { [key: string]: any } {
+        const selectedTreebanks = state.selectedTreebanks.encode();
         return {
             'currentStep': state.currentStep && state.currentStep.number || 0,
             // don't encode the default state
             'xpath': state.xpath !== this.defaultGlobalState.xpath ? state.xpath : undefined,
-            'selectedTreebanks': state.selectedTreebanks.length > 0 ? JSON.stringify(state.selectedTreebanks) : undefined,
+            'selectedTreebanks': selectedTreebanks && JSON.stringify(selectedTreebanks),
             'retrieveContext': this.encodeBool(state.retrieveContext)
         };
     }
 
-    private async initializeGlobalState() {
+    private async getInitialState() {
         // Always start at the first step, if it is restored from the query
         // this is done using a jump to make sure all the variables are
         // retrieved again during the state transitions.
         return await this.steps[0].enterStep(Object.assign({}, this.defaultGlobalState));
     }
 
+    private setStateFromParams(params: Params) {
+        const decoded = this.decodeGlobalState(params);
+        this.stateService.setState(_.pickBy(decoded.state, (item) => item !== undefined) as any, false);
+        this.stateService.jump(decoded.step, false);
+    }
+
     /**
      * Go back one step
      */
     async prev() {
-        const state = await this.stateService.prev(this.globalState);
-        this.updateGlobalState(state);
+        this.stateService.prev();
     }
-
-    updateGlobalState(state: T, updateUrl = true) {
-        this.isTransitioning = false;
-        this.globalState = state;
-        if (updateUrl) {
-            this.updateUrl();
-        }
-    }
-
-    /**
-     * Updates the selected treebanks with the given selection
-     * @param selectedTreebanks the new treebank selection
-     */
-    abstract updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>): void;
 
     /**
      * Goes to the next step if the state is valid. Otherwise a warning will displayed.
      */
     async next() {
-        const state = await this.stateService.next(this.globalState);
-        if (state) {
-            this.updateGlobalState(state);
-        }
+        this.stateService.next();
     }
 
     setValid(valid: boolean) {
         this.globalState.valid = valid;
     }
 
-    updateUrl(writeState = true) {
-        const state = this.encodeGlobalState(this.globalState);
+    updateUrl(state: T, writeState = true) {
+        const queryParams = this.encodeGlobalState(state);
         this.router.navigate([], {
             relativeTo: this.route,
-            queryParams: state,
+            queryParams,
             skipLocationChange: false,
             replaceUrl: writeState ? false : true
         });
     }
 
-    async goToStep(stepNumber: number, updateUrl = true) {
-        const state = await this.stateService.jump(this.globalState, stepNumber);
-        this.updateGlobalState(state, state.currentStep.number === stepNumber && updateUrl);
+    goToStep(stepNumber: number) {
+        this.stateService.jump(stepNumber);
     }
 
     updateFilterValues(filterValues: FilterValues) {
@@ -167,7 +140,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     filterResults(values: { xpath: string, filterValues: FilterValues }, resultsStep: number) {
         // TODO: xpath
         this.globalState.filterValues = values.filterValues;
-        this.goToStep(resultsStep, true);
+        this.goToStep(resultsStep);
     }
 
     protected decodeBool(param: string | undefined): boolean | undefined {

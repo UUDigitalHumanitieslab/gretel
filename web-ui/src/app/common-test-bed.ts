@@ -11,15 +11,24 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 import { routes } from './app-routing/routes';
 
 import { ClipboardServiceMock } from './mocks/clipboard.service.mock';
-
-import { ConfigurationService, UploadedTreebankResponse, ConfiguredTreebanksResponse, StateService } from './services/_index';
 import { HttpClientMock } from './mocks/http-client.mock';
+
+import {
+    ConfigurationService,
+    UploadedTreebankResponse,
+    ConfiguredTreebanksResponse,
+    StateService,
+    TreebankService,
+    NotificationService
+} from './services/_index';
 import { ConfigurationServiceMock } from './services/configuration.service.mock';
+import { GlobalState } from './pages/multi-step-page/steps';
+import { TreebankSelection } from './treebank';
 
 export function commonTestBed() {
     const httpClientMock = new HttpClientMock();
     const stateService = new StateService<any>();
-    stateService.init([]);
+    stateService.init({}, []);
 
     const filteredImports = imports.filter(value => !(value in [AppRoutingModule, ClipboardModule, HttpClientModule]));
     filteredImports.push(
@@ -102,8 +111,27 @@ export function commonTestBed() {
         testingModule: TestBed.configureTestingModule({
             declarations,
             imports: filteredImports,
-            providers: filteredProviders
+            providers: [...filteredProviders, NotificationService]
         }),
         httpClientMock
     };
+}
+
+export function initStateService() {
+    const stateService = TestBed.get(StateService) as StateService<GlobalState>;
+    stateService.init({
+        connectionError: false,
+        currentStep: undefined,
+        filterValues: {},
+        retrieveContext: false,
+        selectedTreebanks: new TreebankSelection(TestBed.get(TreebankService)),
+        xpath: `//node[@cat="smain"
+and node[@rel="su" and @pt="vnw"]
+and node[@rel="hd" and @pt="ww"]
+and node[@rel="predc" and @cat="np"
+    and node[@rel="det" and @pt="lid"]
+    and node[@rel="hd" and @pt="n"]]]`,
+        valid: true,
+        loading: false
+    }, []);
 }

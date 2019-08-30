@@ -14,7 +14,7 @@ export class FuzzyNumber {
      * @param value
      */
     public add(value: number | '?') {
-        if (value == '?') {
+        if (value === '?') {
             this.unknown = true;
         } else {
             this.value += value;
@@ -69,8 +69,14 @@ export interface Treebank {
     uploaded?: Date;
     processed?: Date;
 
-    /* Is this treebank selected for searching, this is a bit of clientside state */
-    selected: boolean;
+    details: { [T in keyof TreebankDetails]: () => Promise<TreebankDetails[T] | undefined> };
+}
+
+export interface TreebankDetails {
+    metadata: TreebankMetadata[];
+    components: TreebankComponents;
+    componentGroups: ComponentGroup[];
+    variants: string[];
 }
 
 export interface ComponentGroup {
@@ -91,7 +97,6 @@ export interface TreebankComponent {
     title: string;
     sentenceCount: number | '?';
     wordCount: number | '?';
-    selected: boolean;
     description: string;
     disabled: boolean;
 
@@ -101,6 +106,10 @@ export interface TreebankComponent {
     variant?: string;
 }
 
+export interface TreebankComponents {
+    [id: string]: TreebankComponent;
+}
+
 export interface TreebankMetadata {
     field: string;
     type: 'text' | 'int' | 'date';
@@ -108,4 +117,124 @@ export interface TreebankMetadata {
     show: boolean;
     minValue?: number | Date;
     maxValue?: number | Date;
+}
+
+export class TreebankSelection {
+    /**
+     * Gets all the selected corpora
+     */
+    get corpora() {
+        return this.providers
+            .flatMap((provider) => provider.corpora.map(corpus => ({ provider: provider.name, corpus })));
+    }
+
+    /**
+     * Gets all the selected providers
+     */
+    get providers() {
+        return Object.entries(this.data)
+            .map(([provider, data]) => {
+                return {
+                    name: provider,
+                    corpora: Object.entries(data)
+                        .filter(([corpus, selection]) => selection.selected)
+                        .map(([corpus, selection]) => {
+                            const components = selection.components;
+                            return {
+                                name: corpus,
+                                components: Object.entries(components)
+                                    .filter(([component, selected]) => selected)
+                                    .map(([component, selected]) => component),
+                                treebank: this.treebankService.get(provider, corpus)
+                            };
+                        })
+                };
+            });
+    }
+
+    data: TreebankSelectionData;
+
+    encode() {
+        const encoded: { [provider: string]: { [corpus: string]: string[] } } = {};
+        let any = false;
+        for (const [provider, corpora] of Object.entries(this.data)) {
+            for (const [corpus, selection] of Object.entries(corpora)) {
+                if (selection.selected) {
+                    for (const [component, selected] of Object.entries(selection.components)) {
+                        if (selected) {
+                            const providerCorpora = encoded[provider] || (encoded[provider] = {});
+                            const components = providerCorpora[corpus] || (providerCorpora[corpus] = []);
+                            components.push(component);
+                            any = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return any ? encoded : undefined;
+    }
+
+    hasAnySelection() {
+        for (const corpora of Object.values(this.data)) {
+            for (const selection of Object.values(corpora)) {
+                if (selection.selected && Object.values(selection.components).some(x => x)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    isSelected(providerName: string, corpusName: string, componentId: string = null) {
+        const provider = this.data[providerName];
+        if (!provider) {
+            return false;
+        }
+        const corpus = provider[corpusName];
+        if (!corpus) {
+            return false;
+        }
+        if (!componentId) {
+            return corpus.selected;
+        }
+
+        return corpus.components[componentId];
+    }
+
+    constructor(private treebankService: TreebankService, state: ReturnType<TreebankSelection['encode']> = {}) {
+        this.data = {};
+        for (const provider of Object.keys(state)) {
+            this.data[provider] = {};
+            for (const corpus of Object.keys(state[provider])) {
+                const treebankState: CorpusSelection = { selected: true, components: {} };
+                this.data[provider][corpus] = treebankState;
+                for (const component of state[provider][corpus]) {
+                    treebankState.components[component] = true;
+                }
+            }
+        }
+    }
+
+    clone() {
+        const clone = new TreebankSelection(this.treebankService);
+        for (const [provider, corpora] of Object.entries(this.data)) {
+            clone.data[provider] = { ...corpora };
+        }
+        return clone;
+    }
+}
+
+// To prevent a circular dependency (actual TreebankService needs this file)
+interface TreebankService {
+    get(corpora: string, corpus: string): Promise<Treebank>;
+}
+
+export interface TreebankSelectionData {
+    [provider: string]: { [corpus: string]: CorpusSelection };
+}
+
+export interface CorpusSelection {
+    selected: boolean;
+    components: { [component: string]: boolean };
 }

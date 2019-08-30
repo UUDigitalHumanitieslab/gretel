@@ -1,15 +1,13 @@
-<table class="table is-hoverable is-fullwidth">
+<div class="section" *ngIf="loading">
+    <progress class="progress is-primary is-large" max="100">Loading...</progress>
+</div>
+<table class="table is-hoverable is-fullwidth" *ngIf="!loading">
     <thead>
         <tr>
             <th [attr.colspan]="variants ? variants.length : 1">
                 <label class="checkbox" *ngIf="treebank.multiOption">
-                    <input
-                        type="checkbox"
-                        title="Select all"
-
-                        [checked]="isEveryComponentSelected(undefined)"
-                        (change)="toggleVariant(undefined)"
-                    >
+                    <input type="checkbox" title="Select all" [checked]="allSelected"
+                        (change)="toggleVariant(undefined)">
                     Component
                 </label>
                 <span *ngIf="!treebank.multiOption">Component</span>
@@ -30,26 +28,19 @@
         <tr *ngIf="variants">
             <!-- variant selector checkboxes -->
             <th *ngFor="let variant of variants">
-                <label *ngIf="treebank.multiOption"
-                    class="checkbox"
-                    [attr.disabled]="!treebank.multiOption || null"
-                >
-                    <input
-                        type="checkbox"
-                        [checked]="isEveryComponentSelected(variant)"
-                        [disabled]="!treebank.multiOption || null"
-                        (change)="toggleVariant(variant)"
-                    >
-                    {{variant}}
+                <label *ngIf="treebank.multiOption" class="checkbox" [attr.disabled]="!treebank.multiOption || null">
+                    <input type="checkbox" [checked]="variant.selected" [disabled]="!treebank.multiOption || null"
+                        (change)="toggleVariant(variant.name)">
+                    {{variant.name}}
                 </label>
-                <label *ngIf="!treebank.multiOption">{{variant}}</label>
+                <label *ngIf="!treebank.multiOption">{{variant.name}}</label>
             </th>
             <th *ngIf="showDescription">
                 &nbsp;
             </th>
             <!-- Variant sentence/wordcount col headers -->
             <th *ngFor="let variant of variants.concat('Total')" colspan="2" class="has-text-centered">
-                {{variant}}
+                {{variant.name}}
             </th>
         </tr>
     </thead>
@@ -58,17 +49,10 @@
         <tr *ngFor="let c of components | keyvalue" (click)="toggleComponent(c.value)">
             <!-- TODO move into named template -->
             <td>
-                <label
-                    [class]="treebank.multiOption ? 'checkbox' : 'radio'"
-                    [attr.disabled]="c.value.disabled || null"
-                    (click)="$event.stopPropagation()"
-                >
-                    <input
-                        [type]="treebank.multiOption ? 'checkbox' : 'radio'"
-                        [disabled]="c.value.disabled"
-                        [checked]="c.value.selected"
-                        (change)="toggleComponent(c.value)"
-                    >
+                <label [class]="treebank.multiOption ? 'checkbox' : 'radio'" [attr.disabled]="c.value.disabled || null"
+                    (click)="$event.stopPropagation()">
+                    <input [type]="treebank.multiOption ? 'checkbox' : 'radio'" [disabled]="c.value.disabled"
+                        [checked]="c.value.selected" (change)="toggleComponent(c.value)">
                     {{c.value.title}}
                 </label>
             </td>
@@ -78,43 +62,40 @@
             <td class="is-number" *ngIf="showWordCount">{{c.value.wordCount.toLocaleString()}}</td>
         </tr>
     </tbody>
-    <ng-template #withGroups><tbody>
-        <tr *ngFor="let group of componentGroups" (click)="toggleGroup(group)">
-            <td *ngFor="let variant of variants">
-                <label
-                    [class]="treebank.multiOption ? 'checkbox' : 'radio'"
-                    [attr.disabled]="components[group.components[variant]].disabled || null"
-                    (click)="$event.stopPropagation()"
-                >
-                    <input
-                        [type]="treebank.multiOption ? 'checkbox' : 'radio'"
-                        [disabled]="components[group.components[variant]].disabled"
-                        [checked]="components[group.components[variant]].selected"
-
-                        (change)="toggleComponent(components[group.components[variant]])"
-                    >
-                    {{components[group.components[variant]].title}}
-                </label>
-            </td>
-            <td *ngIf="showDescription">
-                {{group.description}}
-            </td>
-            <ng-container *ngFor="let variant of variants">
-                <td class="is-number">
-                    {{components[group.components[variant]].sentenceCount.toLocaleString()}}
+    <ng-template #withGroups>
+        <tbody>
+            <tr *ngFor="let group of componentGroups" (click)="toggleGroup(group)">
+                <td *ngFor="let variant of variants">
+                    <label [class]="treebank.multiOption ? 'checkbox' : 'radio'"
+                        [attr.disabled]="components[group.components[variant.name]].disabled || null"
+                        (click)="$event.stopPropagation()">
+                        <input [type]="treebank.multiOption ? 'checkbox' : 'radio'"
+                            [disabled]="components[group.components[variant.name]].disabled"
+                            [checked]="components[group.components[variant.name]].selected"
+                            (change)="toggleComponent(components[group.components[variant.name]])">
+                        {{components[group.components[variant.name]].title}}
+                    </label>
                 </td>
-                <td class="is-number" *ngIf="showWordCount">
-                    {{components[group.components[variant]].wordCount.toLocaleString()}}
+                <td *ngIf="showDescription">
+                    {{group.description}}
                 </td>
-            </ng-container>
-            <th class="is-number">
-                {{totalSentenceCountByGroup[group.key]}}
-            </th>
-            <th class="is-number" *ngIf="showWordCount">
-                {{totalWordCountByGroup[group.key]}}
-            </th>
-        </tr>
-    </tbody></ng-template>
+                <ng-container *ngFor="let variant of variants">
+                    <td class="is-number">
+                        {{components[group.components[variant.name]].sentenceCount.toLocaleString()}}
+                    </td>
+                    <td class="is-number" *ngIf="showWordCount">
+                        {{components[group.components[variant.name]].wordCount.toLocaleString()}}
+                    </td>
+                </ng-container>
+                <th class="is-number">
+                    {{totalSentenceCountByGroup[group.key]}}
+                </th>
+                <th class="is-number" *ngIf="showWordCount">
+                    {{totalWordCountByGroup[group.key]}}
+                </th>
+            </tr>
+        </tbody>
+    </ng-template>
 
     <tfoot>
         <tr>
@@ -122,8 +103,8 @@
                 &nbsp;
             </td>
             <ng-container *ngFor="let variant of (variants || [])">
-                <td class="is-number">{{totalSentenceCountByVariant[variant]}}</td>
-                <td class="is-number" *ngIf="showWordCount">{{totalWordCountByVariant[variant]}}</td>
+                <td class="is-number">{{totalSentenceCountByVariant[variant.name]}}</td>
+                <td class="is-number" *ngIf="showWordCount">{{totalWordCountByVariant[variant.name]}}</td>
             </ng-container>
             <th class="is-number">{{totalSentenceCount}}</th>
             <th class="is-number" *ngIf="showWordCount">{{totalWordCount}}</th>

@@ -2,7 +2,9 @@ $primary: rgba(168, 205, 40, 1);
 $secondary: #7E6748;
 $secondary-invert: white;
 
-@import "~bulma/sass/utilities/_all";
+@import "~bulma/sass/utilities/initial-variables";
+@import "~bulma/sass/utilities/functions";
+@import "~bulma/sass/utilities/derived-variables";
 
 $xpath-path: $pre;
 $xpath-name: $primary;

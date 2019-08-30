@@ -188,10 +188,23 @@ $inputGroupTextColor: $text;
         color: $secondary;
     }
 }
+
+.ui-widget-content a.ui-overlaypanel-close {
+    border-color: $text;
+    background: $text;
+    color: $background;
+
+    &:hover {
+        border-color: lighten($text, 20);
+        background: lighten($text, 20);
+        color: $background;
+    }
+}
+
 // $table-head-cell-color	$text-strong
 // $table-foot-cell-border-width	2px 0 0
 // $table-foot-cell-color	$text-strong
 // $table-row-active-background-color	$primary
 // $table-row-active-color	$primary-invert
 
-@import "~primeng/resources/themes/_theme.scss";
+@import "~primeng/resources/themes/nova-light/theme.css";

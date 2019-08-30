@@ -177,9 +177,9 @@ var jQuery = require('jquery');
 
             anyTree = jqArrayToJqObject(trees);
             anyTooltip = jqArrayToJqObject(tooltips);
-            anyView = jqArrayToJqObject(screens);
+            var anyView = jqArrayToJqObject(screens);
 
-            errorContainer = anyView.children(".tv-error");
+            var errorContainer = anyView.children(".tv-error");
 
             if (args.sentence != "") {
                 anyView.find(".tv-sentence-wrapper").addClass("has-sentence").children("span").html(args.sentence);
