@@ -1,11 +1,12 @@
 <?php
 
-require_once('treebanks/treebanks.php');
+require_once 'treebanks/treebanks.php';
 
 function isGrinded($corpus)
 {
     global $treebanks;
-    return $treebanks[$corpus] ? $treebanks[$corpus]->grinded : false;
+
+    return isset($treebanks[$corpus]) ? $treebanks[$corpus]->grinded : false;
 }
 
 // Returns associative array containing at least the machine and the port
@@ -19,19 +20,20 @@ function isGrinded($corpus)
  *      'username' => 'admin',
  *      'password' => 'admin'
  *  )
- * ```
+ * ```.
  *
  * Throws an exception if the passed component is not known for this the corpus.
  * If the component does not specify its own server, returns the corpus' fallback server.
  * If the corpus is not defined, and the gretel-upload component is active: returns the gretel-upload server data.
  *
- * @param string $corpus the corpus in which the component exists.
- * @param string|null $component the component for which to get the info, this should not contain any grinded suffixes.
+ * @param string      $corpus    the corpus in which the component exists
+ * @param string|null $component the component for which to get the info, this should not contain any grinded suffixes
+ *
  * @return array
  */
 function getServerInfo($corpus, $component = null)
 {
-    /** @var TreebankInfo[] $treebanks */ global $treebanks;
+    /* @var TreebankInfo[] $treebanks */ global $treebanks;
 
     if (array_key_exists($corpus, $treebanks)) {
         $tb = $treebanks[$corpus];
@@ -44,20 +46,20 @@ function getServerInfo($corpus, $component = null)
             }
 
             return array(
-                'machine'   => isset($comp->machine) ? $comp->machine : $tb->machine,
-                'port'      => isset($comp->port) ? $comp->port : $tb->port,
-                'username'  => isset($comp->username) ? $comp->username : $tb->username,
-                'password'  => isset($comp->password) ? $comp->password : $tb->password
+                'machine' => isset($comp->machine) ? $comp->machine : $tb->machine,
+                'port' => isset($comp->port) ? $comp->port : $tb->port,
+                'username' => isset($comp->username) ? $comp->username : $tb->username,
+                'password' => isset($comp->password) ? $comp->password : $tb->password,
             );
         } else { // component does not define its own server - use treebank's own server info
             return array(
-                'machine'   => $tb->machine,
-                'port'      => $tb->port,
-                'username'  => $tb->username,
-                'password'  => $tb->password
+                'machine' => $tb->machine,
+                'port' => $tb->port,
+                'username' => $tb->username,
+                'password' => $tb->password,
             );
         }
-    } elseif(defined('API_BASEX_INFO') && defined('API_URL')) { // We also have the upload component active, assume the corpus exists there.
+    } elseif (defined('API_BASEX_INFO') && defined('API_URL')) { // We also have the upload component active, assume the corpus exists there.
         return API_BASEX_INFO;
     } else {
         throw new Exception(`Unknown corpus $corpus`);
