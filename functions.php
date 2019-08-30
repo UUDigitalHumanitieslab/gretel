@@ -60,7 +60,7 @@ function getServerInfo($corpus, $component = null)
             );
         }
     } elseif (defined('API_BASEX_INFO') && defined('API_URL')) { // We also have the upload component active, assume the corpus exists there.
-        return API_BASEX_INFO;
+        return is_array(API_BASEX_INFO) ? API_BASEX_INFO : unserialize(API_BASEX_INFO);
     } else {
         throw new Exception(`Unknown corpus $corpus`);
     }
