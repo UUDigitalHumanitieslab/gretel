@@ -204,11 +204,15 @@ export class TreebankSelection {
 
     constructor(private treebankService: TreebankService, state: ReturnType<TreebankSelection['encode']> = {}) {
         this.data = {};
+        function databaseName(corpus: string, component: string) {
+            return corpus.toUpperCase().replace('-', '_') + `_ID_${component}`;
+        }
         if ('corpus' in state && 'components' in state) {
             // conversion of pre-federated URLs
             state = {
                 gretel: {
-                    [(state as any).corpus]: state['components']
+                    [(state as any).corpus]: (state['components'] as any as string[])
+                        .map(component => databaseName((state as any).corpus, component))
                 }
             } as any;
         }
