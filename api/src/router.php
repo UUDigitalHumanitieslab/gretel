@@ -147,7 +147,7 @@ $router->map('POST', '/results', function () {
         // Remove it from the list and get the databases for the next components
         if (!$results['remainingDatabases']) {
             array_shift($components);
-            $results['remainingDatabases'] = $components[0] ? getDatabases($corpus, $components[0], $xpath) : array();
+            $results['remainingDatabases'] = $components && $components[0] ? getDatabases($corpus, $components[0], $xpath) : array();
         }
         $results['remainingComponents'] = $components;
 
