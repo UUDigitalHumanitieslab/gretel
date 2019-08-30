@@ -96,8 +96,8 @@ $router->map('POST', '/results', function () {
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 
-    /** @var string $xpath*/            $xpath = $data['xpath'];
-    /** @var boolean $context */        $context = $data['retrieveContext'];
+    /** @var string $xpath */            $xpath = $data['xpath'];
+    /** @var bool $context */        $context = $data['retrieveContext'];
     /** @var string $corpus */          $corpus = $data['corpus'];
     /** @var int $iteration */          $iteration = $data['iteration'];
     /** @var array|null $variables */   $variables = $data['variables'];
@@ -113,15 +113,15 @@ $router->map('POST', '/results', function () {
     // (usually ${corpus}_ID_${component})
     // It is pingponged with the client so we can keep track where we are in the searching.
     /** @var string[]|null $databases */
-    $databases = $data['remainingDatabases'] ?? getDatabases($corpus, $components[0], $xpath);
+    $databases = $data['remainingDatabases'] ? $data['remainingDatabases'] : getDatabases($corpus, $components[0], $xpath);
 
     // Some xpaths are faster on the plain data even in grinded corpora
     // This variable indicates that this is one of those edge cases.
     // If it is true, use the normal process of searching, even for grinded databases.
     // The $already and $databases variables will follow the normal conventions.
     // ($databases will contain the component names, and $already will be null).
-    // (may already have been set true in getDatabases when this is a grinded corpus).
-    $needRegularGrinded = $needRegularGrinded || !!$data['needRegularGrinded'];
+    // (may already hFave been set true in getDatabases when this is a grinded corpus).
+    $needRegularGrinded = $needRegularGrinded || (bool) $data['needRegularGrinded'];
 
     $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
     $searchLimit = $data['isAnalysis'] ? $analysisLimit : $resultsLimit;

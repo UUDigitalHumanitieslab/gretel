@@ -44,10 +44,10 @@ function getServerInfo($corpus, $component = null)
             }
 
             return array(
-                'machine'   => $comp->machine ?? $tb->machine,
-                'port'      => $comp->port ?? $tb->port,
-                'username'  => $comp->username ?? $tb->username,
-                'password'  => $comp->password ?? $tb->password
+                'machine'   => $comp->machine ? $comp->machine : $tb->machine,
+                'port'      => $comp->port ? $comp->port : $tb->port,
+                'username'  => $comp->username ? $comp->username : $tb->username,
+                'password'  => $comp->password ? $comp->password : $tb->password
             );
         } else { // component does not define its own server - use treebank's own server info
             return array(

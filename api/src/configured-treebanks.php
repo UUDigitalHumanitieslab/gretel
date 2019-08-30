@@ -15,7 +15,7 @@ function getConfiguredTreebanks()
                 ($treebank->language ? ' '.$treebank->language : '').
                 ($treebank->version ? ' - version '.$treebank->version : ''),
             'multioption' => $treebank->multioption,
-            'metadata' => $treebank->metadata ?? array(),   // send out an empty array if not configured
+            'metadata' => $treebank->metadata ? $treebank->metadata : array(),   // send out an empty array if not configured
             'components' => array(),                         // filled below
         );
 
