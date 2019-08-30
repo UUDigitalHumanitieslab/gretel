@@ -2,9 +2,15 @@
     <div class="container">
         <a [routerLink]="['/home']" class="navbar-brand">
             <div class="navbar-item">
-                <span grtBalloonPosition="down-left" grtBalloon="Greedy Extraction of Trees for Empirical Linguistics">GrETEL</span> <sup class="version">4</sup>
+                <span grtBalloonPosition="down-left"
+                    grtBalloon="Greedy Extraction of Trees for Empirical Linguistics">GrETEL</span> <sup
+                    class="version">4</sup>
             </div>
         </a>
         <grt-navigation></grt-navigation>
     </div>
 </nav>
+<div class="notification is-radiusless" *ngIf="show" [ngClass]="messageType" [@slideInOut]>
+    <button class="delete" (click)="show=false"></button>
+    {{message}}
+</div>

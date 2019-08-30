@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+
+import { AlpinoService, TreebankService, StateService } from '../../services/_index';
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
     GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultsStep,
     MatrixStep, AnalysisStep, Step
 } from '../multi-step-page/steps';
 import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
-import { AlpinoService, TreebankService, mapTreebanksToSelectionSettings, StateService } from '../../services/_index';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+import { TreebankSelection } from '../../treebank';
 
 @Component({
     selector: 'grt-example-based-search',
@@ -31,7 +33,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         retrieveContext: false,
         respectOrder: false,
         ignoreTopNode: false,
-        selectedTreebanks: [],
+        selectedTreebanks: new TreebankSelection(this.treebankService),
     };
 
     matrixStep: MatrixStep;
@@ -63,7 +65,9 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         const globalState = {
             step: parseInt(queryParams.currentStep || 0, 10),
             state: {
-                selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
+                selectedTreebanks: new TreebankSelection(
+                    this.treebankService,
+                    queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
                 xpath: queryParams.xpath || undefined,
                 inputSentence: queryParams.inputSentence || undefined,
                 isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
@@ -109,51 +113,47 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         }];
     }
 
-    /**
-     * Updates the selected treebanks with the given selection
-     * @param selectedTreebanks the new treebank selection
-     */
-    updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>) {
-        this.globalState.selectedTreebanks = selectedTreebanks;
-        this.updateGlobalState(this.globalState);
-    }
-
     updateSentence(sentence: string) {
-        this.globalState.inputSentence = sentence;
-        // reset parse/previous settings
-        this.globalState.exampleXml = undefined;
-        this.globalState.isCustomXPath = false;
-        this.globalState.attributes = undefined;
-        this.updateGlobalState(this.globalState);
+        this.stateService.setState({
+            inputSentence: sentence,
+            // reset parse/previous settings
+            exampleXml: 'undefined',
+            isCustomXPath: false,
+            attributes: undefined
+        });
     }
 
     async updateMatrix(matrixSettings: MatrixSettings) {
-        this.globalState.retrieveContext = matrixSettings.retrieveContext;
-        this.globalState.ignoreTopNode = matrixSettings.ignoreTopNode;
-        this.globalState.respectOrder = matrixSettings.respectOrder;
+        const newState: any = {
+            loading: true,
+            retrieveContext: matrixSettings.retrieveContext,
+            ignoreTopNode: matrixSettings.ignoreTopNode,
+            respectOrder: matrixSettings.respectOrder
+        };
 
         if (matrixSettings.customXPath) {
-            this.globalState.isCustomXPath = true;
-            this.globalState.xpath = matrixSettings.customXPath;
+            newState.isCustomXPath = true;
+            newState.xpath = matrixSettings.customXPath;
         } else {
-            this.globalState.isCustomXPath = false;
-            this.globalState.tokens = matrixSettings.tokens;
-            this.globalState.attributes = matrixSettings.attributes;
+            newState.isCustomXPath = false;
+            newState.tokens = matrixSettings.tokens;
+            newState.attributes = matrixSettings.attributes;
         }
-        this.globalState = await this.matrixStep.updateMatrix(this.globalState);
-        this.updateGlobalState(this.globalState);
+
+        let state: GlobalStateExampleBased = await this.stateService.setState(newState);
+        state = await this.matrixStep.updateMatrix(state);
+        state.loading = false;
+        state = await this.stateService.setState(state);
     }
 
     updateRetrieveContext(retrieveContext: boolean) {
-        this.globalState.retrieveContext = retrieveContext;
-
-        this.updateGlobalState(this.globalState);
+        this.stateService.setState({ retrieveContext });
     }
 
     updateXPath(xpath: string) {
-        this.globalState.xpath = xpath;
-        this.globalState.isCustomXPath = true;
-
-        this.updateGlobalState(this.globalState);
+        this.stateService.setState({
+            xpath,
+            isCustomXPath: true
+        }, 'history');
     }
 }

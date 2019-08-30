@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, OnInit, OnDestroy } from '@angular/core';
 
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })
-export class XpathInputComponent extends StepComponent<GlobalState> implements OnChanges {
+export class XpathInputComponent extends StepComponent<GlobalState> implements OnChanges, OnInit, OnDestroy {
     public stepType = StepType.XpathInput;
     public treeXml: string;
     public treeDisplay = 'inline';
@@ -76,6 +76,14 @@ export class XpathInputComponent extends StepComponent<GlobalState> implements O
 
     ngOnChanges() {
         this.valueSubject.next(this.value);
+    }
+
+    ngOnInit() {
+        super.ngOnInit();
+    }
+
+    ngOnDestroy() {
+        super.ngOnDestroy();
     }
 
     emitRetrieveContextChanged() {

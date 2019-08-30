@@ -2,30 +2,30 @@
 /// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
-import { map, switchMap, first } from 'rxjs/operators';
+import { switchMap, first } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { ExtractinatorService, PathVariable, ReconstructorService } from 'lassy-xpath/ng';
+import { PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
 import {
     AnalysisService,
     ResultsService,
-    TreebankService,
+    TreebankSelectionService,
     Hit,
-    mapTreebanksToSelectionSettings,
     FilterValues,
     FilterByXPath,
     FilterValue,
-    StateService
-} from '../../services/_index';
+    StateService,
+    ParseService
+} from '../../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
-import { TreebankMetadata } from '../../treebank';
-import { StepComponent } from '../step/step.component';
-import { GlobalState, StepType } from '../../pages/multi-step-page/steps';
+import { TreebankMetadata } from '../../../treebank';
+import { StepComponent } from '../step.component';
+import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
     selector: 'grt-analysis',
@@ -58,6 +58,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
 
     public selectedVariable?: SelectedVariable;
     public showMoreSubject = new BehaviorSubject<number>(0);
+    public showExplanation = true;
 
     @Input()
     public xpath: string;
@@ -75,10 +76,10 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
 
     constructor(
         private analysisService: AnalysisService,
-        private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
-        private treebankService: TreebankService,
+        private treebankSelectionService: TreebankSelectionService,
+        private parseService: ParseService,
         private ngZone: NgZone,
         stateService: StateService<GlobalState>
     ) {
@@ -86,11 +87,13 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     }
 
     ngOnInit() {
+        super.ngOnInit();
         this.$element = $('.analysis-component');
         this.initialize();
     }
 
     ngOnDestroy() {
+        super.ngOnDestroy();
         for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }
@@ -106,45 +109,39 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     }
 
     private async initialize() {
-        let variables: PathVariable[];
-        try {
-            variables = this.extractinatorService.extract(this.xpath);
-        } catch (e) {
-            variables = [];
-            console.warn('Error extracting variables from path', e, this.xpath);
-        }
-
         // TODO: on change
-        this.variables = variables.reduce<{ [name: string]: PathVariable }>((vs, v) => { vs[v.name] = v; return vs; }, {});
+        const { variables, lookup } = this.parseService.extractVariables(this.xpath);
+        this.variables = lookup;
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
 
-        const subscriptionToTreebankSelection = this.treebankService.treebanks.pipe(
-            map(v => ({
-                selected: mapTreebanksToSelectionSettings(v.state),
-                state: v.state
-            })),
-            switchMap(v => {
+        const subscriptionToTreebankSelection = this.treebankSelectionService.state$.pipe(
+            switchMap(selection => {
                 this.isLoading = true;
                 this.hitsSubject.next([]);
-                this.metadata = v.selected.flatMap(s => v.state[s.provider][s.corpus].metadata);
+                const loadMetadata = Promise.all(
+                    selection.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()))
+                    .then(metadata => {
+                        this.metadata = metadata.flatMap(x => x);
+                    });
+
                 // fetch all results for all selected components/treebanks
                 // and merge them into a single stream that's subscribed to.
-                const merged = merge(...v.selected.map(selection => this.resultsService.getAllResults(
+                const searchResults = merge(...selection.corpora.map(corpus => this.resultsService.getAllResults(
                     this.xpath,
-                    selection.provider,
-                    selection.corpus,
-                    selection.components,
+                    corpus.provider,
+                    corpus.corpus.name,
+                    corpus.corpus.components,
                     false,
                     true,
                     [],
                     variables
                 )));
 
-                merged.toPromise().then(() => {
+                Promise.all([loadMetadata, searchResults.toPromise()]).then(() => {
                     this.isLoading = false;
                 });
 
-                return merged;
+                return searchResults;
             }))
             .subscribe(searchResults => {
                 const hits = [...this.hitsSubject.value, ...searchResults.hits];

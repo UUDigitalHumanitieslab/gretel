@@ -2,11 +2,21 @@
     // they can be nested quite deeply
     overflow: auto;
 }
+
 .sentence-matrix {
     // loooong sentence
     overflow: auto;
 
-    .table th {
-        white-space: nowrap;
+    .table {
+        margin-bottom: 1.5rem;
+
+        th {
+            white-space: nowrap;
+        }
     }
+}
+
+// allow clicking the disabled radio buttons for notification
+input[disabled] {
+    pointer-events: none
 }

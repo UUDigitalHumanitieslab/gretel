@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
 
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -10,6 +11,7 @@ import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
 import { LassyXPathModule } from 'lassy-xpath/ng';
 import { ClipboardModule } from 'ngx-clipboard';
@@ -46,22 +48,22 @@ import {
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService
+    ParseService
 } from './services/_index';
-import { AnalysisComponent } from './components/analysis/analysis.component';
+import { AnalysisComponent } from './components/step/analysis/analysis.component';
 import { TreeVisualizerComponent } from './components/tree-visualizer/tree-visualizer.component';
 import { ExternalTreeVisualizerComponent } from './components/tree-visualizer/external-tree-visualizer.component';
 import { XPathEditorComponent } from './components/xpath/editor/xpath-editor.component';
 import { XPathViewerComponent } from './components/xpath/viewer/xpath-viewer.component';
-import { FiltersModule } from './components/filters/filters.module';
+import { FiltersModule } from './modules/filters/filters.module';
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
-import { DistributionListComponent } from './components/step/distribution-list/distribution-list.component';
-import { RouterModule } from '@angular/router';
+import { DistributionListComponent } from './components/step/results/distribution-list.component';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
+import { DownloadResultsComponent } from './components/step/results/download-results.component';
 
 export const declarations: any[] = [
     AdressComponent,
@@ -73,6 +75,7 @@ export const declarations: any[] = [
     DistributionListComponent,
     DocumentationComponent,
     DocumentationContentComponent,
+    DownloadResultsComponent,
     ExampleBasedSearchComponent,
     ExternalTreeVisualizerComponent,
     FiltersByXPathComponent,
@@ -114,6 +117,7 @@ export const imports: any[] = [
     MessageModule,
     MessagesModule,
     NgSelectModule,
+    OverlayPanelModule,
     RouterModule,
     TableModule,
 ];
@@ -127,14 +131,14 @@ export const providers: any[] = [
     LinkService,
     ResultsService,
     TreebankService,
-    XmlParseService,
+    ParseService,
 ];
 
 @NgModule({
     declarations,
     imports,
     providers,
-    bootstrap: [AppComponent],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

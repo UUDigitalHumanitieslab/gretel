@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StateService, TreebankService, mapTreebanksToSelectionSettings } from '../../services/_index';
+import { StateService, TreebankService, EmitType } from '../../services/_index';
 import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
 import {
     AnalysisStep,
@@ -11,6 +11,7 @@ import {
     SelectTreebankStep,
     Step,
 } from '../multi-step-page/steps';
+import { TreebankSelection } from '../../treebank';
 
 /**
  * The xpath search component is the main component for the xpath search page. It keeps track of global state of the page
@@ -27,7 +28,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         currentStep: undefined,
         filterValues: {},
         retrieveContext: false,
-        selectedTreebanks: [],
+        selectedTreebanks: new TreebankSelection(this.treebankService),
         xpath: `//node[@cat="smain"
     and node[@rel="su" and @pt="vnw"]
     and node[@rel="hd" and @pt="ww"]
@@ -62,8 +63,10 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         const globalState = {
             step: parseInt(queryParams.currentStep || '0', 10),
             state: {
-                selectedTreebanks: queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined,
-                xpath: queryParams.xpath || undefined,
+                selectedTreebanks: new TreebankSelection(
+                    this.treebankService,
+                    queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
+                xpath: queryParams.xpath || this.defaultGlobalState.xpath,
                 retrieveContext: this.decodeBool(queryParams.retrieveContext)
             }
         };
@@ -71,22 +74,16 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         return globalState;
     }
 
-    /**
-     * Updates the selected treebanks with the given selection
-     * @param selectedTreebanks the new treebank selection
-     */
-    updateSelected(selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>) {
-        this.globalState.selectedTreebanks = selectedTreebanks;
-        this.updateGlobalState(this.globalState);
+    async updateRetrieveContext(retrieveContext: boolean) {
+        this.stateService.setState({
+            retrieveContext
+        });
     }
 
-    updateRetrieveContext(retrieveContext: boolean) {
-        this.globalState.retrieveContext = retrieveContext;
-        this.updateUrl(false);
-    }
-
-    updateXPath(xpath: string, writeState: boolean) {
-        this.globalState.xpath = xpath;
-        this.updateUrl(writeState);
+    async updateXPath(xpath: string, emit: EmitType) {
+        this.stateService.setState({
+            xpath
+        },
+        emit);
     }
 }

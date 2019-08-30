@@ -6,7 +6,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 
 import { ConfigurationService } from './configuration.service';
-import { XmlParseService } from './xml-parse.service';
+import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath/ng';
 
@@ -26,7 +26,7 @@ export class ResultsService {
         private http: HttpClient,
         private sanitizer: DomSanitizer,
         private configurationService: ConfigurationService,
-        private xmlParseService: XmlParseService) {
+        private parseService: ParseService) {
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
@@ -394,8 +394,8 @@ export class ResultsService {
         return Promise.all(Object.keys(results.sentences).map(async hitId => {
             const sentence = results.sentences[hitId];
             const nodeStarts = results.beginlist[hitId].split('-').map(x => parseInt(x, 10));
-            const metaValues = this.mapMeta(await this.xmlParseService.parse(`<metadata>${results.metalist[hitId]}</metadata>`));
-            const variableValues = this.mapVariables(await this.xmlParseService.parse(results.varlist[hitId]));
+            const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${results.metalist[hitId]}</metadata>`));
+            const variableValues = this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
             return {
                 component: results.sentenceDatabases[hitId],
                 database: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],

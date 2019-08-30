@@ -1,9 +1,15 @@
-@import '../../../colors';
+@import '../../../../colors';
 
 .btn-wrapper {
     button:not(:first-child) {
         margin-left: 10px;
     }
+}
+
+.explanation {
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 :host ::ng-deep {

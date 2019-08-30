@@ -14,7 +14,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 import * as $ from 'jquery';
 
-import { DownloadService, XmlParseService } from '../../services/_index';
+import { DownloadService, ParseService } from '../../services/_index';
 import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
@@ -33,9 +33,9 @@ interface Metadata {
     styleUrls: ['./tree-visualizer.component.scss']
 })
 export class TreeVisualizerComponent implements OnChanges, OnInit {
-    @ViewChild('output', { read: ElementRef })
+    @ViewChild('output', { static: true, read: ElementRef })
     public output: ElementRef;
-    @ViewChild('inline', { read: ElementRef })
+    @ViewChild('inline', { static: false, read: ElementRef })
     public inlineRef: ElementRef;
 
     @Input()
@@ -71,7 +71,7 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
     // jquery tree visualizer
     private instance: any;
 
-    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private xmlParseService: XmlParseService) {
+    constructor(private sanitizer: DomSanitizer, private downloadService: DownloadService, private parseService: ParseService) {
     }
 
     ngOnInit() {
@@ -116,7 +116,7 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
                 showMatrixDetails: this.showMatrixDetails
             });
 
-            this.xmlParseService.parse(this.xml).then((data) => {
+            this.parseService.parseXml(this.xml).then((data) => {
                 this.showMetadata(data);
             });
             this.updateVisibility();

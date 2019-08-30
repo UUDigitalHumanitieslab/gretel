@@ -2,6 +2,12 @@ import { Injectable, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
 import { Hit } from './results.service';
+import JSZip from 'jszip';
+import { PathVariable } from 'lassy-xpath/ng';
+
+// Separator for variable values, this shouldn't be the name of
+// either the variable name or node property
+const KEY_SEPARATOR = '.';
 
 @Injectable()
 export class DownloadService {
@@ -15,31 +21,85 @@ export class DownloadService {
         hits: number,
         sentences: string
     }[]) {
-        let rows = [this.formatCsvRow(['Provider', 'Treebank', 'Component', 'Hits', 'All Sentences'])];
-        for (let count of counts) {
-            rows.push(this.formatCsvRow([count.provider, count.corpus, count.component, count.hits, count.sentences]));
+        const rows = [this.formatCsvRow('Provider', 'Treebank', 'Component', 'Hits', 'All Sentences')];
+        for (const count of counts) {
+            rows.push(this.formatCsvRow(count.provider, count.corpus, count.component, count.hits, count.sentences));
         }
 
         this.downloadRows('gretel-distribution.csv', 'text/csv', rows);
     }
 
-    public downloadResults(results: {corpus: string, components: string[], xpath: string, hits: Hit[]}[]) {
-        let rows: string[] = [];
-        results.forEach(({corpus, components, xpath, hits}) => {
-            rows.push(
-`Corpus: ${corpus}
-Components: ${components.join('-')}
-XPath: ${xpath.replace(/\n/g, '\t')}
-Date: ${new Date()}
-`);
+    public async downloadResults(
+        results: { corpus: string, components: string[], xpath: string, hits: Hit[] }[],
+        variables?: PathVariable[]) {
+        const zip = new JSZip();
+        const corporaNames: string[] = [];
+        results.forEach(({ corpus, components, xpath, hits }) => {
+            zip.file(
+                `${corpus}.meta.txt`,
+                this.blob(
+                    'text/plain',
+                    [`Corpus:\n\t${corpus}
+Components:\n\t${components.join('-')}
+XPath:\n\t${xpath.split('\n').join('\n\t')}
+Date:\n\t${new Date()}
+${this.variablesMetaText(variables)}`]));
+            corporaNames.push(corpus);
 
-                for (let i = 0; i < hits.length; i++) {
-                    let hit = hits[i];
-                    rows.push(`${i + 1}\t${hit.fileId}\t${corpus}\t${hit.component}\t${this.highlightSentence(hit.highlightedSentence)}`);
+            let variableColumns: string[] = [];
+            const variableColumnPositions: { [key: string]: number } = {};
+
+            if (variables) {
+                // determine the columns
+                const variableProperties = new Set<string>();
+                for (const hit of hits) {
+                    for (const [variable, properties] of Object.entries(hit.variableValues)) {
+                        for (const property of Object.keys(properties)) {
+                            const key = `${variable}${KEY_SEPARATOR}${property}`;
+                            variableProperties.add(key);
+                        }
+                    }
                 }
-        })
 
-        this.downloadRows('gretel-results.txt', 'text/plain', rows);
+                variableColumns = [...variableProperties.values()].sort();
+                for (let i = 0; i < variableColumns.length; i++) {
+                    variableColumnPositions[variableColumns[i]] = i;
+                }
+            }
+
+            const rows: string[] = [this.formatCsvRow(
+                '#',
+                'ID',
+                'Corpus',
+                'Component',
+                'Sentence',
+                ...variableColumns)];
+
+            for (let i = 0; i < hits.length; i++) {
+                const hit = hits[i];
+                const variableCells = variableColumns.map(_ => '');
+                if (variables) {
+                    for (const [variable, properties] of Object.entries(hit.variableValues)) {
+                        for (const [property, value] of Object.entries(properties)) {
+                            const key = `${variable}${KEY_SEPARATOR}${property}`;
+                            variableCells[variableColumnPositions[key]] = value;
+                        }
+                    }
+                }
+
+                rows.push(this.formatCsvRow(
+                    i + 1,
+                    hit.fileId,
+                    corpus,
+                    hit.component,
+                    this.highlightSentence(hit.highlightedSentence),
+                    ...variableCells));
+            }
+
+            zip.file(`${corpus}.csv`, this.blob('text/csv', rows));
+        });
+        const content = await zip.generateAsync({ type: 'blob' });
+        saveAs(content, `gretel-${corporaNames.join('-')}-${this.timestamp()}.zip`);
     }
 
     public downloadXPath(xpath: string) {
@@ -50,11 +110,22 @@ Date: ${new Date()}
         saveAs(new Blob([xml], { type: `text/xml;charset=utf-8` }), filename);
     }
 
-    public downloadFilelist(filenames: string[], name: string, header: string = undefined, extension: string = '.fl') {
+    public downloadFilelist(filenames: string[], name: string, header?: string, extension: string = '.fl') {
         if (!header) {
-            header = name
+            header = name;
         }
-        saveAs(new Blob([`${header}\n${filenames.join('\n')}`], { type: 'text/txt' }), `${name}${extension}`)
+        saveAs(new Blob([`${header}\n${filenames.join('\n')}`], { type: 'text/txt' }), `${name}${extension}`);
+    }
+
+    private timestamp() {
+        const now = new Date();
+        return [now.getUTCFullYear(),
+        (now.getUTCMonth() + 1).toString().padStart(2, '0'),
+        now.getUTCDate().toString().padStart(2, '0'),
+        now.getUTCHours().toString().padStart(2, '0'),
+        now.getUTCMinutes().toString().padStart(2, '0'),
+        now.getUTCSeconds().toString().padStart(2, '0'),
+        ].join('');
     }
 
     private highlightSentence(highlightedSentence: SafeHtml) {
@@ -63,11 +134,22 @@ Date: ${new Date()}
             .replace(/<\/strong>/g, '</hit>');
     }
 
-    private formatCsvRow(data: any[]) {
-        return data.join(',') + '\n';
+    private formatCsvRow(...data: any[]) {
+        return data.map(cell => `${cell}`)
+            .map(cell => /[,\n"]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell).join(',') + '\n';
     }
 
-    private downloadRows(filename: string, fileType: "text/csv" | "text/plain", rows: string[]) {
-        saveAs(new Blob(rows, { type: `${fileType};charset=utf-8` }), filename);
+    private blob(fileType: 'text/csv' | 'text/plain', rows: string[]) {
+        return new Blob(rows, { type: `${fileType};charset=utf-8`, endings: 'native' });
+    }
+
+    private downloadRows(filename: string, fileType: 'text/csv' | 'text/plain', rows: string[]) {
+        saveAs(this.blob(fileType, rows), filename);
+    }
+
+    private variablesMetaText(variables?: PathVariable[]) {
+        return variables ?
+            `Variables:\n${variables.map(value => `\t${value.name}:\n\t\t${value.path}`).join('\n')}\n`
+            : '';
     }
 }

@@ -1,17 +1,19 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 
 import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
 import { ValueEvent } from 'lassy-xpath/ng';
 import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent<GlobalState> {
+export class MatrixComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+    private warningId: number;
     public stepType = StepType.Matrix;
 
     @Input('attributes')
@@ -119,11 +121,17 @@ export class MatrixComponent extends StepComponent<GlobalState> {
 
     private originalXPath: string;
 
-    constructor(stateService: StateService<GlobalState>, private confirmationService: ConfirmationService) {
+    constructor(stateService: StateService<GlobalState>,
+        private confirmationService: ConfirmationService,
+        private notificationService: NotificationService) {
         super(stateService);
     }
 
     public setTokenPart(tokenIndex: number, part: Part) {
+        if (this.isCustomXPath) {
+            this.warningId = this.notificationService.addWarning('It is not possible to use the matrix when using custom xpath.');
+            return;
+        }
         if (part.advanced) {
             this.alwaysAdvanced = true;
         }
@@ -169,6 +177,7 @@ export class MatrixComponent extends StepComponent<GlobalState> {
         const reset = () => {
             this.valid = true;
             this.emitChange();
+            this.notificationService.cancel(this.warningId);
         };
         if (this.xpath === this.originalXPath) {
             reset();
@@ -186,6 +195,15 @@ export class MatrixComponent extends StepComponent<GlobalState> {
 
     public getWarningMessage() {
         this.warning = true;
+    }
+
+    ngOnInit() {
+        super.ngOnInit();
+    }
+
+    ngOnDestroy() {
+        this.notificationService.cancel(this.warningId);
+        super.ngOnDestroy();
     }
 }
 

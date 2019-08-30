@@ -1,7 +1,9 @@
-import { TreebankService, mapTreebanksToSelectionSettings } from '../../services/treebank.service';
-import { AlpinoService, FilterValues } from '../../services/_index';
-import { map, take } from 'rxjs/operators';
 import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+
+import { AlpinoService } from '../../services/alpino.service';
+import { TreebankService } from '../../services/treebank.service';
+import { FilterValues } from '../../services/results.service';
+import { TreebankSelection } from '../../treebank';
 
 /**
  * Contains all the steps that are used in the xpath search
@@ -23,7 +25,7 @@ interface GlobalState {
     // Question: should this even be in this state?
     loading: boolean;
     inputSentence?: string;
-    selectedTreebanks: ReturnType<typeof mapTreebanksToSelectionSettings>;
+    selectedTreebanks: TreebankSelection;
 }
 
 interface GlobalStateExampleBased extends GlobalState {
@@ -110,7 +112,6 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
     }
 
     async updateMatrix(state: GlobalStateExampleBased) {
-        state.loading = true;
         if (!state.isCustomXPath) {
             const generated = await this.alpinoService.generateXPath(
                 state.exampleXml,
@@ -129,7 +130,6 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
                 state.valid = false;
             }
         }
-        state.loading = false;
         return state;
     }
 }
@@ -257,11 +257,7 @@ class SelectTreebankStep<T extends GlobalState> extends Step<T> {
      */
     async enterStep(state: T) {
         state.currentStep = this;
-        await this.treebankService.finishedLoading;
-        const selectedTreebanks = await this.treebankService.treebanks.pipe(
-            map(v => mapTreebanksToSelectionSettings(v.state)),
-            take(1)).toPromise();
-        state.valid = selectedTreebanks.length > 0;
+        state.valid = state.selectedTreebanks.hasAnySelection();
         return state;
     }
 

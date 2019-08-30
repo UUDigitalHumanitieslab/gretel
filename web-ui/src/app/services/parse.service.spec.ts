@@ -1,22 +1,24 @@
 import { TestBed, inject, async } from '@angular/core/testing';
 
-import { XmlParseService } from './xml-parse.service';
+import { ParseService } from './parse.service';
+import { ExtractinatorService } from 'lassy-xpath/ng';
 
-describe('XmlParseService', () => {
+describe('ParseService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
-                XmlParseService
+                ParseService,
+                ExtractinatorService
             ]
         });
     });
 
-    it('should be created', inject([XmlParseService], (service: XmlParseService) => {
+    it('should be created', inject([ParseService], (service: ParseService) => {
         expect(service).toBeTruthy();
     }));
 
-    it('should parse metadata', async(inject([XmlParseService], async (service: XmlParseService) => {
-        const parsed = await service.parse(`<metadata>
+    it('should parse metadata', async(inject([ParseService], async (service: ParseService) => {
+        const parsed = await service.parseXml(`<metadata>
         <meta type="text" name="session" value="306_Busverhaalwithout"/>
         <meta type="text" name="charencoding" value="UTF8"/>
         <meta type="text" name="media" value="306_Busverhaal, video"/>
@@ -39,8 +41,8 @@ describe('XmlParseService', () => {
         expect(parsed.metadata.meta[4].$.value).toBe('CHI');
     })));
 
-    it('should parse attribute nodes', async(inject([XmlParseService], async (service: XmlParseService) => {
-        const parsed = await service.parse(`<node cat="top"><node varName="$node" cat="">
+    it('should parse attribute nodes', async(inject([ParseService], async (service: ParseService) => {
+        const parsed = await service.parseXml(`<node cat="top"><node varName="$node" cat="">
         <node varName="$node1" rel="su" pt="vnw">
         </node>
         <node varName="$node2" rel="hd" pt="ww">

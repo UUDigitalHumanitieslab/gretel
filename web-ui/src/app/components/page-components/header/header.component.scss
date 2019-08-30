@@ -1,4 +1,16 @@
 @import "../../../../colors";
+
+.navbar {
+    z-index: 0; // the full screen tree view is drawn over this
+}
+
 .navbar-brand {
     background-color: $secondary;
+}
+
+.notification {
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }

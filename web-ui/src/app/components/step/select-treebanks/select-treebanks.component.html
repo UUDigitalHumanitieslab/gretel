@@ -1,12 +1,13 @@
 <div class="content">
     <p>
-        Which treebank do you want to query? Click on the treebank name to see its different components. If you would like to get
-        more information on these treebanks, you can find the project websites in
-        <a [routerLink]="['/','documentation']" fragment="about-corpora" target="_blank" grtBalloonPosition="down" grtBalloon="More information on corpora">our FAQ</a>.
+        Which treebank do you want to query? Click on the treebank name to see its different components. If you would
+        like to get more information on these treebanks, you can find the project websites in
+        <a [routerLink]="['/','documentation']" fragment="about-corpora" target="_blank" grtBalloonPosition="down"
+            grtBalloon="More information on corpora">our FAQ</a>.
     </p>
-    <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties some sentences
-        could not be included in the system, so the sentence and word counts may slightly differ from the official treebank
-        counts.
+    <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties some
+        sentences could not be included in the system, so the sentence and word counts may slightly differ from the
+        official treebank counts.
     </p>
 </div>
 
@@ -15,24 +16,14 @@
 </h1>
 
 <ng-container *ngFor="let treebank of treebanks">
-    <div class="field" >
+    <div class="field">
         <label class="checkbox">
-            <input
-                type="checkbox"
-                [value]="treebank.treebank.id"
-                [checked]="treebank.treebank.selected"
-                (change)="toggleTreebank(treebank.treebank.provider, treebank.treebank.id)"
-            > {{treebank.treebank.displayName}}
-            <ng-container *ngIf="treebank.treebank.description">: <em>{{treebank.treebank.description}}</em></ng-container>
+            <input type="checkbox" [value]="treebank.id" [checked]="treebank.selected"
+                (change)="toggleTreebank(treebank.provider, treebank.id)"> {{treebank.displayName}}
+            <ng-container *ngIf="treebank.description">: <em>{{treebank.description}}</em></ng-container>
         </label>
-
     </div>
-    <div *ngIf="treebank.treebank.selected" class="box-is-shadowless">
-        <grt-sub-treebanks
-            [treebank]="treebank.treebank"
-            [components]="treebank.components"
-            [componentGroups]="treebank.componentGroups"
-            [variants]="treebank.variants"
-        ></grt-sub-treebanks>
+    <div *ngIf="treebank.selected" class="box-is-shadowless">
+        <grt-sub-treebanks [treebank]="treebank"></grt-sub-treebanks>
     </div>
 </ng-container>
