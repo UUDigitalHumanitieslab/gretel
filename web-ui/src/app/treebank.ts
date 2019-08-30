@@ -204,6 +204,15 @@ export class TreebankSelection {
 
     constructor(private treebankService: TreebankService, state: ReturnType<TreebankSelection['encode']> = {}) {
         this.data = {};
+        if ('corpus' in state && 'components' in state) {
+            // conversion of pre-federated URLs
+            state = {
+                gretel: {
+                    [(state as any).corpus]: state['components']
+                }
+            } as any;
+        }
+
         for (const provider of Object.keys(state)) {
             this.data[provider] = {};
             for (const corpus of Object.keys(state[provider])) {
