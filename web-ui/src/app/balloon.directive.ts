@@ -11,7 +11,7 @@ export class BalloonDirective implements OnChanges {
     public text: string;
 
     @Input('grtBalloonPosition')
-    public position: 'up' | "left" | "right" | "down" | "up-left" | "up-right" | 'down-left' | 'down-right' = 'down';
+    public position: 'up' | 'left' | 'right' | 'down' | 'up-left' | 'up-right' | 'down-left' | 'down-right' = 'down';
 
     @Input('grtBalloonLength')
     public length: 'small' | 'medium' | 'large' | 'fit';
@@ -28,7 +28,7 @@ export class BalloonDirective implements OnChanges {
     ngOnChanges() {
         const element: HTMLElement = this.el.nativeElement;
         if (!this.text) {
-            element.removeAttribute('data-balloon');
+            element.removeAttribute('aria-label');
         } else {
             if (this.visible) {
                 element.setAttribute('data-balloon-visible', '');
@@ -37,11 +37,11 @@ export class BalloonDirective implements OnChanges {
             }
 
             if (this.visible === false) {
-                element.removeAttribute('data-balloon');
+                element.removeAttribute('aria-label');
                 element.removeAttribute('data-balloon-pos');
                 element.removeAttribute('data-balloon-length');
             } else {
-                element.setAttribute('data-balloon', this.text);
+                element.setAttribute('aria-label', this.text);
                 element.setAttribute('data-balloon-pos', this.position);
                 element.setAttribute('data-balloon-length', this.length);
             }
