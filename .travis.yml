@@ -7,8 +7,7 @@ before_install:
   - cd web-ui
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 node_js:
-  - "node"
-  - "lts/*"
+  - 12
 cache: npm
 before_script:
   - "sudo chown root /opt/google/chrome/chrome-sandbox"
