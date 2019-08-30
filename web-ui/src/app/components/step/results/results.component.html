@@ -1,6 +1,6 @@
 <div class="columns is-desktop">
     <!-- XPATH -->
-    <div class="column is-half">
+    <div class="column is-half-desktop">
         <h2 class="subtitle">
             <div class="level">
                 <div class="level-left">
@@ -96,68 +96,70 @@
         </h1>
     </div>
     <div class="level-right is-hidden-print">
-        <div class="level-item">
-            <div class="field">
-                <p class="control">
-                    <a class="button" role="button" (click)="prev.next()">
-                        Previous
-                    </a>
-                </p>
+        <div class="level is-mobile">
+            <div class="level-item">
+                <div class="field">
+                    <p class="control">
+                        <a class="button" role="button" (click)="prev.next()">
+                            Previous
+                        </a>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="level-item">
-            <div class="field has-addons">
-                <p class="control">
-                    <grt-download-results [loading]="loadingDownload"></grt-download-results>
-                </p>
-                <p class="control" *ngIf="!loading">
-                    <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
-                        grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
-                        <span class="icon is-large">
-                            <i class="fas fa-file-alt"></i>
-                        </span>
-                    </a>
-                </p>
+            <div class="level-item">
+                <div class="field has-addons">
+                    <p class="control">
+                        <grt-download-results [loading]="loadingDownload"></grt-download-results>
+                    </p>
+                    <p class="control" *ngIf="!loading">
+                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
+                            grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
+                            <span class="icon is-large">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="level-item">
-            <div class="field">
-                <p class="control" grtBalloonPosition="down" grtBalloon="Print Results"
-                    [grtBalloonVisible]="loading ? false : undefined">
-                    <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
-                        <span class="icon is-large">
-                            <i class="fas fa-print"></i>
-                        </span>
-                    </a>
-                </p>
+            <div class="level-item">
+                <div class="field">
+                    <p class="control" grtBalloonPosition="down" grtBalloon="Print Results"
+                        [grtBalloonVisible]="loading ? false : undefined">
+                        <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
+                            <span class="icon is-large">
+                                <i class="fas fa-print"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="level-item">
-            <div class="field">
-                <p class="control" (click)="toggleContext()">
-                    <a class="button is-warning" role="button" grtBalloonLength="large" grtBalloonPosition="down"
-                        grtBalloon="Click to show the sentences directly before and after the hits."
-                        *ngIf="!retrieveContext">
-                        <span class="icon is-large">
-                            <i class="fas fa-comment-slash"></i>
-                        </span>
-                    </a>
-                    <a class="button is-primary" role="button" grtBalloonLength="large" grtBalloonPosition="down"
-                        grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
-                        <span class="icon is-large">
-                            <i class="fas fa-comment-dots"></i>
-                        </span>
-                    </a>
-                </p>
+            <div class="level-item">
+                <div class="field">
+                    <p class="control" (click)="toggleContext()">
+                        <a class="button is-warning" role="button" grtBalloonLength="large" grtBalloonPosition="down"
+                            grtBalloon="Click to show the sentences directly before and after the hits."
+                            *ngIf="!retrieveContext">
+                            <span class="icon is-large">
+                                <i class="fas fa-comment-slash"></i>
+                            </span>
+                        </a>
+                        <a class="button is-primary" role="button" grtBalloonLength="large" grtBalloonPosition="down"
+                            grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
+                            <span class="icon is-large">
+                                <i class="fas fa-comment-dots"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class="level-item">
-            <div class="field">
-                <p class="control">
-                    <a class="button is-primary" role="button" (click)="next.next()">
-                        Next
-                    </a>
-                </p>
+            <div class="level-item">
+                <div class="field">
+                    <p class="control">
+                        <a class="button is-primary" role="button" (click)="next.next()">
+                            Next
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
