@@ -52,15 +52,21 @@ export class DistributionListComponent implements OnInit, OnDestroy {
     constructor(
         private downloadService: DownloadService,
         private resultsService: ResultsService,
-        private stateService: StateService<GlobalState>    ) {
+        private stateService: StateService<GlobalState>) {
     }
 
     ngOnInit() {
         const components$ = this.stateService.state$.pipe(
-            switchMap(async state => ({
-                components: await this.getComponents(state.selectedTreebanks),
-                xpath: state.xpath
-            })));
+            switchMap(async state => {
+                const components = await this.getComponents(state.selectedTreebanks);
+                return {
+                    components: components.map(x => ({
+                        bank: x.bank,
+                        components: x.components.filter(c => !c.disabled)
+                    })).filter(x => x.components.length > 0),
+                    xpath: state.xpath
+                };
+            }));
         const totals$ = components$.pipe(
             switchMap(({ components, xpath }) => this.getTotals(components, xpath)));
 
