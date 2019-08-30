@@ -1,81 +1,128 @@
-<div class="notification is-warning">
-    <p>
-        This is a preview of the next version of GrETEL, developed by the Digital Humanities Lab at Utrecht University.
-        <strong>This is currently under active development!</strong> It includes additional functionality to
-        <a href="/gretel-upload">upload your own corpus</a>, faceted search, analysis and improved usability.
-    </p>
-    <p>
-        <em>All features are experimental and might break or change unexpectedly!</em>
-    </p>
-    <p>
-        Please
-        <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official stable version
-        </a> (developed by University of Leuven) if you want to use GrETEL for research purposes.
-    </p>
-</div>
-<div class="content">
-    <p>GrETEL stands for
-        <strong>Gr</strong>eedy
-        <strong>E</strong>xtraction of
-        <strong>T</strong>rees for
-        <strong>E</strong>mpirical
-        <strong>L</strong>inguistics. It is a user-friendly search engine for the exploitation of syntactically annotated coropra
-        or
-        <i>treebanks</i>. If you are new to GrETEL we recommend you to take a look at the
-        <a [routerLink]="['/documentation']">documentation</a>.
-    </p>
-</div>
 <div class="columns">
-    <div class="column">
-        <div class="card">
-            <header class="card header">
-                <a [routerLink]="['/example-based-search']" class="card-header-title">Example-based Search</a>
-            </header>
-            <div class="card-content">
-                <div class="content">
-                    <p>Enables you to use a natural language example as a starting point for searching a treebank. The query
-                        procedure consists of several steps, which allows you to define how similar the search results and
-                        the input example should be. In this way you can query a treebank without knowledge of the XPath
-                        query language, the tree representations, nor the exact grammar implementation used for the annotation
-                        of the trees.</p>
+    <div class="column is-8">
+        <div class="notification is-warning">
+            <p>
+                This is a preview of the next version of GrETEL, developed by the Digital Humanities Lab at Utrecht
+                University.
+                <strong>This is currently under active development!</strong> It includes additional functionality to
+                <a href="/gretel-upload">upload your own corpus</a>, faceted search, analysis and improved usability.
+            </p>
+            <p>
+                <em>All features are experimental and might break or change unexpectedly!</em>
+            </p>
+            <p>
+                Please
+                <a style="color: #505050;" href="http://gretel.ccl.kuleuven.be/">navigate to the official stable version
+                </a> (developed by University of Leuven) if you want to use GrETEL for research purposes.
+            </p>
+        </div>
+        <div class="content">
+            <p>GrETEL stands for
+                <strong>Gr</strong>eedy
+                <strong>E</strong>xtraction of
+                <strong>T</strong>rees for
+                <strong>E</strong>mpirical
+                <strong>L</strong>inguistics. It is a user-friendly search engine for the exploitation of syntactically
+                annotated coropra
+                or
+                <i>treebanks</i>. If you are new to GrETEL we recommend you to take a look at the
+                <a [routerLink]="['/documentation']">documentation</a>.
+            </p>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <div class="card">
+                    <header class="card header">
+                        <a [routerLink]="['/example-based-search']" class="card-header-title">Example-based Search</a>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p>Enables you to use a natural language example as a starting point for searching a
+                                treebank.
+                                The
+                                query
+                                procedure consists of several steps, which allows you to define how similar the search
+                                results
+                                and
+                                the input example should be. In this way you can query a treebank without knowledge of
+                                the
+                                XPath
+                                query language, the tree representations, nor the exact grammar implementation used for
+                                the
+                                annotation
+                                of the trees.</p>
+                            <p class="has-text-right">
+                                <a [routerLink]="['/example-based-search']">
+                                    <span>
+                                        Start
+                                    </span>
+                                    <span class="icon">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <header class="card header">
+                        <a [routerLink]="['/xpath-search']" class="card-header-title">XPath Search</a>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p>Enables you to query a treebank by means of an XPath query. This search mode is intended
+                                for
+                                experienced
+                                XPath users, as you need to build the XPath query yourself.</p>
+                            <p class="has-text-right">
+                                <a [routerLink]="['/xpath-search']">
+                                    <span>Start</span>
+                                    <span class="icon">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <header class="card header">
+                        <a [href]="uploadUrl" class="card-header-title">Corpus Upload</a>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <p>Allows you to upload your own corpus to GrETEL.</p>
+                            <p class="has-text-right">
+                                <a [href]="uploadUrl">
+                                    <span>
+                                        Start
+                                    </span>
+                                    <span class="icon">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="column">
-        <div class="card">
-            <header class="card header">
-                <a [routerLink]="['/xpath-search']" class="card-header-title">XPath Search</a>
-            </header>
-            <div class="card-content">
-                <div class="content">
-                    <p>Enables you to query a treebank by means of an XPath query. This search mode is intended for experienced
-                        XPath users, as you need to build the XPath query yourself.</p>
-                </div>
-            </div>
+        <div class="content">
+            <p>Please cite the following paper if you have used GrETEL for your research:</p>
         </div>
-    </div>
-    <div class="column">
-        <div class="card">
-            <header class="card header">
-                <a [href]="uploadUrl" class="card-header-title">Corpus Upload</a>
-            </header>
-            <div class="card-content">
-                <div class="content">
-                    <p>Allows you to upload your own corpus to GrETEL.</p>
-                </div>
-            </div>
-        </div>
+        <grt-paper-cite href="http://aclweb.org/anthology/W/W17/W17-7608.pdf">
+            <p> Jan Odijk, Martijn van der Klis and Sheean Spoel (2018).
+                <a href="http://aclweb.org/anthology/W/W17/W17-7608.pdf" target="_blank">
+                    <strong>&ldquo;Extensions to the GrETEL treebank query application&rdquo;</strong>
+                </a> In:
+                <em>Proceedings of the 16th International Workshop on Treebanks and Linguistic Theories</em>. Prague,
+                Czech Republic. pp. 46-55.</p>
+        </grt-paper-cite>
     </div>
 </div>
-<div class="content">
-    <p>Please cite the following paper if you have used GrETEL for your research:</p>
-</div>
-<grt-paper-cite href="http://aclweb.org/anthology/W/W17/W17-7608.pdf">
-    <p>	Jan Odijk, Martijn van der Klis and Sheean Spoel (2018).
-        <a href="http://aclweb.org/anthology/W/W17/W17-7608.pdf" target="_blank">
-            <strong>&ldquo;Extensions to the GrETEL treebank query application&rdquo;</strong>
-        </a> In:
-        <em>Proceedings of the 16th International Workshop on Treebanks and Linguistic Theories</em>. Prague,
-        Czech Republic. pp. 46-55.</p>
-</grt-paper-cite>

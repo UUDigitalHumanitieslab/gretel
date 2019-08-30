@@ -1,181 +1,276 @@
-<div class="content">
-    <p>This page gathers all sorts of documentation on GrETEL, such as tutorials, related tools, and frequently asked questions.
-        If you have any more questions, you can always consult the GrETEL
-        <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">project website</a> or you can
-        <a [routerLink] fragment="contact" grtBalloonPosition="down" grtBalloon="FAQ how to contact us">contact us</a>.</p>
-    <p>Please cite the following paper if you have used GrETEL for your research:</p>
-</div>
-<grt-paper-cite href="http://aclweb.org/anthology/W/W17/W17-7608.pdf">
-    <p> Jan Odijk, Martijn van der Klis and Sheean Spoel (2018).
-        <a href="http://aclweb.org/anthology/W/W17/W17-7608.pdf" target="_blank">
-            <strong>&ldquo;Extensions to the GrETEL treebank query application&rdquo;</strong>
-        </a> In:
-        <em>Proceedings of the 16th International Workshop on Treebanks and Linguistic Theories</em>. Prague, Czech Republic.
-        pp. 46-55.</p>
-</grt-paper-cite>
-
-<div class="section">
+<section class="section">
     <div class="columns">
-        <article class="column">
-            <h2 class="subtitle">Tutorials</h2>
-            <ul>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf" grtBalloonPosition="right" grtBalloon="Gretel slides" target="_blank">Slides</a>
-                </li>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial-handson.pdf" grtBalloonPosition="right" grtBalloon="Gretel exercises" target="_blank">Exercises</a>
-                </li>
-                <li>
-                    <a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf" grtBalloonPosition="right" grtBalloon="CLARIN Educational Module" target="_blank">CLARIN Educational Module</a>
-                </li>
-                <li>
-                    <a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html" grtBalloonPosition="right" grtBalloon="Combined Case Study MIMORE - GrETEL"
-                        target="_blank">Combined Case Study MIMORE - GrETEL</a>
-                </li>
-            </ul>
-        </article>
-        <article class="column">
-            <h2 class="subtitle">Information</h2>
-            <ul>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a>
-                </li>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and documentation</a>
-                </li>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications and Talks</a>
-                </li>
-            </ul>
-        </article>
-        <article class="column">
-            <h2 class="subtitle">Related tools</h2>
-            <ul>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans
-                    </a>
-                </li>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a>
-                </li>
-                <li>
-                    <a href="http://gretel.ccl.kuleuven.be/gretel-2.0" target="_blank">GrETEL 2.0</a>
-                </li>
-            </ul>
-        </article>
-    </div>
-</div>
-<h2 class="title">Frequently Asked Questions</h2>
+        <div class="column">
+            <div class="content">
+                <p>This page gathers all sorts of documentation on GrETEL, such as tutorials, related tools, and
+                    frequently asked questions.
+                    If you have any more questions, you can always consult the GrETEL
+                    <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">project website</a> or you can
+                    <a [routerLink] fragment="contact" grtBalloonPosition="down"
+                        grtBalloon="FAQ how to contact us">contact us</a>.</p>
+                <p>Please cite the following paper if you have used GrETEL for your research:</p>
+            </div>
+            <grt-paper-cite href="http://aclweb.org/anthology/W/W17/W17-7608.pdf">
+                <p> Jan Odijk, Martijn van der Klis and Sheean Spoel (2018).
+                    <a href="http://aclweb.org/anthology/W/W17/W17-7608.pdf" target="_blank">
+                        <strong>&ldquo;Extensions to the GrETEL treebank query application&rdquo;</strong>
+                    </a> In:
+                    <em>Proceedings of the 16th International Workshop on Treebanks and Linguistic Theories</em>.
+                    Prague, Czech Republic.
+                    pp. 46-55.</p>
+            </grt-paper-cite>
+            <br />
+            <div class="container">
 
-<section>
-    <h2 class="subtitle">Why is the output limited to 500 sentences?</h2>
-    <div class="content">
-        <p>GrETEL is free for students and academic research, but the corpora that are accessible via GrETEL are
-            <strong>not meant for distribution</strong>. In other words, we do not have the rights to give out the corpus as a whole.
-            If a user would search for a structure with only a
-            <code>cat="top"</code> node, they could literally download the whole corpus - which is not the intention of this project. If you would
-            like to obtain the raw corpus data (for academic or commercial use), you should contact the
-            <a href="http://ivdnt.org" target="_blank" grtBalloonPosition="down-right" grtBalloon="Go to the project page">INT</a>
-        </p>
-    </div>
+                <h2 class="title">Frequently Asked Questions</h2>
+                <h2 class="subtitle">Why is the output limited to 500 sentences?</h2>
+                <div class="content">
+                    <p>GrETEL is free for students and academic research, but the corpora that are accessible via GrETEL
+                        are
+                        <strong>not meant for distribution</strong>. In other words, we do not have the rights to give
+                        out
+                        the
+                        corpus as a whole.
+                        If a user would search for a structure with only a
+                        <code>cat="top"</code> node, they could literally download the whole corpus - which is not the
+                        intention
+                        of this project. If you would
+                        like to obtain the raw corpus data (for academic or commercial use), you should contact the
+                        <a href="http://ivdnt.org" target="_blank" grtBalloonPosition="down-right"
+                            grtBalloon="Go to the project page">INT</a>
+                    </p>
+                </div>
 
-    <h2 class="subtitle">For whom is GrETEL intended?</h2>
-    <div class="content">
-        <p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is interested in searching
-            through the Lassy Small, CGN, or SoNaR treebanks. The tool is especially useful if you want to look for
-            <em>specific linguistic patterns</em> in those corpora.</p>
-    </div>
+                <h2 class="subtitle">For whom is GrETEL intended?</h2>
+                <div class="content">
+                    <p>GrETEL is designed as a corpus query tool which means that it is useful for anyone who is
+                        interested
+                        in
+                        searching
+                        through the Lassy Small, CGN, or SoNaR treebanks. The tool is especially useful if you want to
+                        look
+                        for
+                        <em>specific linguistic patterns</em> in those corpora.</p>
+                </div>
 
-    <h2 class="subtitle" id="about-corpora">Where can I find more information about the corpora available in GrETEL?
-    </h2>
-    <div class="content">
-        <p>GrETEL currently provides access to three corpora: Lassy Small, CGN treebank, and SoNaR treebank. More information
-            on these corpora is provided on
-            <a href="http://gretel.ccl.kuleuven.be/project/docs.php#treebanks" target="_blank" grtBalloonPosition="down-left" grtBalloon="Go to the project page">GrETEL's project page</a>.</p>
-        <ul>
-            <li>
-                <a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank" grtBalloonPosition="down-left" grtBalloon="The project page of Lassy Small">Lassy Small
-                </a>
-                was the first corpus to be supported in GrETEL. It is a one-million words treebank that consists of written data. All of
-                its annotations have been manually checked and verified.
-            </li>
-            <li>
-                <a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm" target="_blank"
-                grtBalloonPosition="down-left" grtBalloon="The project page of Corpus Gesproken Nederlands">CGN treebank</a> is a treebank of one million words that consists of transcribed Dutch speech. All the provided
-                annotations have been manually checked and verified. CGN stands for "Corpus Gesproken Nederlands" (Spoken
-                Dutch Corpus). The CGN treebank is a syntactically enriched part of the 10-million word CGN corpus.
-            </li>
-            <li>
-                <a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank" grtBalloonPosition="down-left" grtBalloon="The project page of SoNaR">SoNaR treebank
-                </a> is the parsed version of the 500-million word SoNaR-500 corpus. It is a corpus that consists of 25 components
-                of written data. Because of its size, the syntactic annotations have not been manually verified.
-            </li>
-        </ul>
-    </div>
+                <h2 class="subtitle" id="about-corpora">Where can I find more information about the corpora available in
+                    GrETEL?
+                </h2>
+                <div class="content">
+                    <p>GrETEL currently provides access to three corpora: Lassy Small, CGN treebank, and SoNaR treebank.
+                        More
+                        information
+                        on these corpora is provided on
+                        <a href="http://gretel.ccl.kuleuven.be/project/docs.php#treebanks" target="_blank"
+                            grtBalloonPosition="down-left" grtBalloon="Go to the project page">GrETEL's project
+                            page</a>.
+                    </p>
+                    <ul>
+                        <li>
+                            <a href="http://www.let.rug.nl/~vannoord/Lassy/" target="_blank"
+                                grtBalloonPosition="down-left" grtBalloon="The project page of Lassy Small">Lassy Small
+                            </a>
+                            was the first corpus to be supported in GrETEL. It is a one-million words treebank that
+                            consists
+                            of
+                            written data. All of
+                            its annotations have been manually checked and verified.
+                        </li>
+                        <li>
+                            <a href="http://tst-centrale.org/images/stories/producten/documentatie/cgn_website/doc_English/topics/index.htm"
+                                target="_blank" grtBalloonPosition="down-left"
+                                grtBalloon="The project page of Corpus Gesproken Nederlands">CGN treebank</a> is a
+                            treebank
+                            of
+                            one million words that consists of transcribed Dutch speech. All the provided
+                            annotations have been manually checked and verified. CGN stands for "Corpus Gesproken
+                            Nederlands"
+                            (Spoken
+                            Dutch Corpus). The CGN treebank is a syntactically enriched part of the 10-million word CGN
+                            corpus.
+                        </li>
+                        <li>
+                            <a href="http://lands.let.ru.nl/projects/SoNaR/" target="_blank"
+                                grtBalloonPosition="down-left" grtBalloon="The project page of SoNaR">SoNaR treebank
+                            </a> is the parsed version of the 500-million word SoNaR-500 corpus. It is a corpus that
+                            consists of
+                            25 components
+                            of written data. Because of its size, the syntactic annotations have not been manually
+                            verified.
+                        </li>
+                    </ul>
+                </div>
 
-    <h2 class="subtitle" id="contact">How can I contact you?</h2>
-    <div class="content">
-        <p>This website and this tool were originally developed at the Centre for Computational Linguistics (CCL). The current
-            version is developed by the Digital Humanities Lab at Utrecht University. If you have any suggestions, questions,
-            or general feedback you are welcome to give us a ring, or send us an email. You can find contact information
-            on
-            <a href="https://dig.hum.uu.nl/" target="_blank">Digital Humanities Lab's website</a> or in the footer of this website.</p>
-    </div>
+                <h2 class="subtitle" id="contact">How can I contact you?</h2>
+                <div class="content">
+                    <p>This website and this tool were originally developed at the Centre for Computational Linguistics
+                        (CCL).
+                        The current
+                        version is developed by the Digital Humanities Lab at Utrecht University. If you have any
+                        suggestions,
+                        questions,
+                        or general feedback you are welcome to give us a ring, or send us an email. You can find contact
+                        information
+                        on
+                        <a href="https://dig.hum.uu.nl/" target="_blank">Digital Humanities Lab's website</a> or in the
+                        footer
+                        of this website.</p>
+                </div>
 
-    <h2 class="subtitle">Why does XPath generated for SoNaR only have one leading slash, when the code for LASSY and CGN has two?
-    </h2>
-    <div class="content">
-        <p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR database on the other.
-            An XPath pattern that begins with a double slash makes sure that the pattern is searched for in all descendants
-            of the current node (or implied root), whereas a single slash restricts the search to its direct children. How
-            that difference is relevant for SoNaR has been described in the paper cited below.</p>
+                <h2 class="subtitle">Why does XPath generated for SoNaR only have one leading slash, when the code for
+                    LASSY
+                    and
+                    CGN has two?
+                </h2>
+                <div class="content">
+                    <p>It has to do with how XPath structures work on the one hand, and how we optimised the SoNaR
+                        database
+                        on
+                        the other.
+                        An XPath pattern that begins with a double slash makes sure that the pattern is searched for in
+                        all
+                        descendants
+                        of the current node (or implied root), whereas a single slash restricts the search to its direct
+                        children. How
+                        that difference is relevant for SoNaR has been described in the paper cited below.</p>
 
-        <grt-paper-cite [href]='"http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf"'>
-            <p>Vincent Vandeghinste and Liesbeth Augustinus. (2014).
-                <a href="http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf" grtBalloonPosition="down" grtBalloon="Download 'Making Large Treebanks Searchable. The SoNaR case.'"
-                    target="_blank">
-                    <strong>"Making Large Treebanks Searchable. The SoNaR case"</strong>
-                </a>. In: Marc Kupietz, Hanno Biber, Harald Lüngen, Piotr Bański, Evelyn Breiteneder, Karlheinz Mörth, Andreas
-                Witt &amp; Jani Takhsha (eds.),
-                <em>Proceedings of the LREC2014 2nd workshop on Challenges in the management of large corpora (CMLC-2)</em>.
-                Reykjavik, Iceland. pp. 15-20.
-            </p>
-        </grt-paper-cite>
-    </div>
-    <h2 class="subtitle">What is new in version 3?</h2>
-    <div class="content">
-        <p>In addition to an overall design update, major changes include a more intuitive query builder in the example-based
-            search mode and a visualizer for syntax trees that is compatible with all modern browsers. Moreover, the results
-            are presented as soon as they are found, so you can browse the matching sentences before the treebank search
-            is completed. Furthermore it is possible to query the 500-million word SoNaR treebank in a similar fashion as
-            the two one-million word treebanks CGN and LASSY Small.</p>
-    </div>
-    <h2 class="subtitle">What is new in version 4?</h2>
-    <div class="content">
-        <p>A rewrite of the user interface. Links to results can now be shared and navigation is more flexible, quicker and more reliable.
-            The entry of XPATH has been updated with a highlighted editor, performing live validation and showing suggestions.
-            It's also possible now to show the context of a search (the preceding and following sentence) for an XPATH-based
-            search. We've also added an application for uploading new corpora. Furthermore filtering has been added to be
-            able to filter results by metadata. Finally a completely new analysis module has been added allowing the properties
-            of syntax nodes to be compared using a graphical interface.</p>
-    </div>
-    <h2 class="subtitle">How are properties analysed?</h2>
-    <div class="content">
-        <p>Only the properties of the first node matched by an XPATH variable is returned for analysis. For example:</p>
+                    <grt-paper-cite [href]='"http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf"'>
+                        <p>Vincent Vandeghinste and Liesbeth Augustinus. (2014).
+                            <a href="http://gretel.ccl.kuleuven.be/docs/Vandeghinste2014-GrETELSoNaR-LREC.pdf"
+                                grtBalloonPosition="down"
+                                grtBalloon="Download 'Making Large Treebanks Searchable. The SoNaR case.'"
+                                target="_blank">
+                                <strong>"Making Large Treebanks Searchable. The SoNaR case"</strong>
+                            </a>. In: Marc Kupietz, Hanno Biber, Harald Lüngen, Piotr Bański, Evelyn Breiteneder,
+                            Karlheinz
+                            Mörth, Andreas
+                            Witt &amp; Jani Takhsha (eds.),
+                            <em>Proceedings of the LREC2014 2nd workshop on Challenges in the management of large
+                                corpora
+                                (CMLC-2)</em>.
+                            Reykjavik, Iceland. pp. 15-20.
+                        </p>
+                    </grt-paper-cite>
+                </div>
+                <h2 class="subtitle">What is new in version 3?</h2>
+                <div class="content">
+                    <p>In addition to an overall design update, major changes include a more intuitive query builder in
+                        the
+                        example-based
+                        search mode and a visualizer for syntax trees that is compatible with all modern browsers.
+                        Moreover,
+                        the
+                        results
+                        are presented as soon as they are found, so you can browse the matching sentences before the
+                        treebank
+                        search
+                        is completed. Furthermore it is possible to query the 500-million word SoNaR treebank in a
+                        similar
+                        fashion as
+                        the two one-million word treebanks CGN and LASSY Small.</p>
+                </div>
+                <h2 class="subtitle">What is new in version 4?</h2>
+                <div class="content">
+                    <p>A rewrite of the user interface. Links to results can now be shared and navigation is more
+                        flexible,
+                        quicker and more reliable.
+                        The entry of XPATH has been updated with a highlighted editor, performing live validation and
+                        showing
+                        suggestions.
+                        It's also possible now to show the context of a search (the preceding and following sentence)
+                        for an
+                        XPATH-based
+                        search. We've also added an application for uploading new corpora. Furthermore filtering has
+                        been
+                        added
+                        to be
+                        able to filter results by metadata. Finally a completely new analysis module has been added
+                        allowing
+                        the
+                        properties
+                        of syntax nodes to be compared using a graphical interface.</p>
+                </div>
+                <h2 class="subtitle">How are properties analysed?</h2>
+                <div class="content">
+                    <p>Only the properties of the first node matched by an XPATH variable is returned for analysis. For
+                        example:
+                    </p>
 
-        <p>
-            A user searches for
-            <code>//node[node]</code>. Two variables are found in this query:
-            <code>$node1 = //node</code> and
-            <code>$node2 = $node1[node]</code>. A sentence with the following structure would match this query:
-        </p>
-        <pre>node[np] (node[det] node[noun])</pre>
-        <p>The node found for
-            <code>$node1</code> will then be
-            <code>node[np]</code>. The node found for
-            <code>$node2</code> will then be
-            <code>node[det]</code>. The properties of
-            <code>node[noun]</code> will not be available for analysis using this query. When searching for a more specific structure, this is unlikely
-            to occur.</p>
+                    <p>
+                        A user searches for
+                        <code>//node[node]</code>. Two variables are found in this query:
+                        <code>$node1 = //node</code> and
+                        <code>$node2 = $node1[node]</code>. A sentence with the following structure would match this
+                        query:
+                    </p>
+                    <pre>node[np] (node[det] node[noun])</pre>
+                    <p>The node found for
+                        <code>$node1</code> will then be
+                        <code>node[np]</code>. The node found for
+                        <code>$node2</code> will then be
+                        <code>node[det]</code>. The properties of
+                        <code>node[noun]</code> will not be available for analysis using this query. When searching for
+                        a
+                        more
+                        specific structure, this is unlikely
+                        to occur.</p>
+                </div>
+            </div>
+        </div>
+        <div class="column is-3">
+            <aside class="menu">
+
+                <p class="menu-label">Tutorials</p>
+                <ul class="menu-list">
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial.pdf" grtBalloonPosition="right"
+                            grtBalloon="Gretel slides" target="_blank">Slides</a>
+                    </li>
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/docs/GrETEL2-tutorial-handson.pdf"
+                            grtBalloonPosition="right" grtBalloon="Gretel exercises" target="_blank">Exercises</a>
+                    </li>
+                    <li>
+                        <a href="http://nederbooms.ccl.kuleuven.be/documentation/EducationalModule.pdf"
+                            grtBalloonPosition="right" grtBalloon="CLARIN Educational Module" target="_blank">CLARIN
+                            Educational Module</a>
+                    </li>
+                    <li>
+                        <a href="http://www.meertens.knaw.nl/mimore/educational_module/case_study_mimore_gretel.html"
+                            grtBalloonPosition="right" grtBalloon="Combined Case Study MIMORE - GrETEL"
+                            target="_blank">Combined Case Study MIMORE - GrETEL</a>
+                    </li>
+                </ul>
+
+                <p class="menu-label">Information</p>
+                <ul class="menu-list">
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/project" target="_blank">Project website</a>
+                    </li>
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/project/docs.php" target="_blank">Manuals and
+                            documentation</a>
+                    </li>
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/project/publications.php" target="_blank">Publications
+                            and Talks</a>
+                    </li>
+                </ul>
+
+                <p class="menu-label">Related tools</p>
+                <ul class="menu-list">
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/afribooms" target="_blank">GrETEL 4 Afrikaans
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/poly-gretel" target="_blank">Poly-GrETEL</a>
+                    </li>
+                    <li>
+                        <a href="http://gretel.ccl.kuleuven.be/gretel-2.0" target="_blank">GrETEL 2.0</a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
     </div>
 </section>

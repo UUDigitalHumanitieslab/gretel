@@ -1,19 +1,24 @@
-<div class="content">
-    <p>
-        Which treebank do you want to query? Click on the treebank name to see its different components. If you would
-        like to get more information on these treebanks, you can find the project websites in
-        <a [routerLink]="['/','documentation']" fragment="about-corpora" target="_blank" grtBalloonPosition="down"
-            grtBalloon="More information on corpora">our FAQ</a>.
-    </p>
-    <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties some
-        sentences could not be included in the system, so the sentence and word counts may slightly differ from the
-        official treebank counts.
-    </p>
-</div>
-
 <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
     Select Treebanks
 </h1>
+<div class="columns">
+    <div class="column">
+        <p>
+            Which treebank do you want to query? Click on the treebank name to see its different components. If you
+            would
+            like to get more information on these treebanks, you can find the project websites in
+            <a [routerLink]="['/','documentation']" fragment="about-corpora" target="_blank" grtBalloonPosition="down"
+                grtBalloon="More information on corpora">our FAQ</a>.
+        </p>
+    </div>
+    <div class="column">
+        <p>You can search an entire treebank, or select just one or more components. Due to pre-processing difficulties
+            some
+            sentences could not be included in the system, so the sentence and word counts may slightly differ from the
+            official treebank counts.
+        </p>
+    </div>
+</div>
 
 <ng-container *ngFor="let treebank of treebanks">
     <div class="field">
