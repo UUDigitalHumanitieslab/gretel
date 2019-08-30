@@ -4,8 +4,9 @@
  * Databases containing grinded data ofter refer each other.
  * Retrieve the recursive includes for this database (result does not include this db itself).
  *
- * @param string $database
+ * @param string  $database
  * @param Session $session
+ *
  * @return string[]
  */
 function getMoreIncludes($database, $session)
@@ -27,6 +28,7 @@ function getMoreIncludes($database, $session)
             $databases[] = $file;
         }
     }
+
     return $databases;
 }
 
@@ -37,10 +39,18 @@ function getMoreIncludes($database, $session)
  *
  * @param string $corpus
  * @param string $component
+ *
  * @return string[]
  */
-function getUngrindedDatabases($corpus, $component) {
-    $databasesForComponent = file(ROOT_PATH."/treebank-parts/$corpus/$component.lst", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+function getUngrindedDatabases($corpus, $component)
+{
+    $path = ROOT_PATH."/treebank-parts/$corpus/$component.lst";
+    if (file_exists($path)) {
+        $databasesForComponent = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    } else {
+        $databasesForComponent = false;
+    }
+
     return $databasesForComponent ?: array($component);
 }
 
@@ -51,18 +61,21 @@ function getUngrindedDatabases($corpus, $component) {
  * This function resolves the databases to use and sets the global $needRegularGrinded depending
  * on whether to use dbs containing the normal (true) or grinded data (false).
  *
- * @param string $corpus
- * @param string $component
+ * @param string       $corpus
+ * @param string       $component
  * @param string|false $bf
+ *
  * @return string[]
  */
-function getGrindedDatabases($corpus, $component, $bf) {
+function getGrindedDatabases($corpus, $component, $bf)
+{
     // TODO factor out $needRegularGrinded.
     global $cats, $needRegularGrinded;
 
     // Depending on the xpath sometimes searching the normal data is still faster.
     if (!$bf || $bf === 'ALL') {
         $needRegularGrinded = true;
+
         return getUngrindedDatabases($corpus, $component);
     }
 
@@ -79,7 +92,6 @@ function getGrindedDatabases($corpus, $component, $bf) {
         $databases[] = $component.$bf;
     }
 
-
     $serverInfo = getServerInfo($corpus, $component);
     $session = new Session($serverInfo['machine'], $serverInfo['port'], $serverInfo['username'], $serverInfo['password']);
 
@@ -87,12 +99,16 @@ function getGrindedDatabases($corpus, $component, $bf) {
     $seenDatabases = array();
     while (!empty($databases)) {
         $database = array_pop($databases);
-        if (array_key_exists($database, $seenDatabases)) { continue; }
-        if ($session->query("db:exists('$database')")->execute() == 'false') { continue; }
+        if (array_key_exists($database, $seenDatabases)) {
+            continue;
+        }
+        if ($session->query("db:exists('$database')")->execute() == 'false') {
+            continue;
+        }
 
         $seenDatabases[$database] = true;
 
-        foreach(getMoreIncludes($database, $session) as $newdb) {
+        foreach (getMoreIncludes($database, $session) as $newdb) {
             $databases[] = $newdb;
         }
     }
@@ -110,26 +126,29 @@ function getGrindedDatabases($corpus, $component, $bf) {
  * @param string $corpus
  * @param string $component
  * @param string $xpath
+ *
  * @return string[]
  */
-function getDatabases($corpus, $component, $xpath) {
+function getDatabases($corpus, $component, $xpath)
+{
     if (!isGrinded($corpus)) {
         return getUngrindedDatabases($corpus, $component);
     }
 
     // Now for the grinded case:
     $bf = xpathToBreadthFirst($xpath);
+
     return getGrindedDatabases($corpus, $component, $bf);
 }
 
 /**
- * @param string $corpus the corpus we're searching
- * @param string $component the component we're searching
- * @param string[] $databases the databases that remain to be searched in this component
- * @param int $endPosIteration page number to return
- * @param Session $session the basex session
- * @param int $searchlimit
- * @param array $variables An array with variables to return. Each element should contain name and path.
+ * @param string   $corpus          the corpus we're searching
+ * @param string   $component       the component we're searching
+ * @param string[] $databases       the databases that remain to be searched in this component
+ * @param int      $endPosIteration page number to return
+ * @param Session  $session         the basex session
+ * @param int      $searchlimit
+ * @param array    $variables       An array with variables to return. Each element should contain name and path.
  */
 function getSentences($corpus, $component, $databases, $endPosIteration, $session, $searchLimit, $xpath, $context, $variables = null)
 {
