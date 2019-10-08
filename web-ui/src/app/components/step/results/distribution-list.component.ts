@@ -164,13 +164,13 @@ export class DistributionListComponent implements OnInit, OnDestroy {
         bank: Treebank,
         components: TreebankComponent[]
     }[]> {
-        const banks = selection.corpora.map(corpus => corpus.corpus.treebank);
-        return Promise.all(banks.map(async (bank) => {
-            const treebank = await bank;
+        const selectedCorpora = selection.corpora.map(corpus => corpus.corpus);
+        return Promise.all(selectedCorpora.map(async (selectedCorpus) => {
+            const treebank = await selectedCorpus.treebank;
             const components = await treebank.details.components();
             return {
                 bank: treebank,
-                components: Object.values(components)
+                components: selectedCorpus.components.map(c => components[c])
             };
         }));
     }

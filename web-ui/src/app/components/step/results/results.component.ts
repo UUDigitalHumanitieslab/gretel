@@ -45,19 +45,19 @@ type HitWithOrigin = Hit & {
     componentDisplayName: string;
 };
 
-interface ResultsInfo {
+interface HiddenComponents {
+    [componentId: string]: boolean;
+}
+
+interface HideSettings {
     [provider: string]: {
         [corpus: string]: {
-            hidden: boolean;
-            loading: boolean;
-            hits: HitWithOrigin[];
-            error?: HttpErrorResponse;
-            hiddenComponents: {
-                [componentId: string]: boolean
-            }
+            hiddenComponents: HiddenComponents;
         }
     };
 }
+
+type HidableHit = HitWithOrigin & { hidden: boolean };
 
 @Component({
     selector: 'grt-results',
@@ -70,9 +70,10 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
 
     /** The hits and their visibility status */
-    public info: ResultsInfo = {};
-    public hiddenHits = 0;
-    public filteredResults: Hit[] = [];
+    public errors: { message: string, corpus: string }[];
+    public hidden: HideSettings = {};
+    public hiddenCount = 0;
+    public filteredResults: HidableHit[] = [];
     public stepType = StepType.Results;
 
     @Input('xpath')
@@ -183,8 +184,8 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
                             // info reset on selected treebanks changing (see below).
                             this.loading = true;
                             this.filteredResults = [];
-                            this.info = {};
-                            this.hiddenHits = 0;
+                            this.errors = [];
+                            this.hiddenCount = 0;
                             break;
                         }
                         case 'finish': {
@@ -193,41 +194,24 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
                         }
                     }
                 } else {
-                    if (!this.info[r.provider]) {
-                        this.info[r.provider] = {};
-                    }
-                    let info = this.info[r.provider][r.corpus.name];
-                    if (!info) {
-                        this.info[r.provider][r.corpus.name] = info = {
-                            hidden: false,
-                            hiddenComponents: {},
-                            hits: [],
-                            loading: true
-                        };
-                    }
-
                     switch (r.result.kind) {
                         case NotificationKind.COMPLETE: {
                             // treebank has finished loading
-                            info.loading = false;
                             break;
                         }
                         case NotificationKind.ERROR: {
                             // treebank has errored out!
-                            info.loading = false;
-                            info.error = r.result.error;
+                            this.errors.push({
+                                corpus: r.corpus.name,
+                                message: r.result.error.message
+                            });
                             break;
                         }
                         case NotificationKind.NEXT: {
                             // some new hits!
-                            // i.hits.push(...r.result.value.hits);
-                            if (!info.hidden) {
-                                const filtered = info.hidden
-                                    ? []
-                                    : r.result.value.hits.filter(h => !info.hiddenComponents[h.component]);
-                                this.filteredResults.push(...filtered);
-                                this.hiddenHits += filtered.length - r.result.value.hits.length;
-                            }
+                            const [newHits, newHidden] = this.hideHits(r.result.value.hits);
+                            this.filteredResults.push(...newHits);
+                            this.hiddenCount += newHidden;
                             break;
                         }
                     }
@@ -324,12 +308,10 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
      * Returns the unique file names from the filtered results sorted on name.
      */
     public getFileNames() {
-        return Object.values(this.info)
-            .flatMap(provider => Object.values(provider))
-            .filter(c => !c.hidden) // filter hidden banks
-            .flatMap(c => c.hits.filter(h => !c.hiddenComponents[h.component])) // extract hits, filter hidden components
-            .map(c => c.fileId) // extract names
-            .sort();
+        return [...new Set(this.filteredResults
+            .filter(h => !h.hidden)
+            .map(f => f.fileId) // extract names
+            .sort())];
     }
 
     public copyXPath() {
@@ -342,12 +324,28 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     }
 
     public hideComponents({ provider, corpus, components }: { provider: string, corpus: string, components: string[] }) {
-        const c = this.info[provider][corpus];
-        Object.keys(c.hiddenComponents).forEach(comp => {
-            c.hiddenComponents[comp] = false;
-        });
-        components.forEach(comp => c.hiddenComponents[comp] = true);
-        this.filterHits();
+        if (!this.hidden) {
+            this.hidden = {};
+        }
+        if (!this.hidden[provider]) {
+            this.hidden[provider] = {};
+        }
+        const corpusInfo = this.hidden[provider][corpus];
+        if (corpusInfo) {
+            Object.keys(corpusInfo.hiddenComponents).forEach(comp => {
+                corpusInfo.hiddenComponents[comp] = false;
+            });
+            components.forEach(comp => corpusInfo.hiddenComponents[comp] = true);
+        } else {
+            this.hidden[provider][corpus] = {
+                hiddenComponents: components.reduce((dict, component) => {
+                    dict[component] = true;
+                    return dict;
+                }, {} as HiddenComponents)
+            };
+        }
+
+        [this.filteredResults, this.hiddenCount] = this.hideHits();
     }
 
     public filterChange(filterValues: FilterValues) {
@@ -535,24 +533,23 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     }
 
     /**
-     * Filter out the hits which are part of hidden components or banks and update the hiddenHits counter
+     * Mark the hits which are part of hidden components or banks and
+     * return a count of the hidden hits.
      */
-    private filterHits() {
-        this.hiddenHits = 0;
-        this.filteredResults =
-            Object.values(this.info)
-                .flatMap(provider => Object.values(provider))
-                .filter(corpus => {
-                    if (corpus.hidden) {
-                        this.hiddenHits += corpus.hits.length;
-                    }
-                    return !corpus.hidden;
-                })
-                .flatMap(q => {
-                    const filtered = q.hits.filter(h => !q.hiddenComponents[h.component]);
-                    this.hiddenHits += q.hits.length - filtered.length;
-                    return filtered;
-                });
+    private hideHits(hits: HitWithOrigin[] = this.filteredResults): [HidableHit[], number] {
+        let count = 0;
+        const marked = hits.map(result => {
+            const hiddenCorpora = this.hidden && this.hidden[result.provider];
+            const component = hiddenCorpora && hiddenCorpora[result.corpus.name];
+            const hidden = component && component.hiddenComponents &&
+                component.hiddenComponents[result.component];
+            if (hidden) {
+                count++;
+            }
+            return Object.assign({}, result, { hidden });
+        });
+
+        return [marked, count];
     }
 
     public getWarningMessage() {

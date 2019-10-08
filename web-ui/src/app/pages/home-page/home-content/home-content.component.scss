@@ -1,0 +1,5 @@
+@import '../../../../colors';
+
+.card + .card {
+    margin-top: $block-spacing;
+}

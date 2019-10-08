@@ -91,7 +91,8 @@
 <div class="level">
     <div class="level-left">
         <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
-            Results: {{filteredResults.length}}<ng-container *ngIf="hiddenHits > 0"> ({{hiddenHits}} hidden)
+            Results: {{filteredResults.length - hiddenCount}}<ng-container *ngIf="hiddenCount > 0"> ({{hiddenCount}}
+                hidden)
             </ng-container>
         </h1>
     </div>
@@ -173,7 +174,7 @@
         </div>
     </div>
     <div class="column">
-        <p-table *ngIf="filteredResults.length > 0 else warning" [columns]="columns" [value]="filteredResults"
+        <p-table *ngIf="filteredResults.length > hiddenCount else warning" [columns]="columns" [value]="filteredResults"
             [resizableColumns]="true" styleClass="bulma">
             <ng-template pTemplate="colgroup" let-columns>
                 <colgroup>
@@ -188,7 +189,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                <tr>
+                <tr *ngIf="!rowData.hidden">
                     <td *ngFor="let col of columns" class="ui-resizable-column">
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
@@ -209,22 +210,21 @@
         </p-table>
 
         <ng-template #warning>
-            <div *ngIf="!loading && hiddenHits === 0" class="notification is-warning">
+            <div *ngIf="!loading && hiddenCount === 0" class="notification is-warning">
                 <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
                     with another treebank, other xpath-query or change the filters.</ng-container>
                 <ng-template #noActiveFilters>No results found, please try again with another treebank or other
                     xpath-query.</ng-template>
             </div>
+            <div *ngIf="hiddenCount > 0 && hiddenCount === filteredResults.length" class="notification">
+                All results are hidden.
+            </div>
         </ng-template>
 
-        <ng-container *ngFor="let p of info | keyvalue">
-            <ng-container *ngFor="let b of p.value | keyvalue">
-                <div *ngIf="b.value.error" class="notification is-danger">
-                    Error retrieving results for {{b.key}}: <br>
-                    {{b.value.error.message}}
-                </div>
-            </ng-container>
-        </ng-container>
+        <div *ngFor="let error of errors" class="notification is-danger">
+            Error retrieving results for {{error.corpus}}: <br>
+            {{error.message}}
+        </div>
     </div>
 </div>
 <grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
