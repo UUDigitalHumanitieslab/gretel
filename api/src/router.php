@@ -113,7 +113,9 @@ $router->map('POST', '/results', function () {
     // (usually ${corpus}_ID_${component})
     // It is pingponged with the client so we can keep track where we are in the searching.
     /** @var string[]|null $databases */
-    $databases = isset($data['remainingDatabases']) ? $data['remainingDatabases'] : getDatabases($corpus, $components[0], $xpath);
+    $databases = isset($data['remainingDatabases'])
+        ? $data['remainingDatabases']
+        : null;
 
     // Some xpaths are faster on the plain data even in grinded corpora
     // This variable indicates that this is one of those edge cases.
@@ -131,10 +133,10 @@ $router->map('POST', '/results', function () {
         $xpath,
         $context,
         $corpus,
-        $components[0],
+        $components,
         $databases,
         $iteration,
-            isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
+        isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
             ? $data['searchLimit']
             : $searchLimit,
         $variables
@@ -143,17 +145,9 @@ $router->map('POST', '/results', function () {
     if ($results['success']) {
         // append the actual search limit from the configuration
         $results['searchLimit'] = $searchLimit;
-        // If done with current components (remainingDatabases finished)
-        // Remove it from the list and get the databases for the next components
-        if (!$results['remainingDatabases']) {
-            array_shift($components);
-            $results['remainingDatabases'] = isset($components[0]) ? getDatabases($corpus, $components[0], $xpath) : array();
-        }
-        $results['remainingComponents'] = $components;
-
         $results['needRegularGrinded'] = $needRegularGrinded;
         if ($results['endPosIteration'] * $flushLimit >= $searchLimit) {
-            // clear the remaining databases to signal the search of this component is done
+            // clear the remaining databases to signal the search is done
             $results['remainingDatabases'] = array();
             $results['remainingComponents'] = array();
         }
