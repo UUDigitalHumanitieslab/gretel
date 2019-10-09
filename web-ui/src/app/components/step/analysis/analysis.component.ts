@@ -11,6 +11,7 @@ import 'pivottable';
 
 import { PathVariable, ReconstructorService } from 'lassy-xpath/ng';
 
+import { animations } from '../../../animations';
 import {
     AnalysisService,
     ResultsService,
@@ -28,6 +29,7 @@ import { StepComponent } from '../step.component';
 import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 
 @Component({
+    animations,
     selector: 'grt-analysis',
     templateUrl: './analysis.component.html',
     styleUrls: ['./analysis.component.scss']

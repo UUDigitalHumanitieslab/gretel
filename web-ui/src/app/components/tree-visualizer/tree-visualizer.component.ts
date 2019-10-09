@@ -14,6 +14,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 import * as $ from 'jquery';
 
+import { animations } from '../../animations';
 import { DownloadService, ParseService } from '../../services/_index';
 import './tree-visualizer';
 
@@ -28,6 +29,7 @@ interface Metadata {
 }
 
 @Component({
+    animations,
     selector: 'grt-tree-visualizer',
     templateUrl: './tree-visualizer.component.html',
     styleUrls: ['./tree-visualizer.component.scss']

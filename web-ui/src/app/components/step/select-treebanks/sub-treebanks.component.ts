@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
+import { animations } from '../../../animations';
 import { TreebankSelectionService } from '../../../services/_index';
 import { TreebankComponent, ComponentGroup, FuzzyNumber, Treebank, TreebankComponents, TreebankSelection } from '../../../treebank';
 
@@ -14,6 +15,7 @@ interface ComponentSelection {
 }
 
 @Component({
+    animations,
     selector: 'grt-sub-treebanks',
     templateUrl: './sub-treebanks.component.html',
     styleUrls: ['./sub-treebanks.component.scss']

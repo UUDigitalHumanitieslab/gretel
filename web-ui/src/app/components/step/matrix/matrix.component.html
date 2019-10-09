@@ -10,13 +10,13 @@
         <tbody>
             <ng-container *ngFor="let option of options">
                 <tr *ngIf="!option.advanced || showAdvanced">
-                    <th>
+                    <th [@fade]>
                         {{option.label}}
                         <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="{{option.description}}">
                             <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                         </label>
                     </th>
-                    <td *ngFor="let token of indexedTokens" (click)="setTokenPart(token.index, option)">
+                    <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token.index, option)">
                         <input type="radio" [checked]="tokenValues[token.index] == option" [disabled]="isCustomXPath">
                     </td>
                 </tr>

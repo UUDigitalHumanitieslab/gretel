@@ -1,13 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { StepComponent } from '../step.component';
-import { TreebankService } from '../../../services/treebank.service';
+
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { StateService, TreebankSelectionService } from '../../../services/_index';
+
+import { animations } from '../../../animations';
 import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 import { Treebank, TreebankSelection } from '../../../treebank';
+import { StateService, TreebankService, TreebankSelectionService } from '../../../services/_index';
+import { StepComponent } from '../step.component';
 
 @Component({
+    animations,
     selector: 'grt-select-treebanks',
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']

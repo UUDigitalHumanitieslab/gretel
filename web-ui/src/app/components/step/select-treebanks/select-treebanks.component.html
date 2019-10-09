@@ -28,7 +28,7 @@
             <ng-container *ngIf="treebank.description">: <em>{{treebank.description}}</em></ng-container>
         </label>
     </div>
-    <div *ngIf="treebank.selected" class="box-is-shadowless">
+    <div *ngIf="treebank.selected" class="box-is-shadowless" [@slideDown]>
         <grt-sub-treebanks [treebank]="treebank"></grt-sub-treebanks>
     </div>
 </ng-container>

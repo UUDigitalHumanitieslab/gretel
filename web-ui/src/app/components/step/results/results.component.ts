@@ -18,6 +18,7 @@ import {
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
 
+import { animations } from '../../../animations';
 import {
     DownloadService,
     FilterByXPath,
@@ -60,6 +61,7 @@ interface HideSettings {
 type HidableHit = HitWithOrigin & { hidden: boolean };
 
 @Component({
+    animations,
     selector: 'grt-results',
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']

@@ -28,6 +28,7 @@
     }
 
     .xpath {
+
         // style the xpath display to mark the draggable nodes
         .node-name {
             background: rgba($primary, 0);
@@ -43,6 +44,15 @@
             cursor: move;
             opacity: 0.8;
         }
+    }
+}
+
+.analysis-box {
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    &.box {
+        opacity: 1;
     }
 }
 

@@ -1,4 +1,4 @@
-<div class="notification is-primary explanation" *ngIf="renderCount && showExplanation">
+<div class="notification is-primary explanation" *ngIf="renderCount && showExplanation" [@slideDown]>
     <button class="delete" (click)="showExplanation = false"></button>
     <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to
         analyse its properties.</p>
@@ -32,7 +32,7 @@
             (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
     </div>
 </div>
-<div class="modal is-active" *ngIf="selectedVariable">
+<div class="modal is-active" *ngIf="selectedVariable" [@slideDown]>
     <div class="modal-background"></div>
     <div class="modal-content">
         <div class="box">
@@ -75,9 +75,9 @@
         </div>
     </div>
 </div>
-<div class="box">
-    <div class="content">
-        <p *ngIf="renderCount">Click on a cell in the table to view those documents.</p>
+<div class="analysis-box" [ngClass]="{'box': renderCount}">
+    <div class="content" [@slideDown] *ngIf="renderCount">
+        <p>Click on a cell in the table to view those documents.</p>
     </div>
     <div class="analysis-component"></div>
 </div>

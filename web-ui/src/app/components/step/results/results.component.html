@@ -167,7 +167,7 @@
 </div>
 <grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
-    <div class="column is-one-third is-hidden-print" *ngIf="filters.length">
+    <div class="column is-one-third is-hidden-print" *ngIf="filters.length" [@fade]>
         <div class="filter">
             <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)">
             </grt-filters>
@@ -189,7 +189,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                <tr *ngIf="!rowData.hidden">
+                <tr *ngIf="!rowData.hidden" [@fade]>
                     <td *ngFor="let col of columns" class="ui-resizable-column">
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
@@ -210,13 +210,13 @@
         </p-table>
 
         <ng-template #warning>
-            <div *ngIf="!loading && hiddenCount === 0" class="notification is-warning">
+            <div [@slideDown] *ngIf="!loading && hiddenCount === 0" class="notification is-warning">
                 <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
                     with another treebank, other xpath-query or change the filters.</ng-container>
                 <ng-template #noActiveFilters>No results found, please try again with another treebank or other
                     xpath-query.</ng-template>
             </div>
-            <div *ngIf="hiddenCount > 0 && hiddenCount === filteredResults.length" class="notification">
+            <div [@slideDown] *ngIf="hiddenCount > 0 && hiddenCount === filteredResults.length" class="notification">
                 All results are hidden.
             </div>
         </ng-template>
