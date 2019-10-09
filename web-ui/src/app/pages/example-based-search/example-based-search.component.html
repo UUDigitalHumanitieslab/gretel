@@ -21,13 +21,6 @@
     </grt-parse>
     <grt-matrix
         *ngSwitchCase="2"
-
-        [attributes]="globalState.attributes"
-        [isCustomXPath]="globalState.isCustomXPath"
-        [tokens]="globalState.tokens"
-        [xpath]="globalState.xpath"
-        [subTreeXml]="globalState.subTreeXml"
-
         (changeValid)="setValid($event)"
         (changeValue)="updateMatrix($event)">
     </grt-matrix>

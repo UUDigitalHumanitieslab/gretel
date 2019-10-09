@@ -1,10 +1,12 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
+
+import { ValueEvent } from 'lassy-xpath/ng';
 
 import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
-import { ValueEvent } from 'lassy-xpath/ng';
-import { StepType, GlobalState } from '../../../pages/multi-step-page/steps';
+import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -12,11 +14,11 @@ import { NotificationService } from '../../../services/notification.service';
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+export class MatrixComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
     private warningId: number;
+    private subscriptions: Subscription[];
     public stepType = StepType.Matrix;
 
-    @Input('attributes')
     public set attributes(values: string[]) {
         this.tokenValues = values.map(value => {
             const option = this.options.find(o => o.value === value);
@@ -31,7 +33,6 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
         return this.tokenValues.map(t => t.value);
     }
 
-    @Input('tokens')
     public set tokens(values: string[]) {
         this.indexedTokens = values.map((value, index) => ({ value, index }));
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
@@ -40,17 +41,11 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
         return this.indexedTokens.map(t => t.value);
     }
 
-    @Input()
     public subTreeXml: string;
-    @Input()
     public xpath: string;
-    @Input()
     public isCustomXPath: boolean;
-    @Input()
     public respectOrder: boolean;
-    @Input()
     public retrieveContext: boolean;
-    @Input()
     public ignoreTopNode: boolean;
 
     @Output()
@@ -121,10 +116,22 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
 
     private originalXPath: string;
 
-    constructor(stateService: StateService<GlobalState>,
+    constructor(stateService: StateService<GlobalStateExampleBased>,
         private confirmationService: ConfirmationService,
         private notificationService: NotificationService) {
         super(stateService);
+        this.subscriptions = [
+            this.state$.subscribe(state => {
+                this.attributes = state.attributes;
+                this.ignoreTopNode = state.ignoreTopNode;
+                this.isCustomXPath = state.isCustomXPath;
+                this.respectOrder = state.respectOrder;
+                this.retrieveContext = state.retrieveContext;
+                this.subTreeXml = state.subTreeXml;
+                this.tokens = state.tokens;
+                this.xpath = state.xpath;
+            })
+        ];
     }
 
     public setTokenPart(tokenIndex: number, part: Part) {
@@ -203,6 +210,7 @@ export class MatrixComponent extends StepComponent<GlobalState> implements OnIni
 
     ngOnDestroy() {
         this.notificationService.cancel(this.warningId);
+        this.subscriptions.forEach(s => s.unsubscribe());
         super.ngOnDestroy();
     }
 }
