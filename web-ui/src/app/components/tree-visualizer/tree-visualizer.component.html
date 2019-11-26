@@ -16,7 +16,7 @@
                 </button>
             </div>
             <ng-container *ngTemplateOutlet="metadataTemplate"></ng-container>
-            <div class="tv-tree">
+            <div class="tv-tree" #tree>
             </div>
 
             <aside class="tv-tooltip" style="display: none">
@@ -107,7 +107,7 @@
                 </div>
             </div>
             <ng-container *ngTemplateOutlet="metadataTemplate"></ng-container>
-            <div class="tv-tree">
+            <div class="tv-tree" #tree>
             </div>
             <aside class="tv-tooltip" style="display: none">
                 <ul></ul>
@@ -124,7 +124,7 @@
 <ng-template #metadataTemplate>
     <ng-container *ngIf="metadata">
         <div class="metadata">
-            <div class="card">
+            <div class="card" #metadataCard>
                 <table class="table">
                     <tr *ngFor="let item of metadata">
                         <th>{{item.name}}</th>

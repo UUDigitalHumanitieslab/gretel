@@ -1,4 +1,5 @@
 import {
+    AfterViewChecked,
     Component,
     ElementRef,
     EventEmitter,
@@ -32,11 +33,15 @@ interface Metadata {
     templateUrl: './tree-visualizer.component.html',
     styleUrls: ['./tree-visualizer.component.scss']
 })
-export class TreeVisualizerComponent implements OnChanges, OnInit {
+export class TreeVisualizerComponent implements OnChanges, OnInit, AfterViewChecked {
     @ViewChild('output', { static: true, read: ElementRef })
     public output: ElementRef;
     @ViewChild('inline', { static: false, read: ElementRef })
     public inlineRef: ElementRef;
+    @ViewChild('tree', { static: false, read: ElementRef })
+    public tree: ElementRef;
+    @ViewChild('metadataCard', { static: false, read: ElementRef })
+    public metadataCard: ElementRef;
 
     @Input()
     public xml: string;
@@ -97,6 +102,15 @@ export class TreeVisualizerComponent implements OnChanges, OnInit {
             if (this.instance) {
                 this.updateVisibility();
             }
+        }
+    }
+
+    ngAfterViewChecked() {
+        if (this.tree && this.metadataCard) {
+            // make sure the metadata overview doesn't overflow
+            $(this.metadataCard.nativeElement).css({
+                maxHeight: $(this.tree.nativeElement).outerHeight()
+            });
         }
     }
 
