@@ -36,6 +36,7 @@
 
     .card {
         position: absolute;
+        overflow-y: auto;
         margin-left: 1px;
     }
 }
