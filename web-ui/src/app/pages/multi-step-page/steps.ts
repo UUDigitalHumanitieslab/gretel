@@ -26,6 +26,17 @@ interface GlobalState {
     loading: boolean;
     inputSentence?: string;
     selectedTreebanks: TreebankSelection;
+    /**
+     * Query additional custom properties for variables
+     */
+    variableProperties: {
+        // start with $, refers to an existing variable extracted from
+        // the query tree
+        variableName: string;
+        // start with _
+        propertyName: string;
+        propertyExpression: string;
+    }[];
 }
 
 interface GlobalStateExampleBased extends GlobalState {

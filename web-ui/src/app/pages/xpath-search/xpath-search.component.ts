@@ -29,6 +29,7 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         filterValues: {},
         retrieveContext: false,
         selectedTreebanks: new TreebankSelection(this.treebankService),
+        variableProperties: undefined,
         xpath: `//node[@cat="smain"
     and node[@rel="su" and @pt="vnw"]
     and node[@rel="hd" and @pt="ww"]
@@ -60,18 +61,12 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
     }
 
     decodeGlobalState(queryParams: { [key: string]: any }) {
-        const globalState = {
-            step: parseInt(queryParams.currentStep || '0', 10),
-            state: {
-                selectedTreebanks: new TreebankSelection(
-                    this.treebankService,
-                    queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
-                xpath: queryParams.xpath || this.defaultGlobalState.xpath,
-                retrieveContext: this.decodeBool(queryParams.retrieveContext)
-            }
+        return {
+            selectedTreebanks: new TreebankSelection(
+                this.treebankService,
+                queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
+            xpath: queryParams.xpath || this.defaultGlobalState.xpath
         };
-
-        return globalState;
     }
 
     async updateRetrieveContext(retrieveContext: boolean) {
@@ -84,6 +79,6 @@ export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> im
         this.stateService.setState({
             xpath
         },
-        emit);
+            emit);
     }
 }

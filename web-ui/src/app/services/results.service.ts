@@ -16,11 +16,17 @@ const httpOptions = {
     })
 };
 
+export interface SearchVariable {
+    name: string;
+    path: string;
+    props?: { [name: string]: string };
+}
+
 @Injectable()
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: FilterValue[] = [];
-    defaultVariables: { name: string, path: string }[] = null;
+    defaultVariables: SearchVariable[] = null;
 
     constructor(
         private http: HttpClient,
@@ -172,17 +178,17 @@ export class ResultsService {
     ): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl(provider, 'results'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                retrieveContext,
-                corpus,
-                remainingComponents,
-                remainingDatabases,
-                iteration,
-                isAnalysis,
-                variables,
-                needRegularGrinded,
-                searchLimit
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            retrieveContext,
+            corpus,
+            remainingComponents,
+            remainingDatabases,
+            iteration,
+            isAnalysis,
+            variables,
+            needRegularGrinded,
+            searchLimit
+        }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
         }
@@ -232,20 +238,20 @@ export class ResultsService {
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
             await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                corpus,
-                components,
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         const results = await this.http.post<{ [componentId: string]: string }>(
             await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                corpus,
-                components,
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
 
         return Object.keys(results).map(componentId => {
             return {

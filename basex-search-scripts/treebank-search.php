@@ -259,6 +259,18 @@ function getSentences($corpus, $component, $databases, $endPosIteration, $sessio
     }
 }
 
+function createVariableAttributes($properties)
+{
+    $attributes = '';
+    if (isset($properties)) {
+        foreach ($properties as $name => $expression) {
+            $attributes .= " $name=\"{{$expression}}\"";
+        }
+    }
+
+    return $attributes;
+}
+
 function createXquery($corpus, $component, $database, $endPosIteration, $searchLimit, $flushLimit, $needRegularGrinded, $context, $xpath, $variables)
 {
     $variable_declarations = '';
@@ -271,7 +283,7 @@ function createXquery($corpus, $component, $database, $endPosIteration, $searchL
                 // the root node is already declared in the query itself, do not declare it again
                 $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
             }
-            $variable_results .= '<var name="'.$name.'">{'.$name.'/@*}</var>';
+            $variable_results .= '<var name="'.$name.'"'.createVariableAttributes($value['props']).'>{'.$name.'/@*}</var>';
         }
         $variable_results = '<vars>'.$variable_results.'</vars>';
     }

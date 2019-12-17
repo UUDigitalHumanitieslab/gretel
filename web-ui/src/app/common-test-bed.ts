@@ -125,6 +125,7 @@ export function initStateService() {
         filterValues: {},
         retrieveContext: false,
         selectedTreebanks: new TreebankSelection(TestBed.get(TreebankService)),
+        variableProperties: [],
         xpath: `//node[@cat="smain"
 and node[@rel="su" and @pt="vnw"]
 and node[@rel="hd" and @pt="ww"]
