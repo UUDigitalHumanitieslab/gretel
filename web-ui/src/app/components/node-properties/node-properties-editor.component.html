@@ -1,0 +1,33 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Node</th>
+            <th>Properties</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let node of nodes">
+            <th>
+                {{node.name}}
+            </th>
+            <td>
+                <table class="table" *ngIf="node.props">
+                    <thead>
+                        <tr>
+                            <td>Name</td>
+                            <td>Expression</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let prop of node.props">
+                            <th><input class="input is-static" type="text" name="name" [(ngModel)]="prop.name" /></th>
+                            <td><input class="input is-static" type="text" name="expression"
+                                    [(ngModel)]="prop.expression" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>

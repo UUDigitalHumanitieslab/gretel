@@ -155,8 +155,8 @@ ${this.variablesMetaText(variables)}`]));
     private variableMetaText(variable: SearchVariable) {
         let metaText = `\t${variable.name}:\n\t\t${variable.path}`;
         if (variable.props) {
-            for (const [name, path] of Object.entries(variable.props)) {
-                metaText += `\n\t${variable.name}.${name}:\n\t\t${path}`;
+            for (const { name, expression } of variable.props) {
+                metaText += `\n\t${variable.name}.${name}:\n\t\t${expression}`;
             }
         }
         return metaText;
