@@ -26,7 +26,7 @@ import {
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
-import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
+import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 
 @Component({
     animations,
@@ -116,19 +116,19 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         this.variables = lookup;
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
 
-        const subscriptionToTreebankSelection = this.treebankSelectionService.state$.pipe(
-            switchMap(selection => {
+        const subscriptionToTreebankSelection = this.state$.pipe(
+            switchMap(({ selectedTreebanks, variableProperties }) => {
                 this.isLoading = true;
                 this.hitsSubject.next([]);
                 const loadMetadata = Promise.all(
-                    selection.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()))
+                    selectedTreebanks.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()))
                     .then(metadata => {
                         this.metadata = metadata.flatMap(x => x);
                     });
 
                 // fetch all results for all selected components/treebanks
                 // and merge them into a single stream that's subscribed to.
-                const searchResults = merge(...selection.corpora.map(corpus => this.resultsService.getAllResults(
+                const searchResults = merge(...selectedTreebanks.corpora.map(corpus => this.resultsService.getAllResults(
                     this.xpath,
                     corpus.provider,
                     corpus.corpus.name,
@@ -136,7 +136,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
                     false,
                     true,
                     [],
-                    variables
+                    getSearchVariables(variables, variableProperties)
                 )));
 
                 Promise.all([loadMetadata, searchResults.toPromise()]).then(() => {

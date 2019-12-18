@@ -1,9 +1,8 @@
 import { Injectable, SecurityContext } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { saveAs } from 'file-saver';
-import { Hit } from './results.service';
+import { Hit, SearchVariable } from './results.service';
 import JSZip from 'jszip';
-import { PathVariable } from 'lassy-xpath/ng';
 
 // Separator for variable values, this shouldn't be the name of
 // either the variable name or node property
@@ -31,7 +30,7 @@ export class DownloadService {
 
     public async downloadResults(
         results: { corpus: string, components: string[], xpath: string, hits: Hit[] }[],
-        variables?: PathVariable[]) {
+        variables?: SearchVariable[]) {
         const zip = new JSZip();
         const corporaNames: string[] = [];
         results.forEach(({ corpus, components, xpath, hits }) => {
@@ -147,9 +146,19 @@ ${this.variablesMetaText(variables)}`]));
         saveAs(this.blob(fileType, rows), filename);
     }
 
-    private variablesMetaText(variables?: PathVariable[]) {
+    private variablesMetaText(variables?: SearchVariable[]) {
         return variables ?
-            `Variables:\n${variables.map(value => `\t${value.name}:\n\t\t${value.path}`).join('\n')}\n`
+            `Variables:\n${variables.map(variable => this.variableMetaText(variable)).join('\n')}\n`
             : '';
+    }
+
+    private variableMetaText(variable: SearchVariable) {
+        let metaText = `\t${variable.name}:\n\t\t${variable.path}`;
+        if (variable.props) {
+            for (const [name, path] of Object.entries(variable.props)) {
+                metaText += `\n\t${variable.name}.${name}:\n\t\t${path}`;
+            }
+        }
+        return metaText;
     }
 }
