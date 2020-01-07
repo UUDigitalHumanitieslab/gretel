@@ -429,9 +429,9 @@ export class ResultsService {
                     value: string
                 }
             }[]
-        }
+        }[]
     }): Hit['metaValues'] {
-        return !data.metadata || !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata || !data.metadata.length || !data.metadata[0].meta ? {} : data.metadata[0].meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {} as Hit['metaValues']);
@@ -446,12 +446,12 @@ export class ResultsService {
                     lemma?: string
                 }
             }[]
-        }
+        }[]
     }): Hit['variableValues'] {
-        if (!data) {
+        if (!data || !data.vars) {
             return {};
         }
-        return data.vars.var.reduce((values, variable) => {
+        return data.vars[0].var.reduce((values, variable) => {
             values[variable.$.name] = variable.$;
             return values;
         }, {} as Hit['variableValues']);

@@ -29,7 +29,8 @@ import {
     ResultsStreamService,
     StateService,
     TreebankSelectionService,
-    ParseService
+    ParseService,
+    NotificationService
 } from '../../../services/_index';
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
@@ -143,6 +144,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
 
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
+        private notificationService: NotificationService,
         private resultsService: ResultsService,
         private resultsStreamService: ResultsStreamService,
         private treebankSelectionService: TreebankSelectionService,
@@ -273,30 +275,35 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
             : undefined;
 
         this.loadingDownload = true;
-        const results = await Promise.all(
-            this.treebankSelection.corpora.map(corpus =>
-                this.resultsService.promiseAllResults(
-                    this.xpath,
-                    corpus.provider,
-                    corpus.corpus.name,
-                    corpus.corpus.components,
-                    this.retrieveContext,
-                    false,
-                    filterValues,
-                    variables).then(hits => ({
-                        corpus: corpus,
-                        hits
-                    }))));
+        try {
+            const results = await Promise.all(
+                this.treebankSelection.corpora.map(corpus =>
+                    this.resultsService.promiseAllResults(
+                        this.xpath,
+                        corpus.provider,
+                        corpus.corpus.name,
+                        corpus.corpus.components,
+                        this.retrieveContext,
+                        false,
+                        filterValues,
+                        variables).then(hits => ({
+                            corpus: corpus,
+                            hits
+                        }))));
 
-        const r = results.flatMap(corpusHits => ({
-            xpath: this.xpath,
-            components: corpusHits.corpus.corpus.components,
-            provider: corpusHits.corpus.provider,
-            corpus: corpusHits.corpus.corpus.name,
-            hits: corpusHits.hits
-        }));
+            const r = results.flatMap(corpusHits => ({
+                xpath: this.xpath,
+                components: corpusHits.corpus.corpus.components,
+                provider: corpusHits.corpus.provider,
+                corpus: corpusHits.corpus.corpus.name,
+                hits: corpusHits.hits
+            }));
 
-        await this.downloadService.downloadResults(r, variables);
+            await this.downloadService.downloadResults(r, variables);
+        } catch (error) {
+            this.notificationService.add('Problem downloading results', 'error');
+            console.error(error);
+        }
         this.loadingDownload = false;
     }
 

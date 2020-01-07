@@ -158,7 +158,7 @@ export class MatrixComponent extends StepComponent<GlobalStateExampleBased> impl
 
     public setTokenPart(tokenIndex: number, part: Part) {
         if (this.isCustomXPath) {
-            this.warningId = this.notificationService.addWarning('It is not possible to use the matrix when using custom xpath.');
+            this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
         if (part.advanced) {

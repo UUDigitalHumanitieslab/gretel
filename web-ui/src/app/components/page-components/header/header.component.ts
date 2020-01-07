@@ -1,29 +1,19 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
-import { trigger, transition, animate, style } from '@angular/animations';
-import { NotificationService } from '../../../services/notification.service';
 import { Subscription } from 'rxjs';
+import { NotificationService } from '../../../services/notification.service';
+import { animations } from '../../../animations';
 
 @Component({
     selector: 'grt-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    animations: [
-        trigger('slideInOut', [
-            transition(':enter', [
-                style({ 'height': '0' }),
-                animate('400ms ease-in-out', style({ 'height': '*' }))
-            ]),
-            transition(':leave', [
-                animate('400ms ease-in-out', style({ 'height': '0' }))
-            ])
-        ])
-    ]
+    animations
 })
 export class HeaderComponent implements OnDestroy, OnInit {
     private subscriptions: Subscription[] = [];
     private messageId: number;
     message: string;
-    messageType: 'is-warning' | 'is-error';
+    messageType: 'is-warning' | 'is-danger';
     show = false;
 
     constructor(private notificationService: NotificationService, private ngZone: NgZone) {
@@ -40,7 +30,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
                         return;
 
                     case 'error':
-                        this.messageType = 'is-error';
+                        this.messageType = 'is-danger';
                         break;
 
                     case 'warning':

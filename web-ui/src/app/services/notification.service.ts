@@ -30,12 +30,12 @@ export class NotificationService {
         return id;
     }
 
-    addWarning(message: string) {
+    add(message: string, type: Notification['type'] = 'warning') {
         const id = NotificationService.counter++;
         NotificationService.notifications$.next({
             id,
             message,
-            type: 'warning'
+            type
         });
         return id;
     }
