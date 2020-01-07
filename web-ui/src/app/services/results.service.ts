@@ -19,7 +19,7 @@ const httpOptions = {
 export interface SearchVariable {
     name: string;
     path: string;
-    props?: { [name: string]: string };
+    props?: { name: string, expression: string }[];
 }
 
 @Injectable()

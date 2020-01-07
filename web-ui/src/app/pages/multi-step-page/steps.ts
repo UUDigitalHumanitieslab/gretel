@@ -48,9 +48,9 @@ export function getSearchVariables(
             const variable = output.find(v => v.name === prop.variableName);
             if (variable !== undefined) {
                 if (!variable.props) {
-                    variable.props = {};
+                    variable.props = [];
                 }
-                variable.props[prop.propertyName] = prop.propertyExpression;
+                variable.props.push({ name: prop.propertyName, expression: prop.propertyExpression });
             }
         }
     }
