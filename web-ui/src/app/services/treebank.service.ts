@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { BehaviorSubject, Observable, ReplaySubject, merge, of, from, zip } from 'rxjs';
-import { flatMap, catchError, shareReplay, delay, map, filter, first } from 'rxjs/operators';
+import { BehaviorSubject, Observable, ReplaySubject, merge, from, zip, EMPTY } from 'rxjs';
+import { flatMap, catchError, shareReplay, delay, map, first } from 'rxjs/operators';
 
 import {
     ComponentGroup,
@@ -335,6 +335,11 @@ export class TreebankService {
 
         (async () => {
             const uploadProvider = await this.configurationService.getUploadProvider();
+            if (!uploadProvider) {
+                // Ob already returned in outer scope!
+                ob.complete();
+                return; // return to outer scope
+            }
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
 
             this.http.get<UploadedTreebankResponse[]>(uploadUrl)
@@ -346,7 +351,7 @@ export class TreebankService {
                     // catch errors (either from initial get, or the above async mapping operation)
                     catchError((error: HttpErrorResponse) => {
                         NotificationService.addError(error);
-                        return undefined;
+                        return EMPTY;
                     })
                 )
                 .subscribe(ob);
