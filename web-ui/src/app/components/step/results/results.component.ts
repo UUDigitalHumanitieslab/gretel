@@ -120,6 +120,10 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     public isModifyingXPath = false;
     public activeFilterCount = 0;
 
+    /**
+     * Toggle filters column on mobile
+     */
+    public hideFiltersColumn = true;
     public filters: Filter[] = [];
 
     /**
