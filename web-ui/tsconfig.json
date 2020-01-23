@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "baseUrl": "./",
         "downlevelIteration": true,
         "module": "esnext",
         "outDir": "./dist/out-tsc",
@@ -24,6 +25,9 @@
             "es2019.string"
         ],
         "paths": {
+            "jszip": [
+                "../node_modules/jszip/dist/jszip.min.js"
+            ],
             "@angular/": [
                 "./node_modules/@angular/"
             ]
