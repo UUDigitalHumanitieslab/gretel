@@ -48,7 +48,7 @@
     "lassy-xpath": "^0.4.0",
     "lodash": "^4.17.15",
     "ngx-clipboard": "^12.3.0",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.13.1",
     "pivottable": "^2.23.0",
     "primeicons": "^2.0.0",
     "primeng": "^8.1.1",
@@ -57,7 +57,7 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.803.21",
+    "@angular-devkit/build-angular": "^0.803.23",
     "@angular/cli": "^8.3.21",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/language-service": "^8.2.14",
