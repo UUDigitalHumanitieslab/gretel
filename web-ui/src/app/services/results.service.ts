@@ -411,7 +411,7 @@ export class ResultsService {
             return {
                 component: results.sentenceDatabases[hitId],
                 database: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
-                fileId: hitId.replace(/-endPos=(\d+|all)\+match=\d+$/, ''),
+                fileId: hitId.replace(/\+match=\d+$/, ''),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: results.xmllist[hitId],
@@ -551,7 +551,7 @@ type ApiSearchResult = {
     metalist: { [id: string]: string },
     /** Variable list (xml structure containing the variables), empty unless variables were requested */
     varlist: { [id: string]: string },
-    /** End pos iteration (used for retrieving the next results when scrolling/paging) - basically page number for next result set */
+    /** End pos iteration (used for retrieving the next results when scrolling/paging) */
     endPosIteration: number,
     /** Components left to search */
     remainingComponents: string[],
@@ -572,6 +572,7 @@ type ApiSearchResult = {
     xquery: string
 };
 
+/** Processed search results created from the response */
 export interface SearchResults {
     hits: Hit[];
     /** Start iteration for retrieving the next results (in the first component in `remainingComponents`) */

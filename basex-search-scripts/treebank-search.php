@@ -142,90 +142,78 @@ function getDatabases($corpus, $component, $xpath)
 }
 
 /**
- * @param string   $corpus          the corpus we're searching
- * @param string   $component       the component we're searching
- * @param string[] $databases       the databases that remain to be searched in this component
- * @param int      $endPosIteration page number to return
- * @param Session  $session         the basex session
- * @param int      $searchlimit
- * @param array    $variables       An array with variables to return. Each element should contain name and path.
+ * @param string   $corpus      the corpus we're searching
+ * @param string   $component   the component we're searching
+ * @param string[] $databases   the databases that remain to be searched in this component
+ * @param int      $start       index of first sentence to retrieve (in the current database, that's the last db in the array)
+ * @param Session  $session     the basex session
+ * @param int      $searchlimit max number of sentences to return
+ * @param array    $variables   An array with variables to return. Each element should contain name and path.
  */
-function getSentences($corpus, $component, $databases, $endPosIteration, $session, $searchLimit, $xpath, $context, $variables = null)
+function getSentences($corpus, $component, $databases, $start, $session, $searchLimit, $xpath, $context, $variables = null)
 {
-    global $flushLimit, $needRegularGrinded;
+    global $needRegularGrinded;
 
     $xquery = 'N/A';
     try {
-        $matchesAmount = 0;
-
         while ($database = array_pop($databases)) {
-            while (1) {
-                if ($endPosIteration !== 'all') {
-                    ++$endPosIteration;
+            $xquery = createXquery($corpus, $component, $database, $start, $start + $searchLimit, $needRegularGrinded, $context, $xpath, $variables);
+            $query = $session->query($xquery);
+            $result = $query->execute();
+            $query->close();
+
+            if (!$result || $result == 'false') {
+                // go to the next database and start at its first hit
+                $start = 0;
+                continue;
+            }
+
+            $matches = explode('</match>', $result);
+            $matches = array_cleaner($matches);
+
+            while ($match = array_shift($matches)) {
+                $match = str_replace('<match>', '', $match);
+
+                if (isGrinded($corpus)) {
+                    list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
+                } else {
+                    list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
                 }
 
-                $xquery = createXquery($corpus, $component, $database, $endPosIteration, $searchLimit, $flushLimit, $needRegularGrinded, $context, $xpath, $variables);
-                $query = $session->query($xquery);
-                $result = $query->execute();
-                $query->close();
+                if (isset($sentid, $sentence, $ids, $begins)) {
+                    --$searchLimit;
+                    ++$start;
 
-                if (!$result || $result == 'false') {
-                    if ($endPosIteration !== 'all') {
-                        // go to the next database and start at the first position of that
-                        $endPosIteration = 0;
-                    }
+                    $sentid = trim($sentid);
 
-                    break;
-                }
+                    // Add unique identifier to avoid overlapping sentences w/ same ID
+                    $sentid .= '+match='.$start;
 
-                $matches = explode('</match>', $result);
-                $matches = array_cleaner($matches);
-
-                while ($match = array_shift($matches)) {
-                    if ($endPosIteration === 'all' && $matchesAmount >= $searchLimit) {
-                        break 3;
-                    }
-                    $match = str_replace('<match>', '', $match);
-
+                    $sentences[$sentid] = $sentence;
+                    $idlist[$sentid] = $ids;
+                    $beginlist[$sentid] = $begins;
+                    $xmllist[$sentid] = $xml_sentences;
+                    $metalist[$sentid] = $meta;
+                    preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
+                    $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
                     if (isGrinded($corpus)) {
-                        list($sentid, $sentence, $tb, $ids, $begins) = explode('||', $match);
-                    } else {
-                        list($sentid, $sentence, $ids, $begins, $xml_sentences, $meta) = explode('||', $match);
+                        $tblist[$sentid] = $tb;
                     }
-
-                    if (isset($sentid, $sentence, $ids, $begins)) {
-                        ++$matchesAmount;
-
-                        $sentid = trim($sentid);
-
-                        // Add unique identifier to avoid overlapping sentences w/ same ID
-                        $sentid .= '-endPos='.$endPosIteration.'+match='.$matchesAmount;
-
-                        $sentences[$sentid] = $sentence;
-                        $idlist[$sentid] = $ids;
-                        $beginlist[$sentid] = $begins;
-                        $xmllist[$sentid] = $xml_sentences;
-                        $metalist[$sentid] = $meta;
-                        preg_match('/<vars>.*<\/vars>/s', $match, $varMatches);
-                        $varList[$sentid] = count($varMatches) == 0 ? '' : $varMatches[0];
-                        if (isGrinded($corpus)) {
-                            $tblist[$sentid] = $tb;
-                        }
-                        $sentenceDatabases[$sentid] = $component;
-                    }
-                }
-                if ($endPosIteration === 'all') {
-                    break;
-                } elseif ($matchesAmount >= $flushLimit) {
-                    // Re-add pop'd database because it is very likely we aren't finished with it
-                    // More results are still in that database but because of the flushlimit we
-                    // have to bail out
-                    // NOTE: add to start or next run will apply pagination parameter to the wrong database
-                    array_unshift($databases, $database);
-
-                    break 2;
+                    $sentenceDatabases[$sentid] = $component;
                 }
             }
+            // Done processing all results in this database
+            // if we're limited by the amount we're asked to retrieve
+            // there might have been more hits, in this case, re-add the database to the list
+            // since we're probably not finished.
+            if ($searchLimit <= 0) {
+                array_push($databases, $database);
+                break;
+            }
+
+            // We exhausted this database, but more hits remain to be retrieved this run
+            // reset the start for the next database
+            $start = 0;
         }
 
         if (isset($sentences)) {
@@ -242,7 +230,7 @@ function getSentences($corpus, $component, $databases, $endPosIteration, $sessio
                 'xmllist' => $xmllist,
                 'metalist' => $metalist,
                 'varlist' => $varList,
-                'endPosIteration' => $endPosIteration,
+                'endPosIteration' => $start,
                 'remainingDatabases' => $databases,
                 'sentenceDatabases' => $sentenceDatabases,
                 'xquery' => $xquery,
@@ -271,7 +259,7 @@ function createVariableAttributes($properties)
     return $attributes;
 }
 
-function createXquery($corpus, $component, $database, $endPosIteration, $searchLimit, $flushLimit, $needRegularGrinded, $context, $xpath, $variables)
+function createXquery($corpus, $component, $database, $start, $end, $needRegularGrinded, $context, $xpath, $variables)
 {
     $variable_declarations = '';
     $variable_results = '';
@@ -346,18 +334,9 @@ let $nexts := ($tree/following-sibling::alpino_ds[1]/sentence)';
         $xquery = $for.$xpath.PHP_EOL.$tree.$sentid.$sentence.$regulartb.$ids.$begins.$beginlist.$meta.$variable_declarations.$return;
     }
 
-    // Adds positioning values:; limits possible output
+    // Adds positioning values: limits possible output
     $openPosition = '(';
-    // Never fetch more than the search limit, not even with all
-    if ($endPosIteration == 'all') {
-        $closePosition = ')[position() = 1 to '.$searchLimit.']';
-    } else {
-        // Only fetch the given flushLimit, and increment on each iteration
-        $startPosition = (($endPosIteration - 1) * $flushLimit) + 1; // position() is one-based
-        $endPosition = min($searchLimit, $endPosIteration * $flushLimit);
-        $closePosition = ')[position() = '.$startPosition.' to '.$endPosition.']';
-    }
-
+    $closePosition = ')[position() = '.($start + 1).' to '.$end.']';
     $xquery = $openPosition.$xquery.$closePosition;
 
     return $xquery;

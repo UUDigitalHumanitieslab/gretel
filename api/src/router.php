@@ -96,10 +96,10 @@ $router->map('POST', '/results', function () {
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
 
-    /** @var string $xpath */            $xpath = $data['xpath'];
-    /** @var bool $context */        $context = $data['retrieveContext'];
+    /** @var string $xpath */           $xpath = $data['xpath'];
+    /** @var bool $context */           $context = $data['retrieveContext'];
     /** @var string $corpus */          $corpus = $data['corpus'];
-    /** @var int $iteration */          $iteration = $data['iteration'];
+    /** @var int $start */              $start = $data['iteration'];
     /** @var array|null $variables */   $variables = $data['variables'];
 
     // The (remaining) components of this corpus to search
@@ -125,8 +125,13 @@ $router->map('POST', '/results', function () {
     // (may already hFave been set true in getDatabases when this is a grinded corpus).
     $needRegularGrinded = $needRegularGrinded || (bool) $data['needRegularGrinded'];
 
-    $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
+    // Limit on total results to return
     $searchLimit = $data['isAnalysis'] ? $analysisLimit : $resultsLimit;
+    $searchLimit = isset($data['searchLimit']) ? min($searchLimit, $data['searchLimit']) : $searchLimit;
+
+    // Limit on results to return this request
+    $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
+    $flushLimit = min($flushLimit, $searchLimit);
 
     // We only search one component at a time.
     $results = getResults(
@@ -135,18 +140,16 @@ $router->map('POST', '/results', function () {
         $corpus,
         $components,
         $databases,
-        $iteration,
-        isset($data['searchLimit']) && $data['searchLimit'] < $searchLimit
-            ? $data['searchLimit']
-            : $searchLimit,
+        $start,
+        $flushLimit,
         $variables
     );
 
     if ($results['success']) {
         // append the actual search limit from the configuration
-        $results['searchLimit'] = $searchLimit;
+        $results['searchLimit'] = $searchLimit - count($results['sentences']);
         $results['needRegularGrinded'] = $needRegularGrinded;
-        if ($results['endPosIteration'] * $flushLimit >= $searchLimit) {
+        if ($results['searchLimit'] <= 0) {
             // clear the remaining databases to signal the search is done
             $results['remainingDatabases'] = array();
             $results['remainingComponents'] = array();

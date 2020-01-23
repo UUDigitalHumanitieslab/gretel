@@ -15,7 +15,7 @@ require_once ROOT_PATH.'/basex-search-scripts/treebank-search.php';
  * @param string[] $components  the component we're searching
  * @param string[] $databases   list of databases that remain to be searched in this component
  * @param int      $start       pagination info, hits to skip in current database
- * @param int      $searchLimit
+ * @param int      $searchLimit max number of results to retrieve in this call
  * @param array    $variables
  * @param Session  $session     re-use the session if possible
  */
