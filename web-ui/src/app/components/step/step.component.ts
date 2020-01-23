@@ -13,7 +13,7 @@ export abstract class StepComponent<T extends GlobalState> implements OnInit, On
     public valid = false;
     protected state$: Observable<T>;
 
-    constructor(private stateService: StateService<T>) {
+    constructor(protected stateService: StateService<T>) {
         this.state$ = this.stateService.state$;
     }
 

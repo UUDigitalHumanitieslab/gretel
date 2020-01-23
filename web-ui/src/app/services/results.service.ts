@@ -16,10 +16,16 @@ const httpOptions = {
     })
 };
 
+export interface VariableProperty {
+    name: string;
+    expression: string;
+    enabled: boolean;
+}
+
 export interface SearchVariable {
     name: string;
     path: string;
-    props?: { name: string, expression: string }[];
+    props?: VariableProperty[];
 }
 
 @Injectable()
@@ -185,7 +191,7 @@ export class ResultsService {
             remainingDatabases,
             iteration,
             isAnalysis,
-            variables,
+            variables: this.formatVariables(variables),
             needRegularGrinded,
             searchLimit
         }, httpOptions).toPromise();
@@ -455,6 +461,32 @@ export class ResultsService {
             values[variable.$.name] = variable.$;
             return values;
         }, {} as Hit['variableValues']);
+    }
+
+    /**
+     * Format variables for sending to the server
+     */
+    private formatVariables(variables: SearchVariable[]) {
+        return variables.map(variable => ({
+            name: variable.name,
+            path: variable.path,
+            props: this.formatVariableProps(variable.props)
+        }));
+    }
+
+    private formatVariableProps(props?: SearchVariable['props']) {
+        if (!props || props.length === 0) {
+            return undefined;
+        }
+
+        const result: { [name: string]: string } = {};
+        for (const prop of props) {
+            if (prop.enabled) {
+                result[prop.name] = prop.expression;
+            }
+        }
+
+        return result;
     }
 
     private highlightSentence(sentence: string, nodeStarts: number[], tag: string) {

@@ -1,0 +1,21 @@
+.prop-toggle {
+    &.prop-enabled {
+        &:not(:hover) .disable-toggle {
+            display: none;
+        }
+
+        &:hover .enable-toggle {
+            display: none;
+        }
+    }
+
+    &.prop-disabled {
+        &:not(:hover) .enable-toggle {
+            display: none;
+        }
+
+        &:hover .disable-toggle {
+            display: none;
+        }
+    }
+}

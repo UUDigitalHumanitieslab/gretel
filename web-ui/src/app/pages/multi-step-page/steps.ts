@@ -36,6 +36,7 @@ interface GlobalState {
         // start with _
         propertyName: string;
         propertyExpression: string;
+        enabled: boolean;
     }[];
 }
 
@@ -50,7 +51,11 @@ export function getSearchVariables(
                 if (!variable.props) {
                     variable.props = [];
                 }
-                variable.props.push({ name: prop.propertyName, expression: prop.propertyExpression });
+                variable.props.push({
+                    name: prop.propertyName,
+                    expression: prop.propertyExpression,
+                    enabled: prop.enabled
+                });
             }
         }
     }

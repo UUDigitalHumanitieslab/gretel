@@ -50,6 +50,7 @@
 .analysis-box {
     opacity: 0;
     transition: opacity 0.3s;
+    overflow: auto;
 
     &.box {
         opacity: 1;
@@ -58,6 +59,17 @@
 
 .analysis-component {
     overflow: visible;
+    transition: opacity 0.5s;
+
+    &.disabled {
+        opacity: 0.5;
+    }
+}
+
+.query.disabled,
+.analysis-component.disabled {
+    pointer-events: none;
+
 }
 
 .modal-content {

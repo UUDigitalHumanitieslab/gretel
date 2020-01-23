@@ -1,8 +1,8 @@
 /// <reference path="pivottable.d.ts"/>
 /// <reference types="jqueryui"/>
-import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter, HostListener } from '@angular/core';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
-import { switchMap, first } from 'rxjs/operators';
+import { switchMap, first, finalize, debounceTime, map, distinctUntilChanged } from 'rxjs/operators';
 
 import * as $ from 'jquery';
 import 'jquery-ui/ui/widgets/draggable';
@@ -15,18 +15,19 @@ import { animations } from '../../../animations';
 import {
     AnalysisService,
     ResultsService,
-    TreebankSelectionService,
     Hit,
     FilterValues,
     FilterByXPath,
     FilterValue,
     StateService,
-    ParseService
+    ParseService,
+    NotificationService
 } from '../../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../../treebank';
 import { StepComponent } from '../step.component';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
+import { AddNodeEvent } from '../../node-properties/node-properties-editor.component';
 
 @Component({
     animations,
@@ -47,6 +48,15 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     private hitsSubject = new BehaviorSubject<Hit[]>([]);
     private selectedVariablesSubject = new BehaviorSubject<SelectedVariable[]>([]);
 
+    private subscriptions: Subscription[] = [];
+    private cancellationToken = new Subject<{}>();
+
+    public custom = false;
+    /**
+     * Disable changing the analysis when its updating the
+     * table.
+     */
+    public disabled = false;
     public stepType = StepType.Analysis;
 
     public variables: { [name: string]: PathVariable; };
@@ -59,8 +69,15 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
     public hitsCount = 0;
 
     public selectedVariable?: SelectedVariable;
+
+    public get canShowMore() {
+        return this.renderCount < this.hitsCount && !this.selectedVariable;
+    }
+
     public showMoreSubject = new BehaviorSubject<number>(0);
     public showExplanation = true;
+
+    public attributes: { value: string, label: string }[];
 
     @Input()
     public xpath: string;
@@ -71,16 +88,21 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         filterValues: FilterValues
     }>();
 
-    public attributes: { value: string, label: string }[];
-
-    private subscriptions: Subscription[] = [];
-    private cancellationToken = new Subject<{}>();
+    @HostListener('document:keydown', ['$event'])
+    keyDown(event: KeyboardEvent) {
+        switch (event.key) {
+            case 'Escape':
+                if (this.selectedVariable) {
+                    this.cancelVariable();
+                }
+                break;
+        }
+    }
 
     constructor(
         private analysisService: AnalysisService,
         private reconstructorService: ReconstructorService,
         private resultsService: ResultsService,
-        private treebankSelectionService: TreebankSelectionService,
         private parseService: ParseService,
         private ngZone: NgZone,
         stateService: StateService<GlobalState>
@@ -116,15 +138,19 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         this.variables = lookup;
         this.treeXml = this.reconstructorService.construct(variables, this.xpath);
 
-        const subscriptionToTreebankSelection = this.state$.pipe(
+        const metadata$ = this.state$.pipe(
+            map(s => s.selectedTreebanks),
+            distinctUntilChanged()).subscribe(async selectedTreebanks => {
+                const metadata = await Promise.all(
+                    selectedTreebanks.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()));
+                this.metadata = metadata.flatMap(x => x);
+            });
+
+        const results$ = this.state$.pipe(
+            debounceTime(100),
             switchMap(({ selectedTreebanks, variableProperties }) => {
                 this.isLoading = true;
                 this.hitsSubject.next([]);
-                const loadMetadata = Promise.all(
-                    selectedTreebanks.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()))
-                    .then(metadata => {
-                        this.metadata = metadata.flatMap(x => x);
-                    });
 
                 // fetch all results for all selected components/treebanks
                 // and merge them into a single stream that's subscribed to.
@@ -139,29 +165,44 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
                     getSearchVariables(variables, variableProperties)
                 )));
 
-                Promise.all([loadMetadata, searchResults.toPromise()]).then(() => {
+                return searchResults.pipe(finalize(() => {
                     this.isLoading = false;
+                }));
+            }))
+            .subscribe(
+                searchResults => {
+                    const hits = [...this.hitsSubject.value, ...searchResults.hits];
+                    this.hitsCount = hits.length;
+                    this.hitsSubject.next(hits);
+                },
+                error => {
+                    NotificationService.addError(error);
+                    this.stateService.updateState(state => {
+                        // disable the custom properties (it might be the reason for the error)
+                        for (const prop of state.variableProperties) {
+                            prop.enabled = false;
+                            this.custom = true;
+                            this.selectedVariable = this.selectedVariable = {
+                                attribute: undefined,
+                                axis: 'row',
+                                variable: this.variables['$node']
+                            };
+                        }
+                    });
                 });
 
-                return searchResults;
-            }))
-            .subscribe(searchResults => {
-                const hits = [...this.hitsSubject.value, ...searchResults.hits];
-                this.hitsCount = hits.length;
-                this.hitsSubject.next(hits);
-            });
-
         // wait for the first hits to arrive to actually show a pivot table
-        const firstHits = this.hitsSubject.pipe(first(hits => hits.length > 0))
+        const firstHits$ = this.hitsSubject.pipe(first(hits => hits.length > 0))
             .subscribe(() => {
                 this.defaultPivot();
                 this.subscriptions.push(this.livePivot());
-                firstHits.unsubscribe();
+                firstHits$.unsubscribe();
             });
 
         this.subscriptions = [
-            subscriptionToTreebankSelection,
-            firstHits
+            metadata$,
+            results$,
+            firstHits$
         ];
     }
 
@@ -194,11 +235,39 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         this.selectedVariable = undefined;
     }
 
-    public async addVariable() {
-        this.pivotUiOptions[this.selectedVariable.axis === 'row' ? 'rows' : 'cols']
-            .push(`${this.selectedVariable.variable.name}.${this.selectedVariable.attribute}`);
-        this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([this.selectedVariable]));
+    public async addVariable(customProperty?: AddNodeEvent) {
+        const selectedVariable = this.selectedVariable;
         this.selectedVariable = undefined;
+        const updateSelection = () => {
+            this.pivotUiOptions[selectedVariable.axis === 'row' ? 'rows' : 'cols']
+                .push(`${selectedVariable.variable.name}.${selectedVariable.attribute}`);
+            this.selectedVariablesSubject.next(this.selectedVariablesSubject.value.concat([selectedVariable]));
+        };
+
+        if (customProperty) {
+            this.hide();
+            selectedVariable.variable = this.variables[customProperty.node.name];
+            selectedVariable.attribute = customProperty.property;
+
+            // we need to have results containing this new property
+            const containingHits = this.hitsSubject.pipe(first(hits => hits.length > 0 &&
+                customProperty.node.name in hits[0].variableValues &&
+                customProperty.property in hits[0].variableValues[customProperty.node.name]))
+                .subscribe(() => {
+                    if (!containingHits.closed) {
+                        containingHits.unsubscribe();
+                    }
+                    updateSelection();
+                }, () => {
+                    if (!containingHits.closed) {
+                        containingHits.unsubscribe();
+                    }
+                });
+
+            this.subscriptions.push(containingHits);
+        } else {
+            updateSelection();
+        }
     }
 
     private defaultPivot() {
@@ -236,8 +305,16 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
                 renderer: heatmap,
                 renderers,
                 onRefresh: (data) => {
-                    this.pivotUiOptions = data;
-                    this.addTableClickEvent();
+                    this.ngZone.run(() => {
+                        this.pivotUiOptions = data;
+                        if (this.canShowMore) {
+                            // table is going to be re-rendered anyway
+                            // might as well add the new data
+                            this.showMore();
+                        } else {
+                            this.addTableClickEvent();
+                        }
+                    });
                 }
             };
         } else {
@@ -266,6 +343,8 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         this.ngZone.run(() => {
             // show the window to add a new variable for analysis
             this.attributes = attributes;
+            // no need to show that they can drag a node if they just did
+            this.showExplanation = false;
             const values = attributes.map(x => x.value);
             this.selectedVariable = {
                 attribute: values.find(v => v === 'pt') || values.find(v => v === 'cat') || values[0],
@@ -285,6 +364,11 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
         }
     }
 
+    private hide() {
+        this.disabled = true;
+        this.$table = undefined;
+    }
+
     private pivot(metadataKeys: string[], hits: Hit[], selectedVariables: SelectedVariable[]) {
         const variables = selectedVariables.reduce((grouped, s) => {
             grouped[s.variable.name]
@@ -298,6 +382,7 @@ export class AnalysisComponent extends StepComponent<GlobalState> implements OnI
             variables,
             metadataKeys);
         if (!this.$table) {
+            this.disabled = false;
             this.$element.empty();
             this.$table = $('<div>');
             this.$element.append(this.$table);

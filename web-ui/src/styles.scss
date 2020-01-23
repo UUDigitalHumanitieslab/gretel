@@ -6,6 +6,11 @@ $pageloader-opacity: 0.6;
 @import "~bulma-badge/src/sass/index";
 @import "~bulma-pageloader/dist/css/bulma-pageloader";
 @import "~balloon-css";
+
+[aria-label][data-balloon-pos]:after {
+    z-index: 1000;
+}
+
 @import "material";
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "primeicons/primeicons.css";
