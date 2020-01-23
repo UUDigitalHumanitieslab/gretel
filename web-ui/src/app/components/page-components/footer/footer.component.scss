@@ -6,13 +6,22 @@
 
 .university-logo,
 .lab-logo {
-    padding: 10px;
     display: inline-block;
+    height: 50px;
+}
+
+.university-logo {
+    padding-right: 10px;
+    width: 200px;
 }
 
 .lab-logo {
+    // add padding to give it the same size as the university logo (LAB logo is 10px lower)
     background-color: #3273dc;
+    padding: 5px;
+    width: 210px;
 }
+
 
 .version {
     line-height: 3em;
