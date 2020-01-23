@@ -526,12 +526,21 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         ).pipe(
             filter((values) => values.every(value => value != null)),
             debounceTime(DebounceTime),
-            distinctUntilChanged(),
-            switchMap(([state, xpath, filterValues]) => {
+            map(([state, xpath, filterValues]) => ({
+                selectedTreebanks: state.selectedTreebanks,
+                xpath,
+                filterValues
+            })),
+            distinctUntilChanged((prev, curr) => {
+                return prev.filterValues === curr.filterValues &&
+                    prev.xpath === curr.xpath &&
+                    prev.selectedTreebanks.equals(curr.selectedTreebanks);
+            }),
+            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,
-                    state.selectedTreebanks,
+                    selectedTreebanks,
                     filterValues,
                     this.retrieveContext);
 

@@ -175,6 +175,45 @@ export class TreebankSelection {
         return any ? encoded : undefined;
     }
 
+    equals(other: TreebankSelection) {
+        const providers = this.providers;
+        if (providers.length !== other.providers.length) {
+            return false;
+        }
+        for (let i = 0; i < other.providers.length; i++) {
+            const provider = providers[i];
+            const otherProvider = other.providers[i];
+
+            if (provider.name !== otherProvider.name) {
+                return false;
+            }
+
+            if (provider.corpora.length !== otherProvider.corpora.length) {
+                return false;
+            }
+
+            for (let j = 0; j < otherProvider.corpora.length; j++) {
+                const corpus = provider.corpora[j];
+                const otherCorpus = otherProvider.corpora[j];
+                if (corpus.name !== otherCorpus.name) {
+                    return false;
+                }
+
+                if (corpus.components.length !== otherCorpus.components.length) {
+                    return false;
+                }
+
+                for (let k = 0; k < otherCorpus.components.length; k++) {
+                    if (corpus.components[k] !== otherCorpus.components[k]) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     hasAnySelection() {
         for (const corpora of Object.values(this.data)) {
             for (const selection of Object.values(corpora)) {

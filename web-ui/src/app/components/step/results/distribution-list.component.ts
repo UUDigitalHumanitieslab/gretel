@@ -1,6 +1,6 @@
 import { Component, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { merge, from, Subscription, combineLatest, Notification } from 'rxjs';
-import { map, switchMap, materialize, startWith, endWith } from 'rxjs/operators';
+import { map, switchMap, materialize, startWith, endWith, distinctUntilChanged } from 'rxjs/operators';
 import { NotificationKind } from 'rxjs/internal/Notification';
 
 import { DownloadService, ResultsService, StateService, TreebankCount } from '../../../services/_index';
@@ -57,6 +57,13 @@ export class DistributionListComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         const components$ = this.stateService.state$.pipe(
+            map(state => ({
+                selectedTreebanks: state.selectedTreebanks,
+                xpath: state.xpath
+            })),
+            distinctUntilChanged((prev, curr) =>
+                prev.xpath === curr.xpath &&
+                prev.selectedTreebanks.equals(curr.selectedTreebanks)),
             switchMap(async state => {
                 const components = await this.getComponents(state.selectedTreebanks);
                 return {

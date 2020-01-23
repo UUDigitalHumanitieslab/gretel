@@ -64,6 +64,7 @@ import { DistributionListComponent } from './components/step/results/distributio
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
 import { DownloadResultsComponent } from './components/step/results/download-results.component';
+import { NodePropertiesButtonComponent } from './components/step/results/node-properties-button.component';
 import { NodePropertiesComponent } from './components/node-properties/node-properties.component';
 import { NodePropertiesEditorComponent } from './components/node-properties/node-properties-editor.component';
 
@@ -90,6 +91,7 @@ export const declarations: any[] = [
     HomePageComponent,
     MatrixComponent,
     NavigationComponent,
+    NodePropertiesButtonComponent,
     NodePropertiesComponent,
     NodePropertiesEditorComponent,
     PaperCiteComponent,
