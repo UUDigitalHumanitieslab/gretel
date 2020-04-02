@@ -44,7 +44,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
 5. Install [composer](https://getcomposer.org/) to be able to install PHP dependencies.
-6. Enable the rewrite mdoule (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
+6. Enable the rewrite module (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
 6. Run `npm run build` to compile all the dependencies.
 7. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
