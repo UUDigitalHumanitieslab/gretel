@@ -7,8 +7,10 @@ import { environment } from './../../../../environments/environment';
     styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent {
+    buildTime: string;
     version: string;
     constructor() {
+        this.buildTime = environment.buildTime;
         this.version = environment.version;
     }
 }

@@ -8,6 +8,7 @@ console.log(colors.cyan('\nRunning pre-build tasks'));
 const versionFilePath = path.join(__dirname + '/../src/environments/version.ts');
 
 const src = `export const version = '${appVersion}';
+export const buildTime = '${new Date()}';
 `;
 
 // ensure version module pulls value from package.json
