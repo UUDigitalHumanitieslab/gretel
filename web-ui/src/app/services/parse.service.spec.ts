@@ -34,11 +34,11 @@ describe('ParseService', () => {
         <meta type="text" name="role" value="Target_Child"/>
         <meta type="int" name="uttid" value="19"/>
     </metadata>`);
-        expect(parsed.metadata).toBeTruthy();
-        expect(parsed.metadata.meta).toBeTruthy();
-        expect(parsed.metadata.meta.length).toBe(14);
-        expect(parsed.metadata.meta[0].$.name).toBe('session');
-        expect(parsed.metadata.meta[4].$.value).toBe('CHI');
+        expect(parsed.metadata[0]).toBeTruthy();
+        expect(parsed.metadata[0].meta).toBeTruthy();
+        expect(parsed.metadata[0].meta.length).toBe(14);
+        expect(parsed.metadata[0].meta[0].$.name).toBe('session');
+        expect(parsed.metadata[0].meta[4].$.value).toBe('CHI');
     })));
 
     it('should parse attribute nodes', async(inject([ParseService], async (service: ParseService) => {
@@ -55,10 +55,10 @@ describe('ParseService', () => {
         </node>
     </node></node>`);
         expect(parsed.node).toBeTruthy();
-        expect(parsed.node.node).toBeTruthy();
-        expect(parsed.node.node.length).toBe(1);
-        expect(parsed.node.node[0].$).toEqual({ varName: '$node', cat: '' });
-        expect(parsed.node.node[0].node.length).toBe(3);
-        expect(parsed.node.node[0].node[2].$).toEqual({ varName: '$node3', rel: 'predc', cat: 'np' });
+        expect(parsed.node[0].node).toBeTruthy();
+        expect(parsed.node[0].node.length).toBe(1);
+        expect(parsed.node[0].node[0].$).toEqual({ varName: '$node', cat: '' });
+        expect(parsed.node[0].node[0].node.length).toBe(3);
+        expect(parsed.node[0].node[0].node[2].$).toEqual({ varName: '$node3', rel: 'predc', cat: 'np' });
     })));
 });

@@ -16,11 +16,23 @@ const httpOptions = {
     })
 };
 
+export interface VariableProperty {
+    name: string;
+    expression: string;
+    enabled: boolean;
+}
+
+export interface SearchVariable {
+    name: string;
+    path: string;
+    props?: VariableProperty[];
+}
+
 @Injectable()
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: FilterValue[] = [];
-    defaultVariables: { name: string, path: string }[] = null;
+    defaultVariables: SearchVariable[] = null;
 
     constructor(
         private http: HttpClient,
@@ -172,17 +184,17 @@ export class ResultsService {
     ): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getApiUrl(provider, 'results'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                retrieveContext,
-                corpus,
-                remainingComponents,
-                remainingDatabases,
-                iteration,
-                isAnalysis,
-                variables,
-                needRegularGrinded,
-                searchLimit
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            retrieveContext,
+            corpus,
+            remainingComponents,
+            remainingDatabases,
+            iteration,
+            isAnalysis,
+            variables: this.formatVariables(variables),
+            needRegularGrinded,
+            searchLimit
+        }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
         }
@@ -232,20 +244,20 @@ export class ResultsService {
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
             await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                corpus,
-                components,
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async treebankCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         const results = await this.http.post<{ [componentId: string]: string }>(
             await this.configurationService.getApiUrl(provider, 'treebank_counts'), {
-                xpath: this.createFilteredQuery(xpath, metadataFilters),
-                corpus,
-                components,
-            }, httpOptions).toPromise();
+            xpath: this.createFilteredQuery(xpath, metadataFilters),
+            corpus,
+            components,
+        }, httpOptions).toPromise();
 
         return Object.keys(results).map(componentId => {
             return {
@@ -423,9 +435,9 @@ export class ResultsService {
                     value: string
                 }
             }[]
-        }
+        }[]
     }): Hit['metaValues'] {
-        return !data.metadata || !data.metadata.meta ? {} : data.metadata.meta.reduce((values, meta) => {
+        return !data.metadata || !data.metadata.length || !data.metadata[0].meta ? {} : data.metadata[0].meta.reduce((values, meta) => {
             values[meta.$.name] = meta.$.value;
             return values;
         }, {} as Hit['metaValues']);
@@ -440,15 +452,41 @@ export class ResultsService {
                     lemma?: string
                 }
             }[]
-        }
+        }[]
     }): Hit['variableValues'] {
-        if (!data) {
+        if (!data || !data.vars) {
             return {};
         }
-        return data.vars.var.reduce((values, variable) => {
+        return data.vars[0].var.reduce((values, variable) => {
             values[variable.$.name] = variable.$;
             return values;
         }, {} as Hit['variableValues']);
+    }
+
+    /**
+     * Format variables for sending to the server
+     */
+    private formatVariables(variables: SearchVariable[]) {
+        return variables.map(variable => ({
+            name: variable.name,
+            path: variable.path,
+            props: this.formatVariableProps(variable.props)
+        }));
+    }
+
+    private formatVariableProps(props?: SearchVariable['props']) {
+        if (!props || props.length === 0) {
+            return undefined;
+        }
+
+        const result: { [name: string]: string } = {};
+        for (const prop of props) {
+            if (prop.enabled) {
+                result[prop.name] = prop.expression;
+            }
+        }
+
+        return result;
     }
 
     private highlightSentence(sentence: string, nodeStarts: number[], tag: string) {

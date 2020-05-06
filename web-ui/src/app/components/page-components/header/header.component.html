@@ -10,7 +10,7 @@
         <grt-navigation></grt-navigation>
     </div>
 </nav>
-<div class="notification is-radiusless" *ngIf="show" [ngClass]="messageType" [@slideInOut]>
+<div class="notification is-radiusless" *ngIf="show" [ngClass]="messageType" [@slideDown]>
     <button class="delete" (click)="show=false"></button>
     {{message}}
 </div>

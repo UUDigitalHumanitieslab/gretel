@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "baseUrl": "./",
         "downlevelIteration": true,
         "module": "esnext",
         "outDir": "./dist/out-tsc",
@@ -20,9 +21,13 @@
             "es2017",
             "dom",
             "esnext.array",
-            "es2018.promise"
+            "es2018.promise",
+            "es2019.string"
         ],
         "paths": {
+            "jszip": [
+                "../node_modules/jszip/dist/jszip.min.js"
+            ],
             "@angular/": [
                 "./node_modules/@angular/"
             ]

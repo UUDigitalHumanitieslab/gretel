@@ -1,0 +1,73 @@
+<form (ngSubmit)="addNode()">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Node</th>
+                <th>Name</th>
+                <th>Expression</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let node of nodes">
+                <ng-container *ngIf="node.props">
+                    <tr *ngFor="let prop of node.props">
+                        <th>
+                            <input class="input is-static" type="text" name="node" value="{{node.name}}" readonly />
+                        </th>
+                        <td>
+                            <input class="input is-static" type="text" name="name" value="{{prop.name}}" readonly />
+                        </td>
+                        <td>
+                            <input class="input is-static" type="text" name="expression" value="{{prop.expression}}"
+                                readonly />
+                        </td>
+                        <td>
+                            <div class="field is-grouped">
+                                <p class="control prop-toggle" (click)="toggle($event, node, prop)"
+                                    [ngClass]="{'prop-disabled': !prop.enabled, 'prop-enabled': prop.enabled}">
+                                    <span class="button disable-toggle is-danger is-inverted" grtBalloon="Disable custom property">
+                                        <span class="icon">
+                                            <i class="fas fa-ban"></i>
+                                        </span>
+                                    </span>
+                                    <span class="button enable-toggle is-success is-inverted" grtBalloon="Enable custom property">
+                                        <span class="icon">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    </span>
+                                </p>
+                                <p class="control">
+                                    <span class="button is-black is-inverted" (click)="delete($event, node, prop)" grtBalloon="Remove custom property">
+                                        <span class="icon">
+                                            <i class="fas fa-trash"></i>
+                                        </span>
+                                    </span>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+            <tr>
+                <th>
+                    <ng-select [clearable]="false" [items]="nodes" bindLabel="name" bindValue="name"
+                        [(ngModel)]="nodeName" name="nodeName" required></ng-select>
+                </th>
+                <td>
+                    <input class="input" type="text" name="propName" [(ngModel)]="propName" required #propNameField />
+                </td>
+                <td>
+                    <input class="input" type="text" name="propExpression" [(ngModel)]="propExpression" required />
+                </td>
+                <td>
+                    <button type="submit" class="button is-primary" grtBalloon="Add custom property">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

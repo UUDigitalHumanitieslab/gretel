@@ -98,11 +98,27 @@
     </div>
     <div class="level-right is-hidden-print">
         <div class="level is-mobile">
-            <div class="level-item">
+            <div class="level-item is-hidden-tablet" *ngIf="filters.length">
                 <div class="field">
                     <p class="control">
-                        <a class="button" role="button" (click)="prev.next()">
-                            Previous
+                        <a class="button" role="button" (click)="hideFiltersColumn = !hideFiltersColumn">
+                            <span class="icon">
+                                <i class="fas fa-filter" title="Toggle filters"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="level-item">
+                <div class="field">
+                    <p class="control" (click)="prev.next()">
+                        <a class="button is-hidden-tablet" role="button">
+                            <span class="icon ">
+                                <i class="fas fa-chevron-left" title="Previous"></i>
+                            </span>
+                        </a>
+                        <a class="button is-hidden-mobile" role="button">
+                            <span class="is-hidden-mobile">Previous</span>
                         </a>
                     </p>
                 </div>
@@ -155,9 +171,14 @@
             </div>
             <div class="level-item">
                 <div class="field">
-                    <p class="control">
-                        <a class="button is-primary" role="button" (click)="next.next()">
-                            Next
+                    <p class="control" (click)="next.next()">
+                        <a class="button is-hidden-tablet" role="button">
+                            <span class="icon ">
+                                <i class="fas fa-chevron-right" title="Previous"></i>
+                            </span>
+                        </a>
+                        <a class="button is-hidden-mobile" role="button">
+                            <span class="is-hidden-mobile">Next</span>
                         </a>
                     </p>
                 </div>
@@ -167,10 +188,19 @@
 </div>
 <grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
-    <div class="column is-one-third is-hidden-print" *ngIf="filters.length">
+    <div class="column is-one-third is-hidden-print is-hidden-mobile" *ngIf="filters.length" [@fade]
+        [ngClass]="{'is-hidden-mobile': hideFiltersColumn }">
         <div class="filter">
             <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)">
             </grt-filters>
+        </div>
+        <div class="is-hidden-tablet">
+            <br />
+            <div class="buttons is-centered">
+                <a class="button is-primary" role="button" (click)="hideFiltersColumn = true">
+                    Hide Filters
+                </a>
+            </div>
         </div>
     </div>
     <div class="column">
@@ -189,7 +219,7 @@
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
-                <tr *ngIf="!rowData.hidden">
+                <tr *ngIf="!rowData.hidden" [@fade]>
                     <td *ngFor="let col of columns" class="ui-resizable-column">
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
@@ -210,13 +240,13 @@
         </p-table>
 
         <ng-template #warning>
-            <div *ngIf="!loading && hiddenCount === 0" class="notification is-warning">
+            <div [@slideDown] *ngIf="!loading && hiddenCount === 0" class="notification is-warning">
                 <ng-container *ngIf="activeFilterCount > 0; else noActiveFilters">No results found, please try again
                     with another treebank, other xpath-query or change the filters.</ng-container>
                 <ng-template #noActiveFilters>No results found, please try again with another treebank or other
                     xpath-query.</ng-template>
             </div>
-            <div *ngIf="hiddenCount > 0 && hiddenCount === filteredResults.length" class="notification">
+            <div [@slideDown] *ngIf="hiddenCount > 0 && hiddenCount === filteredResults.length" class="notification">
                 All results are hidden.
             </div>
         </ng-template>

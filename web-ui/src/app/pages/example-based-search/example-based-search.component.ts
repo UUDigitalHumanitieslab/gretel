@@ -34,6 +34,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
         respectOrder: false,
         ignoreTopNode: false,
         selectedTreebanks: new TreebankSelection(this.treebankService),
+        variableProperties: undefined
     };
 
     matrixStep: MatrixStep;
@@ -53,32 +54,27 @@ export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalSt
     encodeGlobalState(state: GlobalStateExampleBased) {
         return Object.assign(
             super.encodeGlobalState(state), {
-                'inputSentence': state.inputSentence,
-                'isCustomXPath': this.encodeBool(state.isCustomXPath),
-                'attributes': state.attributes,
-                'respectOrder': this.encodeBool(state.respectOrder),
-                'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
-            });
+            'inputSentence': state.inputSentence,
+            'isCustomXPath': this.encodeBool(state.isCustomXPath),
+            'attributes': state.attributes,
+            'respectOrder': this.encodeBool(state.respectOrder),
+            'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
+        });
     }
 
     decodeGlobalState(queryParams: { [key: string]: any }) {
-        const globalState = {
-            step: parseInt(queryParams.currentStep || 0, 10),
-            state: {
-                selectedTreebanks: new TreebankSelection(
-                    this.treebankService,
-                    queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
-                xpath: queryParams.xpath || undefined,
-                inputSentence: queryParams.inputSentence || undefined,
-                isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
-                attributes: queryParams.attributes,
-                retrieveContext: this.decodeBool(queryParams.retrieveContext),
-                respectOrder: this.decodeBool(queryParams.respectOrder),
-                ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
-            }
+        return {
+            selectedTreebanks: new TreebankSelection(
+                this.treebankService,
+                queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
+            xpath: queryParams.xpath || undefined,
+            inputSentence: queryParams.inputSentence || undefined,
+            isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
+            attributes: queryParams.attributes,
+            retrieveContext: this.decodeBool(queryParams.retrieveContext),
+            respectOrder: this.decodeBool(queryParams.respectOrder),
+            ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
         };
-
-        return globalState;
     }
 
     initializeSteps(): { step: Step<GlobalStateExampleBased>, name: string }[] {

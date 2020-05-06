@@ -142,13 +142,13 @@ function getDatabases($corpus, $component, $xpath)
 }
 
 /**
- * @param string   $corpus          the corpus we're searching
- * @param string   $component       the component we're searching
- * @param string[] $databases       the databases that remain to be searched in this component
- * @param int      $start           index of first sentence to retrieve (in the current database, that's the last db in the array)
- * @param Session  $session         the basex session
- * @param int      $searchlimit     max number of sentences to return
- * @param array    $variables       An array with variables to return. Each element should contain name and path.
+ * @param string   $corpus      the corpus we're searching
+ * @param string   $component   the component we're searching
+ * @param string[] $databases   the databases that remain to be searched in this component
+ * @param int      $start       index of first sentence to retrieve (in the current database, that's the last db in the array)
+ * @param Session  $session     the basex session
+ * @param int      $searchlimit max number of sentences to return
+ * @param array    $variables   An array with variables to return. Each element should contain name and path.
  */
 function getSentences($corpus, $component, $databases, $start, $session, $searchLimit, $xpath, $context, $variables = null)
 {
@@ -157,7 +157,7 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
     $xquery = 'N/A';
     try {
         while ($database = array_pop($databases)) {
-            $xquery = createXquery($corpus, $component, $database, $start, $start+$searchLimit, $needRegularGrinded, $context, $xpath, $variables);
+            $xquery = createXquery($corpus, $component, $database, $start, $start + $searchLimit, $needRegularGrinded, $context, $xpath, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
@@ -203,8 +203,8 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
                 }
             }
             // Done processing all results in this database
-            // if we're limited by the amount we're asked to retrieve 
-            // there might have been more hits, in this case, re-add the database to the list 
+            // if we're limited by the amount we're asked to retrieve
+            // there might have been more hits, in this case, re-add the database to the list
             // since we're probably not finished.
             if ($searchLimit <= 0) {
                 array_push($databases, $database);
@@ -247,6 +247,18 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
     }
 }
 
+function createVariableAttributes($properties)
+{
+    $attributes = '';
+    if (isset($properties)) {
+        foreach ($properties as $name => $expression) {
+            $attributes .= " $name=\"{{$expression}}\"";
+        }
+    }
+
+    return $attributes;
+}
+
 function createXquery($corpus, $component, $database, $start, $end, $needRegularGrinded, $context, $xpath, $variables)
 {
     $variable_declarations = '';
@@ -259,7 +271,7 @@ function createXquery($corpus, $component, $database, $start, $end, $needRegular
                 // the root node is already declared in the query itself, do not declare it again
                 $variable_declarations .= 'let '.$name.' := ('.$value['path'].')[1]';
             }
-            $variable_results .= '<var name="'.$name.'">{'.$name.'/@*}</var>';
+            $variable_results .= '<var name="'.$name.'"'.createVariableAttributes($value['props']).'>{'.$name.'/@*}</var>';
         }
         $variable_results = '<vars>'.$variable_results.'</vars>';
     }
@@ -324,8 +336,9 @@ let $nexts := ($tree/following-sibling::alpino_ds[1]/sentence)';
 
     // Adds positioning values: limits possible output
     $openPosition = '(';
-    $closePosition = ')[position() = '.($start+1).' to '.$end.']';
+    $closePosition = ')[position() = '.($start + 1).' to '.$end.']';
     $xquery = $openPosition.$xquery.$closePosition;
+
     return $xquery;
 }
 

@@ -1,23 +1,28 @@
 import { Injectable } from '@angular/core';
 
-import { Parser } from 'xml2js';
+import * as parser from 'fast-xml-parser';
 import { ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
 
 @Injectable()
 export class ParseService {
-    private parser = new Parser();
-
     constructor(private extractinatorService: ExtractinatorService) {
     }
 
     parseXml(xml: string): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            this.parser.parseString(xml, (error?: Error, data?: any) => {
-                if (error) {
-                    return reject(error);
-                }
+            try {
+                const data = parser.parse(xml,
+                    {
+                        arrayMode: true,
+                        attrNodeName: '$',
+                        attributeNamePrefix: '',
+                        ignoreAttributes: false,
+                        parseAttributeValue: true
+                    });
                 return resolve(data);
-            });
+            } catch (exception) {
+                return reject(exception);
+            }
         });
     }
 

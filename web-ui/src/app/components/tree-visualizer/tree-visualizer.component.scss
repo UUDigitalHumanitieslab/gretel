@@ -18,13 +18,20 @@
 }
 
 .metadata {
-    display: none;
+    display: block;
     position: relative;
     z-index: 20;
+    opacity: 0;
+    transform: translateX(-50%);
+    transition: opacity 1s ease-in,
+        transform 1s ease-in;
 
     .tv-toolbar-wrapper:hover+&,
     &:hover {
-        display: block;
+        opacity: 1;
+        transform: translateX(0);
+        transition: opacity 0.5s ease-out,
+            transform 0.5s ease-out;
     }
 
     .card {

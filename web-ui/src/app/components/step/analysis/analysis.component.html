@@ -1,9 +1,9 @@
-<div class="notification is-primary explanation" *ngIf="renderCount && showExplanation">
+<div class="notification is-primary explanation" *ngIf="renderCount && showExplanation" [@slideDown]>
     <button class="delete" (click)="showExplanation = false"></button>
     <p>Drag a node from the <strong>XPath query</strong> or the <strong>tree</strong> into the analysis table below to
         analyse its properties.</p>
 </div>
-<div class="columns">
+<div class="columns query" [ngClass]="{'disabled': disabled}">
     <div class="column" [ngClass]="{'is-half': treeXml}">
         <h2 class="subtitle">XPath</h2>
         <div class="content">
@@ -32,10 +32,28 @@
             (displayChange)="treeDisplay = $event"></grt-tree-visualizer>
     </div>
 </div>
-<div class="modal is-active" *ngIf="selectedVariable">
+<div class="modal is-active" *ngIf="selectedVariable" [@slideDown]>
     <div class="modal-background"></div>
     <div class="modal-content">
-        <div class="box">
+        <div class="box" *ngIf="custom">
+            <grt-node-properties (add)="addVariable($event)" [nodeName]="selectedVariable.variable.name">
+            </grt-node-properties>
+            <div class="level">
+                <div class="level-left">
+                    <a role="button" (click)="custom=false">
+                        Show Existing Properties...
+                    </a>
+                </div>
+                <div class="level-right">
+                    <div class="buttons is-right">
+                        <div class="button" role="button" (click)="cancelVariable()">
+                            Cancel
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box" *ngIf="!custom">
             <div class="content">
                 Which property of
                 <span class="tag">{{selectedVariable.variable.name}}</span> should be analyzed?
@@ -49,12 +67,21 @@
                     </ng-option>
                 </ng-select>
             </div>
-            <div class="buttons is-right">
-                <div class="button" role="button" (click)="cancelVariable()">
-                    Cancel
+            <div class="level">
+                <div class="level-left">
+                    <a role="button" (click)="custom=true">
+                        Specify Custom Properties...
+                    </a>
                 </div>
-                <div class="button is-primary" role="button" (click)="addVariable()">
-                    Add
+                <div class="level-right">
+                    <div class="buttons is-right">
+                        <div class="button" role="button" (click)="cancelVariable()">
+                            Cancel
+                        </div>
+                        <div class="button is-primary" role="button" (click)="addVariable()">
+                            Add
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -66,8 +93,7 @@
         <h1 class="title" [ngClass]="{'is-loading': isLoading}" grtSubtitle>Analysis Table</h1>&nbsp;
     </div>
     <div class="level-right">
-        <div class="level-item" *ngIf="renderCount < hitsCount && !selectedVariable"
-            grtBalloon="More data is ready to be shown in the table">
+        <div class="level-item" *ngIf="canShowMore" grtBalloon="More data is ready to be shown in the table">
             <a class="button has-badge-rounded" [ngClass]="{'has-badge-warning': isLoading}" role="button"
                 (click)="showMore()" [attr.data-badge]="hitsCount - renderCount">
                 Show More Data
@@ -75,9 +101,9 @@
         </div>
     </div>
 </div>
-<div class="box">
-    <div class="content">
-        <p *ngIf="renderCount">Click on a cell in the table to view those documents.</p>
+<div class="analysis-box" [ngClass]="{'box': renderCount}">
+    <div class="content" [@slideDown] *ngIf="renderCount">
+        <p>Click on a cell in the table to view those documents.</p>
     </div>
-    <div class="analysis-component"></div>
+    <div class="analysis-component" [ngClass]="{'disabled': disabled}"></div>
 </div>

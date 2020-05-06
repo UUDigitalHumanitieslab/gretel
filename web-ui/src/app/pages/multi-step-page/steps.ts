@@ -1,8 +1,8 @@
-import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath/ng';
 
 import { AlpinoService } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';
-import { FilterValues } from '../../services/results.service';
+import { FilterValues, SearchVariable } from '../../services/results.service';
 import { TreebankSelection } from '../../treebank';
 
 /**
@@ -26,6 +26,40 @@ interface GlobalState {
     loading: boolean;
     inputSentence?: string;
     selectedTreebanks: TreebankSelection;
+    /**
+     * Query additional custom properties for variables
+     */
+    variableProperties: {
+        // start with $, refers to an existing variable extracted from
+        // the query tree
+        variableName: string;
+        // start with _
+        propertyName: string;
+        propertyExpression: string;
+        enabled: boolean;
+    }[];
+}
+
+export function getSearchVariables(
+    variables: PathVariable[],
+    properties: GlobalState['variableProperties']): SearchVariable[] {
+    const output = [...variables] as SearchVariable[];
+    if (properties) {
+        for (const prop of properties) {
+            const variable = output.find(v => v.name === prop.variableName);
+            if (variable !== undefined) {
+                if (!variable.props) {
+                    variable.props = [];
+                }
+                variable.props.push({
+                    name: prop.propertyName,
+                    expression: prop.propertyExpression,
+                    enabled: prop.enabled
+                });
+            }
+        }
+    }
+    return output;
 }
 
 interface GlobalStateExampleBased extends GlobalState {

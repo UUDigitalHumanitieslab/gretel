@@ -8,8 +8,10 @@ import { StateService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
 import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
+import { animations } from '../../../animations';
 
 @Component({
+    animations,
     selector: 'grt-matrix',
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
@@ -20,13 +22,23 @@ export class MatrixComponent extends StepComponent<GlobalStateExampleBased> impl
     public stepType = StepType.Matrix;
 
     public set attributes(values: string[]) {
-        this.tokenValues = values.map(value => {
+        const tokenValues = values.map(value => {
             const option = this.options.find(o => o.value === value);
             if (option.advanced) {
                 this.showAdvanced = true;
             }
             return option;
         });
+        if (this.tokenValues &&
+            tokenValues.length === this.tokenValues.length) {
+            // only update the values, but prevent the whole array
+            // from being re-rendered
+            for (let i = 0; i < tokenValues.length; i++) {
+                Object.assign(this.tokenValues[i], tokenValues[i]);
+            }
+        } else {
+            this.tokenValues = tokenValues;
+        }
     }
 
     public get attributes() {
@@ -34,7 +46,17 @@ export class MatrixComponent extends StepComponent<GlobalStateExampleBased> impl
     }
 
     public set tokens(values: string[]) {
-        this.indexedTokens = values.map((value, index) => ({ value, index }));
+        const indexedTokens = values.map((value, index) => ({ value, index }));
+        if (this.indexedTokens &&
+            indexedTokens.length === this.indexedTokens.length) {
+            // only update the values, but prevent the whole array
+            // from being re-rendered
+            for (let i = 0; i < indexedTokens.length; i++) {
+                Object.assign(this.indexedTokens[i], indexedTokens[i]);
+            }
+        } else {
+            this.indexedTokens = indexedTokens;
+        }
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
     public get tokens() {
@@ -136,7 +158,7 @@ export class MatrixComponent extends StepComponent<GlobalStateExampleBased> impl
 
     public setTokenPart(tokenIndex: number, part: Part) {
         if (this.isCustomXPath) {
-            this.warningId = this.notificationService.addWarning('It is not possible to use the matrix when using custom xpath.');
+            this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
         if (part.advanced) {

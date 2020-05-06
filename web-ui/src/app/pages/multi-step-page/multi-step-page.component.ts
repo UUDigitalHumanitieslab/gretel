@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { Crumb } from '../../components/breadcrumb-bar/breadcrumb-bar.component';
 import { GlobalState, Step } from './steps';
 import { FilterValues, TreebankService, StateService } from '../../services/_index';
+import { TreebankSelection } from '../../treebank';
 
 export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit {
     public crumbs: Crumb[];
@@ -74,8 +75,19 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      * @param queryParams
      */
     abstract decodeGlobalState(queryParams: { [key: string]: any }): {
-        step: number, state: { [K in keyof GlobalState]?: GlobalState[K] | undefined }
+        [K in Exclude<keyof GlobalState,
+            keyof ReturnType<MultiStepPageComponent<T>['decodeGlobalStateCommon']>>]?: GlobalState[K] | undefined
     };
+
+    protected decodeGlobalStateCommon(queryParams: { [key: string]: any }) {
+        return {
+            selectedTreebanks: new TreebankSelection(
+                this.treebankService,
+                queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
+            retrieveContext: this.decodeBool(queryParams.retrieveContext),
+            variableProperties: queryParams.varProps ? JSON.parse(queryParams.varProps) : undefined
+        };
+    }
 
     encodeGlobalState(state: T): { [key: string]: any } {
         const selectedTreebanks = state.selectedTreebanks.encode();
@@ -84,7 +96,8 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
             // don't encode the default state
             'xpath': state.xpath !== this.defaultGlobalState.xpath ? state.xpath : undefined,
             'selectedTreebanks': selectedTreebanks && JSON.stringify(selectedTreebanks),
-            'retrieveContext': this.encodeBool(state.retrieveContext)
+            'retrieveContext': this.encodeBool(state.retrieveContext),
+            'varProps': state.variableProperties && state.variableProperties.length ? JSON.stringify(state.variableProperties) : undefined
         };
     }
 
@@ -96,9 +109,12 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
     }
 
     private setStateFromParams(params: Params) {
-        const decoded = this.decodeGlobalState(params);
-        this.stateService.setState(_.pickBy(decoded.state, (item) => item !== undefined) as any, false);
-        this.stateService.jump(decoded.step, false);
+        const decoded = {
+            ...this.decodeGlobalStateCommon(params),
+            ...this.decodeGlobalState(params)
+        };
+        this.stateService.setState(_.pickBy(decoded, (item) => item !== undefined) as any, false);
+        this.stateService.jump(parseInt(params.currentStep || '0', 10), false);
     }
 
     /**

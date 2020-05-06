@@ -1,5 +1,4 @@
 import { Component, Input, OnDestroy, Output, EventEmitter, OnInit } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { SafeHtml } from '@angular/platform-browser';
 
 import { combineLatest as observableCombineLatest, BehaviorSubject, Subscription, Observable, merge, combineLatest } from 'rxjs';
@@ -18,6 +17,7 @@ import {
 import { ValueEvent } from 'lassy-xpath/ng';
 import { ClipboardService } from 'ngx-clipboard';
 
+import { animations } from '../../../animations';
 import {
     DownloadService,
     FilterByXPath,
@@ -29,13 +29,14 @@ import {
     ResultsStreamService,
     StateService,
     TreebankSelectionService,
-    ParseService
+    ParseService,
+    NotificationService
 } from '../../../services/_index';
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
 import { StepComponent } from '../step.component';
 import { NotificationKind } from 'rxjs/internal/Notification';
-import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
+import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 
 const DebounceTime = 200;
 
@@ -60,6 +61,7 @@ interface HideSettings {
 type HidableHit = HitWithOrigin & { hidden: boolean };
 
 @Component({
+    animations,
     selector: 'grt-results',
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
@@ -118,6 +120,10 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     public isModifyingXPath = false;
     public activeFilterCount = 0;
 
+    /**
+     * Toggle filters column on mobile
+     */
+    public hideFiltersColumn = true;
     public filters: Filter[] = [];
 
     /**
@@ -138,9 +144,11 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     ];
 
     private subscriptions: Subscription[];
+    private variableProperties: GlobalState['variableProperties'];
 
     constructor(private downloadService: DownloadService,
         private clipboardService: ClipboardService,
+        private notificationService: NotificationService,
         private resultsService: ResultsService,
         private resultsStreamService: ResultsStreamService,
         private treebankSelectionService: TreebankSelectionService,
@@ -154,9 +162,8 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     ngOnInit() {
         super.ngOnInit();
         // intermediate streams
-        const treebankSelections$ = this.state$.pipe(
+        const state$ = this.state$.pipe(
             debounceTime(1000),
-            map(v => v.selectedTreebanks),
             shareReplay(1), // this stream is used as input in multiple others, no need to re-run it for every subscription.
         );
         const filterValues$ = this.filterValuesSubject.pipe( // the user-selected values
@@ -167,14 +174,17 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         // the metadata properties for the selected treebanks
         const metadataProperties$ = this.createMetadataPropertiesStream();
         // the values for the properties
-        const metadataCounts$ = this.createMetadataCountsStream(treebankSelections$, this.xpathSubject, filterValues$);
+        const metadataCounts$ = this.createMetadataCountsStream(state$, this.xpathSubject, filterValues$);
 
         // subscribed streams
         const metadataFilters$ = this.createMetadataFiltersStream(metadataProperties$, metadataCounts$);
-        const results$ = this.createResultsStream(treebankSelections$, this.xpathSubject, filterValues$);
+        const results$ = this.createResultsStream(state$, this.xpathSubject, filterValues$);
 
         this.subscriptions = [
-            treebankSelections$.subscribe(treebankSelection => this.treebankSelection = treebankSelection),
+            state$.subscribe(state => {
+                this.treebankSelection = state.selectedTreebanks;
+                this.variableProperties = state.variableProperties;
+            }),
             metadataFilters$.subscribe(filters => this.filters = filters),
 
             results$.subscribe(r => {
@@ -263,34 +273,41 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     public async downloadResults(includeNodeProperties: boolean) {
         const filterValues = Object.values(this.filterValuesSubject.value);
         const variables = includeNodeProperties
-            ? this.parseService.extractVariables(this.xpath).variables
+            ? getSearchVariables(
+                this.parseService.extractVariables(this.xpath).variables,
+                this.variableProperties)
             : undefined;
 
         this.loadingDownload = true;
-        const results = await Promise.all(
-            this.treebankSelection.corpora.map(corpus =>
-                this.resultsService.promiseAllResults(
-                    this.xpath,
-                    corpus.provider,
-                    corpus.corpus.name,
-                    corpus.corpus.components,
-                    this.retrieveContext,
-                    false,
-                    filterValues,
-                    variables).then(hits => ({
-                        corpus: corpus,
-                        hits
-                    }))));
+        try {
+            const results = await Promise.all(
+                this.treebankSelection.corpora.map(corpus =>
+                    this.resultsService.promiseAllResults(
+                        this.xpath,
+                        corpus.provider,
+                        corpus.corpus.name,
+                        corpus.corpus.components,
+                        this.retrieveContext,
+                        false,
+                        filterValues,
+                        variables).then(hits => ({
+                            corpus: corpus,
+                            hits
+                        }))));
 
-        const r = results.flatMap(corpusHits => ({
-            xpath: this.xpath,
-            components: corpusHits.corpus.corpus.components,
-            provider: corpusHits.corpus.provider,
-            corpus: corpusHits.corpus.corpus.name,
-            hits: corpusHits.hits
-        }));
+            const r = results.flatMap(corpusHits => ({
+                xpath: this.xpath,
+                components: corpusHits.corpus.corpus.components,
+                provider: corpusHits.corpus.provider,
+                corpus: corpusHits.corpus.corpus.name,
+                hits: corpusHits.hits
+            }));
 
-        await this.downloadService.downloadResults(r, variables);
+            await this.downloadService.downloadResults(r, variables);
+        } catch (error) {
+            this.notificationService.add('Problem downloading results', 'error');
+            console.error(error);
+        }
         this.loadingDownload = false;
     }
 
@@ -403,25 +420,25 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
 
     /** Retrieves metadata counts based on selected banks and filters */
     private createMetadataCountsStream(
-        banksInput: Observable<TreebankSelection>,
-        xpathInput: Observable<string>,
-        filterValueInput: Observable<FilterValue[]>
+        state$: Observable<GlobalState>,
+        xpath$: Observable<string>,
+        filterValues$: Observable<FilterValue[]>
     ): Observable<MetadataValueCounts> {
         return observableCombineLatest(
-            banksInput,
-            xpathInput,
-            filterValueInput
+            state$,
+            xpath$,
+            filterValues$
         )
             .pipe(
                 debounceTime(DebounceTime),
                 distinctUntilChanged(),
-                switchMap(([banks, xpath, filterValues]) =>
+                switchMap(([state, xpath, filterValues]) =>
                     // TODO: change to stream-based approach, so we can cancel http requests?
                     // TODO: error handling, just ignore that metadata?
                     // would need to check if requests are actually cancelled in the angular http service
 
                     // get counts for all selected
-                    Promise.all(banks.corpora.map(({ provider, corpus }) =>
+                    Promise.all(state.selectedTreebanks.corpora.map(({ provider, corpus }) =>
                         this.resultsService.metadataCounts(
                             xpath,
                             provider,
@@ -453,12 +470,12 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
 
     /** Transforms metadata fields along with their values into filter definitions */
     private createMetadataFiltersStream(
-        metadataFieldsInput: Observable<TreebankMetadata[]>,
-        metadataValuesInput: Observable<MetadataValueCounts>,
+        metadataFields$: Observable<TreebankMetadata[]>,
+        metadataValues$: Observable<MetadataValueCounts>,
     ): Observable<Filter[]> {
         return combineLatest(
-            metadataFieldsInput,
-            metadataValuesInput
+            metadataFields$,
+            metadataValues$
         )
             .pipe(
                 debounceTime(100), // lots of values bouncing around during initialization
@@ -502,19 +519,28 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
      *  @type {Notification} either a set of results, a finished message, or an error message within a selected treebank
      */
     private createResultsStream(
-        treebankSelectionInput: Observable<TreebankSelection>,
-        xpathInput: Observable<string>,
-        filterValueInput: Observable<FilterValue[]>
+        state$: Observable<GlobalState>,
+        xpath$: Observable<string>,
+        filterValue$: Observable<FilterValue[]>
     ) {
         return observableCombineLatest(
-            treebankSelectionInput,
-            xpathInput,
-            filterValueInput
+            state$,
+            xpath$,
+            filterValue$
         ).pipe(
             filter((values) => values.every(value => value != null)),
             debounceTime(DebounceTime),
-            distinctUntilChanged(),
-            switchMap(([selectedTreebanks, xpath, filterValues]) => {
+            map(([state, xpath, filterValues]) => ({
+                selectedTreebanks: state.selectedTreebanks,
+                xpath,
+                filterValues
+            })),
+            distinctUntilChanged((prev, curr) => {
+                return prev.filterValues === curr.filterValues &&
+                    prev.xpath === curr.xpath &&
+                    prev.selectedTreebanks.equals(curr.selectedTreebanks);
+            }),
+            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,

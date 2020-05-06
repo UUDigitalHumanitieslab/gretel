@@ -11,9 +11,13 @@
                 <input type="checkbox" name="includeNodeProperties" [(ngModel)]="includeNodeProperties">
                 Include Node Properties
             </label>
-            <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="For every node specified in the query, columns will be added for that node's linguistic properties e.g. the POS-value, dependency relation, phrasal category, etc.">
+            <label grtBalloonLength="large" grtBalloonPosition="right"
+                grtBalloon="For every node specified in the query, columns will be added for that node's linguistic properties e.g. the POS-value, dependency relation, phrasal category, etc.">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
             </label>
+        </div>
+        <div class="field" *ngIf="includeNodeProperties">
+            <grt-node-properties-button></grt-node-properties-button>
         </div>
         <div class="field">
             <button class="button" type="submit" [ngClass]="{'is-loading': loading}">Download</button>

@@ -1,0 +1,14 @@
+<div class="dropdown is-right" [ngClass]="{'is-active': visible}">
+    <div class="dropdown-trigger">
+        <a role="button" (click)="toggle()">
+            <span>Specify custom properties...</span>
+        </a>
+    </div>
+    <div class="dropdown-menu" *ngIf="visible">
+        <div class="dropdown-content">
+            <div class="dropdown-item">
+                <grt-node-properties></grt-node-properties>
+            </div>
+        </div>
+    </div>
+</div>

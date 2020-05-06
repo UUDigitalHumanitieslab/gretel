@@ -15,6 +15,7 @@ import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
 import * as $ from 'jquery';
 
+import { animations } from '../../animations';
 import { DownloadService, ParseService } from '../../services/_index';
 import './tree-visualizer';
 
@@ -29,6 +30,7 @@ interface Metadata {
 }
 
 @Component({
+    animations,
     selector: 'grt-tree-visualizer',
     templateUrl: './tree-visualizer.component.html',
     styleUrls: ['./tree-visualizer.component.scss']
@@ -159,11 +161,22 @@ export class TreeVisualizerComponent implements OnChanges, OnInit, AfterViewChec
      * Shows the metadata of a tree.
      * @param data The parsed XML data
      */
-    private showMetadata(data: any) {
+    private showMetadata(data: {
+        alpino_ds: {
+            metadata: {
+                meta: {
+                    $: {
+                        name: string,
+                        value: string
+                    }
+                }[]
+            }[]
+        }[]
+    }) {
         const result: Metadata[] = [];
-        if (data && data.alpino_ds && data.alpino_ds.metadata
-            && data.alpino_ds.metadata[0].meta) {
-            for (const item of data.alpino_ds.metadata[0].meta.sort(function (a: any, b: any) {
+        if (data && data.alpino_ds && data.alpino_ds.length === 1 && data.alpino_ds[0].metadata
+            && data.alpino_ds[0].metadata[0].meta) {
+            for (const item of data.alpino_ds[0].metadata[0].meta.sort(function (a: any, b: any) {
                 return a.$.name.localeCompare(b.$.name);
             })) {
                 result.push({ name: item.$.name, value: item.$.value });
