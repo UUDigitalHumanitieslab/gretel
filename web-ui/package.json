@@ -10,7 +10,7 @@
     "serve:live": "ng serve --proxy-config proxy.live.conf.json",
     "serve:poll": "ng serve --poll=2000 --host 0.0.0.0 --proxy-config proxy.conf.json",
     "build": "npm run build-pre && ng build --prod --base-href=/ng/ --output-path=../ng",
-    "build-prod": "npm run build-pre && ng-high-memory build --prod --base-href=/ng/ --output-path=../ng",
+    "build-prod": "npm run build-pre && npm run ng-high-memory build --prod --base-href=/ng/ --output-path=../ng",
     "build-pre": "node ./build/build-pre.js",
     "test": "ng test",
     "lint": "ng lint",
