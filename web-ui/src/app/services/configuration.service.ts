@@ -26,7 +26,8 @@ export class ConfigurationService {
     }
 
     async getUploadApiUrl(path: string) {
-        return (await this.config).uploadUrl + path;
+        const uploadUrl = (await this.config).uploadUrl ;
+        return uploadUrl ? uploadUrl + path : undefined;
     }
 
     async getUploadProvider() {

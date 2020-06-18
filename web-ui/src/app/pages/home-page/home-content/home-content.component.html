@@ -4,8 +4,8 @@
             <p>
                 This is a preview of the next version of GrETEL, developed by the Digital Humanities Lab at Utrecht
                 University.
-                <strong>This is currently under active development!</strong> It includes additional functionality to
-                <a href="/gretel-upload">upload your own corpus</a>, faceted search, analysis and improved usability.
+                <strong>This is currently under active development!</strong> It includes <span *ngIf="uploadUrl">additional functionality to
+                <a [href]="uploadUrl">upload your own corpus</a>,</span> faceted search, analysis and improved usability.
             </p>
             <p>
                 <em>All features are experimental and might break or change unexpectedly!</em>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" *ngIf="uploadUrl">
                     <header class="card header">
                         <a [href]="uploadUrl" class="card-header-title">Corpus Upload</a>
                     </header>
