@@ -10,6 +10,9 @@ function buildHomeURL()
 defined('ROOT_PATH') or define('ROOT_PATH', __DIR__);
 defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
 
+defined('LOG_DIR') or define('LOG_DIR', ROOT_PATH.'/log');
+defined('TMP_DIR') or define('TMP_DIR', ROOT_PATH.'/tmp');
+
 // === GRETEL-UPLOAD ===
 // Whether or not to use an API to retrieve uploaded corpora. If empty, uploaded corpora will be unreachable.
 // defined('API_URL') or define('API_URL', 'http://localhost/gretel-upload/index.php/api/');

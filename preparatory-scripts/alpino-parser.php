@@ -47,15 +47,22 @@ function alpino($sentence, $id)
         return alpino_server($sentence);
     }
 
+    if (!is_dir(LOG_DIR)) {
+        mkdir(LOG_DIR);
+    }
+
     $descriptorspec = array(
               0 => array('pipe', 'r'),  // stdin is a pipe that the child will read from
               1 => array('pipe', 'w'),  // stdout is a pipe that the child will write to
-              2 => array('file', ROOT_PATH.'/log/alpino.log', 'a'), // stderr is a file to write to
+              2 => array('file', LOG_DIR.'/alpino.log', 'a'), // stderr is a file to write to
               );
 
     $cwd = '/';
     $env = array('ALPINO_HOME' => $alpinoDirectory);
-    $tmp = ROOT_PATH.'/tmp';
+    $tmp = TMP_DIR;
+    if (!is_dir($tmp)) {
+        mkdir($tmp);
+    }
     $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=20 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
     $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
