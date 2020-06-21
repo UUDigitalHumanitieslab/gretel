@@ -14,7 +14,7 @@ function alpino_server($sentence)
 {
     global $alpinoServerAddress;
     global $alpinoServerPort;
-    $xml = "";
+    $xml = '';
 
     $fs = fsockopen($alpinoServerAddress, $alpinoServerPort, $errno, $errstr);
     if (!$fs) {
@@ -61,7 +61,7 @@ function alpino($sentence, $id)
 
     if (!is_resource($process)) {
         // die('Error when parsing input with Alpino');
-        throw new Exception('Error starting Alpino.');
+        throw new Exception("Error starting Alpino. Is it installed? $alpino");
     }
 
     // $pipes now looks like this:

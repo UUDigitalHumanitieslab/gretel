@@ -12,7 +12,7 @@ defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
 
 // === GRETEL-UPLOAD ===
 // Whether or not to use an API to retrieve uploaded corpora. If empty, uploaded corpora will be unreachable.
-// defined('API_URL') or define('API_URL', 'http:localhost/gretel-upload/index.php/api/');
+// defined('API_URL') or define('API_URL', 'http://localhost/gretel-upload/index.php/api/');
 // serialize() this for PHP < 5.6
 // defined('API_BASEX_INFO') or define ('API_BASEX_INFO', array(
 //     'machine'   => 'localhost',

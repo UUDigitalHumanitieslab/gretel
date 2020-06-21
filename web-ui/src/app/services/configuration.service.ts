@@ -56,7 +56,10 @@ interface Config {
      * This should not be the raw alpino in server-mode, but should implement as according to gretel4/api/router.php
      */
     alpino: string,
-    /** Uploading is not federated and only supports a single endpoint */
+    /**
+     * Uploading is not federated and only supports a single endpoint.
+     * This can be on a different domain!
+     */
     uploadUrl: string;
     /** Uploading requires a provider to request results */
     uploadProvider: string;
