@@ -97,7 +97,7 @@ function alpino($sentence, $id)
     }
 
     //    echo "command returned $return_value\n";
-    $location = ROOT_PATH."/tmp/$id.xml";
+    $location = "$tmp/$id.xml";
     $parsed = fopen($location, 'r');
     if (!$parsed) {
         throw new Exception('Unable to open Alpino output');
