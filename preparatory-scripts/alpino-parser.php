@@ -28,7 +28,7 @@ function alpino_server($sentence)
     fclose($fs);
 
     if (!$xml) {
-        throw new Exception('Error parsing sentence with Alpino.');
+        throw new Exception('Error parsing sentence with Alpino. (Server did not return xml)');
     }
 
     return $xml;
@@ -59,6 +59,9 @@ function alpino($sentence, $id)
 
     $cwd = '/';
     $env = array('ALPINO_HOME' => $alpinoDirectory);
+    if (defined('LD_LIBRARY_PATH')) {
+        $env['LD_LIBRARY_PATH'] = LD_LIBRARY_PATH.':$LD_LIBRARY_PATH';
+    }
     $tmp = TMP_DIR;
     if (!is_dir($tmp)) {
         mkdir($tmp);
@@ -90,7 +93,7 @@ function alpino($sentence, $id)
     // proc_close in order to avoid a deadlock
     $return_value = proc_close($process);
     if ($return_value != 0) {
-        throw new Exception('Error parsing sentence with Alpino');
+        throw new Exception('Error parsing sentence with Alpino. (Alpino process returned non-zero value)');
     }
 
     //    echo "command returned $return_value\n";
