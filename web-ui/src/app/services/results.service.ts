@@ -218,7 +218,7 @@ export class ResultsService {
         const url = await this.configurationService.getApiUrl(
             provider,
             'tree',
-            [treebank, component, sentenceId],
+            [treebank, component, btoa(sentenceId)],
             { ...(database && { db: database }) });
 
         const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();

@@ -29,7 +29,14 @@ function showTree($sentid, $treebank, $component, $database)
         $query = $session->query($xquery);
 
         $xml = $query->execute();
-        echo $xml;
+        if ($xml) {
+            $filename = preg_replace('/[:\\/_\\-\\. ]+/', '_', $sentid);
+            header('Content-Disposition: attachment; filename="'.$filename.'.xml"');
+            echo $xml;
+        } else {
+            http_response_code(404);
+            echo 'Could not retrieve '.$sentid.' in '.$database;
+        }
     } catch (Exception $e) {
         http_response_code(500);
         echo $e->getMessage();

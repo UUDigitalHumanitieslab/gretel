@@ -62,7 +62,7 @@ $router->map('GET', '/tree/[*:treebank]/[*:component]/[*:sentid]', function ($tr
     } else {
         $database = $component;
     }
-    showTree($sentid, $treebank, $component, $database);
+    showTree(base64_decode(urldecode($sentid)), $treebank, $component, $database);
 });
 
 $router->map('POST', '/metadata_counts', function () {

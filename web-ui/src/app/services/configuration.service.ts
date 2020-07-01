@@ -19,7 +19,7 @@ export class ConfigurationService {
             console.log([provider, path, parts, queryString, config]);
         }
         return providerUrl + path +
-            (parts.length ? '/' + parts.join('/') : '') +
+            (parts.length ? '/' + parts.map(p => encodeURIComponent(p)).join('/') : '') +
             (queryStringEntries.length
                 ? queryStringEntries.map(([key, value], index) => `${index ? '&' : '?'}${key}=${value}`)
                 : '');

@@ -133,6 +133,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
 
     // Xml tree displaying (of a result)
     public treeXml?: string;
+    public treeFilename?: string;
     public loadingTree = false;
     public treeSentence?: SafeHtml;
 
@@ -241,6 +242,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
     /** Show a tree of the given xml file, needs to contact the server as the result might not contain the entire tree */
     async showTree(result: HitWithOrigin) {
         this.treeXml = undefined;
+        this.treeFilename = undefined;
         this.loadingTree = true;
         this.treeSentence = result.highlightedSentence;
 
@@ -254,11 +256,13 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
                 result.nodeIds,
             );
             this.treeXml = treeXml;
+            this.treeFilename = result.fileId.replace(/\.xml$/i, '').replace(/[:\/_\-\\. ]+/g, '_') + '.xml';
         } catch (e) {
             this.treeSentence = undefined;
             this.treeXml = undefined;
             this.loadingTree = false;
 
+            this.notificationService.add('Problem retrieving tree', 'error');
             console.warn(`Error retrieving tree in ${result.provider}:${result.corpus}:${result.component}:${result.fileId}`);
         }
 
