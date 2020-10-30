@@ -342,7 +342,10 @@ export class TreebankService {
             }
             const uploadUrl = await this.configurationService.getUploadApiUrl('treebank');
 
-            this.http.get<UploadedTreebankResponse[]>(uploadUrl)
+            this.http.get<UploadedTreebankResponse[]>(uploadUrl,
+                {
+                    withCredentials: true
+                })
                 .pipe(
                     // unpack array
                     flatMap(r => r),
@@ -366,13 +369,13 @@ export class TreebankService {
             {
                 metadata: async () => {
                     const uploadedMetadata = await this.configurationService.getUploadApiUrl('treebank/metadata/' + bank.title)
-                        .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url).toPromise());
+                        .then(url => this.http.get<UploadedTreebankMetadataResponse[]>(url, { withCredentials: true }).toPromise());
                     return uploadedMetadata.map(makeUploadedMetadata);
                 },
                 componentGroups: async () => undefined,
                 components: async () => {
                     const uploadedComponents = await this.configurationService.getUploadApiUrl('treebank/show/' + bank.title)
-                        .then(url => this.http.get<UploadedTreebankShowResponse[]>(url).toPromise());
+                        .then(url => this.http.get<UploadedTreebankShowResponse[]>(url, { withCredentials: true }).toPromise());
 
                     const components: TreebankComponent[] = uploadedComponents.map(makeUploadedComponent);
                     return components.reduce<TreebankComponents>((cs, c) => { cs[c.id] = c; return cs; }, {});
