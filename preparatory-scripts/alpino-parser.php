@@ -66,7 +66,7 @@ function alpino($sentence, $id)
     if (!is_dir($tmp)) {
         mkdir($tmp);
     }
-    $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=40 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
+    $alpino = "$alpinoDirectory/bin/Alpino -notk -veryfast max_sentence_length=200 user_max=180000 -end_hook=xml -flag treebank $tmp -parse";
     $process = proc_open($alpino, $descriptorspec, $pipes, $cwd, $env);
 
     if (!is_resource($process)) {
