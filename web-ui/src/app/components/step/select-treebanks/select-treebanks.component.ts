@@ -8,6 +8,7 @@ import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-pag
 import { Treebank, TreebankSelection } from '../../../treebank';
 import { StateService, TreebankService, TreebankSelectionService } from '../../../services/_index';
 import { StepComponent } from '../step.component';
+import _ from 'lodash';
 
 @Component({
     animations,
@@ -32,10 +33,12 @@ export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBa
             treebankService.treebanks.pipe(
                 map(lookup => Object.values(lookup.data).flatMap(provider => Object.values(provider))))
                 .subscribe(treebanks => {
-                    this.treebanks = treebanks.map(treebank => ({
-                        ...treebank,
-                        selected: this.selection && this.selection.isSelected(treebank.provider, treebank.id)
-                    }));
+                    this.treebanks = _.orderBy(
+                        treebanks.map(treebank => ({
+                            ...treebank,
+                            selected: this.selection && this.selection.isSelected(treebank.provider, treebank.id)
+                        })),
+                        ['displayName', 'uploaded']);
                 }),
             treebankSelectionService.state$.subscribe(selection => {
                 this.selection = selection;
