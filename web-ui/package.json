@@ -41,7 +41,7 @@
     "jquery-ui": "^1.12.1",
     "jszip": "3.2.2",
     "lassy-xpath": "^0.4.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "ngx-clipboard": "^12.3.0",
     "node-sass": "^4.14.1",
     "pivottable": "^2.23.0",
