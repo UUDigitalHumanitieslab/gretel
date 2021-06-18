@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { StateService, TreebankService, EmitType } from '../../services/_index';
-import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
+import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 import {
     AnalysisStep,
     GlobalState,
@@ -22,7 +22,7 @@ import { TreebankSelection } from '../../treebank';
     templateUrl: './xpath-search.component.html',
     styleUrls: ['./xpath-search.component.scss']
 })
-export class XpathSearchComponent extends MultiStepPageComponent<GlobalState> implements OnInit {
+export class XpathSearchComponent extends MultiStepPageDirective<GlobalState> implements OnInit {
     protected defaultGlobalState: GlobalState = {
         connectionError: false,
         currentStep: undefined,

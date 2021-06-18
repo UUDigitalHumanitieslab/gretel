@@ -1,4 +1,4 @@
-import { OnDestroy, OnInit } from '@angular/core';
+import { OnDestroy, OnInit, Directive } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 
 import * as _ from 'lodash';
@@ -10,7 +10,8 @@ import { GlobalState, Step } from './steps';
 import { FilterValues, TreebankService, StateService } from '../../services/_index';
 import { TreebankSelection } from '../../treebank';
 
-export abstract class MultiStepPageComponent<T extends GlobalState> implements OnDestroy, OnInit {
+@Directive()
+export abstract class MultiStepPageDirective<T extends GlobalState> implements OnDestroy, OnInit {
     public crumbs: Crumb[];
     public globalState: T;
     public warning: string | false;
@@ -76,7 +77,7 @@ export abstract class MultiStepPageComponent<T extends GlobalState> implements O
      */
     abstract decodeGlobalState(queryParams: { [key: string]: any }): {
         [K in Exclude<keyof GlobalState,
-            keyof ReturnType<MultiStepPageComponent<T>['decodeGlobalStateCommon']>>]?: GlobalState[K] | undefined
+            keyof ReturnType<MultiStepPageDirective<T>['decodeGlobalStateCommon']>>]?: GlobalState[K] | undefined
     };
 
     protected decodeGlobalStateCommon(queryParams: { [key: string]: any }) {
