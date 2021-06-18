@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { StateService } from '../../../services/_index';
 import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 
@@ -8,7 +8,7 @@ import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-pag
     templateUrl: './sentence-input.component.html',
     styleUrls: ['./sentence-input.component.scss']
 })
-export class SentenceInputComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
+export class SentenceInputComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
     public stepType = StepType.SentenceInput;
     public warning = false;
 

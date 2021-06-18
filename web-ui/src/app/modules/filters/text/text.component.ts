@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from '../filter/filter.component';
+import { FilterDirective } from '../filter/filter.directive';
 import { Filter } from '../filters.component';
 import { FilterValue } from '../../../services/_index';
 
@@ -8,7 +8,7 @@ import { FilterValue } from '../../../services/_index';
     templateUrl: './text.component.html',
     styleUrls: ['./text.component.scss']
 })
-export class TextComponent extends FilterComponent {
+export class TextComponent extends FilterDirective {
     public options: string[] = [];
 
     public values: { [value: string]: boolean } = {};

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from '../filter/filter.component';
+import { FilterDirective } from '../filter/filter.directive';
 import { Filter } from '../filters.component';
 import { FilterValue } from '../../../services/results.service';
 
@@ -8,7 +8,7 @@ import { FilterValue } from '../../../services/results.service';
     templateUrl: './int.component.html',
     styleUrls: ['./int.component.scss']
 })
-export class IntComponent extends FilterComponent {
+export class IntComponent extends FilterDirective {
     public value: number;
 
     rangeValues: number[] = [0, 0];

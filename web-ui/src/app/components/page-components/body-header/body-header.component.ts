@@ -7,7 +7,7 @@ import { TitleService } from '../../../services/title.service';
     styleUrls: ['./body-header.component.scss']
 })
 export class BodyHeaderComponent implements OnInit {
-    @ViewChild('title', { static: false })
+    @ViewChild('title')
     set title(v: ElementRef<HTMLHeadingElement>) {
         this.titleService.set('title', v.nativeElement.innerText);
     }

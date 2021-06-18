@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FilterByField, FilterValues } from '../../services/_index';
-import { FilterChangeEvent } from './filter/filter.component';
+import { FilterChangeEvent } from './filter/filter.directive';
 
 export interface Filter {
     field: string;

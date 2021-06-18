@@ -34,7 +34,7 @@ import {
 } from '../../../services/_index';
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { NotificationKind } from 'rxjs/internal/Notification';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 
@@ -66,7 +66,7 @@ type HidableHit = HitWithOrigin & { hidden: boolean };
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+export class ResultsComponent extends StepDirective<GlobalState> implements OnInit, OnDestroy {
     private treebankSelection: TreebankSelection;
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});

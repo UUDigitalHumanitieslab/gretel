@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from '../filter/filter.component';
+import { FilterDirective } from '../filter/filter.directive';
 import { Filter } from '../filters.component';
 import { FilterValue } from '../../../services/_index';
 
@@ -8,7 +8,7 @@ import { FilterValue } from '../../../services/_index';
     templateUrl: './dropdown.component.html',
     styleUrls: ['./dropdown.component.scss']
 })
-export class DropdownComponent extends FilterComponent {
+export class DropdownComponent extends FilterDirective {
     public selected: string[];
 
     onFilterSet(filter: Filter) {

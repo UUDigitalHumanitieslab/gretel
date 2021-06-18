@@ -1,4 +1,4 @@
-import { EventEmitter, Input, Output } from '@angular/core';
+import { EventEmitter, Input, Output, Directive } from '@angular/core';
 import { Filter } from '../filters.component';
 import { FilterByField } from '../../../services/_index';
 
@@ -6,7 +6,8 @@ export type FilterChangeEvent = FilterByField & {
     selected: boolean
 };
 
-export abstract class FilterComponent {
+@Directive()
+export abstract class FilterDirective {
     private filterDefinition: Filter;
 
     @Input('filterValue') set filterValue(value: FilterByField) {

@@ -25,7 +25,7 @@ import {
 } from '../../../services/_index';
 import { FileExportRenderer } from './file-export-renderer';
 import { TreebankMetadata } from '../../../treebank';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 import { AddNodeEvent } from '../../node-properties/node-properties-editor.component';
 
@@ -35,7 +35,7 @@ import { AddNodeEvent } from '../../node-properties/node-properties-editor.compo
     templateUrl: './analysis.component.html',
     styleUrls: ['./analysis.component.scss']
 })
-export class AnalysisComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+export class AnalysisComponent extends StepDirective<GlobalState> implements OnInit, OnDestroy {
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;

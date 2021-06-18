@@ -1,5 +1,5 @@
 import { Component, Input, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { StateService } from '../../../services/_index';
 import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 
@@ -8,7 +8,7 @@ import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-pag
     templateUrl: './parse.component.html',
     styleUrls: ['./parse.component.scss']
 })
-export class ParseComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
+export class ParseComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
     @Input() public loading = true;
     @Input() public sentence: string;
     @Input() public xml: string;

@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, OnInit, OnDestroy } 
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
 import { StateService } from '../../../services/_index';
 import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
@@ -13,7 +13,7 @@ import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
     templateUrl: './xpath-input.component.html',
     styleUrls: ['./xpath-input.component.scss']
 })
-export class XpathInputComponent extends StepComponent<GlobalState> implements OnChanges, OnInit, OnDestroy {
+export class XpathInputComponent extends StepDirective<GlobalState> implements OnChanges, OnInit, OnDestroy {
     public stepType = StepType.XpathInput;
     public treeXml: string;
     public treeDisplay = 'inline';
