@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ParseComponent } from './parse.component';
 import { commonTestBed } from '../../../common-test-bed';
@@ -7,7 +7,7 @@ describe('ParseComponent', () => {
     let component: ParseComponent;
     let fixture: ComponentFixture<ParseComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { BreadcrumbBarComponent } from './breadcrumb-bar.component';
 import { commonTestBed } from '../../common-test-bed';
@@ -7,7 +7,7 @@ describe('BreadcrumbBarComponent', () => {
     let component: BreadcrumbBarComponent;
     let fixture: ComponentFixture<BreadcrumbBarComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { XpathInputComponent } from './xpath-input.component';
 import { commonTestBed } from '../../../common-test-bed';
@@ -7,7 +7,7 @@ describe('XpathInputComponent', () => {
     let component: XpathInputComponent;
     let fixture: ComponentFixture<XpathInputComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

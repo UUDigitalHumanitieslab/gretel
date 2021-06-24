@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { filtersTestBed } from '../filters-test-bed';
 import { IntComponent } from './int.component';
@@ -7,7 +7,7 @@ describe('IntComponent', () => {
     let component: IntComponent;
     let fixture: ComponentFixture<IntComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         filtersTestBed().testingModule.compileComponents();
     }));
 

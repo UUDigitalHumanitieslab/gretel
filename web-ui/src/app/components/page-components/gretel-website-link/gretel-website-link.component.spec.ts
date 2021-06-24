@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { GretelWebsiteLinkComponent } from './gretel-website-link.component';
 
@@ -6,7 +6,7 @@ describe('GretelWebsiteLinkComponent', () => {
   let component: GretelWebsiteLinkComponent;
   let fixture: ComponentFixture<GretelWebsiteLinkComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ GretelWebsiteLinkComponent ]
     })

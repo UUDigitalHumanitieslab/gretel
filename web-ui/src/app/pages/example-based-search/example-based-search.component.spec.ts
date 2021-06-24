@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ExampleBasedSearchComponent } from './example-based-search.component';
 import { commonTestBed } from '../../common-test-bed';
@@ -7,7 +7,7 @@ describe('ExampleBasedSearchComponent', () => {
     let component: ExampleBasedSearchComponent;
     let fixture: ComponentFixture<ExampleBasedSearchComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 
