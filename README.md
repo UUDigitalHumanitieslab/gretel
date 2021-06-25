@@ -67,7 +67,7 @@ When searching for a more specific structure, this is unlikely to occur.
 
 ### Front-end
 
-The [Angular 8](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`.
+The [Angular](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`.
 
 ### Back-end
 
