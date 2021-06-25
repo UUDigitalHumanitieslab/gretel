@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { StepDirective } from '../step.directive';
-import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
+import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath';
 import { StateService } from '../../../services/_index';
 import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 

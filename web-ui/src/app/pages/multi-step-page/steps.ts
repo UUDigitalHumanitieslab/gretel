@@ -1,4 +1,4 @@
-import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath/ng';
+import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath';
 
 import { AlpinoService } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';

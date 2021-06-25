@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
-import { ValueEvent } from 'lassy-xpath/ng';
+import { ValueEvent } from 'lassy-xpath';
 
 import { StateService } from '../../../services/_index';
 import { StepDirective } from '../step.directive';

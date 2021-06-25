@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import * as parser from 'fast-xml-parser';
-import { ExtractinatorService, PathVariable } from 'lassy-xpath/ng';
+import { ExtractinatorService, PathVariable } from 'lassy-xpath';
 
 @Injectable()
 export class ParseService {

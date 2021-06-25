@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { ParserService } from 'lassy-xpath/ng';
+import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
 
 @Injectable()

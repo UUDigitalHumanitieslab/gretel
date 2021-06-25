@@ -9,7 +9,7 @@ import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/sortable';
 import 'pivottable';
 
-import { PathVariable, ReconstructorService } from 'lassy-xpath/ng';
+import { PathVariable, ReconstructorService } from 'lassy-xpath';
 
 import { animations } from '../../../animations';
 import {
@@ -141,7 +141,7 @@ export class AnalysisComponent extends StepDirective<GlobalState> implements OnI
         const metadata$ = this.state$.pipe(
             map(s => s.selectedTreebanks),
             distinctUntilChanged()).subscribe(async selectedTreebanks => {
-                const metadata = await Promise.all(
+                const metadata: TreebankMetadata[][] = await Promise.all(
                     selectedTreebanks.corpora.map(async corpus => (await corpus.corpus.treebank).details.metadata()));
                 this.metadata = metadata.flatMap(x => x);
             });
@@ -486,6 +486,8 @@ export class AnalysisComponent extends StepDirective<GlobalState> implements OnI
                         };
                 }
         }
+
+        throw `No FilterValue for ${field} ${value}`;
     }
 
 

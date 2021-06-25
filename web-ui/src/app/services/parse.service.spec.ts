@@ -1,7 +1,7 @@
 import { TestBed, inject, waitForAsync } from '@angular/core/testing';
 
 import { ParseService } from './parse.service';
-import { ExtractinatorService } from 'lassy-xpath/ng';
+import { ExtractinatorService } from 'lassy-xpath';
 
 describe('ParseService', () => {
     beforeEach(() => {

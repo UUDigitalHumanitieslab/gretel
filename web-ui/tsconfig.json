@@ -5,23 +5,24 @@
         "downlevelIteration": true,
         "module": "es2020",
         "outDir": "./dist/out-tsc",
+        "forceConsistentCasingInFileNames": true,
         "sourceMap": true,
-        "declaration": false,
+        "declaration": true,
+        "declarationMap": true,
+        "inlineSources": true,
         "moduleResolution": "node",
-        "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
-        "target": "es2015",
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "target": "es2017",
         "typeRoots": [
             "./node_modules/@types"
         ],
         "lib": [
-            "es2017",
+            "es2018",
             "dom",
-            "esnext.array",
-            "es2018.promise",
-            "es2019.string"
+            "esnext.array"
         ],
         "paths": {
             "@angular/": [
@@ -30,6 +31,10 @@
         }
     },
     "angularCompilerOptions": {
-        "enableIvy": false
+        "enableI18nLegacyMessageIdFormat": false,
+        "strictInjectionParameters": true,
+        "strictInputAccessModifiers": true,
+        "strictTemplates": true,
+        "compilationMode": "partial"
     }
 }

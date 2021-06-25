@@ -35,12 +35,12 @@
             transition: background-color ease 1s;
         }
 
-        .ui-draggable {
+        .p-draggable {
             background: $primary;
             color: white !important;
         }
 
-        .ui-draggable:hover {
+        .p-draggable:hover {
             cursor: move;
             opacity: 0.8;
         }

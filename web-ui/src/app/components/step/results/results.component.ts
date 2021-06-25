@@ -7,14 +7,14 @@ import {
     distinctUntilChanged,
     endWith,
     filter,
-    flatMap,
+    mergeMap,
     map,
     shareReplay,
     startWith,
     switchMap
 } from 'rxjs/operators';
 
-import { ValueEvent } from 'lassy-xpath/ng';
+import { ValueEvent } from 'lassy-xpath';
 import { ClipboardService } from 'ngx-clipboard';
 
 import { animations } from '../../../animations';
@@ -35,7 +35,7 @@ import {
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
 import { StepDirective } from '../step.directive';
-import { NotificationKind } from 'rxjs/internal/Notification';
+import { NotificationKind } from './notification-kind';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 
 const DebounceTime = 200;
@@ -419,7 +419,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         return this.treebankSelectionService.state$.pipe(
             switchMap(selection => Promise.all(selection.corpora.map(corpus => corpus.corpus.treebank))),
             switchMap(treebanks => Promise.all(treebanks.map(t => t.details.metadata()))),
-            flatMap(metadata => metadata));
+            mergeMap(metadata => metadata));
     }
 
     /** Retrieves metadata counts based on selected banks and filters */

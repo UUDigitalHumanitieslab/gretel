@@ -1,11 +1,11 @@
 import { Component, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { merge, from, Subscription, combineLatest, Notification } from 'rxjs';
 import { map, switchMap, materialize, startWith, endWith, distinctUntilChanged } from 'rxjs/operators';
-import { NotificationKind } from 'rxjs/internal/Notification';
 
 import { DownloadService, ResultsService, StateService, TreebankCount } from '../../../services/_index';
 import { Treebank, TreebankComponent, TreebankSelection, FuzzyNumber } from '../../../treebank';
 import { GlobalState } from '../../../pages/multi-step-page/steps';
+import { NotificationKind } from './notification-kind';
 
 interface ComponentState {
     title: string;

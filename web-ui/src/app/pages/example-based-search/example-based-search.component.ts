@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath';
 
 import { AlpinoService, TreebankService, StateService } from '../../services/_index';
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
