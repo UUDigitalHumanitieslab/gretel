@@ -22,22 +22,33 @@
             "styles": [
               "node_modules/primeng/resources/primeng.min.css",
               "src/styles.scss",
-              "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fontawesome.scss",
-              "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fa-solid.scss"
+              "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
+              "node_modules/@fortawesome/fontawesome-free/scss/solid.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "aot": false,
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": true,
-              "extractCss": true,
               "namedChunks": false,
-              "aot": true,
+              "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true,
+              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -45,7 +56,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -75,8 +87,8 @@
             "styles": [
               "src/styles.scss",
               "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fontawesome.scss",
-              "node_modules/@fortawesome/fontawesome-free-webfonts/scss/fa-solid.scss"
+              "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
+              "node_modules/@fortawesome/fontawesome-free/scss/solid.scss"
             ],
             "assets": [
               "src/assets",
@@ -128,7 +140,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "grt",
-      "styleext": "scss"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "grt"

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FilterComponent } from '../filter/filter.component';
+import { FilterDirective } from '../filter/filter.directive';
 import { Filter } from '../filters.component';
 import { FilterValue } from '../../../services/_index';
 
@@ -8,7 +8,7 @@ import { FilterValue } from '../../../services/_index';
     templateUrl: './date.component.html',
     styleUrls: ['./date.component.scss']
 })
-export class DateComponent extends FilterComponent {
+export class DateComponent extends FilterDirective {
     minValue: Date;
     maxValue: Date;
 

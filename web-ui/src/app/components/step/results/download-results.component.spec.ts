@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { commonTestBed } from '../../../common-test-bed';
 import { DownloadResultsComponent } from './download-results.component';
@@ -8,7 +8,7 @@ describe('DownloadResultsComponent', () => {
     let component: DownloadResultsComponent;
     let fixture: ComponentFixture<DownloadResultsComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         const testBed = commonTestBed();
         // It communicates with its parent
         TestBed.overrideComponent(

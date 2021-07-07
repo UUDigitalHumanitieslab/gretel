@@ -38,11 +38,11 @@ interface Metadata {
 export class TreeVisualizerComponent implements OnChanges, OnInit, AfterViewChecked {
     @ViewChild('output', { static: true, read: ElementRef })
     public output: ElementRef;
-    @ViewChild('inline', { static: false, read: ElementRef })
+    @ViewChild('inline', { read: ElementRef })
     public inlineRef: ElementRef;
-    @ViewChild('tree', { static: false, read: ElementRef })
+    @ViewChild('tree', { read: ElementRef })
     public tree: ElementRef;
-    @ViewChild('metadataCard', { static: false, read: ElementRef })
+    @ViewChild('metadataCard', { read: ElementRef })
     public metadataCard: ElementRef;
 
     @Input()

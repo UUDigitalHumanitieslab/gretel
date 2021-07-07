@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { XPathAttributes } from 'lassy-xpath/ng';
+import { XPathAttributes } from 'lassy-xpath';
 import * as _ from 'lodash';
 
 import { Hit } from './results.service';

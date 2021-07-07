@@ -56,7 +56,7 @@ $inputTextColor: $text;
 $invalidInputBorderColor: $danger;
 $inputGroupTextColor: $text;
 
-.ui-table.bulma {
+.p-table.bulma {
     table {
         border-collapse: collapse;
     }
@@ -69,7 +69,7 @@ $inputGroupTextColor: $text;
         padding: $table-cell-padding;
     }
 
-    .ui-table-thead > tr {
+    .p-table-thead > tr {
         > th,
         > td {
             @extend %cell;
@@ -79,14 +79,14 @@ $inputGroupTextColor: $text;
         }
     }
 
-    .ui-table-tbody > tr {
+    .p-table-tbody > tr {
         > th,
         > td {
             @extend %cell;
         }
     }
 
-    .ui-table-tfoot > tr {
+    .p-table-tfoot > tr {
         > th,
         > td {
             @extend %cell;
@@ -101,19 +101,19 @@ $inputGroupTextColor: $text;
             border: $table-cell-border;
         }
 
-        table.ui-table-scrollable-header-table {
+        table.p-table-scrollable-header-table {
             border: none;
 
-            .ui-table-thead > tr > {
+            .p-table-thead > tr > {
                 td, th {
                     border-bottom: none;
                 }
             }
         }
 
-        .ui-table-thead > tr,
-        .ui-table-tbody > tr,
-        .ui-table-tfoot > tr {
+        .p-table-thead > tr,
+        .p-table-tbody > tr,
+        .p-table-tfoot > tr {
             > th,
             > td {
                 border-width: 1px;
@@ -133,7 +133,7 @@ $inputGroupTextColor: $text;
             border: none;
         }
 
-        .ui-table-tbody > tr:last-child {
+        .p-table-tbody > tr:last-child {
             > td,
             > th {
                 border-bottom-width: 0;
@@ -142,19 +142,19 @@ $inputGroupTextColor: $text;
     }
 
     &.is-striped {
-        .ui-table-tbody > tr:nth-child(even) {
+        .p-table-tbody > tr:nth-child(even) {
             > td, > th {
                 background-color: $table-striped-row-even-background-color;
             }
         }
 
-        &.is-hoverable .ui-table-tbody > tr:nth-child(even):hover {
+        &.is-hoverable .p-table-tbody > tr:nth-child(even):hover {
             > td, > th {
                 background-color: $table-striped-row-even-hover-background-color;
             }
         }
 
-        &:not(.is-hoverable) .ui-table-tbody > tr:nth-child(even):hover {
+        &:not(.is-hoverable) .p-table-tbody > tr:nth-child(even):hover {
             > td, > th {
                 background-color: $table-striped-row-even-background-color;
             }
@@ -162,7 +162,7 @@ $inputGroupTextColor: $text;
     }
 
     &:not(.is-striped) {
-        .ui-table-tbody > tr:nth-child(even) {
+        .p-table-tbody > tr:nth-child(even) {
             > td, > th {
                 background-color: $table-background-color;
             }
@@ -170,26 +170,26 @@ $inputGroupTextColor: $text;
     }
 
     &.is-hoverable {
-        .ui-table-tbody > tr:hover {
+        .p-table-tbody > tr:hover {
             > td, > th {
                 background-color: $table-row-hover-background-color;
             }
         }
     }
 }
-.ui-slider {
-    .ui-slider-range {
+.p-slider {
+    .p-slider-range {
         background: $primary;
     }
 
-    .ui-slider-handle {
+    .p-slider-handle {
         background: $secondary;
         border-color: $secondary;
         color: $secondary;
     }
 }
 
-.ui-widget-content a.ui-overlaypanel-close {
+.p-widget-content a.p-overlaypanel-close {
     border-color: $text;
     background: $text;
     color: $background;
@@ -207,4 +207,4 @@ $inputGroupTextColor: $text;
 // $table-row-active-background-color	$primary
 // $table-row-active-color	$primary-invert
 
-@import "~primeng/resources/themes/nova-light/theme.css";
+@import "~primeng/resources/themes/nova/theme.css";

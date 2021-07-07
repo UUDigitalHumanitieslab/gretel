@@ -7,14 +7,14 @@ import {
     distinctUntilChanged,
     endWith,
     filter,
-    flatMap,
+    mergeMap,
     map,
     shareReplay,
     startWith,
     switchMap
 } from 'rxjs/operators';
 
-import { ValueEvent } from 'lassy-xpath/ng';
+import { ValueEvent } from 'lassy-xpath';
 import { ClipboardService } from 'ngx-clipboard';
 
 import { animations } from '../../../animations';
@@ -34,8 +34,8 @@ import {
 } from '../../../services/_index';
 import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
-import { StepComponent } from '../step.component';
-import { NotificationKind } from 'rxjs/internal/Notification';
+import { StepDirective } from '../step.directive';
+import { NotificationKind } from './notification-kind';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 
 const DebounceTime = 200;
@@ -66,7 +66,7 @@ type HidableHit = HitWithOrigin & { hidden: boolean };
     templateUrl: './results.component.html',
     styleUrls: ['./results.component.scss']
 })
-export class ResultsComponent extends StepComponent<GlobalState> implements OnInit, OnDestroy {
+export class ResultsComponent extends StepDirective<GlobalState> implements OnInit, OnDestroy {
     private treebankSelection: TreebankSelection;
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
@@ -419,7 +419,7 @@ export class ResultsComponent extends StepComponent<GlobalState> implements OnIn
         return this.treebankSelectionService.state$.pipe(
             switchMap(selection => Promise.all(selection.corpora.map(corpus => corpus.corpus.treebank))),
             switchMap(treebanks => Promise.all(treebanks.map(t => t.details.metadata()))),
-            flatMap(metadata => metadata));
+            mergeMap(metadata => metadata));
     }
 
     /** Retrieves metadata counts based on selected banks and filters */

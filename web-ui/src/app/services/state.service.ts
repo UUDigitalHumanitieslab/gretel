@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { GlobalState, Step } from '../pages/multi-step-page/steps';
-import { StepComponent } from '../components/step/step.component';
+import { StepDirective } from '../components/step/step.directive';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 class ExternalPromise<T> {
@@ -23,7 +23,7 @@ class ExternalPromise<T> {
  */
 class SharedInstance<T extends GlobalState> {
     private steps: Step<T>[];
-    private currentStepComponent = new ExternalPromise<StepComponent<T>>();
+    private currentStepDirective = new ExternalPromise<StepDirective<T>>();
     isTransitioning$ = new BehaviorSubject<boolean>(false);
     warning$ = new BehaviorSubject<string | false>(false);
     state$: BehaviorSubject<T & {
@@ -39,13 +39,13 @@ class SharedInstance<T extends GlobalState> {
         this.isTransitioning$.next(false);
     }
 
-    subscribe(stepComponent: StepComponent<T>) {
-        if (this.currentStepComponent.resolved) {
+    subscribe(stepDirective: StepDirective<T>) {
+        if (this.currentStepDirective.resolved) {
             // already resolved, this can happen on load (the first step is already rendered)
-            this.currentStepComponent = new ExternalPromise();
+            this.currentStepDirective = new ExternalPromise();
         }
 
-        this.currentStepComponent.resolve(stepComponent);
+        this.currentStepDirective.resolve(stepDirective);
     }
 
     dispose() {
@@ -109,7 +109,7 @@ class SharedInstance<T extends GlobalState> {
     private async jumpState(state: T, stepNumber: number, emit: EmitType = 'history') {
         const { newState, newComponent } = await this.jumpNewState(state, stepNumber);
         if (newComponent) {
-            this.currentStepComponent = new ExternalPromise();
+            this.currentStepDirective = new ExternalPromise();
         }
         this.isTransitioning$.next(false);
         return this.setState(newState, emit);
@@ -157,7 +157,7 @@ class SharedInstance<T extends GlobalState> {
 
     private async showWarning(stepNumber: number) {
         const targetStep = this.steps[stepNumber];
-        const currentStep = await this.currentStepComponent.promise;
+        const currentStep = await this.currentStepDirective.promise;
         if (currentStep.stepType === targetStep.type) {
             this.warning$.next(currentStep.getWarningMessage() || false);
         }
@@ -226,7 +226,7 @@ export class StateService<T extends GlobalState> {
      * receive information e.g. warning messages.
      * @param component The component showing the step state.
      */
-    subscribe(component: StepComponent<T>) {
+    subscribe(component: StepDirective<T>) {
         this.instance.subscribe(component);
     }
 

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnDestroy, Output, Input } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ExtractinatorService } from 'lassy-xpath/ng';
+import { ExtractinatorService } from 'lassy-xpath';
 
 import { StateService, SearchVariable } from '../../services/_index';
 import { GlobalState } from '../../pages/multi-step-page/steps';

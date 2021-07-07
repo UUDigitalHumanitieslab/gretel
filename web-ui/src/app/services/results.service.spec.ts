@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 
-import { Location, ExtractinatorService } from 'lassy-xpath/ng';
+import { Location, ExtractinatorService } from 'lassy-xpath';
 
 import { ResultsService } from './results.service';
 import { HttpClientMock } from '../mocks/http-client.mock';

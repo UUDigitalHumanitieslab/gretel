@@ -1,14 +1,13 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HomeContentComponent } from './home-content.component';
-import { PaperCiteComponent } from '../../../components/page-components/paper-cite/paper-cite.component';
 import { commonTestBed } from '../../../common-test-bed';
 
 describe('HomeContentComponent', () => {
     let component: HomeContentComponent;
     let fixture: ComponentFixture<HomeContentComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

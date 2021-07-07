@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SubtitleDirective } from './subtitle.directive';
 import { Component, Input } from '@angular/core';
@@ -7,7 +7,7 @@ describe('SubtitleDirective', () => {
     let component: TestHeadingComponent;
     let fixture: ComponentFixture<TestHeadingComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [TestHeadingComponent, SubtitleDirective]
         })

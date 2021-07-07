@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { XpathSearchComponent } from './xpath-search.component';
 import { commonTestBed } from '../../common-test-bed';
@@ -7,7 +7,7 @@ describe('XpathSearchComponent', () => {
     let component: XpathSearchComponent;
     let fixture: ComponentFixture<XpathSearchComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

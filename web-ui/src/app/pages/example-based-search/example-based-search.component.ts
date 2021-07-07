@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ExtractinatorService, ReconstructorService } from 'lassy-xpath/ng';
+import { ExtractinatorService, ReconstructorService } from 'lassy-xpath';
 
 import { AlpinoService, TreebankService, StateService } from '../../services/_index';
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
@@ -8,7 +8,7 @@ import {
     GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultsStep,
     MatrixStep, AnalysisStep, Step
 } from '../multi-step-page/steps';
-import { MultiStepPageComponent } from '../multi-step-page/multi-step-page.component';
+import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 import { TreebankSelection } from '../../treebank';
 
 @Component({
@@ -16,7 +16,7 @@ import { TreebankSelection } from '../../treebank';
     templateUrl: './example-based-search.component.html',
     styleUrls: ['./example-based-search.component.scss']
 })
-export class ExampleBasedSearchComponent extends MultiStepPageComponent<GlobalStateExampleBased> {
+export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalStateExampleBased> {
     protected defaultGlobalState: GlobalStateExampleBased = {
         exampleXml: undefined,
         subTreeXml: undefined,

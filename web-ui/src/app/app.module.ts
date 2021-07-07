@@ -13,7 +13,7 @@ import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
-import { LassyXPathModule } from 'lassy-xpath/ng';
+import { LassyXPathModule } from 'lassy-xpath';
 import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppComponent } from './app.component';

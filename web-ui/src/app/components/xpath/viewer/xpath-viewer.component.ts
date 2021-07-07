@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange } from '@angular/core';
-import { PathVariable, ExtractinatorService } from 'lassy-xpath/ng';
+import { PathVariable, ExtractinatorService } from 'lassy-xpath';
 @Component({
     selector: 'grt-xpath-viewer',
     templateUrl: './xpath-viewer.component.html',

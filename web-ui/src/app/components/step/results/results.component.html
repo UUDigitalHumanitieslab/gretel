@@ -220,7 +220,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-rowData let-columns="columns" let-i="rowIndex">
                 <tr *ngIf="!rowData.hidden" [@fade]>
-                    <td *ngFor="let col of columns" class="ui-resizable-column">
+                    <td *ngFor="let col of columns" class="p-resizable-column">
                         <div [ngSwitch]="col.field">
                             <span *ngSwitchCase="'number'">{{i + 1}}</span>
 

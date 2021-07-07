@@ -1,13 +1,13 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SentenceInputComponent } from './sentence-input.component';
 import { commonTestBed } from '../../../common-test-bed';
 
-describe('SentenceInputStepComponent', () => {
+describe('SentenceInputStepDirective', () => {
     let component: SentenceInputComponent;
     let fixture: ComponentFixture<SentenceInputComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

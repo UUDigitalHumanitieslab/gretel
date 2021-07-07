@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { NodePropertiesComponent } from './node-properties.component';
 import { commonTestBed } from '../../common-test-bed';
@@ -7,7 +7,7 @@ describe('NodePropertiesComponent', () => {
     let component: NodePropertiesComponent;
     let fixture: ComponentFixture<NodePropertiesComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 

@@ -1,7 +1,7 @@
-import { TestBed, inject, async } from '@angular/core/testing';
+import { TestBed, inject, waitForAsync } from '@angular/core/testing';
 
 import { ParseService } from './parse.service';
-import { ExtractinatorService } from 'lassy-xpath/ng';
+import { ExtractinatorService } from 'lassy-xpath';
 
 describe('ParseService', () => {
     beforeEach(() => {
@@ -17,7 +17,7 @@ describe('ParseService', () => {
         expect(service).toBeTruthy();
     }));
 
-    it('should parse metadata', async(inject([ParseService], async (service: ParseService) => {
+    it('should parse metadata', waitForAsync(inject([ParseService], async (service: ParseService) => {
         const parsed = await service.parseXml(`<metadata>
         <meta type="text" name="session" value="306_Busverhaalwithout"/>
         <meta type="text" name="charencoding" value="UTF8"/>
@@ -41,7 +41,7 @@ describe('ParseService', () => {
         expect(parsed.metadata[0].meta[4].$.value).toBe('CHI');
     })));
 
-    it('should parse attribute nodes', async(inject([ParseService], async (service: ParseService) => {
+    it('should parse attribute nodes', waitForAsync(inject([ParseService], async (service: ParseService) => {
         const parsed = await service.parseXml(`<node cat="top"><node varName="$node" cat="">
         <node varName="$node1" rel="su" pt="vnw">
         </node>

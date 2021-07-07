@@ -2,10 +2,10 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
-import { ValueEvent } from 'lassy-xpath/ng';
+import { ValueEvent } from 'lassy-xpath';
 
 import { StateService } from '../../../services/_index';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
@@ -16,7 +16,7 @@ import { animations } from '../../../animations';
     templateUrl: './matrix.component.html',
     styleUrls: ['./matrix.component.scss']
 })
-export class MatrixComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
+export class MatrixComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
     private warningId: number;
     private subscriptions: Subscription[];
     public stepType = StepType.Matrix;

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ValueEvent } from "lassy-xpath/ng";
+import { ValueEvent } from "lassy-xpath";
 
 @Component({
     selector: 'grt-xpath-editor',

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ResultsComponent } from './results.component';
 import { commonTestBed, initStateService } from '../../../common-test-bed';
@@ -7,7 +7,7 @@ describe('ResultsComponent', () => {
     let component: ResultsComponent;
     let fixture: ComponentFixture<ResultsComponent>;
 
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         const testBed = commonTestBed();
         testBed.testingModule.compileComponents();
     }));

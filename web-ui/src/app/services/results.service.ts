@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { ConfigurationService } from './configuration.service';
 import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
-import { PathVariable, Location } from 'lassy-xpath/ng';
+import { PathVariable, Location } from 'lassy-xpath';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -377,6 +377,8 @@ export class ResultsService {
 
             return (parentPath ? `${parentPath}/` : '') + path.substring(match[0].length);
         }
+
+        return null;
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {

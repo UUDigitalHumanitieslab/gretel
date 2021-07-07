@@ -7,7 +7,7 @@ import { animations } from '../../../animations';
 import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
 import { Treebank, TreebankSelection } from '../../../treebank';
 import { StateService, TreebankService, TreebankSelectionService } from '../../../services/_index';
-import { StepComponent } from '../step.component';
+import { StepDirective } from '../step.directive';
 import _ from 'lodash';
 
 @Component({
@@ -16,7 +16,7 @@ import _ from 'lodash';
     templateUrl: './select-treebanks.component.html',
     styleUrls: ['./select-treebanks.component.scss']
 })
-export class SelectTreebanksComponent extends StepComponent<GlobalStateExampleBased> implements OnInit, OnDestroy {
+export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
     public treebanks: (Treebank & { selected: boolean })[] = [];
     public loading = true;
     public stepType = StepType.SelectTreebanks;

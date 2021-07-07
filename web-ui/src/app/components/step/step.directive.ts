@@ -3,12 +3,13 @@
  * It is used to give a outline of how a step in a multi-step process should look
  * This component is used as parent for the steps in the xpath-search page
  */
-import { EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { EventEmitter, Output, OnInit, OnDestroy, Directive } from '@angular/core';
 import { StateService } from '../../services/_index';
 import { StepType, GlobalState } from '../../pages/multi-step-page/steps';
 import { Observable } from 'rxjs';
 
-export abstract class StepComponent<T extends GlobalState> implements OnInit, OnDestroy {
+@Directive()
+export abstract class StepDirective<T extends GlobalState> implements OnInit, OnDestroy {
     public abstract stepType: StepType;
     public valid = false;
     protected state$: Observable<T>;
