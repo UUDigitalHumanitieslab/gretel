@@ -1,5 +1,5 @@
-import { Component, OnInit, Sanitizer, SecurityContext } from '@angular/core';
-import { SafeHtml } from '@angular/platform-browser';
+import { Component, OnInit, SecurityContext } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ConfigurationService } from '../../../services/_index';
 
 @Component({
@@ -10,7 +10,7 @@ import { ConfigurationService } from '../../../services/_index';
 export class HomeContentComponent implements OnInit {
     public uploadUrl: SafeHtml;
 
-    constructor(private configurationService: ConfigurationService, private sanitizer: Sanitizer) { }
+    constructor(private configurationService: ConfigurationService, private sanitizer: DomSanitizer) { }
 
     async ngOnInit() {
         this.uploadUrl = this.sanitizer.sanitize(SecurityContext.URL, await this.configurationService.getUploadApiUrl('../../'));
