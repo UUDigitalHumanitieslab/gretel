@@ -1,10 +1,13 @@
 {
     "/gretel/": {
-        "target": "http://gretel.hum.uu.nl/gretel4/",
+        "target": "https://gretel.hum.uu.nl/",
         "pathRewrite": {
             "^/gretel": ""
-        }
+        },
+        "changeOrigin": true
     },
-    "/gretel-upload/": "http://gretel.hum.uu.nl/",
-    "secure": false
+    "/gretel-upload/": {
+        "target": "https://gretel-upload.hum.uu.nl/",
+        "changeOrigin": true
+    }
 }
