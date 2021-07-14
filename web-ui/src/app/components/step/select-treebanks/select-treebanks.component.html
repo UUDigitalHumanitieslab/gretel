@@ -24,34 +24,40 @@
         <input class="input" placeholder="Filter by name" />
     </p>
     <div class="control">
-        <grt-select-treebank-providers [users]="userProviders"></grt-select-treebank-providers>
+        <grt-select-treebank-providers [(preConfigured)]="showPreConfigured" [users]="userProviders"
+            [(selectedUserIds)]="showUsers" (showUserTags)="showUserTags = true">
+        </grt-select-treebank-providers>
     </div>
     <p class="control" *ngIf="userProviders.length">
-        <button class="button" [ngClass]="{'is-primary': showUserTags }" (click)="showUserTags=!showUserTags" grtBalloon="Show the treebanks' users">
+        <button class="button" [ngClass]="{'is-primary': showUserTags }" (click)="showUserTags=!showUserTags"
+            grtBalloon="Show the treebanks' users">
             <span class="icon">
                 <i class="fas fa-tags"></i>
             </span>
         </button>
     </p>
 </div>
-
 <ng-container *ngFor="let treebank of treebanks">
-    <div class="field">
-        <label class="checkbox">
-            <input type="checkbox" [value]="treebank.id" [checked]="treebank.selected"
-                (change)="toggleTreebank(treebank.provider, treebank.id)">
-            {{treebank.displayName}}<ng-container *ngIf="treebank.description">:
-                <em>{{treebank.description}}</em>
-            </ng-container>
-            <ng-container *ngIf="treebank.color">
-                &nbsp;
-                <div class="tag is-{{treebank.color}}" [ngClass]="{'is-invisible': !showUserTags}">
-                    {{treebank.userName}}
-                </div>
-            </ng-container>
-        </label>
-    </div>
-    <div *ngIf="treebank.selected" class="box-is-shadowless" [@slideDown]>
-        <grt-sub-treebanks [treebank]="treebank"></grt-sub-treebanks>
-    </div>
+    <ng-container *ngIf="treebank.selected ||
+        (showPreConfigured && treebank.preConfigured) ||
+        (showUsers.indexOf(treebank.userId) >= 0)">
+        <div class="field">
+            <label class="checkbox">
+                <input type="checkbox" [value]="treebank.id" [checked]="treebank.selected"
+                    (change)="toggleTreebank(treebank.provider, treebank.id)">
+                {{treebank.displayName}}<ng-container *ngIf="treebank.description">:
+                    <em>{{treebank.description}}</em>
+                </ng-container>
+                <ng-container *ngIf="treebank.color">
+                    &nbsp;
+                    <div class="tag is-{{treebank.color}}" [ngClass]="{'is-invisible': !showUserTags}">
+                        {{treebank.userName}}
+                    </div>
+                </ng-container>
+            </label>
+        </div>
+        <div *ngIf="treebank.selected" class="box-is-shadowless" [@slideDown]>
+            <grt-sub-treebanks [treebank]="treebank"></grt-sub-treebanks>
+        </div>
+    </ng-container>
 </ng-container>

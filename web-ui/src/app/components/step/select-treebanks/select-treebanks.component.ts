@@ -9,6 +9,7 @@ import { Treebank, TreebankSelection } from '../../../treebank';
 import { StateService, TreebankService, TreebankSelectionService } from '../../../services/_index';
 import { StepDirective } from '../step.directive';
 import { UserProvider } from './select-treebank-providers.component';
+import { comparatorGenerator } from '../../util';
 
 // bulma.io tag colors
 const colors = [
@@ -21,20 +22,6 @@ const colors = [
     'danger'
 ];
 
-function comparatorGenerator<T>(a: T, b: T, ...propertyExtractors: ((value: T) => any)[]): number {
-    for (let extractor of propertyExtractors) {
-        const extractedA = extractor(a);
-        const extractedB = extractor(b);
-        if (extractedA < extractedB) {
-            return -1;
-        } else if (extractedA > extractedB) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
 @Component({
     animations,
     selector: 'grt-select-treebanks',
@@ -42,13 +29,16 @@ function comparatorGenerator<T>(a: T, b: T, ...propertyExtractors: ((value: T) =
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
-    public treebanks: (Treebank & { color: string, userName: string, selected: boolean })[] = [];
+    public treebanks: (Treebank & { color: string, userName: string, preConfigured: boolean, selected: boolean })[] = [];
     public loading = true;
     public stepType = StepType.SelectTreebanks;
     public selection: TreebankSelection;
     public userProviders: UserProvider[];
+
+    public showPreConfigured = true;
     public showUserTags = false;
-    
+    public showUsers: number[] = [];
+
     private readonly subscriptions: Subscription[];
     private userColors: { [userId: number]: string } = {};
     private userNames: { [userId: number]: string } = {};
@@ -67,7 +57,8 @@ export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBa
                         ...treebank,
                         ...{
                             color: this.determineUserColor(treebank.userId),
-                            userName: this.determineUserName(treebank.email, treebank.userId)
+                            userName: this.determineUserName(treebank.email, treebank.userId),
+                            preConfigured: (treebank.userId ?? null) == null
                         },
                         selected: this.selection && this.selection.isSelected(treebank.provider, treebank.id)
                     })).sort((a, b) => comparatorGenerator(
@@ -76,16 +67,18 @@ export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBa
                         value => value.displayName.toUpperCase(),
                         value => value.uploaded));
 
-                    this.userProviders = (<[number, string][]><any[]>Object.entries(this.userNames)).map(
+                    this.userProviders = Object.entries(this.userNames).map(
                         ([id, name]) => {
                             let color = this.userColors[id];
                             return {
-                                id,
+                                id: +id,
                                 color,
                                 name
                             }
                         }
                     ).sort((a, b) => comparatorGenerator(a, b, value => value.name.toUpperCase()));
+
+                    this.showUsers = this.userProviders.map(user => user.id);
                 }),
             treebankSelectionService.state$.subscribe(selection => {
                 this.selection = selection;
