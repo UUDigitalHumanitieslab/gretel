@@ -26,6 +26,7 @@ import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.compo
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import { SelectTreebankProvidersComponent } from './components/step/select-treebanks/select-treebank-providers.component';
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';
 import { SubTreebanksComponent } from './components/step/select-treebanks/sub-treebanks.component';
 import { ResultsComponent } from './components/step/results/results.component';
@@ -98,6 +99,7 @@ export const declarations: any[] = [
     ParseComponent,
     ResultsComponent,
     SelectTreebanksComponent,
+    SelectTreebankProvidersComponent,
     SentenceInputComponent,
     StepButtonsComponent,
     SubtitleDirective,

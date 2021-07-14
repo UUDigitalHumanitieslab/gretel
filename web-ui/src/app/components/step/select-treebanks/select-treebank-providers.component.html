@@ -1,0 +1,45 @@
+<div class="dropdown" [ngClass]="{'is-active': active }">
+    <div class="dropdown-trigger">
+        <button class="button" aria-haspopup="true" (click)="active = !active">
+            <span>All treebanks</span>
+            <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+            </span>
+        </button>
+    </div>
+    <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+            <div class="dropdown-item">
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            Pre-configured treebanks
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="dropdown-item">
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            All user uploaded treebanks
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <hr class="dropdown-divider">
+            <div class="dropdown-item" *ngFor="let user of users">
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            {{user.name}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
