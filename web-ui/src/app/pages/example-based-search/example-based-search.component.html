@@ -27,7 +27,9 @@
     <grt-select-treebanks
         *ngSwitchCase="3"
 
-        (changeValid)="setValid($event)">
+        (changeValid)="setValid($event)"
+        (prev)="prev()"
+        (next)="next()">
     </grt-select-treebanks>
     <grt-results
         *ngSwitchCase="4"

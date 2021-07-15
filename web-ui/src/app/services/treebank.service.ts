@@ -222,7 +222,7 @@ function makeUploadedTreebank(provider: string, bank: UploadedTreebankResponse) 
     return {
         id: bank.title,
         displayName: bank.title,
-        description: bank.title,
+        description: undefined,
         isPublic: bank.public === '1',
         multiOption: true,
         provider,
