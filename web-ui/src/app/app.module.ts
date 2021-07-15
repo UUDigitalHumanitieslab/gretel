@@ -69,6 +69,9 @@ import { NodePropertiesButtonComponent } from './components/step/results/node-pr
 import { NodePropertiesComponent } from './components/node-properties/node-properties.component';
 import { NodePropertiesEditorComponent } from './components/node-properties/node-properties-editor.component';
 
+import { HighlightPipe } from './highlight.pipe';
+import { HighlightMatchPipe } from './highlight-match.pipe';
+
 export const declarations: any[] = [
     AdressComponent,
     AnalysisComponent,
@@ -88,6 +91,8 @@ export const declarations: any[] = [
     GretelWebsiteLinkComponent,
     Header3Component,
     HeaderComponent,
+    HighlightPipe,
+    HighlightMatchPipe,
     HomeContentComponent,
     HomePageComponent,
     MatrixComponent,

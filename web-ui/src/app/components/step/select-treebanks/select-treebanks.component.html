@@ -19,40 +19,75 @@
         </p>
     </div>
 </div>
-<div class="field is-grouped">
-    <p class="control">
-        <input class="input" placeholder="Filter by name" />
-    </p>
-    <div class="control">
-        <grt-select-treebank-providers [(preConfigured)]="showPreConfigured" [users]="userProviders"
-            [(selectedUserIds)]="showUsers" (showUserTags)="showUserTags = true">
-        </grt-select-treebank-providers>
+<div class="level">
+    <div class="level-left">
+        <div class="field has-addons">
+            <p class="control">
+                <input class="input" type="search" placeholder="Filter by name" [(ngModel)]="filterText" />
+            </p>
+            <div class="control">
+                <grt-select-treebank-providers [(preConfigured)]="showPreConfigured" [users]="userProviders"
+                    [(selectedUserIds)]="showUsers" (showUserTags)="showUserTags = true">
+                </grt-select-treebank-providers>
+            </div>
+            <p class="control" *ngIf="userProviders.length">
+                <button class="button" [ngClass]="{'is-primary': showUserTags }" (click)="showUserTags=!showUserTags"
+                    grtBalloon="Show the treebanks' users">
+                    <span class="icon">
+                        <i class="fas fa-tags"></i>
+                    </span>
+                </button>
+            </p>
+        </div>
     </div>
-    <p class="control" *ngIf="userProviders.length">
-        <button class="button" [ngClass]="{'is-primary': showUserTags }" (click)="showUserTags=!showUserTags"
-            grtBalloon="Show the treebanks' users">
-            <span class="icon">
-                <i class="fas fa-tags"></i>
-            </span>
-        </button>
-    </p>
+    <div class="level-right is-hidden-print">
+        <div class="level-item">
+            <div class="field">
+                <p class="control" (click)="prev.next()">
+                    <a class="button is-hidden-tablet" role="button">
+                        <span class="icon ">
+                            <i class="fas fa-chevron-left" title="Previous"></i>
+                        </span>
+                    </a>
+                    <a class="button is-hidden-mobile" role="button">
+                        <span class="is-hidden-mobile">Previous</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="level-item">
+            <div class="field">
+                <p class="control" (click)="next.next()">
+                    <a class="button is-hidden-tablet" role="button">
+                        <span class="icon ">
+                            <i class="fas fa-chevron-right" title="Previous"></i>
+                        </span>
+                    </a>
+                    <a class="button is-hidden-mobile" role="button">
+                        <span class="is-hidden-mobile">Next</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 <ng-container *ngFor="let treebank of treebanks">
     <ng-container *ngIf="treebank.selected ||
-        (showPreConfigured && treebank.preConfigured) ||
-        (showUsers.indexOf(treebank.userId) >= 0)">
+        (((treebank.displayName | highlightMatch:filterText) || (treebank.description | highlightMatch:filterText) || (showUserTags && (treebank.userName | highlightMatch:filterText))) &&
+         ((showPreConfigured && treebank.preConfigured) ||
+          (showUsers.indexOf(treebank.userId) >= 0)))">
         <div class="field">
             <label class="checkbox">
                 <input type="checkbox" [value]="treebank.id" [checked]="treebank.selected"
                     (change)="toggleTreebank(treebank.provider, treebank.id)">
-                {{treebank.displayName}}<ng-container *ngIf="treebank.description">:
-                    <em>{{treebank.description}}</em>
+                <span [innerHtml]="' ' + treebank.displayName | highlight:filterText"></span>
+                <ng-container *ngIf="treebank.description">: <em
+                        [innerHtml]="treebank.description | highlight:filterText"></em>
                 </ng-container>
                 <ng-container *ngIf="treebank.color">
                     &nbsp;
-                    <div class="tag is-{{treebank.color}}" [ngClass]="{'is-invisible': !showUserTags}">
-                        {{treebank.userName}}
-                    </div>
+                    <div class="tag is-{{treebank.color}}" [ngClass]="{'is-invisible': !showUserTags}"
+                        [innerHtml]="treebank.userName | highlight:filterText"></div>
                 </ng-container>
             </label>
         </div>

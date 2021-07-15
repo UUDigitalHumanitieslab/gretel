@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -34,10 +34,17 @@ export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBa
     public stepType = StepType.SelectTreebanks;
     public selection: TreebankSelection;
     public userProviders: UserProvider[];
+    public filterText = '';
 
     public showPreConfigured = true;
     public showUserTags = false;
     public showUsers: number[] = [];
+    
+    @Output()
+    public prev = new EventEmitter();
+
+    @Output()
+    public next = new EventEmitter();
 
     private readonly subscriptions: Subscription[];
     private userColors: { [userId: number]: string } = {};
