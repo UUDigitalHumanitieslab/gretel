@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef, OnChanges } from '@angular/core';
 
 import { animations } from '../../../animations';
-import { comparatorGenerator, OnTypedChanges, TypedChanges } from '../../util';
+import { comparatorGenerator } from '../../util';
 
 export type UserProvider = {
     id: number,
@@ -15,7 +15,7 @@ export type UserProvider = {
     templateUrl: './select-treebank-providers.component.html',
     styleUrls: ['./select-treebank-providers.component.scss']
 })
-export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTreebankProvidersComponent> {
+export class SelectTreebankProvidersComponent implements OnChanges {
     /**
      * Show the dropdown menu
      */
@@ -23,7 +23,7 @@ export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTr
 
     allUsersSelected = true;
 
-    usersSelection: { [id: number]: boolean };
+    usersSelection: { [id: number]: boolean } = {};
 
     selectionText: string;
 
@@ -53,7 +53,7 @@ export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTr
 
     constructor(private eRef: ElementRef) { }
 
-    ngOnChanges(changes: TypedChanges<SelectTreebankProvidersComponent>): void {
+    ngOnChanges(): void {
         this.checkUserSelections(false, false);
     }
 
@@ -98,11 +98,9 @@ export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTr
     }
 
     updateSelectionText() {
-        const usersText = () => {
+        const usersText: () => [boolean, string] = () => {
             const userNames: string[] = [];
             for (let user of this.users.sort((a, b) => comparatorGenerator(a, b, value => value.name))) {
-                console.log(user);
-                console.log(this.selectedUserIds);
                 if (this.selectedUserIds.indexOf(user.id) >= 0) {
                     userNames.push(user.name);
                 }
@@ -110,11 +108,14 @@ export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTr
 
             switch (userNames.length) {
                 case 0:
-                    return 'no users';
+                    return [false, 'no users'];
                 case 1:
-                    return userNames[0];
+                    return [false, userNames[0]];
+                case 2:
+                case 3:
+                    return [true, userNames.slice(0, -1).join(', ') + ` and ${userNames.slice(-1)}`];
                 default:
-                    return userNames.slice(0, -1).join(', ') + ` and ${userNames.slice(-1)}`;
+                    return [false, `${userNames.length} users`];
             }
         };
 
@@ -122,17 +123,18 @@ export class SelectTreebankProvidersComponent implements OnTypedChanges<SelectTr
             this.selectionText = 'All treebanks';
         } else if (this.preConfigured) {
             if (this.selectedUserIds.length) {
-                this.selectionText = `Configured treebanks and ${usersText()}`;
+                let [conjunction, description] = usersText();
+                this.selectionText = `Pre-configured${(conjunction ? ', ' : ' and ') + description}`;
             } else {
-                this.selectionText = 'Pre-configured treebanks';
+                this.selectionText = 'Pre-configured';
             }
         } else if (!this.preConfigured) {
             if (this.allUsersSelected) {
-                this.selectionText = 'User uploaded treebanks';
+                this.selectionText = 'User uploaded';
             } else if (this.selectedUserIds.length) {
-                this.selectionText = usersText();
+                this.selectionText = usersText()[1];
             } else {
-                this.selectionText = 'Only selected treebanks';
+                this.selectionText = 'Only selected';
             }
         }
     }
