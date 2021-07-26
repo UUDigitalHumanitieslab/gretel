@@ -20,7 +20,7 @@
 .metadata {
     display: block;
     position: relative;
-    z-index: 20;
+    z-index: 120;
     opacity: 0;
     transform: translateX(-50%);
     transition: opacity 1s ease-in,
@@ -272,7 +272,7 @@
 
                 a {
                     position: relative;
-                    z-index: 2;
+                    z-index: 102;
                     display: inline-block;
                     padding: 0.5em 1em;
                     border: 1px solid $tree_branch;
@@ -383,7 +383,7 @@
             position: fixed;
             top: -100%;
             left: 0;
-            z-index: 11;
+            z-index: 111;
             padding: 10px;
             border: 5px solid white;
             border-radius: 5px;
@@ -395,7 +395,7 @@
                 position: relative;
                 top: 15px;
                 margin-top: 15px;
-                z-index: 12;
+                z-index: 112;
                 display: block;
                 box-sizing: border-box;
                 background: white;
@@ -468,7 +468,7 @@
             }
 
             .tv-tooltip {
-                z-index: 9;
+                z-index: 109;
             }
         }
 
@@ -486,7 +486,7 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 10;
+        z-index: 110;
         display: none;
         padding: 24px;
         width: 100vw;
@@ -509,7 +509,7 @@
 
                     &.hovered,
                     &:hover {
-                        z-index: 3;
+                        z-index: 103;
                         border-color: transparent !important;
                         background: $tree_hovered;
                         color: #FFF !important;
@@ -528,7 +528,7 @@
                             margin-bottom: 2em;
 
                             ~span {
-                                z-index: 3;
+                                z-index: 103;
                                 margin-top: 1.5em;
                                 transform: scale(2);
                             }

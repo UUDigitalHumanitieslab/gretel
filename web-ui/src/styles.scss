@@ -49,24 +49,6 @@ $pageloader-opacity: 0.6;
     }
 }
 
-.navbar.is-primary {
-
-    // mobile by default falls back to other colors
-    a.navbar-item,
-    .navbar-link {
-        background-color: $primary;
-        color: $primary-invert;
-
-        &:focus,
-        &:hover,
-        &.is-active {
-            background-color: darken($primary, 5%);
-            color: $primary-invert;
-        }
-    }
-}
-
-
 .is-loading {
     /*! adapted from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
 
