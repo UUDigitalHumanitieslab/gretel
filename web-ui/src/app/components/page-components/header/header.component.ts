@@ -14,6 +14,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
     private messageId: number;
     message: string;
     messageType: 'is-warning' | 'is-danger';
+    menuExpanded = false;
     show = false;
 
     constructor(private notificationService: NotificationService, private ngZone: NgZone) {

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -26,6 +26,7 @@ import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.compo
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import { SelectTreebankProvidersComponent } from './components/step/select-treebanks/select-treebank-providers.component';
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';
 import { SubTreebanksComponent } from './components/step/select-treebanks/sub-treebanks.component';
 import { ResultsComponent } from './components/step/results/results.component';
@@ -33,6 +34,7 @@ import { PaperCiteComponent } from './components/page-components/paper-cite/pape
 import { AdressComponent } from './components/page-components/adress/adress.component';
 import { FooterComponent } from './components/page-components/footer/footer.component';
 import { BodyHeaderComponent } from './components/page-components/body-header/body-header.component';
+import { LoginStatusComponent } from './components/page-components/header/login-status/login-status.component';
 import { NavigationComponent } from './components/page-components/header/navigation/navigation.component';
 import { HeaderComponent } from './components/page-components/header/header.component';
 import { Header3Component } from './components/page-components/header-3/header-3.component';
@@ -68,6 +70,9 @@ import { NodePropertiesButtonComponent } from './components/step/results/node-pr
 import { NodePropertiesComponent } from './components/node-properties/node-properties.component';
 import { NodePropertiesEditorComponent } from './components/node-properties/node-properties-editor.component';
 
+import { HighlightPipe } from './highlight.pipe';
+import { HighlightMatchPipe } from './highlight-match.pipe';
+
 export const declarations: any[] = [
     AdressComponent,
     AnalysisComponent,
@@ -87,8 +92,11 @@ export const declarations: any[] = [
     GretelWebsiteLinkComponent,
     Header3Component,
     HeaderComponent,
+    HighlightPipe,
+    HighlightMatchPipe,
     HomeContentComponent,
     HomePageComponent,
+    LoginStatusComponent,
     MatrixComponent,
     NavigationComponent,
     NodePropertiesButtonComponent,
@@ -98,6 +106,7 @@ export const declarations: any[] = [
     ParseComponent,
     ResultsComponent,
     SelectTreebanksComponent,
+    SelectTreebankProvidersComponent,
     SentenceInputComponent,
     StepButtonsComponent,
     SubtitleDirective,
@@ -124,6 +133,7 @@ export const imports: any[] = [
     MessagesModule,
     NgSelectModule,
     OverlayPanelModule,
+    ReactiveFormsModule,
     RouterModule,
     TableModule,
 ];

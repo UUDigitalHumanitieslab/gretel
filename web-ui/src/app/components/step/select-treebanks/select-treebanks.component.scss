@@ -1,0 +1,8 @@
+.tag {
+    opacity: 1;
+    transition: opacity 0.5s;
+
+    &.is-invisible {
+        opacity: 0;
+    }
+}
