@@ -26,6 +26,7 @@ import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.compo
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
+import { SelectTreebankProvidersComponent } from './components/step/select-treebanks/select-treebank-providers.component';
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';
 import { SubTreebanksComponent } from './components/step/select-treebanks/sub-treebanks.component';
 import { ResultsComponent } from './components/step/results/results.component';
@@ -68,6 +69,9 @@ import { NodePropertiesButtonComponent } from './components/step/results/node-pr
 import { NodePropertiesComponent } from './components/node-properties/node-properties.component';
 import { NodePropertiesEditorComponent } from './components/node-properties/node-properties-editor.component';
 
+import { HighlightPipe } from './highlight.pipe';
+import { HighlightMatchPipe } from './highlight-match.pipe';
+
 export const declarations: any[] = [
     AdressComponent,
     AnalysisComponent,
@@ -87,6 +91,8 @@ export const declarations: any[] = [
     GretelWebsiteLinkComponent,
     Header3Component,
     HeaderComponent,
+    HighlightPipe,
+    HighlightMatchPipe,
     HomeContentComponent,
     HomePageComponent,
     MatrixComponent,
@@ -98,6 +104,7 @@ export const declarations: any[] = [
     ParseComponent,
     ResultsComponent,
     SelectTreebanksComponent,
+    SelectTreebankProvidersComponent,
     SentenceInputComponent,
     StepButtonsComponent,
     SubtitleDirective,
