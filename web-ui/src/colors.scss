@@ -3,6 +3,8 @@ $primary-invert: white;
 $secondary: #7E6748;
 $secondary-invert: white;
 
+$success: lighten($primary, 20%);
+
 @import "~bulma/sass/utilities/initial-variables";
 @import "~bulma/sass/utilities/functions";
 @import "~bulma/sass/utilities/derived-variables";

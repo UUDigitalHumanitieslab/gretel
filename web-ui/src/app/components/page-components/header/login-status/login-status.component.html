@@ -1,34 +1,56 @@
-<div class="navbar-item has-dropdown" [ngClass]="{ 'is-active': showLogin }">
-  <a class="navbar-link is-arrowless" (click)="showLogin=!showLogin">
-    Login
-  </a>
+<div class="navbar-item has-dropdown" [ngClass]="{ 'is-active': active }" *ngIf="allowLogin">
+    <a class="navbar-link is-arrowless" (click)="toggleActive()">
+        <ng-container *ngIf="user">
+            <span class="icon">
+                <i class="fas fa-user"></i>
+            </span>
+            <span>
+                {{ user.displayName }}
+            </span>
+        </ng-container>
+        <ng-container *ngIf="!user">
+            <span class="icon">
+                <i class="fas fa-sign-in-alt"></i>
+            </span>
+            <span>
+                Login
+            </span>
+        </ng-container>
+    </a>
 
-  <form class="navbar-dropdown is-right" [formGroup]="loginForm" (ngSubmit)="login()">
-    <div class="navbar-item">
-      <div class="field">
-        <label class="label">Email</label>
-        <div class="control">
-          <input class="input" type="email" placeholder="Email" required formControlName="email">
-        </div>
-      </div>
+    <div class="navbar-dropdown is-right">
+        <a class="navbar-item" *ngIf="user" [ngClass]="{'is-disabled': loading}" (click)="logout()">
+            Logout
+        </a>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()" *ngIf="!user">
+            <div class="navbar-item">
+                <div class="field">
+                    <label class="label">Username</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Username" required formControlName="username">
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" placeholder="Password" required formControlName="password">
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-item">
+                <div class="field">
+                    <div class="control">
+                        <button class="button" type="submit"
+                            [ngClass]="{'is-loading': loading, 'is-primary': !loggingIn, 'is-danger':error}">
+                            Login
+                        </button>
+                    </div>
+                    <p class="help is-danger" *ngIf="error">Check your input</p>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="navbar-item">
-      <div class="field">
-        <label class="label">Password</label>
-        <div class="control">
-          <input class="input" type="password" placeholder="Password" required formControlName="password">
-        </div>
-      </div>
-    </div>
-    <div class="navbar-item">
-      <div class="field">
-        <div class="control">
-          <button class="button" type="submit" [ngClass]="{'is-loading':loggingIn, 'is-primary':!loggingIn, 'is-danger':error}">
-            Login
-          </button>
-        </div>
-        <p class="help is-danger" *ngIf="error">Check your input</p>
-      </div>
-    </div>
-  </form>
 </div>

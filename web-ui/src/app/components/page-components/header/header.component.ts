@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { NotificationService } from '../../../services/notification.service';
+import { Notification, NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
+
+type messageTypes = {
+    [type in Exclude<'cancel', Notification['type']>]: HeaderComponent['messageType'];
+};
+const mapping: messageTypes = {
+    'error': 'is-danger',
+    'success': 'is-success',
+    'warning': 'is-warning'
+};
 
 @Component({
     selector: 'grt-header',
@@ -13,7 +22,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
     private subscriptions: Subscription[] = [];
     private messageId: number;
     message: string;
-    messageType: 'is-warning' | 'is-danger';
+    messageType: 'is-warning' | 'is-danger' | 'is-success';
     menuExpanded = false;
     show = false;
 
@@ -25,25 +34,27 @@ export class HeaderComponent implements OnDestroy, OnInit {
             this.notificationService.notifications$.subscribe(notification => {
                 switch (notification.type) {
                     case 'cancel':
-                        if (this.messageId === notification.id) {
+                        if (notification.id === undefined || this.messageId === notification.id) {
                             this.show = false;
                         }
                         return;
 
-                    case 'error':
-                        this.messageType = 'is-danger';
-                        break;
-
+                    case 'success':
                     case 'warning':
-                        this.messageType = 'is-warning';
-                        // hide the warning after some time
+                        this.messageType = mapping[notification.type];
+                        // hide the message after some time
                         setTimeout(() => {
                             this.ngZone.run(() => {
                                 if (this.messageId === notification.id) { this.show = false; }
                             });
                         }, 5000);
                         break;
+
+                    default:
+                        this.messageType = mapping[notification.type];
+                        break;
                 }
+
                 this.message = notification.message;
                 this.messageId = notification.id;
                 this.show = true;

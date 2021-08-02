@@ -51,7 +51,7 @@ export class SelectTreebankProvidersComponent implements OnChanges {
 
     private showUserTagsTriggered = false;
 
-    constructor(private eRef: ElementRef) { }
+    constructor(private elementRef: ElementRef) { }
 
     ngOnChanges(): void {
         this.checkUserSelections(false, false);
@@ -59,7 +59,7 @@ export class SelectTreebankProvidersComponent implements OnChanges {
 
     @HostListener('document:click', ['$event'])
     clickOutside(event: Event) {
-        if (this.active && !this.eRef.nativeElement.contains(event.target)) {
+        if (this.active && !this.elementRef.nativeElement.contains(event.target)) {
             this.active = false;
         }
     }
