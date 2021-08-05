@@ -25,6 +25,10 @@ export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
 
     allUsersSelected = true;
 
+    onlyMine = false;
+
+    showOnlyMine = false;
+
     usersSelection: { [id: number]: boolean } = {};
 
     selectionText: string;
@@ -58,11 +62,15 @@ export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
     private showUserTagsTriggered = false;
 
     constructor(private elementRef: ElementRef, private userService: UserService) {
-        this.subscriptions = [this.userService.user$.subscribe(user => user = this.user)];
+        this.subscriptions = [this.userService.user$.subscribe(user => {
+            this.user = user;
+            this.checkShowOnlyMine();
+        })];
     }
 
     ngOnChanges(): void {
-        this.checkUserSelections(false, false);
+        this.checkUserSelections();
+        this.checkShowOnlyMine();
     }
 
     ngOnDestroy(): void {
@@ -76,18 +84,53 @@ export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
         }
     }
 
-    checkOnlyMine(set: boolean = undefined) {
-
+    togglePreConfigured(set: boolean = undefined) {
+        if (set == undefined || set !== this.preConfigured) {
+            this.preConfiguredChange.emit(set == undefined ? !this.preConfigured : set);
+        }
     }
-    
-    checkUserSelections(toggleAll = false, emit = true) {
+
+    toggleOnlyMine() {
+        if (this.onlyMine) {
+            this.onlyMine = false;
+            this.togglePreConfigured(true);
+            this.selectedUserIdsChange.emit(this.users.map(user => user.id));
+        } else {
+            this.onlyMine = true;
+            this.togglePreConfigured(false);
+            this.selectedUserIdsChange.emit([this.user.id]);
+        }
+    }
+
+    checkShowOnlyMine() {
+        this.showOnlyMine = this.users && this.user && !!this.users.find(user => user.id === this.user.id);
+    }
+
+    checkUserSelections() {
         let allUsersSelected = true;
         let updatedSelections: SelectTreebankProvidersComponent['usersSelection'] = {};
-        let forAll = toggleAll ? this.allUsersSelected : undefined;
+
+        for (let user of this.users) {
+            let selected = !!this.selectedUserIds.find(selected => selected == user.id);
+            if (!selected) {
+                allUsersSelected = false;
+            }
+            updatedSelections[user.id] = selected;
+        }
+
+        this.allUsersSelected = allUsersSelected;
+        this.usersSelection = updatedSelections;
+
+        this.updateSelectionStatus();
+    }
+
+    toggleUserSelections(toggleAll = false) {
+        let allUsersSelected = true;
+        let updatedSelections: SelectTreebankProvidersComponent['usersSelection'] = {};
         let selectedUserIds: number[] = [];
 
         for (let user of this.users) {
-            const updatedSelection = forAll ?? this.usersSelection[user.id] ?? true;
+            const updatedSelection = toggleAll ? this.allUsersSelected : this.usersSelection[user.id];
             updatedSelections[user.id] = updatedSelection;
             if (!updatedSelection) {
                 allUsersSelected = false;
@@ -99,18 +142,33 @@ export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
         this.allUsersSelected = allUsersSelected;
         this.usersSelection = updatedSelections;
 
-        if (emit) {
-            this.selectedUserIdsChange.emit(selectedUserIds);
+        this.selectedUserIdsChange.emit(selectedUserIds);
 
-            if (!this.showUserTagsTriggered) {
-                if (!this.allUsersSelected && selectedUserIds.length) {
-                    this.showUserTagsTriggered = true;
-                    this.showUserTags.next();
-                }
+        if (!this.showUserTagsTriggered) {
+            if (!this.allUsersSelected && selectedUserIds.length) {
+                this.showUserTagsTriggered = true;
+                this.showUserTags.next();
             }
         }
+    }
 
+    updateSelectionStatus() {
+        this.updateOnlyMine();
         this.updateSelectionText();
+    }
+
+    /**
+     * Check whether only the user's treebanks are selected to be shown
+     */
+    updateOnlyMine() {
+        if (this.preConfigured) {
+            this.onlyMine = false;
+            return;
+        }
+
+        this.onlyMine = this.user &&
+            this.selectedUserIds.length === 1 &&
+            this.selectedUserIds[0] == this.user.id;
     }
 
     updateSelectionText() {
@@ -135,7 +193,9 @@ export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
             }
         };
 
-        if (this.preConfigured && this.allUsersSelected) {
+        if (this.onlyMine) {
+            this.selectionText = 'Only mine';
+        } else if (this.preConfigured && this.allUsersSelected) {
             this.selectionText = 'All treebanks';
         } else if (this.preConfigured) {
             if (this.selectedUserIds.length) {
