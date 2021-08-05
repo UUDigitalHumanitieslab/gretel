@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, HostListener, ElementRef, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { User, UserService } from '../../../services/user.service';
 
 import { animations } from '../../../animations';
 import { comparatorGenerator } from '../../util';
+import { Subscription } from 'rxjs';
 
 export type UserProvider = {
     id: number,
@@ -15,7 +17,7 @@ export type UserProvider = {
     templateUrl: './select-treebank-providers.component.html',
     styleUrls: ['./select-treebank-providers.component.scss']
 })
-export class SelectTreebankProvidersComponent implements OnChanges {
+export class SelectTreebankProvidersComponent implements OnChanges, OnDestroy {
     /**
      * Show the dropdown menu
      */
@@ -26,6 +28,10 @@ export class SelectTreebankProvidersComponent implements OnChanges {
     usersSelection: { [id: number]: boolean } = {};
 
     selectionText: string;
+
+    user: User;
+
+    subscriptions: Subscription[];
 
     @Input()
     preConfigured: boolean;
@@ -51,10 +57,16 @@ export class SelectTreebankProvidersComponent implements OnChanges {
 
     private showUserTagsTriggered = false;
 
-    constructor(private elementRef: ElementRef) { }
+    constructor(private elementRef: ElementRef, private userService: UserService) {
+        this.subscriptions = [this.userService.user$.subscribe(user => user = this.user)];
+    }
 
     ngOnChanges(): void {
         this.checkUserSelections(false, false);
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(subscription => subscription.unsubscribe());
     }
 
     @HostListener('document:click', ['$event'])
@@ -64,6 +76,10 @@ export class SelectTreebankProvidersComponent implements OnChanges {
         }
     }
 
+    checkOnlyMine(set: boolean = undefined) {
+
+    }
+    
     checkUserSelections(toggleAll = false, emit = true) {
         let allUsersSelected = true;
         let updatedSelections: SelectTreebankProvidersComponent['usersSelection'] = {};
