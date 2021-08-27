@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ConfigurationService } from './configuration.service';
+import { NotificationService } from './notification.service';
 
 type UserResponseSuccess = {
     id: string;
@@ -42,7 +43,8 @@ export class UserService {
 
     constructor(
         private http: HttpClient,
-        private configurationService: ConfigurationService) { }
+        private configurationService: ConfigurationService,
+        private notificationService: NotificationService) { }
 
     public get user$() {
         if (this._user$) {
@@ -61,10 +63,10 @@ export class UserService {
     /**
      * Retrieve the current user or set it to undefined
      */
-    private async retrieveCurrent(): Promise<void> {
+    private async retrieveCurrent(): Promise<boolean> {
         const currentUrl = await this.configurationService.getUploadApiUrl('user');
 
-        let response: UserResponse = await this.http.get(currentUrl).toPromise()
+        let response: UserResponse = await this.http.get(currentUrl, { withCredentials: true }).toPromise()
             .catch((error: HttpErrorResponse) => null);
 
         if (response) {
@@ -76,7 +78,7 @@ export class UserService {
             }
         }
 
-        this.setUser(response);
+        return this.setUser(response);
     }
 
     /**
@@ -91,9 +93,17 @@ export class UserService {
 
         const response = <UserResponse>await this.http.post(
             loginUrl,
-            formData).toPromise();
+            formData,
+            { withCredentials: true }).toPromise();
 
-        return this.setUser(response);
+        var success = this.setUser(response);
+        if (success) {
+            if (!this.retrieveCurrent()) {
+                this.notificationService.add('Your credentials are correct, but login failed anyway. Might be a cross-domain issue with session cookies.', 'error');
+            }
+        }
+
+        return success;
     }
 
     /**
@@ -103,7 +113,7 @@ export class UserService {
         const logoutUrl = await this.configurationService.getUploadApiUrl('user/logout');
 
         try {
-            await this.http.post(logoutUrl, null).toPromise();
+            await this.http.post(logoutUrl, null, { withCredentials: true }).toPromise();
             this.setUser(undefined);
             return true;
         }
