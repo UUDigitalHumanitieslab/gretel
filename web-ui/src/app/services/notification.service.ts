@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 export type Notification = {
     id: number,
     message: string,
-    type: 'error' | 'warning'
+    type: 'error' | 'warning' | 'success'
 } | {
     id: number,
     type: 'cancel'
@@ -42,5 +42,9 @@ export class NotificationService {
 
     cancel(id: number) {
         NotificationService.notifications$.next({ id, type: 'cancel' });
+    }
+
+    cancelAll() {
+        NotificationService.notifications$.next({ id: undefined, type: 'cancel' });
     }
 }

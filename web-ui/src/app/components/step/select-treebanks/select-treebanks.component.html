@@ -59,7 +59,7 @@
             <div class="field">
                 <p class="control" (click)="next.next()">
                     <a class="button is-hidden-tablet" role="button">
-                        <span class="icon ">
+                        <span class="icon">
                             <i class="fas fa-chevron-right" title="Previous"></i>
                         </span>
                     </a>
@@ -83,6 +83,16 @@
                 <span [innerHtml]="' ' + treebank.displayName | highlight:filterText"></span>
                 <ng-container *ngIf="treebank.description">: <em
                         [innerHtml]="treebank.description | highlight:filterText"></em>
+                </ng-container>
+                <ng-container *ngIf="!treebank.isPublic">
+                    &nbsp;
+                    <span class="tag is-dark">
+                        <span class="icon">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        &nbsp;
+                        private
+                    </span>
                 </ng-container>
                 <ng-container *ngIf="treebank.color">
                     &nbsp;

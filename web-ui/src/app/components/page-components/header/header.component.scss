@@ -1,11 +1,23 @@
 @import "../../../../colors";
 
 .navbar {
-    z-index: 0; // the full screen tree view is drawn over this
-}
+    // mobile by default falls back to other colors
+    a.navbar-item,
+    .navbar-link {
+        background-color: $primary;
+        color: $primary-invert;
 
-.navbar-brand {
-    background-color: $secondary;
+        &:focus,
+        &:hover,
+        &.is-active {
+            background-color: darken($primary, 5%);
+            color: $primary-invert;
+        }
+    }
+
+    .navbar-brand .navbar-item {
+        background-color: $secondary;
+    }
 }
 
 .notification {

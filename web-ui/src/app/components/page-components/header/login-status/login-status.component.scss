@@ -1,0 +1,19 @@
+@import "~bulma/sass/utilities/mixins";
+
+.navbar-dropdown {
+    // also toggle the login status on mobile
+    display: none;
+
+    .navbar-item.is-active>& {
+        display: block;
+    }
+
+    .control {
+        min-width: 300px;
+    }
+
+    .navbar-item.is-disabled {
+        pointer-events: none;
+        opacity: .65;
+    }
+}

@@ -13,7 +13,6 @@ import { comparatorGenerator } from '../../util';
 
 // bulma.io tag colors
 const colors = [
-    'black',
     'primary',
     'link',
     'info',
