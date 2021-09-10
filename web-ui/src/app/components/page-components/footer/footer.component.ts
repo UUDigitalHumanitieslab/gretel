@@ -9,8 +9,11 @@ import { environment } from './../../../../environments/environment';
 export class FooterComponent {
     buildTime: string;
     version: string;
+    sourceUrl: string;
+
     constructor() {
         this.buildTime = environment.buildTime;
         this.version = environment.version;
+        this.sourceUrl = environment.sourceUrl;
     }
 }

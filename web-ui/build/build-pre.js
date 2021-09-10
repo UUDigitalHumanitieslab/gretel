@@ -2,21 +2,62 @@ const path = require('path');
 const colors = require('colors/safe');
 const fs = require('fs');
 const appVersion = require('../../package.json').version;
+const { exec } = require('child_process');
 
 console.log(colors.cyan('\nRunning pre-build tasks'));
 
-const versionFilePath = path.join(__dirname + '/../src/environments/version.ts');
+async function getHash() {
+    return new Promise((resolve, reject) => {
+        exec('git rev-parse HEAD', (error, stdout, stderr) => {
+            if (error) {
+                reject(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                reject(`stderr: ${stderr}`);
+                return;
+            }
 
-const src = `export const version = '${appVersion}';
+            resolve(stdout.trimEnd());
+        });
+    });
+}
+
+async function getRemoteUrl() {
+    return new Promise((resolve, reject) => {
+        exec('git config --get remote.origin.url', (error, stdout, stderr) => {
+            if (error) {
+                reject(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                reject(`stderr: ${stderr}`);
+                return;
+            }
+
+            resolve(stdout.replace(/\.git\n?$/, ''));
+        });
+    });
+}
+
+Promise.all([getHash(), getRemoteUrl()]).then(([hash, remoteUrl]) => {
+    writeVersion(hash, remoteUrl);
+});
+
+function writeVersion(hash, remoteUrl) {
+    const versionFilePath = path.join(__dirname + '/../src/environments/version.ts');
+    const src = `export const version = '${appVersion}';
 export const buildTime = '${new Date()}';
+export const sourceUrl = '${remoteUrl}/commit/${hash}';
 `;
 
-// ensure version module pulls value from package.json
-fs.writeFile(versionFilePath, src, { flat: 'w' }, function (err) {
-    if (err) {
-        return console.log(colors.red(err));
-    }
+    // ensure version module pulls value from package.json
+    fs.writeFile(versionFilePath, src, { flat: 'w' }, function (err) {
+        if (err) {
+            return console.log(colors.red(err));
+        }
 
-    console.log(colors.green(`Updating application version ${colors.yellow(appVersion)}`));
-    console.log(`${colors.green('Writing version module to ')}${colors.yellow(versionFilePath)}\n`);
-});
+        console.log(colors.green(`Updating application version ${colors.yellow(appVersion)}`));
+        console.log(`${colors.green('Writing version module to ')}${colors.yellow(versionFilePath)}\n`);
+    });
+}
