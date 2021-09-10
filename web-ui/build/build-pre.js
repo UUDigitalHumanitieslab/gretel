@@ -35,7 +35,7 @@ async function getRemoteUrl() {
                 return;
             }
 
-            resolve(stdout.replace(/\.git\n?$/, ''));
+            resolve(stdout.replace(/([^:\/]+:[^:@]+@|\.git\/?\n?$)/g, ''));
         });
     });
 }
