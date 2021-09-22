@@ -1,3 +1,5 @@
+@import "../../../colors";
+
 .warning {
     position: sticky;
     bottom: 0;
@@ -10,7 +12,7 @@
     /*! from bulma.io v0.6.0 | MIT License | github.com/jgthms/bulma */
     &:before {
         animation: spinAround 500ms infinite linear;
-        border: 10px solid #96846c;
+        border: 10px solid $secondary;
         border-radius: 290486px;
         border-right-color: transparent;
         border-top-color: transparent;

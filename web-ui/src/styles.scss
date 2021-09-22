@@ -54,7 +54,7 @@ $pageloader-opacity: 0.6;
 
     &:after {
         animation: spinAround 500ms infinite linear;
-        border: 3px solid #96846c;
+        border: 3px solid $secondary;
         border-radius: 100%;
         border-right-color: transparent;
         border-top-color: transparent;

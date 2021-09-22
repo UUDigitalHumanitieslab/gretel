@@ -16,10 +16,16 @@
         </div>
     </div>
 </h2>
-<table class="table is-fullwidth scroll">
+<table class="table is-fullwidth scroll has-text-left">
     <thead>
         <tr>
-            <th>Name</th>
+            <th>
+                <!-- disabled checkbox to align precisely with the other checkboxes-->
+                <label class="checkbox">
+                    <input type="checkbox" style="visibility: hidden" disabled />
+                </label>
+                Name
+            </th>
             <th>Hits</th>
             <th>All Sentences</th>
         </tr>
@@ -43,7 +49,7 @@
                 <ng-container *ngIf="!corpus.value.hidden">
                     <tr *ngFor="let component of corpus.value.components | keyvalue">
                         <td>
-                            <label class="checkbox">
+                            &nbsp; &nbsp; <label class="checkbox">
                                 <input
                                     type="checkbox"
                                     [checked]="!component.value.hidden"

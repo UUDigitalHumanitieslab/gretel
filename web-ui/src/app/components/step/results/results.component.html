@@ -90,25 +90,30 @@
 </div>
 <div class="level">
     <div class="level-left">
-        <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
-            Results: {{filteredResults.length - hiddenCount}}<ng-container *ngIf="hiddenCount > 0"> ({{hiddenCount}}
-                hidden)
-            </ng-container>
-        </h1>
-    </div>
-    <div class="level-right is-hidden-print">
         <div class="level is-mobile">
-            <div class="level-item is-hidden-tablet" *ngIf="filters.length">
+            <div class="level-item" *ngIf="filters.length">
                 <div class="field">
                     <p class="control">
-                        <a class="button" role="button" (click)="hideFiltersColumn = !hideFiltersColumn">
+                        <a class="button" role="button" (click)="hideFiltersColumn = !hideFiltersColumn"
+                            [ngClass]="{'is-secondary': hideFiltersColumn, 'has-badge-rounded': activeFilterCount}" [attr.data-badge]="activeFilterCount ? activeFilterCount : undefined">
                             <span class="icon">
-                                <i class="fas fa-filter" title="Toggle filters"></i>
+                                <i class="fas fa-bars" title="Toggle filters"></i>
                             </span>
                         </a>
                     </p>
                 </div>
             </div>
+            <div class="level-item">
+                <h1 class="title" [ngClass]="{'is-loading': loading}" grtSubtitle>
+                    Results: {{filteredResults.length - hiddenCount}}<ng-container *ngIf="hiddenCount > 0"> ({{hiddenCount}}
+                        hidden)
+                    </ng-container>
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="level-right is-hidden-print">
+        <div class="level is-mobile">
             <div class="level-item">
                 <div class="field">
                     <p class="control" (click)="prev.next()">
@@ -188,32 +193,25 @@
 </div>
 <grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
 <div class="columns">
-    <div class="column is-one-third is-hidden-print is-hidden-mobile" *ngIf="filters.length" [@fade]
-        [ngClass]="{'is-hidden-mobile': hideFiltersColumn }">
+    <div class="column is-one-third is-hidden-print" *ngIf="filters.length" [@fade]
+        [ngClass]="{'is-hidden': hideFiltersColumn }">
         <div class="filter">
             <grt-filters [filters]="filters" [filterValues]="filterValues" (filterChange)="filterChange($event)">
             </grt-filters>
         </div>
-        <div class="is-hidden-tablet">
-            <br />
-            <div class="buttons is-centered">
-                <a class="button is-primary" role="button" (click)="hideFiltersColumn = true">
-                    Hide Filters
-                </a>
-            </div>
+        <br />
+        <div class="buttons is-centered">
+            <a class="button is-primary" role="button" (click)="hideFiltersColumn = true">
+                Hide Filters
+            </a>
         </div>
     </div>
     <div class="column">
         <p-table *ngIf="filteredResults.length > hiddenCount else warning" [columns]="columns" [value]="filteredResults"
             [resizableColumns]="true" styleClass="bulma">
-            <ng-template pTemplate="colgroup" let-columns>
-                <colgroup>
-                    <col *ngFor="let col of columns" [style.width]="col.width">
-                </colgroup>
-            </ng-template>
             <ng-template pTemplate="header" let-columns>
                 <tr>
-                    <th *ngFor="let col of columns" pResizableColumn>
+                    <th *ngFor="let col of columns" pResizableColumn [style.width]="col.width">
                         {{col.header}}
                     </th>
                 </tr>

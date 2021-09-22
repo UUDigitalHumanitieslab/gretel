@@ -121,9 +121,9 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public activeFilterCount = 0;
 
     /**
-     * Toggle filters column on mobile
+     * Toggle filters column
      */
-    public hideFiltersColumn = true;
+    public hideFiltersColumn = false;
     public filters: Filter[] = [];
 
     /**
