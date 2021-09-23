@@ -45,8 +45,9 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
   * Set BaseX variables (machine names, port numbers, password and username)
 5. Install [composer](https://getcomposer.org/) to be able to install PHP dependencies.
 6. Enable the rewrite module (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
-6. Run `npm run build` to compile all the dependencies.
-7. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
+7. Set `AllowOverride` to `All` to allow `.htaccess` to set the settings for the rewrite module.
+8. Run `npm run build` to compile all the dependencies.
+9. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
 ## Notes for users
 
