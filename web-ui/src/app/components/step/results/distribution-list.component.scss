@@ -12,4 +12,9 @@ table.scroll {
         width: 100%;
         table-layout: fixed;
     }
+
+    .checkbox {
+        // those corpus names can get quite long
+        word-break: break-all;
+    }
 }
