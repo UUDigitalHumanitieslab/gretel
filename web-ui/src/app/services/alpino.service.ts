@@ -11,14 +11,14 @@ export class AlpinoService {
         this.generateXPathUrl = configurationService.getAlpinoUrl('generate_xpath');
     }
 
-    async generateXPath(xml: string, tokens: string[], attributes: string[], ignoreTopNode: boolean, respectOrder: boolean) {
+    async generateXPath(xml: string, tokens: string[], attributes: TokenAttributes[], ignoreTopNode: boolean, respectOrder: boolean) {
         const result = await this.http.post<{
             xpath: string,
             subTree: string
         }>(await this.generateXPathUrl, {
             xml,
             tokens,
-            attributes,
+            attributes: this.attributesToStrings(attributes),
             ignoreTopNode,
             respectOrder
         }).toPromise();
@@ -37,6 +37,74 @@ export class AlpinoService {
         return this.http.get(
             await this.parseSentenceUrl(sentence),
             { responseType: 'text' }).toPromise();
+    }
+
+    attributesToStrings(attrs: TokenAttributes[]): string[] {
+        if (attrs === undefined) {
+            return undefined;
+        }
+
+        return attrs.map(attr => {
+            let parts: string[] = [];
+
+            for (let key of ['na', 'cs']) {
+                if (attr[key]) {
+                    // this token is ignored - don't parse the remaining tokens
+                    if (key === 'na') {
+                        return 'na';
+                    }
+                    parts.push(key);
+                }
+            }
+
+            for (let key of ['rel', 'token', 'lemma', 'pos', 'postag']) {
+                switch (attr[key]) {
+                    case 'include':
+                        parts.push(key);
+                        break;
+
+                    case 'exclude':
+                        parts.push(`-${key}`);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            return parts.join(',');
+        });
+    }
+
+    attributesFromString(strings: string[]): TokenAttributes[] {
+        if (strings === undefined) {
+            return undefined;
+        }
+
+        return strings.map(string => {
+            let parts: string[] = string.split(',');
+            let attributes: TokenAttributes = {};
+
+            for (let part of parts) {
+                const key = part.replace(/^-/, '');
+                switch (key) {
+                    case 'cs':
+                    case 'na':
+                        attributes[key] = true;
+                        break;
+
+                    case 'rel':
+                    case 'token':
+                    case 'lemma':
+                    case 'pos':
+                    case 'postag':
+                        attributes[key] = part[0] === '-' ? 'exclude' : 'include';
+                        break;
+                }
+            }
+
+            return attributes;
+        });
     }
 
     tokenize(sentence: string) {
@@ -60,3 +128,17 @@ export class AlpinoService {
         return encodeURIComponent(sentence.replace(/\//g, '_SLASH_'));
     }
 }
+
+export type DefaultValue = 'include' | 'exclude' | undefined;
+
+export interface TokenAttributes {
+    rel?: DefaultValue,
+    token?: DefaultValue,
+    lemma?: DefaultValue,
+    pos?: DefaultValue,
+    cs?: boolean,
+    postag?: DefaultValue,
+    na?: boolean
+}
+
+export type AttributeType = keyof TokenAttributes;

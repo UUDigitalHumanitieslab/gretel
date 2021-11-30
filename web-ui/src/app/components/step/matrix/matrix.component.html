@@ -17,7 +17,7 @@
                         </label>
                     </th>
                     <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token.index, option)">
-                        <input type="radio" [checked]="tokenValues[token.index] == option" [disabled]="isCustomXPath">
+                        <grt-matrix-option [attributes]="tokenValues[token.index]" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
             </ng-container>

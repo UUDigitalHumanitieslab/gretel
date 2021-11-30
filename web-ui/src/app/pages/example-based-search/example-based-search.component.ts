@@ -56,13 +56,13 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             super.encodeGlobalState(state), {
             'inputSentence': state.inputSentence,
             'isCustomXPath': this.encodeBool(state.isCustomXPath),
-            'attributes': state.attributes,
+            'attributes': this.alpinoService.attributesToStrings(state.attributes).join('-'),
             'respectOrder': this.encodeBool(state.respectOrder),
             'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
         });
     }
 
-    decodeGlobalState(queryParams: { [key: string]: any }) {
+    decodeGlobalState(queryParams: { [key: string]: any }): { [K in keyof GlobalStateExampleBased]?: GlobalStateExampleBased[K] } {
         return {
             selectedTreebanks: new TreebankSelection(
                 this.treebankService,
@@ -70,7 +70,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             xpath: queryParams.xpath || undefined,
             inputSentence: queryParams.inputSentence || undefined,
             isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
-            attributes: queryParams.attributes,
+            attributes: this.alpinoService.attributesFromString(queryParams.attributes?.split('-')),
             retrieveContext: this.decodeBool(queryParams.retrieveContext),
             respectOrder: this.decodeBool(queryParams.respectOrder),
             ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)

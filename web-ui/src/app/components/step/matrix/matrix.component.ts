@@ -4,11 +4,16 @@ import { ConfirmationService } from 'primeng/api';
 
 import { ValueEvent } from 'lassy-xpath';
 
-import { StateService } from '../../../services/_index';
+import { StateService, TokenAttributes } from '../../../services/_index';
 import { StepDirective } from '../step.directive';
-import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
+import { StepType, GlobalStateExampleBased, DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
+import { Option, options } from './matrix-option.component';
+
+const optionsLookup = Object.assign(
+    {},
+    ...options.map(option => ({ [option.value]: option }))) as { [key: string]: Option };
 
 @Component({
     animations,
@@ -21,28 +26,40 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     private subscriptions: Subscription[];
     public stepType = StepType.Matrix;
 
-    public set attributes(values: string[]) {
-        const tokenValues = values.map(value => {
-            const option = this.options.find(o => o.value === value);
-            if (option.advanced) {
-                this.showAdvanced = true;
+    private set attributes(tokens: TokenAttributes[]) {
+        for (let token of tokens) {
+            if (token != null) {
+                for (let [key, value] of Object.entries(token)) {
+                    var option = optionsLookup[key];
+                    if (option.advanced) {
+                        if (value !== DefaultTokenAttributes[key]) {
+                            this.showAdvanced = true;
+                        }
+                    }
+                }
             }
-            return option;
-        });
+        }
+        // const tokenValues = values.map(value => {
+        //     const option = this.options.find(o => o.value === value.);
+        //     if (option.advanced) {
+        //         this.showAdvanced = true;
+        //     }
+        //     return option;
+        // });
         if (this.tokenValues &&
-            tokenValues.length === this.tokenValues.length) {
+            tokens.length === this.tokenValues.length) {
             // only update the values, but prevent the whole array
             // from being re-rendered
-            for (let i = 0; i < tokenValues.length; i++) {
-                Object.assign(this.tokenValues[i], tokenValues[i]);
+            for (let i = 0; i < tokens.length; i++) {
+                Object.assign(this.tokenValues[i], tokens[i]);
             }
         } else {
-            this.tokenValues = tokenValues;
+            this.tokenValues = tokens;
         }
     }
 
-    public get attributes() {
-        return this.tokenValues.map(t => t.value);
+    private get attributes() {
+        return this.tokenValues;
     }
 
     public set tokens(values: string[]) {
@@ -84,57 +101,9 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
      */
     public alwaysAdvanced: boolean;
 
-    public tokenValues: Part[];
+    public tokenValues: TokenAttributes[];
 
-    public options: Part[] = [
-        {
-            label: 'Word',
-            description: 'The exact word form (also known as token).',
-            value: 'token',
-            advanced: false
-        },
-        {
-            label: 'Word (case-sensitive)',
-            description: 'The word form must match exactly, including the casing.',
-            value: 'cs',
-            advanced: true
-        },
-        {
-            label: 'Lemma',
-            description: `Word form that generalizes over inflected forms.
-            For example: gaan is the lemma of ga, gaat, gaan, ging, gingen, and gegaan.`,
-            value: 'lemma',
-            advanced: false
-        },
-        {
-            label: 'Word class',
-            description: `Short Dutch part-of-speech tag.
-            The different tags are:
-            n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun),
-            vg (conjunction), bw (adverb), tw (numeral), vz (preposition),
-            tsw (interjection), spec (special token), and let (punctuation).`,
-            value: 'pos',
-            advanced: false
-        },
-        {
-            label: 'Detailed word class',
-            description: 'Long part-of-speech tag. For example: N(soort,mv,basis), WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev).',
-            value: 'postag',
-            advanced: true
-        },
-        {
-            label: 'Optional',
-            description: `The word will be ignored in the search instruction.
-            It may be included in the results, but it is not required that it is present.`,
-            value: 'na',
-            advanced: false
-        },
-        {
-            label: 'Exclude',
-            description: 'The word class and the dependency relation will be explicitly excluded from the results.',
-            value: 'not',
-            advanced: true
-        }];
+    public options = options;
 
     private originalXPath: string;
 
@@ -144,6 +113,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         super(stateService);
         this.subscriptions = [
             this.state$.subscribe(state => {
+                console.log([...state.attributes]);
                 this.attributes = state.attributes;
                 this.ignoreTopNode = state.ignoreTopNode;
                 this.isCustomXPath = state.isCustomXPath;
@@ -156,17 +126,27 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         ];
     }
 
-    public setTokenPart(tokenIndex: number, part: Part) {
+    public setTokenPart(tokenIndex: number, part: Option) {
         if (this.isCustomXPath) {
             this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
-        if (part.advanced) {
+
+        var updated = this.rotateValue(tokenIndex, part);
+
+        if (part.advanced && updated !== DefaultTokenAttributes[part.value]) {
             this.alwaysAdvanced = true;
         }
-        this.tokenValues[tokenIndex] = part;
-        if (!part.advanced) {
-            this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
+        else {
+            this.alwaysAdvanced = !!this.tokenValues.find(token => {
+                for (let [key, value] of Object.entries(token)) {
+                    let option = optionsLookup[key];
+                    if (option.advanced && DefaultTokenAttributes[key] !== value) {
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
         this.emitChange();
     }
@@ -176,7 +156,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
             this.valid = true;
         }
         this.changeValue.next(Object.assign({
-            attributes: this.tokenValues.map(t => t.value),
+            attributes: [...this.tokenValues],
             retrieveContext: this.retrieveContext,
             customXPath,
             respectOrder: this.respectOrder,
@@ -235,17 +215,35 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         this.subscriptions.forEach(s => s.unsubscribe());
         super.ngOnDestroy();
     }
-}
 
-interface Part {
-    label: string;
-    description: string;
-    value: string;
-    advanced: boolean;
+    private rotateValue(tokenIndex: number, option: Option): any {
+        var value = (this.tokenValues[tokenIndex][option.value] ??
+            optionsLookup[option.value]);
+        var options: any[];
+
+        switch (option.type) {
+            case 'default':
+                options = ['include', 'exclude', undefined];
+                break;
+
+            case 'bool':
+                options = [true, false];
+                break;
+        }
+
+        var index = options.indexOf(value) + 1;
+        var update = options[index % options.length];
+        Object.assign(
+            this.tokenValues[tokenIndex],
+            {
+                [option.value]: update
+            });
+        return update;
+    }
 }
 
 export interface MatrixSettings {
-    attributes: string[];
+    attributes: TokenAttributes[];
     customXPath: string;
     retrieveContext: boolean;
     respectOrder: boolean;

@@ -62,6 +62,7 @@ import { ExampleBasedSearchComponent } from './pages/example-based-search/exampl
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
+import { MatrixOptionComponent } from './components/step/matrix/matrix-option.component';
 import { DistributionListComponent } from './components/step/results/distribution-list.component';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
@@ -98,6 +99,7 @@ export const declarations: any[] = [
     HomePageComponent,
     LoginStatusComponent,
     MatrixComponent,
+    MatrixOptionComponent,
     NavigationComponent,
     NodePropertiesButtonComponent,
     NodePropertiesComponent,
