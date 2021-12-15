@@ -11,6 +11,8 @@ import {
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 import { TreebankSelection } from '../../treebank';
 
+const attributesSeparator = ':';
+
 @Component({
     selector: 'grt-example-based-search',
     templateUrl: './example-based-search.component.html',
@@ -56,7 +58,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             super.encodeGlobalState(state), {
             'inputSentence': state.inputSentence,
             'isCustomXPath': this.encodeBool(state.isCustomXPath),
-            'attributes': this.alpinoService.attributesToStrings(state.attributes).join('-'),
+            'attributes': this.alpinoService.attributesToStrings(state.attributes).join(attributesSeparator),
             'respectOrder': this.encodeBool(state.respectOrder),
             'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
         });
@@ -70,7 +72,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             xpath: queryParams.xpath || undefined,
             inputSentence: queryParams.inputSentence || undefined,
             isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
-            attributes: this.alpinoService.attributesFromString(queryParams.attributes?.split('-')),
+            attributes: this.alpinoService.attributesFromString(queryParams.attributes?.split(attributesSeparator)),
             retrieveContext: this.decodeBool(queryParams.retrieveContext),
             respectOrder: this.decodeBool(queryParams.respectOrder),
             ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)

@@ -27,6 +27,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public stepType = StepType.Matrix;
 
     private set attributes(tokens: TokenAttributes[]) {
+        let alwaysAdvanced = false;
         for (let token of tokens) {
             if (token != null) {
                 for (let [key, value] of Object.entries(token)) {
@@ -34,18 +35,15 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                     if (option.advanced) {
                         if (value !== DefaultTokenAttributes[key]) {
                             this.showAdvanced = true;
+                            alwaysAdvanced = true;
                         }
                     }
                 }
             }
         }
-        // const tokenValues = values.map(value => {
-        //     const option = this.options.find(o => o.value === value.);
-        //     if (option.advanced) {
-        //         this.showAdvanced = true;
-        //     }
-        //     return option;
-        // });
+
+        this.alwaysAdvanced = alwaysAdvanced;
+
         if (this.tokenValues &&
             tokens.length === this.tokenValues.length) {
             // only update the values, but prevent the whole array
@@ -76,6 +74,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         }
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
+
     public get tokens() {
         return this.indexedTokens.map(t => t.value);
     }
@@ -113,7 +112,6 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         super(stateService);
         this.subscriptions = [
             this.state$.subscribe(state => {
-                console.log([...state.attributes]);
                 this.attributes = state.attributes;
                 this.ignoreTopNode = state.ignoreTopNode;
                 this.isCustomXPath = state.isCustomXPath;
@@ -134,31 +132,19 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
 
         var updated = this.rotateValue(tokenIndex, part);
 
-        if (part.advanced && updated !== DefaultTokenAttributes[part.value]) {
-            this.alwaysAdvanced = true;
-        }
-        else {
-            this.alwaysAdvanced = !!this.tokenValues.find(token => {
-                for (let [key, value] of Object.entries(token)) {
-                    let option = optionsLookup[key];
-                    if (option.advanced && DefaultTokenAttributes[key] !== value) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
-        this.emitChange();
+        this.emitChange({
+            attributes: updated
+        });
     }
 
-    public emitChange(customXPath: string = null, settings: { [key: string]: boolean } = {}) {
-        if (customXPath == null) {
+    private emitChange(settings: Partial<MatrixSettings> = {}) {
+        if (settings.customXPath == null) {
             this.valid = true;
         }
         this.changeValue.next(Object.assign({
-            attributes: [...this.tokenValues],
+            attributes: this.tokenValues,
             retrieveContext: this.retrieveContext,
-            customXPath,
+            customXPath: settings.customXPath || null,
             respectOrder: this.respectOrder,
             tokens: [...this.tokens],
             ignoreTopNode: this.ignoreTopNode
@@ -167,19 +153,19 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     }
 
     public toggleSetting(key: 'retrieveContext' | 'respectOrder' | 'ignoreTopNode') {
-        this.emitChange(null, { [key]: !this[key] });
+        this.emitChange({ [key]: !this[key] });
     }
 
     public changeCustomXpath(valueEvent: ValueEvent) {
         this.valid = !valueEvent.error && !!valueEvent.xpath;
         if (!!valueEvent.xpath) {
-            this.emitChange(valueEvent.xpath);
+            this.emitChange({ customXPath: valueEvent.xpath });
         }
     }
 
     public editXPath() {
         this.originalXPath = this.xpath;
-        this.emitChange(this.xpath);
+        this.emitChange({ customXPath: this.xpath });
     }
 
     public resetXPath() {
@@ -216,7 +202,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         super.ngOnDestroy();
     }
 
-    private rotateValue(tokenIndex: number, option: Option): any {
+    private rotateValue(tokenIndex: number, option: Option): TokenAttributes[] {
         var value = (this.tokenValues[tokenIndex][option.value] ??
             optionsLookup[option.value]);
         var options: any[];
@@ -233,12 +219,15 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
 
         var index = options.indexOf(value) + 1;
         var update = options[index % options.length];
-        Object.assign(
-            this.tokenValues[tokenIndex],
+
+        return [
+            ...this.tokenValues.slice(0, tokenIndex),
             {
+                ...this.tokenValues[tokenIndex],
                 [option.value]: update
-            });
-        return update;
+            },
+            ...this.tokenValues.slice(tokenIndex + 1)
+        ];
     }
 }
 

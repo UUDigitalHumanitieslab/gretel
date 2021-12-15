@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
+import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
 
 @Injectable()
 export class AlpinoService {
@@ -48,7 +49,7 @@ export class AlpinoService {
             let parts: string[] = [];
 
             for (let key of ['na', 'cs']) {
-                if (attr[key]) {
+                if (attr[key] !== DefaultTokenAttributes[key]) {
                     // this token is ignored - don't parse the remaining tokens
                     if (key === 'na') {
                         return 'na';
@@ -59,6 +60,10 @@ export class AlpinoService {
 
             for (let key of ['rel', 'token', 'lemma', 'pos', 'postag']) {
                 switch (attr[key]) {
+                    case DefaultTokenAttributes[key]:
+                        // don't set default values
+                        break;
+
                     case 'include':
                         parts.push(key);
                         break;
@@ -83,7 +88,9 @@ export class AlpinoService {
 
         return strings.map(string => {
             let parts: string[] = string.split(',');
-            let attributes: TokenAttributes = {};
+            let attributes: TokenAttributes = {
+                ...DefaultTokenAttributes
+            };
 
             for (let part of parts) {
                 const key = part.replace(/^-/, '');
