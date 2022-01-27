@@ -28,9 +28,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 
 * [BaseX](https://packages.debian.org/jessie/database/basex)
 * [SimpleXML](http://php.net/manual/en/book.simplexml.php)
-* [Perl](https://packages.debian.org/jessie/perl/perl) with:
-  * [XML::Twig](https://packages.debian.org/jessie/libxml-twig-perl)
-  * [XML::XPath](https://packages.debian.org/jessie/libxml-xpath-perl)
+* [alpino-query](https://github.com/UUDigitalHumanitieslab/alpino-query)
 
 ### Next steps
 

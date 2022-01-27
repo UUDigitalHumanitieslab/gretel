@@ -40,7 +40,7 @@ export class AlpinoService {
             { responseType: 'text' }).toPromise();
     }
 
-    attributesToStrings(attrs: TokenAttributes[]): string[] {
+    attributesToStrings(attrs: TokenAttributes[], skipDefault = false): string[] {
         if (attrs === undefined) {
             return undefined;
         }
@@ -49,18 +49,20 @@ export class AlpinoService {
             let parts: string[] = [];
 
             for (let key of ['na', 'cs']) {
-                if (attr[key] !== DefaultTokenAttributes[key]) {
+                if (!skipDefault || attr[key] !== DefaultTokenAttributes[key]) {
                     // this token is ignored - don't parse the remaining tokens
-                    if (key === 'na') {
+                    if (key === 'na' && attr['na']) {
                         return 'na';
                     }
-                    parts.push(key);
+                    if (attr[key]) {
+                        parts.push(key);
+                    }
                 }
             }
 
             for (let key of ['rel', 'token', 'lemma', 'pos', 'postag']) {
                 switch (attr[key]) {
-                    case DefaultTokenAttributes[key]:
+                    case skipDefault && DefaultTokenAttributes[key]:
                         // don't set default values
                         break;
 
