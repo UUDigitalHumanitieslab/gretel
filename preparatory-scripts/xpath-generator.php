@@ -1,6 +1,6 @@
 <?php
 
-require ROOT_PATH.'/preparatory-scripts/prep-functions.php';
+require ROOT_PATH . '/preparatory-scripts/prep-functions.php';
 
 function exec_args($command, $args)
 {
@@ -11,11 +11,14 @@ function exec_args($command, $args)
         return escapeshellarg($arg);
     }, $args);
 
-    $command .= ' '.implode(' ', $escaped_args);
+    $command .= ' ' . implode(' ', $escaped_args);
 
     exec($command, $output, $return_var);
     if ($return_var != 0) {
-        throw new RuntimeException($command);
+        http_response_code(500);
+        echo $command;
+        echo $return_var;
+        exit($output);
     }
 
     return implode('\n', $output);
@@ -37,14 +40,20 @@ function generate_xpath($xml, $tokens, $attributes, $remove_top_cat, $order)
         $remove = 'rel';
     }
 
-    $marked_tree = exec_args('alpino-query',
-        ['mark', $xml, implode(' ', $tokens), implode(' ', $attributes)]);
+    $marked_tree = exec_args(
+        'alpino-query',
+        ['mark', $xml, implode(' ', $tokens), implode(' ', $attributes)]
+    );
 
-    $sub_tree = exec_args('alpino-query',
-        ['subtree', $marked_tree, $remove]);
+    $sub_tree = exec_args(
+        'alpino-query',
+        ['subtree', $marked_tree, $remove]
+    );
 
-    $xpath = exec_args('alpino-query',
-        ['xpath', $sub_tree, $order ? 1 : 0]);
+    $xpath = exec_args(
+        'alpino-query',
+        ['xpath', $sub_tree, $order ? 1 : 0]
+    );
 
     $results = [
         'xpath' => $xpath,
