@@ -4,14 +4,18 @@ function buildHomeURL()
 {
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
 
-    return $protocol.$_SERVER['HTTP_HOST'].'/'.basename(__DIR__).'/';
+    return $protocol . $_SERVER['HTTP_HOST'] . '/' . basename(__DIR__) . '/';
 }
+
+$path = getenv('PATH');
+# Path of the Python virtual environment
+putenv("PATH=$path:/venv/bin");
 
 defined('ROOT_PATH') or define('ROOT_PATH', __DIR__);
 defined('HOME_PATH') or define('HOME_PATH', buildHomeURL());
 
-defined('LOG_DIR') or define('LOG_DIR', ROOT_PATH.'/log');
-defined('TMP_DIR') or define('TMP_DIR', ROOT_PATH.'/tmp');
+defined('LOG_DIR') or define('LOG_DIR', ROOT_PATH . '/log');
+defined('TMP_DIR') or define('TMP_DIR', ROOT_PATH . '/tmp');
 
 // === GRETEL-UPLOAD ===
 // Whether or not to use an API to retrieve uploaded corpora. If empty, uploaded corpora will be unreachable.
@@ -32,7 +36,7 @@ $alpinoServerPort = 0;
 
 // === CHANGE PATH TO ALPINO DIRECTORY ===
 // Only when $alpinoServerMode = false
-$alpinoDirectory = ROOT_PATH.'/parsers/Alpino';
+$alpinoDirectory = ROOT_PATH . '/parsers/Alpino';
 
 // In the recursive Javascript call, how many sentences to flush each time
 $flushLimit = 50;
@@ -43,5 +47,7 @@ $analysisLimit = 50000;
 $analysisFlushLimit = 500;
 
 // Used for Grinded search
-$cats = array('advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
-    'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub', );
+$cats = array(
+    'advp', 'ahi', 'ap', 'conj', 'cp', 'detp', 'du', 'inf', 'list', 'mwu',
+    'np', 'oti', 'pp', 'ppart', 'ppres', 'rel', 'smain', 'ssub', 'sv1', 'svan', 'ti', 'top', 'whq', 'whrel', 'whsub',
+);
