@@ -1,1 +1,8 @@
-{{attributes[option.value]}}
+<div class="button" [ngClass]="iconColor" role="button">
+    <span class="icon">
+        <i class="far fa-fw" [ngClass]="iconClass" aria-hidden="true"></i>
+    </span>
+</div>
+<span class="is-sr-only">
+    {{iconText}}
+</span>

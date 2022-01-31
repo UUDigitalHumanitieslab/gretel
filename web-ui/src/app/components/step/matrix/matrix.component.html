@@ -90,10 +90,20 @@
                 <div class="level-item level-left">
                     XPath Search Instruction
                 </div>
-                <div class="level-item level-right">
+                <div class="level-item level-right" *ngIf="loading">
+                    <div class="field">
+                        <p class="control">
+                            <a class="button is-loading is-warning" role="button">
+                                <span class="icon is-large">
+                                </span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                <div class="level-item level-right" *ngIf="!loading">
                     <div class="field">
                         <p class="control" *ngIf="!isCustomXPath">
-                            <a class="button" grtBalloonPosition="left"
+                            <a class="button" role="button" grtBalloonPosition="left"
                                 grtBalloon="Edit query. This will disable the matrix." (click)="editXPath()">
                                 <span class="icon is-large">
                                     <i class="fas fa-edit"></i>

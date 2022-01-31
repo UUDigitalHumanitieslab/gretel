@@ -79,6 +79,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         return this.indexedTokens.map(t => t.value);
     }
 
+    public loading: boolean;
     public subTreeXml: string;
     public xpath: string;
     public isCustomXPath: boolean;
@@ -120,6 +121,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                 this.subTreeXml = state.subTreeXml;
                 this.tokens = state.tokens;
                 this.xpath = state.xpath;
+                this.loading = state.loading;
             })
         ];
     }

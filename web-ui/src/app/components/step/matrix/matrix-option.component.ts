@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 
 import { animations } from '../../../animations';
 import { AttributeType, TokenAttributes } from '../../../services/_index';
@@ -90,5 +91,67 @@ export class MatrixOptionComponent {
 
     @Input()
     option: Option;
-}
 
+    get iconClass() {
+        if (!this.option || !this.attributes) {
+            return '';
+        }
+
+        if (this.option.type === 'default') {
+            switch (this.attributes[this.option.value]) {
+                case 'include':
+                    return 'fa-equals';
+
+                case 'exclude':
+                    return 'fa-not-equal';
+
+                default:
+                    return '';
+            }
+        }
+
+        return this.attributes[this.option.value] ?
+            'fa-check' : '';
+    }
+
+    get iconColor() {
+        if (this.option && this.attributes) {
+            const key = this.option.value;
+            const value = this.attributes[key];
+            if (value !== DefaultTokenAttributes[key]) {
+                switch (value) {
+                    case 'include':
+                    case true:
+                        return 'is-primary';
+                    case undefined:
+                        return 'is-warning';
+                    default:
+                        return 'is-danger';
+                }
+            }
+        }
+
+        return 'is-light';
+    }
+
+    get iconText() {
+        if (!this.option || !this.attributes) {
+            return '';
+        }
+
+        const value = this.attributes[this.option.value];
+        switch (value) {
+            case undefined:
+                return 'any';
+
+            case true:
+                return 'yes';
+
+            case false:
+                return 'no';
+
+            default:
+                return value;
+        }
+    }
+}

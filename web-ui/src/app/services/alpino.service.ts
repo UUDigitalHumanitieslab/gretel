@@ -75,6 +75,7 @@ export class AlpinoService {
                         break;
 
                     default:
+                        parts.push(`~${key}`);
                         break;
                 }
             }
@@ -95,7 +96,7 @@ export class AlpinoService {
             };
 
             for (let part of parts) {
-                const key = part.replace(/^-/, '');
+                const key = part.replace(/^[-~]/, '');
                 switch (key) {
                     case 'cs':
                     case 'na':
@@ -107,7 +108,21 @@ export class AlpinoService {
                     case 'lemma':
                     case 'pos':
                     case 'postag':
-                        attributes[key] = part[0] === '-' ? 'exclude' : 'include';
+                        let value: DefaultValue;
+                        switch (part[0]) {
+                            case '-':
+                                value = 'exclude';
+                                break;
+
+                            case '~':
+                                value = undefined;
+                                break;
+
+                            default:
+                                value = 'include';
+                                break;
+                        }
+                        attributes[key] = value;
                         break;
                 }
             }
