@@ -4,7 +4,7 @@
 #
 #    pip-compile requirements.in
 #
-alpino-query==2.1
+alpino-query==2.1.1
     # via -r requirements.in
 lxml==4.7.1
     # via alpino-query

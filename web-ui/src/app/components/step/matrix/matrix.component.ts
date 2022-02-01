@@ -15,6 +15,18 @@ const optionsLookup = Object.assign(
     {},
     ...options.map(option => ({ [option.value]: option }))) as { [key: string]: Option };
 
+interface IndexedToken {
+    /**
+     * string value of this token
+     */
+    value: string,
+    index: number,
+    /**
+     * the key of the exclusive option set for this token (or undefined)
+     */
+    exclusive: keyof TokenAttributes
+};
+
 @Component({
     animations,
     selector: 'grt-matrix',
@@ -28,7 +40,10 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
 
     private set attributes(tokens: TokenAttributes[]) {
         let alwaysAdvanced = false;
-        for (let token of tokens) {
+        let updatedTokens = false;
+
+        for (let i in tokens) {
+            let token = tokens[i];
             if (token != null) {
                 for (let [key, value] of Object.entries(token)) {
                     var option = optionsLookup[key];
@@ -38,8 +53,31 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                             alwaysAdvanced = true;
                         }
                     }
+
+                    if (this.indexedTokens) {
+                        if (option.exclusive) {
+                            if (value === true || value === 'include') {
+                                // checked exclusive option
+                                if (this.indexedTokens[i].exclusive !== option.value) {
+                                    updatedTokens = true;
+                                }
+                                this.indexedTokens[i].exclusive = option.value;
+                            } else {
+                                // unchecked exclusive option
+                                if (this.indexedTokens[i].exclusive == option.value) {
+                                    updatedTokens = true;
+                                }
+                                this.indexedTokens[i].exclusive = undefined;
+                            }
+                        }
+                    }
                 }
             }
+        }
+
+        if (updatedTokens) {
+            // hello change detection
+            this.indexedTokens = [...this.indexedTokens];
         }
 
         this.alwaysAdvanced = alwaysAdvanced;
@@ -61,16 +99,15 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     }
 
     public set tokens(values: string[]) {
-        const indexedTokens = values.map((value, index) => ({ value, index }));
         if (this.indexedTokens &&
-            indexedTokens.length === this.indexedTokens.length) {
+            values.length === this.indexedTokens.length) {
             // only update the values, but prevent the whole array
             // from being re-rendered
-            for (let i = 0; i < indexedTokens.length; i++) {
-                Object.assign(this.indexedTokens[i], indexedTokens[i]);
+            for (let i = 0; i < values.length; i++) {
+                this.indexedTokens[i].value = values[i];
             }
         } else {
-            this.indexedTokens = indexedTokens;
+            this.indexedTokens = values.map((value, index) => ({ value, index, exclusive: undefined }));
         }
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
@@ -94,7 +131,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public subTreeDisplay = 'inline';
     public warning: boolean;
 
-    public indexedTokens: { value: string, index: number }[];
+    public indexedTokens: IndexedToken[];
     public showAdvanced: boolean;
     /**
      * If an advanced option has been selected, the toggle will be disabled.
@@ -126,17 +163,36 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         ];
     }
 
-    public setTokenPart(tokenIndex: number, part: Option) {
+    public setTokenPart(token: IndexedToken, part: Option) {
         if (this.isCustomXPath) {
             this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
 
-        var updated = this.rotateValue(tokenIndex, part);
+        if (this.tokenPartDisabled(token, part)) {
+            return;
+        }
+
+        var updated = this.rotateValue(token.index, part);
 
         this.emitChange({
             attributes: updated
         });
+    }
+
+    public tokenPartDisabled(token: IndexedToken, part: Option) {
+        if (token.exclusive !== undefined && token.exclusive !== part.value) {
+            return true;
+        }
+
+        if (part.dependent_on) {
+            const dependent = this.attributes[token.index][part.dependent_on];
+            if (dependent === undefined || dependent === false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private emitChange(settings: Partial<MatrixSettings> = {}) {

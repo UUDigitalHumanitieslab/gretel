@@ -92,6 +92,9 @@ export class MatrixOptionComponent {
     @Input()
     option: Option;
 
+    @Input()
+    disabled: boolean;
+
     get iconClass() {
         if (!this.option || !this.attributes) {
             return '';
@@ -131,7 +134,7 @@ export class MatrixOptionComponent {
             }
         }
 
-        return 'is-light';
+        return this.disabled ? '' : 'is-light';
     }
 
     get iconText() {
