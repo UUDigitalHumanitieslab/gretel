@@ -58,7 +58,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             super.encodeGlobalState(state), {
             'inputSentence': state.inputSentence,
             'isCustomXPath': this.encodeBool(state.isCustomXPath),
-            'attributes': this.alpinoService.attributesToStrings(state.attributes, true).join(attributesSeparator),
+            'attributes': this.alpinoService.attributesToStrings(state.attributes, true)?.join(attributesSeparator),
             'respectOrder': this.encodeBool(state.respectOrder),
             'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
         });
