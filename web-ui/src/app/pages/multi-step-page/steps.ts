@@ -2,7 +2,7 @@ import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-
 
 import { AlpinoService, TokenAttributes } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';
-import { FilterValues, SearchVariable } from '../../services/results.service';
+import { FilterValues, SearchVariable, NotificationService } from '../../services/_index';
 import { TreebankSelection } from '../../treebank';
 
 export const DefaultTokenAttributes: Readonly<TokenAttributes> = {
@@ -132,7 +132,8 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
     constructor(number: number,
         private alpinoService: AlpinoService,
         private extractinatorService: ExtractinatorService,
-        private reconstructorService: ReconstructorService) {
+        private reconstructorService: ReconstructorService,
+        private notificationService: NotificationService) {
         super(number);
     }
 
@@ -161,15 +162,23 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
 
     async updateMatrix(state: GlobalStateExampleBased) {
         if (!state.isCustomXPath) {
-            const generated = await this.alpinoService.generateXPath(
-                state.exampleXml,
-                state.tokens,
-                state.attributes,
-                state.ignoreTopNode,
-                state.respectOrder);
-            state.subTreeXml = generated.subTree;
-            state.xpath = generated.xpath;
-            state.valid = true;
+            try {
+                const generated = await this.alpinoService.generateXPath(
+                    state.exampleXml,
+                    state.tokens,
+                    state.attributes,
+                    state.ignoreTopNode,
+                    state.respectOrder);
+                state.subTreeXml = generated.subTree;
+                state.xpath = generated.xpath;
+                state.valid = true;
+            }
+            catch (error) {
+                state.connectionError = true;
+                state.valid = false;
+                this.notificationService.add('Problem generating XPath', 'error');
+                console.error(error);
+            }
         } else {
             try {
                 const paths = this.extractinatorService.extract(state.xpath);
