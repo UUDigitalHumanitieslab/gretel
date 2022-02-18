@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { IconDefinition, faEquals, faNotEqual, faCheck  } from '@fortawesome/free-solid-svg-icons';
 import { DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 
 import { animations } from '../../../animations';
@@ -95,26 +96,26 @@ export class MatrixOptionComponent {
     @Input()
     disabled: boolean;
 
-    get iconClass() {
+    get iconDefinition(): IconDefinition {
         if (!this.option || !this.attributes) {
-            return '';
+            return undefined;
         }
 
         if (this.option.type === 'default') {
             switch (this.attributes[this.option.value]) {
                 case 'include':
-                    return 'fa-equals';
+                    return faEquals;
 
                 case 'exclude':
-                    return 'fa-not-equal';
+                    return faNotEqual;
 
                 default:
-                    return '';
+                    return undefined;
             }
         }
 
         return this.attributes[this.option.value] ?
-            'fa-check' : '';
+            faCheck : undefined;
     }
 
     get iconColor() {

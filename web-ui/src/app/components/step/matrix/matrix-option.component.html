@@ -1,6 +1,6 @@
 <div class="button" [ngClass]="iconColor" [attr.disabled]="disabled ? 'disabled' : undefined" role="button">
     <span class="icon">
-        <i class="far fa-fw" [ngClass]="iconClass" aria-hidden="true"></i>
+        <fa-icon *ngIf="iconDefinition" [icon]="iconDefinition"></fa-icon>
     </span>
 </div>
 <span class="is-sr-only">
