@@ -193,7 +193,7 @@ var jQuery = require('jquery');
         }
 
         function parseXMLObj(xml) {
-            var xmlObject = $(xml);
+            var xmlObject = $($.parseXML(xml));
 
             removeError();
 
