@@ -21,7 +21,7 @@ function exec_args($command, $args)
         exit($output);
     }
 
-    return implode('\n', $output);
+    return implode(PHP_EOL, $output);
 }
 
 /**
