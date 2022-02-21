@@ -97,7 +97,7 @@ export class MatrixOptionComponent {
     disabled: boolean;
 
     get iconDefinition(): IconDefinition {
-        if (!this.option || !this.attributes) {
+        if (!this.option || !this.attributes || this.disabled) {
             return undefined;
         }
 
@@ -130,7 +130,7 @@ export class MatrixOptionComponent {
                     case undefined:
                         return 'is-warning';
                     default:
-                        return 'is-danger';
+                        return this.option.type == 'bool' ? '' : 'is-danger';
                 }
             }
         }
@@ -143,7 +143,7 @@ export class MatrixOptionComponent {
             return '';
         }
 
-        const value = this.attributes[this.option.value];
+        const value = this.disabled ? undefined : this.attributes[this.option.value];
         switch (value) {
             case undefined:
                 return 'any';
@@ -167,7 +167,7 @@ export class MatrixOptionComponent {
             }
 
             const key = this.option.value;
-            const value = this.attributes[key];
+            const value = this.disabled ? undefined : this.attributes[key];
             const label = this.option.label.toLowerCase();
             switch (value) {
                 case 'include':
