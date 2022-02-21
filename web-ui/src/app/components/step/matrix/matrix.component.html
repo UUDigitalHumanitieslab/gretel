@@ -11,13 +11,16 @@
             <ng-container *ngFor="let option of options">
                 <tr *ngIf="!option.advanced || showAdvanced">
                     <th [@fade]>
-                        {{option.label}}
-                        <label grtBalloonLength="large" grtBalloonPosition="right" grtBalloon="{{option.description}}">
-                            <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-                        </label>
+                        <span tooltipPosition="right" pTooltip="{{option.description}}">
+                            {{option.label}}
+                            <label>
+                                <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+                            </label>
+                        </span>
                     </th>
                     <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option)">
-                        <grt-matrix-option [attributes]="tokenValues[token.index]" [disabled]="tokenPartDisabled(token, option)" [option]="option"></grt-matrix-option>
+                        <grt-matrix-option [attributes]="tokenValues[token.index]"
+                            [disabled]="tokenPartDisabled(token, option)" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
             </ng-container>
@@ -27,55 +30,59 @@
 <div class="columns">
     <div class="column">
         <div class="content">
-            <p>
+            <p *ngIf="!explanation">
                 In the matrix above, you can indicate the relevant parts of the construction, i.e. the lexical items
                 that should be included in the query, as well as their level of abstraction. Your selection is
                 visualized by means of the <em>query tree</em> at the bottom of this page.
                 The syntactic information provided by the parse in the previous step is automatically included.
             </p>
+            <div class="notification is-dark" *ngIf="explanation">
+                {{explanation}}
+            </div>
         </div>
     </div>
     <div class="column">
         <div class="field">
-            <label class="checkbox" [attr.disabled]="alwaysAdvanced || isCustomXPath || null">
+            <label class="checkbox" [attr.disabled]="alwaysAdvanced || isCustomXPath || null"
+                (mouseout)="explanation = undefined"
+                (mouseover)="explanation = 'The advanced options offer more possibilities to modify your search instruction.'">
                 <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced"
                     [disabled]="alwaysAdvanced || isCustomXPath">
                 Enable advanced options
-                <label grtBalloonLength="large" grtBalloonPosition="right"
-                    grtBalloon="The advanced options offer more possibilities to modify your search instruction.">
+                <label>
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
             </label>
         </div>
-        <div class="field">
+        <div class="field" (mouseout)="explanation = undefined"
+            (mouseover)="explanation = 'Only search for patterns that have the same word order as your input example.'">
             <label class="checkbox" [attr.disabled]="isCustomXPath || null">
                 <input type="checkbox" name="respectOrder" [checked]="respectOrder"
                     (click)="toggleSetting('respectOrder')" [disabled]="isCustomXPath"> Respect
                 word order
-                <label grtBalloonLength="large" grtBalloonPosition="right"
-                    grtBalloon="Only search for patterns that have the same word order as your input example.">
+                <label>
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
             </label>
         </div>
-        <div class="field">
+        <div class="field" (mouseout)="explanation = undefined"
+            (mouseover)="explanation = 'In the results, show the sentence before and after the matching sentence to provide a broader context.'">
             <label class="checkbox">
                 <input type="checkbox" name="retrieveContext" [checked]="retrieveContext"
                     (click)="toggleSetting('retrieveContext')">
                 Include context in results
-                <label grtBalloonLength="large" grtBalloonPosition="right"
-                    grtBalloon="In the results, show the sentence before and after the matching sentence to provide a broader context.">
+                <label>
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
             </label>
         </div>
-        <div class="field">
+        <div class="field" (mouseout)="explanation = undefined"
+            (mouseover)="explanation = 'Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses.'">
             <label class="checkbox" [attr.disabled]="isCustomXPath || null">
                 <input type="checkbox" name="ignoreTopNode" [checked]="ignoreTopNode"
                     (click)="toggleSetting('ignoreTopNode')" [disabled]="isCustomXPath"> Ignore
                 properties of the dominating node
-                <label grtBalloonLength="large" grtBalloonPosition="right"
-                    grtBalloon="Search for more general patterns by ignoring the properties of the top node, e.g. search for both main clauses and subclauses.">
+                <label>
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
                 </label>
             </label>
@@ -103,16 +110,16 @@
                 <div class="level-item level-right" *ngIf="!loading">
                     <div class="field">
                         <p class="control" *ngIf="!isCustomXPath">
-                            <a class="button" role="button" grtBalloonPosition="left"
-                                grtBalloon="Edit query. This will disable the matrix." (click)="editXPath()">
+                            <a class="button" role="button" tooltipPosition="left"
+                                pTooltip="Edit query. This will disable the matrix." (click)="editXPath()">
                                 <span class="icon is-large">
                                     <i class="fas fa-edit"></i>
                                 </span>
                             </a>
                         </p>
                         <p class="control" *ngIf="isCustomXPath">
-                            <a class="button is-danger" grtBalloonLength="large" grtBalloonPosition="left"
-                                grtBalloon="Reset query. The query will be generated based on the options selected in the matrix."
+                            <a class="button is-danger" tooltipPosition="left"
+                                pTooltip="Reset query. The query will be generated based on the options selected in the matrix."
                                 (click)="resetXPath()">
                                 <span class="icon is-large">
                                     <i class="fas fa-times"></i>
@@ -140,8 +147,8 @@
                 </div>
                 <div class="level-item level-right is-hidden-print">
                     <p class="control">
-                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" grtBalloonPosition="left"
-                            grtBalloon="Full screen display of the tree.">
+                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" tooltipPosition="left"
+                            pTooltip="Full screen display of the tree.">
                             <span class="icon is-large">
                                 <i class="fas fa-expand"></i>
                             </span>

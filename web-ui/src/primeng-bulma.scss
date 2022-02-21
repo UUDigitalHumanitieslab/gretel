@@ -177,6 +177,12 @@ $inputGroupTextColor: $text;
         }
     }
 }
+
+.p-tooltip > .p-tooltip-text {
+    width: 500px;
+    max-width: max-content;
+  }
+
 .p-slider {
     .p-slider-range {
         background: $primary;

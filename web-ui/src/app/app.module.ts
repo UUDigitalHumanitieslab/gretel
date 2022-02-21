@@ -14,6 +14,7 @@ import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { LassyXPathModule } from 'lassy-xpath';
 import { ClipboardModule } from 'ngx-clipboard';
 
@@ -139,6 +140,7 @@ export const imports: any[] = [
     ReactiveFormsModule,
     RouterModule,
     TableModule,
+    TooltipModule,
     FontAwesomeModule
 ];
 

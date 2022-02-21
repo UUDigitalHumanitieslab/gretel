@@ -141,6 +141,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public tokenValues: TokenAttributes[];
 
     public options = options;
+    public explanation: string = undefined;
 
     private originalXPath: string;
 

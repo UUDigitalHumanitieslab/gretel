@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IconDefinition, faEquals, faNotEqual, faCheck  } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faEquals, faNotEqual, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 
 import { animations } from '../../../animations';
@@ -157,5 +157,29 @@ export class MatrixOptionComponent {
             default:
                 return value;
         }
+    }
+
+    get iconDescription() {
+        if (this.option && this.attributes) {
+            if (this.option.type == 'bool') {
+                // yes/no doesn't require explanation
+                return undefined;
+            }
+
+            const key = this.option.value;
+            const value = this.attributes[key];
+            const label = this.option.label.toLowerCase();
+            switch (value) {
+                case 'include':
+                case true:
+                    return `require this ${label}`;
+                case undefined:
+                    return `any ${label} will match`;
+                default:
+                    return `exclude this ${label}`;
+            }
+        }
+
+        return this.disabled ? 'disabled' : '???';
     }
 }
