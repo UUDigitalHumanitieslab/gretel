@@ -119,23 +119,21 @@ export class MatrixOptionComponent {
     }
 
     get iconColor() {
-        if (this.option && this.attributes) {
+        if (!this.disabled && this.option && this.attributes) {
             const key = this.option.value;
             const value = this.attributes[key];
-            if (value !== DefaultTokenAttributes[key]) {
-                switch (value) {
-                    case 'include':
-                    case true:
-                        return 'is-primary';
-                    case undefined:
-                        return 'is-warning';
-                    default:
-                        return this.option.type == 'bool' ? '' : 'is-danger';
-                }
+            switch (value) {
+                case 'include':
+                case true:
+                    return 'is-primary';
+                case undefined:
+                    return 'is-warning';
+                default:
+                    return this.option.type == 'bool' ? '' : 'is-danger';
             }
         }
 
-        return this.disabled ? '' : 'is-light';
+        return '';
     }
 
     get iconText() {
