@@ -110,7 +110,7 @@
                 <div class="level-item level-right" *ngIf="!loading">
                     <div class="field">
                         <p class="control" *ngIf="!isCustomXPath">
-                            <a class="button" role="button" tooltipPosition="left"
+                            <a class="button" role="button" tooltipPosition="bottom"
                                 pTooltip="Edit query. This will disable the matrix." (click)="editXPath()">
                                 <span class="icon is-large">
                                     <i class="fas fa-edit"></i>
@@ -118,7 +118,7 @@
                             </a>
                         </p>
                         <p class="control" *ngIf="isCustomXPath">
-                            <a class="button is-danger" tooltipPosition="left"
+                            <a class="button is-danger" tooltipPosition="bottom"
                                 pTooltip="Reset query. The query will be generated based on the options selected in the matrix."
                                 (click)="resetXPath()">
                                 <span class="icon is-large">
@@ -136,6 +136,7 @@
         <grt-xpath-editor *ngIf="isCustomXPath" width="100%" [value]="xpath" (onChange)="changeCustomXpath($event)"
             autofocus="true"></grt-xpath-editor>
         <p *ngIf="!isCustomXPath">
+            <br />
             This is the search instruction which has been created based on the parse and your selection.
         </p>
     </div>
@@ -147,7 +148,7 @@
                 </div>
                 <div class="level-item level-right is-hidden-print">
                     <p class="control">
-                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" tooltipPosition="left"
+                        <a class="button" role="button" (click)="subTreeDisplay = 'both'" tooltipPosition="bottom"
                             pTooltip="Full screen display of the tree.">
                             <span class="icon is-large">
                                 <i class="fas fa-expand"></i>
