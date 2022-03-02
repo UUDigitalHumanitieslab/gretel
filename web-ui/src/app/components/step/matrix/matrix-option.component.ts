@@ -27,7 +27,7 @@ export const options: Option[] = [
     {
         label: 'Word',
         description: 'The exact word form (also known as token).',
-        value: 'token',
+        value: 'word',
         advanced: false,
         exclusive: false,
         type: 'default'
@@ -35,7 +35,7 @@ export const options: Option[] = [
     {
         label: 'Word (case-sensitive)',
         description: 'The word form must match exactly, including the casing.',
-        dependent_on: 'token',
+        dependent_on: 'word',
         value: 'cs',
         advanced: true,
         exclusive: false,

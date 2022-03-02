@@ -207,67 +207,9 @@
                     }
                 }
 
-                &.excluded {
-
-                    &::after,
-                    &::before {
-                        border-top: 1px dotted red;
-                    }
-
-                    &::after {
-                        border-left: 1px dotted red;
-                    }
-
-                    &.first-child {
-                        &::before {
-                            border: 0 none;
-                        }
-                    }
-
-                    &.last-child {
-                        &::before {
-                            border-right: 1px dotted red;
-                        }
-
-                        &::after {
-                            border: 0 none;
-                        }
-                    }
-
-                    a {
-                        span {
-                            opacity: 0.36;
-                        }
-
-                        &::before {
-                            position: absolute;
-                            top: 0;
-                            top: 50%;
-                            left: 0;
-                            width: 100%;
-                            color: #cd2b2b;
-                            content: 'NOT';
-                            text-align: center;
-                            font-size: 120%;
-                            transition: transform 200ms;
-                            transform: translateY(-50%) scale(1);
-                        }
-
-                        &:hover {
-                            span {
-                                opacity: 1;
-                            }
-
-                            &::before {
-                                transform: translateY(-50%) scale(0);
-                                pointer-events: none;
-                            }
-                        }
-
-                        &.hovered {
-                            background-color: rgba(142, 127, 107, 0.36);
-                        }
-                    }
+                .excluded {
+                    color: $danger !important;
+                    text-decoration: line-through;                    
                 }
 
                 a {

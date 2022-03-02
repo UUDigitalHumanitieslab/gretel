@@ -273,26 +273,41 @@ var jQuery = require('jquery');
             anyTree.find("a").each(function () {
                 var $this = $(this),
                     li = $this.parent("li");
+                
+                const excluded = (li.data("exclude") || "").split(",");
+                function checkExclude(attr) {
+                    if (excluded.indexOf(attr) >= 0) {
+                        return ' excluded ';
+                    }
+
+                    return '';
+                }
 
                 if (args.showMatrixDetails && li.data("word")) {
                     if (li.data("caseinsensitive")) {
-                        li.data("word", li.data("word").toLowerCase());
-                        li.data("lemma", li.data("lemma").toLowerCase());
+                        const word = li.data("word");
+                        if (word) {
+                            li.data("word", word.toLowerCase());
+                        }
+                        const lemma = li.data("lema");
+                        if (lemma) {
+                            li.data("lemma", lemma.toLowerCase());
+                        }
                     } else {
                         $this.addClass("cs");
                     }
                 }
 
                 if (li.data("rel")) {
-                    $this.append("<span class='rel'>" + li.data("rel") + "</span>");
+                    $this.append(`<span class='rel ${checkExclude('rel')}'>` + li.data("rel") + "</span>");
                     if (li.data("index")) $this.append("<span class='index'>" + li.data("index") + "</span>");
                 }
 
                 if (li.data("postag") && args.extendedPOS) {
-                    $this.append("<span class='postag'>" + li.data("postag") + "</span>");
+                    $this.append(`<span class='postag ${checkExclude('postag')}'>` + li.data("postag") + "</span>");
                 } else if (li.data("pt")) {
                     if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pt"));
-                    else $this.append("<span class='pt'>" + li.data("pt") + "</span>");
+                    else $this.append(`<span class='pt ${checkExclude('pt')}'>` + li.data("pt") + "</span>");
                 } else if (li.data("cat")) {
                     if (li.data("cat") == " ") {
                         li.removeAttr("data-cat");
@@ -300,11 +315,11 @@ var jQuery = require('jquery');
                         $this.addClass("ignored").text("?").attr("title", "Top node's properties will be ignored");
                     } else {
                         if (li.data("index")) $this.children("span:last-child").append(":" + li.data("cat"));
-                        else $this.append("<span class='cat'>" + li.data("cat") + "</span>");
+                        else $this.append(`<span class='cat ${checkExclude('cat')}'>` + li.data("cat") + "</span>");
                     }
                 } else if (li.data("pos")) {
                     if (li.data("index")) $this.children("span:last-child").append(":" + li.data("pos"));
-                    else $this.append("<span>" + li.data("pos") + "</span>");
+                    else $this.append(`<span class="${checkExclude('pos')}">` + li.data("pos") + "</span>");
                 } else if (!li.data("rel")) {
                     // nothing specified, set something from the query
                     // (when doing a custom xpath query)
@@ -319,14 +334,14 @@ var jQuery = require('jquery');
                         }
                     }
 
-                    $this.append(`<em>${(key && li.data()[key]) || 'node'}</em>`);
+                    $this.append(`<em class="${checkExclude(key)}">${(key && li.data()[key]) || 'node'}</em>`);
                 }
 
                 if ($this.is(":only-child")) {
                     if (li.data("lemma")) li.append("<span class='lemma'>" + li.data("lemma") + "</span>");
                     if (li.data("word")) {
                         var csTitle = (args.showMatrixDetails && !li.data("caseinsensitive")) ? 'data-balloon-pos="down" data-balloon="Case sensitive word"' : '';
-                        li.append("<span class='word'><em" + csTitle + ">" + li.data("word") + "</em></span>");
+                        li.append(`<span class='word ${checkExclude('word')}'><em` + csTitle + ">" + li.data("word") + "</em></span>");
                     }
                     // addClass because after appending new children, it isn't necessarily the
                     // only child any longer

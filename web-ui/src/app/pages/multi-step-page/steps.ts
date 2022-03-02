@@ -7,7 +7,7 @@ import { TreebankSelection } from '../../treebank';
 
 export const DefaultTokenAttributes: Readonly<TokenAttributes> = {
     rel: 'include',
-    token: 'include',
+    word: 'include',
     cs: false,
     lemma: undefined,
     pos: 'include',

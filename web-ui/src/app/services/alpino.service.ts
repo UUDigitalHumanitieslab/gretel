@@ -60,7 +60,7 @@ export class AlpinoService {
                 }
             }
 
-            for (let key of ['rel', 'token', 'lemma', 'pos', 'postag']) {
+            for (let key of ['rel', 'word', 'lemma', 'pos', 'postag']) {
                 switch (attr[key]) {
                     case skipDefault && DefaultTokenAttributes[key]:
                         // don't set default values
@@ -104,7 +104,7 @@ export class AlpinoService {
                         break;
 
                     case 'rel':
-                    case 'token':
+                    case 'word':
                     case 'lemma':
                     case 'pos':
                     case 'postag':
@@ -157,7 +157,7 @@ export type DefaultValue = 'include' | 'exclude' | undefined;
 
 export interface TokenAttributes {
     rel?: DefaultValue,
-    token?: DefaultValue,
+    word?: DefaultValue,
     lemma?: DefaultValue,
     pos?: DefaultValue,
     cs?: boolean,
