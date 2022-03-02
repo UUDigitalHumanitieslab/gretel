@@ -295,13 +295,7 @@
 
                     &.cs~.word em {
                         cursor: help;
-
-                        &::before {
-                            margin-right: 0.36em;
-                            color: #222;
-                            content: '\f031';
-                            @extend %fa;
-                        }
+                        text-decoration: underline;
                     }
 
                     &.ignored {
