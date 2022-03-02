@@ -28,9 +28,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 
 * [BaseX](https://packages.debian.org/jessie/database/basex)
 * [SimpleXML](http://php.net/manual/en/book.simplexml.php)
-* [Perl](https://packages.debian.org/jessie/perl/perl) with:
-  * [XML::Twig](https://packages.debian.org/jessie/libxml-twig-perl)
-  * [XML::XPath](https://packages.debian.org/jessie/libxml-xpath-perl)
+* [alpino-query](https://github.com/UUDigitalHumanitieslab/alpino-query)
 
 ### Next steps
 
@@ -43,11 +41,13 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 4. Adapt `config.example.php` file and change name to `config.php`, and then:
   * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
   * Set BaseX variables (machine names, port numbers, password and username)
+  * Set path for the Python virtual environment or other place where the required commands are installed.
 5. Install [composer](https://getcomposer.org/) to be able to install PHP dependencies.
 6. Enable the rewrite module (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
 7. Set `AllowOverride` to `All` to allow `.htaccess` to set the settings for the rewrite module.
-8. Run `npm run build` to compile all the dependencies.
-9. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
+8. Run `pip install -r requirements.txt`.
+9. Run `npm run build` to compile all the remaining dependencies.
+10. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
 
 ## Notes for users
 

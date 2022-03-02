@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -13,6 +14,7 @@ import { MessageModule } from 'primeng/message';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { LassyXPathModule } from 'lassy-xpath';
 import { ClipboardModule } from 'ngx-clipboard';
 
@@ -62,6 +64,7 @@ import { ExampleBasedSearchComponent } from './pages/example-based-search/exampl
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
+import { MatrixOptionComponent } from './components/step/matrix/matrix-option.component';
 import { DistributionListComponent } from './components/step/results/distribution-list.component';
 import { FormatNumberPipe } from './format-number.pipe';
 import { FiltersByXPathComponent } from './components/step/results/filters-by-xpath.component';
@@ -98,6 +101,7 @@ export const declarations: any[] = [
     HomePageComponent,
     LoginStatusComponent,
     MatrixComponent,
+    MatrixOptionComponent,
     NavigationComponent,
     NodePropertiesButtonComponent,
     NodePropertiesComponent,
@@ -136,6 +140,8 @@ export const imports: any[] = [
     ReactiveFormsModule,
     RouterModule,
     TableModule,
+    TooltipModule,
+    FontAwesomeModule
 ];
 
 export const providers: any[] = [

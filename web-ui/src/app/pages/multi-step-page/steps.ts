@@ -1,9 +1,19 @@
 import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath';
 
-import { AlpinoService } from '../../services/alpino.service';
+import { AlpinoService, TokenAttributes } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';
-import { FilterValues, SearchVariable } from '../../services/results.service';
+import { FilterValues, SearchVariable, NotificationService } from '../../services/_index';
 import { TreebankSelection } from '../../treebank';
+
+export const DefaultTokenAttributes: Readonly<TokenAttributes> = {
+    rel: 'include',
+    token: 'include',
+    cs: false,
+    lemma: undefined,
+    pos: 'include',
+    postag: undefined,
+    na: false
+};
 
 /**
  * Contains all the steps that are used in the xpath search
@@ -67,7 +77,7 @@ interface GlobalStateExampleBased extends GlobalState {
     exampleXml: string;
     subTreeXml: string;
     tokens: string[];
-    attributes: string[];
+    attributes: TokenAttributes[];
     /**
      * Ignores properties of the dominating node
      */
@@ -122,7 +132,8 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
     constructor(number: number,
         private alpinoService: AlpinoService,
         private extractinatorService: ExtractinatorService,
-        private reconstructorService: ReconstructorService) {
+        private reconstructorService: ReconstructorService,
+        private notificationService: NotificationService) {
         super(number);
     }
 
@@ -135,9 +146,13 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
         }
         state.attributes = state.tokens.map((val, index) =>
             state.attributes && state.attributes.length > index
-                ? state.attributes[index]
-                // default value
-                : 'pos');
+                ? {
+                    ...DefaultTokenAttributes,
+                    ...state.attributes[index]
+                }
+                : {
+                    ...DefaultTokenAttributes
+                });
         return this.updateMatrix(state);
     }
 
@@ -147,15 +162,23 @@ class MatrixStep extends Step<GlobalStateExampleBased> {
 
     async updateMatrix(state: GlobalStateExampleBased) {
         if (!state.isCustomXPath) {
-            const generated = await this.alpinoService.generateXPath(
-                state.exampleXml,
-                state.tokens,
-                state.attributes,
-                state.ignoreTopNode,
-                state.respectOrder);
-            state.subTreeXml = generated.subTree;
-            state.xpath = generated.xpath;
-            state.valid = true;
+            try {
+                const generated = await this.alpinoService.generateXPath(
+                    state.exampleXml,
+                    state.tokens,
+                    state.attributes,
+                    state.ignoreTopNode,
+                    state.respectOrder);
+                state.subTreeXml = generated.subTree;
+                state.xpath = generated.xpath;
+                state.valid = true;
+            }
+            catch (error) {
+                state.connectionError = true;
+                state.valid = false;
+                this.notificationService.add('Problem generating XPath', 'error');
+                console.error(error);
+            }
         } else {
             try {
                 const paths = this.extractinatorService.extract(state.xpath);

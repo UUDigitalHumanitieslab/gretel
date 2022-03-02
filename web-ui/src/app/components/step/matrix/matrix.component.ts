@@ -4,11 +4,28 @@ import { ConfirmationService } from 'primeng/api';
 
 import { ValueEvent } from 'lassy-xpath';
 
-import { StateService } from '../../../services/_index';
+import { StateService, TokenAttributes } from '../../../services/_index';
 import { StepDirective } from '../step.directive';
-import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
+import { StepType, GlobalStateExampleBased, DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
+import { Option, options } from './matrix-option.component';
+
+const optionsLookup = Object.assign(
+    {},
+    ...options.map(option => ({ [option.value]: option }))) as { [key: string]: Option };
+
+interface IndexedToken {
+    /**
+     * string value of this token
+     */
+    value: string,
+    index: number,
+    /**
+     * the key of the exclusive option set for this token (or undefined)
+     */
+    exclusive: keyof TokenAttributes
+};
 
 @Component({
     animations,
@@ -21,48 +38,85 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     private subscriptions: Subscription[];
     public stepType = StepType.Matrix;
 
-    public set attributes(values: string[]) {
-        const tokenValues = values.map(value => {
-            const option = this.options.find(o => o.value === value);
-            if (option.advanced) {
-                this.showAdvanced = true;
+    private set attributes(tokens: TokenAttributes[]) {
+        let alwaysAdvanced = false;
+        let updatedTokens = false;
+
+        for (let i in tokens) {
+            let token = tokens[i];
+            if (token != null) {
+                for (let [key, value] of Object.entries(token)) {
+                    var option = optionsLookup[key];
+                    if (option.advanced) {
+                        if (value !== DefaultTokenAttributes[key]) {
+                            this.showAdvanced = true;
+                            alwaysAdvanced = true;
+                        }
+                    }
+
+                    if (this.indexedTokens) {
+                        if (option.exclusive) {
+                            if (value === true || value === 'include') {
+                                // checked exclusive option
+                                if (this.indexedTokens[i].exclusive !== option.value) {
+                                    updatedTokens = true;
+                                }
+                                this.indexedTokens[i].exclusive = option.value;
+                            } else {
+                                // unchecked exclusive option
+                                if (this.indexedTokens[i].exclusive == option.value) {
+                                    updatedTokens = true;
+                                }
+                                this.indexedTokens[i].exclusive = undefined;
+                            }
+                        }
+                    }
+                }
             }
-            return option;
-        });
+        }
+
+        if (updatedTokens) {
+            // hello change detection
+            this.indexedTokens = [...this.indexedTokens];
+        }
+
+        this.alwaysAdvanced = alwaysAdvanced;
+
         if (this.tokenValues &&
-            tokenValues.length === this.tokenValues.length) {
+            tokens.length === this.tokenValues.length) {
             // only update the values, but prevent the whole array
             // from being re-rendered
-            for (let i = 0; i < tokenValues.length; i++) {
-                Object.assign(this.tokenValues[i], tokenValues[i]);
+            for (let i = 0; i < tokens.length; i++) {
+                Object.assign(this.tokenValues[i], tokens[i]);
             }
         } else {
-            this.tokenValues = tokenValues;
+            this.tokenValues = tokens;
         }
     }
 
-    public get attributes() {
-        return this.tokenValues.map(t => t.value);
+    private get attributes() {
+        return this.tokenValues;
     }
 
     public set tokens(values: string[]) {
-        const indexedTokens = values.map((value, index) => ({ value, index }));
         if (this.indexedTokens &&
-            indexedTokens.length === this.indexedTokens.length) {
+            values.length === this.indexedTokens.length) {
             // only update the values, but prevent the whole array
             // from being re-rendered
-            for (let i = 0; i < indexedTokens.length; i++) {
-                Object.assign(this.indexedTokens[i], indexedTokens[i]);
+            for (let i = 0; i < values.length; i++) {
+                this.indexedTokens[i].value = values[i];
             }
         } else {
-            this.indexedTokens = indexedTokens;
+            this.indexedTokens = values.map((value, index) => ({ value, index, exclusive: undefined }));
         }
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
+
     public get tokens() {
         return this.indexedTokens.map(t => t.value);
     }
 
+    public loading: boolean;
     public subTreeXml: string;
     public xpath: string;
     public isCustomXPath: boolean;
@@ -77,64 +131,17 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public subTreeDisplay = 'inline';
     public warning: boolean;
 
-    public indexedTokens: { value: string, index: number }[];
+    public indexedTokens: IndexedToken[];
     public showAdvanced: boolean;
     /**
      * If an advanced option has been selected, the toggle will be disabled.
      */
     public alwaysAdvanced: boolean;
 
-    public tokenValues: Part[];
+    public tokenValues: TokenAttributes[];
 
-    public options: Part[] = [
-        {
-            label: 'Word',
-            description: 'The exact word form (also known as token).',
-            value: 'token',
-            advanced: false
-        },
-        {
-            label: 'Word (case-sensitive)',
-            description: 'The word form must match exactly, including the casing.',
-            value: 'cs',
-            advanced: true
-        },
-        {
-            label: 'Lemma',
-            description: `Word form that generalizes over inflected forms.
-            For example: gaan is the lemma of ga, gaat, gaan, ging, gingen, and gegaan.`,
-            value: 'lemma',
-            advanced: false
-        },
-        {
-            label: 'Word class',
-            description: `Short Dutch part-of-speech tag.
-            The different tags are:
-            n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun),
-            vg (conjunction), bw (adverb), tw (numeral), vz (preposition),
-            tsw (interjection), spec (special token), and let (punctuation).`,
-            value: 'pos',
-            advanced: false
-        },
-        {
-            label: 'Detailed word class',
-            description: 'Long part-of-speech tag. For example: N(soort,mv,basis), WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev).',
-            value: 'postag',
-            advanced: true
-        },
-        {
-            label: 'Optional',
-            description: `The word will be ignored in the search instruction.
-            It may be included in the results, but it is not required that it is present.`,
-            value: 'na',
-            advanced: false
-        },
-        {
-            label: 'Exclude',
-            description: 'The word class and the dependency relation will be explicitly excluded from the results.',
-            value: 'not',
-            advanced: true
-        }];
+    public options = options;
+    public explanation: string = undefined;
 
     private originalXPath: string;
 
@@ -152,33 +159,51 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                 this.subTreeXml = state.subTreeXml;
                 this.tokens = state.tokens;
                 this.xpath = state.xpath;
+                this.loading = state.loading;
             })
         ];
     }
 
-    public setTokenPart(tokenIndex: number, part: Part) {
+    public setTokenPart(token: IndexedToken, part: Option) {
         if (this.isCustomXPath) {
             this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
-        if (part.advanced) {
-            this.alwaysAdvanced = true;
+
+        if (this.tokenPartDisabled(token, part)) {
+            return;
         }
-        this.tokenValues[tokenIndex] = part;
-        if (!part.advanced) {
-            this.alwaysAdvanced = !!this.tokenValues.find(value => value.advanced);
-        }
-        this.emitChange();
+
+        var updated = this.rotateValue(token.index, part);
+
+        this.emitChange({
+            attributes: updated
+        });
     }
 
-    public emitChange(customXPath: string = null, settings: { [key: string]: boolean } = {}) {
-        if (customXPath == null) {
+    public tokenPartDisabled(token: IndexedToken, part: Option) {
+        if (token.exclusive !== undefined && token.exclusive !== part.value) {
+            return true;
+        }
+
+        if (part.dependent_on) {
+            const dependent = this.attributes[token.index][part.dependent_on];
+            if (dependent === undefined || dependent === false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private emitChange(settings: Partial<MatrixSettings> = {}) {
+        if (settings.customXPath == null) {
             this.valid = true;
         }
         this.changeValue.next(Object.assign({
-            attributes: this.tokenValues.map(t => t.value),
+            attributes: this.tokenValues,
             retrieveContext: this.retrieveContext,
-            customXPath,
+            customXPath: settings.customXPath || null,
             respectOrder: this.respectOrder,
             tokens: [...this.tokens],
             ignoreTopNode: this.ignoreTopNode
@@ -187,19 +212,19 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     }
 
     public toggleSetting(key: 'retrieveContext' | 'respectOrder' | 'ignoreTopNode') {
-        this.emitChange(null, { [key]: !this[key] });
+        this.emitChange({ [key]: !this[key] });
     }
 
     public changeCustomXpath(valueEvent: ValueEvent) {
         this.valid = !valueEvent.error && !!valueEvent.xpath;
         if (!!valueEvent.xpath) {
-            this.emitChange(valueEvent.xpath);
+            this.emitChange({ customXPath: valueEvent.xpath });
         }
     }
 
     public editXPath() {
         this.originalXPath = this.xpath;
-        this.emitChange(this.xpath);
+        this.emitChange({ customXPath: this.xpath });
     }
 
     public resetXPath() {
@@ -235,17 +260,38 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         this.subscriptions.forEach(s => s.unsubscribe());
         super.ngOnDestroy();
     }
-}
 
-interface Part {
-    label: string;
-    description: string;
-    value: string;
-    advanced: boolean;
+    private rotateValue(tokenIndex: number, option: Option): TokenAttributes[] {
+        var value = (this.tokenValues[tokenIndex][option.value] ??
+            optionsLookup[option.value]);
+        var options: any[];
+
+        switch (option.type) {
+            case 'default':
+                options = ['include', 'exclude', undefined];
+                break;
+
+            case 'bool':
+                options = [true, false];
+                break;
+        }
+
+        var index = options.indexOf(value) + 1;
+        var update = options[index % options.length];
+
+        return [
+            ...this.tokenValues.slice(0, tokenIndex),
+            {
+                ...this.tokenValues[tokenIndex],
+                [option.value]: update
+            },
+            ...this.tokenValues.slice(tokenIndex + 1)
+        ];
+    }
 }
 
 export interface MatrixSettings {
-    attributes: string[];
+    attributes: TokenAttributes[];
     customXPath: string;
     retrieveContext: boolean;
     respectOrder: boolean;

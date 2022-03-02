@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExtractinatorService, ReconstructorService } from 'lassy-xpath';
 
-import { AlpinoService, TreebankService, StateService } from '../../services/_index';
+import { AlpinoService, TreebankService, StateService, NotificationService } from '../../services/_index';
 import { MatrixSettings } from '../../components/step/matrix/matrix.component';
 import {
     GlobalStateExampleBased, SentenceInputStep, ParseStep, SelectTreebankStep, ResultsStep,
@@ -10,6 +10,8 @@ import {
 } from '../multi-step-page/steps';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 import { TreebankSelection } from '../../treebank';
+
+const attributesSeparator = ':';
 
 @Component({
     selector: 'grt-example-based-search',
@@ -44,6 +46,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
         private alpinoService: AlpinoService,
         private extractinatorService: ExtractinatorService,
         private reconstructorService: ReconstructorService,
+        private notificationService: NotificationService,
         treebankService: TreebankService,
         stateService: StateService<GlobalStateExampleBased>,
         route: ActivatedRoute,
@@ -56,13 +59,13 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             super.encodeGlobalState(state), {
             'inputSentence': state.inputSentence,
             'isCustomXPath': this.encodeBool(state.isCustomXPath),
-            'attributes': state.attributes,
+            'attributes': this.alpinoService.attributesToStrings(state.attributes, true)?.join(attributesSeparator),
             'respectOrder': this.encodeBool(state.respectOrder),
             'ignoreTopNode': this.encodeBool(state.ignoreTopNode)
         });
     }
 
-    decodeGlobalState(queryParams: { [key: string]: any }) {
+    decodeGlobalState(queryParams: { [key: string]: any }): { [K in keyof GlobalStateExampleBased]?: GlobalStateExampleBased[K] } {
         return {
             selectedTreebanks: new TreebankSelection(
                 this.treebankService,
@@ -70,7 +73,7 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             xpath: queryParams.xpath || undefined,
             inputSentence: queryParams.inputSentence || undefined,
             isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
-            attributes: queryParams.attributes,
+            attributes: this.alpinoService.attributesFromString(queryParams.attributes?.split(attributesSeparator)),
             retrieveContext: this.decodeBool(queryParams.retrieveContext),
             respectOrder: this.decodeBool(queryParams.respectOrder),
             ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
@@ -82,7 +85,8 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             2,
             this.alpinoService,
             this.extractinatorService,
-            this.reconstructorService);
+            this.reconstructorService,
+            this.notificationService);
         return [{
             name: 'Example',
             step: new SentenceInputStep(0)

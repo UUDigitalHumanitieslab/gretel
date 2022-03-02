@@ -1,0 +1,9 @@
+<div class="button is-outlined" [ngClass]="iconColor" [attr.disabled]="disabled ? 'disabled' : undefined" role="button"
+    tooltipPosition="bottom" pTooltip="{{iconDescription}}">
+    <span class="icon">
+        <fa-icon *ngIf="iconDefinition" [icon]="iconDefinition"></fa-icon>
+    </span>
+</div>
+<span class="is-sr-only">
+    {{iconText}}
+</span>
