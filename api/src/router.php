@@ -84,7 +84,8 @@ $router->map('POST', '/treebank_counts', function () {
     $components = $data['components'];
     $xpath = $data['xpath'];
 
-    $counts = getTreebankCounts($corpus, $components, $xpath);
+    // $counts = getTreebankCounts($corpus, $components, $xpath);
+    $counts = (object)[];
     header('Content-Type: application/json');
     echo json_encode($counts);
 });
@@ -133,7 +134,10 @@ $router->map('POST', '/results', function () {
     $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
     $flushLimit = min($flushLimit, $searchLimit);
 
-    // We only search one component at a time.
+    // Get results for given components (and databases, if applicable).
+    // NB: getResults stops after the first component or if flushLimit was
+    // reached; however, if no results are found, it continues searching until
+    // the end.
     $results = getResults(
         $xpath,
         $context,
