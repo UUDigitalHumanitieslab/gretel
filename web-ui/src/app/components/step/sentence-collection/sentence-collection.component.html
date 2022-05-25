@@ -1,0 +1,25 @@
+<h2 class="subtitle" grtSubtitle>
+    {{ title }}
+</h2>
+<form>
+    <div class="columns">
+        <div class="column is-half">
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input type="text" class="input"
+                           autocomplete="off"
+                           placeholder="Start typing expression" spellcheck="true" lang="nl"
+                           name="filterString"
+                           [(ngModel)]="filterString">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div *ngFor="let sent of sentences"
+     class="result"
+     (click)="onSelect.emit(sent)">
+    {{sent}}
+</div>

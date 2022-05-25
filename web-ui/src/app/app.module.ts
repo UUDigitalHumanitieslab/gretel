@@ -26,6 +26,7 @@ import { DocumentationComponent } from './pages/documentation/documentation.comp
 import { DocumentationContentComponent } from './pages/documentation/documentation-content/documentation-content.component';
 import { StepButtonsComponent } from './pages/multi-step-page/step-buttons.component';
 import { XpathSearchComponent } from './pages/xpath-search/xpath-search.component';
+import { MultiWordExpressionsComponent } from './pages/multi-word-expressions/multi-word-expressions.component';
 import { XpathInputComponent } from './components/step/xpath-input/xpath-input.component';
 import { BreadcrumbBarComponent } from './components/breadcrumb-bar/breadcrumb-bar.component';
 import { SelectTreebankProvidersComponent } from './components/step/select-treebanks/select-treebank-providers.component';
@@ -62,6 +63,7 @@ import { XPathViewerComponent } from './components/xpath/viewer/xpath-viewer.com
 import { FiltersModule } from './modules/filters/filters.module';
 import { ExampleBasedSearchComponent } from './pages/example-based-search/example-based-search.component';
 import { SentenceInputComponent } from './components/step/sentence-input/sentence-input.component';
+import { SentenceCollectionComponent } from './components/step/sentence-collection/sentence-collection.component';
 import { ParseComponent } from './components/step/parse/parse.component';
 import { MatrixComponent } from './components/step/matrix/matrix.component';
 import { MatrixOptionComponent } from './components/step/matrix/matrix-option.component';
@@ -102,6 +104,7 @@ export const declarations: any[] = [
     LoginStatusComponent,
     MatrixComponent,
     MatrixOptionComponent,
+    MultiWordExpressionsComponent,
     NavigationComponent,
     NodePropertiesButtonComponent,
     NodePropertiesComponent,
@@ -112,6 +115,7 @@ export const declarations: any[] = [
     SelectTreebanksComponent,
     SelectTreebankProvidersComponent,
     SentenceInputComponent,
+    SentenceCollectionComponent,
     StepButtonsComponent,
     SubtitleDirective,
     SubTreebanksComponent,
@@ -160,7 +164,7 @@ export const providers: any[] = [
     declarations,
     imports,
     providers,
-    bootstrap: [AppComponent]
+    bootstrap: [AppComponent],
 })
 export class AppModule {
 }
