@@ -11,7 +11,7 @@
     </grt-sentence-collection>
 
     <div *ngSwitchCase="1">
-      <p>Chosen expression: {{ globalState.canonicalForm }}</p>
+      <p>Chosen expression: <em>{{ globalState.canonicalForm }}</em></p>
       <p>Please choose one of the following queries:</p>
       <grt-query-set
           [queryset]="globalState.querySet"
