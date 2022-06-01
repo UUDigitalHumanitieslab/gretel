@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
 
-class MWEQuery {
+interface MWEQuery {
     /** User-facing description of the query */
     description: string;
     xpath: string;
-
-    constructor(description: string, xpath: string) {
-        this.description = description;
-        this.xpath = xpath;
-    }
 }
 
 export class MWEQuerySet {
@@ -19,7 +14,7 @@ export class MWEQuerySet {
     }
 
     add(description: string, xpath: string) {
-        this.queries.push(new MWEQuery(description, xpath));
+        this.queries.push({description, xpath});
     }
 }
 
