@@ -1,14 +1,20 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StateService, TreebankService, MWECanonicalService } from '../../services/_index';
+import { StateService, TreebankService, MWECanonicalService, MWEQueryMakerService } from '../../services/_index';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 
-import { GlobalState, SentenceInputStep, XpathInputStep, Step, ResultsStep } from '../multi-step-page/steps';
+import {
+    GlobalState, SentenceInputStep, XpathInputStep, Step, SelectTreebankStep,
+    ResultsStep
+} from '../multi-step-page/steps';
 import { TreebankSelection } from '../../treebank';
+
+import { MWEQuerySet } from '../../services/mwe-query-maker.service';
 
 interface MWEState extends GlobalState {
     canonicalForm: string,
+    querySet: MWEQuerySet
 }
 
 @Component({
@@ -28,16 +34,19 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         variableProperties: undefined,
         xpath: '',
         canonicalForm: '',
+        querySet: undefined
     };
 
     private mweService: MWECanonicalService;
+    private mweQueryService: MWEQueryMakerService;
     steps: Step<MWEState>[];
 
     constructor(treebankService: TreebankService, stateService: StateService<MWEState>,
-                mweService: MWECanonicalService,
+                mweService: MWECanonicalService, mweQueryService: MWEQueryMakerService,
                 route: ActivatedRoute, router: Router) {
         super(route, router, treebankService, stateService);
         this.mweService = mweService;
+        this.mweQueryService = mweQueryService;
     }
 
     initializeSteps(): { step: Step<MWEState>, name: string }[] {
@@ -50,7 +59,11 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
             step: new XpathInputStep(1),
         },
         {
-            step: new ResultsStep(2),
+            name: 'Treebanks',
+            step: new SelectTreebankStep(2, this.treebankService)
+        },
+        {
+            step: new ResultsStep(3),
             name: 'Results',
         }];
     }
@@ -68,8 +81,18 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         return this.mweService.get();
     }
 
-    async startWithExpression(expression: string) {
-        console.log('chosen expression:', expression);
+    async startWithExpression(canonicalForm: string) {
+        console.log('chosen expression:', canonicalForm);
+        this.setValid(true);
+
+        let querySet = this.mweQueryService.translate(canonicalForm);
+        this.stateService.setState({canonicalForm, querySet});
+        this.next();
+    }
+
+    proceedWithQuery(xpath: string) {
+        console.log('chosen query:', xpath);
+        this.stateService.setState({xpath});
         this.setValid(true);
         this.next();
     }

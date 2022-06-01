@@ -11,7 +11,12 @@
     </grt-sentence-collection>
 
     <div *ngSwitchCase="1">
-      query here
+      <p>Chosen expression: {{ globalState.canonicalForm }}</p>
+      <p>Please choose one of the following queries:</p>
+      <grt-query-set
+          [queryset]="globalState.querySet"
+          (onSelect)="proceedWithQuery($event)"
+      ></grt-query-set>
     </div>
 
     <grt-select-treebanks
@@ -21,6 +26,22 @@
         (prev)="prev()"
         (next)="next()">
     </grt-select-treebanks>
+
+    <grt-results
+        *ngSwitchCase="3"
+
+        [filterValues]="globalState.filterValues"
+        [inputSentence]="globalState.inputSentence"
+        [retrieveContext]="globalState.retrieveContext"
+        [xpath]="globalState.xpath"
+
+        (changeValid)="setValid($event)"
+        (changeXpath)="updateXPath($event, 'history')"
+        (changeRetrieveContext)="updateRetrieveContext($event)"
+        (changeFilterValues)="updateFilterValues($event)"
+        (prev)="prev()"
+        (next)="next()">
+    </grt-results>
 </div>
 <br />
 <div *ngIf="warning" class="notification is-danger warning">{{warning}}</div>

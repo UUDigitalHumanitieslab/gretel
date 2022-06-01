@@ -77,6 +77,7 @@ import { NodePropertiesEditorComponent } from './components/node-properties/node
 
 import { HighlightPipe } from './highlight.pipe';
 import { HighlightMatchPipe } from './highlight-match.pipe';
+import { QuerySetComponent } from './components/step/query-set/query-set.component';
 
 export const declarations: any[] = [
     AdressComponent,
@@ -111,6 +112,7 @@ export const declarations: any[] = [
     NodePropertiesEditorComponent,
     PaperCiteComponent,
     ParseComponent,
+    QuerySetComponent,
     ResultsComponent,
     SelectTreebanksComponent,
     SelectTreebankProvidersComponent,
