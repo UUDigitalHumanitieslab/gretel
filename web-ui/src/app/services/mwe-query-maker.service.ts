@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { ConfigurationService } from "./configuration.service";
 
 interface MWEQuery {
     /** User-facing description of the query */
@@ -23,15 +25,21 @@ export class MWEQuerySet {
 })
 /** Service to talk to the backend query generation component */
 export class MWEQueryMakerService {
+    generateMWEUrl: Promise<string>;
 
-    constructor() { }
+    constructor(private configurationService: ConfigurationService, private http: HttpClient) {
+        this.generateMWEUrl = configurationService.getAlpinoUrl('generate_mwe');
+    }
 
     /** Retrieve a query set for a given expression */
-    translate(expression: string) : MWEQuerySet {
-        let result = new MWEQuerySet;
-        result.add('Everything', '//node');
-        result.add('Near-Miss (still everything)', '//node');
-        result.add('Superset (still everything)', '//node');
-        return result;
+    async translate(canonical: string) : Promise<MWEQuerySet> {
+        let response = await this.http.post<[MWEQuery]>(
+            await this.generateMWEUrl, {canonical}).toPromise();
+
+        let out = new MWEQuerySet;
+        response.forEach((query) => {
+            out.add(query.description, query.xpath);
+        });
+        return out;
     }
 }

@@ -4,6 +4,7 @@ require '../vendor/autoload.php';
 require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
 require '../../preparatory-scripts/xpath-generator.php';
+require '../../preparatory-scripts/mwe-generator.php';
 require './results.php';
 require './configured-treebanks.php';
 require './show-tree.php';
@@ -38,6 +39,15 @@ $router->map('POST', '/generate_xpath', function () {
     $respect_order = $data['respectOrder'];
 
     $generated = generate_xpath($xml, $tokens, $attributes, $ignore_top_node, $respect_order);
+    header('Content-Type: application/json');
+    echo json_encode($generated);
+});
+
+$router->map('POST', '/generate_mwe', function () {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    $canonical = $data['canonical'];
+    $generated = generate_mwe_queries($canoncial);
     header('Content-Type: application/json');
     echo json_encode($generated);
 });

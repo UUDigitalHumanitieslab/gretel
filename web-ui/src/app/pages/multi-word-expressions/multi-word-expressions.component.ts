@@ -85,7 +85,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         console.log('chosen expression:', canonicalForm);
         this.setValid(true);
 
-        let querySet = this.mweQueryService.translate(canonicalForm);
+        let querySet = await this.mweQueryService.translate(canonicalForm);
         this.stateService.setState({canonicalForm, querySet});
         this.next();
     }
