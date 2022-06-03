@@ -382,22 +382,14 @@ export class ResultsService {
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
-        return results.success ?
-            {
-                hits: await this.mapHits(results),
-                nextIteration: results.endPosIteration,
-                remainingComponents: results.remainingComponents,
-                remainingDatabases: results.remainingDatabases,
-                needRegularGrinded: results.needRegularGrinded,
-                searchLimit: results.searchLimit
-            } : {
-                hits: [],
-                nextIteration: 0,
-                remainingDatabases: [],
-                remainingComponents: [],
-                needRegularGrinded: false,
-                searchLimit: 0
-            };
+        return {
+            hits: await this.mapHits(results),
+            nextIteration: results.endPosIteration,
+            remainingComponents: results.remainingComponents,
+            remainingDatabases: results.remainingDatabases,
+            needRegularGrinded: results.needRegularGrinded,
+            searchLimit: results.searchLimit,
+        };
     }
 
     private mapHits(results: ApiSearchResult): Promise<Hit[]> {
@@ -538,7 +530,7 @@ export class ResultsService {
  * each hit.
  */
 type ApiSearchResult = {
-    success: true
+    success: boolean
     /** Plain text sentences containing the hit */
     sentences: { [id: string]: string },
     /** Origin of the sentence (used for Grinded corpora) */
@@ -557,7 +549,7 @@ type ApiSearchResult = {
     endPosIteration: number,
     /** Components left to search */
     remainingComponents: string[],
-    /** Databases left to search for this component (if this is empty, the search is done) */
+    /** Databases left to search for first component */
     remainingDatabases: string[],
     /** Component ID where each hit originated */
     sentenceDatabases: { [id: string]: string },
@@ -567,11 +559,6 @@ type ApiSearchResult = {
     needRegularGrinded: boolean,
     /** Search limit */
     searchLimit: number
-} | {
-    // no results
-    success: false,
-    // xquery
-    xquery: string
 };
 
 /** Processed search results created from the response */
