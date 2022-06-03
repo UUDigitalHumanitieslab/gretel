@@ -159,15 +159,15 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
     $xquery = 'N/A';
     try {
         while ($database = array_shift($databases)) {
+            // TODO: while can go away, because we will only search one database at a time (except in grinded databases??)
             $xquery = createXquery($corpus, $component, $database, $start, $start + $searchLimit, $needRegularGrinded, $context, $xpath, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
 
             if (!$result || $result == 'false') {
-                // go to the next database of this component and start at its first hit
-                $start = 0;
-                continue;
+                // If no result for this database, go to the end
+                break;
             }
 
             $matches = explode('</match>', $result);
@@ -215,10 +215,14 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
 
             // We exhausted this database, but more hits remain to be retrieved this run
             // reset the start for the next database
-            $start = 0;
+            //$start = 0;
+            // Now: don't continue if database has been exhausted
+            break;
         }
 
+        // TODO: harmonize this for both cases (results or no results)
         if (isset($sentences)) {
+            // At least one result has been found
             if (!isGrinded($corpus)) {
                 $tblist = false;
             }
@@ -238,8 +242,25 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
                 'xquery' => $xquery,
             );
         } else {
-            // in case there are no results to be found
-            return array('success' => false, 'xquery' => $xquery);
+            // in case there are no results found, empty results but remainingDatabases set
+            if (!isGrinded($corpus)) {
+                $tblist = false;
+            } else {
+                $tblist = array();
+            }
+            return array(
+                'success' => false,
+                'sentences' => array(),
+                'tblist' => $tblist,
+                'idlist' => array(),
+                'beginlist' => array(),
+                'xmllist' => array(),
+                'metalist' => array(),
+                'varlist' => array(),
+                'endPosIteration' => 0,
+                'remainingDatabases' => $databases,
+                'xquery' => $xquery,
+            );
         }
     } catch (Exception $e) {
         // allow a developer to directly debug this query (log is truncated)
