@@ -142,6 +142,8 @@ function getDatabases($corpus, $component, $xpath)
 }
 
 /**
+ * Retrieve sentences from (what remains of) one component until
+ *
  * @param string   $corpus      the corpus we're searching
  * @param string   $component   the component we're searching
  * @param string[] $databases   the databases that remain to be searched in this component
@@ -156,14 +158,14 @@ function getSentences($corpus, $component, $databases, $start, $session, $search
 
     $xquery = 'N/A';
     try {
-        while ($database = array_pop($databases)) {
+        while ($database = array_shift($databases)) {
             $xquery = createXquery($corpus, $component, $database, $start, $start + $searchLimit, $needRegularGrinded, $context, $xpath, $variables);
             $query = $session->query($xquery);
             $result = $query->execute();
             $query->close();
 
             if (!$result || $result == 'false') {
-                // go to the next database and start at its first hit
+                // go to the next database of this component and start at its first hit
                 $start = 0;
                 continue;
             }
