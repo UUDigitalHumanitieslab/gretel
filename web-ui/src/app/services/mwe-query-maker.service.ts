@@ -28,7 +28,7 @@ export class MWEQueryMakerService {
     generateMWEUrl: Promise<string>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
-        this.generateMWEUrl = configurationService.getAlpinoUrl('generate_mwe');
+        this.generateMWEUrl = configurationService.getAlpinoUrl('mwe/generate');
     }
 
     /** Retrieve a query set for a given expression */

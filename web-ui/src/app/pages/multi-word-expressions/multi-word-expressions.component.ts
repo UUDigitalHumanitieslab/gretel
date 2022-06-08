@@ -40,6 +40,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
     private mweService: MWECanonicalService;
     private mweQueryService: MWEQueryMakerService;
     steps: Step<MWEState>[];
+    sentences: Promise<string[]>;
 
     constructor(treebankService: TreebankService, stateService: StateService<MWEState>,
                 mweService: MWECanonicalService, mweQueryService: MWEQueryMakerService,
@@ -47,6 +48,8 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         super(route, router, treebankService, stateService);
         this.mweService = mweService;
         this.mweQueryService = mweQueryService;
+
+        this.sentences = this.mweService.get();
     }
 
     initializeSteps(): { step: Step<MWEState>, name: string }[] {
@@ -75,10 +78,6 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
             xpath: queryParams.xpath || this.defaultGlobalState.xpath
         };
-    }
-
-    loadSentences() : string[] {
-        return this.mweService.get();
     }
 
     async startWithExpression(canonicalForm: string) {

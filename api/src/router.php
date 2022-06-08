@@ -9,6 +9,7 @@ require './results.php';
 require './configured-treebanks.php';
 require './show-tree.php';
 require './treebank-counts.php';
+require './mwe/views.php';
 
 // Maybe change this?
 header('Access-Control-Allow-Origin: *');
@@ -43,14 +44,8 @@ $router->map('POST', '/generate_xpath', function () {
     echo json_encode($generated);
 });
 
-$router->map('POST', '/generate_mwe', function () {
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-    $canonical = $data['canonical'];
-    $generated = generate_mwe_queries($canoncial);
-    header('Content-Type: application/json');
-    echo json_encode($generated);
-});
+$router->map('GET', '/mwe/canonical', 'canonical_mwe_view');
+$router->map('POST', '/mwe/generate', 'generate_mwe_view');
 
 $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
     try {
