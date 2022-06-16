@@ -4,7 +4,6 @@ require '../vendor/autoload.php';
 require '../../config.php';
 require '../../preparatory-scripts/alpino-parser.php';
 require '../../preparatory-scripts/xpath-generator.php';
-require '../../preparatory-scripts/mwe-generator.php';
 require './results.php';
 require './configured-treebanks.php';
 require './show-tree.php';
