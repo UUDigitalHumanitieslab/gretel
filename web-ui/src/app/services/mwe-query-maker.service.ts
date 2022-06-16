@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ConfigurationService } from "./configuration.service";
 
-interface MWEQuery {
+export interface MWEQuery {
     /** User-facing description of the query */
     description: string;
     xpath: string;

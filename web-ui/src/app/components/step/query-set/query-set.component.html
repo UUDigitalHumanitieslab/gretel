@@ -1,10 +1,13 @@
 
 <div class="query" *ngFor="let query of queryset.queries; let idx = index">
-  <h4>{{ idx + 1 }}. {{ query.description }}</h4>
+  <h4>Query {{ idx + 1 }}: {{ query.description }}</h4>
   <div>
     <grt-xpath-editor
         [value]="query.xpath">
     </grt-xpath-editor>
   </div>
-  <button class="button" (click)="onSelect.emit(query.xpath)">Search</button>
+  <div *ngIf="idx > 0">
+    <label><input type="checkbox" [(ngModel)]="exclude[idx]"> exclude query {{ idx }} matches</label>
+  </div>
+  <button class="button" (click)="sendQuery(idx)">Search</button>
 </div>
