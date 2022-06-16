@@ -14,8 +14,7 @@ export class QuerySetComponent implements OnInit {
     @Output()
     onSelect = new EventEmitter<string>();
 
-    // used for storing the user's request to run a given query while excluding the results
-    // from the previous query on the list.
+    // used to indicate which queries should be used to exclude results from the target query
     exclude: boolean[] = [];
 
     constructor() { }
@@ -25,14 +24,13 @@ export class QuerySetComponent implements OnInit {
 
     prepareQuery(index: number) : MWEQuery {
         let query = this.queryset.queries[index];
-        if (index < 1) {
-            return query;
-        }
+        let excluded = false;
 
-        if (this.exclude[index]) {
-            let prev = this.queryset.queries[index - 1];
-            // modify the query's xpath to exclude prev
-            query.xpath = `/(${query.xpath} except ${prev.xpath})`;
+        for (let j = 0; j < index; j++) {
+            if (this.exclude[j]) {
+                query.xpath = `${query.xpath} except ${this.queryset.queries[j].xpath}`;
+                excluded = true;
+            }
         }
 
         return query;

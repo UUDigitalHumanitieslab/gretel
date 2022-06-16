@@ -138,6 +138,9 @@ $router->map('POST', '/results', function () {
     $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
     $flushLimit = min($flushLimit, $searchLimit);
 
+    // Encapsulate XPath with brackets, to support complex expressions
+    $xpath = "/($xpath)";
+
     // We only search one component at a time.
     $results = getResults(
         $xpath,
