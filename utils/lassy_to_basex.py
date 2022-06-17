@@ -339,13 +339,13 @@ if args.group_by is not None:
         get_prefix_candidate('test_string')
     except ArgumentError:
         logging.error(
-            'Argument for --group_by option is incorrect - please refer '
+            'Argument for --group-by option is incorrect - please refer '
             'to the documentation.')
         break_script()
 
 # Import settings from lassy_import_settings.py.
 try:
-    from lassy_import_settings import (
+    from lassy_to_basex_settings import (
         BASEX_HOST, BASEX_PORT, BASEX_USER, BASEX_PASSWORD
     )
 except ImportError:
@@ -353,7 +353,7 @@ except ImportError:
     BASEX_PORT = 1984
     BASEX_USER = 'admin'
     BASEX_PASSWORD = 'admin'
-    logging.warning('lassy_import_settings.py not found; using default values')
+    logging.warning('lassy_to_basex_settings.py not found; using defaults')
 
 # Get list of input files in alphabetical order as DirEntry objects
 compactdirname = os.path.join(args.input_dir, 'COMPACT')
@@ -406,10 +406,8 @@ current_component = None
 components = []
 components_number_of_sentences = {}
 components_number_of_words = {}
-components_number_of_databases = {}
 components_id = {}
 components_child_databases = {}
-childdatabase_index = 0
 
 processing_started = True
 
@@ -432,7 +430,6 @@ for fileobj in inputfiles:
             components.append(current_component)
             components_number_of_sentences[current_component] = 0
             components_number_of_words[current_component] = 0
-            components_number_of_databases[current_component] = 0
             components_child_databases[current_component] = []
             components_id[current_component] = treebank_db + '_' + \
                 prefix.upper()
@@ -458,11 +455,9 @@ for fileobj in inputfiles:
         )
         if args.group_by:
             basex_db = treebank_db + '_' + file_title.upper()
-            childdatabase_index += 1
             components_number_of_sentences[current_component] += \
                 number_of_sentences
             components_number_of_words[current_component] += number_of_words
-            components_number_of_databases[current_component] += 1
             components_child_databases[current_component].append(basex_db)
         else:
             basex_db = components_id[current_component]
