@@ -191,7 +191,7 @@ def wrap_up(incomplete=False):
 
         generate_csv_component_list(treebank_title + '_components.csv')
         generate_gretel_configuration(treebank_title.lower() + '.php')
-        generate_parts_files('treebank-parts')
+        generate_parts_files(os.path.join('treebank-parts', treebank_title))
 
 
 def generate_gretel_configuration(output_filename: str):
