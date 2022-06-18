@@ -158,6 +158,9 @@ $router->map('POST', '/results', function () {
             $results['remainingDatabases'] = array();
             $results['remainingComponents'] = array();
         }
+    } else {
+        // If no results are found, give back the search limit that we started with
+        $results['searchLimit'] = $searchLimit;
     }
 
     header('Content-Type: application/json');
