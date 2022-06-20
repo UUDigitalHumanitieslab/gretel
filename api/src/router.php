@@ -84,8 +84,7 @@ $router->map('POST', '/treebank_counts', function () {
     $components = $data['components'];
     $xpath = $data['xpath'];
 
-    // $counts = getTreebankCounts($corpus, $components, $xpath);
-    $counts = (object)[];
+    $counts = getTreebankCounts($corpus, $components, $xpath);
     header('Content-Type: application/json');
     echo json_encode($counts);
 });
