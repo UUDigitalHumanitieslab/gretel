@@ -204,10 +204,16 @@ def generate_gretel_configuration(output_filename: str):
             .format(treebank_title)
         )
         for component in components:
+            if components_names is not None:
+                component_display_name = components_names.get(
+                    component, component
+                )
+            else:
+                component_display_name = component
             f.write(
                 '    new TreebankComponent('
                 '\'' + components_id[component] + '\', ' +
-                '\'' + component + '\', ' +
+                '\'' + component_display_name + '\', ' +
                 str(components_number_of_sentences[component]) + ', ' +
                 str(components_number_of_words[component]) + ', ' +
                 'null, null, null, false, null, null),\n'
@@ -286,6 +292,12 @@ def get_commandline_arguments():
              'documentation for usage)',
         default=None
     )
+    parser.add_argument(
+        '--components-names',
+        help='give user-friendly names to components that will be shown in '
+             'GrETEL according to a CSV file',
+        default=None
+    )
     return parser.parse_args()
 
 
@@ -332,6 +344,23 @@ processing_started = False
 
 if not args.quiet:
     logging.basicConfig(level=logging.INFO)
+
+# Load list of user-friendly components names, if given
+components_names = None
+if args.components_names:
+    try:
+        f = open(args.components_names, 'r')
+        reader = csv.reader(f)
+        components_names = {x[0]: x[1] for x in reader}
+    except FileNotFoundError:
+        logging.error('Components names CSV file not found; ignoring.')
+    except csv.Error:
+        logging.error('Error processing components names CSV file; ignoring.')
+    except IndexError:
+        logging.error(
+            'Components names CSV contains lines with fewer than two '
+            'columns; ignoring.'
+        )
 
 # If group_by is given, check if the argument is in the correct format
 if args.group_by is not None:
