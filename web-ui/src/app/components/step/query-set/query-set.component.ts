@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MWEQuerySet, MWEQuery } from '../../../services/mwe-query-maker.service';
+import { MweQuerySet, MweQuery } from '../../../services/mwe-query-maker.service';
 
 @Component({
     selector: 'grt-query-set',
@@ -9,7 +9,7 @@ import { MWEQuerySet, MWEQuery } from '../../../services/mwe-query-maker.service
 export class QuerySetComponent implements OnInit {
 
     @Input()
-    queryset: MWEQuerySet;
+    queryset: MweQuerySet;
 
     @Output()
     onSelect = new EventEmitter<string>();
@@ -22,7 +22,7 @@ export class QuerySetComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    prepareQuery(index: number) : MWEQuery {
+    prepareQuery(index: number) : MweQuery {
         let query = this.queryset.queries[index];
         let excluded = false;
 

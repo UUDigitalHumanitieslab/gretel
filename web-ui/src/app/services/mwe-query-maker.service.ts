@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ConfigurationService } from "./configuration.service";
 
-export interface MWEQuery {
+export interface MweQuery {
     /** User-facing description of the query */
     description: string;
     xpath: string;
 }
 
-export class MWEQuerySet {
-    queries: MWEQuery[];
+export class MweQuerySet {
+    queries: MweQuery[];
 
-    constructor(queries: MWEQuery[] = []) {
+    constructor(queries: MweQuery[] = []) {
         this.queries = queries;
     }
 
@@ -24,19 +24,19 @@ export class MWEQuerySet {
     providedIn: 'root'
 })
 /** Service to talk to the backend query generation component */
-export class MWEQueryMakerService {
-    generateMWEUrl: Promise<string>;
+export class MweQueryMakerService {
+    generateMweUrl: Promise<string>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient) {
-        this.generateMWEUrl = configurationService.getAlpinoUrl('mwe/generate');
+        this.generateMweUrl = configurationService.getAlpinoUrl('mwe/generate');
     }
 
     /** Retrieve a query set for a given expression */
-    async translate(canonical: string) : Promise<MWEQuerySet> {
-        let response = await this.http.post<[MWEQuery]>(
-            await this.generateMWEUrl, {canonical}).toPromise();
+    async translate(canonical: string) : Promise<MweQuerySet> {
+        let response = await this.http.post<[MweQuery]>(
+            await this.generateMweUrl, {canonical}).toPromise();
 
-        let out = new MWEQuerySet;
+        let out = new MweQuerySet;
         response.forEach((query) => {
             out.add(query.description, query.xpath);
         });

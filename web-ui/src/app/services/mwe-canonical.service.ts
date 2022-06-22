@@ -5,14 +5,14 @@ import { ConfigurationService } from "./configuration.service";
 @Injectable({
     providedIn: 'root'
 })
-export class MWECanonicalService {
-    canonicalMWEUrl: Promise<string>;
+export class MweCanonicalService {
+    canonicalMweUrl: Promise<string>;
 
     constructor(configurationService: ConfigurationService, private http: HttpClient) {
-        this.canonicalMWEUrl = configurationService.getAlpinoUrl('mwe/canonical');
+        this.canonicalMweUrl = configurationService.getAlpinoUrl('mwe/canonical');
     }
 
     async get() : Promise<string[]> {
-        return this.http.get<string[]>(await this.canonicalMWEUrl).toPromise();
+        return this.http.get<string[]>(await this.canonicalMweUrl).toPromise();
     }
 }

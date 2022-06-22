@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StateService, TreebankService, MWECanonicalService, MWEQueryMakerService } from '../../services/_index';
+import { StateService, TreebankService, MweCanonicalService, MweQueryMakerService } from '../../services/_index';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 
 import {
@@ -10,11 +10,11 @@ import {
 } from '../multi-step-page/steps';
 import { TreebankSelection } from '../../treebank';
 
-import { MWEQuerySet } from '../../services/mwe-query-maker.service';
+import { MweQuerySet } from '../../services/mwe-query-maker.service';
 
-interface MWEState extends GlobalState {
+interface MweState extends GlobalState {
     canonicalForm: string,
-    querySet: MWEQuerySet
+    querySet: MweQuerySet
 }
 
 @Component({
@@ -22,8 +22,8 @@ interface MWEState extends GlobalState {
     templateUrl: './multi-word-expressions.component.html',
     styleUrls: ['./multi-word-expressions.component.scss']
 })
-export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWEState> {
-    protected defaultGlobalState: MWEState = {
+export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweState> implements OnInit {
+    protected defaultGlobalState: MweState = {
         connectionError: false,
         currentStep: undefined,
         filterValues: {},
@@ -37,13 +37,13 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         querySet: undefined
     };
 
-    private mweService: MWECanonicalService;
-    private mweQueryService: MWEQueryMakerService;
-    steps: Step<MWEState>[];
+    private mweService: MweCanonicalService;
+    private mweQueryService: MweQueryMakerService;
+    steps: Step<MweState>[];
     sentences: Promise<string[]>;
 
-    constructor(treebankService: TreebankService, stateService: StateService<MWEState>,
-                mweService: MWECanonicalService, mweQueryService: MWEQueryMakerService,
+    constructor(treebankService: TreebankService, stateService: StateService<MweState>,
+                mweService: MweCanonicalService, mweQueryService: MweQueryMakerService,
                 route: ActivatedRoute, router: Router) {
         super(route, router, treebankService, stateService);
         this.mweService = mweService;
@@ -52,7 +52,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MWESta
         this.sentences = this.mweService.get();
     }
 
-    initializeSteps(): { step: Step<MWEState>, name: string }[] {
+    initializeSteps(): { step: Step<MweState>, name: string }[] {
         return [{
             step: new SentenceInputStep(0),
             name: 'Canonical form'

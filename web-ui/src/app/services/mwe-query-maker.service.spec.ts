@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MWEQueryMakerService } from './mwe-query-maker.service';
+import { MweQueryMakerService } from './mwe-query-maker.service';
 
-describe('MWEQueryMakerService', () => {
-    let service: MWEQueryMakerService;
+describe('MweQueryMakerService', () => {
+    let service: MweQueryMakerService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(MWEQueryMakerService);
+        service = TestBed.inject(MweQueryMakerService);
     });
 
     it('should be created', () => {

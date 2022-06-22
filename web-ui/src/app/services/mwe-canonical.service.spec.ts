@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MWECanonicalService } from './mwe-canonical.service';
+import { MweCanonicalService } from './mwe-canonical.service';
 
-describe('MWECanonicalService', () => {
-  let service: MWECanonicalService;
+describe('MweCanonicalService', () => {
+  let service: MweCanonicalService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(MWECanonicalService);
+    service = TestBed.inject(MweCanonicalService);
   });
 
   it('should be created', () => {
