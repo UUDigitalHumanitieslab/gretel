@@ -58,7 +58,6 @@ def process_file(input_filename):
     :param input_filename: Path to input file
     :return: a tuple of the output, the number of sentences and number of words
     """
-    global logging
     current_id = 0
     number_of_sentences = 0
     number_of_words = 0
