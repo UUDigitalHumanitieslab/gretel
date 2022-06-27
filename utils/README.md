@@ -65,7 +65,7 @@ The script needs a running BaseX server. After installing BaseX, start it using
 the command `basexserver -S`.
 
 The script reads its BaseX connection settings from
-``lassy_to_basex.py``. This file is optional and the default BaseX
+``lassy_to_basex_settings.py``. This file is optional and the default BaseX
 settings are used if the file does not exist.
 
 Make sure you have enough disk space: the BaseX databases are much larger than
