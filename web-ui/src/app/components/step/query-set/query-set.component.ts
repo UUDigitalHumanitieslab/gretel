@@ -24,12 +24,10 @@ export class QuerySetComponent implements OnInit {
 
     prepareQuery(index: number) : MweQuery {
         let query = this.queryset.queries[index];
-        let excluded = false;
 
         for (let j = 0; j < index; j++) {
             if (this.exclude[j]) {
                 query.xpath = `${query.xpath} except ${this.queryset.queries[j].xpath}`;
-                excluded = true;
             }
         }
 

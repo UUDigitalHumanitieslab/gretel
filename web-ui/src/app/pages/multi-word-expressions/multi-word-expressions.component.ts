@@ -18,6 +18,21 @@ interface MweState extends GlobalState {
     querySet: MweQuerySet
 }
 
+class MweQueriesStep extends XpathInputStep<MweState> {
+    constructor(number: number, private mweQueryService: MweQueryMakerService) {
+        super(number);
+    }
+
+    async enterStep(state: MweState) {
+        state.currentStep = this;
+        state.valid = false;
+
+        state.querySet = await this.mweQueryService.translate(state.canonicalForm);
+        state.valid = true;
+        return state;
+    }
+}
+
 @Component({
     selector: 'grt-multi-word-expressions',
     templateUrl: './multi-word-expressions.component.html',
@@ -60,7 +75,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         },
         {
             name: 'Query',
-            step: new XpathInputStep(1),
+            step: new MweQueriesStep(1, this.mweQueryService),
         },
         {
             name: 'Treebanks',
@@ -72,27 +87,31 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         }];
     }
 
+    encodeGlobalState(state: MweState) {
+        return Object.assign(super.encodeGlobalState(state), {
+            'canonicalForm': state.canonicalForm,
+            'xpath': state.xpath
+        });
+    }
+
     decodeGlobalState(queryParams: { [key: string]: any }) {
         return {
             selectedTreebanks: new TreebankSelection(
                 this.treebankService,
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
             xpath: queryParams.xpath || this.defaultGlobalState.xpath,
+            canonicalForm: queryParams.canonicalForm,
             valid: true
         };
     }
 
     async startWithExpression(canonicalForm: string) {
-        console.log('chosen expression:', canonicalForm);
+        this.stateService.setState({canonicalForm});
         this.setValid(true);
-
-        let querySet = await this.mweQueryService.translate(canonicalForm);
-        this.stateService.setState({canonicalForm, querySet});
         this.next();
     }
 
     proceedWithQuery(xpath: string) {
-        console.log('chosen query:', xpath);
         this.stateService.setState({xpath});
         this.setValid(true);
         this.next();
