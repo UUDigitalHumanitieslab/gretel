@@ -7,7 +7,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 })
 export class SentenceCollectionComponent implements OnInit {
 
-    private _sentences: string[];
+    private _sentences: {text:string, id:number}[];
 
     filterString: string;
 
@@ -25,14 +25,14 @@ export class SentenceCollectionComponent implements OnInit {
         this._sentences = [];
     }
 
-    get sentences(): string[] {
+    get sentences() {
         return this._sentences.filter((sent) => {
-            return sent.indexOf(this.filterString) >= 0;
+            return sent.text.indexOf(this.filterString) >= 0;
         })
     }
 
     @Input()
-    set sentences(sents: string[]) {
+    set sentences(sents) {
         this._sentences = sents;
     }
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { StateService, TreebankService, MweCanonicalService, MweQueryMakerService } from '../../services/_index';
+import { MweCanonicalForm } from '../../services/mwe-canonical.service';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 
 import {
@@ -40,7 +41,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
     private mweService: MweCanonicalService;
     private mweQueryService: MweQueryMakerService;
     steps: Step<MweState>[];
-    sentences: Promise<string[]>;
+    canonicalForms: Promise<MweCanonicalForm[]>;
 
     constructor(treebankService: TreebankService, stateService: StateService<MweState>,
                 mweService: MweCanonicalService, mweQueryService: MweQueryMakerService,
@@ -49,7 +50,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         this.mweService = mweService;
         this.mweQueryService = mweQueryService;
 
-        this.sentences = this.mweService.get();
+        this.canonicalForms = this.mweService.get();
     }
 
     initializeSteps(): { step: Step<MweState>, name: string }[] {
@@ -76,7 +77,8 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
             selectedTreebanks: new TreebankSelection(
                 this.treebankService,
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
-            xpath: queryParams.xpath || this.defaultGlobalState.xpath
+            xpath: queryParams.xpath || this.defaultGlobalState.xpath,
+            valid: true
         };
     }
 
@@ -94,5 +96,9 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         this.stateService.setState({xpath});
         this.setValid(true);
         this.next();
+    }
+
+    updateXPath(xpath: string) {
+        console.log(xpath);
     }
 }

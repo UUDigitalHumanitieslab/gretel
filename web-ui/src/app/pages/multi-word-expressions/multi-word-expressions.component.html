@@ -4,7 +4,7 @@
     <grt-sentence-collection
         *ngSwitchCase="0"
         title="Canonical form expressions"
-        [sentences]="(sentences | async) ?? []"
+        [sentences]="(canonicalForms | async) ?? []"
         (onUpdateFilter)="updateFilter($event)"
         (onSelect)="startWithExpression($event)"
     >

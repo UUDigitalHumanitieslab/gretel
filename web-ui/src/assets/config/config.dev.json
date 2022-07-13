@@ -4,5 +4,6 @@
     },
     "alpino": "/gretel/api/src/router.php/",
     "uploadUrl": "/gretel-upload/index.php/api/",
-    "uploadProvider": "gretel"
+    "uploadProvider": "gretel",
+    "mwe": "http://localhost:8000/mwe/"
 }

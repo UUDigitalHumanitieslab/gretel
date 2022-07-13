@@ -16,6 +16,6 @@
 
 <div *ngFor="let sent of sentences"
      class="result"
-     (click)="onSelect.emit(sent)">
-  {{sent}}
+     (click)="onSelect.emit(sent.text)">
+  {{sent.text}}
 </div>
