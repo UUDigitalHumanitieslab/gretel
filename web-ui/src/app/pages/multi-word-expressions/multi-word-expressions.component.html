@@ -27,7 +27,7 @@
         (next)="next()">
     </grt-select-treebanks>
 
-    <grt-results
+    <grt-mwe-results
         *ngSwitchCase="3"
 
         [filterValues]="globalState.filterValues"
@@ -41,7 +41,15 @@
         (changeFilterValues)="updateFilterValues($event)"
         (prev)="prev()"
         (next)="next()">
-    </grt-results>
+    </grt-mwe-results>
+    <grt-analysis
+        *ngSwitchCase="4"
+
+        [xpath]="globalState.xpath"
+
+        (changeValid)="setValid($event)"
+        (filterResults)="filterResults($event, 2)">
+    </grt-analysis>
 </div>
 <br />
 <div *ngIf="warning" class="notification is-danger warning">{{warning}}</div>

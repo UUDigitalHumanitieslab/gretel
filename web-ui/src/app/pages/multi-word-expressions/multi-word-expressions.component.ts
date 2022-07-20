@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StateService, TreebankService, MweCanonicalService, MweQueryMakerService } from '../../services/_index';
+import { StateService, TreebankService, MweCanonicalService, MweQueryMakerService,
+         EmitType} from '../../services/_index';
 import { MweCanonicalForm } from '../../services/mwe-canonical.service';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 
 import {
     GlobalState, SentenceInputStep, XpathInputStep, Step, SelectTreebankStep,
-    ResultsStep
+    ResultsStep, AnalysisStep
 } from '../multi-step-page/steps';
 import { TreebankSelection } from '../../treebank';
 
@@ -84,6 +85,10 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         {
             step: new ResultsStep(3),
             name: 'Results',
+        },
+        {
+            step: new AnalysisStep(4),
+            name: 'Analysis',
         }];
     }
 
@@ -117,7 +122,10 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         this.next();
     }
 
-    updateXPath(xpath: string) {
-        console.log(xpath);
+    async updateXPath(xpath: string, emit: EmitType) {
+        this.stateService.setState({
+            xpath
+        },
+            emit);
     }
 }
