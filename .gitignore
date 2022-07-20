@@ -28,3 +28,5 @@ js/ts/**
 
 vendor
 !lassy-xpath/.gitignore
+
+__pycache__/
