@@ -81,6 +81,9 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     @Input('xpath')
     public set xpath(value: string) { this.xpathSubject.next(value); }
     public get xpath(): string { return this.xpathSubject.value; }
+    public validXPath = true;
+    public customXPath: string;
+    public xpathCopied = false;
     @Output()
     public changeXpath = new EventEmitter<string>();
 
@@ -114,10 +117,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public loading = true;
     public loadingDownload = false;
 
-    public xpathCopied = false;
-    public customXPath: string;
-    public validXPath = true;
-    public isModifyingXPath = false;
     public activeFilterCount = 0;
 
     /**
@@ -136,13 +135,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public treeFilename?: string;
     public loadingTree = false;
     public treeSentence?: SafeHtml;
-
-    public columns = [
-        { field: 'number', header: '#', width: '5%' },
-        { field: 'fileId', header: 'ID', width: '20%' },
-        { field: 'componentDisplayName', header: 'Component', width: '20%' },
-        { field: 'highlightedSentence', header: 'Sentence', width: 'fill' },
-    ];
 
     private subscriptions: Subscription[];
     private variableProperties: GlobalState['variableProperties'];
@@ -375,21 +367,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
 
     public print() {
         (window as any).print();
-    }
-
-    public editXPath() {
-        this.isModifyingXPath = true;
-    }
-
-    public updateXPath() {
-        if (this.validXPath) {
-            this.changeXpath.next(this.customXPath);
-            this.isModifyingXPath = false;
-        }
-    }
-
-    public resetXPath() {
-        this.isModifyingXPath = false;
     }
 
     public addFiltersXPath() {

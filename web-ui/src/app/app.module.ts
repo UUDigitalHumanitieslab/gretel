@@ -32,6 +32,8 @@ import { SelectTreebankProvidersComponent } from './components/step/select-treeb
 import { SelectTreebanksComponent } from './components/step/select-treebanks/select-treebanks.component';
 import { SubTreebanksComponent } from './components/step/select-treebanks/sub-treebanks.component';
 import { ResultsComponent } from './components/step/results/results.component';
+import { ResultsXpathEditorComponent } from './components/step/results/xpath-editor.component';
+import { ResultsTableComponent } from './components/step/results/results-table.component';
 import { PaperCiteComponent } from './components/page-components/paper-cite/paper-cite.component';
 import { AdressComponent } from './components/page-components/adress/adress.component';
 import { FooterComponent } from './components/page-components/footer/footer.component';
@@ -109,6 +111,8 @@ export const declarations: any[] = [
     PaperCiteComponent,
     ParseComponent,
     ResultsComponent,
+    ResultsXpathEditorComponent,
+    ResultsTableComponent,
     SelectTreebanksComponent,
     SelectTreebankProvidersComponent,
     SentenceInputComponent,
@@ -119,7 +123,7 @@ export const declarations: any[] = [
     XPathEditorComponent,
     XpathInputComponent,
     XpathSearchComponent,
-    XPathViewerComponent
+    XPathViewerComponent,
 ];
 
 export const imports: any[] = [

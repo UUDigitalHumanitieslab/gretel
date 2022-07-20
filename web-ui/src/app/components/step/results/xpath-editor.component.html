@@ -1,0 +1,81 @@
+<h2 class="subtitle">
+    <div class="level">
+        <div class="level-left">
+            XPath
+        </div>
+        <div class="level-right is-hidden-print">
+            <div class="level-item">
+                <div class="field has-addons">
+                    <ng-container *ngIf="isModifyingXPath">
+                        <p class="control">
+                            <a class="button is-primary" role="button"
+                               [attr.disabled]="!validXPath ? true : null" grtBalloonPosition="down"
+                               grtBalloon="Save query" (click)="updateXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Reset query"
+                               (click)="resetXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-undo"></i>
+                                </span>
+                            </a>
+                        </p>
+                    </ng-container>
+                    <ng-container *ngIf="!isModifyingXPath">
+                        <p class="control">
+                            <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Edit query"
+                               (click)="editXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button" role="button" grtBalloonPosition="down"
+                               grtBalloon="Download query" (click)="downloadXPath()">
+                                <span class="icon is-large">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                            </a>
+                        </p>
+                        <p class="control">
+                            <a class="button" role="button" grtBalloonPosition="down-right"
+                               grtBalloon="Copy query to the clipboard" (click)="copyXPath()"
+                               [ngClass]="{'is-success': xpathCopied }">
+                                <span class="icon is-large">
+                                    <i class="fas fa-copy"></i>
+                                </span>
+                            </a>
+                        </p>
+                    </ng-container>
+                </div>
+            </div>
+            <div class="level-item" *ngIf="activeFilterCount">
+                <div class="field">
+                    <p class="control" grtBalloonPosition="down"
+                       grtBalloon="Modify the XPath to include the specified filters.">
+                        <a class="button has-badge-rounded" [attr.data-badge]="activeFilterCount" role="button"
+                           (click)="addFiltersXPath()">
+                            <span class="is-large">
+                                <i class="fas fa-plus"></i>
+                                <i class="fas fa-filter"></i>
+                            </span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</h2>
+<div class="xpath">
+    <div class="content" *ngIf="!isModifyingXPath">
+        <grt-xpath-viewer (click)="editXPath()" [value]="xpath"></grt-xpath-viewer>
+        <em *ngIf="inputSentence">Based on: &ldquo;{{inputSentence}}&rdquo;</em>
+    </div>
+    <grt-xpath-editor *ngIf="isModifyingXPath" width="100%" [value]="xpath"
+                      (onChange)="changeCustomXpath($event)" autofocus="true"></grt-xpath-editor>
+</div>
