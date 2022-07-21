@@ -11,6 +11,9 @@ class Treebank(models.Model):
     url_more_info = models.URLField(blank=True)
     # The following fields are for user-uploaded treebanks only
     input_file = models.FileField(upload_to='uploaded_treebanks/', blank=True)
+    upload_timestamp = models.DateTimeField(
+        verbose_name='Upload date and time', null=True, blank=True
+    )
     uploaded_by = models.ForeignKey(User, null=True, blank=True,
                                     on_delete=models.SET_NULL)
     public = models.BooleanField(default=True)
@@ -27,9 +30,17 @@ class Component(models.Model):
     slug = models.SlugField(max_length=200)
     title = models.CharField(max_length=1000)
     description = models.TextField(blank=True)
-    nr_sentences = models.IntegerField(verbose_name='Number of sentences')
-    nr_words = models.IntegerField(verbose_name='Number of words')
+    nr_sentences = models.PositiveIntegerField(
+        verbose_name='Number of sentences'
+    )
+    nr_words = models.PositiveBigIntegerField(
+        verbose_name='Number of words'
+    )
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE)
+    total_database_size = models.PositiveIntegerField(
+        default=0, editable=False,
+        help_text='Total size in KiB of all databases for this component'
+    )
 
     class Meta:
         constraints = [
