@@ -1,15 +1,9 @@
-from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet
 
 from .models import CanonicalForm, CanonicalFormSerializer, XPathQuery, XPathQuerySerializer
-
-
-def home(request):
-    return render(request, 'home.html')
 
 
 class CanonicalFormList(ListAPIView):

@@ -5,7 +5,6 @@ from rest_framework.routers import SimpleRouter
 from .views import home, CanonicalFormList, GenerateMweQueries, XPathQueryViewSet
 
 urlpatterns = [
-    path('', home, name='home'),
     path('canonical', CanonicalFormList.as_view(), name='canonical'),
     path('generate', GenerateMweQueries.as_view(), name='generate'),
 ]
