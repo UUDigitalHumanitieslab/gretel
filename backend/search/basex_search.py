@@ -2,13 +2,10 @@ class DatabaseSearcher:
     """A class to search within one BaseX database according to a given
     XPath, starting position and maximum number of results."""
 
-    def __init__(self, session, basex_db: str, xpath: str, start=None,
-                 end=None):
+    def __init__(self, session, basex_db: str, xpath: str):
         self.session = session
         self.basex_db = basex_db
         self.xpath = xpath
-        self.start = start
-        self.end = end
         self.update_xquery()
 
     def update_xquery(self):
@@ -22,8 +19,7 @@ class DatabaseSearcher:
         )
 
     @classmethod
-    def generate_xquery_search(self, basex_db: str, xpath: str, start=None,
-                               end=None) -> str:
+    def generate_xquery_search(self, basex_db: str, xpath: str) -> str:
         query = 'for $node in db:open("' + basex_db + '")/treebank' \
                 + xpath + \
                 'let $tree := ($node/ancestor::alpino_ds)' \
@@ -41,14 +37,6 @@ class DatabaseSearcher:
                 '||</match>'
         # TODO: currently no support for grinded coprora and for variables.
         # Add returntb and variable_results from original implementation.
-
-        # Apply paging if a start and end number are given
-        if not(start is None and end is None):
-            if start is None or end is None:
-                raise ValueError(
-                    'start and end arguments can only be None together'
-                )
-            query = '({})[position() = {} to {}]'.format(query, start + 1, end)
         return query
 
     @classmethod
