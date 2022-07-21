@@ -2,6 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ConfigurationService } from "./configuration.service";
 
+export interface MweCanonicalForm {
+    id: number,
+    text: string
+}
+
 export interface MweQuery {
     /** User-facing description of the query */
     description: string;
@@ -23,16 +28,21 @@ export class MweQuerySet {
 @Injectable({
     providedIn: 'root'
 })
-/** Service to talk to the backend query generation component */
-export class MweQueryMakerService {
+export class MweService {
+    canonicalMweUrl: Promise<string>;
     generateMweUrl: Promise<string>;
 
-    constructor(private configurationService: ConfigurationService, private http: HttpClient) {
+    constructor(configurationService: ConfigurationService, private http: HttpClient) {
+        this.canonicalMweUrl = configurationService.getMweUrl('canonical');
         this.generateMweUrl = configurationService.getMweUrl('generate');
     }
 
+    async getCanonical() : Promise<MweCanonicalForm[]> {
+        return this.http.get<MweCanonicalForm[]>(await this.canonicalMweUrl).toPromise();
+    }
+
     /** Retrieve a query set for a given expression */
-    async translate(canonical: string) : Promise<MweQuerySet> {
+    async generateQuery(canonical: string) : Promise<MweQuerySet> {
         let response = await this.http.post<[MweQuery]>(
             await this.generateMweUrl, {canonical}).toPromise();
 

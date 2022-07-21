@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MweQuerySet, MweQuery } from '../../../services/mwe-query-maker.service';
+import { MweQuerySet, MweQuery } from '../../../services/mwe.service';
 
 @Component({
     selector: 'grt-query-set',

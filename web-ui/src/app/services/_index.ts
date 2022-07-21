@@ -11,5 +11,4 @@ export * from './title.service';
 export * from './treebank.service';
 export * from './treebank-selection.service';
 export * from './parse.service';
-export * from './mwe-canonical.service';
-export * from './mwe-query-maker.service';
+export * from './mwe.service';
