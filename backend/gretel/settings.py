@@ -123,3 +123,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# BaseX connection settings - change in production
+BASEX_HOST = 'localhost'
+BASEX_PORT = 1984
+BASEX_USER = 'admin'
+BASEX_PASSWORD = 'admin'
