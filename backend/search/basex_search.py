@@ -26,7 +26,7 @@ def generate_xquery_search(basex_db: str, xpath: str) -> str:
     """Return XQuery string for use in BaseX to get all occurances
     of a given XPath in XML format in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):
-        raise ValueError
+        raise ValueError('Incorrect database or malformed XPath given')
     query = 'for $node in db:open("' + basex_db + '")/treebank' \
             + xpath + \
             ' let $tree := ($node/ancestor::alpino_ds)' \
@@ -51,6 +51,10 @@ def generate_xquery_count(basex_db: str, xpath: str) -> str:
     """Return XQuery string for use in BaseX to get the count of all
     occurances of a given XPath in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):
-        raise ValueError
+        raise ValueError('Incorrect database or malformed XPath given')
     return 'count(for $node in db:open("{}")/treebank{} return $node)' \
         .format(basex_db, xpath)
+
+
+def get_number_of_matches(results: str) -> int:
+    return results.count('<match>')

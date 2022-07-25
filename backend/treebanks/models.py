@@ -36,7 +36,8 @@ class Component(models.Model):
     nr_words = models.PositiveBigIntegerField(
         verbose_name='Number of words'
     )
-    treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE)
+    treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
+                                 related_name='components')
     total_database_size = models.PositiveIntegerField(
         default=0, editable=False,
         help_text='Total size in KiB of all databases for this component'
@@ -51,12 +52,18 @@ class Component(models.Model):
     def __str__(self):
         return '{} ({})'.format(self.title, self.slug)
 
+    def get_databases(self):
+        '''Return a dictionary of all BaseX databases (keys) and their
+        sizes in KiB (values)'''
+        return {db['dbname']: db['size'] for db in self.databases.values()}
+
 
 class BaseXDB(models.Model):
     dbname = models.CharField(max_length=200, primary_key=True,
                               verbose_name='Database name')
     size = models.IntegerField(help_text='Size of BaseX database in KiB')
-    component = models.ForeignKey(Component, on_delete=models.CASCADE)
+    component = models.ForeignKey(Component, on_delete=models.CASCADE,
+                                  related_name='databases')
 
     class Meta:
         verbose_name = 'BaseX database'
