@@ -10,7 +10,7 @@ class BaseXService:
         if self.session is None:
             try:
                 self.start()
-            except OSError:
+            except ConnectionError:
                 raise
         return self.session.query(query).execute()
 
