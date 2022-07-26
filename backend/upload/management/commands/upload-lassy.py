@@ -10,8 +10,7 @@ import re
 import csv
 
 from treebanks.models import Treebank, Component, BaseXDB
-
-from BaseXClient import BaseXClient
+from gretel.services import basex
 
 BASEX_HOST = 'localhost'
 BASEX_PORT = 1984
@@ -35,30 +34,6 @@ def userinputyesno(prompt, default=False):
     else:
         sys.stderr.write('Invalid answer given.\n')
         return userinputyesno(prompt, default)
-
-
-class BaseXService:
-    session = None
-
-    def perform_query(self, query):
-        if self.session is None:
-            try:
-                self.start()
-            except ConnectionError:
-                raise
-        return self.session.query(query).execute()
-
-    def start(self):
-        if self.session is None:
-            try:
-                self.session = BaseXClient.Session(
-                    BASEX_HOST, BASEX_PORT, BASEX_USER, BASEX_PASSWORD
-                )
-            except ConnectionError:
-                raise
-
-
-basex = BaseXService()
 
 
 class Command(BaseCommand):
@@ -297,7 +272,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(
                 'Treebank {} already exists.'.format(treebank_slug)
             ))
-            if userinputyesno('Delete existing treebank?', True):
+            if userinputyesno(
+                'Delete existing treebank? This will also delete the '
+                'associated databases from BaseX.', True
+            ):
                 existing_treebank.delete()
                 self.stdout.write(self.style.SUCCESS(
                     'Deleted existing treebank.'
