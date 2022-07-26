@@ -226,7 +226,7 @@ class Command(BaseCommand):
         ))
         if self.skipped_files:
             self.stdout.write(self.style.WARNING(
-                'Skipped {} (sub)components with a total of {} sentences '
+                'Skipped {} files with a total of {} sentences '
                 'and {} words.'
                 .format(
                     self.skipped_files,
