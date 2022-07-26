@@ -12,11 +12,6 @@ import csv
 from treebanks.models import Treebank, Component, BaseXDB
 from gretel.services import basex
 
-BASEX_HOST = 'localhost'
-BASEX_PORT = 1984
-BASEX_USER = 'admin'
-BASEX_PASSWORD = 'admin'
-
 
 def userinputyesno(prompt, default=False):
     if default is True:
@@ -181,10 +176,6 @@ class Command(BaseCommand):
                 .format(dirname))
         inputfiles.sort(key=lambda x: x.path)
         return inputfiles
-
-    def get_basex_db_name(self, treebank_db_name: str,
-                          component_name: str) -> str:
-        return treebank_db_name + '_' + component_name.upper()
 
     def wrap_up(self, incomplete=False):
         """
