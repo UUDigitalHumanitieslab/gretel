@@ -38,10 +38,6 @@ class Component(models.Model):
     )
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
                                  related_name='components')
-    total_database_size = models.PositiveIntegerField(
-        default=0, editable=False,
-        help_text='Total size in KiB of all databases for this component'
-    )
 
     class Meta:
         constraints = [
@@ -56,6 +52,10 @@ class Component(models.Model):
         '''Return a dictionary of all BaseX databases (keys) and their
         sizes in KiB (values)'''
         return {db['dbname']: db['size'] for db in self.databases.values()}
+
+    @property
+    def total_database_size(self):
+        return self.databases.all().aggregate(models.Sum('size'))['size__sum']
 
 
 class BaseXDB(models.Model):
