@@ -27,7 +27,12 @@ export class SentenceCollectionComponent implements OnInit {
 
     get sentences() {
         return this._sentences.filter((sent) => {
-            return sent.text.indexOf(this.filterString) >= 0;
+            let words = this.filterString.split(/\s+/);
+            let match = true;
+            words.forEach((word) => {
+                match &&= (sent.text.indexOf(word) >= 0);
+            });
+            return match;
         })
     }
 
