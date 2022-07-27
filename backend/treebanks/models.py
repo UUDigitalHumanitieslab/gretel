@@ -81,6 +81,7 @@ class BaseXDB(models.Model):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
         try:
+            basex.start()
             basex.session.execute('DROP DB {}'.format(self.dbname))
             logger.info('Deleted database {} from BaseX.'.format(self.dbname))
         except OSError as err:
