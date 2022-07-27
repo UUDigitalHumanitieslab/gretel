@@ -11,7 +11,7 @@
     </grt-sentence-collection>
 
     <div *ngSwitchCase="1">
-      <p>Chosen expression: <em>{{ globalState.canonicalForm }}</em></p>
+      <p>Chosen expression: <em>{{ globalState.canonicalForm.text }}</em></p>
       <p>Please choose one of the following queries:</p>
       <grt-query-set
           [queryset]="globalState.querySet"
@@ -27,21 +27,30 @@
         (next)="next()">
     </grt-select-treebanks>
 
-    <grt-mwe-results
-        *ngSwitchCase="3"
+    <div *ngSwitchCase="3">
+        <!-- MWE related info -->
+        <div class="block">
+            <div>Canonical form: <strong>{{ globalState.canonicalForm.text }}</strong></div>
+            <div>Query: {{ globalState.querySet[0].description }}</div>
+        </div>
+        <grt-mwe-results
+            *ngSwitchCase="3"
 
-        [filterValues]="globalState.filterValues"
-        [inputSentence]="globalState.inputSentence"
-        [retrieveContext]="globalState.retrieveContext"
-        [xpath]="globalState.xpath"
+            [filterValues]="globalState.filterValues"
+            [inputSentence]="globalState.inputSentence"
+            [retrieveContext]="globalState.retrieveContext"
+            [xpath]="globalState.xpath"
 
-        (changeValid)="setValid($event)"
-        (changeXpath)="updateXPath($event, 'history')"
-        (changeRetrieveContext)="updateRetrieveContext($event)"
-        (changeFilterValues)="updateFilterValues($event)"
-        (prev)="prev()"
-        (next)="next()">
-    </grt-mwe-results>
+            (changeValid)="setValid($event)"
+            (changeXpath)="updateXPath($event, 'history')"
+            (saveQuery)="saveQuery()"
+            (changeRetrieveContext)="updateRetrieveContext($event)"
+            (changeFilterValues)="updateFilterValues($event)"
+            (prev)="prev()"
+            (next)="next()">
+        </grt-mwe-results>
+    </div>
+
     <grt-analysis
         *ngSwitchCase="4"
 

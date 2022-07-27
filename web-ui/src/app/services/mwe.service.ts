@@ -8,22 +8,18 @@ export interface MweCanonicalForm {
 }
 
 export interface MweQuery {
+    id?: number;
+
     /** User-facing description of the query */
     description: string;
     xpath: string;
+    rank: number;
+
+    /** id of relevant canonical form */
+    canonical: number;
 }
 
-export class MweQuerySet {
-    queries: MweQuery[];
-
-    constructor(queries: MweQuery[] = []) {
-        this.queries = queries;
-    }
-
-    add(description: string, xpath: string) {
-        this.queries.push({description, xpath});
-    }
-}
+export type MweQuerySet = MweQuery[];
 
 @Injectable({
     providedIn: 'root'
@@ -31,10 +27,12 @@ export class MweQuerySet {
 export class MweService {
     canonicalMweUrl: Promise<string>;
     generateMweUrl: Promise<string>;
+    saveQueryUrl: Promise<string>;
 
     constructor(configurationService: ConfigurationService, private http: HttpClient) {
         this.canonicalMweUrl = configurationService.getMweUrl('canonical');
         this.generateMweUrl = configurationService.getMweUrl('generate');
+        this.saveQueryUrl = configurationService.getMweUrl('xpath/');
     }
 
     async getCanonical() : Promise<MweCanonicalForm[]> {
@@ -43,13 +41,16 @@ export class MweService {
 
     /** Retrieve a query set for a given expression */
     async generateQuery(canonical: string) : Promise<MweQuerySet> {
-        let response = await this.http.post<[MweQuery]>(
+        let response = await this.http.post<MweQuerySet>(
             await this.generateMweUrl, {canonical}).toPromise();
 
-        let out = new MweQuerySet;
-        response.forEach((query) => {
-            out.add(query.description, query.xpath);
-        });
-        return out;
+        return response;
+    }
+
+    async saveCustomQuery(query: MweQuery) : Promise<MweQuery> {
+        if (query.id) {
+            return this.http.put<MweQuery>(await this.saveQueryUrl + query.id + '/', query).toPromise();
+        }
+        return this.http.post<MweQuery>(await this.saveQueryUrl, query).toPromise();
     }
 }

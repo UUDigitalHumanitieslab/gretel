@@ -1,7 +1,12 @@
 <div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column is-half-desktop">
-        <grt-results-xpath-editor [xpath]="xpath" (changeXpath)="changeXpath.emit($event)"></grt-results-xpath-editor>
+        <div class="block">
+            <grt-results-xpath-editor [xpath]="xpath" (changeXpath)="changeXpath.emit($event)"></grt-results-xpath-editor>
+        </div>
+        <div class="block">
+            <button class="button" (click)="saveQuery.emit($event)">Save adjusted XPath query</button>
+        </div>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">

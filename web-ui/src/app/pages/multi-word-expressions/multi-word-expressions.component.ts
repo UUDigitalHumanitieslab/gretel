@@ -12,11 +12,12 @@ import {
 } from '../multi-step-page/steps';
 import { TreebankSelection } from '../../treebank';
 
-import { MweQuerySet } from '../../services/mwe.service';
+import { MweQuery, MweQuerySet } from '../../services/mwe.service';
 
 interface MweState extends GlobalState {
-    canonicalForm: string,
-    querySet: MweQuerySet
+    canonicalForm: {text: string, id?:number};
+    querySet: MweQuerySet;
+    currentQuery: MweQuery;
 }
 
 class MweQueriesStep extends XpathInputStep<MweState> {
@@ -28,7 +29,7 @@ class MweQueriesStep extends XpathInputStep<MweState> {
         state.currentStep = this;
         state.valid = false;
 
-        state.querySet = await this.mweService.generateQuery(state.canonicalForm);
+        state.querySet = await this.mweService.generateQuery(state.canonicalForm.text);
         state.valid = true;
         return state;
     }
@@ -50,8 +51,9 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         valid: true,
         variableProperties: undefined,
         xpath: '',
-        canonicalForm: '',
-        querySet: undefined
+        canonicalForm: null,
+        querySet: undefined,
+        currentQuery: null,
     };
 
     private mweService: MweService;
@@ -91,7 +93,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
 
     encodeGlobalState(state: MweState) {
         return Object.assign(super.encodeGlobalState(state), {
-            'canonicalForm': state.canonicalForm,
+            'canonicalForm': JSON.stringify(state.canonicalForm),
             'xpath': state.xpath
         });
     }
@@ -102,19 +104,19 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
                 this.treebankService,
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
             xpath: queryParams.xpath || this.defaultGlobalState.xpath,
-            canonicalForm: queryParams.canonicalForm,
+            canonicalForm: JSON.parse(queryParams.canonicalForm ?? '{}'),
             valid: true
         };
     }
 
-    async startWithExpression(canonicalForm: string) {
+    async startWithExpression(canonicalForm: {text: string, id: number}) {
         this.stateService.setState({canonicalForm});
         this.setValid(true);
         this.next();
     }
 
-    proceedWithQuery(xpath: string) {
-        this.stateService.setState({xpath});
+    proceedWithQuery(query: MweQuery) {
+        this.stateService.setState({xpath: query.xpath, currentQuery: query});
         this.setValid(true);
         this.next();
     }
@@ -124,5 +126,18 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
             xpath
         },
             emit);
+    }
+
+    async saveQuery() {
+        let query = this.globalState.currentQuery;
+        let response = await this.mweService.saveCustomQuery({
+            id: query.id,
+            description: query.description,
+            xpath: this.globalState.xpath,
+            rank: query.rank,
+            canonical: this.globalState.canonicalForm.id,
+        });
+
+        this.stateService.setState({currentQuery: response});
     }
 }
