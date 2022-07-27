@@ -1,1 +1,4 @@
+Django>=4.0.0
+djangorestframework>=3.13.0
 alpino-query>=2.1.3
+BaseXClient
