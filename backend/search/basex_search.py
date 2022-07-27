@@ -3,7 +3,7 @@
 import lxml.etree
 
 ALLOWED_DBNAME_CHARS = '!#$%&\'()+-=@[]^_`{}~ABCDEFGHIJKLMNOPQRSTUVWXYZabcde' \
-                       'fghijklmnopqrstuvwxyz0123456789'
+                       'fghijklmnopqrstuvwxyz0123456789.'
 
 
 def check_xpath(xpath: str) -> bool:
