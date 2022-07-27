@@ -50,3 +50,9 @@ class XPathQueryViewSet(ModelViewSet):
 
     def get_queryset(self):
         return XPathQuery.objects.all()
+
+
+class SaveQuery(APIView):
+    def post(self, request):
+        from django.http.response import JsonResponse
+        return JsonResponse(dict())
