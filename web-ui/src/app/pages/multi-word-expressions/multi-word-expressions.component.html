@@ -39,7 +39,8 @@
             [filterValues]="globalState.filterValues"
             [inputSentence]="globalState.inputSentence"
             [retrieveContext]="globalState.retrieveContext"
-            [xpath]="globalState.xpath"
+            [xpath]="globalState.xpath ?? false"
+            [canSaveQuery]="globalState.canonicalForm.id ?? false"
 
             (changeValid)="setValid($event)"
             (changeXpath)="updateXPath($event, 'history')"

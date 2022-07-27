@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ResultsComponent } from '../results/results.component';
 
 @Component({
@@ -9,6 +9,9 @@ import { ResultsComponent } from '../results/results.component';
 
 })
 export class MweResultsComponent extends ResultsComponent {
+    @Input()
+    public canSaveQuery: boolean = true;
+
     @Output()
     public saveQuery = new EventEmitter<string>();
 

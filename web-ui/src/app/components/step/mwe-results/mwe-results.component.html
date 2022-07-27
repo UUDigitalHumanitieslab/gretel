@@ -5,7 +5,7 @@
             <grt-results-xpath-editor [xpath]="xpath" (changeXpath)="changeXpath.emit($event)"></grt-results-xpath-editor>
         </div>
         <div class="block">
-            <button class="button" (click)="saveQuery.emit($event)">Save adjusted XPath query</button>
+            <button *ngIf="canSaveQuery" class="button" (click)="saveQuery.emit($event)">Save adjusted XPath query</button>
         </div>
     </div>
     <!-- DISTRIBUTION LIST -->

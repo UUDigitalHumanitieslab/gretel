@@ -1,21 +1,27 @@
 <h2 class="subtitle" grtSubtitle>
-  {{ title }}
+    {{ title }}
 </h2>
+
 <form>
-  <div class="field has-addons">
-    <div class="control is-expanded">
-      <input type="text" class="input"
-             autocomplete="off"
-             placeholder="Start typing expression" spellcheck="true" lang="nl"
-             name="filterString"
-             [(ngModel)]="filterString">
+    <div class="field has-addons">
+        <div class="control is-expanded">
+            <input type="text" class="input"
+                   autocomplete="off"
+                   placeholder="Start typing an expression, or a list of words" spellcheck="true" lang="nl"
+                   name="filterString"
+                   [(ngModel)]="filterString">
+        </div>
     </div>
-  </div>
 </form>
 
 
-<div *ngFor="let sent of sentences"
-     class="result"
-     (click)="onSelect.emit(sent)">
-  {{sent.text}}
-</div>
+<table class="table is-fullwidth">
+    <tr *ngFor="let sent of sentences"
+        class="result"
+        (click)="onSelect.emit(sent)">
+        <td>{{sent.text}}</td>
+    </tr>
+    <tr *ngIf="filterString.length > 3" class="result">
+        <td (click)="onSelect.emit({text: filterString})">Search for "{{ filterString }}"</td>
+    </tr>
+</table>
