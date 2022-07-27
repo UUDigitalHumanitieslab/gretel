@@ -82,6 +82,7 @@ class SharedInstance<T extends GlobalState> {
 
             return state;
         } else {
+            console.warn('Cannot proceed to next step, state is invalid');
             this.showWarning(state.currentStep.number);
             return false;
         }

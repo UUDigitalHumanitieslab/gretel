@@ -38,6 +38,10 @@ export class ConfigurationService {
         return (await this.config).alpino + path;
     }
 
+    async getMweUrl(path: string) {
+        return (await this.config).mwe + path;
+    }
+
     async getProviders() {
         return Object.keys((await this.config).providers);
     }
@@ -63,4 +67,9 @@ interface Config {
     uploadUrl: string;
     /** Uploading requires a provider to request results */
     uploadProvider: string;
+
+    /**
+     * new MWE backend base URL
+     */
+    mwe: string,
 }

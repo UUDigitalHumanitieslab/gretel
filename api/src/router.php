@@ -8,6 +8,7 @@ require './results.php';
 require './configured-treebanks.php';
 require './show-tree.php';
 require './treebank-counts.php';
+require './mwe/views.php';
 
 // Maybe change this?
 header('Access-Control-Allow-Origin: *');
@@ -41,6 +42,9 @@ $router->map('POST', '/generate_xpath', function () {
     header('Content-Type: application/json');
     echo json_encode($generated);
 });
+
+$router->map('GET', '/mwe/canonical', 'canonical_mwe_view');
+$router->map('POST', '/mwe/generate', 'generate_mwe_view');
 
 $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
     try {
@@ -132,6 +136,9 @@ $router->map('POST', '/results', function () {
     // Limit on results to return this request
     $flushLimit = $data['isAnalysis'] ? $analysisFlushLimit : $flushLimit;
     $flushLimit = min($flushLimit, $searchLimit);
+
+    // Encapsulate XPath with brackets, to support complex expressions
+    $xpath = "/($xpath)";
 
     // We only search one component at a time.
     $results = getResults(
