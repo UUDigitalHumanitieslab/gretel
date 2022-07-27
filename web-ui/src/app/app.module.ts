@@ -123,7 +123,7 @@ export const declarations: any[] = [
     XPathEditorComponent,
     XpathInputComponent,
     XpathSearchComponent,
-    XPathViewerComponent,
+    XPathViewerComponent
 ];
 
 export const imports: any[] = [
