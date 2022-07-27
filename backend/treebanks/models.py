@@ -3,6 +3,12 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
+import logging
+
+from gretel.services import basex
+
+logger = logging.getLogger(__name__)
+
 
 class Treebank(models.Model):
     slug = models.SlugField(max_length=200, primary_key=True)
@@ -67,8 +73,15 @@ class BaseXDB(models.Model):
     def delete_basex_db(self):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
-        # TODO implement this
-        print('Unimplemented function delete_basex_db() called')
+        try:
+            basex.start()
+            basex.session.execute('DROP DB {}'.format(self.dbname))
+            logger.info('Deleted database {} from BaseX.'.format(self.dbname))
+        except OSError as err:
+            logger.error(
+                'Cannot delete database {} from BaseX: {}.'
+                .format(self.dbname, err)
+            )
 
 
 @receiver(pre_delete, sender=BaseXDB)
