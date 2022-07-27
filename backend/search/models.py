@@ -66,10 +66,15 @@ class ComponentSearchResult(models.Model):
             self.completed_part += size
             self.number_of_results += get_number_of_matches(result)
             if index < (len(databases) - 1):
-                self.save()
-        # Possible optimization: write to the database only after a certain
-        # number of milliseconds have passed, because saving is relatively
-        # costly.
+                # Do a direct database update because this is faster than
+                # calling save(). May yet be optimized by writing to the
+                # database only after a certain number of milliseconds
+                # have passed.
+                ComponentSearchResult.objects.filter(pk=self.pk).update(
+                    completed_part=self.completed_part,
+                    number_of_results=self.number_of_results,
+                    results=self.results
+                )
         self.elapsed_time = (timer() - start_time) * 1000
         self.search_completed = timezone.now()
         self.save()
