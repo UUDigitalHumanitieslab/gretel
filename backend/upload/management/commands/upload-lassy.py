@@ -4,6 +4,7 @@ from django.utils import timezone
 
 import os
 import sys
+import glob
 import gzip
 import zlib
 import re
@@ -32,7 +33,7 @@ def userinputyesno(prompt, default=False):
 
 
 class Command(BaseCommand):
-    help = 'Add LASSY corpus to BaseX database for use in GrETEL or ' \
+    help = 'Add LASSY corpus to BaseX for use in GrETEL or ' \
            'for manual use.'
 
     def add_arguments(self, parser):
@@ -99,7 +100,7 @@ class Command(BaseCommand):
         output = '<treebank>\n'
 
         for line in lines:
-            if line[0:5] == '<?xml':
+            if line.startswith('<?xml'):
                 number_of_sentences += 1
                 continue  # Do not include <?xml line in output file
             if 'cat="top"' in line:
@@ -135,126 +136,38 @@ class Command(BaseCommand):
             # (entered as <character><number>)
             character = self.group_by[0]
             number = int(self.group_by[1:])
-            # Thanks to https://stackoverflow.com/questions/1883980/
-            # find-the-nth-occurrence-of-substring-in-a-string
-            occurances = [x.start()
-                          for x in re.finditer(re.escape(character), filename)]
-            if len(occurances) >= number:
-                return filename[:occurances[number - 1]]
-            else:
-                # Separate component if file does not belong to group
-                return filename
+            return character.join(filename.split(character)[:number])
         else:
             # Incorrect user input for the group_by argument
             raise self.ArgumentError
 
     def get_all_dz_files(self, dirname: str) -> list:
-        """
-        Get a DirEntry list of all .dz files in a directory and its subdirs
-        """
-        try:
-            compactdir = os.scandir(dirname)
-        except FileNotFoundError:
-            raise CommandError(
-                'Directory {} does not exist. Quitting.'
-                .format(dirname)
-            )
-        inputfiles = []
-        for fileobj in (x for x in compactdir):
-            if fileobj.is_file() and fileobj.name[-3:] == '.dz':
-                inputfiles.append(fileobj)
-            elif fileobj.is_dir():
-                subdir = os.scandir(fileobj.path)
-                dzfiles = (x for x in subdir if
-                           (x.is_file and x.name[-3:] == '.dz'))
-                for fileobj2 in dzfiles:
-                    inputfiles.append(fileobj2)
+        inputfiles = glob.glob(dirname + '/*.data.dz')
+        inputfiles.extend(glob.glob(dirname + '/*/*.data.dz'))
         if not inputfiles:
             raise CommandError(
                 'Directory {} (or its subdirectories) does not contain .dz '
                 'files. Quitting.'
                 .format(dirname))
-        inputfiles.sort(key=lambda x: x.path)
+        inputfiles.sort()
         return inputfiles
 
-    def wrap_up(self, incomplete=False):
-        """
-        Give summary to user and set as complete in database.
-        Use with incomplete=False if called in the middle of the script.
-        """
-        self.stdout.write(self.style.SUCCESS(
-            'Exported {} components ({} files) with {} sentences '
-            'and {} words.'
-            .format(
-                self.number_of_components, self.total_number_of_files,
-                self.total_number_of_sentences, self.total_number_of_words
-            )
-        ))
-        if self.skipped_files:
-            self.stdout.write(self.style.WARNING(
-                'Skipped {} files with a total of {} sentences '
-                'and {} words.'
-                .format(
-                    self.skipped_files,
-                    self.skipped_sentences,
-                    self.skipped_words
-                )
-            ))
-        self.treebank.processed = timezone.now()
-        self.treebank.save()
-
-    def handle(self, *args, **options):
-        self.group_by = options['group_by']
-        self.input_dir = options['input_dir']
-
-        # Load list of user-friendly components names, if given
-        self.components_names = {}
-        if options['components_names']:
-            try:
-                f = open(options['components_names'], 'r')
-                reader = csv.reader(f)
-                self.components_names = {x[0]: x[1] for x in reader}
-            except FileNotFoundError:
-                raise CommandError('Components names CSV file not found.')
-            except csv.Error:
-                raise CommandError('Error processing components names file.')
-            except IndexError:
-                raise CommandError(
-                    'Components names file may be correct CSV file but it '
-                    'contains lines with fewer than two columns.'
-                )
-
-        # If group_by is given, check if the argument is in the correct format
-        if self.group_by is not None:
-            try:
-                self.determine_component_id('test_string')
-            except self.ArgumentError:
-                raise CommandError(
-                    'Incorrect argument for --group-by option - please refer '
-                    'to the documentation.')
-
-        # Get list of input files in alphabetical order as DirEntry objects
-        compactdirname = os.path.join(self.input_dir, 'COMPACT')
-        self.inputfiles = self.get_all_dz_files(compactdirname)
-        self.stdout.write(self.style.SUCCESS('Found {} files to process.'
-                                             .format(len(self.inputfiles))))
-
+    def get_components_names(self, filename) -> dict:
         try:
-            basex.start()
-        except ConnectionError as err:
-            raise CommandError('Cannot connect to BaseX: {}. '
-                               'This command needs BaseX to run.'
-                               .format(err))
+            f = open(filename, 'r')
+            reader = csv.reader(f)
+            return {x[0]: x[1] for x in reader}
+        except FileNotFoundError:
+            raise CommandError('Components names CSV file not found.')
+        except csv.Error:
+            raise CommandError('Error processing components names file.')
+        except IndexError:
+            raise CommandError(
+                'Components names file may be correct CSV file but it '
+                'contains lines with fewer than two columns.'
+            )
 
-        # Remove trailing slash because os.path.basename would return empty
-        # string
-        if self.input_dir[-1:] == os.path.sep:
-            self.input_dir = self.input_dir[:-1]
-        treebank_title = os.path.basename(self.input_dir)
-        treebank_db = treebank_title.upper() + '_ID'
-
-        # Check if treebank already exists
-        treebank_slug = slugify(treebank_title)
+    def check_existing_treebank(self, treebank_slug):
         try:
             existing_treebank = Treebank.objects.get(slug=treebank_slug)
         except Treebank.DoesNotExist:
@@ -276,31 +189,101 @@ class Command(BaseCommand):
                     'Cannot continue without deleting existing treebank.'
                 )
 
+    def check_existing_databases(self, treebank_name):
+        all_basex_dbs = basex.session.execute('LIST').split('\n')
+        current_dbs = [x[0:x.find(' ')]
+                       for x in all_basex_dbs
+                       if x.startswith(treebank_name)]
+        if len(current_dbs) > 0:
+            self.stdout.write(self.style.WARNING(
+                '{} BaseX databases with prefix {} already exist.'
+                .format(len(current_dbs), treebank_name)
+            ))
+            if userinputyesno('Delete them? (they may be overwritten!)', True):
+                for db in current_dbs:
+                    try:
+                        basex.session.execute('DROP DB {}'.format(db))
+                    except OSError as err:
+                        raise CommandError(
+                            'Could not delete database: {}'.format(err)
+                        )
+                self.stdout.write(self.style.SUCCESS(
+                    'Deleted existing BaseX databases.'
+                ))
+
+    def wrap_up(self, incomplete=False):
+        """
+        Give summary to user and set as complete in database.
+        Use with incomplete=False if called in the middle of the script.
+        """
+        self.stdout.write(self.style.SUCCESS(
+            'Exported {} components ({} files) with {} sentences '
+            'and {} words.'
+            .format(
+                self.number_of_components, self.total_number_of_files,
+                self.total_number_of_sentences, self.total_number_of_words
+            )
+        ))
+        if self.skipped_files:
+            self.stdout.write(self.style.WARNING(
+                'Skipped {} files.'
+                .format(self.skipped_files)
+            ))
+        self.treebank.processed = timezone.now()
+        self.treebank.save()
+
+    def handle(self, *args, **options):
+        self.group_by = options['group_by']
+        self.input_dir = options['input_dir']
+
+        # Load list of user-friendly components names, if given
+        if options['components_names']:
+            self.components_names = self.get_components_names(
+                options['components_names']
+            )
+        else:
+            self.components_names = {}
+
+        # If group_by is given, check if the argument is in the correct format
+        try:
+            self.determine_component_id('test_string')
+        except self.ArgumentError:
+            raise CommandError(
+                'Incorrect argument for --group-by option - please refer '
+                'to the documentation.')
+
+        # Get list of input files in alphabetical order as DirEntry objects
+        compactdirname = os.path.join(self.input_dir, 'COMPACT')
+        self.inputfiles = self.get_all_dz_files(compactdirname)
+        self.stdout.write(self.style.SUCCESS('Found {} files to process.'
+                                             .format(len(self.inputfiles))))
+
+        try:
+            basex.start()
+        except ConnectionError as err:
+            raise CommandError('Cannot connect to BaseX: {}. '
+                               'This command needs BaseX to run.'
+                               .format(err))
+
+        # Remove trailing slash because os.path.basename would return empty
+        # string
+        self.input_dir = self.input_dir.rstrip(os.path.sep)
+        # Use the directory name as the title of the treebank
+        treebank_title = os.path.basename(self.input_dir)
+        # Prefix for BaseX databases
+        treebank_db = treebank_title.upper() + '_ID'
+
+        # Create treebank in database
+        treebank_slug = slugify(treebank_title)
+        self.check_existing_treebank(treebank_slug)
         self.treebank = Treebank()
         self.treebank.title = treebank_title
         self.treebank.slug = treebank_slug
         self.treebank.save()
 
-        # Check if BaseX databases already exist
-        all_basex_dbs = basex.session.execute('LIST').split('\n')
-        current_dbs = [x[0:x.find(' ')]
-                       for x in all_basex_dbs
-                       if x[0:len(treebank_db)] == treebank_db]
-        if len(current_dbs) > 0:
-            self.stdout.write(self.style.WARNING(
-                '{} BaseX databases with prefix {} already exist.'
-                .format(len(current_dbs), treebank_db)
-            ))
-            if userinputyesno('Delete them? (necessary to continue)', True):
-                for db in current_dbs:
-                    basex.session.execute('DROP DB {}'.format(db))
-                self.stdout.write(self.style.SUCCESS(
-                    'Deleted existing BaseX databases.'
-                ))
-            else:
-                raise CommandError(
-                    'Cannot continue without deleting existing databases'
-                )
+        # Check if BaseX databases with the same prefix already exist to
+        # prevent them from being overwritten.
+        self.check_existing_databases(treebank_db)
 
         # Start the processing
         self.total_number_of_files = 0
@@ -308,42 +291,38 @@ class Command(BaseCommand):
         self.total_number_of_words = 0
         self.number_of_components = 0
         self.skipped_files = 0
-        self.skipped_sentences = 0
-        self.skipped_words = 0
 
         current_comp_id = None
 
         # Extract all dz files in separate xml files; make a BaseX database
         # for every file and put them in components according to the user's
         # preferences
-        for fileobj in self.inputfiles:
+        for dzfile in self.inputfiles:
             success = False
-            if fileobj.name.endswith('.data.dz'):
-                file_title = fileobj.name[:-8]
+            dzfile_name = os.path.basename(dzfile)
+            if dzfile.endswith('.data.dz'):
+                file_title = dzfile_name[:-len('.data.dz')]
             else:
-                file_title = fileobj.name
+                file_title = dzfile_name
             # Start new component if a new component id is detected
             comp_id = self.determine_component_id(file_title)
             if current_comp_id != comp_id:
-                component = Component()
-                component.nr_sentences = 0
-                component.nr_words = 0
+                component = Component(nr_sentences=0, nr_words=0,
+                                      treebank=self.treebank)
                 component.slug = slugify(comp_id)
                 component.title = self.components_names.get(comp_id, comp_id)
-                component.treebank = self.treebank
                 component.save()
                 self.stdout.write(
-                    'Starting new component {}.'
-                    .format(comp_id)
+                    'Starting new component {}.'.format(comp_id)
                 )
                 self.number_of_components += 1
                 current_comp_id = comp_id
             try:
                 output, number_of_sentences, number_of_words = \
-                    self.process_file(fileobj.path)
+                    self.process_file(dzfile)
             except self.InputError:
                 self.stdout.write(self.style.ERROR(
-                    'Cannot read file {}.'.format(fileobj.name)
+                    'Cannot read file {}.'.format(dzfile_name)
                 ))
             else:
                 # Determine BaseX database name
@@ -359,7 +338,7 @@ class Command(BaseCommand):
                 except OSError as err:
                     self.stdout.write(self.style.ERROR(
                         'Adding file {} to BaseX failed: {}.'
-                        .format(fileobj.name, err)
+                        .format(dzfile_name, err)
                     ))
                 else:
                     # Adding to BaseX succeeded; save to database
@@ -378,15 +357,13 @@ class Command(BaseCommand):
                                    * 100)
                     self.stdout.write(
                         'Successfully added contents of {} to BaseX. '
-                        'Progress: {}%'.format(fileobj.name, progress)
+                        'Progress: {}%'.format(dzfile_name, progress)
                     )
             if not success:
                 self.stdout.write(self.style.WARNING(
                     'Could not add {} to BaseX because of errors - skipped.'
-                    .format(fileobj.name)
+                    .format(dzfile_name)
                 ))
                 self.skipped_files += 1
-                self.skipped_sentences += number_of_sentences
-                self.skipped_words += number_of_words
 
         self.wrap_up()
