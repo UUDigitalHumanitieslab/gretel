@@ -19,8 +19,8 @@
                         </span>
                     </th>
                     <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option)">
-                        <grt-matrix-option [attributes]="tokenValues[token.index]"
-                            [disabled]="tokenPartDisabled(token, option)" [option]="option"></grt-matrix-option>
+                        <grt-matrix-option [value]="attributes[token.index][option.key]"
+                            [dependent]="tokenDependents[token.index][option.key]" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
             </ng-container>
