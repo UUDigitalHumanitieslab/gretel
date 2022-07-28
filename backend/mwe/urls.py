@@ -2,7 +2,7 @@ from django.urls import path
 
 from rest_framework.routers import SimpleRouter
 
-from .views import CanonicalFormList, GenerateMweQueries, XPathQueryViewSet, SaveQuery
+from .views import CanonicalFormList, GenerateMweQueries, XPathQueryViewSet
 
 urlpatterns = [
     path('canonical', CanonicalFormList.as_view(), name='canonical'),
