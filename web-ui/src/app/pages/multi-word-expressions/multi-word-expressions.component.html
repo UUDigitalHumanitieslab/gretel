@@ -28,13 +28,14 @@
     </grt-select-treebanks>
 
     <div *ngSwitchCase="3">
-        <!-- MWE related info -->
-        <div class="block">
-            <div>Canonical form: <strong>{{ globalState.canonicalForm.text }}</strong></div>
-            <div>Query: {{ globalState.querySet[0].description }}</div>
-        </div>
         <grt-mwe-results
             *ngSwitchCase="3"
+
+            [canonicalForm]="globalState.canonicalForm.text"
+            [currentQuery]="globalState.currentQuery"
+            [querySet]="globalState.querySet"
+            (changeQuery)="changeQuery($event)"
+
 
             [filterValues]="globalState.filterValues"
             [inputSentence]="globalState.inputSentence"

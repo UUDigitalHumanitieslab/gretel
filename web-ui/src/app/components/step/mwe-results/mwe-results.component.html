@@ -1,3 +1,17 @@
+<!-- MWE related info -->
+<div class="block">
+    <div>Canonical form: <strong>{{ canonicalForm }}</strong></div>
+</div>
+<div class="block">
+    <div>Showing query:
+        <grt-results-query-menu
+            [currentQuery]="currentQuery"
+            [querySet]="querySet"
+            (changeQuery)="changeQuery.emit($event)"
+        ></grt-results-query-menu>
+    </div>
+    <em *ngIf="isQueryAdjusted()">* query is manually adjusted</em>
+</div>
 <div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column is-half-desktop">

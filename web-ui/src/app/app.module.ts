@@ -34,6 +34,7 @@ import { SelectTreebanksComponent } from './components/step/select-treebanks/sel
 import { SubTreebanksComponent } from './components/step/select-treebanks/sub-treebanks.component';
 import { ResultsComponent } from './components/step/results/results.component';
 import { ResultsXpathEditorComponent } from './components/step/results/xpath-editor.component';
+import { ResultsQueryMenuComponent } from './components/step/results/query-menu.component';
 import { ResultsTableComponent } from './components/step/results/results-table.component';
 import { PaperCiteComponent } from './components/page-components/paper-cite/paper-cite.component';
 import { AdressComponent } from './components/page-components/adress/adress.component';
@@ -118,6 +119,7 @@ export const declarations: any[] = [
     QuerySetComponent,
     ResultsComponent,
     ResultsXpathEditorComponent,
+    ResultsQueryMenuComponent,
     ResultsTableComponent,
     SelectTreebanksComponent,
     SelectTreebankProvidersComponent,

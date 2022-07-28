@@ -94,6 +94,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
     encodeGlobalState(state: MweState) {
         return Object.assign(super.encodeGlobalState(state), {
             'canonicalForm': JSON.stringify(state.canonicalForm),
+            'currentQuery': JSON.stringify(state.currentQuery),
             'xpath': state.xpath
         });
     }
@@ -105,6 +106,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
             xpath: queryParams.xpath || this.defaultGlobalState.xpath,
             canonicalForm: JSON.parse(queryParams.canonicalForm ?? '{}'),
+            currentQuery: JSON.parse(queryParams.currentQuery ?? '{}'),
             valid: true
         };
     }
@@ -126,6 +128,11 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
             xpath
         },
             emit);
+    }
+
+    changeQuery(query: MweQuery) {
+        this.globalState.currentQuery = query;
+        this.updateXPath(query.xpath, false);
     }
 
     async saveQuery() {
