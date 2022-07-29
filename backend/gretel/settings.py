@@ -37,15 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    'corsheaders',  # probably only relevant for local dev
     'treebanks',
     'search',
     'upload',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # probably only relevant for local dev
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,3 +134,5 @@ BASEX_HOST = 'localhost'
 BASEX_PORT = 1984
 BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']

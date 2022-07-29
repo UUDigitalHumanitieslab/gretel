@@ -24,6 +24,10 @@ export class ConfigurationServiceMock implements ConfigurationServiceInterface {
         return '';
     }
 
+    async getDjangoUrl(path: string) {
+        return '/' + path;
+    }
+
     public async getProviders(): Promise<string[]> {
         return ['test-provider'];
     }

@@ -1,8 +1,9 @@
 {
     "providers": {
-        "gretel": "/gretel/api/src/router.php/"
+        "gretel": "http://localhost/gretel/api/src/router.php/"
     },
     "alpino": "/gretel/api/src/router.php/",
-    "uploadUrl": "/gretel-upload/index.php/api/",
-    "uploadProvider": "gretel"
+    "uploadUrl": "http://localhost/gretel-upload/index.php/api/",
+    "uploadProvider": "gretel",
+    "django": "http://localhost:8000/"
 }
