@@ -73,6 +73,13 @@ export interface UploadedTreebankResponse {
     user_id: string;
 }
 
+export interface DjangoTreebankResponse {
+    slug: string;
+    title: string;
+    description: string;
+    url_more_info: string;
+}
+
 interface UploadedTreebankMetadataResponse {
     id: string;
     treebank_id: string;
@@ -233,6 +240,17 @@ function makeUploadedTreebank(provider: string, bank: UploadedTreebankResponse) 
     };
 }
 
+function makeDjangoTreebank(bank: DjangoTreebankResponse) {
+    return {
+        id: bank.slug,
+        displayName: bank.title,
+        description: bank.description,
+        isPublic: true,
+        multiOption: true,
+        provider: 'gretel',
+    }
+}
+
 function makeComponentGroup(id: string, description: string, components: TreebankComponent[]): ComponentGroup {
     const compsInGroup = components.filter(c => c.group === id && !!c.variant);
 
@@ -302,8 +320,8 @@ export class TreebankService {
     }
 
     private async loadAll() {
-        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
-
+        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getDjangoTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
+        console.log(allTreebanks$)
         allTreebanks$.subscribe((treebank) => {
             if (treebank) {
                 const current = this.treebanks.value;
@@ -363,6 +381,29 @@ export class TreebankService {
         return ob;
     }
 
+    private getDjangoTreebanks(): Observable<Treebank> {
+        const ob = new ReplaySubject<Treebank>();
+
+        // Not working with providers for now
+
+        (async () => {
+            const djangoUrl = await this.configurationService.getDjangoUrl('treebanks/treebanks/');
+
+            this.http.get<DjangoTreebankResponse[]>(djangoUrl)
+                .pipe(
+                    flatMap(r => r),
+                    map(r => this.getDjangoTreebank(r)),
+                    catchError((error: HttpErrorResponse) => {
+                        NotificationService.addError(error);
+                        return EMPTY;
+                    })
+                )
+                .subscribe(ob);
+        })();
+        
+        return ob;
+    }
+
     private getUploadedTreebank(provider: string, bank: UploadedTreebankResponse): Treebank {
         return new LazyTreebank(
             makeUploadedTreebank(provider, bank),
@@ -382,6 +423,18 @@ export class TreebankService {
                 },
                 variants: async () => undefined
             });
+    }
+
+    private getDjangoTreebank(bank: DjangoTreebankResponse): Treebank {
+        return new LazyTreebank(
+            makeDjangoTreebank(bank),
+            {
+                metadata: undefined,
+                componentGroups: undefined,
+                components: undefined,
+                variants: undefined,
+            }
+        )
     }
 
     /**

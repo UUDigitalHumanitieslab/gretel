@@ -38,6 +38,10 @@ export class ConfigurationService {
         return (await this.config).alpino + path;
     }
 
+    async getDjangoUrl(path: string) {
+        return (await this.config).django + path;
+    }
+
     async getProviders() {
         return Object.keys((await this.config).providers);
     }
@@ -63,4 +67,6 @@ interface Config {
     uploadUrl: string;
     /** Uploading requires a provider to request results */
     uploadProvider: string;
+
+    django: string;
 }
