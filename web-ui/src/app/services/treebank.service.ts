@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { async } from '@angular/core/testing';
 
 import { BehaviorSubject, Observable, ReplaySubject, merge, from, zip, EMPTY } from 'rxjs';
-import { flatMap, catchError, shareReplay, delay, map, first } from 'rxjs/operators';
+import { flatMap, mergeMap, catchError, shareReplay, delay, map, first } from 'rxjs/operators';
 
 import {
     ComponentGroup,
@@ -98,6 +99,14 @@ interface UploadedTreebankShowResponse {
     nr_words: string;
     slug: string;
     title: string;
+}
+
+export interface DjangoComponentsForTreebankResponse {
+    slug: string;
+    title: string;
+    description: string;
+    nr_sentences: string;
+    nr_words: string;
 }
 
 class LazyRetrieve<T> {
@@ -214,6 +223,20 @@ function makeUploadedComponent(comp: UploadedTreebankShowResponse): TreebankComp
     };
 }
 
+function makeDjangoComponent(comp: DjangoComponentsForTreebankResponse): TreebankComponent {
+    return {
+        description: comp.description,
+        disabled: false,
+        id: comp.slug,
+        sentenceCount: parseInt(comp.nr_sentences, 10),
+        title: comp.title,
+        wordCount: parseInt(comp.nr_words, 10),
+
+        group: undefined,
+        variant: undefined,
+    }
+}
+
 function makeTreebank(provider: string, id: string, bank: ConfiguredTreebanksResponse[string]) {
     return {
         id,
@@ -321,7 +344,6 @@ export class TreebankService {
 
     private async loadAll() {
         const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getDjangoTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
-        console.log(allTreebanks$)
         allTreebanks$.subscribe((treebank) => {
             if (treebank) {
                 const current = this.treebanks.value;
@@ -391,7 +413,7 @@ export class TreebankService {
 
             this.http.get<DjangoTreebankResponse[]>(djangoUrl)
                 .pipe(
-                    flatMap(r => r),
+                    mergeMap(r => r),
                     map(r => this.getDjangoTreebank(r)),
                     catchError((error: HttpErrorResponse) => {
                         NotificationService.addError(error);
@@ -429,10 +451,16 @@ export class TreebankService {
         return new LazyTreebank(
             makeDjangoTreebank(bank),
             {
-                metadata: undefined,
-                componentGroups: undefined,
-                components: undefined,
-                variants: undefined,
+                metadata: async () => undefined,
+                componentGroups: async () => undefined,
+                components: async () => {
+                    const djangoComponents = await this.configurationService.getDjangoUrl('treebanks/components-for-treebank/' + bank.slug)
+                        .then(url => this.http.get<DjangoComponentsForTreebankResponse[]>(url, {  }).toPromise());
+                    
+                    const components: TreebankComponent[] = djangoComponents.map(makeDjangoComponent);
+                    return components.reduce<TreebankComponents>((cs, c) => { cs[c.id] = c; return cs; }, {});
+                },
+                variants: async () => undefined,
             }
         )
     }
