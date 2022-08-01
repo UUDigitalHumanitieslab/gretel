@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { async } from '@angular/core/testing';
 
 import { BehaviorSubject, Observable, ReplaySubject, merge, from, zip, EMPTY } from 'rxjs';
 import { flatMap, mergeMap, catchError, shareReplay, delay, map, first } from 'rxjs/operators';
