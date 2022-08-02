@@ -47,6 +47,12 @@ describe('Matrix', () => {
         matrix.set(0, 'cs', true);
         expect(matrix.attributes[0].cs).toEqual(true);
         expect(matrix.attributes[0].word).toEqual('include');
+
+        // case-sensitive is also allowed for exclude
+        matrix.set(0, 'cs', false);
+        matrix.set(0, 'word', 'exclude');
+        matrix.set(0, 'cs', true);
+        expect(matrix.attributes[0].word).toEqual('exclude');
     });
 
     it('setting word, should turn off only na', () => {

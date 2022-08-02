@@ -9,7 +9,7 @@ import { StepDirective } from '../step.directive';
 import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
-import { matrixOptions, Matrix, MatrixOption, TokenAttributes, TokenDependents } from '../../../models/matrix';
+import { matrixOptions, Matrix, TokenAttributes, TokenDependents, MatrixOptionKey } from '../../../models/matrix';
 
 interface IndexedToken {
     /**
@@ -108,13 +108,25 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         ];
     }
 
-    public setTokenPart(token: IndexedToken, option: MatrixOption) {
+    public setTokenRow<T extends MatrixOptionKey>(key: T) {
         if (this.isCustomXPath) {
             this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
 
-        this.matrix.rotate(token.index, option.key);
+        this.matrix.rotateRow(key);
+        this.updateMatrix();
+
+        this.emitChange();
+    }
+
+    public setTokenPart(token: IndexedToken, key: MatrixOptionKey) {
+        if (this.isCustomXPath) {
+            this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
+            return;
+        }
+
+        this.matrix.rotate(token.index, key);
         this.updateMatrix();
 
         this.emitChange();
@@ -125,6 +137,10 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         let { advanced, dependents } = this.matrix.info();
         this.alwaysAdvanced = advanced;
         this.tokenDependents = dependents;
+        if (advanced) {
+            // this might happen when the page is reloaded
+            this.showAdvanced = true;
+        }
         // hello change detection
         this.indexedTokens = [...this.indexedTokens];
     }

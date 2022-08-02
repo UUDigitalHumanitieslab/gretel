@@ -131,11 +131,17 @@ export class Matrix {
         const option = optionsLookup[key];
         if (option.dependent_on) {
             let dependency = optionsLookup[option.dependent_on];
-            this.set(
-                tokenIndex,
-                option.dependent_on,
-                dependency.type === 'default' ? 'include' : true,
-                sourceKey);
+
+            switch (this.attributes[tokenIndex][option.dependent_on]) {
+                case undefined:
+                case false:
+                    this.set(
+                        tokenIndex,
+                        option.dependent_on,
+                        dependency.type === 'default' ? 'include' : true,
+                        sourceKey);
+                    break;
+            }
         }
     }
 
@@ -375,5 +381,16 @@ export class Matrix {
         this.set(tokenIndex, key, updated);
 
         return updated;
+    }
+
+    /**
+     * Rotate all the values in this row. If they differ, the first one
+     * is used to set the rest.
+     */
+    rotateRow<T extends MatrixOptionKey>(key: T): void {
+        const value = this.rotate(0, key);
+        for (let tokenIndex = 1; tokenIndex < this.attributes.length; tokenIndex++) {
+            this.set(tokenIndex, key, value);
+        }
     }
 }
