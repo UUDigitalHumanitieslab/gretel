@@ -9,52 +9,50 @@
         (onSelect)="startWithExpression($event)"
     >
     </grt-sentence-collection>
-
-    <div *ngSwitchCase="1">
-      <p>Chosen expression: <em>{{ globalState.canonicalForm.text }}</em></p>
-      <p>Please choose one of the following queries:</p>
-      <grt-query-set
-          [queryset]="globalState.querySet"
-          (onSelect)="proceedWithQuery($event)"
-      ></grt-query-set>
-    </div>
-
+    <!--
+         <div *ngSwitchCase="1">
+         <p>Chosen expression: <em>{{ globalState.canonicalForm.text }}</em></p>
+         <p>Please choose one of the following queries:</p>
+         <grt-query-set
+         [queryset]="globalState.querySet"
+         (onSelect)="proceedWithQuery($event)"
+         ></grt-query-set>
+         </div>
+    -->
     <grt-select-treebanks
-        *ngSwitchCase="2"
+        *ngSwitchCase="1"
 
         (changeValid)="setValid($event)"
         (prev)="prev()"
         (next)="next()">
     </grt-select-treebanks>
 
-    <div *ngSwitchCase="3">
-        <grt-mwe-results
-            *ngSwitchCase="3"
+    <grt-mwe-results
+        *ngSwitchCase="2"
 
-            [canonicalForm]="globalState.canonicalForm.text"
-            [currentQuery]="globalState.currentQuery"
-            [querySet]="globalState.querySet"
-            (changeQuery)="changeQuery($event)"
+        [canonicalForm]="globalState.canonicalForm.text"
+        [currentQuery]="globalState.currentQuery"
+        [querySet]="globalState.querySet"
+        (changeQuery)="changeQuery($event)"
 
 
-            [filterValues]="globalState.filterValues"
-            [inputSentence]="globalState.inputSentence"
-            [retrieveContext]="globalState.retrieveContext"
-            [xpath]="globalState.xpath ?? false"
-            [canSaveQuery]="globalState.canonicalForm.id ?? false"
+        [filterValues]="globalState.filterValues"
+        [inputSentence]="globalState.inputSentence"
+        [retrieveContext]="globalState.retrieveContext"
+        [xpath]="globalState.xpath ?? false"
+        [canSaveQuery]="globalState.canonicalForm.id ?? false"
 
-            (changeValid)="setValid($event)"
-            (changeXpath)="updateXPath($event, 'history')"
-            (saveQuery)="saveQuery()"
-            (changeRetrieveContext)="updateRetrieveContext($event)"
-            (changeFilterValues)="updateFilterValues($event)"
-            (prev)="prev()"
-            (next)="next()">
-        </grt-mwe-results>
-    </div>
+        (changeValid)="setValid($event)"
+        (changeXpath)="updateXPath($event, 'history')"
+        (saveQuery)="saveQuery()"
+        (changeRetrieveContext)="updateRetrieveContext($event)"
+        (changeFilterValues)="updateFilterValues($event)"
+        (prev)="prev()"
+        (next)="next()">
+    </grt-mwe-results>
 
     <grt-analysis
-        *ngSwitchCase="4"
+        *ngSwitchCase="3"
 
         [xpath]="globalState.xpath"
 

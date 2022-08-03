@@ -20,7 +20,7 @@ interface MweState extends GlobalState {
     currentQuery: MweQuery;
 }
 
-class MweQueriesStep extends XpathInputStep<MweState> {
+class MweResultsStep extends ResultsStep<MweState> {
     constructor(number: number, private mweService: MweService) {
         super(number);
     }
@@ -30,6 +30,9 @@ class MweQueriesStep extends XpathInputStep<MweState> {
         state.valid = false;
 
         state.querySet = await this.mweService.generateQuery(state.canonicalForm.text);
+        state.currentQuery = state.querySet[0];
+        state.xpath = state.currentQuery.xpath;
+
         state.valid = true;
         return state;
     }
@@ -74,19 +77,15 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
             name: 'Canonical form'
         },
         {
-            name: 'Query',
-            step: new MweQueriesStep(1, this.mweService),
-        },
-        {
             name: 'Treebanks',
-            step: new SelectTreebankStep(2, this.treebankService)
+            step: new SelectTreebankStep(1, this.treebankService)
         },
         {
-            step: new ResultsStep(3),
+            step: new MweResultsStep(2, this.mweService),
             name: 'Results',
         },
         {
-            step: new AnalysisStep(4),
+            step: new AnalysisStep(3),
             name: 'Analysis',
         }];
     }
