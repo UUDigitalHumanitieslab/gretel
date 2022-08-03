@@ -408,7 +408,7 @@ export class TreebankService {
         // Not working with providers for now
 
         (async () => {
-            const djangoUrl = await this.configurationService.getDjangoUrl('treebanks/');
+            const djangoUrl = await this.configurationService.getDjangoUrl('treebanks/treebank/');
 
             this.http.get<DjangoTreebankResponse[]>(djangoUrl)
                 .pipe(
@@ -453,7 +453,7 @@ export class TreebankService {
                 metadata: async () => undefined,
                 componentGroups: async () => undefined,
                 components: async () => {
-                    const djangoComponents = await this.configurationService.getDjangoUrl('treebanks/' + bank.slug + '/components/')
+                    const djangoComponents = await this.configurationService.getDjangoUrl('treebanks/treebank/' + bank.slug + '/components/')
                         .then(url => this.http.get<DjangoComponentsForTreebankResponse[]>(url, {  }).toPromise());
                     
                     const components: TreebankComponent[] = djangoComponents.map(makeDjangoComponent);
