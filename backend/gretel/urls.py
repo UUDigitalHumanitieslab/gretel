@@ -19,4 +19,5 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('treebanks/', include('treebanks.urls')),
+    path('search/', include('search.urls')),
 ]

@@ -23,7 +23,7 @@ class Treebank(models.Model):
     processed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} ({})'.format(self.title, self.slug)
+        return '{}'.format(self.slug)
 
 
 class Component(models.Model):
@@ -46,7 +46,7 @@ class Component(models.Model):
         ]
 
     def __str__(self):
-        return '{} ({})'.format(self.title, self.slug)
+        return '{}: {}'.format(self.treebank, self.slug)
 
     def get_databases(self):
         '''Return a dictionary of all BaseX databases (keys) and their
