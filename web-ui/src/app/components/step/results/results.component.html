@@ -14,4 +14,7 @@
     [filters]="filters"
     (prev)="prev.next()"
     (next)="next.next()"
+    (showTree)="showTree($event)"
 ></grt-results-table>
+<grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
+    [filename]="treeFilename" [url]="treeXmlUrl" [loading]="loadingTree"></grt-tree-visualizer>

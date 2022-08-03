@@ -134,9 +134,9 @@
 
                             <ng-container *ngSwitchCase="'fileId'">
                                 <a *ngIf="rowData[col.field]; else fileIdButton"
-                                    (click)="showTree(rowData)">{{rowData[col.field].split('/').pop()}}</a>
+                                    (click)="showTree.emit(rowData)">{{rowData[col.field].split('/').pop()}}</a>
                                 <ng-template #fileIdButton>
-                                    <button type="button" class="button" (click)="showTree(rowData)">Show tree</button>
+                                    <button type="button" class="button" (click)="showTree.emit(rowData)">Show tree</button>
                                 </ng-template>
                             </ng-container>
 
@@ -165,5 +165,3 @@
         </div>
     </div>
 </div>
-<grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
-    [filename]="treeFilename" [url]="treeXmlUrl" [loading]="loadingTree"></grt-tree-visualizer>

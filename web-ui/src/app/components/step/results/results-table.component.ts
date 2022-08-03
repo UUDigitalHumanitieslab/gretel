@@ -23,6 +23,9 @@ export class ResultsTableComponent implements OnInit {
     @Output()
     public next = new EventEmitter();
 
+    @Output()
+    public showTree = new EventEmitter();
+
 
     public hiddenCount = 0;
     public loadingDownload = false;
