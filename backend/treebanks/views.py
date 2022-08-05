@@ -20,6 +20,6 @@ def treebank_components_view(request, treebank):
         # TODO: test if treebank is public and if not if it is accessible
     except Treebank.DoesNotExist:
         return Response(None, status=status.HTTP_404_NOT_FOUND)
-    components = treebank.component_set
+    components = treebank.components
     serializer = ComponentSerializer(components, many=True)
     return Response(serializer.data)

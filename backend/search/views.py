@@ -6,14 +6,20 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework import status
 
+import threading
+
 from treebanks.models import Component
 from .models import SearchQuery
+
+
+def run_search(query_obj) -> None:
+    query_obj.perform_search()
 
 
 @api_view(['POST'])
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
 @parser_classes([JSONParser])
-def search_start(request):
+def search_view(request):
     data = request.data
     try:
         xpath = data['xpath']
@@ -28,17 +34,40 @@ def search_start(request):
         slug__in=components,
         treebank__slug=treebank
     )
+    query_id = data.get('query_id', None)
+    start_from = data.get('start_from', 0)
 
-    query = SearchQuery(xpath=xpath)
-    query.save()
-    query.components.add(*components_obj)
-    query.initialize()
-    # query.perform_search()
-    results, percentage = query.get_results()
-    results = str(results)
+    if query_id:
+        new_query = False
+        try:
+            # TODO: also check if the component list is correct
+            query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
+        except SearchQuery.DoesNotExist:
+            return Response(
+                {'error': 'Cannot find given query_id'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        new_query = True
+        query = SearchQuery(xpath=xpath)
+        query.save()
+        query.components.add(*components_obj)
+        query.initialize()
+
+    # Get results so far, if any
+    results, percentage = query.get_results(start_from, 500)
+    if request.accepted_renderer.format == 'api':
+        results = str(results)[0:100] + \
+            '… (remainder hidden because of slow rendering)'
     response = {
         'query_id': query.id,
         'search_percentage': percentage,
         'results': results,
     }
+
+    if new_query:
+        # Start searching in a new thread
+        thread = threading.Thread(target=run_search, args=(query,))
+        thread.start()
+
     return Response(response)

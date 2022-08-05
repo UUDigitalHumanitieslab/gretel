@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
-                           generate_xquery_count)
+                           generate_xquery_count, parse_search_result)
 
 
 class BaseXSearchTestCase(TestCase):
@@ -37,3 +37,21 @@ class BaseXSearchTestCase(TestCase):
                 self.DB_NAME_CHECK,
                 self.XPATH_CHECK + ' let $a := 0'
             )
+
+    def test_parse_search_result(self):
+        input_str = '<match>id||sentence||ids||begins||xml_sentences' \
+            '||meta||</match><match>id2||sentence2||ids2||begins2' \
+            '||xml_sentences2||meta2||</match>'
+        res = parse_search_result(input_str)
+        self.assertEqual('sentence', res[0]['sentence'])
+        self.assertEqual('meta2', res[1]['meta'])
+        # Incomplete input string should raise exception
+        input_str = '<match>id||sentence||ids||begins||xml_sentences' \
+            '||meta||</match><match>id2||sentence2||id'
+        self.assertRaises(ValueError, parse_search_result, input_str)
+        input_str = '<match>id||sentence||ids||begins||xml_sentences' \
+            '</match>'
+        self.assertRaises(ValueError, parse_search_result, input_str)
+        # Empty string should return an empty list
+        self.assertEqual([], parse_search_result(''))
+        self.assertEqual([], parse_search_result('\n '))

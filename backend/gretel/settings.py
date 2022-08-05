@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'treebanks',
     'search',
     'upload',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -3,11 +3,12 @@ from django.utils import timezone
 from django.db.models import F
 
 from timeit import default_timer as timer
+import json
 
 from treebanks.models import Component
 from gretel.services import basex
-from .basex_search import (generate_xquery_search, get_number_of_matches,
-                           check_xpath)
+from .basex_search import (generate_xquery_search,
+                           check_xpath, parse_search_result)
 
 
 class SearchError(RuntimeError):
@@ -46,29 +47,32 @@ class ComponentSearchResult(models.Model):
         if not check_xpath(self.xpath):
             raise self.SearchError('Malformed XPath')
 
-        databases = self.component.get_databases()
+        databases_with_size = self.component.get_databases()
         self.results = ''
         self.completed_part = 0
         self.number_of_results = 0
         self.errors = ''
         start_time = timer()
         next_save_time = start_time + 1
-        for keys_enumerated in enumerate(databases):
-            index = keys_enumerated[0]
-            database = keys_enumerated[1]
-            size = databases[database]
+        matches = []
+        for database in databases_with_size:
+            size = databases_with_size[database]
             query = generate_xquery_search(database, self.xpath)
             try:
                 result = basex.perform_query(query)
-            except OSError as err:
+            except (OSError, UnicodeDecodeError) as err:
                 self.errors += 'Error searching database {}: ' \
-                    .format(database) + str(err) + \
-                    '\nResults may be incomplete.\n'
+                    .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
-            self.results += result
+            try:
+                matches.extend(parse_search_result(result))
+            except ValueError as err:
+                self.errors += 'Error parsing search result in database {}: ' \
+                    '{}\n'.format(database, err)
+            self.number_of_results = len(matches)
+            self.results = json.dumps(matches)
             self.completed_part += size
-            self.number_of_results += get_number_of_matches(result)
-            if index < (len(databases) - 1) and timer() > next_save_time:
+            if timer() > next_save_time:
                 # Do a direct database update because this is faster than
                 # calling save().
                 ComponentSearchResult.objects.filter(pk=self.pk).update(
@@ -82,8 +86,7 @@ class ComponentSearchResult(models.Model):
         self.save()
 
     def parse_results(self):
-        '''Get results in JSON. Probably better to save it immediately this
-        way.'''
+        '''Get results in JSON. TODO: save immediately in this format'''
         results = str(self.results).split('</match>')[:-1]
         results_dict = []
         i = 0
@@ -152,28 +155,36 @@ class SearchQuery(models.Model):
         completed_part = 0
         to_skip = from_number
         if to_number is not None:
-            maximum_results = to_number - from_number
+            results_to_go = to_number - from_number
         stop_adding = False
-        results = []
+        all_matches = []
         for result_obj in self.results.all().order_by('component'):
-            # Add results to list, as long as no empty or partial search result
+            # Add matches to list, as long as no empty or partial search result
             # has been encountered.
             if not (stop_adding or result_obj.number_of_results is None):
                 if to_skip >= result_obj.number_of_results:
                     # Skip completely
                     to_skip -= result_obj.number_of_results
                 else:
-                    comp_res = result_obj.parse_results()
-                    results.extend(comp_res[to_skip:])
+                    matches_json = result_obj.results
+                    matches = json.loads(matches_json)
+                    all_matches.extend(matches[to_skip:])
                     to_skip = 0
+                    results_to_go -= len(matches)
+                    stop_adding = True
             # Count completed part (for all results)
             if result_obj.completed_part is not None:
                 completed_part += result_obj.completed_part
             # If result is empty or partially complete, stop adding
+            # (this is to make sure that the user will see the results
+            # in the correct order)
             if not result_obj.search_completed:
                 stop_adding = True
         search_percentage = 100 * completed_part / self.total_database_size
-        return (results, search_percentage)
+        # Check if too many results have been added
+        if results_to_go < 0:
+            all_matches = all_matches[0:-results_to_go]
+        return (all_matches, search_percentage)
 
     def perform_search(self) -> None:
         """Perform search and regularly update on progress"""
@@ -187,7 +198,6 @@ class SearchQuery(models.Model):
             .order_by(F('completed_part').desc(nulls_first=True))
 
         for result_obj in result_objs:
-            print(result_obj)
             # Check if search has been completed by now by a concurrent
             # search. If so, continue
             result_obj.refresh_from_db()
@@ -197,8 +207,6 @@ class SearchQuery(models.Model):
                 result_obj.perform_search()
             except SearchError:
                 raise
-            self.completed_part += result_obj.completed_part
-            self.save()
 
     @property
     def errors(self):
