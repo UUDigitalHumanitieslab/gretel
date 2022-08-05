@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FilterDirective } from '../filter/filter.directive';
-import { Filter } from '../filters.component';
+import { IntFilter } from '../../../models/filter';
 import { FilterValue } from '../../../services/results.service';
 
 @Component({
@@ -8,12 +8,12 @@ import { FilterValue } from '../../../services/results.service';
     templateUrl: './int.component.html',
     styleUrls: ['./int.component.scss']
 })
-export class IntComponent extends FilterDirective {
+export class IntComponent extends FilterDirective<IntFilter> {
     public value: number;
 
     rangeValues: number[] = [0, 0];
 
-    onFilterSet(filter: Filter) {
+    onFilterSet(filter: IntFilter) {
         this.rangeValues = [this.rangeValues[0] || filter.minValue as number || 0,
         this.rangeValues[1] || filter.maxValue as number || 0];
     }

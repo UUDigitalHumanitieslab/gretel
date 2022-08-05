@@ -5,7 +5,7 @@
     </span>
 </a>
 <p-overlayPanel appendTo="body" [dismissable]="false" [showCloseIcon]="true">
-    <form (submit)="downloadResults()">
+    <form (submit)="downloadResults.next(includeNodeProperties)">
         <div class="field">
             <label class="checkbox">
                 <input type="checkbox" name="includeNodeProperties" [(ngModel)]="includeNodeProperties">

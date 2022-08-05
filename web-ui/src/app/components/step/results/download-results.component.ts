@@ -1,7 +1,6 @@
-import { Component, ViewChild, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OverlayPanel } from 'primeng/overlaypanel';
-import { ResultsComponent } from './results.component';
 
 @Component({
     selector: 'grt-download-results',
@@ -17,14 +16,13 @@ export class DownloadResultsComponent implements OnInit, OnDestroy {
     @Input()
     loading = false;
 
+    @Output()
+    downloadResults = new EventEmitter<boolean>();
+
     visible = false;
     includeNodeProperties = false;
 
-    constructor(private resultsComponent: ResultsComponent) { }
-
-    downloadResults() {
-        this.resultsComponent.downloadResults(this.includeNodeProperties);
-    }
+    constructor() { }
 
     toggle($event: any) {
         this.overlayPanel.toggle($event);

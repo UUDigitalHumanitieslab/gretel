@@ -10,6 +10,7 @@ import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-pag
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
 import { matrixOptions, Matrix, TokenAttributes, TokenDependents, MatrixOptionKey } from '../../../models/matrix';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 interface IndexedToken {
     /**
@@ -65,7 +66,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public changeValue = new EventEmitter<MatrixSettings>();
 
     public filename: string;
-    public subTreeDisplay = 'inline';
+    public subTreeDisplay: TreeVisualizerDisplay = 'inline';
     public warning: boolean;
 
     public indexedTokens: IndexedToken[];

@@ -17,7 +17,7 @@ describe('IntComponent', () => {
         component.filter = {
             dataType: 'int',
             field: 'range',
-            filterType: 'range',
+            filterType: 'slider',
             minValue: -42,
             maxValue: 42,
             options: []

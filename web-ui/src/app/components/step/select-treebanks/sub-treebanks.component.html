@@ -16,7 +16,7 @@
                 <th *ngIf="showDescription">
                     Description
                 </th>
-                <ng-container *ngFor="let variant of (variants || []).concat('')">
+                <ng-container *ngFor="let variant of (variants || [])">
                     <th class="has-text-right">
                         Sentences
                     </th>
@@ -24,6 +24,12 @@
                         Words
                     </th>
                 </ng-container>
+                <th class="has-text-right">
+                    Sentences
+                </th>
+                <th class="has-text-right" *ngIf="showWordCount">
+                    Words
+                </th>
             </tr>
 
             <tr *ngIf="variants">
@@ -41,8 +47,11 @@
                     &nbsp;
                 </th>
                 <!-- Variant sentence/wordcount col headers -->
-                <th *ngFor="let variant of variants.concat('Total')" colspan="2" class="has-text-centered">
+                <th *ngFor="let variant of variants" colspan="2" class="has-text-centered">
                     {{variant.name}}
+                </th>
+                <th colspan="2" class="has-text-centered">
+                    Total
                 </th>
             </tr>
         </thead>
