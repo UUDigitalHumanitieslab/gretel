@@ -41,8 +41,6 @@ def perform_search_parallel(modeladmin, request, queryset):
 class SearchQueryAdmin(admin.ModelAdmin):
     list_display = ['id', 'xpath', 'query_of', 'total_database_size',
                     'completed_part', 'completed_percentage']
-    actions = [perform_search,
-               perform_search_parallel]
     readonly_fields = ['total_database_size', 'completed_part']
 
     def completed_percentage(self, obj):
