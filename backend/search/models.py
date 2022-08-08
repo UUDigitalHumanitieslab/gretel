@@ -4,6 +4,7 @@ from django.db.models import F
 
 from timeit import default_timer as timer
 import json
+import math
 
 from treebanks.models import Component
 from gretel.services import basex
@@ -45,8 +46,9 @@ class ComponentSearchResult(models.Model):
     def perform_search(self):
         """Perform full component search and regularly update on progress"""
         if not check_xpath(self.xpath):
-            raise self.SearchError('Malformed XPath')
-
+            raise SearchError('Malformed XPath')
+        if not self.component_id:
+            raise SearchError('Field component not filled in')
         databases_with_size = self.component.get_databases()
         self.results = ''
         self.completed_part = 0
@@ -137,6 +139,8 @@ class SearchQuery(models.Model):
         to_skip = from_number
         if to_number is not None:
             results_to_go = to_number - from_number
+        else:
+            results_to_go = math.inf
         stop_adding = False
         all_matches = []
         for result_obj in self.results.all().order_by('component'):
@@ -162,7 +166,11 @@ class SearchQuery(models.Model):
             # in the correct order)
             if not result_obj.search_completed:
                 stop_adding = True
-        search_percentage = 100 * completed_part / self.total_database_size
+        if self.total_database_size != 0:
+            search_percentage = 100 * completed_part \
+                / self.total_database_size
+        else:
+            search_percentage = 100
         # Check if too many results have been added
         if results_to_go < 0:
             to_remove = -results_to_go
