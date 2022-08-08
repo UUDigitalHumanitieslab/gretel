@@ -9,7 +9,6 @@ import { ConfigurationService } from './configuration.service';
 import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath';
-import { NumberSymbol } from '@angular/common';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -82,7 +81,7 @@ export class ResultsService {
     /** On error the returned stream error has type @type {HttpErrorResponse} */
     getAllResults(
         xpath: string,
-        provider: string,
+        provider: string, // Not used anymore but leave for now
         corpus: string,
         componentIds: string[],
         retrieveContext: boolean,
@@ -92,7 +91,6 @@ export class ResultsService {
     ): Observable<SearchResults> {
         const observable = new Observable<SearchResults>(observer => {
             const worker = async () => {
-                let remainingComponents: string[] = componentIds;
                 let queryId: number = undefined;
                 let retrievedMatches: number = 0;
 
@@ -104,7 +102,7 @@ export class ResultsService {
                         results = await this.results(
                             xpath,
                             corpus,
-                            remainingComponents,
+                            componentIds,
                             queryId,
                             retrievedMatches,
                             retrieveContext,
@@ -144,18 +142,14 @@ export class ResultsService {
      * On error the returned promise rejects with @type {HttpErrorResponse}
      *
      * @param xpath Specification of the pattern to match
-     * @param provider Backend server to query
      * @param corpus Identifier of the corpus
-     * @param remainingComponents Identifiers of the sub-treebanks to search
-     * @param remainingDatabases
-     * Identifiers of the databases within the current sub-treebank (components[0]) left to search. All dbs searched when null
-     * @param iteration Zero-based iteration number of the results
+     * @param components Identifiers of the sub-treebanks to search
+     * @param queryId The query number, given back by the API after the first request
+     * @param retrievedMatches The number of matches previously given by the API so that they are not given again
      * @param retrieveContext Get the sentence before and after the hit
      * @param isAnalysis Whether this search is done for retrieving analysis results, in that case a higher result limit is used
      * @param metadataFilters The filters to apply for the metadata properties
      * @param variables Named variables to query on the matched hit (can be determined using the Extractinator)
-     * @param needRegularGrinded search mode (filled in from server)
-     * @param searchLimit filled in on server when null
      */
     private async results(
         xpath: string,
@@ -176,7 +170,7 @@ export class ResultsService {
             query_id: queryId,
             start_from: retrievedMatches,
             components,
-            isAnalysis,
+            is_analysis: isAnalysis,
             variables: this.formatVariables(variables)
         }, httpOptions).toPromise();
         if (results) {
