@@ -65,7 +65,9 @@ class ComponentSearchResult(models.Model):
                     .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
             try:
-                matches.extend(parse_search_result(result))
+                matches.extend(parse_search_result(
+                    result, self.component.slug, database)
+                )
             except ValueError as err:
                 self.errors += 'Error parsing search result in database {}: ' \
                     '{}\n'.format(database, err)
@@ -84,27 +86,6 @@ class ComponentSearchResult(models.Model):
         self.elapsed_time = (timer() - start_time) * 1000
         self.search_completed = timezone.now()
         self.save()
-
-    def parse_results(self):
-        '''Get results in JSON. TODO: save immediately in this format'''
-        results = str(self.results).split('</match>')[:-1]
-        results_dict = []
-        i = 0
-        for result in results:
-            result = result.strip().removeprefix('<match>')
-            (sentid, sentence, ids, begins, xml_sentences, meta, _) \
-                = result.split('||')
-            sentid = sentid.strip() + '+match=' + str(i)
-            results_dict.append({
-                'sentid': sentid,
-                'sentence': sentence,
-                'ids': ids,
-                'begins': begins,
-                'xml_sentences': xml_sentences,
-                'meta': meta,
-            })
-            i += 1
-        return results_dict
 
 
 class SearchQuery(models.Model):
@@ -161,6 +142,10 @@ class SearchQuery(models.Model):
         for result_obj in self.results.all().order_by('component'):
             # Add matches to list, as long as no empty or partial search result
             # has been encountered.
+            print(result_obj)
+            print(stop_adding)
+            print(results_to_go)
+            print(len(all_matches))
             if not (stop_adding or result_obj.number_of_results is None):
                 if to_skip >= result_obj.number_of_results:
                     # Skip completely
@@ -171,7 +156,8 @@ class SearchQuery(models.Model):
                     all_matches.extend(matches[to_skip:])
                     to_skip = 0
                     results_to_go -= len(matches)
-                    stop_adding = True
+                    if results_to_go <= 0:
+                        stop_adding = True
             # Count completed part (for all results)
             if result_obj.completed_part is not None:
                 completed_part += result_obj.completed_part
@@ -183,7 +169,8 @@ class SearchQuery(models.Model):
         search_percentage = 100 * completed_part / self.total_database_size
         # Check if too many results have been added
         if results_to_go < 0:
-            all_matches = all_matches[0:-results_to_go]
+            to_remove = -results_to_go
+            all_matches = all_matches[0:-to_remove]
         return (all_matches, search_percentage)
 
     def perform_search(self) -> None:

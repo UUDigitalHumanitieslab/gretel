@@ -1,9 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.decorators import (
-    api_view, parser_classes, renderer_classes
+    api_view, parser_classes, renderer_classes, authentication_classes
 )
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 
 import threading
@@ -17,6 +18,7 @@ def run_search(query_obj) -> None:
 
 
 @api_view(['POST'])
+@authentication_classes([BasicAuthentication])  # Remove!
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
 @parser_classes([JSONParser])
 def search_view(request):
@@ -57,7 +59,7 @@ def search_view(request):
     # Get results so far, if any
     results, percentage = query.get_results(start_from, 500)
     if request.accepted_renderer.format == 'api':
-        results = str(results)[0:100] + \
+        results = str(results)[0:5000] + \
             '… (remainder hidden because of slow rendering)'
     response = {
         'query_id': query.id,

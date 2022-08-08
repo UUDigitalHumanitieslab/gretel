@@ -9,6 +9,7 @@ import { ConfigurationService } from './configuration.service';
 import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath';
+import { NumberSymbol } from '@angular/common';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -91,12 +92,9 @@ export class ResultsService {
     ): Observable<SearchResults> {
         const observable = new Observable<SearchResults>(observer => {
             const worker = async () => {
-                let iteration = 0;
                 let remainingComponents: string[] = componentIds;
-                let remainingDatabases: string[] | null = null;
-
-                let searchLimit: number | null = null;
-                let needRegularGrinded = false;
+                let queryId: number = undefined;
+                let retrievedMatches: number = 0;
 
                 while (!observer.closed) {
                     let results: SearchResults | false | null = null;
@@ -105,17 +103,14 @@ export class ResultsService {
                     try {
                         results = await this.results(
                             xpath,
-                            provider,
                             corpus,
                             remainingComponents,
-                            remainingDatabases,
-                            iteration,
+                            queryId,
+                            retrievedMatches,
                             retrieveContext,
                             isAnalysis,
                             metadataFilters,
-                            variables,
-                            needRegularGrinded,
-                            searchLimit
+                            variables
                         );
                     } catch (e) {
                         error = e;
@@ -124,22 +119,18 @@ export class ResultsService {
                     if (!observer.closed) {
                         if (results) {
                             observer.next(results);
+                            queryId = results.queryId;
+                            retrievedMatches += results.hits.length;
+                            console.log(results.searchPercentage + "% done");
 
-                            needRegularGrinded = results.needRegularGrinded;
-                            searchLimit = results.searchLimit;
-                            iteration = results.nextIteration;
-                            remainingComponents = results.remainingComponents;
-                            remainingDatabases = results.remainingDatabases;
-
-                            if (remainingDatabases.length === 0 && remainingComponents.length === 0) {
+                            if (results.searchPercentage === 100) {
                                 observer.complete();
                             }
                         } else if (error != null) {
                             observer.error(error);
-                        } else {
-                            observer.complete();
                         }
                     }
+                    await new Promise(r => setTimeout(r, 2000));
                 }
             };
             worker();
@@ -168,32 +159,25 @@ export class ResultsService {
      */
     private async results(
         xpath: string,
-        provider: string,
         corpus: string,
-        remainingComponents: string[],
-        remainingDatabases: string[] | null = null,
-
-        iteration: number = 0,
+        components: string[],
+        queryId: number = undefined,
+        retrievedMatches: number = undefined,
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
-
-        needRegularGrinded = false,
-        searchLimit: number | null = null
     ): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
-            await this.configurationService.getApiUrl(provider, 'results'), {
+            await this.configurationService.getDjangoUrl('search/search/'), {
             xpath: this.createFilteredQuery(xpath, metadataFilters),
             retrieveContext,
-            corpus,
-            remainingComponents,
-            remainingDatabases,
-            iteration,
+            treebank: corpus,
+            query_id: queryId,
+            start_from: retrievedMatches,
+            components,
             isAnalysis,
-            variables: this.formatVariables(variables),
-            needRegularGrinded,
-            searchLimit
+            variables: this.formatVariables(variables)
         }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);
@@ -382,42 +366,30 @@ export class ResultsService {
     }
 
     private async mapResults(results: ApiSearchResult): Promise<SearchResults> {
-        return results.success ?
-            {
-                hits: await this.mapHits(results),
-                nextIteration: results.endPosIteration,
-                remainingComponents: results.remainingComponents,
-                remainingDatabases: results.remainingDatabases,
-                needRegularGrinded: results.needRegularGrinded,
-                searchLimit: results.searchLimit
-            } : {
-                hits: [],
-                nextIteration: 0,
-                remainingDatabases: [],
-                remainingComponents: [],
-                needRegularGrinded: false,
-                searchLimit: 0
-            };
+        return {
+            hits: await this.mapHits(results),
+            queryId: results.query_id,
+            searchPercentage: results.search_percentage
+        };
     }
 
     private mapHits(results: ApiSearchResult): Promise<Hit[]> {
-        if (!results.success) {
-            return Promise.resolve([]);
-        }
-
-        return Promise.all(Object.keys(results.sentences).map(async hitId => {
-            const sentence = results.sentences[hitId];
-            const nodeStarts = results.beginlist[hitId].split('-').map(x => parseInt(x, 10));
-            const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${results.metalist[hitId]}</metadata>`));
-            const variableValues = this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
+        return Promise.all(results.results.map(async result => {
+            const hitId = result.sentid;
+            const sentence = result.sentence;
+            const nodeStarts = result.begins.split('-').map(x => parseInt(x, 10));
+            const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${result.meta}</metadata>`));
+            const variableValues = undefined; // this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
+            const component = result.component;
+            const database = result.database;
             return {
-                component: results.sentenceDatabases[hitId],
-                database: (results.tblist && results.tblist[hitId]) || results.sentenceDatabases[hitId],
+                component,
+                database,
                 fileId: hitId.replace(/\+match=\d+$/, ''),
                 sentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
-                treeXml: results.xmllist[hitId],
-                nodeIds: results.idlist[hitId].split('-').map(x => parseInt(x, 10)),
+                treeXml: result.xml_sentences,
+                nodeIds: result.ids.split('-').map(x => parseInt(x, 10)),
                 nodeStarts,
                 metaValues,
                 /**
@@ -538,53 +510,25 @@ export class ResultsService {
  * each hit.
  */
 type ApiSearchResult = {
-    success: true
-    /** Plain text sentences containing the hit */
-    sentences: { [id: string]: string },
-    /** Origin of the sentence (used for Grinded corpora) */
-    tblist: false | { [id: string]: string },
-    /** Node ids (dash-separated ids of the matched nodes) */
-    idlist: { [id: string]: string },
-    /** Begin positions of the hits (zero based) (node id of first matched node in sentence) */
-    beginlist: { [id: string]: string },
-    /** XML structure of the hit itself, (only the matched portion of the sentence tree, does not include the complete sentence) */
-    xmllist: { [id: string]: string },
-    /** Meta list (xml structure containing the meta values for the sentence) */
-    metalist: { [id: string]: string },
-    /** Variable list (xml structure containing the variables), empty unless variables were requested */
-    varlist: { [id: string]: string },
-    /** End pos iteration (used for retrieving the next results when scrolling/paging) */
-    endPosIteration: number,
-    /** Components left to search */
-    remainingComponents: string[],
-    /** Databases left to search for this component (if this is empty, the search is done) */
-    remainingDatabases: string[],
-    /** Component ID where each hit originated */
-    sentenceDatabases: { [id: string]: string },
-    /** The XQuery used to retrieve the results */
-    xquery: string,
-    /** For grinded corpora only - the search mode used */
-    needRegularGrinded: boolean,
-    /** Search limit */
-    searchLimit: number
-} | {
-    // no results
-    success: false,
-    // xquery
-    xquery: string
+    results: {
+        sentid: string,
+        sentence: string,
+        ids: string,
+        begins: string,
+        xml_sentences: string,
+        meta: string,
+        component: string,
+        database: string
+    }[],
+    query_id: number,
+    search_percentage: number,
 };
 
 /** Processed search results created from the response */
 export interface SearchResults {
     hits: Hit[];
-    /** Start iteration for retrieving the next results (in the first component in `remainingComponents`) */
-    nextIteration: number;
-    /** Components remaining to be searched (for doing a paged search) */
-    remainingComponents: string[];
-    /** Databases remaining in current component (for doing a paged search) */
-    remainingDatabases: string[];
-    needRegularGrinded: boolean;
-    searchLimit: number;
+    queryId: number;
+    searchPercentage: number;
 }
 
 export interface Hit {
