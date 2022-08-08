@@ -142,10 +142,6 @@ class SearchQuery(models.Model):
         for result_obj in self.results.all().order_by('component'):
             # Add matches to list, as long as no empty or partial search result
             # has been encountered.
-            print(result_obj)
-            print(stop_adding)
-            print(results_to_go)
-            print(len(all_matches))
             if not (stop_adding or result_obj.number_of_results is None):
                 if to_skip >= result_obj.number_of_results:
                     # Skip completely

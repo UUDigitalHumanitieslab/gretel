@@ -6,6 +6,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
+from django.conf import settings
 
 import threading
 
@@ -18,7 +19,7 @@ def run_search(query_obj) -> None:
 
 
 @api_view(['POST'])
-@authentication_classes([BasicAuthentication])  # Remove!
+@authentication_classes([BasicAuthentication])  # No CSRF verification for now
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
 @parser_classes([JSONParser])
 def search_view(request):
@@ -38,6 +39,11 @@ def search_view(request):
     )
     query_id = data.get('query_id', None)
     start_from = data.get('start_from', 0)
+    is_analysis = data.get('is_analysis', False)
+    if is_analysis:
+        maximum_results = settings.MAXIMUM_RESULTS_ANALYSIS
+    else:
+        maximum_results = settings.MAXIMUM_RESULTS
 
     if query_id:
         new_query = False
@@ -57,7 +63,7 @@ def search_view(request):
         query.initialize()
 
     # Get results so far, if any
-    results, percentage = query.get_results(start_from, 500)
+    results, percentage = query.get_results(start_from, maximum_results)
     if request.accepted_renderer.format == 'api':
         results = str(results)[0:5000] + \
             '… (remainder hidden because of slow rendering)'
