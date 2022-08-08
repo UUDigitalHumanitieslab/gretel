@@ -53,7 +53,6 @@ class ComponentSearchResult(models.Model):
         self.results = ''
         self.completed_part = 0
         self.number_of_results = 0
-        self.errors = ''
         start_time = timer()
         next_save_time = start_time + 1
         matches = []
@@ -199,7 +198,12 @@ class SearchQuery(models.Model):
             except SearchError:
                 raise
 
-    @property
-    def errors(self):
-        # TODO collect errors
-        pass
+    def get_errors(self) -> str:
+        errs = ''
+        result_objs = self.results.order_by('component')
+        for result_obj in result_objs:
+            if result_obj.errors:
+                errs += 'Errors in searching component {}: ' \
+                    '\n{}\n\n' \
+                    .format(result_obj.component, result_obj.errors)
+        return errs

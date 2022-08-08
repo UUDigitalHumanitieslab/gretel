@@ -9,6 +9,7 @@ import { ConfigurationService } from './configuration.service';
 import { ParseService } from './parse.service';
 import { publishReplay, refCount } from 'rxjs/operators';
 import { PathVariable, Location } from 'lassy-xpath';
+import { NotificationService } from './notification.service';
 
 const httpOptions = {
     headers: new HttpHeaders({
@@ -38,7 +39,8 @@ export class ResultsService {
         private http: HttpClient,
         private sanitizer: DomSanitizer,
         private configurationService: ConfigurationService,
-        private parseService: ParseService) {
+        private parseService: ParseService,
+        private notificationService: NotificationService) {
     }
 
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
@@ -119,9 +121,19 @@ export class ResultsService {
                             observer.next(results);
                             queryId = results.queryId;
                             retrievedMatches += results.hits.length;
-                            console.log(results.searchPercentage + "% done");
+
+                            // TODO maybe not the nicest way to show progress
+                            this.notificationService.add(
+                                "Searching at " + 
+                                Math.round(results.searchPercentage) + "%", "success"
+                            );
 
                             if (results.searchPercentage === 100) {
+                                if (results.errors) {
+                                    // TODO work on error notifications
+                                    this.notificationService.add('Errors occured while searching (check JavaScript console).');
+                                    console.log(results.errors);
+                                }
                                 observer.complete();
                             }
                         } else if (error != null) {
@@ -363,7 +375,8 @@ export class ResultsService {
         return {
             hits: await this.mapHits(results),
             queryId: results.query_id,
-            searchPercentage: results.search_percentage
+            searchPercentage: results.search_percentage,
+            errors: results.errors
         };
     }
 
@@ -516,6 +529,7 @@ type ApiSearchResult = {
     }[],
     query_id: number,
     search_percentage: number,
+    errors: string
 };
 
 /** Processed search results created from the response */
@@ -523,6 +537,7 @@ export interface SearchResults {
     hits: Hit[];
     queryId: number;
     searchPercentage: number;
+    errors: string;
 }
 
 export interface Hit {

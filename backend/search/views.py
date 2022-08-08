@@ -72,6 +72,8 @@ def search_view(request):
         'search_percentage': percentage,
         'results': results,
     }
+    if percentage == 100:
+        response['errors'] = query.get_errors()
 
     if new_query:
         # Start searching in a new thread
