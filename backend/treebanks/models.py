@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 import logging
 
-from gretel.services import basex
+from services.basex import basex
 
 logger = logging.getLogger(__name__)
 

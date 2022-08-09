@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',  # probably only relevant for local dev
+    'services',
     'treebanks',
     'search',
     'upload',
@@ -82,8 +83,10 @@ WSGI_APPLICATION = 'gretel.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': str(BASE_DIR / 'mysql.cnf')
+        }
     }
 }
 
@@ -134,5 +137,9 @@ BASEX_HOST = 'localhost'
 BASEX_PORT = 1984
 BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
+
+ALPINO_PATH = '/opt/Alpino'
+ALPINO_HOST = 'localhost'
+ALPINO_PORT = 7001
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
