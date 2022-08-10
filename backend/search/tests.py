@@ -27,6 +27,7 @@ def setUpModule():
         basex.start()
     except ConnectionError:
         # We cannot work with a real treebank, but let other tests continue
+        print("NO CONNECTION: Skipping Basex tests")
         return
     print('Uploading a test treebank to BaseX (will be deleted afterwards)...')
     call_command(
