@@ -1,5 +1,7 @@
 {
-  "/gretel": "http://localhost:8080/",
-  "/gretel-upload": "http://localhost:8080/",
+  "/gretel": "http://localhost/",
+  "/gretel-upload": "http://localhost/",
+  "/treebanks": "http://localhost:8000/",
+  "/search": "http://localhost:8000/",
   "secure": false
 }
