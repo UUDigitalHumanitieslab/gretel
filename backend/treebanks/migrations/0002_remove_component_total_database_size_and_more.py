@@ -18,11 +18,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='basexdb',
             name='component',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='databases', to='treebanks.component'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='databases', to='treebanks.component'),
         ),
         migrations.AlterField(
             model_name='component',
             name='treebank',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='components', to='treebanks.treebank'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='components', to='treebanks.treebank'),
         ),
     ]
