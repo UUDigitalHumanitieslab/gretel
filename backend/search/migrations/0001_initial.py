@@ -16,25 +16,34 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ComponentSearchResult',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('xpath', models.TextField()),
-                ('search_completed', models.DateTimeField(editable=False, null=True)),
+                ('search_completed', models.DateTimeField(
+                    editable=False, null=True)),
                 ('last_accessed', models.DateField(editable=False, null=True)),
                 ('results', models.TextField(default='', editable=False)),
-                ('number_of_results', models.PositiveIntegerField(editable=False, null=True)),
-                ('completed_part', models.PositiveIntegerField(editable=False, help_text='Total size in KiB of databases for which the search has been completed', null=True)),
-                ('component', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='treebanks.component')),
+                ('number_of_results', models.PositiveIntegerField(
+                    editable=False, null=True)),
+                ('completed_part', models.PositiveIntegerField(editable=False,
+                 help_text='Total size in KiB of databases for which the search has been completed', null=True)),
+                ('component', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='treebanks.component')),
             ],
         ),
         migrations.CreateModel(
             name='SearchQuery',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('xpath', models.TextField()),
-                ('total_database_size', models.PositiveIntegerField(editable=False, help_text='Total size in KiB of all databases for this query', null=True)),
-                ('completed_part', models.PositiveIntegerField(editable=False, help_text='Total size in KiB of databases for which the search has been completed', null=True)),
+                ('total_database_size', models.PositiveIntegerField(editable=False,
+                 help_text='Total size in KiB of all databases for this query', null=True)),
+                ('completed_part', models.PositiveIntegerField(editable=False,
+                 help_text='Total size in KiB of databases for which the search has been completed', null=True)),
                 ('components', models.ManyToManyField(to='treebanks.component')),
-                ('results', models.ManyToManyField(editable=False, to='search.componentsearchresult')),
+                ('results', models.ManyToManyField(
+                    editable=False, to='search.componentsearchresult')),
             ],
         ),
     ]

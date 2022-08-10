@@ -7,8 +7,18 @@
     "url": "git+https://github.com/UUDigitalHumanitieslab/gretel.git"
   },
   "scripts": {
-    "build": "npm run build:api && npm run build:web-ui",
-    "build:api": "cd api && composer install",
-    "build:web-ui": "cd web-ui && npm install && npm run build"
+    "migrate": "cd backend && python manage.py migrate",
+    "build": "cd web-ui && npm run build",
+    "start:backend": "cd backend && python manage.py runserver",
+    "start:frontend": "cd web-ui && npm run start",
+    "install:backend": "pip install -r requirements.txt",
+    "install:frontend": "cd web-ui && npm install",
+    "postinstall": "npm run install:backend && npm run install:frontend",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && ./lint.sh",
+    "lint:frontend": "cd web-ui && npm run lint",
+    "test:backend": "cd backend && python manage.py test",
+    "test:frontend": "cd web-ui && npm test -- --watch=false",
+    "test": "npm run test:backend && npm run test:frontend"
   }
 }

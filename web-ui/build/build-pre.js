@@ -18,7 +18,7 @@ async function getHash() {
                 return;
             }
 
-            resolve(stdout.trimEnd());
+            resolve(stdout.trim());
         });
     });
 }
@@ -35,7 +35,7 @@ async function getRemoteUrl() {
                 return;
             }
 
-            resolve(stdout.replace(/([^:\/]+:[^:@]+@|\.git\/?\n?$)/g, ''));
+            resolve(stdout.replace(/([^:\/]+:[^:@]+@|\.git\/?\n?$)/g, '').trim());
         });
     });
 }
@@ -59,5 +59,6 @@ export const sourceUrl = '${remoteUrl}/tree/${hash}';
 
         console.log(colors.green(`Updating application version ${colors.yellow(appVersion)}`));
         console.log(`${colors.green('Writing version module to ')}${colors.yellow(versionFilePath)}\n`);
+        console.log(src);
     });
 }
