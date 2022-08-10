@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'treebanks',
     'search',
     'upload',
+    'parse',
     'rest_framework',
 ]
 

@@ -4,6 +4,11 @@ import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
 import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
 
+type ApiParseResult = {
+    parsed_sentence?: string,
+    error?: string
+}
+
 @Injectable()
 export class AlpinoService {
     generateXPathUrl: Promise<string>;
@@ -35,9 +40,15 @@ export class AlpinoService {
     }
 
     async parseSentence(sentence: string) {
-        return this.http.get(
-            await this.parseSentenceUrl(sentence),
-            { responseType: 'text' }).toPromise();
+        const response = await this.http.post<ApiParseResult | false>(
+            await this.configurationService.getDjangoUrl('parse/parse-sentence/'),
+            { sentence: sentence }
+        ).toPromise();
+        if (!response) {
+            throw 'error';
+        } else {
+            return response.parsed_sentence;
+        }
     }
 
     attributesToStrings(attrs: TokenAttributes[], skipDefault = false): string[] {

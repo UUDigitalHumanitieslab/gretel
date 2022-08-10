@@ -40,4 +40,4 @@ def parse_sentence(sentence: str) -> str:
         etree.fromstring(result_bytes)
     except etree.XMLSyntaxError:
         raise AlpinoError('Invalid XML returned')
-    return result_bytes
+    return result_bytes.decode()
