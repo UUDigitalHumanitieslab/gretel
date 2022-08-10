@@ -7,6 +7,10 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 
+from lxml import etree
+
+from alpino_query import AlpinoQuery
+
 from services.alpino import parse_sentence, AlpinoError
 
 
@@ -38,3 +42,41 @@ def parse_view(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     return Response({'parsed_sentence': parsed_sentence})
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def generate_xpath_view(request):
+    data = request.data
+    try:
+        # TODO perhaps use a schema for this...
+        xml = data['xml']
+        tokens = data['tokens']
+        attributes = data['attributes']
+        ignore_top_node = data['ignoreTopNode']
+        respect_order = data['respectOrder']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if ignore_top_node:
+        remove = ['rel', 'cat']
+    else:
+        remove = ['rel']
+    query = AlpinoQuery()
+    query.mark(xml, tokens, attributes)
+    marked_tree = query.marked_xml
+    query.generate_subtree([remove])
+    sub_tree = query.subtree_xml
+    xpath = query.generate_xpath(respect_order)
+
+    response = {
+        'xpath': xpath,
+        'markedTree': marked_tree,
+        'subTree': sub_tree
+    }
+    return Response(response)

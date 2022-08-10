@@ -14,7 +14,7 @@ export class AlpinoService {
     generateXPathUrl: Promise<string>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient, private parserService: ParserService) {
-        this.generateXPathUrl = configurationService.getAlpinoUrl('generate_xpath');
+        this.generateXPathUrl = configurationService.getDjangoUrl('parse/generate-xpath/');
     }
 
     async generateXPath(xml: string, tokens: string[], attributes: TokenAttributes[], ignoreTopNode: boolean, respectOrder: boolean) {
