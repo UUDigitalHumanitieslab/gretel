@@ -3,6 +3,12 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
+import logging
+
+from gretel.services import basex
+
+logger = logging.getLogger(__name__)
+
 
 class Treebank(models.Model):
     slug = models.SlugField(max_length=200, primary_key=True)
@@ -23,7 +29,7 @@ class Treebank(models.Model):
     processed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} ({})'.format(self.title, self.slug)
+        return '{}'.format(self.slug)
 
 
 class Component(models.Model):
@@ -36,11 +42,8 @@ class Component(models.Model):
     nr_words = models.PositiveBigIntegerField(
         verbose_name='Number of words'
     )
-    treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE)
-    total_database_size = models.PositiveIntegerField(
-        default=0, editable=False,
-        help_text='Total size in KiB of all databases for this component'
-    )
+    treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
+                                 related_name='components')
 
     class Meta:
         constraints = [
@@ -49,14 +52,24 @@ class Component(models.Model):
         ]
 
     def __str__(self):
-        return '{} ({})'.format(self.title, self.slug)
+        return '{}: {}'.format(self.treebank, self.slug)
+
+    def get_databases(self):
+        '''Return a dictionary of all BaseX databases (keys) and their
+        sizes in KiB (values)'''
+        return {db['dbname']: db['size'] for db in self.databases.values()}
+
+    @property
+    def total_database_size(self):
+        return self.databases.all().aggregate(models.Sum('size'))['size__sum']
 
 
 class BaseXDB(models.Model):
     dbname = models.CharField(max_length=200, primary_key=True,
                               verbose_name='Database name')
     size = models.IntegerField(help_text='Size of BaseX database in KiB')
-    component = models.ForeignKey(Component, on_delete=models.CASCADE)
+    component = models.ForeignKey(Component, on_delete=models.CASCADE,
+                                  related_name='databases')
 
     class Meta:
         verbose_name = 'BaseX database'
@@ -67,8 +80,15 @@ class BaseXDB(models.Model):
     def delete_basex_db(self):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
-        # TODO implement this
-        print('Unimplemented function delete_basex_db() called')
+        try:
+            basex.start()
+            basex.session.execute('DROP DB {}'.format(self.dbname))
+            logger.info('Deleted database {} from BaseX.'.format(self.dbname))
+        except OSError as err:
+            logger.error(
+                'Cannot delete database {} from BaseX: {}.'
+                .format(self.dbname, err)
+            )
 
 
 @receiver(pre_delete, sender=BaseXDB)

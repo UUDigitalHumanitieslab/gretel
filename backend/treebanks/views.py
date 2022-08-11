@@ -1,16 +1,25 @@
-from .models import Treebank, Component
+from .models import Treebank
 from .serializers import TreebankSerializer, ComponentSerializer
-from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
-class TreebankViewset(viewsets.ModelViewSet):
+@api_view(['GET'])
+def treebank_view(request):
     # TODO: make sure that non-public treesets are hidden if needed
-    queryset = Treebank.objects.all().order_by('slug')
-    serializer_class = TreebankSerializer
+    treebanks = Treebank.objects.all()
+    serializer = TreebankSerializer(treebanks, many=True)
+    return Response(serializer.data)
 
 
-class ComponentViewset(viewsets.ModelViewSet):
-    # TODO: make sure that components of non-public treebanks are hidden if
-    # needed
-    queryset = Component.objects.all().order_by('slug')
-    serializer_class = ComponentSerializer
+@api_view(['GET'])
+def treebank_components_view(request, treebank):
+    try:
+        treebank = Treebank.objects.get(slug=treebank)
+        # TODO: test if treebank is public and if not if it is accessible
+    except Treebank.DoesNotExist:
+        return Response(None, status=status.HTTP_404_NOT_FOUND)
+    components = treebank.components
+    serializer = ComponentSerializer(components, many=True)
+    return Response(serializer.data)

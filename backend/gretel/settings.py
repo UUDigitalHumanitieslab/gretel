@@ -42,15 +42,14 @@ INSTALLED_APPS = [
     'treebanks',
     'search',
     'mwe',
+    'upload',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-
     # probably only relevant for local dev
     'corsheaders.middleware.CorsMiddleware',
-
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -131,6 +130,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4201'
-]
+# BaseX connection settings - change in production
+BASEX_HOST = 'localhost'
+BASEX_PORT = 1984
+BASEX_USER = 'admin'
+BASEX_PASSWORD = 'admin'
+
+CORS_ALLOWED_ORIGINS = ['http://localhost:4201']
+
+MAXIMUM_RESULTS = 500
+MAXIMUM_RESULTS_ANALYSIS = 5000

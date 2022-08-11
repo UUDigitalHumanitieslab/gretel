@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('treebanks/', include('treebanks.urls')),
     path('mwe/', include('mwe.urls')),
+    path('search/', include('search.urls')),
 ]

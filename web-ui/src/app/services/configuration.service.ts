@@ -38,8 +38,8 @@ export class ConfigurationService {
         return (await this.config).alpino + path;
     }
 
-    async getMweUrl(path: string) {
-        return (await this.config).mwe + path;
+    async getDjangoUrl(path: string) {
+        return (await this.config).django + path;
     }
 
     async getProviders() {
@@ -68,8 +68,5 @@ interface Config {
     /** Uploading requires a provider to request results */
     uploadProvider: string;
 
-    /**
-     * new MWE backend base URL
-     */
-    mwe: string,
+    django: string;
 }
