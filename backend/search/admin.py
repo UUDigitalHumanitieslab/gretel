@@ -57,9 +57,9 @@ class SearchQueryAdmin(admin.ModelAdmin):
 @admin.register(ComponentSearchResult)
 class ComponentSearchResultAdmin(admin.ModelAdmin):
     list_display = ['component', 'xpath', 'search_completed',
-                    'number_of_results', 'elapsed_time']
+                    'number_of_results']
     actions = [perform_search,
                perform_search_parallel]
     readonly_fields = ['search_completed', 'last_accessed',
                        'number_of_results', 'errors', 'completed_part',
-                       'elapsed_time', 'results']
+                       'results']
