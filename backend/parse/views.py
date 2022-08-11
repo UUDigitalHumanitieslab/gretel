@@ -8,7 +8,6 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 
 from lxml import etree
-
 from alpino_query import AlpinoQuery
 
 from services.alpino import parse_sentence, AlpinoError
@@ -67,12 +66,18 @@ def generate_xpath_view(request):
         remove = ['rel', 'cat']
     else:
         remove = ['rel']
-    query = AlpinoQuery()
-    query.mark(xml, tokens, attributes)
-    marked_tree = query.marked_xml
-    query.generate_subtree([remove])
-    sub_tree = query.subtree_xml
-    xpath = query.generate_xpath(respect_order)
+    try:
+        query = AlpinoQuery()
+        query.mark(xml, tokens, attributes)
+        marked_tree = query.marked_xml
+        query.generate_subtree([remove])
+        sub_tree = query.subtree_xml
+        xpath = query.generate_xpath(respect_order)
+    except etree.XMLSyntaxError as err:
+        return Response(
+            {'error': 'syntax error in input XML: {}'.format(err)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
     response = {
         'xpath': xpath,
