@@ -15,6 +15,7 @@ class BaseXDBInline(admin.TabularInline):
 @admin.register(Treebank)
 class TreebankAdmin(admin.ModelAdmin):
     list_display = ('slug', 'title', 'uploaded_by')
+    ordering = ('slug',)
     fieldsets = (
         (None, {
             'fields': ('slug', 'title', 'description', 'url_more_info')
@@ -31,5 +32,6 @@ class TreebankAdmin(admin.ModelAdmin):
 @admin.register(Component)
 class ComponentAdmin(admin.ModelAdmin):
     list_display = ('slug', 'title', 'description', 'nr_sentences', 'nr_words',
-                    'treebank')
+                    'total_database_size', 'treebank')
+    ordering = ('treebank', 'slug')
     inlines = [BaseXDBInline]

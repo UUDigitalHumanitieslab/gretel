@@ -38,10 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',  # probably only relevant for local dev
+    'rest_framework',
     'treebanks',
     'search',
     'upload',
-    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +136,6 @@ BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
+
+MAXIMUM_RESULTS = 500
+MAXIMUM_RESULTS_ANALYSIS = 5000
