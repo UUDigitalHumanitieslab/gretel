@@ -159,8 +159,9 @@ class SearchQuery(models.Model):
             if not result_obj.search_completed:
                 stop_adding = True
         if self.total_database_size != 0:
-            search_percentage = 100 * completed_part \
-                / self.total_database_size
+            search_percentage = int(
+                100 * completed_part / self.total_database_size
+            )
         else:
             search_percentage = 100
         # Check if too many results have been added
