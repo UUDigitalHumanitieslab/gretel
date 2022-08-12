@@ -144,3 +144,6 @@ ALPINO_HOST = 'localhost'
 ALPINO_PORT = 7001
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
+
+MAXIMUM_RESULTS = 500
+MAXIMUM_RESULTS_ANALYSIS = 5000

@@ -17,39 +17,51 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Treebank',
             fields=[
-                ('slug', models.SlugField(max_length=200, primary_key=True, serialize=False)),
+                ('slug', models.SlugField(max_length=200,
+                 primary_key=True, serialize=False)),
                 ('title', models.CharField(max_length=1000)),
                 ('description', models.TextField(blank=True)),
                 ('url_more_info', models.URLField(blank=True)),
-                ('input_file', models.FileField(blank=True, upload_to='uploaded_treebanks/')),
-                ('upload_timestamp', models.DateTimeField(blank=True, null=True, verbose_name='Upload date and time')),
+                ('input_file', models.FileField(
+                    blank=True, upload_to='uploaded_treebanks/')),
+                ('upload_timestamp', models.DateTimeField(
+                    blank=True, null=True, verbose_name='Upload date and time')),
                 ('public', models.BooleanField(default=True)),
                 ('sentence_tokenized', models.BooleanField(null=True)),
                 ('word_tokenized', models.BooleanField(null=True)),
                 ('sentences_have_labels', models.BooleanField(null=True)),
                 ('processed', models.DateTimeField(blank=True, null=True)),
-                ('uploaded_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('uploaded_by', models.ForeignKey(blank=True, null=True,
+                 on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
             name='Component',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('slug', models.SlugField(max_length=200)),
                 ('title', models.CharField(max_length=1000)),
                 ('description', models.TextField(blank=True)),
-                ('nr_sentences', models.PositiveIntegerField(verbose_name='Number of sentences')),
-                ('nr_words', models.PositiveBigIntegerField(verbose_name='Number of words')),
-                ('total_database_size', models.PositiveIntegerField(default=0, editable=False, help_text='Total size in KiB of all databases for this component')),
-                ('treebank', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='treebanks.treebank')),
+                ('nr_sentences', models.PositiveIntegerField(
+                    verbose_name='Number of sentences')),
+                ('nr_words', models.PositiveBigIntegerField(
+                    verbose_name='Number of words')),
+                ('total_database_size', models.PositiveIntegerField(default=0, editable=False,
+                 help_text='Total size in KiB of all databases for this component')),
+                ('treebank', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='treebanks.treebank')),
             ],
         ),
         migrations.CreateModel(
             name='BaseXDB',
             fields=[
-                ('dbname', models.CharField(max_length=200, primary_key=True, serialize=False, verbose_name='Database name')),
-                ('size', models.IntegerField(help_text='Size of BaseX database in KiB')),
-                ('component', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='treebanks.component')),
+                ('dbname', models.CharField(max_length=200, primary_key=True,
+                 serialize=False, verbose_name='Database name')),
+                ('size', models.IntegerField(
+                    help_text='Size of BaseX database in KiB')),
+                ('component', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='treebanks.component')),
             ],
             options={
                 'verbose_name': 'BaseX database',
@@ -57,6 +69,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='component',
-            constraint=models.UniqueConstraint(fields=('slug', 'treebank'), name='one_slug_per_treebank'),
+            constraint=models.UniqueConstraint(
+                fields=('slug', 'treebank'), name='one_slug_per_treebank'),
         ),
     ]

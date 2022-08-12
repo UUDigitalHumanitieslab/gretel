@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/UUDigitalHumanitieslab/gretel.svg?branch=develop)](https://travis-ci.org/UUDigitalHumanitieslab/gretel)
+[![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel-django/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel-django/actions)
 
 # GrETEL 4
 
