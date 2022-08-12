@@ -7,7 +7,7 @@ import unittest
 import json
 
 from treebanks.models import Treebank
-from gretel.services import basex
+from services.basex import basex
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
                            generate_xquery_count, parse_search_result)
@@ -96,8 +96,9 @@ class BaseXSearchTestCase(TestCase):
 
 
 class ComponentSearchResultTestCase(TestCase):
-    @unittest.skipIf(not basex.session, 'requires running BaseX server')
     def test_perform_search(self):
+        if not basex.session:
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
         component = test_treebank.components.get(slug='troonrede19')
@@ -126,9 +127,10 @@ class ComponentSearchResultTestCase(TestCase):
                 csr2.perform_search()
 
 
-@unittest.skipIf(not basex.session, 'requires running BaseX server')
 class SearchQueryTestCase(TestCase):
     def setUp(self):
+        if not basex.session:
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
 
