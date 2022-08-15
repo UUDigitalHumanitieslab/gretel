@@ -10,7 +10,8 @@ from treebanks.models import Treebank
 from services.basex import basex
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
-                           generate_xquery_count, parse_search_result)
+                           generate_xquery_count, generate_xquery_showtree,
+                           parse_search_result)
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 test_treebank = None
@@ -46,6 +47,7 @@ def tearDownModule():
 
 class BaseXSearchTestCase(TestCase):
     DB_NAME_CHECK = 'EUROPARL_ID_EP-00_0000'
+    SENT_ID_CHECK = 'troonrede1990.data.dz:63'
 
     def test_check_db_name(self):
         self.assertTrue(check_db_name(self.DB_NAME_CHECK))
@@ -73,6 +75,20 @@ class BaseXSearchTestCase(TestCase):
                 self.DB_NAME_CHECK,
                 XPATH1 + ' let $a := 0'
             )
+
+    def test_xquery_showtree(self):
+        # Check if function runs without error
+        generate_xquery_showtree(self.DB_NAME_CHECK, self.SENT_ID_CHECK)
+        # TODO: check for valid XQuery
+        # Illegal arguments should raise error
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK + ' ', self.SENT_ID_CHECK
+        )
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK, self.SENT_ID_CHECK + '"'
+        )
 
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \

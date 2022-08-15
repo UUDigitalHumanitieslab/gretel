@@ -261,9 +261,8 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
             this.treeSentence = undefined;
             this.treeXml = undefined;
             this.loadingTree = false;
-
             this.notificationService.add('Problem retrieving tree', 'error');
-            console.warn(`Error retrieving tree in ${result.provider}:${result.corpus}:${result.component}:${result.fileId}`);
+            console.warn(`Error retrieving tree in ${result.provider}:${result.corpus}:${result.component}:${result.fileId}: ${e.error.error}`);
         }
 
         this.loadingTree = false;
