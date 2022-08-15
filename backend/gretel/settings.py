@@ -139,9 +139,13 @@ BASEX_PORT = 1984
 BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
 
-ALPINO_PATH = '/opt/Alpino'
+# Alpino connection settings
+# Provide ALPINO_HOST and ALPINO_PORT to use Alpino as a server. Provide
+# ALPINO_PATH to use the Alpino executable. If both are provided (i.e.
+# not None) the server will be used.
 ALPINO_HOST = 'localhost'
 ALPINO_PORT = 7001
+ALPINO_PATH = '/opt/Alpino'
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
 

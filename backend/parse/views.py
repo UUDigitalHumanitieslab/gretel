@@ -10,7 +10,7 @@ from rest_framework import status
 from lxml import etree
 from alpino_query import AlpinoQuery
 
-from services.alpino import parse_sentence, AlpinoError
+from services.alpino import alpino, AlpinoError
 
 
 @api_view(['POST'])
@@ -28,13 +28,8 @@ def parse_view(request):
         )
 
     try:
-        parsed_sentence = parse_sentence(sentence)
-    except ConnectionRefusedError:
-        # TODO log error
-        return Response(
-            {'error': 'Cannot connect to Alpino'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        alpino.initialize()
+        parsed_sentence = alpino.client.parse_line(sentence, 'zin')
     except AlpinoError as err:
         return Response(
             {'error': 'Parsing error: {}'.format(err)},

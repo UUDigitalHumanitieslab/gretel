@@ -1,8 +1,6 @@
 from django.test import TestCase
 
-from lxml import etree
-
-from services.alpino import _get_alpino_socket
+from services.alpino import alpino, AlpinoError
 
 EXAMPLE_XML = '''<?xml version="1.0" encoding="UTF-8"?><alpino_ds
 version="1.6">
@@ -36,8 +34,8 @@ voorbeeldzin.</sentence></alpino_ds>
 class ParseViewTestCase(TestCase):
     def setUp(self):
         try:
-            _get_alpino_socket()
-        except ConnectionRefusedError:
+            alpino.initialize()
+        except AlpinoError:
             self.skipTest('need Alpino to run')
 
     def test_parse_view(self):
@@ -47,8 +45,10 @@ class ParseViewTestCase(TestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        # Return meaningful error if Alpino is not available
-        with self.settings(ALPINO_PORT=1000):
+        # Return meaningful error if Alpino is not available, so
+        # de-initialize Alpino and remove correct settings
+        with self.settings(ALPINO_HOST=None, ALPINO_PATH=None):
+            alpino.client = None
             response = self.client.post(
                 '/parse/parse-sentence/',
                 {'sentence': 'Dit is een zin.'},

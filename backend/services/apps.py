@@ -4,7 +4,7 @@ import logging
 import os
 
 from .basex import basex
-from .alpino import parse_sentence, AlpinoError
+from .alpino import alpino, AlpinoError
 
 logger = logging.getLogger(__name__)
 
@@ -26,13 +26,9 @@ class ServicesConfig(AppConfig):
                     'searching will not work.'
                 )
             try:
-                parse_sentence('Draait Alpino?')
-            except ConnectionRefusedError as err:
-                logger.warning(
-                    'Cannot connect to Alpino: {}\n'
-                    'GrETEL will run but parsing will not work.'.format(err)
-                )
+                alpino.initialize()
             except AlpinoError as err:
                 logger.warning(
-                    'Error communicating to Alpino: {}'.format(err)
+                    'Error communicating to Alpino: {} GrETEL will run but '
+                    'parsing will not work.'.format(err)
                 )

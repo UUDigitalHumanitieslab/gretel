@@ -1,43 +1,34 @@
 from django.conf import settings
 
-import socket
-from lxml import etree
+from corpus2alpino.annotators.alpino import AlpinoAnnotator
 
 
 class AlpinoError(RuntimeError):
     pass
 
 
-def _get_alpino_socket():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((settings.ALPINO_HOST, settings.ALPINO_PORT))
-    except ConnectionRefusedError:
-        s.close()
-        raise
-    return s
+class AlpinoService:
+    client = None
+
+    def initialize(self):
+        '''Connect to the Alpino server or the executable. The client
+        will be reachable from the client attribute of this class
+        using the interface provided by corpus2alpino.'''
+        if self.client is None:
+            try:
+                if settings.ALPINO_HOST and settings.ALPINO_PORT:
+                    annotator = AlpinoAnnotator(
+                        settings.ALPINO_HOST, settings.ALPINO_PORT
+                    )
+                elif settings.ALPINO_PATH:
+                    annotator = AlpinoAnnotator(
+                        settings.ALPINO_PATH, []
+                    )
+                else:
+                    raise AlpinoError('Alpino has not been configured.')
+                self.client = annotator.client
+            except Exception as e:
+                raise AlpinoError(str(e))
 
 
-def parse_sentence(sentence: str) -> str:
-    # Alpino only supports IPv4, so we only connect using socket.AF_INET
-    result = bytearray()
-    s = _get_alpino_socket()
-    s.sendall((sentence + '\n\n').encode())
-    while True:
-        answer = s.recv(4096)
-        if answer == b'':
-            break
-        result.extend(answer)
-    s.close()
-    result_bytes = bytes(result)
-
-    # Check if an error was returned
-    if result_bytes.startswith(b'Error:'):
-        raise AlpinoError(result_bytes.decode())
-
-    # Check if result is valid XML
-    try:
-        etree.fromstring(result_bytes)
-    except etree.XMLSyntaxError:
-        raise AlpinoError('Invalid XML returned')
-    return result_bytes.decode()
+alpino = AlpinoService()
