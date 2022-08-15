@@ -40,15 +40,11 @@ export class AlpinoService {
     }
 
     async parseSentence(sentence: string) {
-        const response = await this.http.post<ApiParseResult | false>(
+        const response = await this.http.post<ApiParseResult>(
             await this.configurationService.getDjangoUrl('parse/parse-sentence/'),
             { sentence: sentence }
         ).toPromise();
-        if (!response) {
-            throw 'error';
-        } else {
-            return response.parsed_sentence;
-        }
+        return response.parsed_sentence;
     }
 
     attributesToStrings(attrs: TokenAttributes[], skipDefault = false): string[] {
