@@ -5,12 +5,15 @@ from django.utils import timezone
 
 import unittest
 import json
+import lxml.etree as etree
 
 from treebanks.models import Treebank
 from gretel.services import basex
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
-                           generate_xquery_count, parse_search_result)
+                           generate_xquery_count, parse_search_result,
+                           generate_xquery_for_variables,
+                           check_xquery_variable_name)
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 test_treebank = None
@@ -46,6 +49,23 @@ def tearDownModule():
 
 class BaseXSearchTestCase(TestCase):
     DB_NAME_CHECK = 'EUROPARL_ID_EP-00_0000'
+    VAR_CHECK = [
+        {
+            'name': '$node',
+            'path': '*'
+        },
+        {
+            'name': '$node1',
+            'path': '$node/node[@rel = "su" and @pt = "vnw"]'
+        },
+        {
+            'name': '$node2',
+            'path': '$node/node[@rel = "hd" and @pt = "ww"]',
+            'props': {
+                '_prop1': 'test'
+            }
+        }
+    ]
 
     def test_check_db_name(self):
         self.assertTrue(check_db_name(self.DB_NAME_CHECK))
@@ -54,6 +74,11 @@ class BaseXSearchTestCase(TestCase):
     def test_check_xpath(self):
         self.assertTrue(check_xpath(XPATH1))
         self.assertFalse(check_xpath(XPATH1 + ' let $a := 0'))
+
+    def test_check_xquery_variable_name(self):
+        self.assertTrue(check_xquery_variable_name('$node1'))
+        self.assertFalse(check_xquery_variable_name('node1'))
+        self.assertFalse(check_xquery_variable_name('$node1 let $a := 0'))
 
     def test_xquery_search_count(self):
         # Check if function runs without error
@@ -73,6 +98,20 @@ class BaseXSearchTestCase(TestCase):
                 self.DB_NAME_CHECK,
                 XPATH1 + ' let $a := 0'
             )
+
+    def test_xquery_for_variables(self):
+        # Should work well with VAR_CHECK
+        let_fragment, return_fragment = \
+            generate_xquery_for_variables(self.VAR_CHECK)
+        # There should be two declared variables
+        self.assertEqual(let_fragment.count('let $'), 2)
+        # Return fragment should be valid XML
+        etree.fromstring(return_fragment)
+        # Empty variables lists result in empty strings
+        let_fragment, return_fragment = \
+            generate_xquery_for_variables([])
+        self.assertEqual(let_fragment, '')
+        self.assertEqual(return_fragment, '')
 
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \

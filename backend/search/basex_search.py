@@ -4,6 +4,8 @@ import lxml.etree
 
 ALLOWED_DBNAME_CHARS = '!#$%&\'()+-=@[]^_`{}~ABCDEFGHIJKLMNOPQRSTUVWXYZabcde' \
                        'fghijklmnopqrstuvwxyz0123456789.'
+ALLOWED_VARNAME_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcde' \
+                       'fghijklmnopqrstuvwxyz0123456789-_.'
 
 
 def check_xpath(xpath: str) -> bool:
@@ -22,11 +24,61 @@ def check_db_name(db_name: str) -> bool:
     return all(x in ALLOWED_DBNAME_CHARS for x in db_name)
 
 
-def generate_xquery_search(basex_db: str, xpath: str) -> str:
+def check_xquery_variable_name(variable: str) -> bool:
+    if variable[0] != '$':
+        return False
+    return all(x in ALLOWED_VARNAME_CHARS for x in variable[1:])
+
+
+def generate_xquery_for_variables(variables):
+    let_fragment = ''
+    return_fragment_inside = ''
+    for variable in variables:
+        name = variable['name']
+        path = variable['path']
+        if not check_xquery_variable_name(name):
+            raise ValueError('Invalid XQuery variable: {}'.format(name))
+        if not check_xpath(path):
+            raise ValueError('Invalid XPath: {}'.format(path))
+        properties = variable.get('props', {})
+        # Create fragment for let clause in XQuery for variables
+        if name != '$node':
+            # The root node is already declared in the query itself,
+            # do not declare it again
+            let_fragment += ' let {} := ({})[1]'.format(
+                name, path
+            )
+        # Create fragment for return clause in XQuery for variables
+        properties_xml = ''
+        for prop_name in properties:
+            prop_expression = properties[prop_name]
+            if not all(x in ALLOWED_VARNAME_CHARS for x in prop_name):
+                raise ValueError(
+                    'Property name should be valid XML name: {}'
+                    .format(prop_name)
+                )
+            if '"' in prop_expression or '}' in prop_expression:
+                raise ValueError(
+                    'Property expression cannot contain double quotation '
+                    'mark or closing accolade: {}'.format(prop_expression)
+                )
+            properties_xml += ' ' + prop_name + '="{' + prop_expression + '}"'
+        return_fragment_inside += '<var name="' + name + '"' + \
+            properties_xml + '>{' + name + '/@*}</var>'
+    if return_fragment_inside:
+        return_fragment = '<vars>' + return_fragment_inside + '</vars>'
+    else:
+        return_fragment = ''
+    return let_fragment, return_fragment
+
+
+def generate_xquery_search(basex_db: str, xpath: str, variables=[]) -> str:
     """Return XQuery string for use in BaseX to get all occurances
     of a given XPath in XML format in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):
         raise ValueError('Incorrect database or malformed XPath given')
+    variables_let_fragment, variables_return_fragment = \
+        generate_xquery_for_variables(variables)
     query = 'for $node in db:open("' + basex_db + '")/treebank' \
             + xpath + \
             ' let $tree := ($node/ancestor::alpino_ds)' \
@@ -37,13 +89,15 @@ def generate_xquery_search(basex_db: str, xpath: str) -> str:
             ' let $indexed := ($tree//node[@index=$indexs])' \
             ' let $begins := (($node | $indexed)//@begin)' \
             ' let $beginlist := (distinct-values($begins))' \
-            ' let $meta := ($tree/metadata/meta)' \
+            ' let $meta := ($tree/metadata/meta)' + \
+            variables_let_fragment + \
             ' return <match>{data($sentid)}||{data($sentence)}' \
             '||{string-join($ids, \'-\')}||' \
             '{string-join($beginlist, \'-\')}||{$node}||{$meta}' \
-            '||</match>'
-    # TODO: currently no support for grinded coprora and for variables.
-    # Add returntb and variable_results from original implementation.
+            '||' + variables_return_fragment + '</match>'
+    # TODO: currently no support for grinded coprora.
+    # Add returntb from original implementation.
+    # TODO: also no support for context yet
     return query
 
 
@@ -85,7 +139,8 @@ def parse_search_result(result_str: str, component, database) -> list:
         splitted = result.split('||')
         if len(splitted) != 7:
             raise ValueError('Cannot parse XQuery result: {}'.format(result))
-        (sentid, sentence, ids, begins, xml_sentences, meta, _) = splitted
+        (sentid, sentence, ids, begins, xml_sentences, meta, variables) = \
+            splitted
         # Make sentid-s unique by appending a match index (there may be
         # multiple matches per sentence)
         # TODO: can we change this to something more comprehensible?
@@ -97,6 +152,7 @@ def parse_search_result(result_str: str, component, database) -> list:
             'begins': begins,
             'xml_sentences': xml_sentences,
             'meta': meta,
+            'variables': variables,
             'component': component,
             'database': database,
         })
