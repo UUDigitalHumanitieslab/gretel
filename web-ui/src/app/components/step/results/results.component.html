@@ -1,7 +1,11 @@
 <div class="columns is-desktop">
     <!-- XPATH -->
     <div class="column is-half-desktop">
-        <grt-results-xpath-editor [xpath]="xpath" (changeXpath)="changeXpath.emit($event)"></grt-results-xpath-editor>
+        <grt-results-xpath-editor [xpath]="xpath"
+            [activeFilterCount]="activeFilterCount"
+            [inputSentence]="inputSentence"
+            (changeXpath)="changeXpath.emit($event)"
+            (addFiltersXPath)="addFiltersXPath()"></grt-results-xpath-editor>
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
@@ -12,6 +16,15 @@
     [loading]="loading"
     [filteredResults]="filteredResults"
     [filters]="filters"
+    [filterValues]="filterValues"
+    [filterXPaths]="filterXPaths"
+    [activeFilterCount]="activeFilterCount"
+    [retrieveContext]="retrieveContext"
+    (changeFilterValues)="filterChange($event)"
+    (deleteFilter)="deleteFilter($event)"
+    (downloadResults)="downloadResults($event)"
+    (downloadFilelist)="downloadFilelist()"
+    (toggleContext)="toggleContext()"
     (prev)="prev.next()"
     (next)="next.next()"
     (showTree)="showTree($event)"

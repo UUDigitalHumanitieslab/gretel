@@ -23,7 +23,7 @@ import {
     FilterByXPath,
     FilterValue,
     FilterValues,
-    Hit,
+    HitWithOrigin,
     MetadataValueCounts,
     ResultsService,
     ResultsStreamService,
@@ -39,12 +39,6 @@ import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-
 import { Filter } from '../../../models/filter';
 
 const DebounceTime = 200;
-
-type HitWithOrigin = Hit & {
-    provider: string;
-    corpus: { name: string };
-    componentDisplayName: string;
-};
 
 interface HiddenComponents {
     [componentId: string]: boolean;
@@ -71,8 +65,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     private xpathSubject = new BehaviorSubject<string>(undefined);
     private filterValuesSubject = new BehaviorSubject<FilterValues>({});
 
-    /** The hits and their visibility status */
-    public errors: { message: string, corpus: string }[];
     public hidden: HideSettings = {};
     public hiddenCount = 0;
     public filteredResults: HidableHit[] = [];
@@ -83,7 +75,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public get xpath(): string { return this.xpathSubject.value; }
     public validXPath = true;
     public customXPath: string;
-    public xpathCopied = false;
     @Output()
     public changeXpath = new EventEmitter<string>();
 
@@ -95,6 +86,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         this.activeFilterCount = values.length;
     }
     public get filterValues(): FilterValues { return this.filterValuesSubject.value; }
+
     @Output()
     public changeFilterValues = new EventEmitter<FilterValues>();
 
@@ -118,11 +110,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public loadingDownload = false;
 
     public activeFilterCount = 0;
-
-    /**
-     * Toggle filters column
-     */
-    public hideFiltersColumn = false;
     public filters: Filter[] = [];
 
     /**
@@ -187,7 +174,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                             // info reset on selected treebanks changing (see below).
                             this.loading = true;
                             this.filteredResults = [];
-                            this.errors = [];
+                            this.notificationService.cancelAll();
                             this.hiddenCount = 0;
                             break;
                         }
@@ -204,10 +191,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                         }
                         case NotificationKind.ERROR: {
                             // treebank has errored out!
-                            this.errors.push({
-                                corpus: r.corpus.name,
-                                message: r.result.error.message
-                            });
+                            this.notificationService.add(`Error retrieving results for ${r.corpus.name}: \n${r.result.error.message}`);
                             break;
                         }
                         case NotificationKind.NEXT: {
@@ -307,10 +291,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         this.loadingDownload = false;
     }
 
-    public downloadXPath() {
-        this.downloadService.downloadXPath(this.xpath);
-    }
-
 
     public downloadFilelist() {
         const fileNames = this.getFileNames();
@@ -320,20 +300,11 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     /**
      * Returns the unique file names from the filtered results sorted on name.
      */
-    public getFileNames() {
+    private getFileNames() {
         return [...new Set(this.filteredResults
             .filter(h => !h.hidden)
             .map(f => f.fileId) // extract names
             .sort())];
-    }
-
-    public copyXPath() {
-        if (this.clipboardService.copyFromContent(this.xpath)) {
-            this.xpathCopied = true;
-            setTimeout(() => {
-                this.xpathCopied = false;
-            }, 5000);
-        }
     }
 
     public hideComponents({ provider, corpus, components }: { provider: string, corpus: string, components: string[] }) {
@@ -363,10 +334,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
 
     public filterChange(filterValues: FilterValues) {
         this.changeFilterValues.next(filterValues);
-    }
-
-    public print() {
-        (window as any).print();
     }
 
     public addFiltersXPath() {

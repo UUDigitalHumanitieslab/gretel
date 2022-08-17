@@ -41,10 +41,10 @@
             <div class="level-item">
                 <div class="field has-addons">
                     <p class="control">
-                        <grt-download-results [loading]="loadingDownload" (downloadResults)="downloadResults($event)"></grt-download-results>
+                        <grt-download-results [loading]="loadingDownload" (downloadResults)="downloadResults.next($event)"></grt-download-results>
                     </p>
                     <p class="control" *ngIf="!loading">
-                        <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
+                        <a class="button" role="button" (click)="downloadFilelist.next()" grtBalloonLength="large"
                             grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                             <span class="icon is-large">
                                 <i class="fas fa-file-alt"></i>
@@ -67,7 +67,7 @@
             </div>
             <div class="level-item">
                 <div class="field">
-                    <p class="control" (click)="toggleContext()">
+                    <p class="control" (click)="toggleContext.next()">
                         <a class="button is-warning" role="button" grtBalloonLength="large" grtBalloonPosition="down"
                             grtBalloon="Click to show the sentences directly before and after the hits."
                             *ngIf="!retrieveContext">
@@ -101,7 +101,7 @@
         </div>
     </div>
 </div>
-<grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter($event)"></grt-filters-by-xpath>
+<grt-filters-by-xpath [filters]="filterXPaths" (delete)="deleteFilter.next($event)"></grt-filters-by-xpath>
 <div class="columns">
     <div class="column is-one-third is-hidden-print" *ngIf="filters.length" [@fade]
         [ngClass]="{'is-hidden': hideFiltersColumn }">
@@ -158,10 +158,5 @@
                 All results are hidden.
             </div>
         </ng-template>
-
-        <div *ngFor="let error of errors" class="notification is-danger">
-            Error retrieving results for {{error.corpus}}: <br>
-            {{error.message}}
-        </div>
     </div>
 </div>
