@@ -36,18 +36,13 @@ VAR_CHECK = [
     },
     {
         'name': '$node2',
-        'path': '$node/node[@rel = "hd" and @pt = "ww"]',
-        'props': {
-            '_prop1': 'test'
-        }
+        'path': '$node/node[@rel = "hd" and @pt = "ww"]'
     }
 ]
 
 
 def setUpModule():
-    try:
-        basex.start()
-    except ConnectionError:
+    if not basex.test_connection():
         # We cannot work with a real treebank, but let other tests continue
         print("NO CONNECTION: Skipping Basex tests")
         return
@@ -103,6 +98,7 @@ class BaseXSearchTestCase(TestCase):
             )
 
     def test_xquery_for_variables(self):
+        # TODO: test with custom properties
         # Should work well with VAR_CHECK
         let_fragment, return_fragment = \
             generate_xquery_for_variables(VAR_CHECK)
@@ -186,7 +182,7 @@ class BaseXSearchTestCase(TestCase):
 
 class ComponentSearchResultTestCase(TestCase):
     def test_perform_search(self):
-        if not basex.session:
+        if not basex.test_connection():
             return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
@@ -222,7 +218,7 @@ class ComponentSearchResultTestCase(TestCase):
 
 class SearchQueryTestCase(TestCase):
     def setUp(self):
-        if not basex.session:
+        if not basex.test_connection():
             return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')

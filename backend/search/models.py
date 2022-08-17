@@ -63,7 +63,7 @@ class ComponentSearchResult(models.Model):
             try:
                 result = basex.perform_query(query)
             except (OSError, UnicodeDecodeError) as err:
-                self.errors += 'Error searrching database {}: ' \
+                self.errors += 'Error searching database {}: ' \
                     .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
             try:
