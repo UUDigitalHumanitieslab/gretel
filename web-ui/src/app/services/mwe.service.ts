@@ -30,9 +30,9 @@ export class MweService {
     saveQueryUrl: Promise<string>;
 
     constructor(configurationService: ConfigurationService, private http: HttpClient) {
-        this.canonicalMweUrl = configurationService.getMweUrl('canonical');
-        this.generateMweUrl = configurationService.getMweUrl('generate');
-        this.saveQueryUrl = configurationService.getMweUrl('xpath/');
+        this.canonicalMweUrl = configurationService.getDjangoUrl('mwe/canonical');
+        this.generateMweUrl = configurationService.getDjangoUrl('mwe/generate');
+        this.saveQueryUrl = configurationService.getDjangoUrl('mwe/xpath/');
     }
 
     async getCanonical() : Promise<MweCanonicalForm[]> {

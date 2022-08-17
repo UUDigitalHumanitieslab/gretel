@@ -31,3 +31,9 @@ class XPathQuerySerializer(serializers.ModelSerializer):
     class Meta:
         model = XPathQuery
         fields = ['id', 'canonical', 'xpath', 'description', 'rank']
+
+
+class MweQuerySerializer(serializers.Serializer):
+    xpath = serializers.CharField()
+    description = serializers.CharField()
+    rank = serializers.IntegerField()

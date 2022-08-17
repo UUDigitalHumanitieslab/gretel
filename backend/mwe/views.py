@@ -3,7 +3,10 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet
 
-from .models import CanonicalForm, CanonicalFormSerializer, XPathQuery, XPathQuerySerializer
+from alpino_query.parser import parse_sentence
+from mwe_query import Mwe
+
+from .models import CanonicalForm, CanonicalFormSerializer, XPathQuery, XPathQuerySerializer, MweQuerySerializer
 
 
 class CanonicalFormList(ListAPIView):
@@ -12,15 +15,12 @@ class CanonicalFormList(ListAPIView):
 
 
 def generate_query(sentence, rank):
+    parsed_xml = parse_sentence(sentence)
+    mwe = Mwe(sentence, parsed_xml)
     # a placeholder function for Martin Kroon's query generator
     # there should also be an alpino parse step here
-    generated = [
-        dict(description='everything', xpath='//node', rank=1),
-        dict(description='near miss (still everything)', xpath='//node', rank=2),
-        dict(description='superset (still everything)', xpath='//node', rank=3),
-    ]
-
-    return generated[rank - 1]
+    generated = mwe.generate_queries()
+    return MweQuerySerializer(generated[rank - 1]).data
 
 
 class GenerateMweQueries(APIView):
