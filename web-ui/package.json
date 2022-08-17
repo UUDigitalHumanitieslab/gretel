@@ -12,6 +12,7 @@
     "build": "npm run build-pre && npm run ng-high-memory -- build --configuration production --base-href=/ng/ --output-path=../ng",
     "build-pre": "node ./build/build-pre.js",
     "test": "ng test",
+    "test:once": "ng test --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
