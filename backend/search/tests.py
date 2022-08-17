@@ -13,7 +13,8 @@ from gretel.services import basex
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
                            generate_xquery_count, parse_search_result,
                            generate_xquery_for_variables,
-                           check_xquery_variable_name)
+                           check_xquery_variable_name,
+                           parse_metadata_count_result)
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 test_treebank = None
@@ -132,6 +133,35 @@ class BaseXSearchTestCase(TestCase):
         # Empty string should return an empty list
         self.assertEqual([], parse_search_result('', 'component', 'db'))
         self.assertEqual([], parse_search_result('\n ', 'component', 'db'))
+
+    def test_parse_metadata_count_result(self):
+        TEST_XML = """
+<metadata>
+  <meta name="uttstartlineno" type="int">
+    <count value="33">1</count>
+    <count value="216">1</count>
+  </meta>
+  <meta name="charencoding" type="text">
+    <count value="UTF8">311</count>
+  </meta>
+</metadata>
+"""
+        EXPECTED_RESULT = {
+            'uttstartlineno': {'33': 1, '216': 1},
+            'charencoding': {'UTF8': 311}
+        }
+        totals = parse_metadata_count_result(
+            TEST_XML
+        )
+        self.assertEqual(totals, EXPECTED_RESULT)
+        # Empty list should give empty dict
+        self.assertEqual(
+            parse_metadata_count_result('<metadata></metadata>'),
+            {}
+        )
+        # Invalid format should raise error
+        with self.assertRaises(ValueError):
+            parse_metadata_count_result('<something></something>')
 
 
 class ComponentSearchResultTestCase(TestCase):
