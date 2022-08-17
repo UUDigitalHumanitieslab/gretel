@@ -3,6 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
 import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
+import { TokenAttributes, FilterValue } from '../models/matrix';
 
 @Injectable()
 export class AlpinoService {
@@ -95,6 +96,16 @@ export class AlpinoService {
                 ...DefaultTokenAttributes
             };
 
+            const notApplicable = parts.indexOf('na') >= 0;
+            if (notApplicable) {
+                for (let key of Object.keys(attributes)) {
+                    attributes[key]
+                }
+                parts = Object.keys(DefaultTokenAttributes)
+                    .filter(key => key != 'cs')
+                    .map(key => `~${key}`);
+            }
+
             for (let part of parts) {
                 const key = part.replace(/^[-~]/, '');
                 switch (key) {
@@ -108,7 +119,7 @@ export class AlpinoService {
                     case 'lemma':
                     case 'pos':
                     case 'postag':
-                        let value: DefaultValue;
+                        let value: FilterValue;
                         switch (part[0]) {
                             case '-':
                                 value = 'exclude';
@@ -152,17 +163,3 @@ export class AlpinoService {
         return encodeURIComponent(sentence.replace(/\//g, '_SLASH_'));
     }
 }
-
-export type DefaultValue = 'include' | 'exclude' | undefined;
-
-export interface TokenAttributes {
-    rel?: DefaultValue,
-    word?: DefaultValue,
-    lemma?: DefaultValue,
-    pos?: DefaultValue,
-    cs?: boolean,
-    postag?: DefaultValue,
-    na?: boolean
-}
-
-export type AttributeType = keyof TokenAttributes;

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FilterDirective } from '../filter/filter.directive';
-import { Filter } from '../filters.component';
+import { TextFilter } from '../../../models/filter';
 import { FilterValue } from '../../../services/_index';
 
 @Component({
@@ -8,12 +8,12 @@ import { FilterValue } from '../../../services/_index';
     templateUrl: './text.component.html',
     styleUrls: ['./text.component.scss']
 })
-export class TextComponent extends FilterDirective {
+export class TextComponent extends FilterDirective<TextFilter> {
     public options: string[] = [];
 
     public values: { [value: string]: boolean } = {};
 
-    onFilterSet(filter: Filter) {
+    onFilterSet(filter: TextFilter) {
         this.options = filter.options.sort((a, b) => a.localeCompare(
             b,
             undefined,

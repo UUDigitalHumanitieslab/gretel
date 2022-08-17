@@ -18,7 +18,7 @@
 <p *ngIf="loading">Loading ...</p>
 <ng-container *ngIf="xml">
     <grt-tree-visualizer [xml]="xml" [display]="display" [fullScreenButton]="false"
-        (onDisplayChange)="display = $event"></grt-tree-visualizer>
+        (displayChange)="display = $event"></grt-tree-visualizer>
 </ng-container>
 <br />
 <div class="columns">

@@ -20,7 +20,7 @@ import { DownloadService, ParseService } from '../../services/_index';
 import './tree-visualizer';
 
 type TypedChanges = { [name in keyof TreeVisualizerComponent]: SimpleChange };
-type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
+export type TreeVisualizerDisplay = 'fullscreen' | 'inline' | 'both';
 interface Metadata {
     name: string;
     /**

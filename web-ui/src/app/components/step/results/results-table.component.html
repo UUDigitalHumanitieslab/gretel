@@ -41,7 +41,7 @@
             <div class="level-item">
                 <div class="field has-addons">
                     <p class="control">
-                        <grt-download-results [loading]="loadingDownload"></grt-download-results>
+                        <grt-download-results [loading]="loadingDownload" (downloadResults)="downloadResults($event)"></grt-download-results>
                     </p>
                     <p class="control" *ngIf="!loading">
                         <a class="button" role="button" (click)="downloadFilelist()" grtBalloonLength="large"
