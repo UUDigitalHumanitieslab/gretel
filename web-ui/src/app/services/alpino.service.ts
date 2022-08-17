@@ -4,12 +4,17 @@ import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
 import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
 
+type ApiParseResult = {
+    parsed_sentence?: string,
+    error?: string
+}
+
 @Injectable()
 export class AlpinoService {
     generateXPathUrl: Promise<string>;
 
     constructor(private configurationService: ConfigurationService, private http: HttpClient, private parserService: ParserService) {
-        this.generateXPathUrl = configurationService.getAlpinoUrl('generate_xpath');
+        this.generateXPathUrl = configurationService.getDjangoUrl('parse/generate-xpath/');
     }
 
     async generateXPath(xml: string, tokens: string[], attributes: TokenAttributes[], ignoreTopNode: boolean, respectOrder: boolean) {
@@ -35,9 +40,11 @@ export class AlpinoService {
     }
 
     async parseSentence(sentence: string) {
-        return this.http.get(
-            await this.parseSentenceUrl(sentence),
-            { responseType: 'text' }).toPromise();
+        const response = await this.http.post<ApiParseResult>(
+            await this.configurationService.getDjangoUrl('parse/parse-sentence/'),
+            { sentence: sentence }
+        ).toPromise();
+        return response.parsed_sentence;
     }
 
     attributesToStrings(attrs: TokenAttributes[], skipDefault = false): string[] {

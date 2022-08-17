@@ -12,6 +12,8 @@ import threading
 
 from treebanks.models import Component
 from .models import SearchQuery
+from .basex_search import generate_xquery_showtree
+from services.basex import basex
 
 
 def run_search(query_obj) -> None:
@@ -84,3 +86,34 @@ def search_view(request):
         thread.start()
 
     return Response(response)
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])  # No CSRF verification for now
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def tree_view(request):
+    data = request.data
+    try:
+        database = data['database']
+        sentence_id = data['sentence_id']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        xquery = generate_xquery_showtree(database, sentence_id)
+    except ValueError as err:
+        return Response(
+            {'error': str(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        result = basex.perform_query(xquery)
+    except OSError as err:
+        return Response(
+            {'error': str(err)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    return Response({'tree': result})

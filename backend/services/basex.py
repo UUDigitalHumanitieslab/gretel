@@ -1,6 +1,6 @@
 from BaseXClient import BaseXClient
 
-from .settings import BASEX_HOST, BASEX_PORT, BASEX_USER, BASEX_PASSWORD
+from django.conf import settings
 
 
 class BaseXService:
@@ -18,7 +18,10 @@ class BaseXService:
         if self.session is None:
             try:
                 self.session = BaseXClient.Session(
-                    BASEX_HOST, BASEX_PORT, BASEX_USER, BASEX_PASSWORD
+                    settings.BASEX_HOST,
+                    settings.BASEX_PORT,
+                    settings.BASEX_USER,
+                    settings.BASEX_PASSWORD
                 )
             except ConnectionError:
                 raise

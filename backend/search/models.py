@@ -7,7 +7,7 @@ import json
 import math
 
 from treebanks.models import Component
-from gretel.services import basex
+from services.basex import basex
 from .basex_search import (generate_xquery_search,
                            check_xpath, parse_search_result)
 

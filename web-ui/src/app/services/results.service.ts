@@ -205,14 +205,20 @@ export class ResultsService {
         sentenceId: string,
         nodeIds: number[],
     ) {
-        const url = await this.configurationService.getApiUrl(
-            provider,
-            'tree',
-            [treebank, component, btoa(sentenceId)],
-            { ...(database && { db: database }) });
-
-        const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return this.highlightSentenceNodes(treeXml, nodeIds);
+        /* provider, treebank and component are not used anymore,
+        but leave them for now */
+        const url2 = await this.configurationService.getDjangoUrl(
+            'search/tree/'
+        );
+        const data = {
+            database: database,
+            sentence_id: sentenceId
+        }
+        const response = await this.http.post<ApiTreeResult>(
+            url2,
+            data
+        ).toPromise();
+        return this.highlightSentenceNodes(response.tree, nodeIds);
     }
 
     /** adds a "highlight=yes" attribute to all nodes with ID, and their descendants. */
@@ -622,3 +628,8 @@ export interface TreebankCount {
 }
 
 export interface MetadataValueCounts { [key: string]: { [value: string]: number }; }
+
+type ApiTreeResult = {
+    tree?: string,
+    error?: string
+}

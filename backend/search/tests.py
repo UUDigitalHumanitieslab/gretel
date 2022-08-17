@@ -8,13 +8,14 @@ import json
 import lxml.etree as etree
 
 from treebanks.models import Treebank
-from gretel.services import basex
+from services.basex import basex
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
                            generate_xquery_count, parse_search_result,
                            generate_xquery_for_variables,
                            check_xquery_variable_name,
-                           parse_metadata_count_result)
+                           parse_metadata_count_result,
+                           generate_xquery_showtree)
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 test_treebank = None
@@ -67,6 +68,7 @@ def tearDownModule():
 
 class BaseXSearchTestCase(TestCase):
     DB_NAME_CHECK = 'EUROPARL_ID_EP-00_0000'
+    SENT_ID_CHECK = 'troonrede1990.data.dz:63'
 
     def test_check_db_name(self):
         self.assertTrue(check_db_name(self.DB_NAME_CHECK))
@@ -113,6 +115,20 @@ class BaseXSearchTestCase(TestCase):
             generate_xquery_for_variables([])
         self.assertEqual(let_fragment, '')
         self.assertEqual(return_fragment, '')
+
+    def test_xquery_showtree(self):
+        # Check if function runs without error
+        generate_xquery_showtree(self.DB_NAME_CHECK, self.SENT_ID_CHECK)
+        # TODO: check for valid XQuery
+        # Illegal arguments should raise error
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK + ' ', self.SENT_ID_CHECK
+        )
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK, self.SENT_ID_CHECK + '"'
+        )
 
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
@@ -165,8 +181,9 @@ class BaseXSearchTestCase(TestCase):
 
 
 class ComponentSearchResultTestCase(TestCase):
-    @unittest.skipIf(not basex.session, 'requires running BaseX server')
     def test_perform_search(self):
+        if not basex.session:
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
         component = test_treebank.components.get(slug='troonrede19')
@@ -199,9 +216,10 @@ class ComponentSearchResultTestCase(TestCase):
                 csr2.perform_search()
 
 
-@unittest.skipIf(not basex.session, 'requires running BaseX server')
 class SearchQueryTestCase(TestCase):
     def setUp(self):
+        if not basex.session:
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
 
