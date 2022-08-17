@@ -11,7 +11,7 @@ import re
 import csv
 
 from treebanks.models import Treebank, Component, BaseXDB
-from gretel.services import basex
+from services.basex import basex
 
 
 def userinputyesno(prompt, default=False):
