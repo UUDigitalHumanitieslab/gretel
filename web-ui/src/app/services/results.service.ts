@@ -386,7 +386,7 @@ export class ResultsService {
             const sentence = result.sentence;
             const nodeStarts = result.begins.split('-').map(x => parseInt(x, 10));
             const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${result.meta}</metadata>`));
-            const variableValues = undefined; // this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
+            const variableValues = this.mapVariables(await this.parseService.parseXml(result.variables));
             const component = result.component;
             const database = result.database;
             return {
@@ -524,6 +524,7 @@ type ApiSearchResult = {
         begins: string,
         xml_sentences: string,
         meta: string,
+        variables: string,
         component: string,
         database: string
     }[],

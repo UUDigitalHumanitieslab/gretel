@@ -19,6 +19,7 @@ class SearchError(RuntimeError):
 class ComponentSearchResult(models.Model):
     xpath = models.TextField()
     component = models.ForeignKey(Component, on_delete=models.CASCADE)
+    variables = models.JSONField(blank=True, default=list)
     search_completed = models.DateTimeField(null=True, editable=False)
     last_accessed = models.DateField(null=True, editable=False)
     results = models.TextField(default='', editable=False)
@@ -32,7 +33,7 @@ class ComponentSearchResult(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['xpath', 'component'],
+            models.UniqueConstraint(fields=['xpath', 'component', 'variables'],
                                     name='componentsearchresult_uniqueness')
         ]
 
@@ -54,11 +55,15 @@ class ComponentSearchResult(models.Model):
         matches = []
         for database in databases_with_size:
             size = databases_with_size[database]
-            query = generate_xquery_search(database, self.xpath)
+            query = generate_xquery_search(
+                database,
+                self.xpath,
+                self.variables
+            )
             try:
                 result = basex.perform_query(query)
             except (OSError, UnicodeDecodeError) as err:
-                self.errors += 'Error searching database {}: ' \
+                self.errors += 'Error searrching database {}: ' \
                     .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
             try:
@@ -72,11 +77,7 @@ class ComponentSearchResult(models.Model):
             self.results = json.dumps(matches)
             self.completed_part += size
             if timer() > next_save_time:
-                # Do a direct database update because this is faster than
-                # calling save().
-                self.save(update_fields=['completed_part',
-                                         'number_of_results',
-                                         'results'])
+                self.save()
                 next_save_time = timer() + 1
         self.search_completed = timezone.now()
         self.save()
@@ -86,6 +87,7 @@ class SearchQuery(models.Model):
     # User-defined fields
     components = models.ManyToManyField(Component)
     xpath = models.TextField()
+    variables = models.JSONField(blank=True, default=list)
     # Fields that are filled in as soon as searching has started
     results = models.ManyToManyField(ComponentSearchResult, editable=False)
     total_database_size = models.PositiveIntegerField(
@@ -114,7 +116,8 @@ class SearchQuery(models.Model):
         for component in self.components.all():
             result, created = ComponentSearchResult.objects.get_or_create(
                 xpath=self.xpath,
-                component=component
+                component=component,
+                variables=self.variables
             )
             self.total_database_size += component.total_database_size
             results.append(result)

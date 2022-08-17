@@ -40,6 +40,7 @@ def search_view(request):
     query_id = data.get('query_id', None)
     start_from = data.get('start_from', 0)
     is_analysis = data.get('is_analysis', False)
+    variables = data.get('variables', [])
     if is_analysis:
         maximum_results = settings.MAXIMUM_RESULTS_ANALYSIS
     else:
@@ -59,7 +60,7 @@ def search_view(request):
             )
     else:
         new_query = True
-        query = SearchQuery(xpath=xpath)
+        query = SearchQuery(xpath=xpath, variables=variables)
         query.save()
         query.components.add(*components_obj)
         query.initialize()

@@ -23,6 +23,23 @@ XPATH1 = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and' \
          ' node[@rel="hd" and @pt="ww"] and node[@rel="predc" and' \
          ' @cat="np" and node[@rel="det" and @pt="lid"] and' \
          ' node[@rel="hd" and @pt="n"]]]'
+VAR_CHECK = [
+    {
+        'name': '$node',
+        'path': '*'
+    },
+    {
+        'name': '$node1',
+        'path': '$node/node[@rel = "su" and @pt = "vnw"]'
+    },
+    {
+        'name': '$node2',
+        'path': '$node/node[@rel = "hd" and @pt = "ww"]',
+        'props': {
+            '_prop1': 'test'
+        }
+    }
+]
 
 
 def setUpModule():
@@ -49,23 +66,6 @@ def tearDownModule():
 
 class BaseXSearchTestCase(TestCase):
     DB_NAME_CHECK = 'EUROPARL_ID_EP-00_0000'
-    VAR_CHECK = [
-        {
-            'name': '$node',
-            'path': '*'
-        },
-        {
-            'name': '$node1',
-            'path': '$node/node[@rel = "su" and @pt = "vnw"]'
-        },
-        {
-            'name': '$node2',
-            'path': '$node/node[@rel = "hd" and @pt = "ww"]',
-            'props': {
-                '_prop1': 'test'
-            }
-        }
-    ]
 
     def test_check_db_name(self):
         self.assertTrue(check_db_name(self.DB_NAME_CHECK))
@@ -102,7 +102,7 @@ class BaseXSearchTestCase(TestCase):
     def test_xquery_for_variables(self):
         # Should work well with VAR_CHECK
         let_fragment, return_fragment = \
-            generate_xquery_for_variables(self.VAR_CHECK)
+            generate_xquery_for_variables(VAR_CHECK)
         # There should be two declared variables
         self.assertEqual(let_fragment.count('let $'), 2)
         # Return fragment should be valid XML
@@ -115,8 +115,8 @@ class BaseXSearchTestCase(TestCase):
 
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
-            '||meta||</match><match>id2||sentence2||ids2||begins2' \
-            '||xml_sentences2||meta2||</match>'
+            '||meta||vars</match><match>id2||sentence2||ids2||begins2' \
+            '||xml_sentences2||meta2||vars</match>'
         res = parse_search_result(input_str, 'component', 'db')
         self.assertEqual('sentence', res[0]['sentence'])
         self.assertEqual('meta2', res[1]['meta'])
@@ -140,7 +140,11 @@ class ComponentSearchResultTestCase(TestCase):
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
         component = test_treebank.components.get(slug='troonrede19')
-        csr = ComponentSearchResult(xpath=XPATH1, component=component)
+        csr = ComponentSearchResult(
+            xpath=XPATH1,
+            component=component,
+            variables=VAR_CHECK
+        )
         csr.perform_search()
         # Compare results with what we know from GrETEL 4
         self.assertEqual(csr.number_of_results, 4)

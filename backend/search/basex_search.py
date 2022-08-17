@@ -33,6 +33,8 @@ def check_xquery_variable_name(variable: str) -> bool:
 def generate_xquery_for_variables(variables):
     let_fragment = ''
     return_fragment_inside = ''
+    if variables is None:
+        variables = []
     for variable in variables:
         name = variable['name']
         path = variable['path']
