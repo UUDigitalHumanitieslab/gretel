@@ -1,6 +1,7 @@
 import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath';
 
-import { AlpinoService, TokenAttributes } from '../../services/alpino.service';
+import { TokenAttributes } from '../../models/matrix';
+import { AlpinoService } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';
 import { FilterValues, SearchVariable, NotificationService } from '../../services/_index';
 import { TreebankSelection } from '../../treebank';

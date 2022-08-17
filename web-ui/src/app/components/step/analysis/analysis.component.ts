@@ -28,6 +28,7 @@ import { TreebankMetadata } from '../../../treebank';
 import { StepDirective } from '../step.directive';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 import { AddNodeEvent } from '../../node-properties/node-properties-editor.component';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 @Component({
     animations,
@@ -61,7 +62,7 @@ export class AnalysisComponent extends StepDirective<GlobalState> implements OnI
 
     public variables: { [name: string]: PathVariable; };
     public treeXml: string;
-    public treeDisplay = 'inline';
+    public treeDisplay: TreeVisualizerDisplay = 'inline';
 
     public isLoading = true;
 

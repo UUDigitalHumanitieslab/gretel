@@ -1,15 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FilterByField, FilterValues } from '../../services/_index';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Filter } from '../../models/filter';
+import { FilterValue, FilterValues } from '../../services/_index';
 import { FilterChangeEvent } from './filter/filter.directive';
-
-export interface Filter {
-    field: string;
-    dataType: string;
-    filterType: 'checkbox' | 'slider' | 'range' | 'dropdown';
-    options: string[];
-    minValue?: Date | number;
-    maxValue?: Date | number;
-}
 
 @Component({
     selector: 'grt-filters',
@@ -34,13 +26,13 @@ export class FiltersComponent {
         }
     }
 
-    private addToSelectedFilters(filterValue: FilterByField) {
+    private addToSelectedFilters(filterValue: FilterValue) {
         this.filterChange.emit(Object.assign({}, this.filterValues, {
             [filterValue.field]: filterValue
         }));
     }
 
-    private removeFromSelectedFilters(filterValue: FilterByField) {
+    private removeFromSelectedFilters(filterValue: FilterValue) {
         const { [filterValue.field]: _, ...remaining } = this.filterValues;
         this.filterChange.emit(remaining);
     }

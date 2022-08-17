@@ -18,7 +18,7 @@ export abstract class StepDirective<T extends GlobalState> implements OnInit, On
         this.state$ = this.stateService.state$;
     }
 
-    @Output() changeValid = new EventEmitter<Boolean>();
+    @Output() changeValid = new EventEmitter<boolean>();
 
     /**
      * Gives an warning that helps the user to understand why the current input is not valid

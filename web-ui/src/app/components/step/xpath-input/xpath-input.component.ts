@@ -7,6 +7,7 @@ import { StepDirective } from '../step.directive';
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath';
 import { StateService } from '../../../services/_index';
 import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 @Component({
     selector: 'grt-xpath-input',
@@ -16,7 +17,7 @@ import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
 export class XpathInputComponent extends StepDirective<GlobalState> implements OnChanges, OnInit, OnDestroy {
     public stepType = StepType.XpathInput;
     public treeXml: string;
-    public treeDisplay = 'inline';
+    public treeDisplay: TreeVisualizerDisplay = 'inline';
     public warning = false;
 
     private valueSubject = new Subject<string>();

@@ -4,13 +4,13 @@
         <thead>
             <tr>
                 <th>Sentence</th>
-                <td *ngFor="let token of indexedTokens">{{token.value}}</td>
+                <td *ngFor="let token of indexedTokens" class="is-clickable" (click)="setTokenPart(token, 'na')">{{token.value}}</td>
             </tr>
         </thead>
         <tbody>
             <ng-container *ngFor="let option of options">
                 <tr *ngIf="!option.advanced || showAdvanced">
-                    <th [@fade]>
+                    <th [@fade] class="is-clickable" (click)="setTokenRow(option.key)">
                         <span tooltipPosition="right" pTooltip="{{option.description}}">
                             {{option.label}}
                             <label>
@@ -18,9 +18,9 @@
                             </label>
                         </span>
                     </th>
-                    <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option)">
-                        <grt-matrix-option [attributes]="tokenValues[token.index]"
-                            [disabled]="tokenPartDisabled(token, option)" [option]="option"></grt-matrix-option>
+                    <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option.key)">
+                        <grt-matrix-option [value]="attributes[token.index][option.key]"
+                            [dependent]="tokenDependents[token.index][option.key]" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
             </ng-container>

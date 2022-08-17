@@ -32,11 +32,11 @@ import {
     ParseService,
     NotificationService
 } from '../../../services/_index';
-import { Filter } from '../../../modules/filters/filters.component';
 import { TreebankMetadata, TreebankSelection } from '../../../treebank';
 import { StepDirective } from '../step.directive';
 import { NotificationKind } from './notification-kind';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
+import { Filter } from '../../../models/filter';
 
 const DebounceTime = 200;
 
@@ -501,7 +501,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                                 item.facet = 'dropdown';
                             }
 
-                            return {
+                            return <Filter>{
                                 field: item.field,
                                 dataType: item.type,
                                 filterType: item.facet,
