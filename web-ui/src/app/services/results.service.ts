@@ -239,9 +239,9 @@ export class ResultsService {
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
-            await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
+            await this.configurationService.getDjangoUrl('search/metadata-count/'), {
             xpath: this.createFilteredQuery(xpath, metadataFilters),
-            corpus,
+            treebank: corpus,
             components,
         }, httpOptions).toPromise();
     }

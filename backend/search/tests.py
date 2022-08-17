@@ -160,11 +160,15 @@ class BaseXSearchTestCase(TestCase):
   <meta name="charencoding" type="text">
     <count value="UTF8">311</count>
   </meta>
+  <meta name="charencoding" type="text">
+    <count value="UTF8">100</count>
+    <count value="UTF16">50</count>
+  </meta>
 </metadata>
 """
         EXPECTED_RESULT = {
             'uttstartlineno': {'33': 1, '216': 1},
-            'charencoding': {'UTF8': 311}
+            'charencoding': {'UTF8': 411, 'UTF16': 50}
         }
         totals = parse_metadata_count_result(
             TEST_XML

@@ -12,7 +12,10 @@ import threading
 
 from treebanks.models import Component
 from .models import SearchQuery
-from .basex_search import generate_xquery_showtree
+from .basex_search import (
+    generate_xquery_showtree, generate_xquery_metadata_count,
+    parse_metadata_count_result
+)
 from services.basex import basex
 
 
@@ -117,3 +120,40 @@ def tree_view(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     return Response({'tree': result})
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])  # No CSRF verification for now
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def metadata_count_view(request):
+    data = request.data
+    try:
+        xpath = data['xpath']
+        treebank = data['treebank']
+        components = data['components']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    xml_pieces = []
+    for component_slug in components:
+        component = Component.objects.get(
+            slug=component_slug, treebank__slug=treebank
+        )
+        dbs = component.get_databases().keys()
+        for db in dbs:
+            xquery = generate_xquery_metadata_count(db, xpath)
+            xml_count_for_db = basex.perform_query(xquery)
+            if xml_count_for_db == '<metadata/>':
+                continue
+            xml_pieces.append(
+                xml_count_for_db
+                .replace('<metadata>', '')
+                .replace('</metadata>', '')
+            )
+    xml = '<metadata>' + ''.join(xml_pieces) + '</metadata>'
+    print(xml)
+    counts = parse_metadata_count_result(xml)
+    return Response(counts)
