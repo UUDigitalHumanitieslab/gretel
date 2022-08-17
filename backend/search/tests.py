@@ -105,7 +105,6 @@ class ComponentSearchResultTestCase(TestCase):
         csr.perform_search()
         # Compare results with what we know from GrETEL 4
         self.assertEqual(csr.number_of_results, 4)
-        self.assertGreater(csr.elapsed_time, 0)
         self.assertLessEqual(csr.search_completed, timezone.now())
         # There should be no errors and error string should be empty
         self.assertEqual(csr.errors, '')

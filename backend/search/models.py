@@ -24,10 +24,6 @@ class ComponentSearchResult(models.Model):
     results = models.TextField(default='', editable=False)
     number_of_results = models.PositiveIntegerField(null=True, editable=False)
     errors = models.TextField(default='', editable=False)
-    elapsed_time = models.PositiveBigIntegerField(
-        null=True, editable=False,
-        help_text='Elapsed time in ms'
-    )
     completed_part = models.PositiveIntegerField(
         null=True, editable=False,
         help_text='Total size in KiB of databases for which the search has '
@@ -78,13 +74,10 @@ class ComponentSearchResult(models.Model):
             if timer() > next_save_time:
                 # Do a direct database update because this is faster than
                 # calling save().
-                ComponentSearchResult.objects.filter(pk=self.pk).update(
-                    completed_part=self.completed_part,
-                    number_of_results=self.number_of_results,
-                    results=self.results
-                )
+                self.save(update_fields=['completed_part',
+                                         'number_of_results',
+                                         'results'])
                 next_save_time = timer() + 1
-        self.elapsed_time = (timer() - start_time) * 1000
         self.search_completed = timezone.now()
         self.save()
 
@@ -166,8 +159,9 @@ class SearchQuery(models.Model):
             if not result_obj.search_completed:
                 stop_adding = True
         if self.total_database_size != 0:
-            search_percentage = 100 * completed_part \
-                / self.total_database_size
+            search_percentage = int(
+                100 * completed_part / self.total_database_size
+            )
         else:
             search_percentage = 100
         # Check if too many results have been added

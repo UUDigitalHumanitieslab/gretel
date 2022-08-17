@@ -48,6 +48,8 @@ def search_view(request):
     if query_id:
         new_query = False
         try:
+            # We also require the right XPath to avoid the possibility of
+            # tampering with queries of other users.
             # TODO: also check if the component list is correct
             query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
         except SearchQuery.DoesNotExist:
