@@ -1,12 +1,12 @@
 """Auxiliary functions to facilitate searching in BaseX."""
 
 import lxml.etree
+import string
 from io import StringIO
 
-ALLOWED_DBNAME_CHARS = '!#$%&\'()+-=@[]^_`{}~ABCDEFGHIJKLMNOPQRSTUVWXYZabcde' \
-                       'fghijklmnopqrstuvwxyz0123456789.'
-ALLOWED_VARNAME_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcde' \
-                       'fghijklmnopqrstuvwxyz0123456789-_.'
+ALLOWED_DBNAME_CHARS = string.ascii_letters + string.digits + \
+    '!#$%&\'()+-=@[]^_`{}~.'
+ALLOWED_VARNAME_CHARS = string.ascii_letters + string.digits + '-_.'
 
 
 def check_xpath(xpath: str) -> bool:
@@ -26,12 +26,14 @@ def check_db_name(db_name: str) -> bool:
 
 
 def check_xquery_variable_name(variable: str) -> bool:
-    if variable[0] != '$':
+    if len(variable) < 1 or variable[0] != '$':
         return False
     return all(x in ALLOWED_VARNAME_CHARS for x in variable[1:])
 
 
-def generate_xquery_for_variables(variables):
+def generate_xquery_for_variables(variables=None):
+    '''Return the let and return fragments as a tuple for the variables
+    part of a search XQuery, to be used for the analysis phase'''
     let_fragment = ''
     return_fragment_inside = ''
     if variables is None:
@@ -75,7 +77,7 @@ def generate_xquery_for_variables(variables):
     return let_fragment, return_fragment
 
 
-def generate_xquery_search(basex_db: str, xpath: str, variables=[]) -> str:
+def generate_xquery_search(basex_db: str, xpath: str, variables=None) -> str:
     """Return XQuery string for use in BaseX to get all occurances
     of a given XPath in XML format in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):

@@ -154,6 +154,5 @@ def metadata_count_view(request):
                 .replace('</metadata>', '')
             )
     xml = '<metadata>' + ''.join(xml_pieces) + '</metadata>'
-    print(xml)
     counts = parse_metadata_count_result(xml)
     return Response(counts)
