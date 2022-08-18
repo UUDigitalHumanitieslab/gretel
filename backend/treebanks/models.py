@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 import logging
 
-from gretel.services import basex
+from services.basex import basex
 
 logger = logging.getLogger(__name__)
 
@@ -81,8 +81,7 @@ class BaseXDB(models.Model):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
         try:
-            basex.start()
-            basex.session.execute('DROP DB {}'.format(self.dbname))
+            basex.get_session().execute('DROP DB {}'.format(self.dbname))
             logger.info('Deleted database {} from BaseX.'.format(self.dbname))
         except OSError as err:
             logger.error(

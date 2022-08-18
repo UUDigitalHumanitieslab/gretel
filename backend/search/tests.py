@@ -5,12 +5,17 @@ from django.utils import timezone
 
 import unittest
 import json
+import lxml.etree as etree
 
 from treebanks.models import Treebank
-from gretel.services import basex
+from services.basex import basex
 
 from .basex_search import (check_db_name, check_xpath, generate_xquery_search,
-                           generate_xquery_count, parse_search_result)
+                           generate_xquery_count, parse_search_result,
+                           generate_xquery_for_variables,
+                           check_xquery_variable_name,
+                           parse_metadata_count_result,
+                           generate_xquery_showtree)
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 test_treebank = None
@@ -20,12 +25,24 @@ XPATH1 = '//node[@cat="smain" and node[@rel="su" and @pt="vnw"] and' \
          ' node[@rel="hd" and @pt="ww"] and node[@rel="predc" and' \
          ' @cat="np" and node[@rel="det" and @pt="lid"] and' \
          ' node[@rel="hd" and @pt="n"]]]'
+VAR_CHECK = [
+    {
+        'name': '$node',
+        'path': '*'
+    },
+    {
+        'name': '$node1',
+        'path': '$node/node[@rel = "su" and @pt = "vnw"]'
+    },
+    {
+        'name': '$node2',
+        'path': '$node/node[@rel = "hd" and @pt = "ww"]'
+    }
+]
 
 
 def setUpModule():
-    try:
-        basex.start()
-    except ConnectionError:
+    if not basex.test_connection():
         # We cannot work with a real treebank, but let other tests continue
         print("NO CONNECTION: Skipping Basex tests")
         return
@@ -46,6 +63,7 @@ def tearDownModule():
 
 class BaseXSearchTestCase(TestCase):
     DB_NAME_CHECK = 'EUROPARL_ID_EP-00_0000'
+    SENT_ID_CHECK = 'troonrede1990.data.dz:63'
 
     def test_check_db_name(self):
         self.assertTrue(check_db_name(self.DB_NAME_CHECK))
@@ -54,6 +72,11 @@ class BaseXSearchTestCase(TestCase):
     def test_check_xpath(self):
         self.assertTrue(check_xpath(XPATH1))
         self.assertFalse(check_xpath(XPATH1 + ' let $a := 0'))
+
+    def test_check_xquery_variable_name(self):
+        self.assertTrue(check_xquery_variable_name('$node1'))
+        self.assertFalse(check_xquery_variable_name('node1'))
+        self.assertFalse(check_xquery_variable_name('$node1 let $a := 0'))
 
     def test_xquery_search_count(self):
         # Check if function runs without error
@@ -74,10 +97,39 @@ class BaseXSearchTestCase(TestCase):
                 XPATH1 + ' let $a := 0'
             )
 
+    def test_xquery_for_variables(self):
+        # TODO: test with custom properties
+        # Should work well with VAR_CHECK
+        let_fragment, return_fragment = \
+            generate_xquery_for_variables(VAR_CHECK)
+        # There should be two declared variables
+        self.assertEqual(let_fragment.count('let $'), 2)
+        # Return fragment should be valid XML
+        etree.fromstring(return_fragment)
+        # Empty variables lists result in empty strings
+        let_fragment, return_fragment = \
+            generate_xquery_for_variables([])
+        self.assertEqual(let_fragment, '')
+        self.assertEqual(return_fragment, '')
+
+    def test_xquery_showtree(self):
+        # Check if function runs without error
+        generate_xquery_showtree(self.DB_NAME_CHECK, self.SENT_ID_CHECK)
+        # TODO: check for valid XQuery
+        # Illegal arguments should raise error
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK + ' ', self.SENT_ID_CHECK
+        )
+        self.assertRaises(
+            ValueError, generate_xquery_showtree,
+            self.DB_NAME_CHECK, self.SENT_ID_CHECK + '"'
+        )
+
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
-            '||meta||</match><match>id2||sentence2||ids2||begins2' \
-            '||xml_sentences2||meta2||</match>'
+            '||meta||vars</match><match>id2||sentence2||ids2||begins2' \
+            '||xml_sentences2||meta2||vars</match>'
         res = parse_search_result(input_str, 'component', 'db')
         self.assertEqual('sentence', res[0]['sentence'])
         self.assertEqual('meta2', res[1]['meta'])
@@ -94,14 +146,52 @@ class BaseXSearchTestCase(TestCase):
         self.assertEqual([], parse_search_result('', 'component', 'db'))
         self.assertEqual([], parse_search_result('\n ', 'component', 'db'))
 
+    def test_parse_metadata_count_result(self):
+        TEST_XML = """
+<metadata>
+  <meta name="uttstartlineno" type="int">
+    <count value="33">1</count>
+    <count value="216">1</count>
+  </meta>
+  <meta name="charencoding" type="text">
+    <count value="UTF8">311</count>
+  </meta>
+  <meta name="charencoding" type="text">
+    <count value="UTF8">100</count>
+    <count value="UTF16">50</count>
+  </meta>
+</metadata>
+"""
+        EXPECTED_RESULT = {
+            'uttstartlineno': {'33': 1, '216': 1},
+            'charencoding': {'UTF8': 411, 'UTF16': 50}
+        }
+        totals = parse_metadata_count_result(
+            TEST_XML
+        )
+        self.assertEqual(totals, EXPECTED_RESULT)
+        # Empty list should give empty dict
+        self.assertEqual(
+            parse_metadata_count_result('<metadata></metadata>'),
+            {}
+        )
+        # Invalid format should raise error
+        with self.assertRaises(ValueError):
+            parse_metadata_count_result('<something></something>')
+
 
 class ComponentSearchResultTestCase(TestCase):
-    @unittest.skipIf(not basex.session, 'requires running BaseX server')
     def test_perform_search(self):
+        if not basex.test_connection():
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
         component = test_treebank.components.get(slug='troonrede19')
-        csr = ComponentSearchResult(xpath=XPATH1, component=component)
+        csr = ComponentSearchResult(
+            xpath=XPATH1,
+            component=component,
+            variables=VAR_CHECK
+        )
         csr.perform_search()
         # Compare results with what we know from GrETEL 4
         self.assertEqual(csr.number_of_results, 4)
@@ -126,9 +216,10 @@ class ComponentSearchResultTestCase(TestCase):
                 csr2.perform_search()
 
 
-@unittest.skipIf(not basex.session, 'requires running BaseX server')
 class SearchQueryTestCase(TestCase):
     def setUp(self):
+        if not basex.test_connection():
+            return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
 

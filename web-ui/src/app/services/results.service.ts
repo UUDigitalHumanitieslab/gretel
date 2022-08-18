@@ -205,14 +205,20 @@ export class ResultsService {
         sentenceId: string,
         nodeIds: number[],
     ) {
-        const url = await this.configurationService.getApiUrl(
-            provider,
-            'tree',
-            [treebank, component, btoa(sentenceId)],
-            { ...(database && { db: database }) });
-
-        const treeXml = await this.http.get(url, { responseType: 'text' }).toPromise();
-        return this.highlightSentenceNodes(treeXml, nodeIds);
+        /* provider, treebank and component are not used anymore,
+        but leave them for now */
+        const url2 = await this.configurationService.getDjangoUrl(
+            'search/tree/'
+        );
+        const data = {
+            database: database,
+            sentence_id: sentenceId
+        }
+        const response = await this.http.post<ApiTreeResult>(
+            url2,
+            data
+        ).toPromise();
+        return this.highlightSentenceNodes(response.tree, nodeIds);
     }
 
     /** adds a "highlight=yes" attribute to all nodes with ID, and their descendants. */
@@ -233,9 +239,9 @@ export class ResultsService {
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
-            await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
+            await this.configurationService.getDjangoUrl('search/metadata-count/'), {
             xpath: this.createFilteredQuery(xpath, metadataFilters),
-            corpus,
+            treebank: corpus,
             components,
         }, httpOptions).toPromise();
     }
@@ -386,7 +392,7 @@ export class ResultsService {
             const sentence = result.sentence;
             const nodeStarts = result.begins.split('-').map(x => parseInt(x, 10));
             const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${result.meta}</metadata>`));
-            const variableValues = undefined; // this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
+            const variableValues = this.mapVariables(await this.parseService.parseXml(result.variables));
             const component = result.component;
             const database = result.database;
             return {
@@ -524,6 +530,7 @@ type ApiSearchResult = {
         begins: string,
         xml_sentences: string,
         meta: string,
+        variables: string,
         component: string,
         database: string
     }[],
@@ -621,3 +628,8 @@ export interface TreebankCount {
 }
 
 export interface MetadataValueCounts { [key: string]: { [value: string]: number }; }
+
+type ApiTreeResult = {
+    tree?: string,
+    error?: string
+}

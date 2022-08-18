@@ -12,6 +12,11 @@ import threading
 
 from treebanks.models import Component
 from .models import SearchQuery
+from .basex_search import (
+    generate_xquery_showtree, generate_xquery_metadata_count,
+    parse_metadata_count_result
+)
+from services.basex import basex
 
 
 def run_search(query_obj) -> None:
@@ -40,6 +45,7 @@ def search_view(request):
     query_id = data.get('query_id', None)
     start_from = data.get('start_from', 0)
     is_analysis = data.get('is_analysis', False)
+    variables = data.get('variables', [])
     if is_analysis:
         maximum_results = settings.MAXIMUM_RESULTS_ANALYSIS
     else:
@@ -59,7 +65,7 @@ def search_view(request):
             )
     else:
         new_query = True
-        query = SearchQuery(xpath=xpath)
+        query = SearchQuery(xpath=xpath, variables=variables)
         query.save()
         query.components.add(*components_obj)
         query.initialize()
@@ -83,3 +89,70 @@ def search_view(request):
         thread.start()
 
     return Response(response)
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])  # No CSRF verification for now
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def tree_view(request):
+    data = request.data
+    try:
+        database = data['database']
+        sentence_id = data['sentence_id']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        xquery = generate_xquery_showtree(database, sentence_id)
+    except ValueError as err:
+        return Response(
+            {'error': str(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        result = basex.perform_query(xquery)
+    except OSError as err:
+        return Response(
+            {'error': str(err)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    return Response({'tree': result})
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])  # No CSRF verification for now
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def metadata_count_view(request):
+    data = request.data
+    try:
+        xpath = data['xpath']
+        treebank = data['treebank']
+        components = data['components']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    xml_pieces = []
+    for component_slug in components:
+        component = Component.objects.get(
+            slug=component_slug, treebank__slug=treebank
+        )
+        dbs = component.get_databases().keys()
+        for db in dbs:
+            xquery = generate_xquery_metadata_count(db, xpath)
+            xml_count_for_db = basex.perform_query(xquery)
+            if xml_count_for_db == '<metadata/>':
+                continue
+            xml_pieces.append(
+                xml_count_for_db
+                .replace('<metadata>', '')
+                .replace('</metadata>', '')
+            )
+    xml = '<metadata>' + ''.join(xml_pieces) + '</metadata>'
+    counts = parse_metadata_count_result(xml)
+    return Response(counts)
