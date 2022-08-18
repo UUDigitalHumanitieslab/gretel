@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,7 +134,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # BaseX connection settings - change in production
-BASEX_HOST = 'localhost'
+BASEX_HOST = os.getenv('BASEX_HOST', 'localhost')
 BASEX_PORT = 1984
 BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
@@ -142,7 +143,7 @@ BASEX_PASSWORD = 'admin'
 # Provide ALPINO_HOST and ALPINO_PORT to use Alpino as a server. Provide
 # ALPINO_PATH to use the Alpino executable. If both are provided (i.e.
 # not None) the server will be used.
-ALPINO_HOST = 'localhost'
+ALPINO_HOST = os.getenv('ALPINO_HOST', 'localhost')
 ALPINO_PORT = 7001
 ALPINO_PATH = '/opt/Alpino'
 
