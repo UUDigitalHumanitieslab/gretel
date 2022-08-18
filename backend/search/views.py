@@ -8,14 +8,13 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.conf import settings
 
-import threading
-
 from treebanks.models import Component
 from .models import SearchQuery
 from .basex_search import (
     generate_xquery_showtree, generate_xquery_metadata_count,
     parse_metadata_count_result
 )
+from .tasks import run_search_query
 from services.basex import basex
 
 
@@ -70,6 +69,13 @@ def search_view(request):
         query.components.add(*components_obj)
         query.initialize()
 
+    if new_query:
+        try:
+            run_search_query.delay(query.pk)
+        except run_search_query.OperationalError:
+            # No connection with message broker - run synchronously
+            run_search_query.apply((query.pk,))
+
     # Get results so far, if any
     results, percentage = query.get_results(start_from, maximum_results)
     if request.accepted_renderer.format == 'api':
@@ -82,11 +88,6 @@ def search_view(request):
     }
     if percentage == 100:
         response['errors'] = query.get_errors()
-
-    if new_query:
-        # Start searching in a new thread
-        thread = threading.Thread(target=run_search, args=(query,))
-        thread.start()
 
     return Response(response)
 
