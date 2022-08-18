@@ -17,9 +17,7 @@ class ServicesConfig(AppConfig):
         if os.environ.get('RUN_MAIN') == 'true':
             # Try to connect to BaseX and Alpino as soon as server starts to
             # warn the user immediately
-            try:
-                basex.start()
-            except ConnectionRefusedError:
+            if not basex.test_connection():
                 logger.warning(
                     'Could not connect to BaseX. Check if it is running and '
                     'connection settings are correct. GrETEL will run but '

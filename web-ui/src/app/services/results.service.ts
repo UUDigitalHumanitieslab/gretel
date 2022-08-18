@@ -239,9 +239,9 @@ export class ResultsService {
     /** On error the returned promise rejects with @type {HttpErrorResponse} */
     async metadataCounts(xpath: string, provider: string, corpus: string, components: string[], metadataFilters: FilterValue[] = []) {
         return await this.http.post<MetadataValueCounts>(
-            await this.configurationService.getApiUrl(provider, 'metadata_counts'), {
+            await this.configurationService.getDjangoUrl('search/metadata-count/'), {
             xpath: this.createFilteredQuery(xpath, metadataFilters),
-            corpus,
+            treebank: corpus,
             components,
         }, httpOptions).toPromise();
     }
@@ -392,7 +392,7 @@ export class ResultsService {
             const sentence = result.sentence;
             const nodeStarts = result.begins.split('-').map(x => parseInt(x, 10));
             const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${result.meta}</metadata>`));
-            const variableValues = undefined; // this.mapVariables(await this.parseService.parseXml(results.varlist[hitId]));
+            const variableValues = this.mapVariables(await this.parseService.parseXml(result.variables));
             const component = result.component;
             const database = result.database;
             return {
@@ -530,6 +530,7 @@ type ApiSearchResult = {
         begins: string,
         xml_sentences: string,
         meta: string,
+        variables: string,
         component: string,
         database: string
     }[],

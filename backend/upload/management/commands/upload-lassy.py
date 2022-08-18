@@ -190,7 +190,7 @@ class Command(BaseCommand):
                 )
 
     def check_existing_databases(self, treebank_name):
-        all_basex_dbs = basex.session.execute('LIST').split('\n')
+        all_basex_dbs = basex.execute('LIST').split('\n')
         current_dbs = [x[0:x.find(' ')]
                        for x in all_basex_dbs
                        if x.startswith(treebank_name)]
@@ -202,7 +202,7 @@ class Command(BaseCommand):
             if userinputyesno('Delete them? (they may be overwritten!)', True):
                 for db in current_dbs:
                     try:
-                        basex.session.execute('DROP DB {}'.format(db))
+                        basex.execute('DROP DB {}'.format(db))
                     except OSError as err:
                         raise CommandError(
                             'Could not delete database: {}'.format(err)
@@ -258,9 +258,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Found {} files to process.'
                                              .format(len(self.inputfiles))))
 
-        try:
-            basex.start()
-        except ConnectionError as err:
+        if not basex.test_connection():
             raise CommandError('Cannot connect to BaseX: {}. '
                                'This command needs BaseX to run.'
                                .format(err))
@@ -329,7 +327,7 @@ class Command(BaseCommand):
                 basex_db = treebank_db + '_' + file_title.upper()
                 # Add to BaseX and wrap up if this succeeds
                 try:
-                    basex.session.create(basex_db, output)
+                    basex.create(basex_db, output)
                     # Get database size in KiB
                     dbsize = int(basex.perform_query(
                         'db:property("{}", "size")'.format(basex_db)
