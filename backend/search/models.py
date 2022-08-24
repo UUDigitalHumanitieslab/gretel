@@ -40,7 +40,7 @@ class ComponentSearchResult(models.Model):
     def __str__(self):
         return '"{}…" for {}'.format(self.xpath[:10], self.component)
 
-    def perform_search(self):
+    def perform_search(self, query_id=None):
         """Perform full component search and regularly update on progress"""
         if not check_xpath(self.xpath):
             raise SearchError('Malformed XPath')
@@ -79,6 +79,12 @@ class ComponentSearchResult(models.Model):
             if timer() > next_save_time:
                 self.save()
                 next_save_time = timer() + 1
+                # Also check if search has been cancelled
+                if query_id is not None:
+                    cancelled = SearchQuery.objects \
+                        .values_list('cancelled', flat=True).get(id=query_id)
+                    if cancelled:
+                        return
         self.search_completed = timezone.now()
         self.save()
 
@@ -99,6 +105,10 @@ class SearchQuery(models.Model):
         null=True, editable=False,
         help_text='Total size in KiB of databases for which the search has '
                   'been completed'
+    )
+    cancelled = models.BooleanField(
+        default=False,
+        help_text='True if the query was cancelled by the user'
     )
 
     def initialize(self) -> None:
@@ -191,9 +201,13 @@ class SearchQuery(models.Model):
             if result_obj.search_completed and result_obj.errors == '':
                 continue
             try:
-                result_obj.perform_search()
+                result_obj.perform_search(self.id)
             except SearchError:
                 raise
+            # Check if search has been cancelled in the meantime
+            self.refresh_from_db(fields=['cancelled'])
+            if self.cancelled:
+                break
 
     def get_errors(self) -> str:
         errs = ''
@@ -204,3 +218,8 @@ class SearchQuery(models.Model):
                     '\n{}\n\n' \
                     .format(result_obj.component, result_obj.errors)
         return errs
+
+    def cancel_search(self) -> None:
+        """Mark search as cancelled and save object"""
+        self.cancelled = True
+        self.save()
