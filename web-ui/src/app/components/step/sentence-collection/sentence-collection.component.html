@@ -14,6 +14,10 @@
     </div>
 </form>
 
+<div class="block">
+    Showing {{ visible() }} out of {{ count() }} matching known expressions:
+</div>
+
 
 <table class="table is-fullwidth">
     <tr *ngFor="let sent of sentences"
@@ -25,3 +29,5 @@
         <td (click)="onSelect.emit({text: filterString})">Search for "{{ filterString }}"</td>
     </tr>
 </table>
+
+<a (click)="showMore()">Show more...</a>

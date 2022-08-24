@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 
+const STEP: number = 20;
+
 @Component({
     selector: 'grt-sentence-collection',
     templateUrl: './sentence-collection.component.html',
@@ -8,6 +10,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 export class SentenceCollectionComponent implements OnInit {
 
     private _sentences: {text:string, id:number}[];
+    private limit: number;
 
     filterString: string;
 
@@ -23,9 +26,10 @@ export class SentenceCollectionComponent implements OnInit {
     constructor() {
         this.filterString = '';
         this._sentences = [];
+        this.limit = STEP;
     }
 
-    get sentences() {
+    filteredSentences() {
         return this._sentences.filter((sent) => {
             let words = this.filterString.split(/\s+/);
             let match = true;
@@ -35,6 +39,9 @@ export class SentenceCollectionComponent implements OnInit {
             return match;
         })
     }
+    get sentences() {
+        return this.filteredSentences().slice(0, this.limit);
+    }
 
     @Input()
     set sentences(sents) {
@@ -42,5 +49,17 @@ export class SentenceCollectionComponent implements OnInit {
     }
 
     ngOnInit(): void {
+    }
+
+    count(): number {
+        return this.filteredSentences().length;
+    }
+
+    visible(): number {
+        return Math.min(this.count(), this.limit);
+    }
+
+    showMore(): void {
+        this.limit += STEP;
     }
 }
