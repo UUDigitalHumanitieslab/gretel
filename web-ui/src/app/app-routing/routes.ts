@@ -25,7 +25,7 @@ const routes: Routes = [
     component: XpathSearchComponent,
   },
   {
-    path: 'mwe',
+    path: 'mwe-search',
     component: MultiWordExpressionsComponent,
   },
   {

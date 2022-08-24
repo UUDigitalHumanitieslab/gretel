@@ -25,7 +25,7 @@ const links: Link[] = [
     },
     {
         name: 'Multi Word Expressions',
-        link: '/mwe',
+        link: '/mwe-search',
         proxy: false,
     },
     {
