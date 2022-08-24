@@ -188,7 +188,7 @@ class SearchQuery(models.Model):
             # Check if search has been completed by now by a concurrent
             # search. If so, continue
             result_obj.refresh_from_db()
-            if result_obj.search_completed:
+            if result_obj.search_completed and result_obj.errors == '':
                 continue
             try:
                 result_obj.perform_search()
