@@ -31,6 +31,9 @@ export class ResultsTableComponent implements OnInit, OnDestroy {
     public loading = true;
 
     @Input()
+    public loadingDownload = true;
+
+    @Input()
     public filteredResults = [];
 
     @Input()
