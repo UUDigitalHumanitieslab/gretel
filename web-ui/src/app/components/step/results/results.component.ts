@@ -361,6 +361,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         ).pipe(
             filter((values) => values.every(value => value != null)),
             map(([state, filterValues]) => ({
+                retrieveContext: state.retrieveContext,
                 selectedTreebanks: state.selectedTreebanks,
                 xpath: state.xpath,
                 filterValues
@@ -371,18 +372,19 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                 // already give feedback a change is pending,
                 // so the user doesn't think the interface is stuck
                 this.loading = true;
-                return prev.filterValues === curr.filterValues &&
+                return prev.retrieveContext === curr.retrieveContext &&
+                    prev.filterValues === curr.filterValues &&
                     prev.xpath === curr.xpath &&
                     prev.selectedTreebanks.equals(curr.selectedTreebanks);
             }),
             debounceTime(DebounceTime),
-            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
+            switchMap(({ selectedTreebanks, xpath, filterValues, retrieveContext }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,
                     selectedTreebanks,
                     filterValues,
-                    this.retrieveContext);
+                    retrieveContext);
 
                 // join all results, and wrap the entire sequence in a start and end message so
                 // we know what's happening and can update spinners etc.
