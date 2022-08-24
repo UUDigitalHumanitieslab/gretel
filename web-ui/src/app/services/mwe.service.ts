@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ConfigurationService } from "./configuration.service";
+import { ParserService } from 'lassy-xpath';
 
 export interface MweCanonicalForm {
     id: number,
@@ -29,7 +30,7 @@ export class MweService {
     generateMweUrl: Promise<string>;
     saveQueryUrl: Promise<string>;
 
-    constructor(configurationService: ConfigurationService, private http: HttpClient) {
+    constructor(configurationService: ConfigurationService, private http: HttpClient, private parserService: ParserService) {
         this.canonicalMweUrl = configurationService.getDjangoUrl('mwe/canonical');
         this.generateMweUrl = configurationService.getDjangoUrl('mwe/generate');
         this.saveQueryUrl = configurationService.getDjangoUrl('mwe/xpath/');
@@ -43,6 +44,10 @@ export class MweService {
     async generateQuery(canonical: string) : Promise<MweQuerySet> {
         let response = await this.http.post<MweQuerySet>(
             await this.generateMweUrl, {canonical}).toPromise();
+
+        response.forEach((query) => {
+            query.xpath = this.parserService.format(query.xpath);
+        });
 
         return response;
     }
