@@ -56,7 +56,7 @@ def search_view(request):
             # We also require the right XPath to avoid the possibility of
             # tampering with queries of other users.
             # TODO: also check if the component list is correct
-            query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
+            query = SearchQuery.objects.get(pk=query_id)
         except SearchQuery.DoesNotExist:
             return Response(
                 {'error': 'Cannot find given query_id'},
@@ -88,8 +88,38 @@ def search_view(request):
     }
     if percentage == 100:
         response['errors'] = query.get_errors()
+    if query.cancelled is True:
+        response['cancelled'] = True
 
     return Response(response)
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def cancel_query_view(request):
+    data = request.data
+    try:
+        xpath = data['xpath']
+        query_id = data['query_id']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # We also require the right XPath to avoid the possibility of
+        # tampering with queries of other users.
+        # TODO: also check if the component list is correct
+        query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
+    except SearchQuery.DoesNotExist:
+        return Response(
+            {'error': 'Cannot find given query_id'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    query.cancel_search()
 
 
 @api_view(['POST'])

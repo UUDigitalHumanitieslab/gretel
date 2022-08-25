@@ -206,6 +206,7 @@ class SearchQuery(models.Model):
                 raise
             # Check if search has been cancelled in the meantime
             self.refresh_from_db(fields=['cancelled'])
+            print(self.cancelled)
             if self.cancelled:
                 break
 
