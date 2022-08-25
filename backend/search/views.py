@@ -79,6 +79,9 @@ def search_view(request):
     # Get results so far, if any
     results, percentage = query.get_results(start_from, maximum_results)
     if request.accepted_renderer.format == 'api':
+        # If using the API view, only show part of the results, because
+        # the HTML rendering of Django Rest Framework turns out to be
+        # very slow
         results = str(results)[0:5000] + \
             '… (remainder hidden because of slow rendering)'
     response = {
