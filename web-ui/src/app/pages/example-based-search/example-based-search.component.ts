@@ -140,10 +140,10 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
             newState.attributes = matrixSettings.attributes;
         }
 
-        let state: GlobalStateExampleBased = await this.stateService.setState(newState);
+        let state = this.stateService.setState(newState);
         state = await this.matrixStep.updateMatrix(state);
         state.loading = false;
-        state = await this.stateService.setState(state);
+        this.stateService.setState(state);
     }
 
     updateRetrieveContext(retrieveContext: boolean) {

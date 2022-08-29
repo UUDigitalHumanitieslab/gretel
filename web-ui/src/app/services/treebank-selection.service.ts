@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { StateService } from './state.service';
 import { TreebankService } from './treebank.service';
 import { GlobalState, StepType } from '../pages/multi-step-page/steps';
-import { Treebank, TreebankDetails, CorpusSelection } from '../treebank';
+import { Treebank, TreebankDetails, CorpusSelection, TreebankSelection } from '../treebank';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 type DetailLookup<T extends keyof TreebankDetails> = Pick<TreebankDetails, T>;
@@ -11,7 +12,7 @@ type DetailLookup<T extends keyof TreebankDetails> = Pick<TreebankDetails, T>;
     providedIn: 'root'
 })
 export class TreebankSelectionService {
-    get state$() {
+    get state$(): Observable<TreebankSelection> {
         return this.stateService.state$.pipe(map(state => state.selectedTreebanks));
     }
 

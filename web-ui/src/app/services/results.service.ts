@@ -611,6 +611,12 @@ export interface Hit {
     variableValues: { [variableName: string]: { [propertyKey: string]: string } };
 }
 
+export type HitWithOrigin = Hit & {
+    provider: string;
+    corpus: { name: string };
+    componentDisplayName: string;
+};
+
 
 export type FilterValue = FilterByField | FilterByXPath;
 export type FilterByField =
