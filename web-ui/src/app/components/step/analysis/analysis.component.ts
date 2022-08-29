@@ -1,6 +1,7 @@
 /// <reference path="pivottable.d.ts"/>
 /// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter, HostListener } from '@angular/core';
+import { faExpand } from '@fortawesome/free-solid-svg-icons';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
 import { switchMap, first, finalize, debounceTime, map, distinctUntilChanged } from 'rxjs/operators';
 
@@ -28,6 +29,7 @@ import { TreebankMetadata } from '../../../treebank';
 import { StepDirective } from '../step.directive';
 import { GlobalState, StepType, getSearchVariables } from '../../../pages/multi-step-page/steps';
 import { AddNodeEvent } from '../../node-properties/node-properties-editor.component';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 @Component({
     animations,
@@ -36,6 +38,8 @@ import { AddNodeEvent } from '../../node-properties/node-properties-editor.compo
     styleUrls: ['./analysis.component.scss']
 })
 export class AnalysisComponent extends StepDirective<GlobalState> implements OnInit, OnDestroy {
+    faExpand = faExpand;
+
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;
@@ -61,7 +65,7 @@ export class AnalysisComponent extends StepDirective<GlobalState> implements OnI
 
     public variables: { [name: string]: PathVariable; };
     public treeXml: string;
-    public treeDisplay = 'inline';
+    public treeDisplay: TreeVisualizerDisplay = 'inline';
 
     public isLoading = true;
 

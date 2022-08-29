@@ -1,7 +1,7 @@
-import { Component, ViewChild, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OverlayPanel } from 'primeng/overlaypanel';
-import { ResultsComponent } from './results.component';
+import { faDownload, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'grt-download-results',
@@ -11,20 +11,22 @@ import { ResultsComponent } from './results.component';
 export class DownloadResultsComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
 
+    faDownload = faDownload;
+    faInfoCircle = faInfoCircle;
+
     @ViewChild(OverlayPanel, { static: true })
     overlayPanel: OverlayPanel;
 
     @Input()
     loading = false;
 
+    @Output()
+    downloadResults = new EventEmitter<boolean>();
+
     visible = false;
     includeNodeProperties = false;
 
-    constructor(private resultsComponent: ResultsComponent) { }
-
-    downloadResults() {
-        this.resultsComponent.downloadResults(this.includeNodeProperties);
-    }
+    constructor() { }
 
     toggle($event: any) {
         this.overlayPanel.toggle($event);

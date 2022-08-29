@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FilterDirective } from '../filter/filter.directive';
-import { Filter } from '../filters.component';
+import { TextFilter } from '../../../models/filter';
 import { FilterValue } from '../../../services/_index';
 
 @Component({
@@ -8,10 +8,10 @@ import { FilterValue } from '../../../services/_index';
     templateUrl: './dropdown.component.html',
     styleUrls: ['./dropdown.component.scss']
 })
-export class DropdownComponent extends FilterDirective {
+export class DropdownComponent extends FilterDirective<TextFilter> {
     public selected: string[];
 
-    onFilterSet(filter: Filter) {
+    onFilterSet(filter: TextFilter) {
         if (!this.selected) {
             this.selected = [];
         }

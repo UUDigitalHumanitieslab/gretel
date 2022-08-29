@@ -13,7 +13,7 @@ import { TreebankSelection } from '../../treebank';
 @Directive()
 export abstract class MultiStepPageDirective<T extends GlobalState> implements OnDestroy, OnInit {
     public crumbs: Crumb[];
-    public globalState: T;
+    public globalState: Readonly<T>;
     public warning: string | false;
     /**
      * Whether the next step is currently being resolved
@@ -132,8 +132,8 @@ export abstract class MultiStepPageDirective<T extends GlobalState> implements O
         this.stateService.next();
     }
 
-    setValid(valid: boolean) {
-        this.globalState.valid = valid;
+    setValid(valid: boolean): void {
+        this.stateService.setState({ valid }, false);
     }
 
     updateUrl(state: T, writeState = true) {
@@ -151,12 +151,12 @@ export abstract class MultiStepPageDirective<T extends GlobalState> implements O
     }
 
     updateFilterValues(filterValues: FilterValues) {
-        this.globalState.filterValues = filterValues;
+        this.stateService.setState({ filterValues }, false);
     }
 
     filterResults(values: { xpath: string, filterValues: FilterValues }, resultsStep: number) {
         // TODO: xpath
-        this.globalState.filterValues = values.filterValues;
+        this.stateService.setState({ filterValues: values.filterValues }, false);
         this.goToStep(resultsStep);
     }
 

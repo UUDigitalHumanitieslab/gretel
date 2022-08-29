@@ -28,19 +28,19 @@
                                     [ngClass]="{'prop-disabled': !prop.enabled, 'prop-enabled': prop.enabled}">
                                     <span class="button disable-toggle is-danger is-inverted" grtBalloon="Disable custom property">
                                         <span class="icon">
-                                            <i class="fas fa-ban"></i>
+                                            <fa-icon [icon]="faBan" aria-hidden="true"></fa-icon>
                                         </span>
                                     </span>
                                     <span class="button enable-toggle is-success is-inverted" grtBalloon="Enable custom property">
                                         <span class="icon">
-                                            <i class="fas fa-check"></i>
+                                            <fa-icon [icon]="faCheck" aria-hidden="true"></fa-icon>
                                         </span>
                                     </span>
                                 </p>
                                 <p class="control">
                                     <span class="button is-black is-inverted" (click)="delete($event, node, prop)" grtBalloon="Remove custom property">
                                         <span class="icon">
-                                            <i class="fas fa-trash"></i>
+                                            <fa-icon [icon]="faTrash" aria-hidden="true"></fa-icon>
                                         </span>
                                     </span>
                                 </p>
@@ -63,7 +63,7 @@
                 <td>
                     <button type="submit" class="button is-primary" grtBalloon="Add custom property">
                         <span class="icon">
-                            <i class="fas fa-plus"></i>
+                            <fa-icon [icon]="faPlus" aria-hidden="true"></fa-icon>
                         </span>
                     </button>
                 </td>

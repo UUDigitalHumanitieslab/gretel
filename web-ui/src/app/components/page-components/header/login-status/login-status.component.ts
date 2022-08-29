@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { NotificationService } from '../../../../services/notification.service';
 import { User, UserService } from '../../../../services/user.service';
@@ -10,6 +11,9 @@ import { User, UserService } from '../../../../services/user.service';
     styleUrls: ['./login-status.component.scss']
 })
 export class LoginStatusComponent implements OnInit, OnDestroy {
+    faUser = faUser;
+    faUsers = faUsers;
+
     subscriptions: Subscription[] = [];
 
     /**

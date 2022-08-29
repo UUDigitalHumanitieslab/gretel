@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { commonTestBed } from '../../../common-test-bed';
 
-import { PaperCiteComponent } from './paper-cite.component';
+import { AddressComponent } from './address.component';
 
-describe('PaperCiteComponent', () => {
-    let component: PaperCiteComponent;
-    let fixture: ComponentFixture<PaperCiteComponent>;
+describe('AddressComponent', () => {
+    let component: AddressComponent;
+    let fixture: ComponentFixture<AddressComponent>;
 
     beforeEach(waitForAsync(() => {
         commonTestBed().testingModule.compileComponents();
     }));
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(PaperCiteComponent);
+        fixture = TestBed.createComponent(AddressComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
