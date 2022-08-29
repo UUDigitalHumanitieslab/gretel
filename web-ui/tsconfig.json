@@ -35,6 +35,6 @@
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true,
-        "compilationMode": "partial"
+        "compilationMode": "full"
     }
 }
