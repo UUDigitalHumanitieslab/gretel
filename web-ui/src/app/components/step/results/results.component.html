@@ -14,11 +14,9 @@
 </div>
 <grt-results-table
     [loading]="loading"
+    [loadingDownload]="loadingDownload"
     [filteredResults]="filteredResults"
-    [filters]="filters"
-    [filterValues]="filterValues"
     [filterXPaths]="filterXPaths"
-    [activeFilterCount]="activeFilterCount"
     [retrieveContext]="retrieveContext"
     (changeFilterValues)="filterChange($event)"
     (deleteFilter)="deleteFilter($event)"
