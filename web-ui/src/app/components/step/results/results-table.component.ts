@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { faBars, faChevronLeft, faChevronRight, faCommentDots, faCommentSlash, faFileAlt, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { Subscription, Observable, combineLatest } from 'rxjs';
 import {
     debounceTime,
@@ -27,6 +28,14 @@ const DebounceTime = 200;
     styleUrls: ['./results-table.component.scss'],
 })
 export class ResultsTableComponent implements OnInit, OnDestroy {
+    faBars = faBars;
+    faChevronLeft = faChevronLeft;
+    faChevronRight = faChevronRight;
+    faCommentDots = faCommentDots;
+    faCommentSlash = faCommentSlash;
+    faFileAlt = faFileAlt;
+    faPrint = faPrint;
+
     @Input()
     public loading = true;
 

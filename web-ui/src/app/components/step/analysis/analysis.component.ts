@@ -1,6 +1,7 @@
 /// <reference path="pivottable.d.ts"/>
 /// <reference types="jqueryui"/>
 import { Component, Input, OnDestroy, OnInit, NgZone, Output, EventEmitter, HostListener } from '@angular/core';
+import { faExpand } from '@fortawesome/free-solid-svg-icons';
 import { BehaviorSubject, Subject, Subscription, combineLatest, merge } from 'rxjs';
 import { switchMap, first, finalize, debounceTime, map, distinctUntilChanged } from 'rxjs/operators';
 
@@ -37,6 +38,8 @@ import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.com
     styleUrls: ['./analysis.component.scss']
 })
 export class AnalysisComponent extends StepDirective<GlobalState> implements OnInit, OnDestroy {
+    faExpand = faExpand;
+
     left: number;
     top: number;
     private $element: JQuery<HTMLElement>;

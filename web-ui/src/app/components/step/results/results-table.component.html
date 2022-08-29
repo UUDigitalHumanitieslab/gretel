@@ -5,9 +5,10 @@
                 <div class="field">
                     <p class="control">
                         <a class="button" role="button" (click)="hideFiltersColumn = !hideFiltersColumn"
-                            [ngClass]="{'is-secondary': hideFiltersColumn, 'has-badge-rounded': activeFilterCount}" [attr.data-badge]="activeFilterCount ? activeFilterCount : undefined">
+                            [ngClass]="{'is-secondary': hideFiltersColumn, 'has-badge-rounded': activeFilterCount}" [attr.data-badge]="activeFilterCount ? activeFilterCount : undefined"
+                            title="Toggle filters">
                             <span class="icon">
-                                <i class="fas fa-bars" title="Toggle filters"></i>
+                                <fa-icon [icon]="faBars" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>
@@ -27,9 +28,9 @@
             <div class="level-item">
                 <div class="field">
                     <p class="control" (click)="prev.emit()">
-                        <a class="button is-hidden-tablet" role="button">
+                        <a class="button is-hidden-tablet" role="button" title="Previous">
                             <span class="icon ">
-                                <i class="fas fa-chevron-left" title="Previous"></i>
+                                <fa-icon [icon]="faChevronLeft" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                         <a class="button is-hidden-mobile" role="button">
@@ -47,7 +48,7 @@
                         <a class="button" role="button" (click)="downloadFilelist.next()" grtBalloonLength="large"
                             grtBalloonPosition="down" grtBalloon="Download the names of the files in a filelist (.fl)">
                             <span class="icon is-large">
-                                <i class="fas fa-file-alt"></i>
+                                <fa-icon [icon]="faFileAlt" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>
@@ -59,7 +60,7 @@
                         [grtBalloonVisible]="loading ? false : undefined">
                         <a class="button" role="button" [ngClass]="{'is-loading':loading}" (click)="print()">
                             <span class="icon is-large">
-                                <i class="fas fa-print"></i>
+                                <fa-icon [icon]="faPrint" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>
@@ -72,13 +73,13 @@
                             grtBalloon="Click to show the sentences directly before and after the hits."
                             *ngIf="!retrieveContext">
                             <span class="icon is-large">
-                                <i class="fas fa-comment-slash"></i>
+                                <fa-icon [icon]="faCommentSlash" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                         <a class="button is-primary" role="button" grtBalloonLength="large" grtBalloonPosition="down"
                             grtBalloon="Click to hide the sentences surrounding the hits." *ngIf="retrieveContext">
                             <span class="icon is-large">
-                                <i class="fas fa-comment-dots"></i>
+                                <fa-icon [icon]="faCommentDots" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>
@@ -87,9 +88,9 @@
             <div class="level-item">
                 <div class="field">
                     <p class="control" (click)="next.emit()">
-                        <a class="button is-hidden-tablet" role="button">
+                        <a class="button is-hidden-tablet" role="button" title="Previous">
                             <span class="icon ">
-                                <i class="fas fa-chevron-right" title="Previous"></i>
+                                <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                         <a class="button is-hidden-mobile" role="button">

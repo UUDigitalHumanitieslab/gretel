@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, OnInit, OnDestroy } from '@angular/core';
+import { faInfoCircle, faExpand } from '@fortawesome/free-solid-svg-icons';
 
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -15,6 +16,9 @@ import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.com
     styleUrls: ['./xpath-input.component.scss']
 })
 export class XpathInputComponent extends StepDirective<GlobalState> implements OnChanges, OnInit, OnDestroy {
+    faInfoCircle = faInfoCircle;
+    faExpand = faExpand;
+
     public stepType = StepType.XpathInput;
     public treeXml: string;
     public treeDisplay: TreeVisualizerDisplay = 'inline';

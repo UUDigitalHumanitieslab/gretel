@@ -35,7 +35,7 @@ import { ResultsComponent } from './components/step/results/results.component';
 import { ResultsXpathEditorComponent } from './components/step/results/xpath-editor.component';
 import { ResultsTableComponent } from './components/step/results/results-table.component';
 import { PaperCiteComponent } from './components/page-components/paper-cite/paper-cite.component';
-import { AdressComponent } from './components/page-components/adress/adress.component';
+import { AddressComponent } from './components/page-components/address/address.component';
 import { FooterComponent } from './components/page-components/footer/footer.component';
 import { BodyHeaderComponent } from './components/page-components/body-header/body-header.component';
 import { LoginStatusComponent } from './components/page-components/header/login-status/login-status.component';
@@ -79,7 +79,7 @@ import { HighlightPipe } from './highlight.pipe';
 import { HighlightMatchPipe } from './highlight-match.pipe';
 
 export const declarations: any[] = [
-    AdressComponent,
+    AddressComponent,
     AnalysisComponent,
     AppComponent,
     BalloonDirective,

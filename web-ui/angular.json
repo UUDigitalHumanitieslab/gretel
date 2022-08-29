@@ -21,9 +21,7 @@
             ],
             "styles": [
               "node_modules/primeng/resources/primeng.min.css",
-              "src/styles.scss",
-              "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
-              "node_modules/@fortawesome/fontawesome-free/scss/solid.scss"
+              "src/styles.scss"
             ],
             "scripts": [],
             "aot": false,
@@ -86,9 +84,7 @@
             "scripts": [],
             "styles": [
               "src/styles.scss",
-              "node_modules/primeng/resources/primeng.min.css",
-              "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
-              "node_modules/@fortawesome/fontawesome-free/scss/solid.scss"
+              "node_modules/primeng/resources/primeng.min.css"
             ],
             "assets": [
               "src/assets",

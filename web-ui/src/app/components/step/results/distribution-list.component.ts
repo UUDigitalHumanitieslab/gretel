@@ -1,4 +1,5 @@
 import { Component, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { merge, from, Subscription, combineLatest, Notification } from 'rxjs';
 import { map, switchMap, materialize, startWith, endWith, distinctUntilChanged } from 'rxjs/operators';
 
@@ -6,7 +7,6 @@ import { DownloadService, ResultsService, StateService, TreebankCount } from '..
 import { Treebank, TreebankComponent, TreebankSelection, FuzzyNumber } from '../../../treebank';
 import { GlobalState } from '../../../pages/multi-step-page/steps';
 import { NotificationKind } from './notification-kind';
-
 interface ComponentState {
     title: string;
     hidden: boolean;
@@ -20,6 +20,8 @@ interface ComponentState {
     styleUrls: ['./distribution-list.component.scss']
 })
 export class DistributionListComponent implements OnInit, OnDestroy {
+    faDownload = faDownload;
+
     @Output()
     public hidingComponents = new EventEmitter<{
         provider: string,

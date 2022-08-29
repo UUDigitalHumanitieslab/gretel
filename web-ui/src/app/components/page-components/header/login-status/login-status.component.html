@@ -2,7 +2,7 @@
     <a class="navbar-link is-arrowless" (click)="toggleActive()">
         <ng-container *ngIf="user">
             <span class="icon">
-                <i class="fas fa-user"></i>
+                <fa-icon [icon]="faUser" aria-hidden="true"></fa-icon>
             </span>
             <span>
                 {{ user.displayName }}
@@ -10,7 +10,7 @@
         </ng-container>
         <ng-container *ngIf="!user">
             <span class="icon">
-                <i class="fas fa-users"></i>
+                <fa-icon [icon]="faUsers" aria-hidden="true"></fa-icon>
             </span>
             <span>
                 Login

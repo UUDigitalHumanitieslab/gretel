@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { faCheck, faCopy, faDownload, faEdit, faFilter, faUndo, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ValueEvent } from 'lassy-xpath';
 import { ClipboardService } from 'ngx-clipboard';
 import { DownloadService, NotificationService } from '../../../services/_index';
@@ -9,6 +10,14 @@ import { DownloadService, NotificationService } from '../../../services/_index';
     styleUrls: ['./xpath-editor.component.scss']
 })
 export class ResultsXpathEditorComponent {
+    faCheck = faCheck;
+    faCopy = faCopy;
+    faDownload = faDownload;
+    faEdit = faEdit;
+    faFilter = faFilter;
+    faUndo = faUndo;
+    faPlus = faPlus;
+
     @Input()
     public xpath: string;
 

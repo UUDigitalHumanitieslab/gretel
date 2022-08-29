@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import { faBan, faCheck, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { SearchVariable, VariableProperty } from '../../services/_index';
 
 export interface AddNodeEvent {
@@ -12,6 +13,11 @@ export interface AddNodeEvent {
     styleUrls: ['./node-properties-editor.component.scss']
 })
 export class NodePropertiesEditorComponent implements OnChanges {
+    faBan = faBan;
+    faCheck = faCheck;
+    faPlus = faPlus;
+    faTrash = faTrash;
+
     @ViewChild('propNameField', { static: true })
     propNameField: ElementRef<HTMLInputElement>;
 

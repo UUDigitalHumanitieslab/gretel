@@ -1,6 +1,7 @@
 import { Component, ViewChild, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OverlayPanel } from 'primeng/overlaypanel';
+import { faDownload, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'grt-download-results',
@@ -9,6 +10,9 @@ import { OverlayPanel } from 'primeng/overlaypanel';
 })
 export class DownloadResultsComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription[];
+
+    faDownload = faDownload;
+    faInfoCircle = faInfoCircle;
 
     @ViewChild(OverlayPanel, { static: true })
     overlayPanel: OverlayPanel;

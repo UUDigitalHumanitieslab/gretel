@@ -12,6 +12,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
+import { faArrowsAlt, faChevronLeft, faChevronRight, faCommentDots, faFileCode, faTimes, faSearchMinus, faSearchPlus } from '@fortawesome/free-solid-svg-icons';
 
 import * as $ from 'jquery';
 
@@ -36,6 +37,15 @@ interface Metadata {
     styleUrls: ['./tree-visualizer.component.scss']
 })
 export class TreeVisualizerComponent implements OnChanges, OnInit, AfterViewChecked {
+    faArrowsAlt = faArrowsAlt;
+    faChevronLeft = faChevronLeft;
+    faChevronRight = faChevronRight;
+    faCommentDots = faCommentDots;
+    faFileCode = faFileCode;
+    faTimes = faTimes;
+    faSearchMinus = faSearchMinus;
+    faSearchPlus = faSearchPlus;
+
     @ViewChild('output', { static: true, read: ElementRef })
     public output: ElementRef;
     @ViewChild('inline', { read: ElementRef })

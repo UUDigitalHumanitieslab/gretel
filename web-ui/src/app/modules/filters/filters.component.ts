@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { Filter } from '../../models/filter';
 import { FilterValue, FilterValues } from '../../services/_index';
 import { FilterChangeEvent } from './filter/filter.directive';
@@ -9,6 +10,8 @@ import { FilterChangeEvent } from './filter/filter.directive';
     styleUrls: ['./filters.component.scss']
 })
 export class FiltersComponent {
+    faFilter = faFilter;
+
     @Input()
     public filters: Filter[];
 

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { faChevronLeft, faChevronRight, faLock, faTags } from '@fortawesome/free-solid-svg-icons';
 
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -28,6 +29,11 @@ const colors = [
     styleUrls: ['./select-treebanks.component.scss']
 })
 export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
+    faChevronLeft = faChevronLeft;
+    faChevronRight = faChevronRight;
+    faLock = faLock;
+    faTags = faTags;
+
     public treebanks: (Treebank & { color: string, userName: string, preConfigured: boolean, selected: boolean })[] = [];
     public loading = true;
     public stepType = StepType.SelectTreebanks;
@@ -38,7 +44,7 @@ export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBa
     public showPreConfigured = true;
     public showUserTags = false;
     public showUsers: number[] = [];
-    
+
     @Output()
     public prev = new EventEmitter();
 

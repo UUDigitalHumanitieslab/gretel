@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
+import { faCircleInfo, faEdit, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { ValueEvent } from 'lassy-xpath';
 
@@ -27,6 +28,11 @@ interface IndexedToken {
     styleUrls: ['./matrix.component.scss']
 })
 export class MatrixComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
+    faCircleInfo = faCircleInfo;
+    faEdit = faEdit;
+    faExpand = faExpand;
+    faTimes = faTimes;
+
     private warningId: number;
     private subscriptions: Subscription[];
     private matrix: Matrix;

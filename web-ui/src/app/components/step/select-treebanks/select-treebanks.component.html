@@ -34,7 +34,7 @@
                 <button class="button" [ngClass]="{'is-primary': showUserTags }" (click)="showUserTags=!showUserTags"
                     grtBalloon="Show the treebanks' users">
                     <span class="icon">
-                        <i class="fas fa-tags"></i>
+                        <fa-icon [icon]="faTags" aria-hidden="true"></fa-icon>
                     </span>
                 </button>
             </p>
@@ -44,9 +44,9 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="prev.next()">
-                    <a class="button is-hidden-tablet" role="button">
+                    <a class="button is-hidden-tablet" role="button" title="Previous">
                         <span class="icon ">
-                            <i class="fas fa-chevron-left" title="Previous"></i>
+                            <fa-icon [icon]="faChevronLeft" aria-hidden="true"></fa-icon>
                         </span>
                     </a>
                     <a class="button is-hidden-mobile" role="button">
@@ -58,9 +58,9 @@
         <div class="level-item">
             <div class="field">
                 <p class="control" (click)="next.next()">
-                    <a class="button is-hidden-tablet" role="button">
+                    <a class="button is-hidden-tablet" role="button" title="Previous">
                         <span class="icon">
-                            <i class="fas fa-chevron-right" title="Previous"></i>
+                            <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
                         </span>
                     </a>
                     <a class="button is-hidden-mobile" role="button">
@@ -88,7 +88,7 @@
                     &nbsp;
                     <span class="tag is-dark">
                         <span class="icon">
-                            <i class="fas fa-lock"></i>
+                            <fa-icon [icon]="faLock" aria-hidden="true"></fa-icon>
                         </span>
                         &nbsp;
                         private
