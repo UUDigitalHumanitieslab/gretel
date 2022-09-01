@@ -169,14 +169,13 @@ class SearchQuery(models.Model):
         initialize() method but search does not have to be started yet
         with perform_search() method. Return a tuple of the result as
         a list of dictionaries and the percentage of search completion."""
-        print(from_number, to_number)
         completed_part = 0
         to_skip = from_number
         if to_number is not None:
             results_to_go = to_number - from_number
         else:
             results_to_go = math.inf
-        if to_number - from_number > 0:
+        if to_number is None or (to_number - from_number) > 0:
             stop_adding = False
         else:
             stop_adding = True
