@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.db.models import F
+from django.conf import settings
 
 from timeit import default_timer as timer
 import json
@@ -40,12 +41,25 @@ class ComponentSearchResult(models.Model):
     def __str__(self):
         return '"{}…" for {}'.format(self.xpath[:10], self.component)
 
+    def _get_cache_path(self, create_dir: bool):
+        """Get the Path of the caching file corresponding to this
+        ComponentSearchResult. If create_dir is True, create the parent
+        directory if needed."""
+        try:
+            settings.CACHING_DIR.mkdir(exist_ok=True, parents=True)
+        except (FileExistsError, FileNotFoundError):
+            raise SearchError('Could not access or create caching directory')
+        return settings.CACHING_DIR / str(self.id)
+
     def perform_search(self, query_id=None):
         """Perform full component search and regularly update on progress"""
-        if not check_xpath(self.xpath):
-            raise SearchError('Malformed XPath')
         if not self.component_id:
             raise SearchError('Field component not filled in')
+        if not check_xpath(self.xpath):
+            raise SearchError('Malformed XPath')
+        if not self.id:
+            # Save, because we need the id for the caching file
+            self.save()
         databases_with_size = self.component.get_databases()
         self.results = ''
         self.completed_part = 0
@@ -53,6 +67,10 @@ class ComponentSearchResult(models.Model):
         start_time = timer()
         next_save_time = start_time + 1
         matches = []
+        try:
+            resultsfile = self._get_cache_path(True).open(mode='w')
+        except OSError:
+            raise SearchError('Could not open caching file')
         for database in databases_with_size:
             size = databases_with_size[database]
             query = generate_xquery_search(
@@ -66,6 +84,7 @@ class ComponentSearchResult(models.Model):
                 self.errors += 'Error searching database {}: ' \
                     .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
+            resultsfile.write(result)
             try:
                 matches.extend(parse_search_result(
                     result, self.component.slug, database)
@@ -85,6 +104,7 @@ class ComponentSearchResult(models.Model):
                         .values_list('cancelled', flat=True).get(id=query_id)
                     if cancelled:
                         return
+        resultsfile.close()
         self.search_completed = timezone.now()
         self.save()
 

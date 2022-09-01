@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.conf import settings
 from django.core.management import call_command
 from django.utils import timezone
@@ -6,6 +6,8 @@ from django.utils import timezone
 import unittest
 import json
 import lxml.etree as etree
+import tempfile
+import pathlib
 
 from treebanks.models import Treebank
 from services.basex import basex
@@ -54,11 +56,15 @@ def setUpModule():
     )
     global test_treebank
     test_treebank = Treebank.objects.get(slug='test_troonrede')
+    global test_cache_dir, test_cache_path
+    test_cache_dir = tempfile.TemporaryDirectory()
+    test_cache_path = pathlib.Path(test_cache_dir.name)
 
 
 def tearDownModule():
     if test_treebank is not None:
         test_treebank.delete()
+    test_cache_dir.cleanup()
 
 
 class BaseXSearchTestCase(TestCase):
@@ -186,34 +192,35 @@ class ComponentSearchResultTestCase(TestCase):
             return self.skipTest('requires running BaseX server')
         if not test_treebank:
             return self.skipTest('requires an uploaded test treebank')
-        component = test_treebank.components.get(slug='troonrede19')
-        csr = ComponentSearchResult(
-            xpath=XPATH1,
-            component=component,
-            variables=VAR_CHECK
-        )
-        csr.perform_search()
-        # Compare results with what we know from GrETEL 4
-        self.assertEqual(csr.number_of_results, 4)
-        self.assertLessEqual(csr.search_completed, timezone.now())
-        # There should be no errors and error string should be empty
-        self.assertEqual(csr.errors, '')
-        # Results should be valid JSON
-        try:
-            json.loads(csr.results)
-        except json.JSONDecodeError:
-            self.fail('search produces invalid JSON')
-        csr.delete()  # Delete because CSR auto-saves
-        # No component should throw exception
-        csr2 = ComponentSearchResult(xpath=XPATH1)
-        with self.assertRaises(SearchError):
-            csr2.perform_search()
-        csr2.component = component
-        # Invalid or empty (= invalid) XPath should throw exception
-        for xpath in ['//node[@cat=', '']:
-            csr2.xpath = xpath
+        with self.settings(CACHING_DIR=test_cache_path):
+            component = test_treebank.components.get(slug='troonrede19')
+            csr = ComponentSearchResult(
+                xpath=XPATH1,
+                component=component,
+                variables=VAR_CHECK
+            )
+            csr.perform_search()
+            # Compare results with what we know from GrETEL 4
+            self.assertEqual(csr.number_of_results, 4)
+            self.assertLessEqual(csr.search_completed, timezone.now())
+            # There should be no errors and error string should be empty
+            self.assertEqual(csr.errors, '')
+            # Results should be valid JSON
+            try:
+                json.loads(csr.results)
+            except json.JSONDecodeError:
+                self.fail('search produces invalid JSON')
+            csr.delete()  # Delete because CSR auto-saves
+            # No component should throw exception
+            csr2 = ComponentSearchResult(xpath=XPATH1)
             with self.assertRaises(SearchError):
                 csr2.perform_search()
+            csr2.component = component
+            # Invalid or empty (= invalid) XPath should throw exception
+            for xpath in ['//node[@cat=', '']:
+                csr2.xpath = xpath
+                with self.assertRaises(SearchError):
+                    csr2.perform_search()
 
 
 class SearchQueryTestCase(TestCase):
@@ -225,74 +232,77 @@ class SearchQueryTestCase(TestCase):
 
     def test_initialize(self):
         # Create a SQ and test if it gets the right number of CSRs
-        sq = SearchQuery(xpath=XPATH1)
-        sq.save()
-        components = test_treebank.components.all()
-        sq.components.add(*components)
-        sq.initialize()
-        self.assertEqual(sq.components.count(), sq.results.count())
-        sq.results.all().delete()
-        # Now do the same but first manually create a CSR
-        component = test_treebank.components.all().first()
-        csr = ComponentSearchResult(xpath=XPATH1, component=component)
-        csr.save()
-        sq2 = SearchQuery(xpath=XPATH1)
-        sq2.save()
-        components = test_treebank.components.all()
-        sq.components.add(*components)
-        sq.initialize()
-        self.assertEqual(sq.components.count(), sq.results.count())
+        with self.settings(CACHING_DIR=test_cache_path):
+            sq = SearchQuery(xpath=XPATH1)
+            sq.save()
+            components = test_treebank.components.all()
+            sq.components.add(*components)
+            sq.initialize()
+            self.assertEqual(sq.components.count(), sq.results.count())
+            sq.results.all().delete()
+            # Now do the same but first manually create a CSR
+            component = test_treebank.components.all().first()
+            csr = ComponentSearchResult(xpath=XPATH1, component=component)
+            csr.save()
+            sq2 = SearchQuery(xpath=XPATH1)
+            sq2.save()
+            components = test_treebank.components.all()
+            sq.components.add(*components)
+            sq.initialize()
+            self.assertEqual(sq.components.count(), sq.results.count())
 
     def test_get_results(self):
-        # No components means no results, but no error either
-        sq = SearchQuery(xpath=XPATH1)
-        sq.save()
-        sq.initialize()
-        results, percentage = sq.get_results()
-        self.assertEqual(len(results), 0)
+        with self.settings(CACHING_DIR=test_cache_path):
+            # No components means no results, but no error either
+            sq = SearchQuery(xpath=XPATH1)
+            sq.save()
+            sq.initialize()
+            results, percentage = sq.get_results()
+            self.assertEqual(len(results), 0)
 
-        # New SQ without any results
-        # Make sure there are no results left from other tests
-        ComponentSearchResult.objects.all().delete()
-        sq2 = SearchQuery(xpath=XPATH1)
-        sq2.save()
-        components = test_treebank.components.all()
-        sq2.components.add(*components)
-        sq2.initialize()
-        results, percentage = sq2.get_results()
-        self.assertEqual(len(results), 0)
-        self.assertEqual(percentage, 0)
+            # New SQ without any results
+            # Make sure there are no results left from other tests
+            ComponentSearchResult.objects.all().delete()
+            sq2 = SearchQuery(xpath=XPATH1)
+            sq2.save()
+            components = test_treebank.components.all()
+            sq2.components.add(*components)
+            sq2.initialize()
+            results, percentage = sq2.get_results()
+            self.assertEqual(len(results), 0)
+            self.assertEqual(percentage, 0)
 
-        # Now manually search all CSRs and check if search is done
-        nr_results = 0
-        for csr in sq2.results.all():
-            csr.perform_search()
-            nr_results += csr.number_of_results
-        results, percentage = sq2.get_results()
-        self.assertEqual(len(results), nr_results)
-        self.assertEqual(percentage, 100)
+            # Now manually search all CSRs and check if search is done
+            nr_results = 0
+            for csr in sq2.results.all():
+                csr.perform_search()
+                nr_results += csr.number_of_results
+            results, percentage = sq2.get_results()
+            self.assertEqual(len(results), nr_results)
+            self.assertEqual(percentage, 100)
 
-        # Check if from_number and to_number work
-        # (there should be seven results)
-        results2, _ = sq2.get_results(from_number=1)
-        self.assertEqual(results[1:], results2)
-        results3, _ = sq2.get_results(to_number=4)
-        self.assertEqual(results[:4], results3)
+            # Check if from_number and to_number work
+            # (there should be seven results)
+            results2, _ = sq2.get_results(from_number=1)
+            self.assertEqual(results[1:], results2)
+            results3, _ = sq2.get_results(to_number=4)
+            self.assertEqual(results[:4], results3)
 
     def test_perform_search(self):
-        # Make sure there are no results left from other tests
-        ComponentSearchResult.objects.all().delete()
-        # SQ with full treebank
-        sq = SearchQuery(xpath=XPATH1)
-        sq.save()
-        components = test_treebank.components.all()
-        sq.components.add(*components)
-        sq.initialize()
+        with self.settings(CACHING_DIR=test_cache_path):
+            # Make sure there are no results left from other tests
+            ComponentSearchResult.objects.all().delete()
+            # SQ with full treebank
+            sq = SearchQuery(xpath=XPATH1)
+            sq.save()
+            components = test_treebank.components.all()
+            sq.components.add(*components)
+            sq.initialize()
 
-        # Manually search first component, then run perform_search()
-        # and check if all components have been searched
-        first_csr = sq.results.first()
-        first_csr.perform_search()
-        sq.perform_search()
-        for csr in sq.results.all():
-            self.assertIsNotNone(csr.search_completed)
+            # Manually search first component, then run perform_search()
+            # and check if all components have been searched
+            first_csr = sq.results.first()
+            first_csr.perform_search()
+            sq.perform_search()
+            for csr in sq.results.all():
+                self.assertIsNotNone(csr.search_completed)
