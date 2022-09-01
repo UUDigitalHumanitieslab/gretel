@@ -134,23 +134,23 @@ class BaseXSearchTestCase(TestCase):
 
     def test_parse_search_result(self):
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
-            '||meta||vars</match><match>id2||sentence2||ids2||begins2' \
-            '||xml_sentences2||meta2||vars</match>'
-        res = parse_search_result(input_str, 'component', 'db')
+            '||meta||vars||db</match><match>id2||sentence2||ids2||begins2' \
+            '||xml_sentences2||meta2||vars||db</match>'
+        res = parse_search_result(input_str, 'component')
         self.assertEqual('sentence', res[0]['sentence'])
         self.assertEqual('meta2', res[1]['meta'])
         # Incomplete input string should raise exception
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
             '||meta||</match><match>id2||sentence2||id'
         self.assertRaises(ValueError, parse_search_result, input_str,
-                          'component', 'db')
+                          'component')
         input_str = '<match>id||sentence||ids||begins||xml_sentences' \
             '</match>'
         self.assertRaises(ValueError, parse_search_result, input_str,
-                          'component', 'db')
+                          'component')
         # Empty string should return an empty list
-        self.assertEqual([], parse_search_result('', 'component', 'db'))
-        self.assertEqual([], parse_search_result('\n ', 'component', 'db'))
+        self.assertEqual([], parse_search_result('', 'component'))
+        self.assertEqual([], parse_search_result('\n ', 'component'))
 
     def test_parse_metadata_count_result(self):
         TEST_XML = """
@@ -205,11 +205,8 @@ class ComponentSearchResultTestCase(TestCase):
             self.assertLessEqual(csr.search_completed, timezone.now())
             # There should be no errors and error string should be empty
             self.assertEqual(csr.errors, '')
-            # Results should be valid JSON
-            try:
-                json.loads(csr.results)
-            except json.JSONDecodeError:
-                self.fail('search produces invalid JSON')
+            # Actual number of results should be correct
+            self.assertEqual(len(csr.get_results()), csr.number_of_results)
             csr.delete()  # Delete because CSR auto-saves
             # No component should throw exception
             csr2 = ComponentSearchResult(xpath=XPATH1)

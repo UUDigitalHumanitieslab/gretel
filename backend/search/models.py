@@ -6,11 +6,14 @@ from django.conf import settings
 from timeit import default_timer as timer
 import json
 import math
+import logging
 
 from treebanks.models import Component
 from services.basex import basex
 from .basex_search import (generate_xquery_search,
                            check_xpath, parse_search_result)
+
+logger = logging.getLogger(__name__)
 
 
 class SearchError(RuntimeError):
@@ -51,6 +54,21 @@ class ComponentSearchResult(models.Model):
             raise SearchError('Could not access or create caching directory')
         return settings.CACHING_DIR / str(self.id)
 
+    def get_results(self) -> dict:
+        """Return results as a dict"""
+        cache_filename = str(self._get_cache_path(False))
+        try:
+            cache_file = open(cache_filename, 'r')
+        except FileNotFoundError:
+            logger.error(
+                'Could not open cache file for ComponentSearchResult {}: {}'
+                .format(self.id, cache_filename)
+            )
+            raise SearchError('Cache file not found')
+        results = cache_file.read()
+        cache_file.close()
+        return parse_search_result(results, self.component.slug)
+
     def perform_search(self, query_id=None):
         """Perform full component search and regularly update on progress"""
         if not self.component_id:
@@ -66,7 +84,6 @@ class ComponentSearchResult(models.Model):
         self.number_of_results = 0
         start_time = timer()
         next_save_time = start_time + 1
-        matches = []
         try:
             resultsfile = self._get_cache_path(True).open(mode='w')
         except OSError:
@@ -85,15 +102,7 @@ class ComponentSearchResult(models.Model):
                     .format(database) + str(err) + '\n'
                 result = ''  # No break because completed_part is to be updated
             resultsfile.write(result)
-            try:
-                matches.extend(parse_search_result(
-                    result, self.component.slug, database)
-                )
-            except ValueError as err:
-                self.errors += 'Error parsing search result in database {}: ' \
-                    '{}\n'.format(database, err)
-            self.number_of_results = len(matches)
-            self.results = json.dumps(matches)
+            self.number_of_results += result.count('<match>')
             self.completed_part += size
             if timer() > next_save_time:
                 self.save()
@@ -160,13 +169,17 @@ class SearchQuery(models.Model):
         initialize() method but search does not have to be started yet
         with perform_search() method. Return a tuple of the result as
         a list of dictionaries and the percentage of search completion."""
+        print(from_number, to_number)
         completed_part = 0
         to_skip = from_number
         if to_number is not None:
             results_to_go = to_number - from_number
         else:
             results_to_go = math.inf
-        stop_adding = False
+        if to_number - from_number > 0:
+            stop_adding = False
+        else:
+            stop_adding = True
         all_matches = []
         for result_obj in self.results.all().order_by('component'):
             # Add matches to list, as long as no empty or partial search result
@@ -176,8 +189,7 @@ class SearchQuery(models.Model):
                     # Skip completely
                     to_skip -= result_obj.number_of_results
                 else:
-                    matches_json = result_obj.results
-                    matches = json.loads(matches_json)
+                    matches = result_obj.get_results()
                     all_matches.extend(matches[to_skip:])
                     to_skip = 0
                     results_to_go -= len(matches)
