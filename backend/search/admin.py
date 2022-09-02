@@ -28,16 +28,8 @@ def perform_search(modeladmin, request, queryset):
 
 @admin.register(SearchQuery)
 class SearchQueryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'xpath', 'query_of', 'total_database_size',
-                    'completed_part', 'completed_percentage']
-    readonly_fields = ['total_database_size', 'completed_part']
-
-    def completed_percentage(self, obj):
-        if not (obj.completed_part and obj.total_database_size):
-            return 'Not started'
-        return str(formats.localize(round(
-            obj.completed_part / obj.total_database_size * 100, 1
-        ))) + '%'
+    list_display = ['id', 'xpath', 'query_of', 'total_database_size']
+    readonly_fields = ['total_database_size']
 
     def query_of(self, obj):
         return str(obj.components.all().first()) + ', …'

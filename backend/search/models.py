@@ -1,12 +1,15 @@
 from django.db import models
 from django.utils import timezone
-from django.db.models import F
+from django.db.models import F, Sum
 from django.conf import settings
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 from timeit import default_timer as timer
-import json
 import math
 import logging
+import pathlib
+from datetime import timedelta
 
 from treebanks.models import Component
 from services.basex import basex
@@ -26,8 +29,10 @@ class ComponentSearchResult(models.Model):
     variables = models.JSONField(blank=True, default=list)
     search_completed = models.DateTimeField(null=True, editable=False)
     last_accessed = models.DateField(null=True, editable=False)
-    results = models.TextField(default='', editable=False)
     number_of_results = models.PositiveIntegerField(null=True, editable=False)
+    cache_size = models.PositiveBigIntegerField(
+        null=True, editable=False,
+        help_text='Size of the cached results in bytes')
     errors = models.TextField(default='', editable=False)
     completed_part = models.PositiveIntegerField(
         null=True, editable=False,
@@ -44,7 +49,7 @@ class ComponentSearchResult(models.Model):
     def __str__(self):
         return '"{}…" for {}'.format(self.xpath[:10], self.component)
 
-    def _get_cache_path(self, create_dir: bool):
+    def _get_cache_path(self, create_dir: bool) -> pathlib.Path:
         """Get the Path of the caching file corresponding to this
         ComponentSearchResult. If create_dir is True, create the parent
         directory if needed."""
@@ -67,6 +72,8 @@ class ComponentSearchResult(models.Model):
             raise SearchError('Cache file not found')
         results = cache_file.read()
         cache_file.close()
+        self.last_accessed = timezone.now()
+        self.save()
         return parse_search_result(results, self.component.slug)
 
     def perform_search(self, query_id=None):
@@ -88,6 +95,7 @@ class ComponentSearchResult(models.Model):
             resultsfile = self._get_cache_path(True).open(mode='w')
         except OSError:
             raise SearchError('Could not open caching file')
+        cancelled = False
         for database in databases_with_size:
             size = databases_with_size[database]
             query = generate_xquery_search(
@@ -109,13 +117,69 @@ class ComponentSearchResult(models.Model):
                 next_save_time = timer() + 1
                 # Also check if search has been cancelled
                 if query_id is not None:
-                    cancelled = SearchQuery.objects \
+                    cancelled_value = SearchQuery.objects \
                         .values_list('cancelled', flat=True).get(id=query_id)
-                    if cancelled:
-                        return
+                    if cancelled_value:
+                        cancelled = True
+                        break
         resultsfile.close()
-        self.search_completed = timezone.now()
+        self.cache_size = self._get_cache_path(False).stat().st_size
+        if not cancelled:
+            self.search_completed = timezone.now()
+        self.last_accessed = timezone.now()
         self.save()
+
+    def delete_cache_file(self):
+        """Delete the cache file belonging to this ComponentSearchResult.
+        This method is called automatically on delete."""
+        cache_path = self._get_cache_path(False)
+        cache_path.unlink(missing_ok=True)
+        logger.info('Deleted cache for ComponentSearchResult with ID {}.'
+                    .format(self.id))
+
+    @classmethod
+    def purge_cache(cls):
+        yesterday = timezone.now() - timedelta(days=1)
+        # Get total cache size
+        total_size = \
+            cls.objects.aggregate(Sum('cache_size'))['cache_size__sum']
+        if total_size is None:
+            # This happens if all CSRs have no filled in cache size
+            return
+        # Calculate how much data we should delete
+        maximum_size = settings.MAXIMUM_CACHE_SIZE * 1024 * 1024
+        to_delete = total_size - maximum_size
+        if to_delete <= 0:
+            logger.info('Size of component search result cache is ok.')
+            return
+        # Get CSRs starting with lowest last accessed date
+        number_deleted = 0
+        for csr in cls.objects.order_by('last_accessed'):
+            if csr.cache_size is None:
+                continue
+            if csr.searchquery_set.filter(
+                last_accessed__lt=yesterday
+            ).count() > 0:
+                # Do not delete if there are queries that might still be active
+                continue
+            to_delete -= csr.cache_size
+            csr.delete()
+            number_deleted += 1
+            if to_delete <= 0:
+                break
+        if to_delete <= 0:
+            logger.info('Deleted the {} component search results having the '
+                        'earliest last access date to make space in cache.'
+                        .format(number_deleted))
+        else:
+            logger.warning('Deleted {} component search results to make '
+                           'space in cache, but cache is still larger than '
+                           'maximum size.'.format(number_deleted))
+
+
+@receiver(pre_delete, sender=ComponentSearchResult)
+def delete_basex_db_callback(sender, instance, using, **kwargs):
+    instance.delete_cache_file()
 
 
 class SearchQuery(models.Model):
@@ -129,22 +193,16 @@ class SearchQuery(models.Model):
         null=True, editable=False,
         help_text='Total size in KiB of all databases for this query'
     )
-    # completed_part can be removed because it is obtained dynamically
-    completed_part = models.PositiveIntegerField(
-        null=True, editable=False,
-        help_text='Total size in KiB of databases for which the search has '
-                  'been completed'
-    )
     cancelled = models.BooleanField(
         default=False,
         help_text='True if the query was cancelled by the user'
     )
+    last_accessed = models.DateTimeField(null=True, editable=False)
 
     def initialize(self) -> None:
         """Initialize search query after entering XPath and list of
         components by calculating total database size and creating
         ComponentSearchResult-s"""
-        self.completed_part = 0
         self.total_database_size = 0
         if not self.pk:
             # If object has not been saved we cannot add ComponentSearchResult
@@ -168,7 +226,8 @@ class SearchQuery(models.Model):
         """Get results so far. Object should have been initialized with
         initialize() method but search does not have to be started yet
         with perform_search() method. Return a tuple of the result as
-        a list of dictionaries and the percentage of search completion."""
+        a list of dictionaries and the percentage of search completion.
+        This method saves the object to update last accessed time."""
         completed_part = 0
         to_skip = from_number
         if to_number is not None:
@@ -212,6 +271,8 @@ class SearchQuery(models.Model):
         if results_to_go < 0:
             to_remove = -results_to_go
             all_matches = all_matches[0:-to_remove]
+        self.last_accessed = timezone.now()
+        self.save()
         return (all_matches, search_percentage)
 
     def perform_search(self) -> None:

@@ -131,6 +131,20 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost'
 
@@ -154,3 +168,4 @@ MAXIMUM_RESULTS = 500
 MAXIMUM_RESULTS_ANALYSIS = 5000
 
 CACHING_DIR = BASE_DIR / 'query_result_cache'
+MAXIMUM_CACHE_SIZE = 256  # Maximum cache size in MiB
