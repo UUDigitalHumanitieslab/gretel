@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.contrib import messages
 from django.utils import formats
 
-import threading
-
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 
@@ -28,15 +26,6 @@ def perform_search(modeladmin, request, queryset):
                                 messages.WARNING)
 
 
-@admin.action(description='Perform search (parallel)')
-def perform_search_parallel(modeladmin, request, queryset):
-    '''Admin action to perform search in separate thread;
-    no error reporting.'''
-    thread = threading.Thread(target=perform_search,
-                              args=(modeladmin, request, queryset))
-    thread.start()
-
-
 @admin.register(SearchQuery)
 class SearchQueryAdmin(admin.ModelAdmin):
     list_display = ['id', 'xpath', 'query_of', 'total_database_size',
@@ -58,8 +47,7 @@ class SearchQueryAdmin(admin.ModelAdmin):
 class ComponentSearchResultAdmin(admin.ModelAdmin):
     list_display = ['component', 'xpath', 'search_completed',
                     'number_of_results']
-    actions = [perform_search,
-               perform_search_parallel]
+    actions = [perform_search]
     readonly_fields = ['search_completed', 'last_accessed',
                        'number_of_results', 'errors', 'completed_part',
-                       'results']
+                       'cache_size']
