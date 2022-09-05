@@ -9,12 +9,14 @@ from timeit import default_timer as timer
 import math
 import logging
 import pathlib
+import re
 from datetime import timedelta
 
 from treebanks.models import Component
 from services.basex import basex
 from .basex_search import (generate_xquery_search,
-                           check_xpath, parse_search_result)
+                           check_xpath, parse_search_result,
+                           generate_xquery_count)
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +78,11 @@ class ComponentSearchResult(models.Model):
         self.save()
         return parse_search_result(results, self.component.slug)
 
+    def _truncate_results(self, results: str, number: int) -> str:
+        matches = list(re.finditer('<match>', results))
+        start_of_nth_match = matches[number].span()[0]
+        return results[:start_of_nth_match]
+
     def perform_search(self, query_id=None):
         """Perform full component search and regularly update on progress"""
         if not self.component_id:
@@ -96,21 +103,42 @@ class ComponentSearchResult(models.Model):
         except OSError:
             raise SearchError('Could not open caching file')
         cancelled = False
+        stop_adding_results = False
         for database in databases_with_size:
             size = databases_with_size[database]
-            query = generate_xquery_search(
-                database,
-                self.xpath,
-                self.variables
-            )
-            try:
-                result = basex.perform_query(query)
-            except (OSError, UnicodeDecodeError) as err:
-                self.errors += 'Error searching database {}: ' \
-                    .format(database) + str(err) + '\n'
-                result = ''  # No break because completed_part is to be updated
-            resultsfile.write(result)
-            self.number_of_results += result.count('<match>')
+            if not stop_adding_results:
+                print('Searching db')
+                query = generate_xquery_search(
+                    database, self.xpath, self.variables
+                )
+                try:
+                    result = basex.perform_query(query)
+                except (OSError, UnicodeDecodeError) as err:
+                    self.errors += 'Error searching database {}: ' \
+                        .format(database) + str(err) + '\n'
+                    result = ''  # No break, keep going
+                results_for_database = result.count('<match>')
+                maximum_to_add = settings.MAXIMUM_RESULTS_PER_COMPONENT - \
+                    self.number_of_results
+                self.number_of_results += results_for_database
+                if results_for_database > maximum_to_add:
+                    result = self._truncate_results(
+                        result, maximum_to_add
+                    )
+                if results_for_database >= maximum_to_add:
+                    stop_adding_results = True
+                resultsfile.write(result)
+            else:
+                print('Counting db')
+                # Only count from now on
+                query = generate_xquery_count(database, self.xpath)
+                try:
+                    count = int(basex.perform_query(query))
+                except (OSError, UnicodeDecodeError, ValueError) as err:
+                    self.errors += 'Error searching database {}: ' \
+                        .format(database) + str(err) + '\n'
+                    count = 0
+                self.number_of_results += count
             self.completed_part += size
             if timer() > next_save_time:
                 self.save()
@@ -234,9 +262,11 @@ class SearchQuery(models.Model):
             results_to_go = to_number - from_number
         else:
             results_to_go = math.inf
-        if to_number is None or (to_number - from_number) > 0:
-            stop_adding = False
-        else:
+        stop_adding = False
+        if to_number is not None and to_number <= from_number:
+            # Maximum number of results was already reached, so don't retrieve
+            # any results - but we still need to calculate the count and the
+            # search percentage.
             stop_adding = True
         all_matches = []
         for result_obj in self.results.all().order_by('component'):
@@ -249,16 +279,20 @@ class SearchQuery(models.Model):
                 else:
                     matches = result_obj.get_results()
                     all_matches.extend(matches[to_skip:])
+                    results_to_go -= len(matches) - to_skip
                     to_skip = 0
-                    results_to_go -= len(matches)
                     if results_to_go <= 0:
                         stop_adding = True
             # Count completed part (for all results)
             if result_obj.completed_part is not None:
                 completed_part += result_obj.completed_part
-            # If result is empty or partially complete, stop adding
-            # (this is to make sure that the user will see the results
-            # in the correct order)
+            # If result is empty or partially complete, stop adding.
+            # There might still be results in later ComponentSearchResult-s,
+            # but if we give them back already they will be returned in
+            # the incorrect order and we would have to keep track of what
+            # has already been returned and what not. We continue our loop
+            # though, because we still want to know the count so far and
+            # the search percentage.
             if not result_obj.search_completed:
                 stop_adding = True
         if self.total_database_size != 0:

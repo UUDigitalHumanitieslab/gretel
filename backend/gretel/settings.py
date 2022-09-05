@@ -167,5 +167,7 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
 MAXIMUM_RESULTS = 500
 MAXIMUM_RESULTS_ANALYSIS = 5000
 
+MAXIMUM_RESULTS_PER_COMPONENT = 5000
+
 CACHING_DIR = BASE_DIR / 'query_result_cache'
 MAXIMUM_CACHE_SIZE = 256  # Maximum cache size in MiB
