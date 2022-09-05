@@ -303,3 +303,12 @@ class SearchQueryTestCase(TestCase):
             sq.perform_search()
             for csr in sq.results.all():
                 self.assertIsNotNone(csr.search_completed)
+
+    def test_perform_count(self):
+        sq = SearchQuery(xpath=XPATH1)
+        sq.save()
+        components = test_treebank.components.all()
+        sq.components.add(*components)
+        counts = sq.perform_count()
+        self.assertEqual(counts['troonrede19'], 4)
+        self.assertEqual(counts['troonrede20'], 3)

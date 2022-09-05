@@ -107,7 +107,6 @@ class ComponentSearchResult(models.Model):
         for database in databases_with_size:
             size = databases_with_size[database]
             if not stop_adding_results:
-                print('Searching db')
                 query = generate_xquery_search(
                     database, self.xpath, self.variables
                 )
@@ -129,7 +128,6 @@ class ComponentSearchResult(models.Model):
                     stop_adding_results = True
                 resultsfile.write(result)
             else:
-                print('Counting db')
                 # Only count from now on
                 query = generate_xquery_count(database, self.xpath)
                 try:
@@ -344,6 +342,27 @@ class SearchQuery(models.Model):
                     '\n{}\n\n' \
                     .format(result_obj.component, result_obj.errors)
         return errs
+
+    def perform_count(self) -> dict:
+        """Perform a full count without using any cached results or saving
+        anything and return a dict of all components (using their slugs
+        as keys) and the counts. This is mainly meant for debug purposes
+        to check if no results are accidentally skipped when using the
+        views. The XQuery code is equal to that of GrETEL 4. No need to
+        call initialize() first."""
+        counts = {}
+        try:
+            for component in self.components.all():
+                component_count = 0
+                dbs = component.get_databases().keys()
+                for db in dbs:
+                    xquery = generate_xquery_count(db, self.xpath)
+                    component_count += int(basex.perform_query(xquery))
+                counts[component.slug] = component_count
+        except (OSError, ValueError) as err:
+            # Propagate errors because of bad XPath or BaseX problems
+            raise SearchError(str(err))
+        return counts
 
     def cancel_search(self) -> None:
         """Mark search as cancelled and save object"""
