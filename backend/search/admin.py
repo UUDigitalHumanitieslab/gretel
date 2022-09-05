@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib import messages
 from django.utils import formats
 
+import pprint
+
 from .models import ComponentSearchResult, SearchQuery, SearchError
 
 
@@ -26,10 +28,32 @@ def perform_search(modeladmin, request, queryset):
                                 messages.WARNING)
 
 
+@admin.action(description='Perform count')
+def perform_count(modeladmin, request, queryset):
+    '''Admin action to perform a count on a search query, to check if
+    the frontend is returning all results'''
+    total_count = 0
+    for search_query in queryset:
+        try:
+            results = search_query.perform_count()
+        except SearchError:
+            modeladmin.message_user(request,
+                                    'Could not complete count: {}'
+                                    .format(str(SearchError)),
+                                    messages.ERROR)
+        print('Results for query number {}:'.format(search_query.id))
+        pprint.pprint(results)
+        total_count += sum(results.values())
+    modeladmin.message_user(request,
+                            'Total count: {}. See console log for details.'
+                            .format(total_count))
+
+
 @admin.register(SearchQuery)
 class SearchQueryAdmin(admin.ModelAdmin):
     list_display = ['id', 'xpath', 'query_of', 'total_database_size']
     readonly_fields = ['total_database_size']
+    actions = [perform_count]
 
     def query_of(self, obj):
         return str(obj.components.all().first()) + ', …'
