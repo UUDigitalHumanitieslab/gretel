@@ -21,4 +21,3 @@ def setup_periodic_tasks(sender, **kwargs):
 def purge_cache():
     from search.models import ComponentSearchResult
     ComponentSearchResult.purge_cache()
-    pass
