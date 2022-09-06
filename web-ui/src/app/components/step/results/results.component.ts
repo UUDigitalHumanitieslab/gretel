@@ -117,6 +117,9 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public loadingTree = false;
     public treeSentence?: SafeHtml;
 
+    public incomingCounts = {};
+    public changes = 0;
+
     private subscriptions: Subscription[];
     private variableProperties: GlobalState['variableProperties'];
 
@@ -185,6 +188,15 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                             const [newHits, newHidden] = this.hideHits(r.result.value.hits);
                             this.filteredResults.push(...newHits);
                             this.hiddenCount += newHidden;
+                            const corpus = r.corpus.name;
+                            const provider = r.provider;
+                            if (!this.incomingCounts.hasOwnProperty(provider)) {
+                                this.incomingCounts[provider] = {};
+                            }
+                            this.incomingCounts[provider][corpus] = r.result.value.counts;
+                            this.changes = Math.random();
+                            
+                            // [corpus] = r.result.value.counts;
                             break;
                         }
                     }

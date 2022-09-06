@@ -1,9 +1,9 @@
-import { Component, Output, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, Output, OnInit, OnDestroy, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { merge, from, Subscription, combineLatest, Notification } from 'rxjs';
 import { map, switchMap, materialize, startWith, endWith, distinctUntilChanged } from 'rxjs/operators';
 
-import { DownloadService, ResultsService, StateService, TreebankCount } from '../../../services/_index';
+import { DownloadService, ResultCount, ResultsService, StateService, TreebankCount } from '../../../services/_index';
 import { Treebank, TreebankComponent, TreebankSelection, FuzzyNumber } from '../../../treebank';
 import { GlobalState } from '../../../pages/multi-step-page/steps';
 import { NotificationKind } from './notification-kind';
@@ -12,6 +12,7 @@ interface ComponentState {
     hidden: boolean;
     sentenceCount: string;
     hits?: number;
+    percentage?: number;
 }
 
 @Component({
@@ -19,7 +20,7 @@ interface ComponentState {
     templateUrl: './distribution-list.component.html',
     styleUrls: ['./distribution-list.component.scss']
 })
-export class DistributionListComponent implements OnInit, OnDestroy {
+export class DistributionListComponent implements OnInit, OnDestroy, OnChanges {
     faDownload = faDownload;
 
     @Output()
@@ -45,6 +46,16 @@ export class DistributionListComponent implements OnInit, OnDestroy {
             };
         };
     } = {};
+
+    @Input()
+    public incomingCounts: {
+        [provider: string]: {
+            [corpus: string]: [ResultCount]
+        }
+    } = {};
+
+    @Input()
+    public changes = 0;
 
     public totalHits = 0;
     public totalSentences = '?';
@@ -105,6 +116,25 @@ export class DistributionListComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        console.log('Something changed!');
+        let totalHits = 0;
+        for (const provider of Object.getOwnPropertyNames(this.incomingCounts)) {
+            for (const treebank of Object.getOwnPropertyNames(this.incomingCounts[provider])) {
+                let treebankhits = 0;
+                for (const resultcount of this.incomingCounts[provider][treebank]) {
+                    treebankhits += resultcount.numberOfResults;
+                    this.state[provider][treebank].components[resultcount.component].hits = resultcount.numberOfResults;
+                    this.state[provider][treebank].components[resultcount.component].percentage = resultcount.percentage;
+                }
+                this.state[provider][treebank].hits = treebankhits;
+                totalHits += treebankhits;
+                //this.state[provider][treebank]
+            }
+        }
+        this.totalHits = totalHits;
     }
 
     private recreateState(entries: Array<{ bank: Treebank, components: TreebankComponent[] }>) {

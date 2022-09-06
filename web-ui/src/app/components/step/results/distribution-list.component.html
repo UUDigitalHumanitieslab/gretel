@@ -43,7 +43,7 @@
                             /> {{corpus.key}}
                         </label>
                     </th>
-                    <th>{{corpus.value.hits != null ? corpus.value.hits : 'loading...'}}</th>
+                    <th>{{corpus.value.hits != null ? corpus.value.hits.toLocaleString() : 'loading...'}}</th>
                     <th>{{corpus.value.sentenceCount}}</th>
                 </tr>
                 <ng-container *ngIf="!corpus.value.hidden">
@@ -57,7 +57,7 @@
                                 /> {{component.value.title}}
                             </label>
                         </td>
-                        <td>{{component.value.hits != null ? component.value.hits : 'loading...'}}</td>
+                        <td>{{component.value.hits != null ? component.value.hits.toLocaleString() : 'loading...'}}</td>
                         <td>{{component.value.sentenceCount}}</td>
                     </tr>
                 </ng-container>

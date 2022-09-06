@@ -9,7 +9,7 @@
     </div>
     <!-- DISTRIBUTION LIST -->
     <div class="column">
-        <grt-distribution-list (hidingComponents)="hideComponents($event)"></grt-distribution-list>
+        <grt-distribution-list [incomingCounts]="incomingCounts" [changes]="changes" (hidingComponents)="hideComponents($event)"></grt-distribution-list>
     </div>
 </div>
 <grt-results-table

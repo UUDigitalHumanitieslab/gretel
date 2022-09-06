@@ -77,7 +77,8 @@ def search_view(request):
             run_search_query.apply((query.pk,))
 
     # Get results so far, if any
-    results, percentage = query.get_results(start_from, maximum_results)
+    results, percentage, counts = \
+        query.get_results(start_from, maximum_results)
     if request.accepted_renderer.format == 'api':
         # If using the API view, only show part of the results, because
         # the HTML rendering of Django Rest Framework turns out to be
@@ -88,6 +89,7 @@ def search_view(request):
         'query_id': query.id,
         'search_percentage': percentage,
         'results': results,
+        'counts': counts,
     }
     if percentage == 100:
         response['errors'] = query.get_errors()
