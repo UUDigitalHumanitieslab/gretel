@@ -15,8 +15,9 @@ class CanonicalFormList(ListAPIView):
 
 
 def generate_query(sentence, rank):
-    parsed_xml = parse_sentence(sentence)
-    mwe = Mwe(sentence, parsed_xml)
+    mwe = Mwe(sentence)
+    tree = parse_sentence(mwe.can_form)
+    mwe.set_tree(tree)
     # a placeholder function for Martin Kroon's query generator
     # there should also be an alpino parse step here
     generated = mwe.generate_queries()
