@@ -1,0 +1,36 @@
+{
+    "slug": "lassy-klein",
+    "title": "Lassy Klein",
+    "components": [
+        {
+            "slug": "dpc",
+            "title": "DPC",
+            "description": "Dutch Parallel Corpus",
+            "databases": ["LASSY_ID_DPC"]
+        },
+        {
+            "slug": "wiki",
+            "title": "Wikipedia",
+            "description": "Dutch Wikipedia pages",
+            "databases": ["LASSY_ID_WIKI"]
+        },
+        {
+            "slug": "wpre",
+            "title": "WR-P-E",
+            "description": "E-magazines, newsletters, teletext pages, web sites, Wikipedia",
+            "databases": ["LASSY_ID_WRPE"]
+        },
+        {
+            "slug": "wrpp",
+            "title": "WR-P-P",
+            "description": "Books, brochures, guides and manuals, legal texts, newspapers, periodicals and magazines, policy documents, proceedings, reports, surveys",
+            "databases": ["LASSY_ID_WRPP"]
+        },
+        {
+            "slug": "wsu",
+            "title": "WS-U",
+            "description": "Auto cues, news scripts, text for the visually impaired",
+            "databases": ["LASSY_ID_WSU"]
+        }
+    ]
+}
