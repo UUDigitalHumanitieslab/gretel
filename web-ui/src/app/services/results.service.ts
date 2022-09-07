@@ -123,10 +123,19 @@ export class ResultsService {
                             retrievedMatches += results.hits.length;
 
                             // TODO maybe not the nicest way to show progress
-                            this.notificationService.add(
-                                "Searching at " + 
-                                Math.round(results.searchPercentage) + "%", "success"
-                            );
+                            const percentage = Math.round(results.searchPercentage)
+                            if (!results.cancelled) {
+                                this.notificationService.add(
+                                    "Searching at " + 
+                                    percentage + "%", "success"
+                                );
+                            } else {
+                                this.notificationService.add(
+                                    "Search was cancelled at " + 
+                                    percentage + "%", "warning"
+                                );
+                                observer.complete();
+                            }
 
                             if (results.searchPercentage === 100) {
                                 if (results.errors) {
@@ -140,7 +149,7 @@ export class ResultsService {
                             observer.error(error);
                         }
                     }
-                    await new Promise(r => setTimeout(r, 2000));
+                    await new Promise(r => setTimeout(r, 1000));
                 }
             };
             worker();
@@ -382,7 +391,8 @@ export class ResultsService {
             hits: await this.mapHits(results),
             queryId: results.query_id,
             searchPercentage: results.search_percentage,
-            errors: results.errors
+            errors: results.errors,
+            cancelled: results.cancelled,
         };
     }
 
@@ -536,7 +546,8 @@ type ApiSearchResult = {
     }[],
     query_id: number,
     search_percentage: number,
-    errors: string
+    errors: string,
+    cancelled?: boolean,
 };
 
 /** Processed search results created from the response */
@@ -545,6 +556,7 @@ export interface SearchResults {
     queryId: number;
     searchPercentage: number;
     errors: string;
+    cancelled?: boolean;
 }
 
 export interface Hit {
@@ -570,6 +582,12 @@ export interface Hit {
     /** Contains the properties of the node matching the variable */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } };
 }
+
+export type HitWithOrigin = Hit & {
+    provider: string;
+    corpus: { name: string };
+    componentDisplayName: string;
+};
 
 
 export type FilterValue = FilterByField | FilterByXPath;

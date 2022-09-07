@@ -8,14 +8,13 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.conf import settings
 
-import threading
-
 from treebanks.models import Component
 from .models import SearchQuery
 from .basex_search import (
     generate_xquery_showtree, generate_xquery_metadata_count,
     parse_metadata_count_result
 )
+from .tasks import run_search_query
 from services.basex import basex
 
 
@@ -57,7 +56,7 @@ def search_view(request):
             # We also require the right XPath to avoid the possibility of
             # tampering with queries of other users.
             # TODO: also check if the component list is correct
-            query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
+            query = SearchQuery.objects.get(pk=query_id)
         except SearchQuery.DoesNotExist:
             return Response(
                 {'error': 'Cannot find given query_id'},
@@ -70,9 +69,19 @@ def search_view(request):
         query.components.add(*components_obj)
         query.initialize()
 
+    if new_query:
+        try:
+            run_search_query.delay(query.pk)
+        except run_search_query.OperationalError:
+            # No connection with message broker - run synchronously
+            run_search_query.apply((query.pk,))
+
     # Get results so far, if any
     results, percentage = query.get_results(start_from, maximum_results)
     if request.accepted_renderer.format == 'api':
+        # If using the API view, only show part of the results, because
+        # the HTML rendering of Django Rest Framework turns out to be
+        # very slow
         results = str(results)[0:5000] + \
             '… (remainder hidden because of slow rendering)'
     response = {
@@ -82,13 +91,38 @@ def search_view(request):
     }
     if percentage == 100:
         response['errors'] = query.get_errors()
-
-    if new_query:
-        # Start searching in a new thread
-        thread = threading.Thread(target=run_search, args=(query,))
-        thread.start()
+    if query.cancelled is True:
+        response['cancelled'] = True
 
     return Response(response)
+
+
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
+@parser_classes([JSONParser])
+def cancel_query_view(request):
+    data = request.data
+    try:
+        xpath = data['xpath']
+        query_id = data['query_id']
+    except KeyError as err:
+        return Response(
+            {'error': '{} is missing'.format(err)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # We also require the right XPath to avoid the possibility of
+        # tampering with queries of other users.
+        # TODO: also check if the component list is correct
+        query = SearchQuery.objects.get(xpath=xpath, pk=query_id)
+    except SearchQuery.DoesNotExist:
+        return Response(
+            {'error': 'Cannot find given query_id'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    query.cancel_search()
 
 
 @api_view(['POST'])

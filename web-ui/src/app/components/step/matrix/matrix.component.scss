@@ -1,3 +1,5 @@
+@import "../../../../colors";
+
 .xpath {
     // they can be nested quite deeply
     overflow: auto;
@@ -19,4 +21,10 @@
 // allow clicking the disabled radio buttons for notification
 input[disabled] {
     pointer-events: none
+}
+
+th.is-clickable:hover,
+td.is-clickable:hover {
+    background-color: $secondary;
+    color: $secondary-invert;
 }

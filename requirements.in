@@ -1,6 +1,7 @@
 Django>=4.0.0
 djangorestframework>=3.13.0
-alpino-query>=2.1.7
+alpino-query>=2.1.8
 django-cors-headers>=3.13.0
 BaseXClient
 corpus2alpino>=0.3.10
+celery>=5.2.0

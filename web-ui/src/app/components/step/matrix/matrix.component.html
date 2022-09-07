@@ -4,23 +4,21 @@
         <thead>
             <tr>
                 <th>Sentence</th>
-                <td *ngFor="let token of indexedTokens">{{token.value}}</td>
+                <td *ngFor="let token of indexedTokens" class="is-clickable" (click)="setTokenPart(token, 'na')">{{token.value}}</td>
             </tr>
         </thead>
         <tbody>
             <ng-container *ngFor="let option of options">
                 <tr *ngIf="!option.advanced || showAdvanced">
-                    <th [@fade]>
+                    <th [@fade] class="is-clickable" (click)="setTokenRow(option.key)">
                         <span tooltipPosition="right" pTooltip="{{option.description}}">
                             {{option.label}}
-                            <label>
-                                <i *ngIf="option.description" class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-                            </label>
+                            <fa-icon *ngIf="option.description" [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
                         </span>
                     </th>
-                    <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option)">
-                        <grt-matrix-option [attributes]="tokenValues[token.index]"
-                            [disabled]="tokenPartDisabled(token, option)" [option]="option"></grt-matrix-option>
+                    <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option.key)">
+                        <grt-matrix-option [value]="attributes[token.index][option.key]"
+                            [dependent]="tokenDependents[token.index][option.key]" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
             </ng-container>
@@ -49,9 +47,7 @@
                 <input type="checkbox" name="advanced" [(ngModel)]="showAdvanced"
                     [disabled]="alwaysAdvanced || isCustomXPath">
                 Enable advanced options
-                <label>
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-                </label>
+                <fa-icon [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
             </label>
         </div>
         <div class="field" (mouseout)="explanation = undefined"
@@ -60,9 +56,7 @@
                 <input type="checkbox" name="respectOrder" [checked]="respectOrder"
                     (click)="toggleSetting('respectOrder')" [disabled]="isCustomXPath"> Respect
                 word order
-                <label>
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-                </label>
+                <fa-icon [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
             </label>
         </div>
         <div class="field" (mouseout)="explanation = undefined"
@@ -72,7 +66,7 @@
                     (click)="toggleSetting('retrieveContext')">
                 Include context in results
                 <label>
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+                    <fa-icon [icon]="faCircleInfo"></fa-icon>
                 </label>
             </label>
         </div>
@@ -82,9 +76,7 @@
                 <input type="checkbox" name="ignoreTopNode" [checked]="ignoreTopNode"
                     (click)="toggleSetting('ignoreTopNode')" [disabled]="isCustomXPath"> Ignore
                 properties of the dominating node
-                <label>
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
-                </label>
+                <fa-icon [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
             </label>
         </div>
     </div>
@@ -113,7 +105,7 @@
                             <a class="button" role="button" tooltipPosition="bottom"
                                 pTooltip="Edit query. This will disable the matrix." (click)="editXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-edit"></i>
+                                    <fa-icon [icon]="faEdit" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -122,7 +114,7 @@
                                 pTooltip="Reset query. The query will be generated based on the options selected in the matrix."
                                 (click)="resetXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-times"></i>
+                                    <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -151,7 +143,7 @@
                         <a class="button" role="button" (click)="subTreeDisplay = 'both'" tooltipPosition="bottom"
                             pTooltip="Full screen display of the tree.">
                             <span class="icon is-large">
-                                <i class="fas fa-expand"></i>
+                                <fa-icon [icon]="faExpand" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>

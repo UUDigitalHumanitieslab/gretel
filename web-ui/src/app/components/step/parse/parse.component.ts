@@ -1,7 +1,9 @@
 import { Component, Input, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
+import { faExpand } from '@fortawesome/free-solid-svg-icons';
 import { StepDirective } from '../step.directive';
 import { StateService } from '../../../services/_index';
 import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-page/steps';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 @Component({
     selector: 'grt-parse',
@@ -9,12 +11,14 @@ import { GlobalStateExampleBased, StepType } from '../../../pages/multi-step-pag
     styleUrls: ['./parse.component.scss']
 })
 export class ParseComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
+    faExpand = faExpand;
+
     @Input() public loading = true;
     @Input() public sentence: string;
     @Input() public xml: string;
     @Output() public changeXml = new EventEmitter<string>();
 
-    public display = 'inline';
+    public display: TreeVisualizerDisplay = 'inline';
     public stepType = StepType.Parse;
     public warning?: string;
 

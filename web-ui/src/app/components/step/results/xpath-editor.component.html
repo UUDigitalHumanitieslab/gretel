@@ -12,7 +12,7 @@
                                [attr.disabled]="!validXPath ? true : null" grtBalloonPosition="down"
                                grtBalloon="Save query" (click)="updateXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-check"></i>
+                                    <fa-icon [icon]="faCheck" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -20,7 +20,7 @@
                             <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Reset query"
                                (click)="resetXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-undo"></i>
+                                    <fa-icon [icon]="faUndo" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -30,7 +30,7 @@
                             <a class="button" role="button" grtBalloonPosition="down" grtBalloon="Edit query"
                                (click)="editXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-edit"></i>
+                                    <fa-icon [icon]="faEdit" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -38,7 +38,7 @@
                             <a class="button" role="button" grtBalloonPosition="down"
                                grtBalloon="Download query" (click)="downloadXPath()">
                                 <span class="icon is-large">
-                                    <i class="fas fa-download"></i>
+                                    <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -47,7 +47,7 @@
                                grtBalloon="Copy query to the clipboard" (click)="copyXPath()"
                                [ngClass]="{'is-success': xpathCopied }">
                                 <span class="icon is-large">
-                                    <i class="fas fa-copy"></i>
+                                    <fa-icon [icon]="faCopy" aria-hidden="true"></fa-icon>
                                 </span>
                             </a>
                         </p>
@@ -59,10 +59,10 @@
                     <p class="control" grtBalloonPosition="down"
                        grtBalloon="Modify the XPath to include the specified filters.">
                         <a class="button has-badge-rounded" [attr.data-badge]="activeFilterCount" role="button"
-                           (click)="addFiltersXPath()">
+                           (click)="addFiltersXPath.next()">
                             <span class="is-large">
-                                <i class="fas fa-plus"></i>
-                                <i class="fas fa-filter"></i>
+                                <fa-icon [icon]="faPlus" aria-hidden="true"></fa-icon>
+                                <fa-icon [icon]="faFilter" aria-hidden="true"></fa-icon>
                             </span>
                         </a>
                     </p>

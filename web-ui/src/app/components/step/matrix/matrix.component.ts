@@ -1,31 +1,25 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
+import { faCircleInfo, faEdit, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { ValueEvent } from 'lassy-xpath';
 
-import { StateService, TokenAttributes } from '../../../services/_index';
+import { StateService } from '../../../services/_index';
 import { StepDirective } from '../step.directive';
-import { StepType, GlobalStateExampleBased, DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
+import { StepType, GlobalStateExampleBased } from '../../../pages/multi-step-page/steps';
 import { NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
-import { Option, options } from './matrix-option.component';
-
-const optionsLookup = Object.assign(
-    {},
-    ...options.map(option => ({ [option.value]: option }))) as { [key: string]: Option };
+import { matrixOptions, Matrix, TokenAttributes, TokenDependents, MatrixOptionKey } from '../../../models/matrix';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 interface IndexedToken {
     /**
      * string value of this token
      */
     value: string,
-    index: number,
-    /**
-     * the key of the exclusive option set for this token (or undefined)
-     */
-    exclusive: keyof TokenAttributes
-};
+    index: number
+}
 
 @Component({
     animations,
@@ -34,69 +28,19 @@ interface IndexedToken {
     styleUrls: ['./matrix.component.scss']
 })
 export class MatrixComponent extends StepDirective<GlobalStateExampleBased> implements OnInit, OnDestroy {
+    faCircleInfo = faCircleInfo;
+    faEdit = faEdit;
+    faExpand = faExpand;
+    faTimes = faTimes;
+
     private warningId: number;
     private subscriptions: Subscription[];
+    private matrix: Matrix;
+
     public stepType = StepType.Matrix;
 
-    private set attributes(tokens: TokenAttributes[]) {
-        let alwaysAdvanced = false;
-        let updatedTokens = false;
-
-        for (let i in tokens) {
-            let token = tokens[i];
-            if (token != null) {
-                for (let [key, value] of Object.entries(token)) {
-                    var option = optionsLookup[key];
-                    if (option.advanced) {
-                        if (value !== DefaultTokenAttributes[key]) {
-                            this.showAdvanced = true;
-                            alwaysAdvanced = true;
-                        }
-                    }
-
-                    if (this.indexedTokens) {
-                        if (option.exclusive) {
-                            if (value === true || value === 'include') {
-                                // checked exclusive option
-                                if (this.indexedTokens[i].exclusive !== option.value) {
-                                    updatedTokens = true;
-                                }
-                                this.indexedTokens[i].exclusive = option.value;
-                            } else {
-                                // unchecked exclusive option
-                                if (this.indexedTokens[i].exclusive == option.value) {
-                                    updatedTokens = true;
-                                }
-                                this.indexedTokens[i].exclusive = undefined;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (updatedTokens) {
-            // hello change detection
-            this.indexedTokens = [...this.indexedTokens];
-        }
-
-        this.alwaysAdvanced = alwaysAdvanced;
-
-        if (this.tokenValues &&
-            tokens.length === this.tokenValues.length) {
-            // only update the values, but prevent the whole array
-            // from being re-rendered
-            for (let i = 0; i < tokens.length; i++) {
-                Object.assign(this.tokenValues[i], tokens[i]);
-            }
-        } else {
-            this.tokenValues = tokens;
-        }
-    }
-
-    private get attributes() {
-        return this.tokenValues;
-    }
+    public attributes: TokenAttributes[];
+    public tokenDependents: TokenDependents[];
 
     public set tokens(values: string[]) {
         if (this.indexedTokens &&
@@ -107,7 +51,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                 this.indexedTokens[i].value = values[i];
             }
         } else {
-            this.indexedTokens = values.map((value, index) => ({ value, index, exclusive: undefined }));
+            this.indexedTokens = values.map((value, index) => ({ value, index }));
         }
         this.filename = values.filter(t => t.match(/[^'"-:!?,\.]/)).join('-').toLowerCase() + '.xml';
     }
@@ -128,7 +72,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     public changeValue = new EventEmitter<MatrixSettings>();
 
     public filename: string;
-    public subTreeDisplay = 'inline';
+    public subTreeDisplay: TreeVisualizerDisplay = 'inline';
     public warning: boolean;
 
     public indexedTokens: IndexedToken[];
@@ -138,9 +82,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
      */
     public alwaysAdvanced: boolean;
 
-    public tokenValues: TokenAttributes[];
-
-    public options = options;
+    public options = matrixOptions;
     public explanation: string = undefined;
 
     private originalXPath: string;
@@ -151,7 +93,6 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         super(stateService);
         this.subscriptions = [
             this.state$.subscribe(state => {
-                this.attributes = state.attributes;
                 this.ignoreTopNode = state.ignoreTopNode;
                 this.isCustomXPath = state.isCustomXPath;
                 this.respectOrder = state.respectOrder;
@@ -160,40 +101,55 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
                 this.tokens = state.tokens;
                 this.xpath = state.xpath;
                 this.loading = state.loading;
+
+                let first = false;
+                if (this.matrix === undefined) {
+                    this.matrix = Matrix.default(state.tokens.length);
+                    // make sure a new matrix is initialized
+                    first = true;
+                }
+                if (this.matrix.setMultiple(state.attributes) || first) {
+                    this.updateMatrix();
+                }
             })
         ];
     }
 
-    public setTokenPart(token: IndexedToken, part: Option) {
+    public setTokenRow<T extends MatrixOptionKey>(key: T) {
         if (this.isCustomXPath) {
             this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
 
-        if (this.tokenPartDisabled(token, part)) {
+        this.matrix.rotateRow(key);
+        this.updateMatrix();
+
+        this.emitChange();
+    }
+
+    public setTokenPart(token: IndexedToken, key: MatrixOptionKey) {
+        if (this.isCustomXPath) {
+            this.warningId = this.notificationService.add('It is not possible to use the matrix when using custom xpath.');
             return;
         }
 
-        var updated = this.rotateValue(token.index, part);
+        this.matrix.rotate(token.index, key);
+        this.updateMatrix();
 
-        this.emitChange({
-            attributes: updated
-        });
+        this.emitChange();
     }
 
-    public tokenPartDisabled(token: IndexedToken, part: Option) {
-        if (token.exclusive !== undefined && token.exclusive !== part.value) {
-            return true;
+    private updateMatrix() {
+        this.attributes = this.matrix.attributes;
+        let { advanced, dependents } = this.matrix.info();
+        this.alwaysAdvanced = advanced;
+        this.tokenDependents = dependents;
+        if (advanced) {
+            // this might happen when the page is reloaded
+            this.showAdvanced = true;
         }
-
-        if (part.dependent_on) {
-            const dependent = this.attributes[token.index][part.dependent_on];
-            if (dependent === undefined || dependent === false) {
-                return true;
-            }
-        }
-
-        return false;
+        // hello change detection
+        this.indexedTokens = [...this.indexedTokens];
     }
 
     private emitChange(settings: Partial<MatrixSettings> = {}) {
@@ -201,7 +157,7 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
             this.valid = true;
         }
         this.changeValue.next(Object.assign({
-            attributes: this.tokenValues,
+            attributes: [...this.matrix.attributes],
             retrieveContext: this.retrieveContext,
             customXPath: settings.customXPath || null,
             respectOrder: this.respectOrder,
@@ -259,34 +215,6 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         this.notificationService.cancel(this.warningId);
         this.subscriptions.forEach(s => s.unsubscribe());
         super.ngOnDestroy();
-    }
-
-    private rotateValue(tokenIndex: number, option: Option): TokenAttributes[] {
-        var value = (this.tokenValues[tokenIndex][option.value] ??
-            optionsLookup[option.value]);
-        var options: any[];
-
-        switch (option.type) {
-            case 'default':
-                options = ['include', 'exclude', undefined];
-                break;
-
-            case 'bool':
-                options = [true, false];
-                break;
-        }
-
-        var index = options.indexOf(value) + 1;
-        var update = options[index % options.length];
-
-        return [
-            ...this.tokenValues.slice(0, tokenIndex),
-            {
-                ...this.tokenValues[tokenIndex],
-                [option.value]: update
-            },
-            ...this.tokenValues.slice(tokenIndex + 1)
-        ];
     }
 }
 

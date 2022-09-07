@@ -7,11 +7,11 @@
         <div class="tv-content-wrapper">
             <div class="tv-toolbar-wrapper" *ngIf="fullScreenButton || sentence">
                 <div class="tv-sentence-wrapper">
-                    <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                    <fa-icon [icon]="faCommentDots" aria-hidden="true"></fa-icon>
                     <span></span>
                 </div>
                 <button class="tv-show-fs" grtBalloonPosition="left" grtBalloon="Open the tree in full screen mode" type="button" *ngIf="fullScreenButton">
-                    <i class="fa fa-loaded fa-fw fa-arrows-alt"></i>
+                    <fa-icon [icon]="faArrowsAlt" aria-hidden="true"></fa-icon>
                     <span class="sr-only">Open in fullscreen</span>
                 </button>
             </div>
@@ -22,7 +22,7 @@
             <aside class="tv-tooltip" style="display: none">
                 <ul></ul>
                 <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button">
-                    <i class="fa fa-loaded fa-fw fa-times"></i>
+                    <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
                     <span class="sr-only">Close</span>
                 </button>
                 <span class="arrow"></span>
@@ -38,17 +38,17 @@
         <div class="tv-content-wrapper">
             <div class="tv-toolbar-wrapper level is-marginless">
                 <div class="tv-sentence-wrapper level-left">
-                    <i class="level-item fas fa-comment-dots" aria-hidden="true"></i>
+                    <fa-icon [icon]="faCommentDots" aria-hidden="true"></fa-icon>
                     <span class="level-item"></span>
                 </div>
                 <div class="level-item">
                     <nav class="tv-navigation-wrapper">
                         <button class="tv-prev-tree" type="button" grtBalloonPosition="down" grtBalloon="Show previous tree">
-                            <i class="fa fa-loaded fa-fw fa-chevron-left" aria-hidden="true"></i>
+                            <fa-icon [icon]="faChevronLeft" aria-hidden="true"></fa-icon>
                             <span class="sr-only">Previous tree</span>
                         </button>
                         <button class="tv-next-tree" type="button" grtBalloonPosition="down" grtBalloon="Show next tree">
-                            <i class="fa fa-loaded fa-fw fa-chevron-right" aria-hidden="true"></i>
+                            <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
                             <span class="sr-only">Next tree</span>
                         </button>
                     </nav>
@@ -59,14 +59,14 @@
                             <p class="control">
                                 <a *ngIf="url;else downloadButton" class="button" [href]="url" target="_blank" grtBalloonPosition="down" grtBalloon="Show XML">
                                     <span class="icon is-large">
-                                        <i class="fas fa-file-code" aria-hidden="true"></i>
+                                        <fa-icon [icon]="faFileCode" aria-hidden="true"></fa-icon>
                                     </span>
                                     <span>Show XML</span>
                                 </a>
                                 <ng-template #downloadButton>
                                     <span class="button" (click)="downloadXml()" grtBalloonPosition="down" grtBalloon="Download XML" rel="button">
                                         <span class="icon is-large">
-                                            <i class="fas fa-file-code" aria-hidden="true"></i>
+                                            <fa-icon [icon]="faFileCode" aria-hidden="true"></fa-icon>
                                         </span>
                                         <span>Download XML</span>
                                     </span>
@@ -79,7 +79,7 @@
                             <div class="tv-zoom-opts field has-addons">
                                 <p class="control">
                                     <button class="tv-zoom-out button" type="button">
-                                        <i class="fas fa-search-minus" aria-hidden="true"></i>
+                                        <fa-icon [icon]="faSearchMinus" aria-hidden="true"></fa-icon>
                                         <span class="sr-only">Zoom out</span>
                                     </button>
                                 </p>
@@ -88,7 +88,7 @@
                                 </p>
                                 <p class="control">
                                     <button class="tv-zoom-in button" type="button">
-                                        <i class="fas fa-search-plus" aria-hidden="true"></i>
+                                        <fa-icon [icon]="faSearchPlus" aria-hidden="true"></fa-icon>
                                         <span class="sr-only">Zoom in</span>
                                     </button>
                                 </p>
@@ -99,7 +99,7 @@
                         <div class="field">
                             <p class="control">
                                 <button grtBalloonPosition="down-right" grtBalloon="Close fullscreen mode" type="button" class="tv-close-fs button is-danger">
-                                    <i class="fas fa-times"></i>
+                                    <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
                                 </button>
                             </p>
                         </div>
@@ -112,7 +112,7 @@
             <aside class="tv-tooltip" style="display: none">
                 <ul></ul>
                 <button grtBalloonPosition="up" grtBalloon="Close this tooltip" type="button">
-                    <i class="fa fa-loaded fa-fw fa-times"></i>
+                    <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
                     <span class="sr-only">Close</span>
                 </button>
                 <span class="arrow"></span>

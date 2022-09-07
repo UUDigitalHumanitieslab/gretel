@@ -3,7 +3,7 @@
         <p class="panel-heading">
             {{filter.field}}
             <span class="icon has-text-primary" *ngIf="filterValues[filter.field]">
-                <i class="fas fa-filter"></i>
+                <fa-icon [icon]="faFilter" aria-hidden="true"></fa-icon>
             </span>
         </p>
         <ng-container [ngSwitch]="filter.filterType">

@@ -1,84 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { IconDefinition, faEquals, faNotEqual, faCheck } from '@fortawesome/free-solid-svg-icons';
-import { DefaultTokenAttributes } from '../../../pages/multi-step-page/steps';
 
 import { animations } from '../../../animations';
-import { AttributeType, TokenAttributes } from '../../../services/_index';
+import { FilterValue, MatrixOption } from '../../../models/matrix';
 
-export type Option = {
-    type: 'bool' | 'default';
-    label: string;
-    description: string;
-    value: AttributeType;
-    dependent_on?: AttributeType;
-    advanced: boolean;
-    exclusive: boolean;
-}
-
-export const options: Option[] = [
-    {
-        label: 'Relation',
-        description: 'The exact word form (also known as token).',
-        value: 'rel',
-        advanced: false,
-        exclusive: false,
-        type: 'default'
-    },
-    {
-        label: 'Word',
-        description: 'The exact word form (also known as token).',
-        value: 'word',
-        advanced: false,
-        exclusive: false,
-        type: 'default'
-    },
-    {
-        label: 'Word (case-sensitive)',
-        description: 'The word form must match exactly, including the casing.',
-        dependent_on: 'word',
-        value: 'cs',
-        advanced: true,
-        exclusive: false,
-        type: 'bool'
-    },
-    {
-        label: 'Lemma',
-        description: `Word form that generalizes over inflected forms.
-        For example: gaan is the lemma of ga, gaat, gaan, ging, gingen, and gegaan.`,
-        value: 'lemma',
-        advanced: false,
-        exclusive: false,
-        type: 'default'
-    },
-    {
-        label: 'Word class',
-        description: `Short Dutch part-of-speech tag.
-        The different tags are:
-        n (noun), ww (verb), adj (adjective), lid (article), vnw (pronoun),
-        vg (conjunction), bw (adverb), tw (numeral), vz (preposition),
-        tsw (interjection), spec (special token), and let (punctuation).`,
-        value: 'pos',
-        advanced: false,
-        exclusive: false,
-        type: 'default'
-    },
-    {
-        label: 'Detailed word class',
-        description: 'Long part-of-speech tag. For example: N(soort,mv,basis), WW(pv,tgw,ev), VNW(pers,pron,nomin,vol,2v,ev).',
-        value: 'postag',
-        advanced: true,
-        exclusive: false,
-        type: 'default'
-    },
-    {
-        label: 'Optional',
-        description: `The word will be ignored in the search instruction.
-        It may be included in the results, but it is not required that it is present.`,
-        value: 'na',
-        advanced: false,
-        exclusive: true,
-        type: 'bool'
-    }];
 
 @Component({
     animations,
@@ -88,21 +13,21 @@ export const options: Option[] = [
 })
 export class MatrixOptionComponent {
     @Input()
-    attributes: TokenAttributes;
+    value: boolean | FilterValue;
 
     @Input()
-    option: Option;
+    option: MatrixOption;
 
     @Input()
-    disabled: boolean;
+    dependent: boolean;
 
     get iconDefinition(): IconDefinition {
-        if (!this.option || !this.attributes || this.disabled) {
+        if (!this.option || this.dependent) {
             return undefined;
         }
 
         if (this.option.type === 'default') {
-            switch (this.attributes[this.option.value]) {
+            switch (this.value) {
                 case 'include':
                     return faEquals;
 
@@ -114,15 +39,12 @@ export class MatrixOptionComponent {
             }
         }
 
-        return this.attributes[this.option.value] ?
-            faCheck : undefined;
+        return this.value ? faCheck : undefined;
     }
 
     get iconColor() {
-        if (!this.disabled && this.option && this.attributes) {
-            const key = this.option.value;
-            const value = this.attributes[key];
-            switch (value) {
+        if (!this.dependent && this.option) {
+            switch (this.value) {
                 case 'include':
                 case true:
                     return 'is-primary';
@@ -137,11 +59,11 @@ export class MatrixOptionComponent {
     }
 
     get iconText() {
-        if (!this.option || !this.attributes) {
+        if (!this.option) {
             return '';
         }
 
-        const value = this.disabled ? undefined : this.attributes[this.option.value];
+        const value = this.dependent ? undefined : this.value;
         switch (value) {
             case undefined:
                 return 'any';
@@ -158,14 +80,17 @@ export class MatrixOptionComponent {
     }
 
     get iconDescription() {
-        if (this.option && this.attributes) {
+        if (this.dependent) {
+            return undefined;
+        }
+
+        if (this.option) {
             if (this.option.type == 'bool') {
                 // yes/no doesn't require explanation
                 return undefined;
             }
 
-            const key = this.option.value;
-            const value = this.disabled ? undefined : this.attributes[key];
+            const value = this.dependent ? undefined : this.value;
             const label = this.option.label.toLowerCase();
             switch (value) {
                 case 'include':
@@ -178,6 +103,6 @@ export class MatrixOptionComponent {
             }
         }
 
-        return this.disabled ? 'disabled' : '???';
+        return undefined;
     }
 }

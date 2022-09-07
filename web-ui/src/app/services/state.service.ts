@@ -164,7 +164,7 @@ class SharedInstance<T extends GlobalState> {
         }
     }
 
-    setState(values: { [K in keyof GlobalState]?: GlobalState[K] }, emit: EmitType = false) {
+    setState(values: { [K in keyof GlobalState]?: GlobalState[K] }, emit: EmitType = false): T & { emit: EmitType } {
         const nextState = {
             ...this.state$.value,
             ...values,
@@ -249,7 +249,7 @@ export class StateService<T extends GlobalState> {
         return this.instance.jump(stepNumber, emit);
     }
 
-    setState(values: { [K in keyof T]?: T[K] }, emit: EmitType = 'in-place') {
+    setState(values: Partial<T> | Partial<GlobalState>, emit: EmitType = 'in-place'): T {
         return this.instance.setState(values, emit);
     }
 

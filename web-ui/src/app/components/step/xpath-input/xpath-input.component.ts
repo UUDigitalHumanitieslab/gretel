@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, OnInit, OnDestroy } from '@angular/core';
+import { faInfoCircle, faExpand } from '@fortawesome/free-solid-svg-icons';
 
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -7,6 +8,7 @@ import { StepDirective } from '../step.directive';
 import { MacroService, ValueEvent, ReconstructorService, ExtractinatorService, PathVariable } from 'lassy-xpath';
 import { StateService } from '../../../services/_index';
 import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
+import { TreeVisualizerDisplay } from '../../tree-visualizer/tree-visualizer.component';
 
 @Component({
     selector: 'grt-xpath-input',
@@ -14,9 +16,12 @@ import { GlobalState, StepType } from '../../../pages/multi-step-page/steps';
     styleUrls: ['./xpath-input.component.scss']
 })
 export class XpathInputComponent extends StepDirective<GlobalState> implements OnChanges, OnInit, OnDestroy {
+    faInfoCircle = faInfoCircle;
+    faExpand = faExpand;
+
     public stepType = StepType.XpathInput;
     public treeXml: string;
-    public treeDisplay = 'inline';
+    public treeDisplay: TreeVisualizerDisplay = 'inline';
     public warning = false;
 
     private valueSubject = new Subject<string>();

@@ -1,11 +1,11 @@
 <a class="button" role="button" (click)="toggle($event)" grtBalloonLength="large" grtBalloonPosition="down"
     grtBalloon="Download the results as a .csv-file" [grtBalloonVisible]="visible ? false : undefined">
     <span class="icon is-large">
-        <i class="fas fa-download"></i>
+        <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
     </span>
 </a>
 <p-overlayPanel appendTo="body" [dismissable]="false" [showCloseIcon]="true">
-    <form (submit)="downloadResults()">
+    <form (submit)="downloadResults.next(includeNodeProperties)">
         <div class="field">
             <label class="checkbox">
                 <input type="checkbox" name="includeNodeProperties" [(ngModel)]="includeNodeProperties">
@@ -13,7 +13,7 @@
             </label>
             <label grtBalloonLength="large" grtBalloonPosition="right"
                 grtBalloon="For every node specified in the query, columns will be added for that node's linguistic properties e.g. the POS-value, dependency relation, phrasal category, etc.">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+                <fa-icon [icon]="faInfoCircle" aria-hidden="true"></fa-icon>
             </label>
         </div>
         <div class="field" *ngIf="includeNodeProperties">

@@ -8,15 +8,6 @@
 @import "tv-buttons";
 @import "clearfix";
 
-%fa {
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
 .metadata {
     display: block;
     position: relative;
@@ -209,7 +200,7 @@
 
                 .excluded {
                     color: $danger !important;
-                    text-decoration: line-through;                    
+                    text-decoration: line-through;
                 }
 
                 a {

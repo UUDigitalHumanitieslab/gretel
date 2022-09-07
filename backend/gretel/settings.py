@@ -133,6 +133,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost'
+
 # BaseX connection settings - change in production
 BASEX_HOST = os.getenv('BASEX_HOST', 'localhost')
 BASEX_PORT = 1984
