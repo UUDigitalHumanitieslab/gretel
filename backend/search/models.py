@@ -55,10 +55,11 @@ class ComponentSearchResult(models.Model):
         """Get the Path of the caching file corresponding to this
         ComponentSearchResult. If create_dir is True, create the parent
         directory if needed."""
-        try:
-            settings.CACHING_DIR.mkdir(exist_ok=True, parents=True)
-        except (FileExistsError, FileNotFoundError):
-            raise SearchError('Could not access or create caching directory')
+        if create_dir:
+            try:
+                settings.CACHING_DIR.mkdir(exist_ok=True, parents=True)
+            except (FileExistsError, FileNotFoundError):
+                raise SearchError('Could not create caching directory')
         return settings.CACHING_DIR / str(self.id)
 
     def get_results(self) -> dict:
