@@ -1,0 +1,33 @@
+version: "3"
+
+volumes:
+  gretel:
+
+services:
+  gretel:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - alpino
+      - basex
+    volumes:
+      - ./backend:/gretel
+    environment:
+      - BASEX_HOST=basex
+      - ALPINO_HOST=alpino
+    command: bash -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+  alpino:
+    image: registry.webhosting.rug.nl/compling/alpino:latest
+    environment:
+      - PROLOGMAXSIZE=1500M
+    ports:
+      - "7001:7001"
+    command: Alpino -notk -veryfast user_max=600000 server_kind=parse server_port=7001 assume_input_is_tokenized=on debug=0 end_hook=xml -init_dict_p batch_command=alpino_server
+
+  basex:
+    image: basex/basexhttp:latest
+    ports:
+      - "1984:1984"
+    command: basexserver
