@@ -265,7 +265,8 @@ class SearchQuery(models.Model):
                 component=component,
                 variables=self.variables
             )
-            self.total_database_size += component.total_database_size
+            if component.total_database_size is not None:
+                self.total_database_size += component.total_database_size
             results.append(result)
         self.results.add(*results)
         self.save()
