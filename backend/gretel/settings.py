@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -131,11 +132,25 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost'
 
 # BaseX connection settings - change in production
-BASEX_HOST = 'localhost'
+BASEX_HOST = os.getenv('BASEX_HOST', 'localhost')
 BASEX_PORT = 1984
 BASEX_USER = 'admin'
 BASEX_PASSWORD = 'admin'
@@ -144,7 +159,7 @@ BASEX_PASSWORD = 'admin'
 # Provide ALPINO_HOST and ALPINO_PORT to use Alpino as a server. Provide
 # ALPINO_PATH to use the Alpino executable. If both are provided (i.e.
 # not None) the server will be used.
-ALPINO_HOST = 'localhost'
+ALPINO_HOST = os.getenv('ALPINO_HOST', 'localhost')
 ALPINO_PORT = 7001
 ALPINO_PATH = '/opt/Alpino'
 
@@ -155,3 +170,8 @@ MAXIMUM_RESULTS_ANALYSIS = 5000
 
 # Delete BaseX databases if corresponding treebanks/components are deleted
 DELETE_COMPONENTS_FROM_BASEX = False
+
+MAXIMUM_RESULTS_PER_COMPONENT = 5000
+
+CACHING_DIR = BASE_DIR / 'query_result_cache'
+MAXIMUM_CACHE_SIZE = 256  # Maximum cache size in MiB
