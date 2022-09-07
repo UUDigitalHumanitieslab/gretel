@@ -130,7 +130,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
     }
 
     changeQuery(query: MweQuery) {
-        this.globalState.currentQuery = query;
+        this.stateService.setState({currentQuery: query});
         this.updateXPath(query.xpath, false);
     }
 
