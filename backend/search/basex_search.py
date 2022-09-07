@@ -112,7 +112,7 @@ def generate_xquery_count(basex_db: str, xpath: str) -> str:
     occurances of a given XPath in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):
         raise ValueError('Incorrect database or malformed XPath given')
-    return 'count(for $node in db:open("{}")/treebank{} return $node)' \
+    return 'count(db:open("{}")/treebank{})' \
         .format(basex_db, xpath)
 
 
