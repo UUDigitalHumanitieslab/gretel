@@ -177,10 +177,11 @@ def parse_search_result(result_str: str, component) -> list:
             raise ValueError('Cannot parse XQuery result: <match> '
                              'is not closed in {}'.format(result))
         splitted = result.split('||')
-        if len(splitted) != 8:
-            raise ValueError('Cannot parse XQuery result: {}'.format(result))
-        (sentid, sentence, ids, begins, xml_sentences, meta, variables,
-         database) = splitted
+        try:
+            (sentid, sentence, ids, begins, xml_sentences, meta, variables,
+             database) = splitted
+        except ValueError as err:
+            raise ValueError('Cannot parse XQuery result: {}'.format(err))
         # Make sentid-s unique by appending a match index (there may be
         # multiple matches per sentence)
         # TODO: can we change this to something more comprehensible?
