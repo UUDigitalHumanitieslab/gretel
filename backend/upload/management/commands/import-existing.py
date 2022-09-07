@@ -71,10 +71,11 @@ class Command(BaseCommand):
         nr_sentences = 0
         for dbname in databases:
             basex_db = self.create_database(dbname)
+            basex_db.component = component
             basex_dbs.append(basex_db)
         component.nr_words = nr_words
         component.nr_sentences = nr_sentences
-        return component
+        return component, basex_dbs
 
     def handle(self, *args, **options):
         if not basex.test_connection():
@@ -103,10 +104,15 @@ class Command(BaseCommand):
             raise CommandError('Treebank {} already exists.'
                                .format(self.treebank.slug))
 
-        components = []
-        for component in self.config_components:
-            components.append(self.create_component(component))
+        component_objs = []
+        db_objs_per_component = []  # A list of BaseXDB objects per component
+        for component_config in self.config_components:
+            component_obj, db_objs = self.create_component(component_config)
+            component_objs.append(component_obj)
+            db_objs_per_component.append(db_objs)
 
         self.treebank.save()
-        for component in components:
-            component.save()
+        for i in range(len(component_objs)):
+            component_objs[i].save()
+            for db_obj in db_objs_per_component[i]:
+                db_obj.save()
