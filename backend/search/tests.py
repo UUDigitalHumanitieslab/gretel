@@ -208,16 +208,6 @@ class ComponentSearchResultTestCase(TestCase):
             # Actual number of results should be correct
             self.assertEqual(len(csr.get_results()), csr.number_of_results)
             csr.delete()  # Delete because CSR auto-saves
-            # No component should throw exception
-            csr2 = ComponentSearchResult(xpath=XPATH1)
-            with self.assertRaises(SearchError):
-                csr2.perform_search()
-            csr2.component = component
-            # Invalid or empty (= invalid) XPath should throw exception
-            for xpath in ['//node[@cat=', '']:
-                csr2.xpath = xpath
-                with self.assertRaises(SearchError):
-                    csr2.perform_search()
 
 
 class SearchQueryTestCase(TestCase):
