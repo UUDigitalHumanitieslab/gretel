@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.conf import settings
 
 import logging
 
@@ -77,6 +78,13 @@ class BaseXDB(models.Model):
     def __str__(self):
         return str(self.dbname)
 
+    def get_db_size(self):
+        """Get database size in KiB"""
+        dbsize = int(basex.perform_query(
+                        'db:property("{}", "size")'.format(self.dbname)
+                    ))
+        return int(dbsize / 1024)
+
     def delete_basex_db(self):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
@@ -92,4 +100,10 @@ class BaseXDB(models.Model):
 
 @receiver(pre_delete, sender=BaseXDB)
 def delete_basex_db_callback(sender, instance, using, **kwargs):
-    instance.delete_basex_db()
+    if settings.DELETE_COMPONENTS_FROM_BASEX is True:
+        instance.delete_basex_db()
+    else:
+        logger.warning('Database {} was removed but corresponding BaseX '
+                       'database was not deleted because setting '
+                       'DELETE_COMPONENTS_FROM_BASEX is False.'
+                       .format(str(instance)))

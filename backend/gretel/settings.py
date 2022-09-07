@@ -152,3 +152,6 @@ CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
 
 MAXIMUM_RESULTS = 500
 MAXIMUM_RESULTS_ANALYSIS = 5000
+
+# Delete BaseX databases if corresponding treebanks/components are deleted
+DELETE_COMPONENTS_FROM_BASEX = False
