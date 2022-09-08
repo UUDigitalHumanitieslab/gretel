@@ -66,7 +66,9 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
     public filteredResults: HidableHit[] = [];
     public stepType = StepType.Results;
 
+    @Input()
     public xpath: string;
+
     public validXPath = true;
     public customXPath: string;
     @Output()

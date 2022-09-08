@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { StateService, TreebankService, MweService,
-         EmitType} from '../../services/_index';
+import { StateService, TreebankService, MweService } from '../../services/_index';
 import { MweCanonicalForm } from '../../services/mwe.service';
 import { MultiStepPageDirective } from '../multi-step-page/multi-step-page.directive';
 
 import {
-    GlobalState, SentenceInputStep, XpathInputStep, Step, SelectTreebankStep,
+    GlobalState, SentenceInputStep, Step, SelectTreebankStep,
     ResultsStep, AnalysisStep
 } from '../multi-step-page/steps';
 import { TreebankSelection } from '../../treebank';
@@ -122,16 +121,13 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         this.next();
     }
 
-    async updateXPath(xpath: string, emit: EmitType) {
-        this.stateService.setState({
-            xpath
-        },
-            emit);
+    async updateXPath(xpath: string) {
+        this.stateService.setState({xpath});
     }
 
     changeQuery(query: MweQuery) {
         this.stateService.setState({currentQuery: query});
-        this.updateXPath(query.xpath, false);
+        this.updateXPath(query.xpath);
     }
 
     async saveQuery() {
