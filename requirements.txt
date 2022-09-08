@@ -12,6 +12,8 @@ argparse==1.4.0
     # via corpus2alpino
 asgiref==3.5.2
     # via django
+async-timeout==4.0.2
+    # via redis
 basexclient==8.4.4
     # via -r requirements.in
 beautifulsoup4==4.11.1
@@ -25,7 +27,7 @@ catalogue==2.0.8
     #   spacy
     #   srsly
     #   thinc
-celery==5.2.7
+celery[redis]==5.2.7
     # via -r requirements.in
 certifi==2022.6.15
     # via requests
@@ -53,6 +55,8 @@ cymem==2.0.6
     #   preshed
     #   spacy
     #   thinc
+deprecated==1.2.13
+    # via redis
 django==4.1
     # via
     #   -r requirements.in
@@ -91,7 +95,9 @@ numpy==1.23.2
     #   spacy
     #   thinc
 packaging==21.3
-    # via spacy
+    # via
+    #   redis
+    #   spacy
 pathy==0.6.2
     # via spacy
 preshed==3.0.7
@@ -114,6 +120,8 @@ pytz==2022.2.1
     #   djangorestframework
 rdflib==6.2.0
     # via folia
+redis==4.3.4
+    # via celery
 requests==2.28.1
     # via
     #   alpino-query
@@ -165,6 +173,8 @@ wasabi==0.10.1
     #   thinc
 wcwidth==0.2.5
     # via prompt-toolkit
+wrapt==1.14.1
+    # via deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
