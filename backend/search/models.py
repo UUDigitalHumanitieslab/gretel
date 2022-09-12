@@ -68,11 +68,9 @@ class ComponentSearchResult(models.Model):
         try:
             cache_file = open(cache_filename, 'r')
         except FileNotFoundError:
-            logger.error(
-                'Could not open cache file for ComponentSearchResult {}: {}'
-                .format(self.id, cache_filename)
-            )
-            raise SearchError('Cache file not found')
+            # This can happen if search results are requested before
+            # searching had started, and is not necessarily an error
+            return []
         results = cache_file.read()
         cache_file.close()
         self.last_accessed = timezone.now()
