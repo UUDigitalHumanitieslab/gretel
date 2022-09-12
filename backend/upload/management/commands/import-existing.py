@@ -1,14 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
-from django.utils import timezone
+from django.conf import settings
 
-import os
 import sys
-import glob
-import gzip
-import zlib
-import re
-import csv
 import json
 
 from treebanks.models import Treebank, Component, BaseXDB
@@ -35,6 +28,7 @@ def userinputyesno(prompt, default=False):
 
 class Command(BaseCommand):
     help = 'Add treebank for which BaseX databases already exist'
+    requires_migrations_checks = True
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -51,8 +45,17 @@ class Command(BaseCommand):
     def create_database(self, dbname: str):
         # Get database size (and check if it exists)
         basex_db = BaseXDB(dbname)
-        basex_db.size = basex_db.get_db_size()
-        return basex_db
+        try:
+            basex_db.size = basex_db.get_db_size()
+            words = basex_db.get_number_of_words()
+            sentences = basex_db.get_number_of_sentences()
+        except OSError as err:
+            raise CommandError(
+                'Error accessing BaseX database {}: {}'
+                ' - probably this database does not exist.'
+                .format(dbname, str(err))
+            )
+        return basex_db, words, sentences
 
     def create_component(self, comp: dict):
         try:
@@ -66,11 +69,15 @@ class Command(BaseCommand):
         component = Component(slug=slug, title=title,
                               description=description)
         component.treebank = self.treebank
+        component.variant = comp.get('variant', '')
+        component.group = comp.get('group', '')
         basex_dbs = []
         nr_words = 0
         nr_sentences = 0
         for dbname in databases:
-            basex_db = self.create_database(dbname)
+            basex_db, words, sentences = self.create_database(dbname)
+            nr_words += words
+            nr_sentences += sentences
             basex_db.component = component
             basex_dbs.append(basex_db)
         component.nr_words = nr_words
@@ -104,6 +111,10 @@ class Command(BaseCommand):
             raise CommandError('Treebank {} already exists.'
                                .format(self.treebank.slug))
 
+        # Optional treebank-wide fields that are stored in JSON
+        self.treebank.variants = self.configuration.get('variants', '[]')
+        self.treebank.groups = self.configuration.get('groups', '{}')
+
         component_objs = []
         db_objs_per_component = []  # A list of BaseXDB objects per component
         for component_config in self.config_components:
@@ -116,3 +127,15 @@ class Command(BaseCommand):
             component_objs[i].save()
             for db_obj in db_objs_per_component[i]:
                 db_obj.save()
+
+        self.stdout.write(self.style.SUCCESS(
+            'Successfully imported treebank {} with existing BaseX databases'
+            .format(self.treebank.slug)
+        ))
+
+        if settings.DELETE_COMPONENTS_FROM_BASEX:
+            self.stdout.write(self.style.WARNING(
+                'Warning: the setting DELETE_COMPONENTS_FROM_BASEX is '
+                'True, which means that the existing BaseX databases '
+                'will be deleted in case you delete this treebank.'
+            ))
