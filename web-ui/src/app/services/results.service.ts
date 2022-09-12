@@ -149,7 +149,7 @@ export class ResultsService {
                             observer.error(error);
                         }
                     }
-                    await new Promise(r => setTimeout(r, 500));
+                    await new Promise(r => setTimeout(r, 1000));
                 }
             };
             worker();
@@ -576,6 +576,7 @@ export interface SearchResults {
     errors: string;
     cancelled?: boolean;
     counts: ResultCount[];
+    
 }
 
 export interface Hit {
