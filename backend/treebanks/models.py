@@ -7,6 +7,9 @@ from django.conf import settings
 import logging
 
 from services.basex import basex
+from search.basex_search import (
+    generate_xquery_count_words, generate_xquery_count_sentences
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,8 @@ class Treebank(models.Model):
     word_tokenized = models.BooleanField(null=True)
     sentences_have_labels = models.BooleanField(null=True)
     processed = models.DateTimeField(null=True, blank=True)
+    variants = models.JSONField(blank=True, default=list)
+    groups = models.JSONField(blank=True, default=dict)
 
     def __str__(self):
         return '{}'.format(self.slug)
@@ -45,6 +50,8 @@ class Component(models.Model):
     )
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
                                  related_name='components')
+    variant = models.CharField(max_length=100, blank=True, default='')
+    group = models.CharField(max_length=100, blank=True, default='')
 
     class Meta:
         constraints = [
@@ -84,6 +91,16 @@ class BaseXDB(models.Model):
                         'db:property("{}", "size")'.format(self.dbname)
                     ))
         return int(dbsize / 1024)
+
+    def get_number_of_words(self):
+        return int(basex.perform_query(
+            generate_xquery_count_words(self.dbname)
+        ))
+
+    def get_number_of_sentences(self):
+        return int(basex.perform_query(
+            generate_xquery_count_sentences(self.dbname)
+        ))
 
     def delete_basex_db(self):
         """Delete this database from BaseX (called when BaseXDB objects
