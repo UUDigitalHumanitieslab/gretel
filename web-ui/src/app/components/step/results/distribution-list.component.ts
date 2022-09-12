@@ -119,7 +119,7 @@ export class DistributionListComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        console.log('Something changed!');
+        // Update counts based on data coming from ResultsComponent
         let totalHits = 0;
         for (const provider of Object.getOwnPropertyNames(this.incomingCounts)) {
             for (const treebank of Object.getOwnPropertyNames(this.incomingCounts[provider])) {
@@ -131,7 +131,6 @@ export class DistributionListComponent implements OnInit, OnDestroy, OnChanges {
                 }
                 this.state[provider][treebank].hits = treebankhits;
                 totalHits += treebankhits;
-                //this.state[provider][treebank]
             }
         }
         this.totalHits = totalHits;
