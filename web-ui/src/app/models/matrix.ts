@@ -36,7 +36,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
     'rel':
     {
         label: 'Relation',
-        description: 'Grammatical relation, such as subject(su), direct object (obj1), etc.',
+        description: 'Grammatical relation, such as subject (su), direct object (obj1), etc.',
         advanced: false,
         exclusive: false,
         type: 'default',
