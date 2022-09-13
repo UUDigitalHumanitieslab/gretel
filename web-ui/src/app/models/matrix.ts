@@ -36,7 +36,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
     'rel':
     {
         label: 'Relation',
-        description: 'The exact word form (also known as token).',
+        description: 'Grammatical relation, such as subject(su), direct object (obj1), etc.',
         advanced: false,
         exclusive: false,
         type: 'default',
@@ -48,7 +48,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
         advanced: false,
         exclusive: false,
         type: 'default',
-        default: 'include'
+        default: undefined
     },
     'cs': {
         label: 'Word (case-sensitive)',
@@ -266,6 +266,10 @@ export class Matrix {
 
     info(): {
         advanced: boolean,
+        /**
+         * Which token attributes are dependent on other attributes
+         * to be enabled.
+         */
         dependents: TokenDependents[]
     } {
         let advanced = false;
@@ -374,7 +378,7 @@ export class Matrix {
             case 'postag':
             case 'rel':
             case 'word':
-                updated = mod(['include', 'exclude', undefined]);
+                updated = mod(['include', undefined, 'exclude']);
                 break;
         }
 

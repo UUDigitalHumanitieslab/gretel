@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
-import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
-import { TokenAttributes, FilterValue } from '../models/matrix';
+import { TokenAttributes, FilterValue, DefaultTokenAttributes } from '../models/matrix';
 
 @Injectable()
 export class AlpinoService {
