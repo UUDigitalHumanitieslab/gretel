@@ -12,8 +12,7 @@ export class ResultsStreamService {
 
     stream(xpath: string,
         selection: TreebankSelection,
-        filterValues: FilterValue[],
-        retrieveContext: boolean) {
+        filterValues: FilterValue[]) {
         // create a request for each treebank
         return selection.corpora.map(({ provider, corpus }) => {
             // create the basic request, without error handling
@@ -22,7 +21,6 @@ export class ResultsStreamService {
                 provider,
                 corpus.name,
                 corpus.components,
-                retrieveContext,
                 false,
                 filterValues,
                 []
