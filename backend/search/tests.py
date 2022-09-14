@@ -133,8 +133,9 @@ class BaseXSearchTestCase(TestCase):
         )
 
     def test_parse_search_result(self):
-        input_str = '<match>id||sentence||ids||begins||xml_sentences' \
-            '||meta||vars||db</match><match>id2||sentence2||ids2||begins2' \
+        input_str = '<match>id||sentence||prevs||nexts||ids||begins||' \
+            'xml_sentences||meta||vars||db</match><match>id2||sentence2' \
+            '||prevs||nexts||ids2||begins2' \
             '||xml_sentences2||meta2||vars||db</match>'
         res = parse_search_result(input_str, 'component')
         self.assertEqual('sentence', res[0]['sentence'])
