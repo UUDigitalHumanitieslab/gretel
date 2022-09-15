@@ -97,9 +97,6 @@ export class AlpinoService {
 
             const notApplicable = parts.indexOf('na') >= 0;
             if (notApplicable) {
-                for (let key of Object.keys(attributes)) {
-                    attributes[key]
-                }
                 parts = Object.keys(DefaultTokenAttributes)
                     .filter(key => key != 'cs')
                     .map(key => `~${key}`);
