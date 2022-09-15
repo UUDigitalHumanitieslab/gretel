@@ -60,7 +60,7 @@ export class AlpinoService {
                 }
             }
 
-            for (let key of ['rel', 'word', 'lemma', 'pos', 'postag']) {
+            for (let key of ['rel', 'word', 'lemma', 'pt', 'postag']) {
                 switch (attr[key]) {
                     case skipDefault && DefaultTokenAttributes[key]:
                         // don't set default values
@@ -116,7 +116,7 @@ export class AlpinoService {
                     case 'rel':
                     case 'word':
                     case 'lemma':
-                    case 'pos':
+                    case 'pt':
                     case 'postag':
                         let value: FilterValue;
                         switch (part[0]) {

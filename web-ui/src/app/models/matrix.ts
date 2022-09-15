@@ -1,4 +1,4 @@
-type FilterKey = 'rel' | 'word' | 'lemma' | 'pos' | 'postag';
+type FilterKey = 'rel' | 'word' | 'lemma' | 'pt' | 'postag';
 type BoolKey = 'cs' | 'na';
 
 export type MatrixOptionKey = FilterKey | BoolKey;
@@ -68,7 +68,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
         type: 'default',
         default: undefined
     },
-    'pos': {
+    'pt': {
         label: 'Word class',
         description: `Short Dutch part-of-speech tag.
         The different tags are:
@@ -278,7 +278,7 @@ export class Matrix {
                 rel: false,
                 word: false,
                 lemma: false,
-                pos: false,
+                pt: false,
                 cs: false,
                 postag: false,
                 na: false
@@ -374,7 +374,7 @@ export class Matrix {
                 break;
 
             case 'lemma':
-            case 'pos':
+            case 'pt':
             case 'postag':
             case 'rel':
             case 'word':
