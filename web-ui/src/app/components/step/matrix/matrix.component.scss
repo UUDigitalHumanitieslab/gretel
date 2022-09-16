@@ -15,16 +15,26 @@
         th {
             white-space: nowrap;
         }
+
+        th.is-clickable:hover,
+        td.is-clickable:hover {
+            background-color: $secondary;
+            color: $secondary-invert;
+        }
+
+        th.is-disabled,
+        td.is-disabled {
+            color: $grey;
+
+            fa-icon {
+                visibility: hidden;
+            }
+        }
+
     }
 }
 
 // allow clicking the disabled radio buttons for notification
 input[disabled] {
     pointer-events: none
-}
-
-th.is-clickable:hover,
-td.is-clickable:hover {
-    background-color: $secondary;
-    color: $secondary-invert;
 }

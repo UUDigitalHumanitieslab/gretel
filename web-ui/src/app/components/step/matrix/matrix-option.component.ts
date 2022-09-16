@@ -21,6 +21,9 @@ export class MatrixOptionComponent {
     @Input()
     dependent: boolean;
 
+    @Input()
+    disabled: boolean;
+
     get iconDefinition(): IconDefinition {
         if (!this.option || this.dependent) {
             return undefined;
