@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { flatMap, materialize, map } from 'rxjs/operators';
 
-import { FilterValue, SearchResults, ResultsService } from './results.service';
+import { FilterValue, SearchResults, ResultsService, SearchBehaviour } from './results.service';
 import { TreebankService } from './treebank.service';
 import { TreebankSelection } from '../treebank';
 
@@ -13,7 +13,8 @@ export class ResultsStreamService {
     stream(xpath: string,
         selection: TreebankSelection,
         filterValues: FilterValue[],
-        retrieveContext: boolean) {
+        retrieveContext: boolean,
+        behaviour?: SearchBehaviour) {
         // create a request for each treebank
         return selection.corpora.map(({ provider, corpus }) => {
             // create the basic request, without error handling
@@ -25,7 +26,8 @@ export class ResultsStreamService {
                 retrieveContext,
                 false,
                 filterValues,
-                []
+                [],
+                behaviour,
             );
 
             return base.pipe(

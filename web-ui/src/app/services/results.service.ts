@@ -29,11 +29,17 @@ export interface SearchVariable {
     props?: VariableProperty[];
 }
 
+export interface SearchBehaviour {
+    supersetXpath: string,
+    expandIndex: boolean,
+}
+
 @Injectable()
 export class ResultsService {
     defaultIsAnalysis = false;
     defaultMetadataFilters: FilterValue[] = [];
     defaultVariables: SearchVariable[] = null;
+    defaultBehaviour: SearchBehaviour = {supersetXpath: null, expandIndex: false};
 
     constructor(
         private http: HttpClient,
@@ -89,7 +95,8 @@ export class ResultsService {
         retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
-        variables = this.defaultVariables
+        variables = this.defaultVariables,
+        behaviour = this.defaultBehaviour,
     ): Observable<SearchResults> {
         const observable = new Observable<SearchResults>(observer => {
             const worker = async () => {
@@ -110,7 +117,8 @@ export class ResultsService {
                             retrieveContext,
                             isAnalysis,
                             metadataFilters,
-                            variables
+                            variables,
+                            behaviour
                         );
                     } catch (e) {
                         error = e;
@@ -126,12 +134,12 @@ export class ResultsService {
                             const percentage = Math.round(results.searchPercentage)
                             if (!results.cancelled) {
                                 this.notificationService.add(
-                                    "Searching at " + 
+                                    "Searching at " +
                                     percentage + "%", "success"
                                 );
                             } else {
                                 this.notificationService.add(
-                                    "Search was cancelled at " + 
+                                    "Search was cancelled at " +
                                     percentage + "%", "warning"
                                 );
                                 observer.complete();
@@ -182,6 +190,7 @@ export class ResultsService {
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
+        behaviour: SearchBehaviour,
     ): Promise<SearchResults | false> {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getDjangoUrl('search/search/'), {
@@ -192,7 +201,8 @@ export class ResultsService {
             start_from: retrievedMatches,
             components,
             is_analysis: isAnalysis,
-            variables: this.formatVariables(variables)
+            variables: this.formatVariables(variables),
+            behaviour,
         }, httpOptions).toPromise();
         if (results) {
             return this.mapResults(results);

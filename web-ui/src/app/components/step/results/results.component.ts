@@ -126,7 +126,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         private clipboardService: ClipboardService,
         private notificationService: NotificationService,
         private resultsService: ResultsService,
-        private resultsStreamService: ResultsStreamService,
+        protected resultsStreamService: ResultsStreamService,
         private parseService: ParseService,
         stateService: StateService<GlobalState>
     ) {
@@ -353,7 +353,7 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
      *  'finish': all treebanks finished searching
      *  @type {Notification} either a set of results, a finished message, or an error message within a selected treebank
      */
-    private createResultsStream(
+    protected createResultsStream(
         state$: Observable<GlobalState>,
         filterValue$: Observable<FilterValue[]>
     ) {
