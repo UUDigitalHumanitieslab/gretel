@@ -18,10 +18,10 @@ def generate_query(sentence, rank):
     mwe = Mwe(sentence)
     tree = parse_sentence(mwe.can_form)
     mwe.set_tree(tree)
-    # a placeholder function for Martin Kroon's query generator
-    # there should also be an alpino parse step here
-    generated = mwe.generate_queries()
-    return MweQuerySerializer(generated[rank - 1]).data
+    generated = mwe.generate_queries()[rank - 1]
+    if not generated.xpath.startswith('//'):
+        generated.xpath = '/alpino_ds' + generated.xpath
+    return MweQuerySerializer(generated).data
 
 
 class GenerateMweQueries(APIView):
