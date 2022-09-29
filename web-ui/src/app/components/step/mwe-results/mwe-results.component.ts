@@ -38,7 +38,7 @@ export class MweResultsComponent extends ResultsComponent {
     public querySet: MweQuerySet;
 
     @Output()
-    public saveQuery = new EventEmitter<string>();
+    public saveQuery = new EventEmitter();
 
     @Output()
     public changeQuery = new EventEmitter<MweQuery>();

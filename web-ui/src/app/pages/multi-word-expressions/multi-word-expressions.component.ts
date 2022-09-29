@@ -109,7 +109,7 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         };
     }
 
-    async startWithExpression(canonicalForm: {text: string, id: number}) {
+    async startWithExpression(canonicalForm: {text: string, id?: number}) {
         this.stateService.setState({canonicalForm});
         this.setValid(true);
         this.next();
@@ -141,5 +141,9 @@ export class MultiWordExpressionsComponent extends MultiStepPageDirective<MweSta
         });
 
         this.stateService.setState({currentQuery: response});
+    }
+
+    updateRetrieveContext(retrieveContext: boolean) {
+        this.stateService.setState({ retrieveContext });
     }
 }

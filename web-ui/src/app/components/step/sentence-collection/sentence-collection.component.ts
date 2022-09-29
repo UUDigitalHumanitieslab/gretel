@@ -18,10 +18,7 @@ export class SentenceCollectionComponent implements OnInit {
     title: string;
 
     @Output()
-    onSelect = new EventEmitter<string>();
-
-    @Output()
-    onUpdateFilter = new EventEmitter<string>();
+    onSelect = new EventEmitter<{text:string, id?:number}>();
 
     constructor() {
         this.filterString = '';

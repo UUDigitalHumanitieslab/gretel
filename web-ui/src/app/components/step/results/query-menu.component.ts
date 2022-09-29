@@ -7,7 +7,7 @@ import { MweQuerySet, MweQuery } from '../../../services/mwe.service';
   styleUrls: ['./query-menu.component.scss']
 })
 export class ResultsQueryMenuComponent {
-    protected dropdownActive = false;
+    public dropdownActive = false;
 
     @Input()
     public currentQuery: MweQuery;

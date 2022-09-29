@@ -5,20 +5,9 @@
         *ngSwitchCase="0"
         title="Canonical form expressions"
         [sentences]="(canonicalForms | async) ?? []"
-        (onUpdateFilter)="updateFilter($event)"
         (onSelect)="startWithExpression($event)"
     >
     </grt-sentence-collection>
-    <!--
-         <div *ngSwitchCase="1">
-         <p>Chosen expression: <em>{{ globalState.canonicalForm.text }}</em></p>
-         <p>Please choose one of the following queries:</p>
-         <grt-query-set
-         [queryset]="globalState.querySet"
-         (onSelect)="proceedWithQuery($event)"
-         ></grt-query-set>
-         </div>
-    -->
     <grt-select-treebanks
         *ngSwitchCase="1"
 
@@ -39,11 +28,11 @@
         [filterValues]="globalState.filterValues"
         [inputSentence]="globalState.inputSentence"
         [retrieveContext]="globalState.retrieveContext"
-        [xpath]="globalState.xpath ?? false"
-        [canSaveQuery]="globalState.canonicalForm.id ?? false"
+        [xpath]="globalState.xpath"
+        [canSaveQuery]="globalState.canonicalForm.id !== undefined"
 
         (changeValid)="setValid($event)"
-        (changeXpath)="updateXPath($event, 'history')"
+        (changeXpath)="updateXPath($event)"
         (saveQuery)="saveQuery()"
         (changeRetrieveContext)="updateRetrieveContext($event)"
         (changeFilterValues)="updateFilterValues($event)"
