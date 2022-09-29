@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { ParserService } from 'lassy-xpath';
 import { ConfigurationService } from "./configuration.service";
-import { DefaultTokenAttributes } from '../pages/multi-step-page/steps';
-import { TokenAttributes, FilterValue } from '../models/matrix';
+import { TokenAttributes, FilterValue, DefaultTokenAttributes } from '../models/matrix';
 
 type ApiParseResult = {
     parsed_sentence?: string,
@@ -68,7 +67,7 @@ export class AlpinoService {
                 }
             }
 
-            for (let key of ['rel', 'word', 'lemma', 'pos', 'postag']) {
+            for (let key of ['rel', 'word', 'lemma', 'pt', 'postag']) {
                 switch (attr[key]) {
                     case skipDefault && DefaultTokenAttributes[key]:
                         // don't set default values
@@ -105,9 +104,6 @@ export class AlpinoService {
 
             const notApplicable = parts.indexOf('na') >= 0;
             if (notApplicable) {
-                for (let key of Object.keys(attributes)) {
-                    attributes[key]
-                }
                 parts = Object.keys(DefaultTokenAttributes)
                     .filter(key => key != 'cs')
                     .map(key => `~${key}`);
@@ -124,7 +120,7 @@ export class AlpinoService {
                     case 'rel':
                     case 'word':
                     case 'lemma':
-                    case 'pos':
+                    case 'pt':
                     case 'postag':
                         let value: FilterValue;
                         switch (part[0]) {

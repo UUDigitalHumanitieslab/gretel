@@ -1,4 +1,4 @@
-type FilterKey = 'rel' | 'word' | 'lemma' | 'pos' | 'postag';
+type FilterKey = 'rel' | 'word' | 'lemma' | 'pt' | 'postag';
 type BoolKey = 'cs' | 'na';
 
 export type MatrixOptionKey = FilterKey | BoolKey;
@@ -36,7 +36,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
     'rel':
     {
         label: 'Relation',
-        description: 'The exact word form (also known as token).',
+        description: 'Grammatical relation, such as subject (su), direct object (obj1), etc.',
         advanced: false,
         exclusive: false,
         type: 'default',
@@ -48,7 +48,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
         advanced: false,
         exclusive: false,
         type: 'default',
-        default: 'include'
+        default: undefined
     },
     'cs': {
         label: 'Word (case-sensitive)',
@@ -68,7 +68,7 @@ export const optionsLookup: Record<FilterKey, Keyless<MatrixFilterOption>> &
         type: 'default',
         default: undefined
     },
-    'pos': {
+    'pt': {
         label: 'Word class',
         description: `Short Dutch part-of-speech tag.
         The different tags are:
@@ -266,6 +266,10 @@ export class Matrix {
 
     info(): {
         advanced: boolean,
+        /**
+         * Which token attributes are dependent on other attributes
+         * to be enabled.
+         */
         dependents: TokenDependents[]
     } {
         let advanced = false;
@@ -274,7 +278,7 @@ export class Matrix {
                 rel: false,
                 word: false,
                 lemma: false,
-                pos: false,
+                pt: false,
                 cs: false,
                 postag: false,
                 na: false
@@ -370,11 +374,11 @@ export class Matrix {
                 break;
 
             case 'lemma':
-            case 'pos':
+            case 'pt':
             case 'postag':
             case 'rel':
             case 'word':
-                updated = mod(['include', 'exclude', undefined]);
+                updated = mod(['include', undefined, 'exclude']);
                 break;
         }
 

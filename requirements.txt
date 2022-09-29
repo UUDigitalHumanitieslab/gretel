@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-alpino-query==2.1.8
+alpino-query==2.1.9
     # via -r requirements.in
 amqp==5.1.1
     # via kombu
@@ -29,7 +29,7 @@ catalogue==2.0.8
     #   thinc
 celery[redis]==5.2.7
     # via -r requirements.in
-certifi==2022.6.15
+certifi==2022.9.24
     # via requests
 chamd==0.5.8
     # via corpus2alpino
@@ -48,6 +48,8 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
+confection==0.0.2
+    # via thinc
 corpus2alpino==0.3.10
     # via -r requirements.in
 cymem==2.0.6
@@ -57,18 +59,18 @@ cymem==2.0.6
     #   thinc
 deprecated==1.2.13
     # via redis
-django==4.1
+django==4.1.1
     # via
     #   -r requirements.in
     #   django-cors-headers
     #   djangorestframework
 django-cors-headers==3.13.0
     # via -r requirements.in
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via -r requirements.in
 folia==2.5.8
     # via corpus2alpino
-idna==3.3
+idna==3.4
     # via requests
 isodate==0.6.1
     # via rdflib
@@ -90,7 +92,7 @@ murmurhash==1.0.8
     #   preshed
     #   spacy
     #   thinc
-numpy==1.23.2
+numpy==1.23.3
     # via
     #   spacy
     #   thinc
@@ -104,7 +106,7 @@ preshed==3.0.7
     # via
     #   spacy
     #   thinc
-prompt-toolkit==3.0.30
+prompt-toolkit==3.0.31
     # via click-repl
 pydantic==1.9.2
     # via
@@ -139,7 +141,7 @@ spacy-legacy==3.0.10
     # via spacy
 spacy-loggers==1.0.3
     # via spacy
-sqlparse==0.4.2
+sqlparse==0.4.3
     # via django
 srsly==2.4.4
     # via
@@ -147,9 +149,9 @@ srsly==2.4.4
     #   thinc
 tei-reader==0.0.17
     # via corpus2alpino
-thinc==8.1.0
+thinc==8.1.2
     # via spacy
-tqdm==4.64.0
+tqdm==4.64.1
     # via
     #   corpus2alpino
     #   spacy

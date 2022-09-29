@@ -66,14 +66,25 @@ export class ExampleBasedSearchComponent extends MultiStepPageDirective<GlobalSt
     }
 
     decodeGlobalState(queryParams: { [key: string]: any }): { [K in keyof GlobalStateExampleBased]?: GlobalStateExampleBased[K] } {
+        let attributes: string[];
+        let isCustomXPath: boolean;
+        if (Array.isArray(queryParams.attributes)) {
+            // fallback for old URLs
+            attributes = queryParams.attributes;
+            isCustomXPath = true; // preserve the existing XPath
+        } else {
+            attributes = queryParams.attributes?.split(attributesSeparator);
+            isCustomXPath = this.decodeBool(queryParams.isCustomXPath)
+        }
+
         return {
             selectedTreebanks: new TreebankSelection(
                 this.treebankService,
                 queryParams.selectedTreebanks ? JSON.parse(queryParams.selectedTreebanks) : undefined),
             xpath: queryParams.xpath || undefined,
             inputSentence: queryParams.inputSentence || undefined,
-            isCustomXPath: this.decodeBool(queryParams.isCustomXPath),
-            attributes: this.alpinoService.attributesFromString(queryParams.attributes?.split(attributesSeparator)),
+            isCustomXPath,
+            attributes: this.alpinoService.attributesFromString(attributes),
             retrieveContext: this.decodeBool(queryParams.retrieveContext),
             respectOrder: this.decodeBool(queryParams.respectOrder),
             ignoreTopNode: this.decodeBool(queryParams.ignoreTopNode)
