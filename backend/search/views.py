@@ -79,6 +79,9 @@ def search_view(request):
         maximum_results = settings.MAXIMUM_RESULTS
 
     use_superset = behaviour.get('supersetXpath') is not None
+    # TODO: find a nicer way for running just the superset query
+    use_superset = use_superset and behaviour['supersetXpath'] != xpath
+
     should_expand_index = behaviour.get('expandIndex', False)
     if use_superset:
         subset_xpath = xpath
