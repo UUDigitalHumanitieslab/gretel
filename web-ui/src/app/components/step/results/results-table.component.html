@@ -159,12 +159,5 @@
                 All results are hidden.
             </div>
         </ng-template>
-
-        <div *ngFor="let error of errors" class="notification is-danger">
-            Error retrieving results for {{error.corpus}}: <br>
-            {{error.message}}
-        </div>
     </div>
 </div>
-<grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
-    [filename]="treeFilename" [url]="treeXmlUrl" [loading]="loadingTree"></grt-tree-visualizer>
