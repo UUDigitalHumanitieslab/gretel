@@ -47,9 +47,14 @@ export class MweResultsComponent extends ResultsComponent {
         return this.currentQuery.id ?? false;
     }
 
+    get supersetQuery() {
+        // TODO: avoid constant index
+        return this.querySet[2];
+    }
+
     protected createResultsStream(state$: Observable<GlobalState>, filterValue$: Observable<FilterValue[]>) {
         let behaviour = {
-            supersetXpath: this.querySet[2].xpath,
+            supersetXpath: this.supersetQuery.xpath,
             expandIndex: true
         };
 
