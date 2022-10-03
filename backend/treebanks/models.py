@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 import logging
 
 from services.basex import basex
+from search.basex_search import generate_xquery_get_version
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,10 @@ class BaseXDB(models.Model):
                 'Cannot delete database {} from BaseX: {}.'
                 .format(self.dbname, err)
             )
+
+    def get_alpino_version(self):
+        xquery = generate_xquery_get_version(self.dbname)
+        return basex.perform_query(xquery)
 
 
 @receiver(pre_delete, sender=BaseXDB)
