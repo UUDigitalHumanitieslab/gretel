@@ -89,6 +89,8 @@ def generate_xquery_search(basex_db: str, xpath: str, variables=None) -> str:
             ' let $tree := ($node/ancestor::alpino_ds)' \
             ' let $sentid := ($tree/@id)' \
             ' let $sentence := ($tree/sentence)' \
+            ' let $prevs := ($tree/preceding-sibling::alpino_ds[1]/sentence)' \
+            ' let $nexts := ($tree/following-sibling::alpino_ds[1]/sentence)' \
             ' let $ids := ($node//@id)' \
             ' let $indexs := (distinct-values($node//@index))' \
             ' let $indexed := ($tree//node[@index=$indexs])' \
@@ -97,13 +99,13 @@ def generate_xquery_search(basex_db: str, xpath: str, variables=None) -> str:
             ' let $meta := ($tree/metadata/meta)' + \
             variables_let_fragment + \
             ' return <match>{data($sentid)}||{data($sentence)}' \
+            '||{data($prevs)}||{data($nexts)}' \
             '||{string-join($ids, \'-\')}||' \
             '{string-join($beginlist, \'-\')}||{$node}||{$meta}' \
             '||' + variables_return_fragment + '||' + \
             basex_db + '</match>'
     # TODO: currently no support for grinded coprora.
     # Add returntb from original implementation.
-    # TODO: also no support for context yet
     return query
 
 
@@ -178,8 +180,8 @@ def parse_search_result(result_str: str, component) -> list:
                              'is not closed in {}'.format(result))
         splitted = result.split('||')
         try:
-            (sentid, sentence, ids, begins, xml_sentences, meta, variables,
-             database) = splitted
+            (sentid, sentence, prevs, nexts, ids, begins, xml_sentences, meta,
+             variables, database) = splitted
         except ValueError as err:
             raise ValueError('Cannot parse XQuery result: {}'.format(err))
         # Make sentid-s unique by appending a match index (there may be
@@ -189,6 +191,8 @@ def parse_search_result(result_str: str, component) -> list:
         matches.append({
             'sentid': sentid,
             'sentence': sentence,
+            'prevs': prevs,
+            'nexts': nexts,
             'ids': ids,
             'begins': begins,
             'xml_sentences': xml_sentences,
