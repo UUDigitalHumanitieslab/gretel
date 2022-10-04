@@ -368,13 +368,13 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                 // wait for the debouncing first.
                 // already give feedback a change is pending,
                 // so the user doesn't think the interface is stuck
-                const equal = prev.filterValues === curr.filterValues &&
+                const unchanged = prev.filterValues === curr.filterValues &&
                     prev.xpath === curr.xpath &&
                     prev.selectedTreebanks.equals(curr.selectedTreebanks);
-                if (!equal) {
+                if (!unchanged) {
                     this.loading = true;
                 }
-                return equal;
+                return unchanged;
             }),
             debounceTime(DebounceTime),
             switchMap(({ selectedTreebanks, xpath, filterValues }) => {
