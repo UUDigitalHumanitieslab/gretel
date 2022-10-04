@@ -6,17 +6,35 @@ volumes:
 services:
   gretel:
     build: .
+    image: gretel
     ports:
       - "8000:8000"
     depends_on:
       - alpino
       - basex
+      - redis
     volumes:
       - ./backend:/gretel
     environment:
       - BASEX_HOST=basex
       - ALPINO_HOST=alpino
+      - REDIS_HOST=redis
     command: bash -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+  celery:
+    image: gretel
+    depends_on:
+      - alpino
+      - basex
+      - redis
+      - gretel
+    volumes:
+      - ./backend:/gretel
+    environment:
+      - BASEX_HOST=basex
+      - ALPINO_HOST=alpino
+      - REDIS_HOST=redis
+    command: bash -c "sleep 5 && python -m celery -A gretel.celery worker --loglevel=info -B"
 
   alpino:
     image: registry.webhosting.rug.nl/compling/alpino:latest
@@ -31,3 +49,9 @@ services:
     ports:
       - "1984:1984"
     command: basexserver
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server
