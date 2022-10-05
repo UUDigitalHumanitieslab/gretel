@@ -55,7 +55,6 @@ export class ResultsService {
         provider: string,
         corpus: string,
         componentIds: string[],
-        retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
@@ -68,7 +67,6 @@ export class ResultsService {
                 provider,
                 corpus,
                 componentIds,
-                retrieveContext,
                 isAnalysis,
                 metadataFilters,
                 variables
@@ -92,7 +90,6 @@ export class ResultsService {
         provider: string, // Not used anymore but leave for now
         corpus: string,
         componentIds: string[],
-        retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
@@ -114,7 +111,6 @@ export class ResultsService {
                             componentIds,
                             queryId,
                             retrievedMatches,
-                            retrieveContext,
                             isAnalysis,
                             metadataFilters,
                             variables,
@@ -186,7 +182,6 @@ export class ResultsService {
         components: string[],
         queryId: number = undefined,
         retrievedMatches: number = undefined,
-        retrieveContext: boolean,
         isAnalysis = this.defaultIsAnalysis,
         metadataFilters = this.defaultMetadataFilters,
         variables = this.defaultVariables,
@@ -195,7 +190,6 @@ export class ResultsService {
         const results = await this.http.post<ApiSearchResult | false>(
             await this.configurationService.getDjangoUrl('search/search/'), {
             xpath: this.createFilteredQuery(xpath, metadataFilters),
-            retrieveContext,
             treebank: corpus,
             query_id: queryId,
             start_from: retrievedMatches,
@@ -410,6 +404,8 @@ export class ResultsService {
         return Promise.all(results.results.map(async result => {
             const hitId = result.sentid;
             const sentence = result.sentence;
+            const previousSentence = result.prevs;
+            const nextSentence = result.nexts;
             const nodeStarts = result.begins.split('-').map(x => parseInt(x, 10));
             const metaValues = this.mapMeta(await this.parseService.parseXml(`<metadata>${result.meta}</metadata>`));
             const variableValues = this.mapVariables(await this.parseService.parseXml(result.variables));
@@ -420,6 +416,8 @@ export class ResultsService {
                 database,
                 fileId: hitId.replace(/\+match=\d+$/, ''),
                 sentence,
+                previousSentence,
+                nextSentence,
                 highlightedSentence: this.highlightSentence(sentence, nodeStarts, 'strong'),
                 treeXml: result.xml_sentences,
                 nodeIds: result.ids.split('-').map(x => parseInt(x, 10)),
@@ -546,6 +544,8 @@ type ApiSearchResult = {
     results: {
         sentid: string,
         sentence: string,
+        prevs: string,
+        nexts: string,
         ids: string,
         begins: string,
         xml_sentences: string,
@@ -581,6 +581,8 @@ export interface Hit {
     fileId: string;
     /** The basic sentence this hit was found in, extracted from its xml. */
     sentence: string;
+    previousSentence: string;
+    nextSentence: string;
     highlightedSentence: SafeHtml;
     /* The XML of the matched portion of the sentence, does not always contain the full xml! */
     treeXml: string;

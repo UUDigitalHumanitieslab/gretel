@@ -254,7 +254,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                         corpus.provider,
                         corpus.corpus.name,
                         corpus.corpus.components,
-                        this.retrieveContext,
                         false,
                         filterValues,
                         variables).then(hits => ({
@@ -362,7 +361,6 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
         ).pipe(
             filter((values) => values.every(value => value != null)),
             map(([state, filterValues]) => ({
-                retrieveContext: state.retrieveContext,
                 selectedTreebanks: state.selectedTreebanks,
                 xpath: state.xpath,
                 filterValues
@@ -372,20 +370,22 @@ export class ResultsComponent extends StepDirective<GlobalState> implements OnIn
                 // wait for the debouncing first.
                 // already give feedback a change is pending,
                 // so the user doesn't think the interface is stuck
-                this.loading = true;
-                return prev.retrieveContext === curr.retrieveContext &&
-                    prev.filterValues === curr.filterValues &&
+                const unchanged = prev.filterValues === curr.filterValues &&
                     prev.xpath === curr.xpath &&
                     prev.selectedTreebanks.equals(curr.selectedTreebanks);
+                if (!unchanged) {
+                    this.loading = true;
+                }
+                return unchanged;
             }),
             debounceTime(DebounceTime),
-            switchMap(({ selectedTreebanks, xpath, filterValues, retrieveContext }) => {
+            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,
                     selectedTreebanks,
-                    filterValues,
-                    retrieveContext);
+                    filterValues
+                );
 
                 // join all results, and wrap the entire sequence in a start and end message so
                 // we know what's happening and can update spinners etc.

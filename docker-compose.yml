@@ -6,6 +6,7 @@ volumes:
 services:
   gretel:
     build: .
+    image: gretel
     ports:
       - "8000:8000"
     depends_on:
@@ -21,7 +22,7 @@ services:
     command: bash -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
 
   celery:
-    build: .
+    image: gretel
     depends_on:
       - alpino
       - basex

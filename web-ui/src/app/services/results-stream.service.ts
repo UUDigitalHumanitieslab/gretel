@@ -23,7 +23,6 @@ export class ResultsStreamService {
                 provider,
                 corpus.name,
                 corpus.components,
-                retrieveContext,
                 false,
                 filterValues,
                 [],

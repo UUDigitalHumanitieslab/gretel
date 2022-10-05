@@ -141,6 +141,13 @@
                                 </ng-template>
                             </ng-container>
 
+                            <ng-container *ngSwitchCase="'highlightedSentence'">
+                                <span *ngIf="retrieveContext" class="content is-small">{{rowData['previousSentence']}} </span>
+                                <span [innerHTML]="rowData['highlightedSentence']"></span>
+                                <span *ngIf="retrieveContext" class="content is-small"> {{rowData['nextSentence']}}</span>
+                                
+                            </ng-container>
+
                             <span [innerHTML]="rowData[col.field]" *ngSwitchDefault></span>
                         </div>
                     </td>
