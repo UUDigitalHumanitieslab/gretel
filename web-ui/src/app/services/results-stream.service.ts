@@ -13,7 +13,6 @@ export class ResultsStreamService {
     stream(xpath: string,
         selection: TreebankSelection,
         filterValues: FilterValue[],
-        retrieveContext: boolean,
         behaviour?: SearchBehaviour) {
         // create a request for each treebank
         return selection.corpora.map(({ provider, corpus }) => {

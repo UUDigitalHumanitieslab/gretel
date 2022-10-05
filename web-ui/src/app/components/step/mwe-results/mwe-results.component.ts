@@ -80,13 +80,12 @@ export class MweResultsComponent extends ResultsComponent {
                     prev.selectedTreebanks.equals(curr.selectedTreebanks);
             }),
             debounceTime(DebounceTime),
-            switchMap(({ selectedTreebanks, xpath, filterValues, retrieveContext }) => {
+            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,
                     selectedTreebanks,
                     filterValues,
-                    retrieveContext,
                     behaviour
                 );
 
