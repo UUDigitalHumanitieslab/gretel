@@ -1,24 +1,43 @@
 {
-  "name": "gretel",
-  "version": "4.2.4",
-  "license": "CC-BY-NC-SA-4.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/UUDigitalHumanitieslab/gretel.git"
-  },
-  "scripts": {
-    "migrate": "cd backend && python manage.py migrate",
-    "build": "cd web-ui && npm run build",
-    "start:backend": "cd backend && python manage.py runserver",
-    "start:frontend": "cd web-ui && npm run start",
-    "install:backend": "pip install -r requirements.txt",
-    "install:frontend": "cd web-ui && npm install",
-    "postinstall": "npm run install:backend && npm run install:frontend",
-    "lint": "npm run lint:backend && npm run lint:frontend",
-    "lint:backend": "cd backend && ./lint.sh",
-    "lint:frontend": "cd web-ui && npm run lint",
-    "test:backend": "cd backend && python manage.py test",
-    "test:frontend": "cd web-ui && npm test -- --watch=false",
-    "test": "npm run test:backend && npm run test:frontend"
-  }
+    "name": "gretel5",
+    "version": "0.0.0",
+    "description": "GrETEL5",
+    "author": "UU Digital Humanities Lab",
+    "license": "BSD-3-Clause",
+    "repository": "github:UUDigitalHumanitieslab/gretel-django",
+    "private": true,
+    "scripts": {
+        "front": "cd web-ui && ",
+        "back": "cd backend && ",
+        "func": "cd functional-tests && ",
+        "fyarn": "yarn front yarn",
+        "preinstall": "pip install pip-tools",
+        "install-back": "yarn back -- pip install -r requirements.txt",
+        "install-func": "yarn func -- pip install -r requirements.txt",
+        "postinstall": "yarn fyarn && yarn install-back && yarn install-func",
+        "django": "yarn back python manage.py",
+        "startapp": "yarn back django-admin startapp --settings gretel5.settings --pythonpath .",
+        "test-front": "yarn front yarn test-once",
+        "test-back": "yarn back pytest",
+        "test-func": "yarn func pytest",
+        "test": "yarn test-back && yarn test-front && yarn test-func",
+        "start-front": "yarn fyarn stop && yarn front yarn serve",
+        "start-back": "cd backend && python manage.py runserver --settings glue --pythonpath ..",
+        "livereload-back": "cd backend && python manage.py livereload --settings glue --pythonpath ..",
+        "watch-test-front": "yarn front yarn test",
+        "watch-test-back": "yarn test-back --looponfail",
+        "watch-back": "yarn livereload-back & yarn watch-test-back",
+        "start": "yarn start-front & yarn start-back & yarn watch-back",
+        "build": "yarn front yarn build",
+        "build-p": "yarn front yarn build --prod",
+        "collectstatic-p": "cd backend && python manage.py collectstatic --noinput -v 0 --settings collect --pythonpath ..",
+        "clean-static": "rm -rf static || rd /S /Q static",
+        "static-p": "yarn build-p && yarn clean-static && yarn collectstatic-p",
+        "watch-front-p": "yarn front yarn watch",
+        "start-back-p": "cd backend && python manage.py runserver --settings production --insecure --pythonpath ..",
+        "start-p": "yarn static-p && yarn watch-front-p & yarn start-back-p"
+    },
+    "devDependencies": {
+        "@angular/cli": ">=11 <12"
+    }
 }

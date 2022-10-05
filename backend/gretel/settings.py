@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dms@rm3$e_okoefopufu^kbb70z72ruz2yz+9$i*zc4dh-ilun'
+SECRET_KEY = 'kxreeb3bds$oibo7ex#f3bi5r+d(1x5zljo-#ms=i2%ih-!pvn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'livereload',
     'django.contrib.staticfiles',
-    'corsheaders',  # probably only relevant for local dev
     'services',
     'treebanks',
     'search',
@@ -46,18 +46,18 @@ INSTALLED_APPS = [
     'upload',
     'parse',
     'rest_framework',
+    'revproxy',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # probably only relevant for local dev
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'gretel.urls'
@@ -116,9 +116,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Amsterdam'
 
 USE_I18N = True
+
+USE_L10N = True
 
 USE_TZ = True
 
@@ -146,7 +148,6 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
-
 # Celery settings
 CELERY_BROKER_URL = 'redis://' + os.getenv('REDIS_HOST', 'localhost')
 
@@ -164,8 +165,6 @@ ALPINO_HOST = os.getenv('ALPINO_HOST', 'localhost')
 ALPINO_PORT = 7001
 ALPINO_PATH = '/opt/Alpino'
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost']
-
 MAXIMUM_RESULTS = 500
 MAXIMUM_RESULTS_ANALYSIS = 5000
 
@@ -176,3 +175,5 @@ MAXIMUM_RESULTS_PER_COMPONENT = 5000
 
 CACHING_DIR = BASE_DIR / 'query_result_cache'
 MAXIMUM_CACHE_SIZE = 256  # Maximum cache size in MiB
+STATICFILES_DIRS = []
+PROXY_FRONTEND = None

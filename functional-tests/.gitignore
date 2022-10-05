@@ -15,11 +15,6 @@ coverage.xml
 *.cover
 .pytest_cache/
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-
 # pyenv
 .python-version
 
@@ -31,3 +26,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# WebDriver logs
+*.log
+
+# Local overrides
+pytest.ini

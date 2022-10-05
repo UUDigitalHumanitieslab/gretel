@@ -1,94 +1,209 @@
-[![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel-django/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel-django/actions)
-[![DOI](https://zenodo.org/badge/95562504.svg)](https://zenodo.org/badge/latestdoi/95562504)
+# GrETEL5
 
-# GrETEL 4
+[![Actions Status](https://github.com/UUDigitalHumanitieslab/gretel-django/workflows/Unit%20tests/badge.svg)](https://github.com/UUDigitalHumanitieslab/gretel-django/actions)
 
-This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
+GrETEL5
 
-## Info
 
-* v4.2.0 August 2019: federated search, improved configuration and state management, download results with node properties and again [many more fixes](https://github.com/UUDigitalHumanitieslab/gretel/compare/v4.1.0...v4.2.0).
-* v4.1.0 February 2019: Fixed support for GrInded corpora, [many more fixes](https://github.com/UUDigitalHumanitieslab/gretel/compare/v4.0.2...v4.1.0), feature complete replacement of version 3.
-* v4.0.2 October 2018: GrETEL 4 release with many bugfixes and improvements.
-* v4.0.0 June 2018: First GrETEL 4 release with new interface.
-* v3.9.99 November 2017: GrETEL 4 currently under development!
-* v3.0.2 July 2017: Show error message if the BaseX server is down
-* v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
+## Before you start
 
-### Branches
+You need to install the following software:
 
-master: official version of GrETEL 4, available at http://gretel.hum.uu.nl/gretel3/
-dev: development version
-gretel2.0: official version of GrETEL 2.0, available at http://gretel.ccl.kuleuven.be/gretel-2.0
+ - PostgreSQL >= 10, client, server and C libraries
+ - Python >= 3.8, <= 3.10
+ - virtualenv
+ - WSGI-compatible webserver (deployment only)
+ - [Visual C++ for Python][1] (Windows only)
+ - Node.js >= 8
+ - Yarn
+ - [WebDriver][2] for at least one browser (only for functional testing)
 
-## Installation
+[1]: https://wiki.python.org/moin/WindowsCompilers
+[2]: https://pypi.org/project/selenium/#drivers
 
-### Prerequisites
 
-Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the following packages to be installed on your machine:
+## How it works
 
-* [BaseX](https://packages.debian.org/jessie/database/basex)
-* [SimpleXML](http://php.net/manual/en/book.simplexml.php)
-* [alpino-query](https://github.com/UUDigitalHumanitieslab/alpino-query)
+This project integrates three isolated subprojects, each inside its own subdirectory with its own code, package dependencies and tests:
 
-### Next steps
+ - **backend**: the server side web application based on [Django][3] and [DRF][4]
+ 
+ - **frontend**: the client side web application based on [Angular](https://angular.io)
+ 
+ - **functional-tests**: the functional test suite based on [Selenium][6] and [pytest][7]
 
-1. Download (or clone) GrETEL from GitHub.
-2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)).
+[3]: https://www.djangoproject.com
+[4]: https://www.django-rest-framework.org
+[6]: https://www.selenium.dev/documentation/webdriver/
+[7]: https://docs.pytest.org/en/latest/
 
-> It is recommended to use the same version used for creating the treebanks. This way an example based search will result in the same search structure as stored in the database.
+Each subproject is configurable from the outside. Integration is achieved using "magic configuration" which is contained inside the root directory together with this README. In this way, the subprojects can stay truly isolated from each other.
 
-3. Create BaseX databases containing the treebanks you want to make available (not necessary when using GrETEL-upload).
-4. Adapt `config.example.php` file and change name to `config.php`, and then:
-  * Set the path to the Alpino dependency parser in the variable `$alpinoDirectory` (by default: directory `parsers`)
-  * Set BaseX variables (machine names, port numbers, password and username)
-  * Set path for the Python virtual environment or other place where the required commands are installed.
-5. Install [composer](https://getcomposer.org/) to be able to install PHP dependencies.
-6. Enable the rewrite module (e.g. `sudo a2enmod rewrite && sudo systemctl restart apache2`).
-7. Set `AllowOverride` to `All` to allow `.htaccess` to set the settings for the rewrite module.
-8. Run `pip install -r requirements.txt`.
-9. Run `npm run build` to compile all the remaining dependencies.
-10. Make sure `tmp` and `log` folders exist in the root and can be accessed by Apache.
+If you are reading this README, you'll likely be working with the integrated project as a whole rather than with one of the subprojects in isolation. In this case, this README should be your primary source of information on how to develop or deploy the project. However, we recommend that you also read the "How it works" section in the README of each subproject.
 
-## Notes for users
 
-Only the properties of the first node matched by an XPATH variable is returned for analysis. For example:
+## Development
 
-A user searches for `//node[node]`. Two variables are found in this query: `$node1 = //node` and `$node2 = $node1[node]`.
+### Quickstart
 
-The following sentence would match this query:
+First time after cloning this project:
 
-`node[np] (node[det] node[noun])`
+```console
+$ python bootstrap.py
+```
 
-The node found for `$node1` will then be `node[np]`.
-The node found for `$node2` will then be `node[det]`. The properties of `node[noun]` will not be available for analysis using this query.
+Running the application in [development mode][8] (hit ctrl-C to stop):
 
-When searching for a more specific structure, this is unlikely to occur.
+```console
+$ yarn start
+```
 
-## Notes for developers
+This will run the backend and frontend applications, as well as their unittests, and watch all source files for changes. You can visit the frontend on http://localhost:8000/, the browsable backend API on http://localhost:8000/api/ and the backend admin on http://localhost:8000/admin/. On every change, unittests rerun, frontend code rebuilds and open browser tabs refresh automatically (livereload).
 
-### Front-end
+[8]: #development-mode-vs-production-mode
 
-The [Angular](https://angular.io) front-end can be found under `web-ui` and run from there: `npm run start`. You can also use `npm run start:live` to use the production back-end.
 
-### Back-end
+### Recommended order of development
 
-* The results that are flushed to the user at a time as well as the maximum results that will be fetched is stored in variables in `config.php`. Change `$flushLimit` and `$resultsLimit` to the values that you want.
-* Scripts are organised according to their function:
-  * `api/`: entry point for server calls from the front-end (through `api/src/router.php`).
-  * `basex-search-scripts/`: scripts that are required to do the actual searching for results. However, the `basex-client.php` is sometimes needed in other cases as well to open up a BaseX session.
-  * `preparatory-scripts/`: scripts that run functions on the input leading up to but not including the actual fetching of results. These scripts manipulate do things such as creating XPath, generating breadth-first patterns, parsing the input, and modifying input examples.
-  * `functions.php`: contains general functions that are often required but that are not specific to any part of the process
+For each new feature, we suggested that you work through the steps listed below. This could be called a back-to-front or "bottom up" order. Of course, you may have reasons to choose otherwise. For example, if very precise specifications are provided, you could move step 8 to the front for a more test-driven approach.
 
-## Credits
+Steps 1–5 also include updating the unittests. Only functions should be tested, especially critical and nontrivial ones.
 
-* [Liesbeth Augustinus](http://www.ccl.kuleuven.be/~liesbeth/) and [Vincent Vandeghinste](http://www.ccl.kuleuven.be/~vincent/ccl): concept and initial implementation;
-* [Bram Vanroy](http://bramvanroy.be/): GrETEL 3 improvements and design;
-* [Martijn van der Klis](http://www.uu.nl/staff/MHvanderKlis): initial GrETEL 4 functionality and improvements;
-* [Sheean Spoel](http://www.uu.nl/staff/SJJSpoel), [Gerson Foks](https://www.uu.nl/staff/GFoks) and [Jelte van Boheemen](https://www.uu.nl/medewerkers/JvanBoheemen): additional GrETEL 4 functionality and improvements;
-* [Koen Mertens](https://github.com/KCMertens): federated search at [Instituut voor de Nederlandse taal](https://ivdnt.org).
-* Colleagues at the [Centre for Computational Linguistics at KU Leuven](http://www.arts.kuleuven.be/ling/ccl), and [Utrecht University Digital Humanities Lab](https://dig.hum.uu.nl) for their feedback.
+ 1. Backend model changes including migrations.
+ 2. Backend serializer changes and backend admin changes.
+ 3. Backend API endpoint changes.
+ 4. Frontend model changes.
+ 5. Other frontend unit changes (templates, views, routers, FSMs).
+ 6. Frontend integration (globals, event bindings).
+ 7. Run functional tests, repair broken functionality and broken tests.
+ 8. [Add functional tests][9] for the new feature.
+ 9. Update technical documentation.
 
-## License
+[9]: functional-tests/README.md#writing-tests
 
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (cc-by-sa-4.0). See the [LICENSE](LICENSE) file for license rights and limitations.
+For release branches, we suggest the following checklist.
+
+ 1. Bump the version number in the `package.json` next to this README.
+ 2. Run the functional tests in production mode, fix bugs if necessary.
+ 3. Try using the application in production mode, look for problems that may have escaped the tests.
+ 4. Add regression tests (unit or functional) that detect problems from step 3.
+ 5. Work on the code until new regression tests from step 4 pass.
+ 6. Optionally, repeat steps 2–5 with the application running in a real deployment setup (see [Deployment](#deployment)).
+
+
+### Commands for common tasks
+
+The `package.json` next to this README defines several shortcut commands to help streamline development. In total, there are over 30 commands. Most may be regarded as implementation details of other commands, although each command could be used directly. Below, we discuss the commands that are most likely to be useful to you. For full details, consult the `package.json`.
+
+Install the pinned versions of all package dependencies in all subprojects:
+
+```console
+$ yarn
+```
+
+Run backend and frontend in [production mode][8]:
+
+```console
+$ yarn start-p
+```
+
+Run the functional test suite:
+
+```console
+$ yarn test-func [FUNCTIONAL TEST OPTIONS]
+```
+
+The functional test suite by default assumes that you have the application running locally in production mode (i.e., on port `4200`). See [Configuring the browsers][10] and [Configuring the base address][11] in `functional-tests/README` for options.
+
+[10]: functional-tests/README.md#configuring-the-browsers
+[11]: functional-tests/README.md#configuring-the-base-address
+
+Run *all* tests (mostly useful for continuous integration):
+
+```console
+$ yarn test [FUNCTIONAL TEST OPTIONS]
+```
+
+Run an arbitrary command from within the root of a subproject:
+
+```console
+$ yarn back  [ARBITRARY BACKEND COMMAND HERE]
+$ yarn front [ARBITRARY FRONTEND COMMAND HERE]
+$ yarn func  [ARBITRARY FUNCTIONAL TESTS COMMAND HERE]
+```
+
+For example,
+
+```console
+$ yarn back less README.md
+```
+
+is equivalent to
+
+```console
+$ cd backend
+$ less README.md
+$ cd ..
+```
+
+Run `python manage.py` within the `backend` directory:
+
+```console
+$ yarn django [SUBCOMMAND] [OPTIONS]
+```
+
+`yarn django` is a shorthand for `yarn back python manage.py`. This command is useful for managing database migrations, among other things.
+
+Manage the frontend package dependencies:
+
+```console
+$ yarn fyarn (add|remove|upgrade|...) (PACKAGE ...) [OPTIONS]
+```
+
+
+
+### Notes on Python package dependencies
+
+Both the backend and the functional test suite are Python-based and package versions are pinned using [pip-tools][13] in both subprojects. For ease of development, you most likely want to use the same virtualenv for both and this is also what the `bootstrap.py` assumes.
+
+[13]: https://pypi.org/project/pip-tools/
+
+This comes with a small catch: the subprojects each have their own separate `requirements.txt`. If you run `pip-sync` in one subproject, the dependencies of the other will be uninstalled. In order to avoid this, you run `pip install -r requirements.txt` instead. The `yarn` command does this correctly by default.
+
+Another thing to be aware of, is that `pip-compile` takes the old contents of your `requirements.txt` into account when building the new version based on your `requirements.in`. You can use the following trick to keep the requirements in both projects aligned so the versions of common packages don't conflict:
+
+```console
+$ yarn back pip-compile
+# append contents of backend/requirements.txt to functional-tests/requirements.txt
+$ yarn func pip-compile
+```
+
+
+### Development mode vs production mode
+
+The purpose of development mode is to facilitate live development, as the name implies. The purpose of production mode is to simulate deployment conditions as closely as possible, in order to check whether everything still works under such conditions. A complete overview of the differences is given below.
+
+dimension  |  Development mode  |  Production mode
+-----------|--------------------|-----------------
+command  |  `yarn start`  |  `yarn start-p`
+base address  |  http://localhost:8000  |  http://localhost:4200
+backend server (Django)  |  in charge of everything  |  serves backend only
+frontend server (angular-cli)  |  serves  |  watch and build
+static files  |  served directly by Django's staticfiles app  |  collected by Django, served by gulp-connect
+backend `DEBUG` setting  |  `True`  |  `False`
+backend `ALLOWED_HOSTS`  |  -  |  restricted to `localhost`
+frontend sourcemaps  |  yes  |  no
+frontend optimization  |  no  |  yes
+
+
+## Deployment
+
+Both the backend and frontend applications have a section dedicated to deployment in their own READMEs. You should read these sections entirely before proceeding. All instructions in these sections still apply, though it is good to know that you can use the following shorthand commands from the integrated project root:
+
+```console
+
+# collect static files of both backend and frontend, with overridden settings
+$ yarn django collectstatic --settings SETTINGS --pythonpath path/to/SETTINGS.py
+```
+
+You should build the frontend before collecting all static files.
