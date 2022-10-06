@@ -3,7 +3,7 @@
   "license": "CC-BY-NC-SA-4.0",
   "scripts": {
     "start": "yarn serve",
-    "build": "ng build --deploy-url='/static/'",
+    "build": "node ./build/build-pre.js && ng build --deploy-url='/static/'",
     "test": "ng test --watch=true",
     "lint": "ng lint",
     "build:en": "ng build  --deploy-url='/static/' --configuration=production-en",
