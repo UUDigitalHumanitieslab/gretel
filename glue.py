@@ -19,7 +19,7 @@ import sys
 from importlib import util, machinery
 
 settings_name = 'settings'
-settings_path = op.join(here, 'backend', 'gretel5', 'settings.py')
+settings_path = op.join(here, 'backend', 'gretel', 'settings.py')
 
 if sys.version_info >= (3, 5):
     spec = util.spec_from_file_location(settings_name, settings_path)
@@ -41,4 +41,3 @@ STATICFILES_DIRS += [
     op.join(here, 'frontend', 'src')
 ]
 PROXY_FRONTEND = "http://localhost:4200"
-

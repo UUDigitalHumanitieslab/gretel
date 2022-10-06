@@ -16,7 +16,7 @@
         "install-func": "yarn func -- pip install -r requirements.txt",
         "postinstall": "yarn fyarn && yarn install-back && yarn install-func",
         "django": "yarn back python manage.py",
-        "startapp": "yarn back django-admin startapp --settings gretel5.settings --pythonpath .",
+        "startapp": "yarn back django-admin startapp --settings gretel.settings --pythonpath .",
         "test-front": "yarn front yarn test-once",
         "test-back": "yarn back pytest",
         "test-func": "yarn func pytest",
