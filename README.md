@@ -1,4 +1,5 @@
 [![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel/actions)
+[![DOI](https://zenodo.org/badge/95562504.svg)](https://zenodo.org/badge/latestdoi/95562504)
 
 # GrETEL 4
 
