@@ -23,7 +23,7 @@ describe('Matrix', () => {
             rel: undefined,
             word: undefined,
             lemma: undefined,
-            pos: undefined,
+            pt: undefined,
             cs: false,
             postag: undefined,
             na: true
@@ -62,7 +62,7 @@ describe('Matrix', () => {
             rel: undefined,
             word: undefined,
             lemma: undefined,
-            pos: undefined,
+            pt: undefined,
             cs: false,
             postag: undefined,
             na: true
@@ -74,7 +74,7 @@ describe('Matrix', () => {
             rel: undefined,
             word: 'include',
             lemma: undefined,
-            pos: undefined,
+            pt: undefined,
             cs: false,
             postag: undefined,
             na: false
@@ -86,7 +86,7 @@ describe('Matrix', () => {
 
         matrix.set(0, 'rel', undefined);
         matrix.set(0, 'lemma', undefined);
-        matrix.set(0, 'pos', undefined);
+        matrix.set(0, 'pt', undefined);
         matrix.set(0, 'cs', false);
         matrix.set(0, 'postag', undefined);
         matrix.set(0, 'rel', undefined);
