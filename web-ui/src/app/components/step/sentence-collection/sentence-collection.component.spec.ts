@@ -24,8 +24,12 @@ describe('SentenceCollectionComponent', () => {
     });
 
     it('should exclude sentences that do not contain the filter string', () => {
-        component.sentences = ['first', 'second', 'third'];
+        component.sentences = [
+            {id: 1, text:'first'},
+            {id: 2, text:'second'},
+            {id: 3, text:'third'},
+        ];
         component.filterString = 'con';
-        expect(component.sentences).toEqual(['second']);
+        expect(component.sentences).toEqual([{id: 2, text:'second'}]);
     });
 });
