@@ -3,21 +3,27 @@
     <table class="table is-striped is-fullwidth" *ngIf="indexedTokens">
         <thead>
             <tr>
-                <th>Sentence</th>
-                <td *ngFor="let token of indexedTokens" class="is-clickable" (click)="setTokenPart(token, 'na')">{{token.value}}</td>
+                <th [ngClass]="{ 'is-disabled': isCustomXPath }">Sentence</th>
+                <td *ngFor="let token of indexedTokens" [ngClass]="{
+                    'is-clickable': !isCustomXPath,
+                    'is-disabled': isCustomXPath
+                }" (click)="setTokenPart(token, 'na')">{{token.value}}</td>
             </tr>
         </thead>
         <tbody>
             <ng-container *ngFor="let option of options">
                 <tr *ngIf="!option.advanced || showAdvanced">
-                    <th [@fade] class="is-clickable" (click)="setTokenRow(option.key)">
-                        <span tooltipPosition="right" pTooltip="{{option.description}}">
+                    <th [@fade] [ngClass]="{
+                        'is-clickable': !isCustomXPath,
+                        'is-disabled': isCustomXPath
+                    }" (click)="setTokenRow(option.key)">
+                        <span tooltipPosition="right" pTooltip="{{isCustomXPath ? undefined : option.description}}">
                             {{option.label}}
                             <fa-icon *ngIf="option.description" [icon]="faCircleInfo" aria-hidden="true"></fa-icon>
                         </span>
                     </th>
                     <td [@fade] *ngFor="let token of indexedTokens" (click)="setTokenPart(token, option.key)">
-                        <grt-matrix-option [value]="attributes[token.index][option.key]"
+                        <grt-matrix-option [value]="attributes[token.index][option.key]" [disabled]="isCustomXPath"
                             [dependent]="tokenDependents[token.index][option.key]" [option]="option"></grt-matrix-option>
                     </td>
                 </tr>
@@ -61,9 +67,9 @@
         </div>
         <div class="field" (mouseout)="explanation = undefined"
             (mouseover)="explanation = 'In the results, show the sentence before and after the matching sentence to provide a broader context.'">
-            <label class="checkbox">
+            <label class="checkbox" [attr.disabled]="isCustomXPath || null">
                 <input type="checkbox" name="retrieveContext" [checked]="retrieveContext"
-                    (click)="toggleSetting('retrieveContext')">
+                    (click)="toggleSetting('retrieveContext')" [disabled]="isCustomXPath">
                 Include context in results
                 <label>
                     <fa-icon [icon]="faCircleInfo"></fa-icon>

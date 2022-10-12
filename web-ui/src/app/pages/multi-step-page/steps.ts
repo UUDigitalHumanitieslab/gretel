@@ -1,20 +1,10 @@
 import { ExtractinatorService, ReconstructorService, PathVariable } from 'lassy-xpath';
 
-import { TokenAttributes } from '../../models/matrix';
+import { DefaultTokenAttributes, TokenAttributes } from '../../models/matrix';
 import { AlpinoService } from '../../services/alpino.service';
 import { TreebankService } from '../../services/treebank.service';
 import { FilterValues, SearchVariable, NotificationService } from '../../services/_index';
 import { TreebankSelection } from '../../treebank';
-
-export const DefaultTokenAttributes: Readonly<TokenAttributes> = {
-    rel: 'include',
-    word: 'include',
-    cs: false,
-    lemma: undefined,
-    pos: 'include',
-    postag: undefined,
-    na: false
-};
 
 /**
  * Contains all the steps that are used in the xpath search

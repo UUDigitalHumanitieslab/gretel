@@ -1,5 +1,5 @@
 <div class="button is-outlined" [ngClass]="iconColor" role="button"
-    tooltipPosition="bottom" pTooltip="{{iconDescription}}">
+    tooltipPosition="bottom" pTooltip="{{iconDescription}}" [attr.disabled]="disabled ? 'disabled' : undefined">
     <span class="icon">
         <fa-icon *ngIf="iconDefinition" [icon]="iconDefinition"></fa-icon>
     </span>

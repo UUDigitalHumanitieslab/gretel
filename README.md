@@ -1,4 +1,5 @@
 [![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel-django/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel-django/actions)
+[![DOI](https://zenodo.org/badge/95562504.svg)](https://zenodo.org/badge/latestdoi/95562504)
 
 # GrETEL 4
 
@@ -11,14 +12,14 @@ This is currently under active development. The stable predecessor can be found 
 * v4.0.2 October 2018: GrETEL 4 release with many bugfixes and improvements.
 * v4.0.0 June 2018: First GrETEL 4 release with new interface.
 * v3.9.99 November 2017: GrETEL 4 currently under development!
-* v3.0.2 July 2017: Show error message if the BaseX server is down  
+* v3.0.2 July 2017: Show error message if the BaseX server is down
 * v3.0. November 2016: GrETEL 3 initial release. Available at http://gretel.ccl.kuleuven.be/gretel3
 
 ### Branches
 
 master: official version of GrETEL 4, available at http://gretel.hum.uu.nl/gretel3/
-dev: development version  
-gretel2.0: official version of GrETEL 2.0, available at http://gretel.ccl.kuleuven.be/gretel-2.0  
+dev: development version
+gretel2.0: official version of GrETEL 2.0, available at http://gretel.ccl.kuleuven.be/gretel-2.0
 
 ## Installation
 
@@ -33,7 +34,7 @@ Next to a standard LAMP server (with a PHP version > 5.4), GrETEL requires the f
 ### Next steps
 
 1. Download (or clone) GrETEL from GitHub.
-2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)). 
+2. Download the Alpino dependency parser. Current binary used in the live version: `Alpino-x86_64-linux-glibc2.5-20548-sicstus` (available [here](http://www.let.rug.nl/vannoord/alp/Alpino/versions/binary)).
 
 > It is recommended to use the same version used for creating the treebanks. This way an example based search will result in the same search structure as stored in the database.
 
@@ -55,11 +56,11 @@ Only the properties of the first node matched by an XPATH variable is returned f
 
 A user searches for `//node[node]`. Two variables are found in this query: `$node1 = //node` and `$node2 = $node1[node]`.
 
-The following sentence would match this query: 
+The following sentence would match this query:
 
 `node[np] (node[det] node[noun])`
 
-The node found for `$node1` will then be `node[np]`. 
+The node found for `$node1` will then be `node[np]`.
 The node found for `$node2` will then be `node[det]`. The properties of `node[noun]` will not be available for analysis using this query.
 
 When searching for a more specific structure, this is unlikely to occur.
