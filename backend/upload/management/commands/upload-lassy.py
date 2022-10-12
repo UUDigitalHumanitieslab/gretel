@@ -259,9 +259,8 @@ class Command(BaseCommand):
                                              .format(len(self.inputfiles))))
 
         if not basex.test_connection():
-            raise CommandError('Cannot connect to BaseX: {}. '
-                               'This command needs BaseX to run.'
-                               .format(err))
+            raise CommandError('Cannot connect to BaseX. '
+                               'This command needs BaseX to run.')
 
         # Remove trailing slash because os.path.basename would return empty
         # string
