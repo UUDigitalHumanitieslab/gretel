@@ -43,6 +43,15 @@ export class MweResultsComponent extends ResultsComponent {
     @Output()
     public changeQuery = new EventEmitter<MweQuery>();
 
+    @Input()
+    public retrieveContext = false;
+    @Output()
+    public changeRetrieveContext = new EventEmitter<boolean>();
+
+    toggleContext() {
+        this.changeRetrieveContext.emit(!this.retrieveContext);
+    }
+
     isQueryAdjusted() {
         return this.currentQuery.id ?? false;
     }
@@ -63,7 +72,6 @@ export class MweResultsComponent extends ResultsComponent {
         ).pipe(
             filter((values) => values.every(value => value != null)),
             map(([state, filterValues]) => ({
-                retrieveContext: state.retrieveContext,
                 selectedTreebanks: state.selectedTreebanks,
                 xpath: state.xpath,
                 filterValues
@@ -73,11 +81,13 @@ export class MweResultsComponent extends ResultsComponent {
                 // wait for the debouncing first.
                 // already give feedback a change is pending,
                 // so the user doesn't think the interface is stuck
-                this.loading = true;
-                return prev.retrieveContext === curr.retrieveContext &&
-                    prev.filterValues === curr.filterValues &&
+                const unchanged = prev.filterValues === curr.filterValues &&
                     prev.xpath === curr.xpath &&
                     prev.selectedTreebanks.equals(curr.selectedTreebanks);
+                if (!unchanged) {
+                    this.loading = true;
+                }
+                return unchanged;
             }),
             debounceTime(DebounceTime),
             switchMap(({ selectedTreebanks, xpath, filterValues }) => {
