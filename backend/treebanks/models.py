@@ -44,6 +44,7 @@ class Component(models.Model):
     )
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
                                  related_name='components')
+    contains_metadata = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
