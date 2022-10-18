@@ -114,7 +114,7 @@ def generate_xquery_count(basex_db: str, xpath: str) -> str:
     occurances of a given XPath in a given BaseX database."""
     if not check_db_name(basex_db) or not check_xpath(xpath):
         raise ValueError('Incorrect database or malformed XPath given')
-    return 'count(for $node in db:open("{}")/treebank{} return $node)' \
+    return 'count(db:open("{}")/treebank{})' \
         .format(basex_db, xpath)
 
 
@@ -151,6 +151,23 @@ def generate_xquery_showtree(basex_db: str, sentence_id: str) -> str:
         raise ValueError('Incorrect database or malformed sentence ID given')
     return 'db:open("' + basex_db + '")/treebank/alpino_ds[@id="' + \
         sentence_id + '"]'
+
+
+def generate_xquery_count_words(basex_db: str) -> str:
+    '''Return XQuery to get number of words in a database, calculated on
+    the basis of the attribute @end in every top node (i.e. every sentence)'''
+    if not check_db_name(basex_db):
+        raise ValueError('Incorrect database or malformed sentence ID given')
+    return 'sum(db:open("{}")//node[@cat="top"] ! ' \
+           'data(@end))'.format(basex_db)
+
+
+def generate_xquery_count_sentences(basex_db: str) -> str:
+    '''Return XQuery to get number of sentences in a database, by getting
+    the total number of top nodes (i.e. sentences)'''
+    if not check_db_name(basex_db):
+        raise ValueError('Incorrect database or malformed sentence ID given')
+    return 'count(db:open("{}")//node[@cat="top"])'.format(basex_db)
 
 
 def parse_search_result(result_str: str, component) -> list:

@@ -2,10 +2,14 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.conf import settings
 
 import logging
 
 from services.basex import basex
+from search.basex_search import (
+    generate_xquery_count_words, generate_xquery_count_sentences
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +31,8 @@ class Treebank(models.Model):
     word_tokenized = models.BooleanField(null=True)
     sentences_have_labels = models.BooleanField(null=True)
     processed = models.DateTimeField(null=True, blank=True)
+    variants = models.JSONField(blank=True, default=list)
+    groups = models.JSONField(blank=True, default=dict)
 
     def __str__(self):
         return '{}'.format(self.slug)
@@ -45,6 +51,8 @@ class Component(models.Model):
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
                                  related_name='components')
     contains_metadata = models.BooleanField(default=False)
+    variant = models.CharField(max_length=100, blank=True, default='')
+    group = models.CharField(max_length=100, blank=True, default='')
 
     class Meta:
         constraints = [
@@ -78,6 +86,24 @@ class BaseXDB(models.Model):
     def __str__(self):
         return str(self.dbname)
 
+    def get_db_size(self):
+        """Get database size in KiB. An OSError will be raised if
+        the database does not exist."""
+        dbsize = int(basex.perform_query(
+                        'db:property("{}", "size")'.format(self.dbname)
+                    ))
+        return int(dbsize / 1024)
+
+    def get_number_of_words(self):
+        return int(basex.perform_query(
+            generate_xquery_count_words(self.dbname)
+        ))
+
+    def get_number_of_sentences(self):
+        return int(basex.perform_query(
+            generate_xquery_count_sentences(self.dbname)
+        ))
+
     def delete_basex_db(self):
         """Delete this database from BaseX (called when BaseXDB objects
         are deleted)"""
@@ -93,4 +119,10 @@ class BaseXDB(models.Model):
 
 @receiver(pre_delete, sender=BaseXDB)
 def delete_basex_db_callback(sender, instance, using, **kwargs):
-    instance.delete_basex_db()
+    if settings.DELETE_COMPONENTS_FROM_BASEX is True:
+        instance.delete_basex_db()
+    else:
+        logger.warning('Database {} was removed but corresponding BaseX '
+                       'database was not deleted because setting '
+                       'DELETE_COMPONENTS_FROM_BASEX is False.'
+                       .format(str(instance)))
