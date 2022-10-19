@@ -20,22 +20,19 @@ jobs:
     runs-on: ubuntu-20.04
 
     services:
-      # Label used to access the service container
-      postgres:
-        # Docker Hub image
-        image: postgres
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: postgrespwd
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      alpino:
+        image: registry.webhosting.rug.nl/compling/alpino:latest
+        environment:
+          - PROLOGMAXSIZE=1500M
         ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
+          - "7001:7001"
+        command: Alpino -notk -veryfast user_max=600000 server_kind=parse server_port=7001 assume_input_is_tokenized=on debug=0 end_hook=xml -init_dict_p batch_command=alpino_server
+
+      basex:
+        image: basex/basexhttp:latest
+        ports:
+          - "1984:1984"
+        command: basexserver
 
     strategy:
       matrix:
@@ -65,13 +62,6 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run all tests
-      env:
-        # Provide PostgreSQL environment variables in order to default to TCP connection
-        PGDATABASE: postgres
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: postgres
-        PGPASSWORD: postgrespwd
       run: |
         cat bootstrap_ci.txt | python bootstrap.py
         yarn
