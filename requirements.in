@@ -5,3 +5,4 @@ django-cors-headers>=3.13.0
 BaseXClient
 corpus2alpino>=0.3.10
 celery[redis]>=5.2.0
+-e git+https://github.com/UUDigitalHumanitieslab/mwe-query@bug/expand-cycle#egg=mwe-query

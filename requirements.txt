@@ -4,8 +4,12 @@
 #
 #    pip-compile
 #
-alpino-query==2.1.9
+-e git+https://github.com/UUDigitalHumanitieslab/mwe-query@bug/expand-cycle#egg=mwe-query
     # via -r requirements.in
+alpino-query==2.1.9
+    # via
+    #   -r requirements.in
+    #   mwe-query
 amqp==5.1.1
     # via kombu
 argparse==1.4.0
@@ -15,7 +19,9 @@ asgiref==3.5.2
 async-timeout==4.0.2
     # via redis
 basexclient==8.4.4
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   mwe-query
 beautifulsoup4==4.11.1
     # via tei-reader
 billiard==3.6.4.0
@@ -128,6 +134,7 @@ requests==2.28.1
     # via
     #   alpino-query
     #   folia
+    #   mwe-query
     #   spacy
 six==1.16.0
     # via click-repl

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'services',
     'treebanks',
     'search',
+    'mwe',
     'upload',
     'parse',
     'rest_framework',

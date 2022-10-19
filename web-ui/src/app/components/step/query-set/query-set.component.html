@@ -1,0 +1,10 @@
+
+<div class="query" *ngFor="let query of queryset; let idx = index">
+  <h4>Query {{ idx + 1 }}: {{ query.description }}</h4>
+  <div>
+    <grt-xpath-editor
+        [value]="query.xpath">
+    </grt-xpath-editor>
+  </div>
+  <button class="button" (click)="sendQuery(idx)">Search</button>
+</div>

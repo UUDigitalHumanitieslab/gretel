@@ -1,0 +1,53 @@
+<grt-body-header>Multi Word Expressions</grt-body-header>
+<grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState?.currentStep?.number" (jump)="goToStep($event)"></grt-breadcrumb-bar>
+<div [ngSwitch]="globalState?.currentStep?.number" [ngClass]="{'is-loading':isTransitioning}">
+    <grt-sentence-collection
+        *ngSwitchCase="0"
+        title="Canonical form expressions"
+        [sentences]="(canonicalForms | async) ?? []"
+        (onSelect)="startWithExpression($event)"
+    >
+    </grt-sentence-collection>
+    <grt-select-treebanks
+        *ngSwitchCase="1"
+
+        (changeValid)="setValid($event)"
+        (prev)="prev()"
+        (next)="next()">
+    </grt-select-treebanks>
+
+    <grt-mwe-results
+        *ngSwitchCase="2"
+
+        [canonicalForm]="globalState.canonicalForm.text"
+        [currentQuery]="globalState.currentQuery"
+        [querySet]="globalState.querySet"
+        (changeQuery)="changeQuery($event)"
+
+
+        [filterValues]="globalState.filterValues"
+        [inputSentence]="globalState.inputSentence"
+        [retrieveContext]="globalState.retrieveContext"
+        [xpath]="globalState.xpath"
+        [canSaveQuery]="globalState.canonicalForm.id !== undefined"
+
+        (changeValid)="setValid($event)"
+        (changeXpath)="updateXPath($event)"
+        (saveQuery)="saveQuery()"
+        (changeRetrieveContext)="updateRetrieveContext($event)"
+        (changeFilterValues)="updateFilterValues($event)"
+        (prev)="prev()"
+        (next)="next()">
+    </grt-mwe-results>
+
+    <grt-analysis
+        *ngSwitchCase="3"
+
+        [xpath]="globalState.xpath"
+
+        (changeValid)="setValid($event)"
+        (filterResults)="filterResults($event, 2)">
+    </grt-analysis>
+</div>
+<br />
+<div *ngIf="warning" class="notification is-danger warning">{{warning}}</div>
