@@ -16,6 +16,22 @@ class CanonicalFormList(ListAPIView):
 
 
 def generate_query(sentence, rank):
+    """ Generates a set of queries using the mwe-query package.
+    (https://github.com/UUDigitalHumanitieslab/mwe-query)
+
+    This happens on the basis of an alpino parse tree and results in three
+    queries:
+    1. Multi-word expression query
+    2. "Near-miss" query
+    3. Superset query
+
+    The superset query is special in the sense that it is executed directly on BaseX.
+    The other queries are executed against the results of the superset query.
+    This numbering scheme (1-3) is referred to as "rank" in the codebase, and reflects the idea that
+    the results of query of rank i should be included in the results of query j if j>i.
+    """
+
+    # TODO: we could maybe replace the whole rank idea with an is_superset boolean
     mwe = Mwe(sentence)
     tree = parse_sentence(mwe.can_form)
     mwe.set_tree(tree)

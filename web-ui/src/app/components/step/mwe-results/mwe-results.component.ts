@@ -61,6 +61,9 @@ export class MweResultsComponent extends ResultsComponent {
         return this.querySet ? this.querySet[2] : undefined;
     }
 
+    // What follows is mostly a duplicate of ResultsComponent.createResultsStream
+    // because it's impossible to override just the part we need to customize (SearchBehaviour)
+    // without further refactoring of ResultsComponent, which would be irrelevant for the rest of the app.
     protected createResultsStream(state$: Observable<GlobalState>, filterValue$: Observable<FilterValue[]>) {
         let behaviour = {
             supersetXpath: this.supersetQuery?.xpath,

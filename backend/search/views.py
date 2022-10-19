@@ -33,11 +33,11 @@ def run_search(query_obj) -> None:
 def filter_subset_results(results, xpath, should_expand_index):
     out = []
     for result in results:
-        sent = ET.fromstring(result['xml_sentences'])
-        expanded = sent
+        sentence = ET.fromstring(result['xml_sentences'])
+        expanded = sentence
         if should_expand_index:
             try:
-                expanded = expand_index_nodes(sent)
+                expanded = expand_index_nodes(sentence)
             except Exception:
                 log.exception('Failed expanding index nodes for sentence')
 
@@ -78,15 +78,21 @@ def search_view(request):
     else:
         maximum_results = settings.MAXIMUM_RESULTS
 
-    use_superset = behaviour.get('supersetXpath') is not None
-    # TODO: find a nicer way for running just the superset query
-    use_superset = use_superset and behaviour['supersetXpath'] != xpath
+    # The frontend might ask us to run the given query on the results of another
+    # "superset" query instead of directly on BaseX.
+    # in that case, a separate 'supersetXpath' variable is set, which we then
+    # place in the normal 'xpath' variable because that's what BaseX knows about.
+
+    # TODO:
+    # There's one caveat which is that the frontend currently also sends a supersetXpath
+    # when the superset query is the one chosen by the user. In that case it makes no sense
+    # to run the superset query on the results of itself (and it breaks becaues of the /alpino_ds prefix hack)
+    use_superset = behaviour.get('supersetXpath') is not None and behaviour['supersetXpath'] != xpath
 
     should_expand_index = behaviour.get('expandIndex', False)
     if use_superset:
         subset_xpath = xpath
         xpath = behaviour['supersetXpath']
-
 
     if query_id:
         new_query = False
