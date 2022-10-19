@@ -10,3 +10,4 @@ corpus2alpino>=0.3.10
 BaseXClient
 alpino-query>=2.1.9
 celery[redis]>=5.2.0
+-e git+https://github.com/UUDigitalHumanitieslab/mwe-query@bug/expand-cycle#egg=mwe-query
