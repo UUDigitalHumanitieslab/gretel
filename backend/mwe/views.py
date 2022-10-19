@@ -6,7 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 from alpino_query.parser import parse_sentence
 from mwe_query import Mwe
 
-from .models import CanonicalForm, CanonicalFormSerializer, XPathQuery, XPathQuerySerializer, MweQuerySerializer
+from .models import CanonicalForm, XPathQuery
+from .serializers import CanonicalFormSerializer, XPathQuerySerializer, MweQuerySerializer
 
 
 class CanonicalFormList(ListAPIView):
