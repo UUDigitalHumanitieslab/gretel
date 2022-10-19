@@ -19,21 +19,6 @@ jobs:
 
     runs-on: ubuntu-20.04
 
-    services:
-      alpino:
-        image: registry.webhosting.rug.nl/compling/alpino:latest
-        environment:
-          - PROLOGMAXSIZE=1500M
-        ports:
-          - "7001:7001"
-        command: Alpino -notk -veryfast user_max=600000 server_kind=parse server_port=7001 assume_input_is_tokenized=on debug=0 end_hook=xml -init_dict_p batch_command=alpino_server
-
-      basex:
-        image: basex/basexhttp:latest
-        ports:
-          - "1984:1984"
-        command: basexserver
-
     strategy:
       matrix:
         python-version: ['3.8']
@@ -48,6 +33,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: "${{ matrix.node-version }}"
+    - name: Install Ubuntu packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install basex
     - name: Install Python dependencies
       run: |
         cd backend
@@ -63,6 +52,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run all tests
       run: |
+        basexserver -S
         cat bootstrap_ci.txt | python bootstrap.py
         yarn
         yarn django migrate
