@@ -115,18 +115,20 @@ class Command(BaseCommand):
         self.treebank.variants = self.configuration.get('variants', '[]')
         self.treebank.groups = self.configuration.get('groups', '{}')
 
+        # Get all Component and BaseXDB objects
         component_objs = []
-        db_objs_per_component = []  # A list of BaseXDB objects per component
+        all_db_objs = []  # A flat list of all BaseXDB objects
         for component_config in self.config_components:
             component_obj, db_objs = self.create_component(component_config)
             component_objs.append(component_obj)
-            db_objs_per_component.append(db_objs)
+            all_db_objs.extend(db_objs)
 
+        # If all objects have been created successfully, save them
         self.treebank.save()
-        for i in range(len(component_objs)):
-            component_objs[i].save()
-            for db_obj in db_objs_per_component[i]:
-                db_obj.save()
+        for component_obj in component_objs:
+            component_obj.save()
+        for db_obj in all_db_objs:
+            db_obj.save()
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully imported treebank {} with existing BaseX databases'
@@ -135,7 +137,7 @@ class Command(BaseCommand):
 
         if settings.DELETE_COMPONENTS_FROM_BASEX:
             self.stdout.write(self.style.WARNING(
-                'Warning: the setting DELETE_COMPONENTS_FROM_BASEX is '
+                'Warning: the DELETE_COMPONENTS_FROM_BASEX setting is '
                 'True, which means that the existing BaseX databases '
                 'will be deleted in case you delete this treebank.'
             ))
