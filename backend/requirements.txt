@@ -4,8 +4,6 @@
 #
 #    pip-compile
 #
---no-binary psycopg2
-
 -e git+https://github.com/UUDigitalHumanitieslab/mwe-query@bug/expand-cycle#egg=mwe-query
     # via -r requirements.in
 alpino-query==2.1.9
@@ -130,8 +128,6 @@ preshed==3.0.7
     #   thinc
 prompt-toolkit==3.0.31
     # via click-repl
-psycopg2==2.9.4
-    # via -r requirements.in
 py==1.11.0
     # via
     #   pytest
