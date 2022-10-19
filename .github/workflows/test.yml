@@ -62,4 +62,6 @@ jobs:
         find static
         yarn start-back-p &
         chromedriver --version
-        yarn test
+        yarn test-back --ignore-glob=**/mwe-query/*
+        yarn test-front
+        yarn test-func
