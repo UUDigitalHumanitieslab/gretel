@@ -12,4 +12,4 @@ urlpatterns = [
 router = SimpleRouter()
 router.register('xpath', XPathQueryViewSet, basename='xpath')
 
-urlpatterns += router.urls
+urlpatterns += router.urls  # type: ignore
