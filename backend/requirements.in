@@ -1,0 +1,13 @@
+Django>=4.0.1,<5
+djangorestframework>=3.13.0
+django-livereload-server
+django-revproxy>=0.10.0
+psycopg2 --no-binary psycopg2
+pytest
+pytest-django
+pytest-xdist
+corpus2alpino>=0.3.10
+BaseXClient
+alpino-query>=2.1.9
+celery[redis]>=5.2.0
+-e git+https://github.com/UUDigitalHumanitieslab/mwe-query@bug/expand-cycle#egg=mwe-query

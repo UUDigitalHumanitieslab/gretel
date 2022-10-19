@@ -342,7 +342,7 @@ export class TreebankService {
     }
 
     private async loadAll() {
-        const allTreebanks$ = merge(this.getAllConfiguredTreebanks(), this.getDjangoTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
+        const allTreebanks$ = merge(this.getDjangoTreebanks(), this.getUploadedTreebanks()).pipe(shareReplay()).pipe(delay(0));
         allTreebanks$.subscribe((treebank) => {
             if (treebank) {
                 const current = this.treebanks.value;
