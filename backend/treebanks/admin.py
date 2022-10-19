@@ -18,7 +18,8 @@ class TreebankAdmin(admin.ModelAdmin):
     ordering = ('slug',)
     fieldsets = (
         (None, {
-            'fields': ('slug', 'title', 'description', 'url_more_info')
+            'fields': ('slug', 'title', 'description', 'url_more_info',
+                       'variants', 'groups')
         }),
         ('For uploaded treebanks', {
             'fields': ('input_file', 'uploaded_by', 'public',

@@ -1,0 +1,8 @@
+This directory contains the configuration file for the treebanks that were
+preconfigured in previous versions of GrETEL (4 and before). Use them with
+the import-existing management command to import treebanks that are already
+present in BaseX:
+
+% python manage.py import-existing TREEBANK.json
+
+The configuration files may also be used as examples for your own imports.

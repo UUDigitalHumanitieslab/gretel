@@ -68,11 +68,9 @@ class ComponentSearchResult(models.Model):
         try:
             cache_file = open(cache_filename, 'r')
         except FileNotFoundError:
-            logger.error(
-                'Could not open cache file for ComponentSearchResult {}: {}'
-                .format(self.id, cache_filename)
-            )
-            raise SearchError('Cache file not found')
+            # This can happen if search results are requested before
+            # searching had started, and is not necessarily an error
+            return []
         results = cache_file.read()
         cache_file.close()
         self.last_accessed = timezone.now()
@@ -265,7 +263,8 @@ class SearchQuery(models.Model):
                 component=component,
                 variables=self.variables
             )
-            self.total_database_size += component.total_database_size
+            if component.total_database_size is not None:
+                self.total_database_size += component.total_database_size
             results.append(result)
         self.results.add(*results)
         self.save()
