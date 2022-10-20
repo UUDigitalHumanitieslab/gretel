@@ -5,7 +5,7 @@
     "ng": "ng",
     "ng-high-memory": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng",
     "start": "yarn serve",
-    "build": "node ./build/build-pre.js && npm run ng-high-memory -- build --deploy-url='/static/' --configuration=production",
+    "build": "node ./build/build-pre.js && npm run ng-high-memory -- build --deploy-url='/static/'",
     "test": "ng test --watch=true",
     "lint": "ng lint",
     "build:en": "ng build  --deploy-url='/static/' --configuration=production-en",
