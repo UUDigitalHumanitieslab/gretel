@@ -192,7 +192,8 @@ def search_view(request):
             run_search_query.apply((query.pk,))
 
     # Get results so far, if any
-    results, percentage = query.get_results(start_from, maximum_results)
+    results, percentage, counts = \
+        query.get_results(start_from, maximum_results)
 
     if use_superset:
         results = filter_subset_results(results,
@@ -209,6 +210,7 @@ def search_view(request):
         'query_id': query.id,
         'search_percentage': percentage,
         'results': results,
+        'counts': counts,
     }
     if percentage == 100:
         response['errors'] = query.get_errors()
