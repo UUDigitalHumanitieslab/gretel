@@ -338,7 +338,8 @@ class SearchQuery(models.Model):
         # early).
         result_objs = self.results \
             .filter(search_completed__isnull=True) \
-            .order_by(F('completed_part').desc(nulls_first=True))
+            .order_by(F('completed_part').desc(nulls_first=True),
+                      'component__slug')
 
         for result_obj in result_objs:
             # Check if search has been completed by now by a concurrent
