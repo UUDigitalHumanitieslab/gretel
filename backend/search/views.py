@@ -8,7 +8,6 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.conf import settings
 from django.db.utils import IntegrityError
-import logging
 
 from treebanks.models import Component, BaseXDB, Treebank
 from .models import SearchQuery
@@ -19,7 +18,13 @@ from .basex_search import (
 from .tasks import run_search_query
 from services.basex import basex
 
-logger = logging.getLogger(__name__)
+from mwe_query import expand_index_nodes
+from lxml import etree
+import xml.etree.ElementTree as ET
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def run_search(query_obj) -> None:
@@ -60,10 +65,10 @@ def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
         # This may happen if the BaseX database is also used by a
         # configured treebank so that a BaseXDB object already exists,
         # but it should not occur.
-        logger.error('Error creating BaseXDB object on the fly for '
-                     '{} component {}: {}.'.format(dbname,
-                                                   component_slug,
-                                                   err))
+        log.error('Error creating BaseXDB object on the fly for '
+                  '{} component {}: {}.'.format(dbname,
+                                                component_slug,
+                                                err))
         # Delete Component object so that the view will generate
         # an error.
         component.delete()
@@ -90,6 +95,24 @@ def _get_or_create_components(component_slugs, treebank):
                                     treebank__slug=treebank)
 
 
+def filter_subset_results(results, xpath, should_expand_index):
+    out = []
+    for result in results:
+        sentence = ET.fromstring(result['xml_sentences'])
+        expanded = sentence
+        if should_expand_index:
+            try:
+                expanded = expand_index_nodes(sentence)
+            except Exception:
+                log.exception('Failed expanding index nodes for sentence')
+
+        converted = etree.fromstring(ET.tostring(expanded))
+        if converted.xpath(xpath):
+            out.append(result)
+
+    return out
+
+
 @api_view(['POST'])
 @authentication_classes([BasicAuthentication])  # No CSRF verification for now
 @renderer_classes([JSONRenderer, BrowsableAPIRenderer])
@@ -109,10 +132,31 @@ def search_view(request):
     start_from = data.get('start_from', 0)
     is_analysis = data.get('is_analysis', False)
     variables = data.get('variables', [])
+    behaviour = data.get('behaviour', {})
+
     if is_analysis:
         maximum_results = settings.MAXIMUM_RESULTS_ANALYSIS
     else:
         maximum_results = settings.MAXIMUM_RESULTS
+
+    # The frontend might ask us to run the given query on the results of
+    # another "superset" query instead of directly on BaseX.
+    # in that case, a separate 'supersetXpath' variable is set, which we then
+    # place in the normal 'xpath' variable because that's what BaseX knows
+    # about.
+
+    # TODO:
+    # There's one caveat which is that the frontend currently also sends a
+    # supersetXpath when the superset query is the one chosen by the user. In
+    # that case it makes no sense to run the superset query on the results of
+    # itself (and it breaks becaues of the /alpino_ds prefix hack)
+    use_superset = behaviour.get('supersetXpath') is not None and \
+        behaviour['supersetXpath'] != xpath
+
+    should_expand_index = behaviour.get('expandIndex', False)
+    if use_superset:
+        subset_xpath = xpath
+        xpath = behaviour['supersetXpath']
 
     if query_id:
         new_query = False
@@ -149,6 +193,12 @@ def search_view(request):
 
     # Get results so far, if any
     results, percentage = query.get_results(start_from, maximum_results)
+
+    if use_superset:
+        results = filter_subset_results(results,
+                                        subset_xpath,
+                                        should_expand_index)
+
     if request.accepted_renderer.format == 'api':
         # If using the API view, only show part of the results, because
         # the HTML rendering of Django Rest Framework turns out to be

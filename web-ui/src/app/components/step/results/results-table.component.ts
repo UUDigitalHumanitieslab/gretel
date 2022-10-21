@@ -79,6 +79,7 @@ export class ResultsTableComponent implements OnInit, OnDestroy {
     public toggleContext = new EventEmitter<void>();
 
     public activeFilterCount: number;
+    @Input()
     public filters: Filter[] = [];
     public filterValues: FilterValues;
     /**

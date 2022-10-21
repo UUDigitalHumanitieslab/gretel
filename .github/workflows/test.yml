@@ -6,8 +6,13 @@ name: Tests
 on:
   workflow_dispatch:
   push:
-    paths-ignore:
-      - '**.md'
+    branches:
+      - 'develop'
+      - 'master'
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'release/**'
 
 jobs:
   build:
@@ -17,38 +22,46 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.8']
-        node-version: ['12.x']
+        node-version: ['16.x']
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python {{ "${{ matrix.python-version }}" }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Use Node.js ${{ matrix.node-version }}
+        python-version: "${{ matrix.python-version }}"
+    - name: Use Node.js {{ "${{ matrix.node-version }}" }}
       uses: actions/setup-node@v2
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: "${{ matrix.node-version }}"
     - name: Install Ubuntu packages
       run: |
         sudo apt-get update
         sudo apt-get install basex
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        npm install
-    - name: Build
+        pip install virtualenv
+        virtualenv .venv
+        source .venv/bin/activate
+        pip install -r backend/requirements.txt
+    - name: Lint with flake8
       run: |
-        npm run build
-    - name: Migrate
-      run: |
-        npm run migrate
-    - name: Lint
-      run: |
-        # npm run lint
-        npm run lint:backend
-    - name: Run tests
+        cd backend
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run all tests
       run: |
         basexserver -S
-        npm run start:backend &
+        cat bootstrap_ci.txt | python bootstrap.py
+        yarn
+        yarn django migrate
+        yarn static-p
+        find static
+        yarn start-back-p &
         chromedriver --version
-        npm run test
+        yarn test-back --ignore-glob=**/mwe-query/*
+        yarn test-front
+        yarn test-func

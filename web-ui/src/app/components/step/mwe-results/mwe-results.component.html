@@ -1,0 +1,48 @@
+<!-- MWE related info -->
+<div class="panel" *ngIf="querySet">
+    <div class="panel-heading">Query</div>
+    <div class="panel-block columns is-desktop">
+        <div class="column is-half-desktop">
+            <div class="block">
+                <div>Canonical form: <strong>{{ canonicalForm }}</strong></div>
+            </div>
+            <div>Showing query:
+                <grt-results-query-menu
+                    [currentQuery]="currentQuery"
+                    [querySet]="querySet"
+                    (changeQuery)="changeQuery.emit($event)"
+                ></grt-results-query-menu>
+            </div>
+            <em *ngIf="isQueryAdjusted()">* query is manually adjusted</em>
+        </div>
+        <div class="column">
+            <div *ngFor="let query of querySet">
+                <label *ngIf="query.rank != currentQuery.rank"><input type="checkbox"/>Exclude results from query {{ query.rank }}: {{ query.description }}</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="columns is-desktop">
+    <!-- XPATH -->
+    <div class="column is-half-desktop">
+        <div class="block">
+            <grt-results-xpath-editor [xpath]="xpath" (changeXpath)="changeXpath.emit($event)"></grt-results-xpath-editor>
+        </div>
+        <div class="block">
+            <button *ngIf="canSaveQuery" class="button" (click)="saveQuery.emit()">Save adjusted XPath query</button>
+        </div>
+    </div>
+    <!-- DISTRIBUTION LIST -->
+    <div class="column">
+        <grt-distribution-list (hidingComponents)="hideComponents($event)"></grt-distribution-list>
+    </div>
+</div>
+<grt-results-table
+    [loading]="loading"
+    [filteredResults]="filteredResults"
+    [filters]="filters"
+    [retrieveContext]="retrieveContext"
+    (prev)="prev.next()"
+    (next)="next.next()"
+    (toggleContext)="toggleContext()"
+></grt-results-table>
