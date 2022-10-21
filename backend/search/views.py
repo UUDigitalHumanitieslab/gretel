@@ -7,6 +7,8 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.conf import settings
+from django.db.utils import IntegrityError
+import logging
 
 from treebanks.models import Component, BaseXDB, Treebank
 from .models import SearchQuery
@@ -17,6 +19,8 @@ from .basex_search import (
 from .tasks import run_search_query
 from services.basex import basex
 
+logger = logging.getLogger(__name__)
+
 
 def run_search(query_obj) -> None:
     query_obj.perform_search()
@@ -25,8 +29,20 @@ def run_search(query_obj) -> None:
 def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
     '''Try to create a component object consisting of one database
     with the same name. Also create Treebank object if it does not yet
-    exist'''
-    basex_db = BaseXDB(component_slug)
+    exist.  Creation is meant for compatibility with
+    the existing separate gretel-upload application as long as
+    gretel-upload is not yet integrated into GrETEL.'''
+
+    # The frontend adds a 'GRETEL-UPLOAD-' prefix to all gretel-upload
+    # components so that we can identify them. We leave this prefix
+    # in the component names but we have to remove it to access
+    # the BaseX databases, because the gretel-upload application
+    # created the BaseX databases and it does not know about this
+    # prefix.
+    if not component_slug.startswith('GRETEL-UPLOAD-'):
+        return
+    dbname = component_slug[len('GRETEL-UPLOAD-'):]
+    basex_db = BaseXDB(dbname)
     try:
         basex_db.size = basex_db.get_db_size()
     except OSError:
@@ -36,15 +52,27 @@ def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
                           nr_sentences=basex_db.get_number_of_sentences(),
                           nr_words=basex_db.get_number_of_words())
     component.treebank = treebank
-    component.save()  # TODO: check for uniqueness
+    component.save()
     basex_db.component = component
-    basex_db.save()
+    try:
+        basex_db.save()
+    except IntegrityError as err:
+        # This may happen if the BaseX database is also used by a
+        # configured treebank so that a BaseXDB object already exists,
+        # but it should not occur.
+        logger.error('Error creating BaseXDB object on the fly for '
+                     '{} component {}: {}.'.format(dbname,
+                                                   component_slug,
+                                                   err))
+        # Delete Component object so that the view will generate
+        # an error.
+        component.delete()
 
 
 def _get_or_create_components(component_slugs, treebank):
     '''Check if all requested components are present as Component
     objects in database; if not create them if a corresponing
-    BaseX database is present. This is meant for compatibility with
+    BaseX database is present. Creation is meant for compatibility with
     the existing separate gretel-upload application'''
     existing_components = set(Component.objects.filter(
         slug__in=component_slugs,

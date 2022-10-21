@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('treebanks', '0002_remove_component_total_database_size_and_more'),
+        ('treebanks', '0003_component_group_component_variant_treebank_groups_and_more'),
     ]
 
     operations = [
