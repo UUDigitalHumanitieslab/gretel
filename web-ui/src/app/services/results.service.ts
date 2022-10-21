@@ -397,6 +397,7 @@ export class ResultsService {
             searchPercentage: results.search_percentage,
             errors: results.errors,
             cancelled: results.cancelled,
+            counts: await this.mapCounts(results),
         };
     }
 
@@ -427,6 +428,17 @@ export class ResultsService {
                  * Contains the XML of the node matching the variable
                  */
                 variableValues
+            };
+        }));
+    }
+
+    private mapCounts(results: ApiSearchResult): Promise<ResultCount[]> {
+        return Promise.all(results.counts.map(async count => {
+            return {
+                component: count.component,
+                numberOfResults: count.number_of_results,
+                completed: count.completed,
+                percentage: count.percentage,
             };
         }));
     }
@@ -558,6 +570,12 @@ type ApiSearchResult = {
     search_percentage: number,
     errors: string,
     cancelled?: boolean,
+    counts: {
+        component: string,
+        number_of_results: number,
+        completed: boolean,
+        percentage: number,
+    }[],
 };
 
 /** Processed search results created from the response */
@@ -567,6 +585,8 @@ export interface SearchResults {
     searchPercentage: number;
     errors: string;
     cancelled?: boolean;
+    counts: ResultCount[];
+    
 }
 
 export interface Hit {
@@ -593,6 +613,13 @@ export interface Hit {
     metaValues: { [key: string]: string };
     /** Contains the properties of the node matching the variable */
     variableValues: { [variableName: string]: { [propertyKey: string]: string } };
+}
+
+export interface ResultCount {
+    component: string;
+    numberOfResults: number;
+    completed: boolean;
+    percentage: number;
 }
 
 export type HitWithOrigin = Hit & {

@@ -270,7 +270,7 @@ class SearchQuery(models.Model):
         self.save()
 
     def get_results(self, from_number: int = 0, to_number: int = None) \
-            -> (list, float):
+            -> (list, float, list):
         """Get results so far. Object should have been initialized with
         initialize() method but search does not have to be started yet
         with perform_search() method. Return a tuple of the result as
@@ -289,7 +289,9 @@ class SearchQuery(models.Model):
             # search percentage.
             stop_adding = True
         all_matches = []
+        counts = []
         for result_obj in self.results.all().order_by('component'):
+            completed = True if result_obj.search_completed else False
             # Add matches to list, as long as no empty or partial search result
             # has been encountered.
             if not (stop_adding or result_obj.number_of_results is None):
@@ -306,6 +308,14 @@ class SearchQuery(models.Model):
             # Count completed part (for all results)
             if result_obj.completed_part is not None:
                 completed_part += result_obj.completed_part
+                percentage = result_obj.completed_part / \
+                    result_obj.component.total_database_size * 100
+                counts.append({
+                    'component': result_obj.component.slug,
+                    'number_of_results': result_obj.number_of_results,
+                    'completed': completed,
+                    'percentage': percentage,
+                })
             # If result is empty or partially complete, stop adding.
             # There might still be results in later ComponentSearchResult-s,
             # but if we give them back already they will be returned in
@@ -313,7 +323,7 @@ class SearchQuery(models.Model):
             # has already been returned and what not. We continue our loop
             # though, because we still want to know the count so far and
             # the search percentage.
-            if not result_obj.search_completed:
+            if not completed:
                 stop_adding = True
         if self.total_database_size != 0:
             search_percentage = int(
@@ -327,7 +337,7 @@ class SearchQuery(models.Model):
             all_matches = all_matches[0:-to_remove]
         self.last_accessed = timezone.now()
         self.save()
-        return (all_matches, search_percentage)
+        return (all_matches, search_percentage, counts)
 
     def perform_search(self) -> None:
         """Perform search and regularly update on progress"""
