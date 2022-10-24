@@ -51,7 +51,9 @@ def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
     try:
         basex_db.size = basex_db.get_db_size()
     except OSError:
-        return
+        log.error('Tried to create component for BaseX database {} '
+                  'for gretel-upload compatibility, but BaseX '
+                  'database does not exist.'.format(dbname))
     treebank, _ = Treebank.objects.get_or_create(slug=treebank)
     component = Component(slug=component_slug, title=component_slug,
                           nr_sentences=basex_db.get_number_of_sentences(),
@@ -288,17 +290,16 @@ def metadata_count_view(request):
     try:
         xpath = data['xpath']
         treebank = data['treebank']
-        components = data['components']
+        component_slugs = data['components']
     except KeyError as err:
         return Response(
             {'error': '{} is missing'.format(err)},
             status=status.HTTP_400_BAD_REQUEST
         )
     xml_pieces = []
-    for component_slug in components:
-        component = Component.objects.get(
-            slug=component_slug, treebank__slug=treebank
-        )
+    component_objects = _get_or_create_components(component_slugs,
+                                                  treebank)
+    for component in component_objects:
         if not component.contains_metadata:
             continue
         dbs = component.get_databases().keys()
