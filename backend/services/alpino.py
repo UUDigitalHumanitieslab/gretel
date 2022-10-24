@@ -1,4 +1,5 @@
 from django.conf import settings
+from lxml import etree
 
 from corpus2alpino.annotators.alpino import AlpinoAnnotator
 
@@ -29,6 +30,21 @@ class AlpinoService:
                 self.client = annotator.client
             except Exception as e:
                 raise AlpinoError(str(e))
+
+    def get_alpino_version(self):
+        if not self.client:
+            raise AlpinoError('Alpino service not initialized')
+        try:
+            parsed_sentence = self.client.parse_line('hoi', 'test_line') \
+                .encode()  # Encode to bytes because lxml.etree expects that
+        except Exception as e:
+            raise AlpinoError(str(e))
+        try:
+            tree = etree.fromstring(parsed_sentence)
+            version = tree.xpath('/alpino_ds/@version')[0]
+        except etree.ParseError as e:
+            raise AlpinoError(str(e))
+        return version
 
 
 alpino = AlpinoService()

@@ -64,7 +64,7 @@ def setUpModule():
 def tearDownModule():
     if test_treebank is not None:
         test_treebank.delete()
-    test_cache_dir.cleanup()
+        test_cache_dir.cleanup()
 
 
 class BaseXSearchTestCase(TestCase):
