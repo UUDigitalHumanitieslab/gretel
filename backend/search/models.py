@@ -185,6 +185,18 @@ class ComponentSearchResult(models.Model):
                     .format(self.id))
 
     @classmethod
+    def empty_cache(cls) -> int:
+        '''Empty search result cache by deleting all CSR objects.
+        Return number of CSR objects that were deleted.'''
+        # Delete all objects one by one to make sure cache files are
+        # deleted as well
+        count = 0
+        for csr in cls.objects.all():
+            csr.delete()
+            count += 1
+        return count
+
+    @classmethod
     def purge_cache(cls):
         yesterday = timezone.now() - timedelta(days=1)
         # Get total cache size
