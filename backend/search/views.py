@@ -59,6 +59,9 @@ def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
                           nr_sentences=basex_db.get_number_of_sentences(),
                           nr_words=basex_db.get_number_of_words())
     component.treebank = treebank
+    # We cannot see if the components contain metadata, but
+    # gretel-upload components often do, so set to True
+    component.contains_metadata = True
     component.save()
     basex_db.component = component
     try:
