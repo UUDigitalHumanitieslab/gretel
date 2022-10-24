@@ -50,18 +50,20 @@ def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
     basex_db = BaseXDB(dbname)
     try:
         basex_db.size = basex_db.get_db_size()
+        nr_sentences = basex_db.get_number_of_sentences()
+        nr_words = basex_db.get_number_of_words()
     except OSError:
         log.error('Tried to create component for BaseX database {} '
                   'for gretel-upload compatibility, but BaseX '
                   'database does not exist.'.format(dbname))
+        # Return without exception -- _get_or_create_components
+        # will see that not all components exist
+        return
     treebank, _ = Treebank.objects.get_or_create(slug=treebank)
     component = Component(slug=component_slug, title=component_slug,
-                          nr_sentences=basex_db.get_number_of_sentences(),
-                          nr_words=basex_db.get_number_of_words())
+                          nr_sentences=nr_sentences,
+                          nr_words=nr_words)
     component.treebank = treebank
-    # We cannot see if the components contain metadata, but
-    # gretel-upload components often do, so set to True
-    component.contains_metadata = True
     component.save()
     basex_db.component = component
     try:
@@ -293,22 +295,39 @@ def metadata_count_view(request):
     try:
         xpath = data['xpath']
         treebank = data['treebank']
-        component_slugs = data['components']
+        components = data['components']
     except KeyError as err:
         return Response(
             {'error': '{} is missing'.format(err)},
             status=status.HTTP_400_BAD_REQUEST
         )
     xml_pieces = []
-    component_objects = _get_or_create_components(component_slugs,
-                                                  treebank)
-    for component in component_objects:
-        if not component.contains_metadata:
-            continue
-        dbs = component.get_databases().keys()
+    for component_slug in components:
+        if component_slug.startswith('GRETEL-UPLOAD-'):
+            # Directly access database - we cannot create
+            # component objects with _get_or_create_components
+            # because this API call is made parallel to the search
+            # call, and creating objects would cause a race
+            # condition.
+            dbs = [component_slug[len('GRETEL-UPLOAD-'):]]
+        else:
+            component = Component.objects.get(
+                slug=component_slug, treebank__slug=treebank
+            )
+            if not component.contains_metadata:
+                continue
+            dbs = component.get_databases().keys()
         for db in dbs:
             xquery = generate_xquery_metadata_count(db, xpath)
-            xml_count_for_db = basex.perform_query(xquery)
+            try:
+                xml_count_for_db = basex.perform_query(xquery)
+            except OSError as err:
+                return Response(
+                    {'error': 'BaseX search error'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+                log.error('Error in metadata count view: {}'
+                          .format(err))
             if xml_count_for_db == '<metadata/>':
                 continue
             xml_pieces.append(
