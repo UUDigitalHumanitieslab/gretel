@@ -71,6 +71,8 @@ class Component(models.Model):
 
     @property
     def total_database_size(self):
+        if self.databases.all().count() == 0:
+            return 0
         return self.databases.all().aggregate(models.Sum('size'))['size__sum']
 
 
