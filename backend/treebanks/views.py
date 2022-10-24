@@ -8,7 +8,8 @@ from rest_framework.response import Response
 @api_view(['GET'])
 def treebank_view(request):
     # TODO: make sure that non-public treesets are hidden if needed
-    treebanks = Treebank.objects.all()
+    treebanks = Treebank.objects.all() \
+        .exclude(slug__startswith='GRETEL-UPLOAD-')
     serializer = TreebankSerializer(treebanks, many=True)
     return Response(serializer.data)
 
