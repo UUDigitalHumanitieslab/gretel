@@ -1,4 +1,4 @@
-<grt-body-header>Multi Word Expressions</grt-body-header>
+<grt-body-header>Multiword Expressions</grt-body-header>
 <grt-breadcrumb-bar [crumbs]="crumbs" [currentCrumb]="globalState?.currentStep?.number" (jump)="goToStep($event)"></grt-breadcrumb-bar>
 <div [ngSwitch]="globalState?.currentStep?.number" [ngClass]="{'is-loading':isTransitioning}">
     <grt-sentence-collection

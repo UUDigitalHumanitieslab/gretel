@@ -24,7 +24,7 @@ const links: Link[] = [
         proxy: false,
     },
     {
-        name: 'Multi Word Expressions',
+        name: 'Multiword Expressions',
         link: '/mwe-search',
         proxy: false,
     },
@@ -41,7 +41,7 @@ const mainLinksName = [
     'Home',
     'Example-based Search',
     'XPath Search',
-    'Multi Word Expressions',
+    'Multiword Expressions',
     'Documentation'
 ];
 
