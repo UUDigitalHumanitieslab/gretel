@@ -45,4 +45,7 @@
     (prev)="prev.next()"
     (next)="next.next()"
     (toggleContext)="toggleContext()"
+    (showTree)="showTree($event)"
 ></grt-results-table>
+<grt-tree-visualizer *ngIf="loadingTree || treeXml" display="fullscreen" [sentence]="treeSentence" [xml]="treeXml"
+    [filename]="treeFilename" [loading]="loadingTree"></grt-tree-visualizer>
