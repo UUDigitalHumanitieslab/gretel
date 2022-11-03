@@ -10,5 +10,17 @@
     "/static": {
         "target": "http://localhost:8000",
         "secure": false
-    }
+    },
+    "/mwe/": {
+	"target": "http://localhost:8000/",
+        "secure": false
+    },
+    "/search/": {
+	"target": "http://localhost:8000/",
+        "secure": false
+    },
+    "/treebanks/": {
+	"target": "http://localhost:8000/",
+        "secure": false
+    },
 }
