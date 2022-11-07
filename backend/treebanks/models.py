@@ -8,7 +8,8 @@ import logging
 
 from services.basex import basex
 from search.basex_search import (
-    generate_xquery_count_words, generate_xquery_count_sentences
+    generate_xquery_count_words, generate_xquery_count_sentences,
+    generate_xquery_get_version
 )
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,7 @@ class Component(models.Model):
     )
     treebank = models.ForeignKey(Treebank, on_delete=models.CASCADE,
                                  related_name='components')
+    contains_metadata = models.BooleanField(default=False)
     variant = models.CharField(max_length=100, blank=True, default='')
     group = models.CharField(max_length=100, blank=True, default='')
 
@@ -69,6 +71,8 @@ class Component(models.Model):
 
     @property
     def total_database_size(self):
+        if self.databases.all().count() == 0:
+            return 0
         return self.databases.all().aggregate(models.Sum('size'))['size__sum']
 
 
@@ -86,7 +90,8 @@ class BaseXDB(models.Model):
         return str(self.dbname)
 
     def get_db_size(self):
-        """Get database size in KiB"""
+        """Get database size in KiB. An OSError will be raised if
+        the database does not exist."""
         dbsize = int(basex.perform_query(
                         'db:property("{}", "size")'.format(self.dbname)
                     ))
@@ -113,6 +118,10 @@ class BaseXDB(models.Model):
                 'Cannot delete database {} from BaseX: {}.'
                 .format(self.dbname, err)
             )
+
+    def get_alpino_version(self):
+        xquery = generate_xquery_get_version(self.dbname)
+        return basex.perform_query(xquery)
 
 
 @receiver(pre_delete, sender=BaseXDB)

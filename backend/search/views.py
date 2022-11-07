@@ -7,8 +7,9 @@ from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.authentication import BasicAuthentication
 from rest_framework import status
 from django.conf import settings
+from django.db.utils import IntegrityError
 
-from treebanks.models import Component
+from treebanks.models import Component, BaseXDB, Treebank
 from .models import SearchQuery
 from .basex_search import (
     generate_xquery_showtree, generate_xquery_metadata_count,
@@ -28,6 +29,77 @@ log = logging.getLogger(__name__)
 
 def run_search(query_obj) -> None:
     query_obj.perform_search()
+
+
+def _create_component_on_the_fly(component_slug: str, treebank: str) -> None:
+    '''Try to create a component object consisting of one database
+    with the same name. Also create Treebank object if it does not yet
+    exist.  Creation is meant for compatibility with
+    the existing separate gretel-upload application as long as
+    gretel-upload is not yet integrated into GrETEL.'''
+
+    # The frontend adds a 'GRETEL-UPLOAD-' prefix to all gretel-upload
+    # components so that we can identify them. We leave this prefix
+    # in the component names but we have to remove it to access
+    # the BaseX databases, because the gretel-upload application
+    # created the BaseX databases and it does not know about this
+    # prefix.
+    if not component_slug.startswith('GRETEL-UPLOAD-'):
+        return
+    dbname = component_slug[len('GRETEL-UPLOAD-'):]
+    basex_db = BaseXDB(dbname)
+    try:
+        basex_db.size = basex_db.get_db_size()
+        nr_sentences = basex_db.get_number_of_sentences()
+        nr_words = basex_db.get_number_of_words()
+    except OSError:
+        log.error('Tried to create component for BaseX database {} '
+                  'for gretel-upload compatibility, but BaseX '
+                  'database does not exist.'.format(dbname))
+        # Return without exception -- _get_or_create_components
+        # will see that not all components exist
+        return
+    treebank, _ = Treebank.objects.get_or_create(slug=treebank)
+    component = Component(slug=component_slug, title=component_slug,
+                          nr_sentences=nr_sentences,
+                          nr_words=nr_words)
+    component.treebank = treebank
+    component.save()
+    basex_db.component = component
+    try:
+        basex_db.save()
+    except IntegrityError as err:
+        # This may happen if the BaseX database is also used by a
+        # configured treebank so that a BaseXDB object already exists,
+        # but it should not occur.
+        log.error('Error creating BaseXDB object on the fly for '
+                  '{} component {}: {}.'.format(dbname,
+                                                component_slug,
+                                                err))
+        # Delete Component object so that the view will generate
+        # an error.
+        component.delete()
+
+
+def _get_or_create_components(component_slugs, treebank):
+    '''Check if all requested components are present as Component
+    objects in database; if not create them if a corresponing
+    BaseX database is present. Creation is meant for compatibility with
+    the existing separate gretel-upload application'''
+    existing_components = set(Component.objects.filter(
+        slug__in=component_slugs,
+        treebank__slug=treebank
+    ).values_list('slug', flat=True))
+    existing_components = set(map(lambda x: x.upper(), existing_components))
+    nonexisting_components = set(component_slugs) - existing_components
+    for component in nonexisting_components:
+        # These components were probably made by gretel-upload
+        # (a separate application). Create them if they indeed exist
+        _create_component_on_the_fly(component, treebank)
+        # Create BaseX database with the same name, because
+        # gretel-upload components exist of only one database
+    return Component.objects.filter(slug__in=component_slugs,
+                                    treebank__slug=treebank)
 
 
 def filter_subset_results(results, xpath, should_expand_index):
@@ -57,16 +129,12 @@ def search_view(request):
     try:
         xpath = data['xpath']
         treebank = data['treebank']
-        components = data['components']
+        component_slugs = data['components']
     except KeyError as err:
         return Response(
             {'error': '{} is missing'.format(err)},
             status=status.HTTP_400_BAD_REQUEST
         )
-    components_obj = Component.objects.filter(
-        slug__in=components,
-        treebank__slug=treebank
-    )
     query_id = data.get('query_id', None)
     start_from = data.get('start_from', 0)
     is_analysis = data.get('is_analysis', False)
@@ -78,16 +146,19 @@ def search_view(request):
     else:
         maximum_results = settings.MAXIMUM_RESULTS
 
-    # The frontend might ask us to run the given query on the results of another
-    # "superset" query instead of directly on BaseX.
+    # The frontend might ask us to run the given query on the results of
+    # another "superset" query instead of directly on BaseX.
     # in that case, a separate 'supersetXpath' variable is set, which we then
-    # place in the normal 'xpath' variable because that's what BaseX knows about.
+    # place in the normal 'xpath' variable because that's what BaseX knows
+    # about.
 
     # TODO:
-    # There's one caveat which is that the frontend currently also sends a supersetXpath
-    # when the superset query is the one chosen by the user. In that case it makes no sense
-    # to run the superset query on the results of itself (and it breaks becaues of the /alpino_ds prefix hack)
-    use_superset = behaviour.get('supersetXpath') is not None and behaviour['supersetXpath'] != xpath
+    # There's one caveat which is that the frontend currently also sends a
+    # supersetXpath when the superset query is the one chosen by the user. In
+    # that case it makes no sense to run the superset query on the results of
+    # itself (and it breaks becaues of the /alpino_ds prefix hack)
+    use_superset = behaviour.get('supersetXpath') is not None and \
+        behaviour['supersetXpath'] != xpath
 
     should_expand_index = behaviour.get('expandIndex', False)
     if use_superset:
@@ -108,9 +179,16 @@ def search_view(request):
             )
     else:
         new_query = True
+        component_objects = _get_or_create_components(component_slugs,
+                                                      treebank)
+        if component_objects.count() != len(component_slugs):
+            return Response(
+                {'error': 'Not all requested components could be found.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         query = SearchQuery(xpath=xpath, variables=variables)
         query.save()
-        query.components.add(*components_obj)
+        query.components.add(*component_objects)
         query.initialize()
 
     if new_query:
@@ -125,7 +203,9 @@ def search_view(request):
         query.get_results(start_from, maximum_results)
 
     if use_superset:
-        results = filter_subset_results(results, subset_xpath, should_expand_index)
+        results = filter_subset_results(results,
+                                        subset_xpath,
+                                        should_expand_index)
 
     if request.accepted_renderer.format == 'api':
         # If using the API view, only show part of the results, because
@@ -223,13 +303,31 @@ def metadata_count_view(request):
         )
     xml_pieces = []
     for component_slug in components:
-        component = Component.objects.get(
-            slug=component_slug, treebank__slug=treebank
-        )
-        dbs = component.get_databases().keys()
+        if component_slug.startswith('GRETEL-UPLOAD-'):
+            # Directly access database - we cannot create
+            # component objects with _get_or_create_components
+            # because this API call is made parallel to the search
+            # call, and creating objects would cause a race
+            # condition.
+            dbs = [component_slug[len('GRETEL-UPLOAD-'):]]
+        else:
+            component = Component.objects.get(
+                slug=component_slug, treebank__slug=treebank
+            )
+            if not component.contains_metadata:
+                continue
+            dbs = component.get_databases().keys()
         for db in dbs:
             xquery = generate_xquery_metadata_count(db, xpath)
-            xml_count_for_db = basex.perform_query(xquery)
+            try:
+                xml_count_for_db = basex.perform_query(xquery)
+            except OSError as err:
+                return Response(
+                    {'error': 'BaseX search error'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+                log.error('Error in metadata count view: {}'
+                          .format(err))
             if xml_count_for_db == '<metadata/>':
                 continue
             xml_pieces.append(

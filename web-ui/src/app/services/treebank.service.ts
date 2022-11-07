@@ -212,7 +212,7 @@ function makeUploadedComponent(comp: UploadedTreebankShowResponse): TreebankComp
     return {
         description: '',
         disabled: false,
-        id: comp.basex_db,
+        id: 'GRETEL-UPLOAD-' + comp.basex_db,
         sentenceCount: parseInt(comp.nr_sentences, 10),
         title: comp.title,
         wordCount: parseInt(comp.nr_words, 10),
@@ -249,7 +249,7 @@ function makeTreebank(provider: string, id: string, bank: ConfiguredTreebanksRes
 
 function makeUploadedTreebank(provider: string, bank: UploadedTreebankResponse) {
     return {
-        id: bank.title,
+        id: 'GRETEL-UPLOAD-' + bank.title,
         displayName: bank.title,
         description: undefined,
         isPublic: bank.public === '1',
