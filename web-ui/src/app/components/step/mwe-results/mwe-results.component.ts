@@ -11,9 +11,10 @@ import {
     startWith,
     switchMap
 } from 'rxjs/operators';
-import { combineLatest, Observable, merge } from 'rxjs';
+import { combineLatest, Observable, BehaviorSubject, merge } from 'rxjs';
 import {FilterValue} from '../../../services/_index';
 import { GlobalState } from '../../../pages/multi-step-page/steps';
+import { SearchBehaviour } from '../../../services/results.service';
 
 const DebounceTime = 200;
 
@@ -34,8 +35,16 @@ export class MweResultsComponent extends ResultsComponent {
     @Input()
     public currentQuery: MweQuery;
 
+    private _querySet: MweQuerySet;
     @Input()
-    public querySet: MweQuerySet;
+    set querySet(value: MweQuerySet) {
+        this._querySet = value;
+        this.emitBehaviour();
+    }
+
+    get querySet() {
+        return this._querySet;
+    }
 
     @Output()
     public saveQuery = new EventEmitter();
@@ -48,8 +57,28 @@ export class MweResultsComponent extends ResultsComponent {
     @Output()
     public changeRetrieveContext = new EventEmitter<boolean>();
 
+    public excludeQuery: { [key: number]: boolean } = {};
+
+    private behaviour$: BehaviorSubject<SearchBehaviour> = new BehaviorSubject({
+        supersetXpath: null,
+        expandIndex: true,
+    });
+
     toggleContext() {
         this.changeRetrieveContext.emit(!this.retrieveContext);
+    }
+
+    toggleExclude(query: MweQuery, event: Event) {
+        this.excludeQuery[query.rank] = !this.excludeQuery[query.rank];
+        this.emitBehaviour();
+    }
+
+    private emitBehaviour() {
+        this.behaviour$.next({
+            supersetXpath: this.supersetQuery?.xpath,
+            expandIndex: true,
+            exclusions: this.querySet.filter(query => this.excludeQuery[query.rank]).map(query => query.xpath),
+        });
     }
 
     isQueryAdjusted() {
@@ -65,19 +94,15 @@ export class MweResultsComponent extends ResultsComponent {
     // because it's impossible to override just the part we need to customize (SearchBehaviour)
     // without further refactoring of ResultsComponent, which would be irrelevant for the rest of the app.
     protected createResultsStream(state$: Observable<GlobalState>, filterValue$: Observable<FilterValue[]>) {
-        let behaviour = {
-            supersetXpath: this.supersetQuery?.xpath,
-            expandIndex: true
-        };
-
         return combineLatest(
-            [state$, filterValue$]
+            [state$, filterValue$, this.behaviour$]
         ).pipe(
             filter((values) => values.every(value => value != null)),
-            map(([state, filterValues]) => ({
+            map(([state, filterValues, behaviour]) => ({
                 selectedTreebanks: state.selectedTreebanks,
                 xpath: state.xpath,
-                filterValues
+                filterValues,
+                behaviour
             })),
             distinctUntilChanged((prev, curr) => {
                 // results are going to be reloaded, but we need to
@@ -86,14 +111,15 @@ export class MweResultsComponent extends ResultsComponent {
                 // so the user doesn't think the interface is stuck
                 const unchanged = prev.filterValues === curr.filterValues &&
                     prev.xpath === curr.xpath &&
-                    prev.selectedTreebanks.equals(curr.selectedTreebanks);
+                    prev.selectedTreebanks.equals(curr.selectedTreebanks) &&
+                    prev.behaviour === curr.behaviour;
                 if (!unchanged) {
                     this.loading = true;
                 }
                 return unchanged;
             }),
             debounceTime(DebounceTime),
-            switchMap(({ selectedTreebanks, xpath, filterValues }) => {
+            switchMap(({ selectedTreebanks, xpath, filterValues, behaviour }) => {
                 // create a request for each treebank
                 const resultStreams = this.resultsStreamService.stream(
                     xpath,

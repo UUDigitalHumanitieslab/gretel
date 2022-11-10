@@ -30,8 +30,13 @@ export interface SearchVariable {
 }
 
 export interface SearchBehaviour {
+    /** if a superset xpath is specified, then the regular xpath query will be run on the results of
+        the superset query instead of directly */
     supersetXpath: string,
     expandIndex: boolean,
+
+    /** a list of xpath queries whose results should be excluded from the results of the main query */
+    exclusions?: string[],
 }
 
 @Injectable()
@@ -586,7 +591,7 @@ export interface SearchResults {
     errors: string;
     cancelled?: boolean;
     counts: ResultCount[];
-    
+
 }
 
 export interface Hit {

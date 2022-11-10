@@ -105,6 +105,9 @@ def _get_or_create_components(component_slugs, treebank):
 def filter_subset_results(results, xpath, should_expand_index):
     out = []
     for result in results:
+        # expand_index_nodes from mwe-query is written using python's ElementTree
+        # library, and at this point in the process we no longer have the tree
+        # in context. So we have to parse it again from an XML string.
         sentence = ET.fromstring(result['xml_sentences'])
         expanded = sentence
         if should_expand_index:
@@ -113,11 +116,22 @@ def filter_subset_results(results, xpath, should_expand_index):
             except Exception:
                 log.exception('Failed expanding index nodes for sentence')
 
+        # Some of the XPath queries that we run are not supported by python's ElementTree
+        # so we need to switch over to lxml's etree.
         converted = etree.fromstring(ET.tostring(expanded))
         if converted.xpath(xpath):
             out.append(result)
 
     return out
+
+
+def filter_exclusions(results, exclusion_xpaths):
+    for result in results:
+        sentence = etree.fromstring(result['xml_sentences'])
+        if any(sentence.xpath(xpath) for xpath in exclusion_xpaths):
+            continue
+        else:
+            yield result
 
 
 @api_view(['POST'])
@@ -206,6 +220,8 @@ def search_view(request):
         results = filter_subset_results(results,
                                         subset_xpath,
                                         should_expand_index)
+
+    results = filter_exclusions(results, behaviour.get('exclusions', []))
 
     if request.accepted_renderer.format == 'api':
         # If using the API view, only show part of the results, because

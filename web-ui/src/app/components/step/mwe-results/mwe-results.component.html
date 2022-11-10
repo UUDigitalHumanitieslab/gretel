@@ -17,7 +17,10 @@
         </div>
         <div class="column">
             <div *ngFor="let query of querySet">
-                <label *ngIf="query.rank != currentQuery.rank"><input type="checkbox"/>Exclude results from query {{ query.rank }}: {{ query.description }}</label>
+                <label *ngIf="query.rank < currentQuery.rank">
+                    <input type="checkbox" [checked]="excludeQuery[query.rank]" (change)="toggleExclude(query, $event)" />
+                    Exclude results from query {{ query.rank }}: {{ query.description }}
+                </label>
             </div>
         </div>
     </div>
