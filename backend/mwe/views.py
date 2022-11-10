@@ -34,6 +34,7 @@ def generate_query(sentence, rank):
 
     # TODO: we could maybe replace the whole rank idea with an is_superset boolean
     mwe = Mwe(sentence)
+    alpino.initialize()
     tree = alpino.client.parse_line(mwe.can_form, 'mwe')
     mwe.set_tree(tree)
     generated = mwe.generate_queries()[rank - 1]
