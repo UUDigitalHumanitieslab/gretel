@@ -166,13 +166,7 @@ def search_view(request):
     # place in the normal 'xpath' variable because that's what BaseX knows
     # about.
 
-    # TODO:
-    # There's one caveat which is that the frontend currently also sends a
-    # supersetXpath when the superset query is the one chosen by the user. In
-    # that case it makes no sense to run the superset query on the results of
-    # itself (and it breaks becaues of the /alpino_ds prefix hack)
-    use_superset = behaviour.get('supersetXpath') is not None and \
-        behaviour['supersetXpath'] != xpath
+    use_superset = behaviour.get('supersetXpath') is not None
 
     should_expand_index = behaviour.get('expandIndex', False)
     if use_superset:

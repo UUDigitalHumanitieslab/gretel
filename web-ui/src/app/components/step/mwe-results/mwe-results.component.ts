@@ -32,8 +32,16 @@ export class MweResultsComponent extends ResultsComponent {
     @Input()
     public canonicalForm: string;
 
+    public _currentQuery: MweQuery;
     @Input()
-    public currentQuery: MweQuery;
+    set currentQuery(value: MweQuery) {
+        this._currentQuery = value;
+        this.emitBehaviour();
+    }
+
+    get currentQuery() {
+        return this._currentQuery;
+    }
 
     private _querySet: MweQuerySet;
     @Input()
@@ -75,7 +83,7 @@ export class MweResultsComponent extends ResultsComponent {
 
     private emitBehaviour() {
         this.behaviour$.next({
-            supersetXpath: this.supersetQuery?.xpath,
+            supersetXpath: this.currentQuery.rank != this.supersetQuery.rank ? this.supersetQuery?.xpath : null,
             expandIndex: true,
             exclusions: this.querySet.filter(query => this.excludeQuery[query.rank]).map(query => query.xpath),
         });

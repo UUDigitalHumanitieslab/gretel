@@ -35,8 +35,6 @@ def generate_query(sentence, rank):
     tree = alpino.client.parse_line(mwe.can_form, 'mwe')
     mwe.set_tree(tree)
     generated = mwe.generate_queries()[rank - 1]
-    if not generated.xpath.startswith('//'):
-        generated.xpath = '/alpino_ds' + generated.xpath
     return MweQuerySerializer(generated).data
 
 
