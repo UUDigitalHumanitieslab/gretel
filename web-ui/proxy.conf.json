@@ -1,9 +1,9 @@
 {
   "/gretel": "http://localhost/",
   "/gretel-upload": "http://localhost/",
-  "/treebanks": "http://localhost:8000/",
-  "/search": "http://localhost:8000/",
-  "/parse": "http://localhost:8000/",
-  "/mwe": "http://localhost:8000/",
+  "/treebanks/": "http://localhost:8000/",
+  "/search/": "http://localhost:8000/",
+  "/parse/": "http://localhost:8000/",
+  "/mwe/": "http://localhost:8000/",
   "secure": false
 }
