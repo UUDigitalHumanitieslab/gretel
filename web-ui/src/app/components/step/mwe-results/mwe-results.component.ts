@@ -36,6 +36,9 @@ export class MweResultsComponent extends ResultsComponent {
     @Input()
     set currentQuery(value: MweQuery) {
         this._currentQuery = value;
+        // when the query is changed we have to clear the exclusion queries,
+        // because they probably don't make sense anymore
+        this.excludeQuery = {};
         this.emitBehaviour();
     }
 
