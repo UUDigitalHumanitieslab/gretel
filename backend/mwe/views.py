@@ -3,12 +3,11 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework.viewsets import ModelViewSet
 
-from alpino_query.parser import parse_sentence
 from mwe_query import Mwe
 
 from .models import CanonicalForm, XPathQuery
 from .serializers import CanonicalFormSerializer, XPathQuerySerializer, MweQuerySerializer
-
+from services.alpino import alpino
 
 class CanonicalFormList(ListAPIView):
     queryset = CanonicalForm.objects.all()
@@ -33,7 +32,7 @@ def generate_query(sentence, rank):
 
     # TODO: we could maybe replace the whole rank idea with an is_superset boolean
     mwe = Mwe(sentence)
-    tree = parse_sentence(mwe.can_form)
+    tree = alpino.client.parse_line(mwe.can_form, 'mwe')
     mwe.set_tree(tree)
     generated = mwe.generate_queries()[rank - 1]
     if not generated.xpath.startswith('//'):
