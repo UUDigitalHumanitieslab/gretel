@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
@@ -52,10 +54,13 @@ class GenerateMweQueries(APIView):
             for query in canonical.xpathquery_set.all():
                 queries[query.rank] = XPathQuerySerializer(query).data
 
-        # complement saved queries with newly generated ones, based on rank
-        for rank in range(1, 4):
-            if rank not in queries:
-                queries[rank] = generate_query(text, rank)
+        try:
+            # complement saved queries with newly generated ones, based on rank
+            for rank in range(1, 4):
+                if rank not in queries:
+                    queries[rank] = generate_query(text, rank)
+        except Exception as e:
+            return Response('Could not generate MWE queries', status=500)
 
         return Response(queries.values())
 
