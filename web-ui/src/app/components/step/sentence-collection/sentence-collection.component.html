@@ -14,20 +14,28 @@
     </div>
 </form>
 
-<div class="block">
-    Showing {{ visible() }} out of {{ count() }} matching known expressions:
+<div *ngIf="count() == 0" class="block">
+    <p class="mt-3">The query "{{ filterString }}" does not match a known multiword expression.</p>
+    <p class="mt-3">To search for <strong>{{ filterString }}</strong> as an expression,
+        <a (click)="onSelect.emit({text: filterString})">click here</a>.
+    </p>
 </div>
 
 
-<table class="table is-fullwidth">
-    <tr *ngFor="let sent of sentences"
-        class="result"
-        (click)="onSelect.emit(sent)">
-        <td>{{sent.text}}</td>
-    </tr>
-    <tr *ngIf="filterString.length > 3" class="result">
-        <td (click)="onSelect.emit({text: filterString})">Search for "{{ filterString }}"</td>
-    </tr>
-</table>
+<div *ngIf="count() > 0">
+    <div class="block mt-3">
+        Showing {{ visible() }} out of {{ count() }} matching known expressions:
+    </div>
+    <table class="table is-fullwidth">
+        <tr *ngFor="let sent of sentences"
+            class="result"
+            (click)="onSelect.emit(sent)">
+            <td>{{sent.text}}</td>
+        </tr>
+        <tr *ngIf="filterString.length > 3" class="result">
+            <td (click)="onSelect.emit({text: filterString})">Click here to search for "{{ filterString }}"</td>
+        </tr>
+    </table>
 
-<a (click)="showMore()">Show more...</a>
+    <a (click)="showMore()">Show more...</a>
+</div>
