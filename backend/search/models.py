@@ -6,11 +6,11 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from timeit import default_timer as timer
-import math
 import logging
 import pathlib
 import re
 from datetime import timedelta
+from typing import List
 
 from treebanks.models import Component
 from services.basex import basex
@@ -289,34 +289,35 @@ class SearchQuery(models.Model):
         a list of dictionaries and the percentage of search completion.
         This method saves the object to update last accessed time."""
         completed_part = 0
-        to_skip = from_number
-        if to_number is not None:
-            results_to_go = to_number - from_number
-        else:
-            results_to_go = math.inf
-        stop_adding = False
-        if to_number is not None and to_number <= from_number:
-            # Maximum number of results was already reached, so don't retrieve
-            # any results - but we still need to calculate the count and the
-            # search percentage.
-            stop_adding = True
-        all_matches = []
+        all_matches: List[dict] = []
         counts = []
+
+        # In the following code we loop over `self.results` twice:
+        # 1. First we collect matches, and for that we would like to stop once
+        # the desired amount of matches is reached.
+
+        if to_number is None or to_number > from_number:
+            for result_obj in self.results.all().order_by('component'):
+                if not result_obj.search_completed:
+                    # If result is empty or partially complete, stop adding.
+                    # There might still be results in later ComponentSearchResult-s,
+                    # but if we give them back already they will be returned in
+                    # the incorrect order and we would have to keep track of what
+                    # has already been returned and what not. We continue our loop
+                    # though, because we still want to know the count so far and
+                    # the search percentage.
+                    break
+
+                # Add matches to list
+                matches = result_obj.get_results()
+                all_matches.extend(matches)
+                if to_number is not None and len(all_matches) > to_number:
+                    break
+
+        # 2. Here we collect statistics, and for that we would
+        # like to loop over the complete results set.
+
         for result_obj in self.results.all().order_by('component'):
-            completed = True if result_obj.search_completed else False
-            # Add matches to list, as long as no empty or partial search result
-            # has been encountered.
-            if not (stop_adding or result_obj.number_of_results is None):
-                if to_skip >= result_obj.number_of_results:
-                    # Skip completely
-                    to_skip -= result_obj.number_of_results
-                else:
-                    matches = result_obj.get_results()
-                    all_matches.extend(matches[to_skip:])
-                    results_to_go -= len(matches) - to_skip
-                    to_skip = 0
-                    if results_to_go <= 0:
-                        stop_adding = True
             # Count completed part (for all results)
             if result_obj.completed_part is not None:
                 completed_part += result_obj.completed_part
@@ -325,31 +326,28 @@ class SearchQuery(models.Model):
                 counts.append({
                     'component': result_obj.component.slug,
                     'number_of_results': result_obj.number_of_results,
-                    'completed': completed,
+                    'completed': result_obj.search_completed is not None,
                     'percentage': percentage,
                 })
-            # If result is empty or partially complete, stop adding.
-            # There might still be results in later ComponentSearchResult-s,
-            # but if we give them back already they will be returned in
-            # the incorrect order and we would have to keep track of what
-            # has already been returned and what not. We continue our loop
-            # though, because we still want to know the count so far and
-            # the search percentage.
-            if not completed:
-                stop_adding = True
+
         if self.total_database_size != 0:
             search_percentage = int(
                 100 * completed_part / self.total_database_size
             )
         else:
             search_percentage = 100
+
+        continue_from = len(all_matches)
+        # Skip results that were already returned
+        all_matches = all_matches[from_number:]
+
         # Check if too many results have been added
-        if results_to_go < 0:
-            to_remove = -results_to_go
-            all_matches = all_matches[0:-to_remove]
+        if to_number is not None:
+            all_matches = all_matches[0:to_number]
+
         self.last_accessed = timezone.now()
         self.save()
-        return (all_matches, search_percentage, counts)
+        return (all_matches, search_percentage, counts, continue_from)
 
     def perform_search(self) -> None:
         """Perform search and regularly update on progress"""

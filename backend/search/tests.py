@@ -245,7 +245,7 @@ class SearchQueryTestCase(TestCase):
             sq = SearchQuery(xpath=XPATH1)
             sq.save()
             sq.initialize()
-            results, percentage, _ = sq.get_results()
+            results, percentage, _, _ = sq.get_results()
             self.assertEqual(len(results), 0)
 
             # New SQ without any results
@@ -256,7 +256,7 @@ class SearchQueryTestCase(TestCase):
             components = test_treebank.components.all()
             sq2.components.add(*components)
             sq2.initialize()
-            results, percentage, _ = sq2.get_results()
+            results, percentage, _, _ = sq2.get_results()
             self.assertEqual(len(results), 0)
             self.assertEqual(percentage, 0)
 
@@ -265,15 +265,15 @@ class SearchQueryTestCase(TestCase):
             for csr in sq2.results.all():
                 csr.perform_search()
                 nr_results += csr.number_of_results
-            results, percentage, counts = sq2.get_results()
+            results, percentage, counts, _ = sq2.get_results()
             self.assertEqual(len(results), nr_results)
             self.assertEqual(percentage, 100)
 
             # Check if from_number and to_number work
             # (there should be seven results)
-            results2, _, _ = sq2.get_results(from_number=1)
+            results2, _, _, _ = sq2.get_results(from_number=1)
             self.assertEqual(results[1:], results2)
-            results3, _, _ = sq2.get_results(to_number=4)
+            results3, _, _, _ = sq2.get_results(to_number=4)
             self.assertEqual(results[:4], results3)
 
     def test_perform_search(self):
