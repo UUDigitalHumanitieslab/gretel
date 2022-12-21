@@ -1,3 +1,5 @@
+from collections import Counter
+
 from rest_framework.response import Response
 from rest_framework.decorators import (
     api_view, parser_classes, renderer_classes, authentication_classes
@@ -122,7 +124,8 @@ def filter_subset_results(results, xpath, should_expand_index):
         if converted.xpath(xpath):
             out.append(result)
 
-    return out
+    counts = Counter([result['component'] for result in out])
+    return out, counts
 
 
 def filter_exclusions(results, exclusion_xpaths):
@@ -211,9 +214,14 @@ def search_view(request):
         query.get_results(start_from, maximum_results)
 
     if use_superset:
-        results = filter_subset_results(results,
-                                        subset_xpath,
-                                        should_expand_index)
+        results, subset_counter = filter_subset_results(results,
+                                                        subset_xpath,
+                                                        should_expand_index)
+        # The variable `counts' holds at this moment information relevant for
+        # the superset query. We have to modify the hit counts to what the subset
+        # filter came up with:
+        for entry in counts:
+            entry['number_of_results'] = subset_counter[entry['component']]
 
     results = filter_exclusions(results, behaviour.get('exclusions', []))
 
