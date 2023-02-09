@@ -9,7 +9,7 @@
 .explanation {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 200;
 }
 
 :host ::ng-deep {
@@ -35,13 +35,13 @@
             transition: background-color ease 1s;
         }
 
-        .p-draggable {
+        .ui-draggable {
             background: $primary;
             color: white !important;
+            cursor: move;
         }
 
-        .p-draggable:hover {
-            cursor: move;
+        .ui-draggable:hover {
             opacity: 0.8;
         }
     }

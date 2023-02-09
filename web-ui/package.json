@@ -43,7 +43,7 @@
     "jquery": "^3.6.1",
     "jquery-ui": "^1.13.2",
     "jszip": "^3.10.1",
-    "lassy-xpath": "^0.12.0",
+    "lassy-xpath": "^0.12.1",
     "lodash": "^4.17.15",
     "ngx-clipboard": "^12.3.0",
     "pivottable": "^2.23.0",

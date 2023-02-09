@@ -8,7 +8,7 @@ $pageloader-opacity: 0.6;
 @import "~balloon-css/src/balloon";
 
 [aria-label][data-balloon-pos]:after {
-    z-index: 1000;
+    z-index: 500;
     white-space: nowrap !important;
 }
 
@@ -99,7 +99,7 @@ $pageloader-opacity: 0.6;
 
     .tag.is-#{$name} .highlight {
         @if (length($pair) > 3) {
-            $color-light: nth($pair, 3); 
+            $color-light: nth($pair, 3);
             $color-dark: nth($pair, 4);
 
             background-color: $color-dark;
