@@ -9,7 +9,8 @@ $pageloader-opacity: 0.6;
 
 [aria-label][data-balloon-pos]:after {
     z-index: 500;
-    white-space: nowrap !important;
+    // make sure balloons can be shown in multiple lines
+    white-space: normal !important;
 }
 
 @import "material";

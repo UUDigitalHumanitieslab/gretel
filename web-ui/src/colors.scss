@@ -4,7 +4,9 @@ $secondary: #7E6748;
 $secondary-invert: white;
 
 $success: lighten($primary, 20%);
-$custom-colors: ("secondary": ($secondary, $secondary-invert));
+$custom-colors: (
+    "secondary": ($secondary, $secondary-invert)
+);
 
 @import "~bulma/sass/utilities/initial-variables";
 @import "~bulma/sass/utilities/functions";
@@ -18,3 +20,19 @@ $xpath-string: $code;
 
 $highlight: $warning;
 $highlight-text: $warning-invert;
+
+@mixin closeButton {
+    border: 0 none;
+    background: $danger;
+    color: white;
+    transition: transform 200ms;
+
+    &:hover {
+        background: darken($danger, 4%);
+        transform: scale(1.23);
+    }
+
+    &:active {
+        background: darken($danger, 8%);
+    }
+}

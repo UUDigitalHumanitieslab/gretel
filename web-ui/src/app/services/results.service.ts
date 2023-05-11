@@ -469,7 +469,7 @@ export class ResultsService {
      * Format variables for sending to the server
      */
     private formatVariables(variables: SearchVariable[]) {
-        return variables.map(variable => ({
+        return variables?.map(variable => ({
             name: variable.name,
             path: variable.path,
             props: this.formatVariableProps(variable.props)
