@@ -357,28 +357,20 @@
             }
 
             button {
+                @include closeButton;
                 position: absolute;
                 top: 0;
                 right: 0;
                 width: 30px;
                 height: 30px;
-                border: 0 none;
                 border-radius: 50%;
-                background: $danger;
-                color: white;
                 text-align: center;
                 font-size: 14px;
                 line-height: 1;
-                transition: transform 200ms;
                 transform: translate(50%, -50%);
 
                 &:hover {
-                    background: darken($danger, 4%);
                     transform: translate(50%, -50%) scale(1.23);
-                }
-
-                &:active {
-                    background: darken($danger, 8%);
                 }
             }
         }
