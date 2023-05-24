@@ -3,7 +3,8 @@
 
 # GrETEL 4
 
-This is currently under active development. The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
+This is the current version of GrETEL which is being maintained, but active development currently takes place at https://github.com/UUDigitalHumanitieslab/gretel-django as GrETEL 5. That has a completely rebuild back-end and which will eventually be merged into this repository.
+The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
 
 ## Info
 
