@@ -1,0 +1,30 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: GrETEL
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: 'Research Software Lab, Centre for Digital Humanities, Utrecht University'
+    website: 'https://cdh.uu.nl/centre-for-digital-humanities/research-software-lab/'
+    city: Utrecht
+    country: NL
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.7152769
+repository-code: 'https://github.com/UUDigitalHumanitieslab/gretel'
+url: 'https://gretel.hum.uu.nl'
+abstract: >-
+keywords:
+  - corpus research
+  - natural language processing
+  - dutch
+  - syntax
+  - treebanks
+
+license: Attribution-NonCommercial-ShareAlike 4.0 International
+version: 4.2.4.1
+date-released: '2022-10-06'
