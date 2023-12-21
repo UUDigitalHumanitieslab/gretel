@@ -1,9 +1,13 @@
-[![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel/actions)
-[![DOI](https://zenodo.org/badge/95562504.svg)](https://zenodo.org/badge/latestdoi/95562504)
-
 # GrETEL 4
+[![DOI](https://zenodo.org/badge/95562504.svg)](https://zenodo.org/badge/latestdoi/95562504)
+[![Actions Status](https://github.com/UUDigitalHumanitiesLab/gretel/workflows/Tests/badge.svg)](https://github.com/UUDigitalHumanitiesLab/gretel/actions)
+
+GrETEL stands for Greedy Extraction of Trees for Empirical Linguistics. It is a user-friendly search engine for the exploitation of syntactically annotated corpora or treebanks
 
 This is the current version of GrETEL which is being maintained, but active development currently takes place at https://github.com/UUDigitalHumanitieslab/gretel-django as GrETEL 5. That has a completely rebuild back-end and which will eventually be merged into this repository.
+
+GrETEL is publicly available at [https://gretel.hum.uu.nl](https://gretel.hum.uu.nl) (version 4) or [https://gretel5.hum.uu.nl](https://gretel.hum.uu.nl) (version 5)
+
 The stable predecessor can be found at http://gretel.ccl.kuleuven.be/gretel3 (and the source at https://github.com/CCL-KULeuven/gretel/).
 
 ## Info
