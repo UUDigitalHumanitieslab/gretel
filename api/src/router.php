@@ -47,7 +47,7 @@ $router->map('GET', '/parse_sentence/[*:sentence]', function ($sentence) {
         $xml = alpino(str_replace(
             '_SLASH_',
             '/',
-            urldecode($sentence)), 'ng'.time());
+            urldecode($sentence)), 'ng'.(microtime(true)*10000));
         header('Content-Type: application/xml');
         echo $xml;
     } catch (Exception $e) {
