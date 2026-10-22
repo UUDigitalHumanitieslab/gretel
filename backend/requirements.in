@@ -1,3 +1,4 @@
+cdh-django-core[federated-auth] @ git+https://github.com/CentreForDigitalHumanities/django-shared-core.git
 Django>=4.0.1,<5
 djangorestframework>=3.13.0
 django-livereload-server
@@ -13,3 +14,6 @@ mwe-query>=0.2.0a2
 urllib3<=2.0.0
 psycopg2
 elementpath
+dj_rest_auth
+django-allauth<65.3
+requests-oauthlib

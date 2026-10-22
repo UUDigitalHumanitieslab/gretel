@@ -6,7 +6,7 @@ export type Notification = {
     id: number,
     message: string,
     progress?: number,
-    type: 'error' | 'warning' | 'success'
+    type: 'error' | 'warning' | 'success' | 'info'
 } | {
     id: number,
     type: 'cancel'

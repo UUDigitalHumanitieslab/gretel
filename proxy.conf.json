@@ -30,5 +30,9 @@
     "/treebanks/": {
         "target": "http://localhost:8000/",
         "secure": false
+    },
+    "/saml": {
+        "target": "http://localhost:8000",
+        "secure": false
     }
 }

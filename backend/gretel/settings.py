@@ -37,12 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django_extensions',
     'livereload',
     'django.contrib.staticfiles',
     'services',
     'treebanks',
     'search',
     'upload',
+    'users',
     'parse',
     'mwe',
     'rest_framework',
@@ -174,3 +176,14 @@ CACHING_DIR = BASE_DIR / 'query_result_cache'
 MAXIMUM_CACHE_SIZE = 256  # Maximum cache size in MiB
 STATICFILES_DIRS: List[str] = []
 PROXY_FRONTEND = None
+
+try:
+    from gretel.saml_settings import *  # noqa: S2208 import SAML settings
+
+    # Only add the required apps/middleware if we could load the SAML config
+    INSTALLED_APPS += SAML_APPS
+    MIDDLEWARE += SAML_MIDDLEWARE
+
+except ImportError as err:
+    print(err)
+    print("Proceeding without SAML")

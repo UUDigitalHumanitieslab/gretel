@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ConfigurationService } from './configuration.service';
 import { NotificationService } from './notification.service';
+import { environment } from '../../environments/environment';
 
 type UserResponseSuccess = {
     id: string;
@@ -39,7 +40,7 @@ export type User = {
 })
 export class UserService {
     private _user$: BehaviorSubject<User>;
-    private _canLogIn$ = new BehaviorSubject<boolean>(false);
+    private _canLogIn$ = new BehaviorSubject<boolean>(environment.showSamlLogin);
 
     constructor(
         private http: HttpClient,
@@ -64,7 +65,7 @@ export class UserService {
      * Retrieve the current user or set it to undefined
      */
     private async retrieveCurrent(): Promise<boolean> {
-        const currentUrl = await this.configurationService.getUploadApiUrl('user');
+        const currentUrl = await this.configurationService.getDjangoUrl('api/users/current/');
 
         let response: UserResponse = await firstValueFrom(this.http.get(currentUrl, { withCredentials: true }))
             .catch((error: HttpErrorResponse) => null);
@@ -82,46 +83,17 @@ export class UserService {
     }
 
     /**
-     * Logs the user in, returns true if successful
+     * Redirects the user to login with SAML
      */
-    async login(username: string, password: string): Promise<boolean> {
-        const loginUrl = await this.configurationService.getUploadApiUrl('user/login');
-
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-
-        const response = <UserResponse>await firstValueFrom(this.http.post(
-            loginUrl,
-            formData,
-            { withCredentials: true }));
-
-        var success = this.setUser(response);
-        if (success) {
-            if (!this.retrieveCurrent()) {
-                this.notificationService.add('Your credentials are correct, but login failed anyway. Might be a cross-domain issue with session cookies.', 'error');
-            }
-        }
-
-        return success;
+    login(): void {
+        window.location.href = '/saml/login/';
     }
 
     /**
      * Logs the user out, returns true if successful
      */
-    async logout(): Promise<boolean> {
-        const logoutUrl = await this.configurationService.getUploadApiUrl('user/logout');
-
-        try {
-            await firstValueFrom(this.http.post(logoutUrl, null, { withCredentials: true }));
-            this.setUser(undefined);
-            return true;
-        }
-        catch (error) {
-            console.error(error);
-        }
-
-        return false;
+    logout(): void {
+        window.location.href = '/saml/logout/';
     }
 
     private setUser(response: UserResponse): boolean {

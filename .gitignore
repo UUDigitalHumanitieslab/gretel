@@ -30,3 +30,4 @@ vendor
 !lassy-xpath/.gitignore
 
 __pycache__/
+static

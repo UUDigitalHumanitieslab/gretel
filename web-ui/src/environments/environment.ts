@@ -10,5 +10,6 @@ export const environment = {
     production: false,
     buildTime,
     version,
-    sourceUrl
+    sourceUrl,
+    showSamlLogin: true
 };

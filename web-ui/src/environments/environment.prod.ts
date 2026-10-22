@@ -5,5 +5,6 @@ export const environment = {
     production: true,
     buildTime,
     version,
-    sourceUrl
+    sourceUrl,
+    showSamlLogin: true
 };

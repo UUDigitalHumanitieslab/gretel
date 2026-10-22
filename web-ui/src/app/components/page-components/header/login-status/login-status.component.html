@@ -23,34 +23,56 @@
             Logout
         </a>
 
-        <form [formGroup]="loginForm" (ngSubmit)="login()" *ngIf="!user">
+        <ng-container *ngIf="showSamlLogin && !user">
             <div class="navbar-item">
                 <div class="field">
-                    <label class="label">Username</label>
-                    <div class="control">
-                        <input class="input" type="text" placeholder="Username" required formControlName="username">
-                    </div>
+                    <p class="control">
+                        Login with:
+                    </p>
                 </div>
             </div>
             <div class="navbar-item">
-                <div class="field">
-                    <label class="label">Password</label>
-                    <div class="control">
-                        <input class="input" type="password" placeholder="Password" required formControlName="password">
+                <a class="button" href="/saml/login/" (click)="login()">
+                    <span class="icon">
+                        <img src="assets/uu-icon.svg" width="40" height="40" alt="">
+                    </span>
+                    <span>
+                        <strong>Solis ID</strong>
+                    </span>
+                </a>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!showSamlLogin">
+            <form [formGroup]="loginForm" (ngSubmit)="login()" *ngIf="!user">
+                <div class="navbar-item">
+                    <div class="field">
+                        <label class="label">Username</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Username" required formControlName="username">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="navbar-item">
-                <div class="field">
-                    <div class="control">
-                        <button class="button" type="submit"
-                            [ngClass]="{'is-loading': loading, 'is-primary': !loading, 'is-danger':error}">
-                            Login
-                        </button>
+                <div class="navbar-item">
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control">
+                            <input class="input" type="password" placeholder="Password" required
+                                formControlName="password">
+                        </div>
                     </div>
-                    <p class="help is-danger" *ngIf="error">Check your input</p>
                 </div>
-            </div>
-        </form>
+                <div class="navbar-item">
+                    <div class="field">
+                        <div class="control">
+                            <button class="button" type="submit"
+                                [ngClass]="{'is-loading': loading, 'is-primary': !loading, 'is-danger':error}">
+                                Login
+                            </button>
+                        </div>
+                        <p class="help is-danger" *ngIf="error">Check your input</p>
+                    </div>
+                </div>
+            </form>
+        </ng-container>
     </div>
 </div>

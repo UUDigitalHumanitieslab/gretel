@@ -3,13 +3,17 @@ import { Subscription } from 'rxjs';
 import { Notification, NotificationService } from '../../../services/notification.service';
 import { animations } from '../../../animations';
 
-type messageTypes = {
-    [type in Exclude<'cancel', Notification['type']>]: HeaderComponent['messageType'];
+type NotificationType = Exclude<Notification['type'], 'cancel'>;
+type MessageType = 'is-danger' | 'is-success' | 'is-warning' | 'is-info';
+type MessageTypes = {
+    [type in NotificationType]: MessageType;
 };
-const mapping: messageTypes = {
+
+const mapping: MessageTypes = {
     'error': 'is-danger',
     'success': 'is-success',
-    'warning': 'is-warning'
+    'warning': 'is-warning',
+    'info': 'is-info'
 };
 
 @Component({
@@ -20,10 +24,10 @@ const mapping: messageTypes = {
 })
 export class HeaderComponent implements OnDestroy, OnInit {
     private subscriptions: Subscription[] = [];
-    private messageId: number;
-    message: string;
+    private messageId?: number;
+    message?: string;
     progress?: number;
-    messageType: 'is-warning' | 'is-danger' | 'is-success';
+    messageType?: MessageType;
     menuExpanded = false;
     show = false;
 

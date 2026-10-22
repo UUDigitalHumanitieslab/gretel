@@ -4,6 +4,7 @@ import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { NotificationService } from '../../../../services/notification.service';
 import { User, UserService } from '../../../../services/user.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'grt-login-status',
@@ -20,10 +21,10 @@ export class LoginStatusComponent implements OnInit, OnDestroy {
      * show the drop down menu
      */
     active = false;
-    allowLogin = false;
+    allowLogin = environment.showSamlLogin;
     error = false;
     loading = false;
-
+    showSamlLogin = environment.showSamlLogin;
     user: User;
 
     loginForm = this.formBuilder.group({
@@ -39,7 +40,7 @@ export class LoginStatusComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.subscriptions.push(
             this.userService.user$.subscribe(user => this.user = user),
-            this.userService.canLogin$.subscribe(canLogin => this.allowLogin = canLogin));
+            this.userService.canLogin$.subscribe(canLogin => this.allowLogin));
     }
 
     ngOnDestroy(): void {
@@ -68,33 +69,17 @@ export class LoginStatusComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (this.loginForm.valid) {
-            this.loading = true;
-            this.error = false;
-
-            if (await this.userService.login(this.loginForm.value.username, this.loginForm.value.password)) {
-                this.loginForm.reset();
-                this.notificationService.add('Logged in', 'success');
-                this.active = false;
-            } else {
-                this.error = true;
-            }
-            this.loading = false;
-        } else {
-            this.error = true;
-        }
+        this.loading = true;
+        this.active = false;
+        this.notificationService.add('Logging in...', 'info');
+        this.userService.login();
     }
 
     async logout() {
         this.loading = true;
-        if (await this.userService.logout()) {
-            this.notificationService.add('Logged out', 'success');
-        } else {
-            this.notificationService.add('Something went wrong logging off, try again.', 'error');
-        }
-
         this.active = false;
-        this.loading = false;
+        this.notificationService.add('Logging off...', 'info');
+        this.userService.logout();
     }
 
 }
