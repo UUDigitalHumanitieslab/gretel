@@ -9,21 +9,3 @@
 
 <grt-footer></grt-footer>
 
-<p-confirmDialog #cd header="Confirmation">
-    <p-footer>
-        <div class="buttons is-right has-addons">
-            <button class="button is-primary" (click)="cd.accept()">
-                <span class="icon">
-                    <fa-icon [icon]="faCheck" aria-hidden="true"></fa-icon>
-                </span>
-                <span>Yes</span>
-            </button>
-            <button class="button" (click)="cd.reject()">
-                <span class="icon">
-                    <fa-icon [icon]="faTimes" aria-hidden="true"></fa-icon>
-                </span>
-                <span>No</span>
-            </button>
-        </div>
-    </p-footer>
-</p-confirmDialog>

@@ -1,26 +1,33 @@
-<a class="button" role="button" (click)="toggle($event)" tooltipPosition="bottom"
-    pTooltip="Download the results as a .csv-file">
-    <span class="icon is-large">
-        <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
-    </span>
-</a>
-<p-overlayPanel appendTo="body" [dismissable]="false" [showCloseIcon]="true">
-    <form (submit)="downloadResults.next(includeNodeProperties)">
-        <div class="field">
-            <label class="checkbox">
-                <input type="checkbox" name="includeNodeProperties" [(ngModel)]="includeNodeProperties">
-                Include Node Properties
-                <span class="icon" tooltipPosition="bottom"
-                    pTooltip="For every node specified in the query, columns will be added for that node's linguistic properties e.g. the POS-value, dependency relation, phrasal category, etc.">
-                    <fa-icon [icon]="faInfoCircle" aria-hidden="true"></fa-icon>
-                </span>
-            </label>
+<div class="dropdown" [ngClass]="{'is-active': visible}">
+    <div class="dropdown-trigger">
+        <a class="button" role="button" (click)="toggle()" tooltipPosition="bottom"
+            pTooltip="Download the results as a .csv-file">
+            <span class="icon is-large">
+                <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
+            </span>
+        </a>
+    </div>
+    <div class="dropdown-menu">
+        <div class="dropdown-content">
+            <form (submit)="downloadResults.next(includeNodeProperties)" class="dropdown-item">
+                <div class="field">
+                    <label class="checkbox">
+                        <input type="checkbox" name="includeNodeProperties" [(ngModel)]="includeNodeProperties">
+                        Include Node Properties
+                        <span class="icon" tooltipPosition="bottom"
+                            pTooltip="For every node specified in the query, columns will be added for that node's linguistic properties e.g. the POS-value, dependency relation, phrasal category, etc.">
+                            <fa-icon [icon]="faInfoCircle" aria-hidden="true"></fa-icon>
+                        </span>
+                    </label>
+                </div>
+                <div class="field" *ngIf="includeNodeProperties">
+                    <grt-node-properties-button></grt-node-properties-button>
+                </div>
+                <div class="field">
+                    <button class="button is-primary" type="submit"
+                        [ngClass]="{'is-loading': loading}">Download</button>
+                </div>
+            </form>
         </div>
-        <div class="field" *ngIf="includeNodeProperties">
-            <grt-node-properties-button></grt-node-properties-button>
-        </div>
-        <div class="field">
-            <button class="button is-primary" type="submit" [ngClass]="{'is-loading': loading}">Download</button>
-        </div>
-    </form>
-</p-overlayPanel>
+    </div>
+</div>

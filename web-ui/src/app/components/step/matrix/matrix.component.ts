@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ConfirmationService } from 'primeng/api';
 import { faCircleInfo, faEdit, faExpand, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import { ValueEvent } from 'lassy-xpath';
@@ -87,7 +86,6 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
     private originalXPath: string;
 
     constructor(stateService: StateService<GlobalStateExampleBased>,
-        private confirmationService: ConfirmationService,
         notificationService: NotificationService) {
         super(stateService, notificationService);
         this.subscriptions = [
@@ -191,10 +189,9 @@ export class MatrixComponent extends StepDirective<GlobalStateExampleBased> impl
         if (this.xpath === this.originalXPath) {
             reset();
         } else {
-            this.confirmationService.confirm({
-                message: 'Are you sure you want to reset your custom XPath query?',
-                accept: reset
-            });
+            if (confirm('Are you sure you want to reset your custom XPath query?')) {
+                reset();
+            }
         }
     }
 
