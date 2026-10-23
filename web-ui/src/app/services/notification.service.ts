@@ -31,6 +31,16 @@ export class NotificationService {
         return id;
     }
 
+    constructor() {
+        setTimeout(() => {
+            this.uploadDisabled();
+        }, 2000);
+    }
+
+    uploadDisabled() {
+        this.add('Corpus Upload is currently disabled because of the PHP2Shell vulnerability; we are working on a fix', 'warning');
+    }
+
     add(message: string, type: Notification['type'] = 'warning', progress?: number) {
         const id = NotificationService.counter++;
         NotificationService.notifications$.next({

@@ -70,7 +70,7 @@ export class SelectTreebanksComponent extends StepDirective<GlobalStateExampleBa
         stateService: StateService<GlobalStateExampleBased>,
         notificationService: NotificationService) {
         super(stateService, notificationService);
-
+        this.notificationService.uploadDisabled();
         this.subscriptions = [
             treebankService.treebanks.pipe(
                 map(lookup => Object.values(lookup.data).flatMap(provider => Object.values(provider))))
